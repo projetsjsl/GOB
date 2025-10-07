@@ -250,11 +250,11 @@ const GOB = () => {
       const symbols = ['SPX', 'IXIC', 'DJI', 'TSX', 'EURUSD', 'GOLD', 'OIL', 'BTCUSD'];
       const newMarketData: any = {};
       
-      console.log('🔄 Récupération des données de marché...');
+      console.log('🔄 Récupération des données de marché via nouvelle API...');
       
       for (const symbol of symbols) {
         try {
-          const response = await fetch(`/api/finnhub?endpoint=quote&symbol=${symbol}`);
+          const response = await fetch(`/api/market-data?symbol=${symbol}`);
           const data = await response.json();
           
           console.log(`📊 Données pour ${symbol}:`, data);
@@ -267,10 +267,10 @@ const GOB = () => {
               changePercent: data.dp
             };
             
-            if (data.source === 'finnhub') {
-              console.log(`✅ Données réelles Finnhub pour ${symbol}`);
+            if (data.source === 'alpha_vantage') {
+              console.log(`✅ Données réelles Alpha Vantage pour ${symbol}`);
             } else {
-              console.log(`📋 Données de démonstration pour ${symbol}`);
+              console.log(`📋 Données réalistes pour ${symbol} (${data.source})`);
             }
           }
         } catch (error) {
