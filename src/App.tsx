@@ -552,12 +552,12 @@ const GOB = () => {
       
       <header className="relative z-10">
         {/* Bandeau défilant des indices boursiers */}
-        <div className={`backdrop-blur-xl px-6 py-3 border-b overflow-hidden ${
+        <div className={`backdrop-blur-xl px-3 sm:px-6 py-2 sm:py-3 border-b overflow-hidden ${
           isDarkMode 
             ? 'bg-gradient-to-r from-gray-900/95 via-black/95 to-gray-800/95 text-white border-green-500/20' 
             : 'bg-gradient-to-r from-blue-600/95 via-blue-700/95 to-blue-800/95 text-white border-blue-500/20'
         }`}>
-          <div className="flex items-center space-x-8 text-sm font-medium animate-scroll">
+          <div className="flex items-center space-x-4 sm:space-x-8 text-xs sm:text-sm font-medium animate-scroll">
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">S&P 500</span>
               <span className="text-green-400 font-bold">+0.85%</span>
@@ -601,21 +601,23 @@ const GOB = () => {
           </div>
         </div>
         
-        <div className={`backdrop-blur-xl px-6 py-2 border-b ${
+        <div className={`backdrop-blur-xl px-3 sm:px-6 py-2 border-b ${
           isDarkMode 
             ? 'bg-gradient-to-r from-gray-900/95 via-black/95 to-gray-800/95 text-white border-green-500/20' 
             : 'bg-gradient-to-r from-blue-600/95 via-blue-700/95 to-blue-800/95 text-white border-blue-500/20'
         }`}>
-          <div className="flex items-center justify-between text-sm font-medium">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-between text-xs sm:text-sm font-medium">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <div className={`w-2 h-2 rounded-full ${isMarketOpen ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-                <span className={`font-semibold ${isMarketOpen ? 'text-green-400' : 'text-red-400'}`}>
+                <span className={`font-semibold text-xs sm:text-sm ${isMarketOpen ? 'text-green-400' : 'text-red-400'}`}>
                   {isMarketOpen ? 'MARCHÉ OUVERT' : 'MARCHÉ FERMÉ'}
                 </span>
               </div>
-              <div className={isDarkMode ? 'text-gray-300' : 'text-blue-200'}>|</div>
-              <span className={isDarkMode ? 'text-gray-300' : 'text-blue-200'}>Heure de Montréal: {currentTime || '00:00'}</span>
+              <div className={`hidden sm:block ${isDarkMode ? 'text-gray-300' : 'text-blue-200'}`}>|</div>
+              <span className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-blue-200'}`}>
+                {isDarkMode ? 'Montréal:' : 'Heure de Montréal:'} {currentTime || '00:00'}
+              </span>
             </div>
           </div>
         </div>

@@ -1,17 +1,19 @@
-// API NewsAPI.ai pour les actualités financières
+// API News multi-sources pour les actualités financières
 export default async function handler(req, res) {
     const { q, limit = 20, language = 'fr' } = req.query;
     
-    // Clé API NewsAPI.ai (à configurer dans les variables d'environnement Vercel)
+    // Clés API multiples (à configurer dans les variables d'environnement Vercel)
     const NEWSAPI_KEY = process.env.NEWSAPI_KEY || 'YOUR_NEWSAPI_KEY';
+    const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || 'YOUR_FINNHUB_API_KEY';
+    const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY || 'YOUR_ALPHA_VANTAGE_API_KEY';
     
     // Générer des actualités de démonstration basées sur les tickers demandés
     const generateDemoNews = (tickers) => {
         const newsTemplates = {
             'CVS': [
-        {
-            title: "CVS Health Reports Strong Q3 Earnings",
-            description: "CVS Health Corporation reported better-than-expected third quarter earnings, driven by strong performance in its pharmacy and health services segments.",
+                {
+                    title: "CVS Health Reports Strong Q3 Earnings",
+                    description: "CVS Health Corporation reported better-than-expected third quarter earnings, driven by strong performance in its pharmacy and health services segments.",
                     content: "CVS Health Corporation reported better-than-expected third quarter earnings, driven by strong performance in its pharmacy and health services segments. The company's revenue increased significantly compared to the previous quarter.",
                     sectorAnalysis: "Le secteur de la santé connaît une croissance soutenue avec l'expansion des services de pharmacie et de soins primaires. CVS bénéficie de cette tendance avec son modèle intégré."
                 },
@@ -23,9 +25,9 @@ export default async function handler(req, res) {
                 }
             ],
             'MSFT': [
-        {
-            title: "Microsoft Azure Growth Continues in Cloud Market",
-            description: "Microsoft's cloud computing division Azure continues to show strong growth, maintaining its competitive position against AWS and Google Cloud.",
+                {
+                    title: "Microsoft Azure Growth Continues in Cloud Market",
+                    description: "Microsoft's cloud computing division Azure continues to show strong growth, maintaining its competitive position against AWS and Google Cloud.",
                     content: "Microsoft's cloud computing division Azure continues to show strong growth, maintaining its competitive position against AWS and Google Cloud. The company reported significant revenue increases in its cloud segment.",
                     sectorAnalysis: "Le secteur du cloud computing connaît une croissance explosive avec une demande croissante pour les services d'infrastructure. Microsoft Azure maintient sa position de leader face à la concurrence."
                 },
@@ -144,10 +146,10 @@ export default async function handler(req, res) {
             demoNews.push({
                 title: "Marché Boursier : Signaux Mixtes",
                 description: "Le marché boursier affiche des signaux mixtes aujourd'hui avec les actions technologiques en tête des gains tandis que les actions de santé font face à une certaine pression.",
-            url: "https://example.com/market-update",
-            publishedAt: new Date(Date.now() - 7200000).toISOString(),
-            source: { name: "Market Watch" },
-            urlToImage: null,
+                url: "https://example.com/market-update",
+                publishedAt: new Date(Date.now() - 7200000).toISOString(),
+                source: { name: "Market Watch" },
+                urlToImage: null,
                 content: "Le marché boursier affiche des signaux mixtes aujourd'hui avec les actions technologiques en tête des gains tandis que les actions de santé font face à une certaine pression.",
                 sectorAnalysis: "Le marché financier connaît une volatilité accrue avec des secteurs performants (technologie) et d'autres en difficulté (santé). Cette divergence reflète les défis macroéconomiques actuels."
             });
@@ -156,165 +158,103 @@ export default async function handler(req, res) {
         return demoNews;
     };
 
-    if (!NEWSAPI_KEY || NEWSAPI_KEY === 'YOUR_NEWSAPI_KEY') {
-        // Générer des actualités de démonstration basées sur les tickers demandés
-        const demoNews = generateDemoNews(q);
-        
-        return res.status(200).json({
-            articles: demoNews,
-            totalResults: demoNews.length,
-            query: q || 'finance',
-            timestamp: new Date().toISOString(),
-            source: 'demo',
-            message: 'Données de démonstration - Configurez NEWSAPI_KEY pour des actualités réelles'
-        });
-    }
-
-    try {
-        // Construire la requête pour NewsAPI.ai selon la documentation
-        const query = q || 'finance stock market';
-        const url = `https://newsapi.ai/api/v1/article/getArticles`;
-        
-        // Utiliser les tickers de la requête ou les tickers par défaut
-        const requestedTickers = q ? q.split(' OR ').map(t => t.trim().toUpperCase()) : [];
-        const defaultTickers = ['CVS', 'MSFT', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META'];
-        const tickers = requestedTickers.length > 0 ? requestedTickers : defaultTickers;
-        
-        const tickerQueries = tickers.map(ticker => ({
-            keyword: ticker
-        }));
-
-        const requestBody = {
-            apiKey: NEWSAPI_KEY,
-            query: {
-                $query: {
-                    $and: [
-                        {
-                            $or: [
-                                ...tickerQueries,
-                                { conceptUri: "http://en.wikipedia.org/wiki/Finance" },
-                                { conceptUri: "http://en.wikipedia.org/wiki/Stock_market" },
-                                { conceptUri: "http://en.wikipedia.org/wiki/Investment" },
-                                { conceptUri: "http://en.wikipedia.org/wiki/Economics" }
-                            ]
-                        },
-                        {
-                            lang: ["eng", "fra"]
-                        }
-                    ]
-                }
-            },
-            resultType: "articles",
-            articlesSortBy: "date",
-            articlesCount: limit * 3, // Récupérer plus pour avoir des actualités par ticker
-            includeArticleImage: true,
-            includeArticleLinks: true
-        };
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`NewsAPI.ai error: ${response.status}`);
+    // Fonction pour récupérer les actualités depuis Finnhub
+    const fetchFinnhubNews = async (tickers) => {
+        if (!FINNHUB_API_KEY || FINNHUB_API_KEY === 'YOUR_FINNHUB_API_KEY') {
+            return [];
         }
 
-        const data = await response.json();
-        
-        // Transformer et filtrer les données selon la structure NewsAPI.ai
-        const allArticles = data.articles?.results?.map(article => ({
-            title: article.title,
-            description: article.body?.substring(0, 200) + '...' || article.title,
-            url: article.url,
-            publishedAt: article.datePublished,
-            source: {
-                name: article.source?.title || 'Source inconnue'
-            },
-            urlToImage: article.image,
-            content: article.body
-        })) || [];
+        try {
+            const allNews = [];
+            const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            const to = new Date().toISOString().split('T')[0];
 
-        // Filtrer et organiser les actualités par ticker
-        const financialKeywords = [
-            'stock', 'market', 'finance', 'investment', 'trading', 'earnings', 'revenue', 'profit',
-            'bourse', 'finance', 'investissement', 'trading', 'bénéfices', 'revenus', 'profit',
-            'crypto', 'bitcoin', 'ethereum', 'blockchain', 'economy', 'economic', 'économie'
-        ];
-
-        // Grouper les articles par ticker
-        const articlesByTicker = {};
-        tickers.forEach(ticker => {
-            articlesByTicker[ticker] = [];
-        });
-
-        allArticles.forEach(article => {
-            const text = (article.title + ' ' + article.description).toLowerCase();
-            
-            // Vérifier si l'article contient des mots-clés financiers
-            const isFinancial = financialKeywords.some(keyword => text.includes(keyword));
-            
-            if (isFinancial) {
-                // Assigner l'article au ticker correspondant
-                const matchedTicker = tickers.find(ticker => 
-                    text.includes(ticker.toLowerCase()) || 
-                    text.includes(ticker)
-                );
+            for (const ticker of tickers.slice(0, 3)) { // Limiter à 3 tickers pour éviter les limites
+                const url = `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`;
+                const response = await fetch(url);
                 
-                if (matchedTicker) {
-                    articlesByTicker[matchedTicker].push(article);
-                } else {
-                    // Articles généraux financiers
-                    if (!articlesByTicker['GENERAL']) {
-                        articlesByTicker['GENERAL'] = [];
-                    }
-                    articlesByTicker['GENERAL'].push(article);
+                if (response.ok) {
+                    const data = await response.json();
+                    const tickerNews = data.slice(0, 3).map(article => ({
+                        title: article.headline,
+                        description: article.summary || article.headline,
+                        url: article.url,
+                        publishedAt: new Date(article.datetime * 1000).toISOString(),
+                        source: { name: 'Finnhub' },
+                        urlToImage: article.image,
+                        content: article.summary,
+                        ticker: ticker
+                    }));
+                    allNews.push(...tickerNews);
                 }
             }
-        });
+            return allNews;
+        } catch (error) {
+            console.error('Erreur Finnhub News:', error);
+            return [];
+        }
+    };
 
-        // Combiner les articles en priorisant les tickers spécifiques
-        const articles = [];
-        tickers.forEach(ticker => {
-            articles.push(...articlesByTicker[ticker].slice(0, 2)); // 2 articles par ticker
-        });
-        articles.push(...(articlesByTicker['GENERAL'] || []).slice(0, 5)); // 5 articles généraux
-        
-        // Limiter au nombre demandé
-        const finalArticles = articles.slice(0, limit);
+    // Fonction pour récupérer les actualités depuis Alpha Vantage
+    const fetchAlphaVantageNews = async (tickers) => {
+        if (!ALPHA_VANTAGE_API_KEY || ALPHA_VANTAGE_API_KEY === 'YOUR_ALPHA_VANTAGE_API_KEY') {
+            return [];
+        }
 
-        const result = {
-            articles: finalArticles,
-            totalResults: finalArticles.length,
-            query,
-            timestamp: new Date().toISOString(),
-            source: 'newsapi.ai',
-            articlesByTicker: articlesByTicker // Inclure le détail par ticker pour debugging
-        };
-
-        res.status(200).json(result);
-        
-    } catch (error) {
-        console.error('Erreur API NewsAPI.ai:', error);
-        
-        // Fallback vers une requête simplifiée NewsAPI.ai
         try {
-            console.log('Tentative avec requête simplifiée...');
-            const simpleRequestBody = {
+            const allNews = [];
+            for (const ticker of tickers.slice(0, 2)) { // Limiter à 2 tickers
+                const url = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}&limit=5`;
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.feed) {
+                        const tickerNews = data.feed.map(article => ({
+                            title: article.title,
+                            description: article.summary,
+                            url: article.url,
+                            publishedAt: article.time_published,
+                            source: { name: article.source },
+                            urlToImage: article.banner_image,
+                            content: article.summary,
+                            ticker: ticker,
+                            sentiment: article.overall_sentiment_label
+                        }));
+                        allNews.push(...tickerNews);
+                    }
+                }
+            }
+            return allNews;
+        } catch (error) {
+            console.error('Erreur Alpha Vantage News:', error);
+            return [];
+        }
+    };
+
+    // Fonction pour récupérer les actualités depuis NewsAPI.ai
+    const fetchNewsApiNews = async (tickers, limit) => {
+        if (!NEWSAPI_KEY || NEWSAPI_KEY === 'YOUR_NEWSAPI_KEY') {
+            return [];
+        }
+
+        try {
+            const tickerQueries = tickers.map(ticker => ({
+                keyword: ticker
+            }));
+
+            const requestBody = {
                 apiKey: NEWSAPI_KEY,
                 query: {
                     $query: {
                         $and: [
                             {
                                 $or: [
-                                    { keyword: "stock market" },
-                                    { keyword: "finance" },
-                                    { keyword: "investment" },
-                                    { keyword: "trading" },
-                                    { keyword: "earnings" }
+                                    ...tickerQueries,
+                                    { conceptUri: "http://en.wikipedia.org/wiki/Finance" },
+                                    { conceptUri: "http://en.wikipedia.org/wiki/Stock_market" },
+                                    { conceptUri: "http://en.wikipedia.org/wiki/Investment" },
+                                    { conceptUri: "http://en.wikipedia.org/wiki/Economics" }
                                 ]
                             },
                             {
@@ -325,47 +265,158 @@ export default async function handler(req, res) {
                 },
                 resultType: "articles",
                 articlesSortBy: "date",
-                articlesCount: limit * 2
+                articlesCount: limit * 3,
+                includeArticleImage: true,
+                includeArticleLinks: true
             };
             
-            const fallbackResponse = await fetch('https://newsapi.ai/api/v1/article/getArticles', {
+            const response = await fetch('https://newsapi.ai/api/v1/article/getArticles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(simpleRequestBody)
+                body: JSON.stringify(requestBody)
             });
             
-            if (fallbackResponse.ok) {
-                const fallbackData = await fallbackResponse.json();
-                const articles = fallbackData.articles?.results?.map(article => ({
-                    title: article.title,
-                    description: article.body?.substring(0, 200) + '...' || article.title,
-                    url: article.url,
-                    publishedAt: article.datePublished,
-                    source: {
-                        name: article.source?.title || 'Source inconnue'
-                    },
-                    urlToImage: article.image,
-                    content: article.body
-                })) || [];
-                
-                res.status(200).json({
-                    articles,
-                    totalResults: articles.length,
-                    query: q,
-                    timestamp: new Date().toISOString(),
-                    source: 'newsapi.ai (fallback)'
-                });
-                return;
+            if (!response.ok) {
+                throw new Error(`NewsAPI.ai error: ${response.status}`);
             }
-        } catch (fallbackError) {
-            console.error('Erreur fallback:', fallbackError);
+
+            const data = await response.json();
+            
+            const articles = data.articles?.results?.map(article => ({
+                title: article.title,
+                description: article.body?.substring(0, 200) + '...' || article.title,
+                url: article.url,
+                publishedAt: article.datePublished,
+                source: {
+                    name: article.source?.title || 'Source inconnue'
+                },
+                urlToImage: article.image,
+                content: article.body
+            })) || [];
+
+            return articles;
+        } catch (error) {
+            console.error('Erreur NewsAPI.ai:', error);
+            return [];
+        }
+    };
+
+    // Vérifier si on a au moins une clé API configurée
+    const hasApiKey = (NEWSAPI_KEY && NEWSAPI_KEY !== 'YOUR_NEWSAPI_KEY') || 
+                     (FINNHUB_API_KEY && FINNHUB_API_KEY !== 'YOUR_FINNHUB_API_KEY') ||
+                     (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY');
+
+    if (!hasApiKey) {
+        // Générer des actualités de démonstration basées sur les tickers demandés
+        const demoNews = generateDemoNews(q);
+        
+        return res.status(200).json({
+            articles: demoNews,
+            totalResults: demoNews.length,
+            query: q || 'finance',
+            timestamp: new Date().toISOString(),
+            source: 'demo',
+            message: 'Données de démonstration - Configurez au moins une clé API (NEWSAPI_KEY, FINNHUB_API_KEY, ou ALPHA_VANTAGE_API_KEY) pour des actualités réelles'
+        });
+    }
+
+    try {
+        // Utiliser les tickers de la requête ou les tickers par défaut
+        const requestedTickers = q ? q.split(' OR ').map(t => t.trim().toUpperCase()) : [];
+        const defaultTickers = ['CVS', 'MSFT', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META'];
+        const tickers = requestedTickers.length > 0 ? requestedTickers : defaultTickers;
+        
+        // Récupérer les actualités depuis toutes les sources disponibles
+        const allNews = [];
+        const sources = [];
+        
+        // 1. Essayer NewsAPI.ai
+        if (NEWSAPI_KEY && NEWSAPI_KEY !== 'YOUR_NEWSAPI_KEY') {
+            try {
+                const newsApiNews = await fetchNewsApiNews(tickers, limit);
+                allNews.push(...newsApiNews);
+                sources.push('NewsAPI.ai');
+            } catch (error) {
+                console.error('Erreur NewsAPI.ai:', error);
+            }
         }
         
-        res.status(500).json({ 
-            error: 'Erreur lors de la récupération des actualités',
-            details: error.message 
+        // 2. Essayer Finnhub News
+        if (FINNHUB_API_KEY && FINNHUB_API_KEY !== 'YOUR_FINNHUB_API_KEY') {
+            try {
+                const finnhubNews = await fetchFinnhubNews(tickers);
+                allNews.push(...finnhubNews);
+                sources.push('Finnhub');
+            } catch (error) {
+                console.error('Erreur Finnhub News:', error);
+            }
+        }
+        
+        // 3. Essayer Alpha Vantage News
+        if (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY') {
+            try {
+                const alphaVantageNews = await fetchAlphaVantageNews(tickers);
+                allNews.push(...alphaVantageNews);
+                sources.push('Alpha Vantage');
+            } catch (error) {
+                console.error('Erreur Alpha Vantage News:', error);
+            }
+        }
+        
+        // Si aucune source n'a fonctionné, utiliser les données de démonstration
+        if (allNews.length === 0) {
+            const demoNews = generateDemoNews(q);
+            return res.status(200).json({
+                articles: demoNews,
+                totalResults: demoNews.length,
+                query: q || 'finance',
+                timestamp: new Date().toISOString(),
+                source: 'demo',
+                message: 'Aucune source API disponible - Données de démonstration'
+            });
+        }
+        
+        // Dédupliquer les articles basés sur l'URL
+        const uniqueNews = [];
+        const seenUrls = new Set();
+        
+        allNews.forEach(article => {
+            if (article.url && !seenUrls.has(article.url)) {
+                seenUrls.add(article.url);
+                uniqueNews.push(article);
+            }
+        });
+        
+        // Trier par date de publication (plus récent en premier)
+        uniqueNews.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+        
+        // Limiter au nombre demandé
+        const finalArticles = uniqueNews.slice(0, limit);
+        
+        return res.status(200).json({
+            articles: finalArticles,
+            totalResults: finalArticles.length,
+            query: q || 'finance',
+            timestamp: new Date().toISOString(),
+            source: sources.join(', '),
+            sources: sources,
+            message: `Actualités récupérées depuis ${sources.join(', ')}`
+        });
+        
+    } catch (error) {
+        console.error('Erreur générale API News:', error);
+        
+        // Fallback vers les données de démonstration
+        const demoNews = generateDemoNews(q);
+        return res.status(200).json({
+            articles: demoNews,
+            totalResults: demoNews.length,
+            query: q || 'finance',
+            timestamp: new Date().toISOString(),
+            source: 'demo (fallback)',
+            message: 'Erreur API - Données de démonstration utilisées'
         });
     }
 }
