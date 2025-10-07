@@ -250,33 +250,45 @@ const GOB = () => {
       const newMarketData: any = {};
       let hasRealData = false;
       
+      console.log('🔄 Récupération des données de marché...');
+      
       for (const symbol of symbols) {
         try {
           const response = await fetch(`/api/finnhub?endpoint=quote&symbol=${symbol}`);
           const data = await response.json();
           
-          if (data.c && data.d !== undefined && data.dp !== undefined && data.source === 'finnhub') {
+          console.log(`📊 Données pour ${symbol}:`, data);
+          
+          if (data.c && data.d !== undefined && data.dp !== undefined) {
             newMarketData[symbol] = {
               symbol: getSymbolName(symbol),
               price: data.c,
               change: data.d,
               changePercent: data.dp
             };
-            hasRealData = true;
+            
+            if (data.source === 'finnhub') {
+              hasRealData = true;
+              console.log(`✅ Données réelles Finnhub pour ${symbol}`);
+            } else {
+              console.log(`📋 Données de démonstration pour ${symbol}`);
+            }
           }
         } catch (error) {
-          console.log(`Erreur pour ${symbol}:`, error);
+          console.log(`❌ Erreur pour ${symbol}:`, error);
         }
       }
       
-      if (hasRealData && Object.keys(newMarketData).length > 0) {
-        setMarketData(prev => ({ ...prev, ...newMarketData }));
+      if (Object.keys(newMarketData).length > 0) {
+        setMarketData(newMarketData);
+        console.log('📈 Données de marché mises à jour:', newMarketData);
       } else {
-        // Utiliser des données réalistes générées si l'API ne fonctionne pas
+        // Utiliser des données réalistes générées si aucune donnée n'est disponible
+        console.log('🎲 Génération de données réalistes...');
         generateRealisticMarketData();
       }
     } catch (error) {
-      console.log('Erreur lors de la récupération des données de marché:', error);
+      console.log('❌ Erreur lors de la récupération des données de marché:', error);
       generateRealisticMarketData();
     }
   };
