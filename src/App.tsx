@@ -392,10 +392,10 @@ const GOB = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Test Finnhub connection and fetch market data on component mount
+  // Test API connections and fetch market data on component mount
   useEffect(() => {
-    // Test de connexion Finnhub au démarrage
-    testFinnhubConnection();
+    // Test de connexion des APIs au démarrage
+    testAPIConnection();
     
     // Récupération des données de marché
     fetchMarketData();
