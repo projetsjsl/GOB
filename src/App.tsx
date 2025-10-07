@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon } from 'lucide-react';
 
-// Import des logos
-import logojslaidark from '/logojslaidark.png';
-import logojslailight from '/logojslailight.png';
+// Les logos seront chargés dynamiquement via les chemins publics
 
 // Popular emojis for app icons
 const popularEmojis = [
@@ -490,7 +488,7 @@ const GOB = () => {
             <div className="mb-8 animate-pulse">
               <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-md border border-green-500/30 shadow-2xl shadow-green-500/20">
                 <img 
-                  src={isDarkMode ? logojslaidark : logojslailight} 
+                  src={isDarkMode ? '/logojslaidark.png' : '/logojslailight.png'} 
                   alt="JSL AI Logo" 
                   className="w-20 h-20 object-contain animate-bounce"
                   onError={(e) => {
