@@ -205,6 +205,9 @@ const GOB = () => {
   });
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeFadeOut, setWelcomeFadeOut] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -369,8 +372,32 @@ const GOB = () => {
     }
   }, []);
 
-  // Welcome screen logic - affichage à chaque actualisation avec fade out
+  // Vérification du mot de passe au chargement
   useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const response = await fetch('/api/check-password');
+        const data = await response.json();
+        
+        if (data.requiresPassword) {
+          setShowPasswordModal(true);
+        } else {
+          setIsAuthenticated(true);
+          startWelcomeAnimation();
+        }
+      } catch (error) {
+        console.log('Erreur lors de la vérification du mot de passe:', error);
+        // En cas d'erreur, permettre l'accès
+        setIsAuthenticated(true);
+        startWelcomeAnimation();
+      }
+    };
+
+    checkAuthentication();
+  }, []);
+
+  // Fonction pour démarrer l'animation de bienvenue
+  const startWelcomeAnimation = () => {
     setShowWelcome(true);
     setWelcomeFadeOut(false);
     
@@ -388,7 +415,36 @@ const GOB = () => {
       clearTimeout(fadeOutTimer);
       clearTimeout(hideTimer);
     };
-  }, []);
+  };
+
+  // Fonction pour vérifier le mot de passe
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('/api/check-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsAuthenticated(true);
+        setShowPasswordModal(false);
+        startWelcomeAnimation();
+      } else {
+        alert('Mot de passe incorrect');
+        setPassword('');
+      }
+    } catch (error) {
+      console.log('Erreur lors de la vérification du mot de passe:', error);
+      alert('Erreur lors de la vérification du mot de passe');
+    }
+  };
 
   // Load dark mode preference
   useEffect(() => {
@@ -608,8 +664,78 @@ const GOB = () => {
 
   return (
     <div className={`min-h-screen ${currentTheme.colors.background} relative overflow-hidden`}>
+      {/* Modal de mot de passe */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className={`w-full max-w-md mx-4 p-8 rounded-2xl shadow-2xl ${
+            isDarkMode 
+              ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' 
+              : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+          }`}>
+            <div className="text-center mb-6">
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                isDarkMode 
+                  ? 'bg-gradient-to-br from-green-500 to-blue-500' 
+                  : 'bg-gradient-to-br from-blue-500 to-purple-500'
+              }`}>
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h2 className={`text-2xl font-bold mb-2 ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>
+                Accès Sécurisé
+              </h2>
+              <p className={`text-sm ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+              }`}>
+                Veuillez entrer le mot de passe pour accéder à GOB Apps
+              </p>
+            </div>
+            
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mot de passe"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 ${
+                    isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-green-500 focus:ring-green-500/20' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20'
+                  }`}
+                  required
+                  autoFocus
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className={`w-full py-3 px-4 rounded-xl font-semibold transition-all ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white' 
+                    : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white'
+                } shadow-lg hover:shadow-xl active:scale-95`}
+              >
+                Accéder
+              </button>
+            </form>
+            
+            <div className="mt-6 text-center">
+              <p className={`text-xs ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                Plateforme financière • Propulsée par JSL AI
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Écran de bienvenue - Fullpage avec fade out */}
-      {showWelcome && (
+      {showWelcome && isAuthenticated && (
         <div className={`fixed inset-0 z-50 flex items-center justify-center ${
           welcomeFadeOut ? 'animate-fade-out' : ''
         } ${
@@ -680,13 +806,16 @@ const GOB = () => {
         </div>
       )}
 
-      <div className={`fixed inset-0 pointer-events-none ${
-        isDarkMode 
-          ? 'bg-gradient-to-br from-green-500/5 via-transparent to-red-500/5' 
-          : 'bg-gradient-to-br from-blue-500/5 via-transparent to-green-500/5'
-      }`}></div>
-      
-      <header className="relative z-10">
+      {/* Contenu principal - affiché seulement si authentifié */}
+      {isAuthenticated && (
+        <>
+          <div className={`fixed inset-0 pointer-events-none ${
+            isDarkMode 
+              ? 'bg-gradient-to-br from-green-500/5 via-transparent to-red-500/5' 
+              : 'bg-gradient-to-br from-blue-500/5 via-transparent to-green-500/5'
+          }`}></div>
+          
+          <header className="relative z-10">
         {/* Bandeau défilant des indices boursiers */}
         <div className={`backdrop-blur-xl px-3 sm:px-6 py-2 sm:py-3 border-b overflow-hidden ${
           isDarkMode 
@@ -1361,6 +1490,8 @@ const GOB = () => {
         .financial-indicator-3 { bottom: 2px; left: 50%; transform: translateX(-50%); }
         .financial-indicator-4 { top: 50%; left: 2px; transform: translateY(-50%); }
       `}</style>
+        </>
+      )}
     </div>
   );
 };
