@@ -624,46 +624,19 @@ const GOB = () => {
             : 'bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 text-gray-800 border-gray-300/20'
         }`}>
           <div className="flex items-center space-x-4 sm:space-x-8 text-xs sm:text-sm font-medium animate-scroll">
-            <div className="flex items-center space-x-2 whitespace-nowrap">
-              <span className="text-xs font-semibold">S&P 500</span>
-              <span className="text-green-400 font-bold">+0.85%</span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>4,567.89</span>
-            </div>
-            <div className="flex items-center space-x-2 whitespace-nowrap">
-              <span className="text-xs font-semibold">NASDAQ</span>
-              <span className="text-green-400 font-bold">+1.23%</span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>14,234.56</span>
-            </div>
-            <div className="flex items-center space-x-2 whitespace-nowrap">
-              <span className="text-xs font-semibold">DOW JONES</span>
-              <span className="text-red-400 font-bold">-0.45%</span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>34,567.89</span>
-            </div>
-            <div className="flex items-center space-x-2 whitespace-nowrap">
-              <span className="text-xs font-semibold">TSX</span>
-              <span className="text-green-400 font-bold">+0.67%</span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>20,123.45</span>
-            </div>
-            <div className="flex items-center space-x-2 whitespace-nowrap">
-              <span className="text-xs font-semibold">EUR/USD</span>
-              <span className="text-green-400 font-bold">+0.12%</span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>1.0845</span>
-            </div>
-            <div className="flex items-center space-x-2 whitespace-nowrap">
-              <span className="text-xs font-semibold">GOLD</span>
-              <span className="text-red-400 font-bold">-0.34%</span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>$2,034.50</span>
-            </div>
-            <div className="flex items-center space-x-2 whitespace-nowrap">
-              <span className="text-xs font-semibold">OIL</span>
-              <span className="text-green-400 font-bold">+1.56%</span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>$78.45</span>
-            </div>
-            <div className="flex items-center space-x-2 whitespace-nowrap">
-              <span className="text-xs font-semibold">BITCOIN</span>
-              <span className="text-green-400 font-bold">+2.34%</span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>$43,567.89</span>
-            </div>
+            {Object.entries(marketData).map(([key, data]) => (
+              <div key={key} className="flex items-center space-x-2 whitespace-nowrap">
+                <span className="text-xs font-semibold">{data.symbol}</span>
+                <span className={`font-bold ${data.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {data.changePercent >= 0 ? '+' : ''}{data.changePercent.toFixed(2)}%
+                </span>
+                <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {key === 'EURUSD' ? data.price.toFixed(4) : 
+                   key === 'GOLD' || key === 'OIL' || key === 'BTCUSD' ? `$${data.price.toLocaleString()}` :
+                   data.price.toLocaleString()}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
         
