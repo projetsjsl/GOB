@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOB Apps - Dashboard Simple</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const SimpleDashboard = () => {
+            const [tickers, setTickers] = useState(['CVS', 'MSFT', 'MGA', 'GOOG', 'MU', 'BRK.B', 'UNH', 'PFE', 'BCE', 'T']);
+            const [activeTab, setActiveTab] = useState('stocks');
+            const [loading, setLoading] = useState(false);
+
+            const API_BASE_URL = window.location.origin;
+
+            const fetchStockData = async (ticker) => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
+                    if (!response.ok) throw new Error(`API error: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur fetch stock data:', error);
+                    return null;
+                }
+            };
+
+            const refreshAllStocks = async () => {
+                setLoading(true);
+                console.log('🔄 Actualisation des données stocks...');
+                
+                for (const ticker of tickers) {
+                    try {
+                        const data = await fetchStockData(ticker);
+                        console.log(`${ticker}:`, data);
+                    } catch (error) {
+                        console.error(`❌ ${ticker}:`, error);
+                    }
+                }
+                
+                setLoading(false);
+            };
+
+            useEffect(() => {
+                console.log('🚀 Initialisation du dashboard simple...');
+                refreshAllStocks();
+            }, []);
+
+            return (
+                <div className="min-h-screen bg-gray-100">
+                    <div className="bg-white shadow-sm border-b">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between items-center py-4">
+                                <h1 className="text-2xl font-bold text-gray-900">
+                                    🚀 GOB Apps - Dashboard Simple
+                                </h1>
+                                <button
+                                    onClick={refreshAllStocks}
+                                    disabled={loading}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    {loading ? '🔄 Chargement...' : '🔄 Actualiser'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h2 className="text-xl font-semibold mb-4">📊 Tickers surveillés</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                {tickers.map((ticker) => (
+                                    <div key={ticker} className="bg-gray-50 p-3 rounded-lg text-center">
+                                        <span className="font-mono font-bold text-lg">{ticker}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="mt-6 bg-white rounded-lg shadow p-6">
+                            <h2 className="text-xl font-semibold mb-4">🔧 Informations de diagnostic</h2>
+                            <div className="space-y-2 text-sm">
+                                <p><strong>URL actuelle:</strong> {window.location.href}</p>
+                                <p><strong>API Base URL:</strong> {API_BASE_URL}</p>
+                                <p><strong>Nombre de tickers:</strong> {tickers.length}</p>
+                                <p><strong>Statut:</strong> {loading ? 'Chargement...' : 'Prêt'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<SimpleDashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>
