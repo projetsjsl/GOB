@@ -249,7 +249,6 @@ const GOB = () => {
     try {
       const symbols = ['SPX', 'IXIC', 'DJI', 'TSX', 'EURUSD', 'GOLD', 'OIL', 'BTCUSD'];
       const newMarketData: any = {};
-      let hasRealData = false;
       
       console.log('🔄 Récupération des données de marché...');
       
@@ -269,7 +268,6 @@ const GOB = () => {
             };
             
             if (data.source === 'finnhub') {
-              hasRealData = true;
               console.log(`✅ Données réelles Finnhub pour ${symbol}`);
             } else {
               console.log(`📋 Données de démonstration pour ${symbol}`);
