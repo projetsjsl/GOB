@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seeking Alpha Dashboard - JSL AI</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const SeekingAlphaDashboard = () => {
+          const [tickers, setTickers] = useState([]);
+          const [stockData, setStockData] = useState({});
+          const [newTicker, setNewTicker] = useState('');
+          const [loading, setLoading] = useState(false);
+          const [message, setMessage] = useState(null);
+          const [selectedStock, setSelectedStock] = useState(null);
+          const [sortBy, setSortBy] = useState('ticker');
+          const [showChart, setShowChart] = useState(false);
+          const [showAdmin, setShowAdmin] = useState(false);
+          const [apiStatus, setApiStatus] = useState({});
+          const [lastUpdate, setLastUpdate] = useState(null);
+
+          // Configuration pour l'API Vercel
+          const API_BASE_URL = window.location.origin;
+
+          const showMessage = (text, type = 'info') => {
+            setMessage({ text, type });
+            setTimeout(() => setMessage(null), 5000);
+          };
+
+          const fetchStockData = async (ticker) => {
+            try {
+              const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
+              if (!response.ok) throw new Error(`API error: ${response.status}`);
+              return await response.json();
+            } catch (error) {
+              console.error('Erreur fetch stock data:', error);
+              return null;
+            }
+          };
+
+          const refreshStockPrices = async () => {
+            setLoading(true);
+            try {
+              const newStockData = { ...stockData };
+              for (const ticker of tickers) {
+                const priceData = await fetchStockData(ticker);
+                if (priceData) {
+                  newStockData[ticker] = {
+                    ...newStockData[ticker],
+                    currentPrice: priceData.c,
+                    change: priceData.d,
+                    changePercent: priceData.dp,
+                    high: priceData.h,
+                    low: priceData.l,
+                    open: priceData.o,
+                    previousClose: priceData.pc,
+                    timestamp: priceData.t
+                  };
+                }
+              }
+              setStockData(newStockData);
+              setLastUpdate(new Date().toLocaleString('fr-FR'));
+              showMessage('Prix mis à jour', 'success');
+            } catch (error) {
+              showMessage('Erreur mise à jour prix', 'error');
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          // Fonctions de monitoring Admin
+          const checkApiStatus = async () => {
+            const status = {
+              finnhub: { status: 'checking', responseTime: 0, error: null },
+              vercel: { status: 'checking', responseTime: 0, error: null },
+              github: { status: 'checking', responseTime: 0, error: null }
+            };
+
+            // Test Finnhub API
+            try {
+              const startTime = Date.now();
+              const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=AAPL`);
+              const responseTime = Date.now() - startTime;
+              
+              if (response.ok) {
+                const data = await response.json();
+                status.finnhub = {
+                  status: data.message ? 'warning' : 'success',
+                  responseTime,
+                  error: data.message || null
+                };
+              } else {
+                status.finnhub = {
+                  status: 'error',
+                  responseTime,
+                  error: `HTTP ${response.status}`
+                };
+              }
+            } catch (error) {
+              status.finnhub = {
+                status: 'error',
+                responseTime: 0,
+                error: error.message
+              };
+            }
+
+            // Test Vercel API
+            try {
+              const startTime = Date.now();
+              const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=TEST`);
+              const responseTime = Date.now() - startTime;
+              
+              status.vercel = {
+                status: response.ok ? 'success' : 'error',
+                responseTime,
+                error: response.ok ? null : `HTTP ${response.status}`
+              };
+            } catch (error) {
+              status.vercel = {
+                status: 'error',
+                responseTime: 0,
+                error: error.message
+              };
+            }
+
+            // Test GitHub API (pour les données statiques)
+            try {
+              const startTime = Date.now();
+              const response = await fetch('./tickers.json');
+              const responseTime = Date.now() - startTime;
+              
+              status.github = {
+                status: response.ok ? 'success' : 'error',
+                responseTime,
+                error: response.ok ? null : `HTTP ${response.status}`
+              };
+            } catch (error) {
+              status.github = {
+                status: 'error',
+                responseTime: 0,
+                error: error.message
+              };
+            }
+
+            setApiStatus(status);
+          };
+
+          const getStatusColor = (status) => {
+            switch (status) {
+              case 'success': return 'text-green-500';
+              case 'warning': return 'text-yellow-500';
+              case 'error': return 'text-red-500';
+              default: return 'text-gray-500';
+            }
+          };
+
+          const getStatusIcon = (status) => {
+            switch (status) {
+              case 'success': return '✅';
+              case 'warning': return '⚠️';
+              case 'error': return '❌';
+              default: return '⏳';
+            }
+          };
+
+          // Charger les données depuis les fichiers JSON statiques
+          const loadStaticData = async () => {
+            try {
+              // Charger tickers.json
+              const tickersResponse = await fetch('./tickers.json');
+              if (tickersResponse.ok) {
+                const tickersData = await tickersResponse.json();
+                setTickers(tickersData.tickers || []);
+              }
+              
+              // Charger stock_data.json
+              const stocksResponse = await fetch('./stock_data.json');
+              if (stocksResponse.ok) {
+                const stocksData = await stocksResponse.json();
+                setStockData(stocksData.stocks || {});
+              }
+            } catch (error) {
+              console.error('Erreur chargement données statiques:', error);
+            }
+          };
+
+          const loadData = async () => {
+            setLoading(true);
+            try {
+              await loadStaticData();
+              showMessage('Données chargées', 'success');
+            } catch (error) {
+              showMessage('Erreur chargement', 'error');
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          const addTicker = async () => {
+            if (!newTicker.trim()) return;
+            const ticker = newTicker.trim().toUpperCase();
+            if (tickers.includes(ticker)) {
+              showMessage('Ticker existe déjà', 'warning');
+              return;
+            }
+            setLoading(true);
+            try {
+              const newTickers = [...tickers, ticker];
+              setTickers(newTickers);
+              setNewTicker('');
+              showMessage(`${ticker} ajouté`, 'success');
+            } catch (error) {
+              showMessage('Erreur ajout', 'error');
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          const removeTicker = async (ticker) => {
+            if (!confirm(`Supprimer ${ticker} ?`)) return;
+            setLoading(true);
+            try {
+              const newTickers = tickers.filter(t => t !== ticker);
+              setTickers(newTickers);
+              showMessage(`${ticker} supprimé`, 'success');
+            } catch (error) {
+              showMessage('Erreur', 'error');
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          useEffect(() => {
+            loadData();
+          }, []);
+
+          const getSortedTickers = () => {
+            return [...tickers].sort((a, b) => {
+              const dataA = stockData[a];
+              const dataB = stockData[b];
+              
+              if (!dataA || !dataB) return 0;
+              
+              switch(sortBy) {
+                case 'ticker':
+                  return a.localeCompare(b);
+                case 'rating':
+                  const ratingOrder = { 'Buy': 3, 'Hold': 2, 'Sell': 1 };
+                  const rA = ratingOrder[dataA.finalConclusion?.rating] || 0;
+                  const rB = ratingOrder[dataB.finalConclusion?.rating] || 0;
+                  return rB - rA;
+                case 'valuation':
+                  return (dataB.quantRating?.valuation || 'Z').localeCompare(dataA.quantRating?.valuation || 'Z');
+                default:
+                  return 0;
+              }
+            });
+          };
+
+          const getGradeColor = (grade) => {
+            if (!grade) return 'bg-gray-100 text-gray-600';
+            const letter = grade.charAt(0);
+            if (letter === 'A') return 'bg-green-100 text-green-700 border border-green-300';
+            if (letter === 'B') return 'bg-blue-100 text-blue-700 border border-blue-300';
+            if (letter === 'C') return 'bg-yellow-100 text-yellow-700 border border-yellow-300';
+            if (letter === 'D') return 'bg-orange-100 text-orange-700 border border-orange-300';
+            if (letter === 'F') return 'bg-red-100 text-red-700 border border-red-300';
+            return 'bg-gray-100 text-gray-600';
+          };
+
+          const getRatingColor = (rating) => {
+            if (!rating) return 'bg-gray-500';
+            const r = rating.toLowerCase();
+            if (r.includes('buy') || r.includes('acheter')) return 'bg-green-500';
+            if (r.includes('hold') || r.includes('conserver')) return 'bg-yellow-500';
+            if (r.includes('sell') || r.includes('vendre')) return 'bg-red-500';
+            return 'bg-gray-500';
+          };
+
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
+              {message && (
+                <div className={`fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 ${
+                  message.type === 'success' ? 'bg-green-500' :
+                  message.type === 'error' ? 'bg-red-500' :
+                  message.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                } text-white font-medium`}>{message.text}</div>
+              )}
+
+              <div className="max-w-7xl mx-auto mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center font-bold text-2xl text-blue-600 shadow-lg">
+                      JSL
+                    </div>
+                    <div>
+                      <h1 className="text-4xl font-bold text-white">Fiches d'entreprises Seeking Alpha - GOB</h1>
+                      <p className="text-sm text-slate-300">Propulsé par JSL AI</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <button onClick={() => setShowChart(!showChart)} className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600">
+                      📊
+                    </button>
+                    <button onClick={refreshStockPrices} disabled={loading} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                      {loading ? '⏳' : '💰'} Prix
+                    </button>
+                    <button onClick={() => setShowAdmin(!showAdmin)} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                      🔧 Admin
+                    </button>
+                    <button onClick={loadData} disabled={loading} className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600">
+                      {loading ? '⏳' : '🔄'}
+                    </button>
+                  </div>
+                </div>
+
+                {showChart && (
+                  <div className="bg-slate-800 rounded-lg p-6 mb-6">
+                    <h2 className="text-xl font-bold text-white mb-4">Comparaison des Ratings</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {getSortedTickers().filter(t => stockData[t] && !stockData[t].error).map(ticker => {
+                        const data = stockData[ticker];
+                        return (
+                          <div key={ticker} className="bg-slate-700 rounded-lg p-4">
+                            <div className="text-white font-bold mb-2">{ticker}</div>
+                            <div className="space-y-1">
+                              {Object.entries(data.quantRating || {}).map(([key, value]) => (
+                                <div key={key} className="flex justify-between items-center text-sm">
+                                  <span className="text-slate-300 capitalize">{key}</span>
+                                  <span className={`${getGradeColor(value)} px-2 py-0.5 rounded text-xs font-bold`}>{value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {showAdmin && (
+                  <div className="bg-slate-800 rounded-lg p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-xl font-bold text-white">🔧 Panel Admin - Monitoring</h2>
+                      <button onClick={checkApiStatus} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        🔄 Vérifier
+                      </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                      {/* Status Finnhub API */}
+                      <div className="bg-slate-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-white font-bold">Finnhub API</h3>
+                          <span className={`text-lg ${getStatusColor(apiStatus.finnhub?.status || 'checking')}`}>
+                            {getStatusIcon(apiStatus.finnhub?.status || 'checking')}
+                          </span>
+                        </div>
+                        <div className="text-sm text-slate-300">
+                          <div>Temps de réponse: {apiStatus.finnhub?.responseTime || 0}ms</div>
+                          {apiStatus.finnhub?.error && (
+                            <div className="text-red-400 mt-1">{apiStatus.finnhub.error}</div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Status Vercel API */}
+                      <div className="bg-slate-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-white font-bold">Vercel API</h3>
+                          <span className={`text-lg ${getStatusColor(apiStatus.vercel?.status || 'checking')}`}>
+                            {getStatusIcon(apiStatus.vercel?.status || 'checking')}
+                          </span>
+                        </div>
+                        <div className="text-sm text-slate-300">
+                          <div>Temps de réponse: {apiStatus.vercel?.responseTime || 0}ms</div>
+                          {apiStatus.vercel?.error && (
+                            <div className="text-red-400 mt-1">{apiStatus.vercel.error}</div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Status GitHub */}
+                      <div className="bg-slate-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-white font-bold">GitHub Data</h3>
+                          <span className={`text-lg ${getStatusColor(apiStatus.github?.status || 'checking')}`}>
+                            {getStatusIcon(apiStatus.github?.status || 'checking')}
+                          </span>
+                        </div>
+                        <div className="text-sm text-slate-300">
+                          <div>Temps de réponse: {apiStatus.github?.responseTime || 0}ms</div>
+                          {apiStatus.github?.error && (
+                            <div className="text-red-400 mt-1">{apiStatus.github.error}</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Informations système */}
+                    <div className="bg-slate-700 rounded-lg p-4">
+                      <h3 className="text-white font-bold mb-3">📊 Informations Système</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <div className="text-slate-300 mb-1">URL de base:</div>
+                          <div className="text-white font-mono bg-slate-600 px-2 py-1 rounded">{API_BASE_URL}</div>
+                        </div>
+                        <div>
+                          <div className="text-slate-300 mb-1">Dernière mise à jour:</div>
+                          <div className="text-white">{lastUpdate || 'Jamais'}</div>
+                        </div>
+                        <div>
+                          <div className="text-slate-300 mb-1">Tickers chargés:</div>
+                          <div className="text-white">{tickers.length}</div>
+                        </div>
+                        <div>
+                          <div className="text-slate-300 mb-1">Données stocks:</div>
+                          <div className="text-white">{Object.keys(stockData).length}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions Admin */}
+                    <div className="bg-slate-700 rounded-lg p-4 mt-4">
+                      <h3 className="text-white font-bold mb-3">⚡ Actions Rapides</h3>
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={checkApiStatus} className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                          Test APIs
+                        </button>
+                        <button onClick={refreshStockPrices} className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                          Actualiser Prix
+                        </button>
+                        <button onClick={loadData} className="px-3 py-1 bg-slate-600 text-white rounded text-sm hover:bg-slate-700">
+                          Recharger Données
+                        </button>
+                        <button onClick={() => {
+                          localStorage.clear();
+                          window.location.reload();
+                        }} className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                          Reset Cache
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-slate-800 rounded-lg p-6 mb-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-white">Gestion des Tickers</h2>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white">🔽</span>
+                      <select 
+                        value={sortBy} 
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="bg-slate-700 text-white px-3 py-2 rounded-lg"
+                      >
+                        <option value="ticker">Ticker (A-Z)</option>
+                        <option value="rating">Recommandation</option>
+                        <option value="valuation">Valuation</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mb-6">
+                    <input
+                      type="text"
+                      value={newTicker}
+                      onChange={(e) => setNewTicker(e.target.value.toUpperCase())}
+                      onKeyPress={(e) => e.key === 'Enter' && addTicker()}
+                      placeholder="Ex: MSFT, GOOGL..."
+                      className="flex-1 px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600"
+                    />
+                    <button onClick={addTicker} disabled={loading} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                      ➕ Ajouter
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {tickers.map(ticker => (
+                      <div key={ticker} className="flex items-center gap-2 bg-slate-700 px-4 py-2 rounded-lg">
+                        <span className="text-white font-medium">{ticker}</span>
+                        <button onClick={() => removeTicker(ticker)} className="text-red-400 hover:text-red-300 font-bold">
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {getSortedTickers().map(ticker => {
+                  const data = stockData[ticker];
+                  if (!data || data.error) {
+                    return (
+                      <div key={ticker} className="bg-slate-800 rounded-lg p-6 border-2 border-slate-700">
+                        <h3 className="text-2xl font-bold text-white mb-4">{ticker}</h3>
+                        <p className="text-slate-400">{data?.error || 'Pas de données'}</p>
+                      </div>
+                    );
+                  }
+
+                  const rating = data.finalConclusion?.rating || 'Hold';
+                  
+                  return (
+                    <div key={ticker} onClick={() => setSelectedStock(ticker)} 
+                         className="bg-slate-800 rounded-lg p-6 hover:bg-slate-750 cursor-pointer transition-all hover:scale-105 shadow-xl border-2 border-slate-700 hover:border-blue-500">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="text-2xl font-bold text-white">{ticker}</h3>
+                          <p className="text-sm text-slate-400">{data.companyName || 'N/A'}</p>
+                        </div>
+                        <div className={`${getRatingColor(rating)} text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}>
+                          {rating}
+                        </div>
+                      </div>
+
+                      {data.metrics?.price && (
+                        <div className="mb-4 p-3 bg-slate-900 rounded-lg">
+                          <div className="text-2xl font-bold text-white">{data.metrics.price}</div>
+                          <div className={`text-sm flex items-center gap-1 ${data.metrics.priceChange?.includes('+') ? 'text-green-400' : 'text-red-400'}`}>
+                            {data.metrics.priceChange?.includes('+') ? '📈' : '📉'}
+                            {data.metrics.priceChange}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-2 mb-4 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Market Cap</span>
+                          <span className="text-white font-medium">{data.metrics?.marketCap || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">P/E Ratio</span>
+                          <span className="text-white font-medium">{data.metrics?.peRatio || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Dividend</span>
+                          <span className="text-white font-medium">{data.metrics?.dividendYield || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Secteur</span>
+                          <span className="text-white font-medium text-xs">{data.metrics?.sector || 'N/A'}</span>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-slate-700 pt-4 mb-4">
+                        <div className="text-xs text-slate-400 mb-2 font-semibold">QUANT RATINGS</div>
+                        <div className="grid grid-cols-5 gap-1">
+                          {Object.entries(data.quantRating || {}).map(([key, value]) => (
+                            <div key={key} className="text-center">
+                              <div className="text-xs text-slate-500 mb-1">{key.substring(0, 3)}</div>
+                              <div className={`${getGradeColor(value)} px-1 py-1 rounded text-xs font-bold`}>{value || '-'}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-slate-500 text-center pt-3 border-t border-slate-700">
+                        👉 Cliquez pour le rapport détaillé
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {selectedStock && stockData[selectedStock] && (
+                <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4 overflow-y-auto" 
+                     onClick={() => setSelectedStock(null)}>
+                  <div className="bg-white rounded-xl max-w-5xl w-full my-8" onClick={(e) => e.stopPropagation()}>
+                    <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-t-xl flex justify-between items-center shadow-lg">
+                      <div>
+                        <h2 className="text-3xl font-bold">{selectedStock}</h2>
+                        <p className="text-blue-100">{stockData[selectedStock].companyName}</p>
+                      </div>
+                      <button onClick={() => setSelectedStock(null)} className="text-3xl hover:bg-white hover:bg-opacity-20 rounded-lg px-3 py-1">
+                        ✕
+                      </button>
+                    </div>
+                    
+                    <div className="p-8 space-y-8 max-h-[70vh] overflow-y-auto">
+                      <section className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
+                        <h3 className="text-2xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                          <div className="w-1 h-8 bg-blue-600 rounded"></div>
+                          Métriques Clés
+                        </h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">Capitalisation</div>
+                            <div className="text-xl font-bold text-gray-900">{stockData[selectedStock].metrics?.marketCap || 'N/A'}</div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">Croissance BPA</div>
+                            <div className="text-xl font-bold text-gray-900">{stockData[selectedStock].metrics?.bpaGrowth || 'N/A'}</div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">P/E Ratio</div>
+                            <div className="text-xl font-bold text-gray-900">{stockData[selectedStock].metrics?.peRatio || 'N/A'}</div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">Secteur</div>
+                            <div className="text-lg font-bold text-gray-900">{stockData[selectedStock].metrics?.sector || 'N/A'}</div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">Rendement Dividende</div>
+                            <div className="text-xl font-bold text-green-600">{stockData[selectedStock].metrics?.dividendYield || 'N/A'}</div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">Fréquence</div>
+                            <div className="text-lg font-bold text-gray-900">{stockData[selectedStock].metrics?.dividendFrequency || 'N/A'}</div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">Ex-Dividende</div>
+                            <div className="text-sm font-medium text-gray-900">{stockData[selectedStock].metrics?.exDivDate || 'N/A'}</div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">Paiement Annuel</div>
+                            <div className="text-xl font-bold text-green-600">{stockData[selectedStock].metrics?.annualPayout || 'N/A'}</div>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <div className="text-sm text-gray-500">Prix Actuel</div>
+                            <div className="text-xl font-bold text-blue-600">{stockData[selectedStock].metrics?.price || 'N/A'}</div>
+                          </div>
+                        </div>
+                      </section>
+
+                      <section className="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 className="text-2xl font-bold text-blue-900 mb-4">Profil de l'Entreprise</h3>
+                        <p className="text-gray-700 leading-relaxed">{stockData[selectedStock].companyProfile?.description || 'N/A'}</p>
+                      </section>
+
+                      <section className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-xl shadow-lg">
+                        <h3 className="text-2xl font-bold text-blue-900 mb-6">Analyse Quantitative</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                          {Object.entries(stockData[selectedStock].quantRating || {}).map(([key, value]) => (
+                            <div key={key} className="bg-white p-4 rounded-lg shadow-md text-center">
+                              <div className="text-sm text-gray-600 mb-2 capitalize font-medium">{key}</div>
+                              <div className={`${getGradeColor(value)} px-4 py-3 rounded-lg font-bold text-2xl`}>{value || 'N/A'}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+
+                      {stockData[selectedStock].sectorAnalysis && (
+                        <section className="bg-white p-6 rounded-xl shadow-lg">
+                          <h3 className="text-2xl font-bold text-blue-900 mb-4">Analyse Sectorielle</h3>
+                          <div className="space-y-4">
+                            {Object.entries(stockData[selectedStock].sectorAnalysis).map(([key, value]) => (
+                              <div key={key} className="bg-gray-50 p-4 rounded-lg">
+                                <span className="font-bold capitalize text-blue-900">{key}:</span>
+                                <p className="text-gray-700 mt-1">{value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </section>
+                      )}
+
+                      <section className="bg-green-50 p-6 rounded-xl shadow-lg">
+                        <h3 className="text-2xl font-bold text-green-900 mb-4">✅ Points Positifs</h3>
+                        <ul className="space-y-3">
+                          {(stockData[selectedStock].strengths || []).map((s, i) => (
+                            <li key={i} className="flex items-start gap-3 bg-white p-4 rounded-lg shadow">
+                              <span className="text-green-600 font-bold">{i + 1}.</span>
+                              <span className="text-gray-700">{s}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+
+                      <section className="bg-red-50 p-6 rounded-xl shadow-lg">
+                        <h3 className="text-2xl font-bold text-red-900 mb-4">⚠️ Préoccupations</h3>
+                        <ul className="space-y-3">
+                          {(stockData[selectedStock].concerns || []).map((c, i) => (
+                            <li key={i} className="flex items-start gap-3 bg-white p-4 rounded-lg shadow">
+                              <span className="text-red-600 font-bold">!</span>
+                              <span className="text-gray-700">{c}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+
+                      <section className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 rounded-xl shadow-2xl">
+                        <h3 className="text-3xl font-bold mb-6">Conclusion Finale</h3>
+                        <div className="bg-white p-6 rounded-lg text-gray-900">
+                          <div className="flex items-center justify-between mb-4">
+                            <p className="font-bold text-2xl">Recommandation:</p>
+                            <span className={`${getRatingColor(stockData[selectedStock].finalConclusion?.rating)} text-white px-6 py-3 rounded-full font-bold text-xl`}>
+                              {stockData[selectedStock].finalConclusion?.rating || 'N/A'}
+                            </span>
+                          </div>
+                          <p className="text-gray-700 text-lg leading-relaxed">{stockData[selectedStock].finalConclusion?.recommendation || 'N/A'}</p>
+                        </div>
+                      </section>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        ReactDOM.render(React.createElement(SeekingAlphaDashboard), document.getElementById('root'));
+    </script>
+</body>
+</html>

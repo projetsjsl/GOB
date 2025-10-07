@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard Financier Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1e3a 100%);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 15px;
+            overflow-x: hidden;
+            font-size: 14px;
+        }
+        .header {
+            text-align: center;
+            padding: 15px 0;
+            border-bottom: 2px solid #2d3a5f;
+            margin-bottom: 20px;
+        }
+        .time { font-size: 42px; font-weight: 300; }
+        .date { font-size: 14px; color: #7d8da6; margin-top: 5px; }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 16px;
+            color: #7d8da6;
+            margin-bottom: 10px;
+            padding-left: 5px;
+            border-left: 3px solid #4a9eff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .live-indicator {
+            background: #00c853;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .ticker-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .ticker-card {
+            background: linear-gradient(135deg, #1e2a4a 0%, #2d3a5f 100%);
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .ticker-card.live {
+            border: 1px solid #00c853;
+        }
+        .ticker-symbol {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .ticker-price {
+            font-size: 20px;
+            font-weight: 300;
+            margin-bottom: 3px;
+        }
+        .ticker-change {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .positive { color: #00c853; }
+        .negative { color: #ff1744; }
+        
+        .calendar-container {
+            background: #1a2238;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .calendar-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #2d3a5f;
+            border-radius: 8px;
+            border-left: 4px solid transparent;
+        }
+        .calendar-item.high { border-left-color: #ff1744; }
+        .calendar-item.medium { border-left-color: #ffa000; }
+        .calendar-item.low { border-left-color: #7d8da6; }
+        .calendar-time {
+            font-size: 11px;
+            color: #7d8da6;
+            margin-bottom: 5px;
+        }
+        .calendar-event {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .calendar-data {
+            font-size: 12px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .calendar-data span {
+            background: rgba(74, 158, 255, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        
+        .news-container {
+            background: #1a2238;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .news-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #2d3a5f;
+            cursor: pointer;
+        }
+        .news-item:hover {
+            background: rgba(74, 158, 255, 0.05);
+        }
+        .news-item:last-child { border-bottom: none; }
+        .news-title {
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }
+        .news-source {
+            font-size: 11px;
+            color: #7d8da6;
+        }
+        .news-ticker-tag {
+            display: inline-block;
+            background: #4a9eff;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-right: 5px;
+        }
+        
+        .watchlist-controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .watchlist-btn {
+            background: #4a9eff;
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .watchlist-btn:active {
+            background: #3d85d6;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #7d8da6;
+            padding: 20px;
+        }
+        
+        .forex-pair {
+            font-size: 11px;
+            color: #7d8da6;
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="time" id="time"></div>
+        <div class="date" id="date"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            ⭐ Ma Watchlist Live
+            <span class="live-indicator"></span>
+        </div>
+        <div class="watchlist-controls">
+            <button class="watchlist-btn" onclick="showWatchlistSettings()">⚙️ Gérer</button>
+            <button class="watchlist-btn" onclick="toggleLiveMode()">📡 Temps Réel</button>
+        </div>
+        <div class="ticker-grid" id="watchlist"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">📰 News - Ma Watchlist</div>
+        <div class="news-container" id="watchlist-news"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">📅 Calendrier Économique (Aujourd'hui)</div>
+        <div class="calendar-container" id="economic-calendar"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">💱 Taux de Change</div>
+        <div class="ticker-grid" id="forex"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🇨🇦 Actions Canada (TSX)</div>
+        <div class="ticker-grid" id="canada-stocks"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🇺🇸 Actions US</div>
+        <div class="ticker-grid" id="us-stocks"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">📊 ETF</div>
+        <div class="ticker-grid" id="etfs"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">💵 Obligations</div>
+        <div class="ticker-grid" id="bonds"></div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">📰 Actualités Économiques</div>
+        <div class="news-container" id="general-news"></div>
+    </div>
+
+    <script>
+        let socket = null;
+        let liveMode = false;
+        
+        let myWatchlist = JSON.parse(localStorage.getItem('myWatchlist')) || [
+            { symbol: 'AAPL', name: 'Apple', exchange: 'US' },
+            { symbol: 'SHOP.TO', name: 'Shopify', exchange: 'TSX' },
+            { symbol: 'TSLA', name: 'Tesla', exchange: 'US' },
+            { symbol: 'RY.TO', name: 'Royal Bank', exchange: 'TSX' }
+        ];
+        
+        const portfolios = {
+            forex: [
+                { symbol: 'OANDA:USD_CAD', name: 'USD/CAD' },
+                { symbol: 'OANDA:EUR_USD', name: 'EUR/USD' },
+                { symbol: 'OANDA:GBP_USD', name: 'GBP/USD' },
+                { symbol: 'OANDA:USD_JPY', name: 'USD/JPY' }
+            ],
+            canadaStocks: [
+                { symbol: 'SHOP.TO', name: 'Shopify' },
+                { symbol: 'RY.TO', name: 'Royal Bank' },
+                { symbol: 'TD.TO', name: 'TD Bank' },
+                { symbol: 'ENB.TO', name: 'Enbridge' }
+            ],
+            usStocks: [
+                { symbol: 'AAPL', name: 'Apple' },
+                { symbol: 'MSFT', name: 'Microsoft' },
+                { symbol: 'GOOGL', name: 'Google' },
+                { symbol: 'NVDA', name: 'Nvidia' }
+            ],
+            etfs: [
+                { symbol: 'SPY', name: 'S&P 500' },
+                { symbol: 'VFV.TO', name: 'Vanguard S&P' },
+                { symbol: 'QQQ', name: 'Nasdaq 100' },
+                { symbol: 'XBB.TO', name: 'Bonds CAD' }
+            ],
+            bonds: [
+                { symbol: '^TNX', name: 'US 10Y' },
+                { symbol: '^TYX', name: 'US 30Y' },
+                { symbol: 'TLT', name: 'ETF Bonds 20Y+' },
+                { symbol: 'XBB.TO', name: 'Bond Index CAD' }
+            ]
+        };
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time').textContent = now.toLocaleTimeString('fr-FR', {
+                hour: '2-digit', minute: '2-digit'
+            });
+            document.getElementById('date').textContent = now.toLocaleDateString('fr-FR', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        async function fetchQuote(symbol) {
+            try {
+                const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                const quote = data.chart.result[0].meta;
+                
+                return {
+                    price: quote.regularMarketPrice,
+                    change: quote.regularMarketChange,
+                    changePercent: quote.regularMarketChangePercent
+                };
+            } catch (error) {
+                console.error(`Erreur ${symbol}:`, error);
+                return null;
+            }
+        }
+
+        async function callFinnhubAPI(endpoint, params = {}) {
+            try {
+                const queryString = new URLSearchParams(params).toString();
+                const url = `/api/finnhub?endpoint=${encodeURIComponent(endpoint)}&${queryString}`;
+                const res = await fetch(url);
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                
+                return await res.json();
+            } catch (error) {
+                console.error('Erreur API Finnhub:', error);
+                return null;
+            }
+        }
+
+        async function displayEconomicCalendar() {
+            const container = document.getElementById('economic-calendar');
+            container.innerHTML = '<div class="loading">Chargement du calendrier...</div>';
+            
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const tomorrow = new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0];
+                
+                const data = await callFinnhubAPI('calendar/economic', {
+                    from: today,
+                    to: tomorrow
+                });
+                
+                if (!data || !data.economicCalendar || data.economicCalendar.length === 0) {
+                    container.innerHTML = '<div class="loading">Aucun événement économique aujourd\'hui</div>';
+                    return;
+                }
+                
+                let html = '';
+                data.economicCalendar.forEach(event => {
+                    const time = new Date(event.time).toLocaleTimeString('fr-FR', { 
+                        hour: '2-digit', minute: '2-digit' 
+                    });
+                    const impact = event.impact || 'low';
+                    
+                    html += `
+                        <div class="calendar-item ${impact}">
+                            <div class="calendar-time">
+                                ${time} • ${event.country} • Impact: ${impact.toUpperCase()}
+                            </div>
+                            <div class="calendar-event">${event.event}</div>
+                            <div class="calendar-data">
+                                ${event.actual !== undefined ? `<span>Actuel: ${event.actual}</span>` : ''}
+                                ${event.estimate !== undefined ? `<span>Prévu: ${event.estimate}</span>` : ''}
+                                ${event.prev !== undefined ? `<span>Précédent: ${event.prev}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<div class="loading">Erreur chargement calendrier (API Finnhub requise)</div>';
+            }
+        }
+
+        async function displayWatchlistNews() {
+            const container = document.getElementById('watchlist-news');
+            container.innerHTML = '<div class="loading">Chargement des news...</div>';
+            
+            try {
+                let allNews = [];
+                const today = new Date().toISOString().split('T')[0];
+                const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
+                
+                for (const stock of myWatchlist) {
+                    const cleanSymbol = stock.symbol.replace('.TO', '');
+                    const news = await callFinnhubAPI('company-news', {
+                        symbol: cleanSymbol,
+                        from: weekAgo,
+                        to: today
+                    });
+                    
+                    if (Array.isArray(news)) {
+                        news.forEach(item => {
+                            item.ticker = stock.symbol;
+                            item.tickerName = stock.name;
+                        });
+                        allNews = allNews.concat(news.slice(0, 3));
+                    }
+                }
+                
+                allNews.sort((a, b) => b.datetime - a.datetime);
+                
+                let html = '';
+                allNews.slice(0, 10).forEach(item => {
+                    const date = new Date(item.datetime * 1000).toLocaleDateString('fr-FR');
+                    html += `
+                        <div class="news-item" onclick="window.open('${item.url}', '_blank')">
+                            <div class="news-ticker-tag">${item.ticker}</div>
+                            <div class="news-title">${item.headline}</div>
+                            <div class="news-source">${item.source} • ${date}</div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html || '<div class="loading">Aucune news récente</div>';
+            } catch (error) {
+                container.innerHTML = '<div class="loading">Erreur chargement news (API Finnhub requise)</div>';
+            }
+        }
+
+        async function displayGeneralNews() {
+            const container = document.getElementById('general-news');
+            container.innerHTML = '<div class="loading">Chargement des news...</div>';
+            
+            try {
+                const news = await callFinnhubAPI('news', { category: 'general' });
+                
+                if (!Array.isArray(news)) {
+                    container.innerHTML = '<div class="loading">Erreur chargement news</div>';
+                    return;
+                }
+                
+                let html = '';
+                news.slice(0, 8).forEach(item => {
+                    const date = new Date(item.datetime * 1000).toLocaleString('fr-FR');
+                    html += `
+                        <div class="news-item" onclick="window.open('${item.url}', '_blank')">
+                            <div class="news-title">${item.headline}</div>
+                            <div class="news-source">${item.source} • ${date}</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<div class="loading">Erreur chargement news (API Finnhub requise)</div>';
+            }
+        }
+
+        function toggleLiveMode() {
+            liveMode = !liveMode;
+            
+            if (liveMode) {
+                alert('Mode temps réel : fonctionnalité avancée. Configurez un WebSocket proxy sur votre serveur Vercel.');
+                liveMode = false;
+            }
+        }
+
+        function renderTicker(data, name, symbol) {
+            if (!data) return '<div class="ticker-card loading">Erreur</div>';
+            
+            const isPositive = data.change >= 0;
+            const changeClass = isPositive ? 'positive' : 'negative';
+            const arrow = isPositive ? '▲' : '▼';
+            
+            let priceStr = '$' + data.price.toFixed(2);
+            if (symbol.includes('^')) {
+                priceStr = data.price.toFixed(3) + '%';
+            } else if (symbol.includes('OANDA:')) {
+                priceStr = data.price.toFixed(4);
+            }
+            
+            return `
+                <div class="ticker-card" data-symbol="${symbol}">
+                    ${symbol.includes('OANDA:') ? '<div class="forex-pair">' + symbol.replace('OANDA:', '') + '</div>' : ''}
+                    <div class="ticker-symbol">${name}</div>
+                    <div class="ticker-price">${priceStr}</div>
+                    <div class="ticker-change ${changeClass}">
+                        ${arrow} ${Math.abs(data.change).toFixed(2)} (${Math.abs(data.changePercent).toFixed(2)}%)
+                    </div>
+                </div>
+            `;
+        }
+
+        async function displaySection(sectionId, portfolio) {
+            const container = document.getElementById(sectionId);
+            container.innerHTML = '<div class="loading">Chargement...</div>';
+            
+            let html = '';
+            for (const stock of portfolio) {
+                const data = await fetchQuote(stock.symbol);
+                html += renderTicker(data, stock.name, stock.symbol);
+            }
+            container.innerHTML = html;
+        }
+
+        function showWatchlistSettings() {
+            const currentSymbols = myWatchlist.map(s => s.symbol).join(', ');
+            const newSymbols = prompt(
+                'Entrez vos tickers séparés par des virgules\n\n' +
+                'Exemples:\n' +
+                '- Actions US: AAPL, TSLA, GOOGL\n' +
+                '- Actions Canada: SHOP.TO, RY.TO\n' +
+                '- ETF: SPY, QQQ\n\n' +
+                'Actuel: ' + currentSymbols,
+                currentSymbols
+            );
+            
+            if (newSymbols) {
+                myWatchlist = newSymbols.split(',').map(s => {
+                    const trimmed = s.trim();
+                    return {
+                        symbol: trimmed,
+                        name: trimmed.replace('.TO', ''),
+                        exchange: trimmed.includes('.TO') ? 'TSX' : 'US'
+                    };
+                });
+                
+                localStorage.setItem('myWatchlist', JSON.stringify(myWatchlist));
+                
+                displaySection('watchlist', myWatchlist);
+                displayWatchlistNews();
+            }
+        }
+
+        async function init() {
+            await displaySection('watchlist', myWatchlist);
+            await displayWatchlistNews();
+            await displayEconomicCalendar();
+            await displaySection('forex', portfolios.forex);
+            await displaySection('canada-stocks', portfolios.canadaStocks);
+            await displaySection('us-stocks', portfolios.usStocks);
+            await displaySection('etfs', portfolios.etfs);
+            await displaySection('bonds', portfolios.bonds);
+            await displayGeneralNews();
+        }
+
+        init();
+        setInterval(init, 120000);
+    </script>
+</body>
+</html>
