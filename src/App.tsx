@@ -193,6 +193,7 @@ const GOB = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMarketOpen, setIsMarketOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [logoTestMode, setLogoTestMode] = useState(false);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -486,14 +487,21 @@ const GOB = () => {
           <div className="text-center">
             {/* Logo avec animation */}
             <div className="mb-8 animate-pulse">
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-md border-2 border-green-500/40 shadow-2xl shadow-green-500/20">
-                <div className="text-6xl font-bold text-white drop-shadow-lg animate-bounce">
-                  🤖
-                </div>
-              </div>
-              <div className="text-center mt-4">
-                <div className="text-lg font-semibold text-gray-300 mb-1">JSL AI</div>
-                <div className="text-sm text-gray-400">Powered by</div>
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-md border border-green-500/30 shadow-2xl shadow-green-500/20">
+                <img 
+                  src={isDarkMode ? '/logojslaidark.png' : '/logojslailight.png'} 
+                  alt="JSL AI Logo" 
+                  className="w-20 h-20 object-contain animate-bounce"
+                  onLoad={() => console.log('Welcome logo loaded successfully')}
+                  onError={(e) => {
+                    console.log('Welcome logo failed to load, showing fallback');
+                    e.currentTarget.style.display = 'none';
+                    const fallback = document.createElement('div');
+                    fallback.className = 'w-20 h-20 flex items-center justify-center text-6xl animate-bounce';
+                    fallback.textContent = '🤖';
+                    e.currentTarget.parentElement?.appendChild(fallback);
+                  }}
+                />
               </div>
             </div>
             
@@ -563,34 +571,35 @@ const GOB = () => {
         }`}>
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-6">
-                {/* Logo avec nouvelle disposition */}
-                <div className="flex items-center space-x-3">
-                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center shadow-2xl border-2 ${
-                    isDarkMode 
-                      ? 'bg-gradient-to-br from-green-500/20 to-blue-500/20 border-green-500/40' 
-                      : 'bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-500/40'
-                  }`}>
-                    <div className="text-4xl font-bold text-white drop-shadow-lg">
-                      🤖
+              <div className="flex items-center space-x-4">
+                {/* Logo JSL AI avec fallback robuste */}
+                <div className={`backdrop-blur-md rounded-2xl p-2 shadow-xl border ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600/30' 
+                    : 'bg-gradient-to-br from-white to-gray-100 border-gray-300/30'
+                }`}>
+                  <div className="w-16 h-16 flex items-center justify-center">
+                    <img 
+                      src={isDarkMode ? '/logojslaidark.png' : '/logojslailight.png'} 
+                      alt="JSL AI Logo" 
+                      className="w-14 h-14 object-contain"
+                      onLoad={() => console.log('Logo loaded successfully')}
+                      onError={(e) => {
+                        console.log('Logo failed to load, showing fallback');
+                        e.currentTarget.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.className = 'w-14 h-14 flex items-center justify-center text-3xl';
+                        fallback.textContent = '🤖';
+                        e.currentTarget.parentElement?.appendChild(fallback);
+                      }}
+                    />
+                  </div>
                 </div>
-                </div>
-                  <div className="text-center">
-                    <div className="text-xs font-semibold text-gray-400 mb-1">JSL AI</div>
-                    <div className="text-xs text-gray-500">Powered by</div>
-              </div>
-                </div>
-                
-                {/* Titre principal */}
-                <div className="flex-1">
-                  <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-lg font-['Inter'] mb-2">
-                    GOB Apps
-                  </h1>
-                  <p className={`text-lg font-medium font-['Inter'] ${
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg font-['Inter']">GOB Apps</h1>
+                  <p className={`text-sm font-medium font-['Inter'] ${
                     isDarkMode ? 'text-green-400' : 'text-blue-200'
-                  }`}>
-                    Plateforme financière • Propulsée par JSL AI
-                  </p>
+                  }`}>Plateforme financière • Propulsée par JSL AI</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
