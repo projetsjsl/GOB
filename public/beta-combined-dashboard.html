@@ -66,7 +66,7 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+<body class="min-h-screen">
     <div id="root"></div>
     
     <script type="text/babel">
@@ -102,6 +102,9 @@
             const [scrapingStatus, setScrapingStatus] = useState('idle'); // 'idle', 'running', 'completed', 'error'
             const [scrapingProgress, setScrapingProgress] = useState(0);
             const [scrapingLogs, setScrapingLogs] = useState([]);
+            
+            // État pour le thème
+            const [isDarkMode, setIsDarkMode] = useState(true);
 
             // Configuration API
             const API_BASE_URL = window.location.origin;
@@ -139,6 +142,11 @@
             const showMessage = (text, type = 'info') => {
                 setMessage({ text, type });
                 setTimeout(() => setMessage(null), 5000);
+            };
+
+            // Fonction pour basculer le thème
+            const toggleTheme = () => {
+                setIsDarkMode(!isDarkMode);
             };
 
             // Données Finnhub
@@ -593,7 +601,9 @@
             const SeekingAlphaTab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold text-white">📈 Analyses Seeking Alpha</h2>
+                        <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>📈 Analyses Seeking Alpha</h2>
                         <div className="flex gap-2">
                             <button
                                 onClick={refreshAllStocks}
@@ -637,13 +647,21 @@
                     </div>
 
                     {/* Section Scraping */}
-                    <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-600">
-                        <h3 className="text-lg font-semibold text-white mb-4">🔧 Outils de Scraping</h3>
+                    <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-800/50 border-gray-600' 
+                            : 'bg-white/80 border-gray-300'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🔧 Outils de Scraping</h3>
                         
                         {/* Statut du scraping */}
                         <div className="mb-4">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-white font-medium">Statut:</span>
+                                <span className={`font-medium transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>Statut:</span>
                                 <span className={`px-3 py-1 rounded text-sm font-bold ${
                                     scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
                                     scrapingStatus === 'running' ? 'bg-blue-500 text-white' :
@@ -667,15 +685,25 @@
                                 </div>
                             )}
                             
-                            <div className="text-sm text-gray-300">
+                            <div className={`text-sm transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                            }`}>
                                 Progression: {scrapingProgress}%
                             </div>
                         </div>
 
                         {/* Instructions de scraping */}
-                        <div className="bg-blue-900/30 rounded-lg p-4 mb-4">
-                            <h4 className="text-white font-medium mb-2">📖 Instructions de Scraping</h4>
-                            <div className="text-sm text-blue-200 space-y-2">
+                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-blue-900/30' 
+                                : 'bg-blue-100/80'
+                        }`}>
+                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📖 Instructions de Scraping</h4>
+                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                            }`}>
                                 <div>• <strong>Méthode 1:</strong> Cliquez sur "🚀 Lancer le Scraper" pour ouvrir les pages</div>
                                 <div>• <strong>Méthode 2:</strong> Cliquez sur "📋 Script F12" pour copier un script</div>
                                 <div>• <strong>Étapes:</strong> Ouvrez F12 → Console → Collez le script → Entrée</div>
@@ -684,10 +712,18 @@
                         </div>
 
                         {/* Logs de scraping */}
-                        <div className="bg-black/50 rounded-lg p-4 max-h-64 overflow-y-auto">
-                            <h4 className="text-white font-medium mb-2">📋 Logs de Scraping</h4>
+                        <div className={`rounded-lg p-4 max-h-64 overflow-y-auto transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-black/50' 
+                                : 'bg-gray-100/80'
+                        }`}>
+                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📋 Logs de Scraping</h4>
                             {scrapingLogs.length === 0 ? (
-                                <div className="text-gray-400 text-sm">Aucun log pour le moment...</div>
+                                <div className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`}>Aucun log pour le moment...</div>
                             ) : (
                                 <div className="space-y-1">
                                     {scrapingLogs.map((log, index) => (
@@ -706,20 +742,44 @@
                     </div>
 
                     {/* Tableau de données financières avec actualités */}
-                    <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-600">
-                        <h3 className="text-lg font-semibold text-white mb-4">📊 Données Financières & Actualités</h3>
+                    <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-800/50 border-gray-600' 
+                            : 'bg-white/80 border-gray-300'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>📊 Données Financières & Actualités</h3>
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b border-slate-600">
-                                        <th className="text-left py-2 text-slate-300">Ticker</th>
-                                        <th className="text-left py-2 text-slate-300">Prix</th>
-                                        <th className="text-left py-2 text-slate-300">Change</th>
-                                        <th className="text-left py-2 text-slate-300">P/E</th>
-                                        <th className="text-left py-2 text-slate-300">Dividende</th>
-                                        <th className="text-left py-2 text-slate-300">Secteur</th>
-                                        <th className="text-left py-2 text-slate-300">Sentiment</th>
-                                        <th className="text-left py-2 text-slate-300">Actions</th>
+                                    <tr className={`border-b transition-colors duration-300 ${
+                                        isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                                    }`}>
+                                        <th className={`text-left py-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>Ticker</th>
+                                        <th className={`text-left py-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>Prix</th>
+                                        <th className={`text-left py-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>Change</th>
+                                        <th className={`text-left py-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>P/E</th>
+                                        <th className={`text-left py-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>Dividende</th>
+                                        <th className={`text-left py-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>Secteur</th>
+                                        <th className={`text-left py-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>Sentiment</th>
+                                        <th className={`text-left py-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -769,14 +829,28 @@
                                         return (
                                             <React.Fragment key={ticker}>
                                                 {/* Ligne principale avec données financières */}
-                                                <tr className="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer"
+                                                <tr className={`border-b cursor-pointer transition-colors duration-300 ${
+                                                    isDarkMode 
+                                                        ? 'border-gray-700 hover:bg-gray-700/50' 
+                                                        : 'border-gray-300 hover:bg-gray-100/50'
+                                                }`}
                                                 onClick={() => setSelectedStock(ticker)}>
-                                                    <td className="py-2 font-mono text-white font-bold">{ticker}</td>
-                                                <td className="py-2 text-white">{price}</td>
-                                                <td className={`py-2 ${changeColor}`}>{change}</td>
-                                                <td className="py-2 text-white">{peRatio}</td>
-                                                <td className="py-2 text-white">{dividendYield}</td>
-                                                    <td className="py-2 text-white text-xs">{cleanText(sector)}</td>
+                                                    <td className={`py-2 font-mono font-bold transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>{ticker}</td>
+                                                    <td className={`py-2 transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>{price}</td>
+                                                    <td className={`py-2 ${changeColor}`}>{change}</td>
+                                                    <td className={`py-2 transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>{peRatio}</td>
+                                                    <td className={`py-2 transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>{dividendYield}</td>
+                                                    <td className={`py-2 text-xs transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>{cleanText(sector)}</td>
                                                     <td className="py-2">
                                                         <div className="flex items-center gap-1">
                                                             <span className="text-sm">{sentiment.icon}</span>
@@ -784,7 +858,11 @@
                                                         </div>
                                                     </td>
                                                 <td className="py-2">
-                                                    <button className="text-blue-400 hover:text-blue-300 text-xs">
+                                                    <button className={`text-xs transition-colors duration-300 ${
+                                                        isDarkMode 
+                                                            ? 'text-blue-400 hover:text-blue-300' 
+                                                            : 'text-blue-600 hover:text-blue-700'
+                                                    }`}>
                                                         Voir fiche →
                                                     </button>
                                                 </td>
@@ -792,20 +870,36 @@
                                                 
                                                 {/* Ligne avec actualité récente */}
                                                 {latestNews && (
-                                                    <tr className="border-b border-slate-700/30 hover:bg-slate-700/30">
+                                                    <tr className={`border-b transition-colors duration-300 ${
+                                                        isDarkMode 
+                                                            ? 'border-gray-700/30 hover:bg-gray-700/30' 
+                                                            : 'border-gray-300/30 hover:bg-gray-100/30'
+                                                    }`}>
                                                         <td className="py-1"></td>
                                                         <td colSpan="7" className="py-1">
-                                                            <div className="bg-slate-700/30 rounded p-2 text-xs">
+                                                            <div className={`rounded p-2 text-xs transition-colors duration-300 ${
+                                                                isDarkMode 
+                                                                    ? 'bg-gray-700/30' 
+                                                                    : 'bg-gray-100/50'
+                                                            }`}>
                                                                 <div className="flex items-start gap-2">
-                                                                    <span className="text-blue-400">📰</span>
+                                                                    <span className={`transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                                                    }`}>📰</span>
                                                                     <div className="flex-1">
-                                                                        <div className="text-slate-200 font-medium mb-1">
+                                                                        <div className={`font-medium mb-1 transition-colors duration-300 ${
+                                                                            isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                                                        }`}>
                                                                             {cleanText(latestNews.title)}
                                                                         </div>
-                                                                        <div className="text-slate-300 line-clamp-2">
+                                                                        <div className={`line-clamp-2 transition-colors duration-300 ${
+                                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                                        }`}>
                                                                             {cleanText(latestNews.description)}
                                                                         </div>
-                                                                        <div className="flex items-center gap-2 mt-1 text-slate-400">
+                                                                        <div className={`flex items-center gap-2 mt-1 transition-colors duration-300 ${
+                                                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                        }`}>
                                                                             <span>{latestNews.source?.name || 'Source inconnue'}</span>
                                                                             <span>•</span>
                                                                             <span>
@@ -1269,15 +1363,19 @@
             const StocksNewsTab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold text-white">📊 Stocks & News</h2>
+                        <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>📊 Stocks & News</h2>
                         <div className="flex gap-2">
-                            <div className="flex bg-slate-700 rounded-lg p-1">
+                            <div className={`rounded-lg p-1 transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                            }`}>
                                 <button
                                     onClick={() => setViewMode('list')}
                                     className={`px-3 py-1 rounded text-sm transition-colors ${
                                         viewMode === 'list' 
-                                            ? 'bg-blue-600 text-white' 
-                                            : 'text-gray-300 hover:text-white'
+                                            ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white')
+                                            : (isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                                     }`}
                                 >
                                     📋 Liste
@@ -1286,8 +1384,8 @@
                                     onClick={() => setViewMode('cards')}
                                     className={`px-3 py-1 rounded text-sm transition-colors ${
                                         viewMode === 'cards' 
-                                            ? 'bg-blue-600 text-white' 
-                                            : 'text-gray-300 hover:text-white'
+                                            ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white')
+                                            : (isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                                     }`}
                                 >
                                     🎴 Cartes
@@ -1742,32 +1840,67 @@
             );
 
             return (
-                <div className="min-h-screen">
+                <div className={`min-h-screen transition-colors duration-300 ${
+                    isDarkMode 
+                        ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900' 
+                        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
+                }`}>
                     {/* Header */}
-                    <header className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 border-b border-slate-700">
+                    <header className={`p-6 border-b transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gradient-to-r from-gray-800 to-gray-900 border-gray-700' 
+                            : 'bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300'
+                    }`}>
                         <div className="max-w-7xl mx-auto">
-                            <div className="flex items-center space-x-4">
-                                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 shadow-xl border border-white/20">
-                                    <img 
-                                        src="/logojslaidark.jpg" 
-                                        alt="JSL AI Logo" 
-                                        className="w-8 h-8 object-contain"
-                                    />
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4">
+                                    <div className={`backdrop-blur-md rounded-2xl p-3 shadow-xl border transition-colors duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-white/10 border-white/20' 
+                                            : 'bg-gray-800/10 border-gray-800/20'
+                                    }`}>
+                                        <img 
+                                            src={isDarkMode ? "/logojslaidark.jpg" : "/logojslailight.png"} 
+                                            alt="JSL AI Logo" 
+                                            className="w-8 h-8 object-contain"
+                                        />
+                                    </div>
+                                    <div>
+                                        <h1 className={`text-3xl font-bold mb-2 font-['Inter'] transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>
+                                            GOB Apps - Dashboard Financier Beta
+                                        </h1>
+                                        <p className={`font-['Inter'] transition-colors duration-300 ${
+                                            isDarkMode ? 'text-slate-300' : 'text-gray-600'
+                                        }`}>
+                                            Plateforme financière • Seeking Alpha + Stocks & News • Propulsée par JSL AI
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h1 className="text-3xl font-bold text-white mb-2 font-['Inter']">
-                                        GOB Apps - Dashboard Financier Beta
-                                    </h1>
-                                    <p className="text-slate-300 font-['Inter']">
-                                        Plateforme financière • Seeking Alpha + Stocks & News • Propulsée par JSL AI
-                                    </p>
-                                </div>
+                                
+                                {/* Bouton de basculement de thème */}
+                                <button
+                                    onClick={toggleTheme}
+                                    className={`p-3 rounded-xl transition-all duration-300 hover:scale-105 ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' 
+                                            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                                    }`}
+                                    title={isDarkMode ? 'Passer en mode clair' : 'Passer en mode sombre'}
+                                >
+                                    {isDarkMode ? '☀️' : '🌙'}
+                                </button>
                             </div>
                         </div>
                     </header>
 
                     {/* Navigation par onglets */}
-                    <nav className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700">
+                    <nav className={`backdrop-blur-sm border-b transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-800/50 border-gray-700' 
+                            : 'bg-gray-100/50 border-gray-300'
+                    }`}>
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="flex space-x-1">
                                 {[
@@ -1779,8 +1912,12 @@
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`tab-button px-6 py-3 rounded-t-lg font-medium transition-all ${
                                             activeTab === tab.id 
-                                                ? 'bg-slate-700 text-white border-b-2 border-blue-500' 
-                                                : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                                                ? (isDarkMode 
+                                                    ? 'bg-gray-700 text-white border-b-2 border-blue-500' 
+                                                    : 'bg-gray-200 text-gray-900 border-b-2 border-blue-600')
+                                                : (isDarkMode 
+                                                    ? 'text-slate-300 hover:text-white hover:bg-gray-700/50' 
+                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50')
                                         }`}
                                     >
                                         {tab.label}
@@ -1788,7 +1925,11 @@
                                 ))}
                                 <button
                                     onClick={() => setShowAdmin(true)}
-                                    className="ml-auto px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded"
+                                    className={`ml-auto px-4 py-2 rounded transition-colors duration-300 ${
+                                        isDarkMode 
+                                            ? 'text-slate-300 hover:text-white hover:bg-gray-700/50' 
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
+                                    }`}
                                 >
                                     ⚙️ Admin
                                 </button>
