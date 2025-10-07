@@ -488,7 +488,7 @@ const GOB = () => {
             <div className="mb-8 animate-pulse">
               <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-md border border-green-500/30 shadow-2xl shadow-green-500/20">
                 <img 
-                  src={isDarkMode ? '/logojslaidark.png' : '/logojslailight.png'} 
+                  src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
                   alt="JSL AI Logo" 
                   className="w-20 h-20 object-contain animate-bounce"
                   onError={(e) => {
@@ -582,9 +582,9 @@ const GOB = () => {
                       console.log('Logo error, trying fallback paths');
                       // Essayer différents chemins
                       const paths = [
-                        isDarkMode ? '/logojslaidark.png' : '/logojslailight.png',
-                        isDarkMode ? './logojslaidark.png' : './logojslailight.png',
-                        isDarkMode ? 'public/logojslaidark.png' : 'public/logojslailight.png'
+                        isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg',
+                        isDarkMode ? './logojslaidark.jpg' : './logojslailight.jpg',
+                        isDarkMode ? 'public/logojslaidark.jpg' : 'public/logojslailight.jpg'
                       ];
                       
                       let currentPathIndex = 0;
