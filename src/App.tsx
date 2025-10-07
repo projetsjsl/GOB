@@ -508,25 +508,6 @@ const GOB = () => {
           )}
           
           <div className="text-center relative z-10">
-            {/* Logo avec animation */}
-            <div className="mb-8">
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-md border border-green-500/30 shadow-2xl shadow-green-500/20">
-                <img 
-                  src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
-                  alt="JSL AI Logo" 
-                  className="w-20 h-20 object-contain"
-                  onLoad={() => console.log('Welcome logo loaded successfully')}
-                  onError={(e) => {
-                    console.log('Welcome logo failed to load, showing fallback');
-                    e.currentTarget.style.display = 'none';
-                    const fallback = document.createElement('div');
-                    fallback.className = 'w-20 h-20 flex items-center justify-center text-6xl';
-                    fallback.textContent = '🤖';
-                    e.currentTarget.parentElement?.appendChild(fallback);
-                  }}
-                />
-              </div>
-            </div>
             
             {/* Texte de bienvenue */}
             <div className="space-y-4">
