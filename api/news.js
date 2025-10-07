@@ -53,6 +53,12 @@ export default async function handler(req, res) {
         const query = q || 'finance stock market';
         const url = `https://newsapi.ai/api/v1/article/getArticles`;
         
+        // Construire une requête pour chaque ticker spécifique
+        const tickers = ['CVS', 'MSFT', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META'];
+        const tickerQueries = tickers.map(ticker => ({
+            keyword: ticker
+        }));
+
         const requestBody = {
             apiKey: NEWSAPI_KEY,
             query: {
@@ -60,6 +66,7 @@ export default async function handler(req, res) {
                     $and: [
                         {
                             $or: [
+                                ...tickerQueries,
                                 { conceptUri: "http://en.wikipedia.org/wiki/Finance" },
                                 { conceptUri: "http://en.wikipedia.org/wiki/Stock_market" },
                                 { conceptUri: "http://en.wikipedia.org/wiki/Investment" },
@@ -74,7 +81,7 @@ export default async function handler(req, res) {
             },
             resultType: "articles",
             articlesSortBy: "date",
-            articlesCount: limit * 2, // Récupérer plus pour filtrer
+            articlesCount: limit * 3, // Récupérer plus pour avoir des actualités par ticker
             includeArticleImage: true,
             includeArticleLinks: true
         };
@@ -106,26 +113,61 @@ export default async function handler(req, res) {
             content: article.body
         })) || [];
 
-        // Filtrer pour ne garder que les actualités financières pertinentes
+        // Filtrer et organiser les actualités par ticker
         const financialKeywords = [
             'stock', 'market', 'finance', 'investment', 'trading', 'earnings', 'revenue', 'profit',
             'bourse', 'finance', 'investissement', 'trading', 'bénéfices', 'revenus', 'profit',
             'crypto', 'bitcoin', 'ethereum', 'blockchain', 'economy', 'economic', 'économie'
         ];
 
-        const articles = allArticles
-            .filter(article => {
-                const text = (article.title + ' ' + article.description).toLowerCase();
-                return financialKeywords.some(keyword => text.includes(keyword));
-            })
-            .slice(0, limit); // Limiter au nombre demandé
+        // Grouper les articles par ticker
+        const articlesByTicker = {};
+        tickers.forEach(ticker => {
+            articlesByTicker[ticker] = [];
+        });
+
+        allArticles.forEach(article => {
+            const text = (article.title + ' ' + article.description).toLowerCase();
+            
+            // Vérifier si l'article contient des mots-clés financiers
+            const isFinancial = financialKeywords.some(keyword => text.includes(keyword));
+            
+            if (isFinancial) {
+                // Assigner l'article au ticker correspondant
+                const matchedTicker = tickers.find(ticker => 
+                    text.includes(ticker.toLowerCase()) || 
+                    text.includes(ticker)
+                );
+                
+                if (matchedTicker) {
+                    articlesByTicker[matchedTicker].push(article);
+                } else {
+                    // Articles généraux financiers
+                    if (!articlesByTicker['GENERAL']) {
+                        articlesByTicker['GENERAL'] = [];
+                    }
+                    articlesByTicker['GENERAL'].push(article);
+                }
+            }
+        });
+
+        // Combiner les articles en priorisant les tickers spécifiques
+        const articles = [];
+        tickers.forEach(ticker => {
+            articles.push(...articlesByTicker[ticker].slice(0, 2)); // 2 articles par ticker
+        });
+        articles.push(...(articlesByTicker['GENERAL'] || []).slice(0, 5)); // 5 articles généraux
+        
+        // Limiter au nombre demandé
+        const finalArticles = articles.slice(0, limit);
 
         const result = {
-            articles,
-            totalResults: articles.length,
+            articles: finalArticles,
+            totalResults: finalArticles.length,
             query,
             timestamp: new Date().toISOString(),
-            source: 'newsapi.ai'
+            source: 'newsapi.ai',
+            articlesByTicker: articlesByTicker // Inclure le détail par ticker pour debugging
         };
 
         res.status(200).json(result);
