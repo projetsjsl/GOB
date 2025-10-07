@@ -355,12 +355,25 @@ const GOB = () => {
   useEffect(() => {
     const stored = localStorage.getItem('gobapps');
     if (stored) {
-      setApps(JSON.parse(stored));
+      const parsedApps = JSON.parse(stored);
+      // Vérifier si les anciennes apps sont présentes et les remplacer par les nouvelles par défaut
+      const hasOldApps = parsedApps.some((app: App) => 
+        app.name === 'Seeking Alpha' || app.name === 'Stocks & News'
+      );
+      
+      if (hasOldApps) {
+        // Réinitialiser avec les nouvelles apps par défaut
+        const defaultApps: App[] = [
+          { id: '3', name: 'Dashboard Beta', url: 'https://mygob.vercel.app/beta-combined-dashboard.html', logo: '🚀', order: 0, visible: true }
+        ];
+        setApps(defaultApps);
+        localStorage.setItem('gobapps', JSON.stringify(defaultApps));
+      } else {
+        setApps(parsedApps);
+      }
     } else {
       const defaultApps: App[] = [
-        { id: '1', name: 'Seeking Alpha', url: '/seeking-alpha/index.html', logo: '📈', order: 0, visible: true },
-        { id: '2', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 1, visible: true },
-        { id: '3', name: 'Dashboard Beta', url: 'https://mygob.vercel.app/beta-combined-dashboard.html', logo: '🚀', order: 2, visible: true }
+        { id: '3', name: 'Dashboard Beta', url: 'https://mygob.vercel.app/beta-combined-dashboard.html', logo: '🚀', order: 0, visible: true }
       ];
       setApps(defaultApps);
     }
