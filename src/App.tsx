@@ -835,6 +835,11 @@ const GOB = () => {
             ? 'bg-gradient-to-r from-gray-900/95 via-black/95 to-gray-800/95 text-white border-green-500/20' 
             : 'bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 text-gray-800 border-gray-300/20'
         }`}>
+          <div className="text-center mb-1">
+            <span className={`text-xs font-semibold ${isDarkMode ? 'text-yellow-400' : 'text-orange-600'}`}>
+              ⚠️ VALEURS FICTIVES - EN DÉVELOPPEMENT
+            </span>
+          </div>
           <div className="flex items-center space-x-4 sm:space-x-8 text-xs sm:text-sm font-medium animate-scroll">
             {Object.entries(marketData).map(([key, data]) => (
               <div key={key} className="flex items-center space-x-2 whitespace-nowrap">
