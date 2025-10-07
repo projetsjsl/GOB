@@ -194,6 +194,7 @@ const GOB = () => {
   const [currentTime, setCurrentTime] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMarketOpen, setIsMarketOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -253,7 +254,19 @@ const GOB = () => {
       const theme = themes.find(t => t.id === storedTheme);
       if (theme) setCurrentTheme(theme);
     }
+  }, []);
 
+  // Welcome screen timer
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 3000); // 3 secondes d'animation
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Load dark mode preference
+  useEffect(() => {
     const storedDarkMode = localStorage.getItem('gobapps-dark-mode');
     if (storedDarkMode !== null) {
       setIsDarkMode(storedDarkMode === 'true');
@@ -461,6 +474,51 @@ const GOB = () => {
 
   return (
     <div className={`min-h-screen ${currentTheme.colors.background} relative overflow-hidden`}>
+      {/* Écran de bienvenue */}
+      {showWelcome && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800">
+          <div className="text-center">
+            {/* Logo avec animation */}
+            <div className="mb-8 animate-pulse">
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-md border border-green-500/30 shadow-2xl shadow-green-500/20">
+                <img 
+                  src={isDarkMode ? logojslaidark : logojslailight} 
+                  alt="JSL AI Logo" 
+                  className="w-20 h-20 object-contain animate-bounce"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = document.createElement('div');
+                    fallback.className = 'w-20 h-20 flex items-center justify-center text-6xl animate-bounce';
+                    fallback.textContent = '🤖';
+                    e.currentTarget.parentElement?.appendChild(fallback);
+                  }}
+                />
+              </div>
+            </div>
+            
+            {/* Texte de bienvenue */}
+            <div className="space-y-4">
+              <h1 className="text-6xl font-bold text-white font-['Inter'] animate-fade-in">
+                Bienvenue
+              </h1>
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent font-['Inter'] animate-fade-in-delay">
+                GOB
+              </h2>
+              <p className="text-xl text-gray-300 font-['Inter'] animate-fade-in-delay-2">
+                Plateforme financière • Propulsée par JSL AI
+              </p>
+            </div>
+            
+            {/* Barre de progression */}
+            <div className="mt-12 w-64 mx-auto">
+              <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full animate-progress"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={`fixed inset-0 pointer-events-none ${
         isDarkMode 
           ? 'bg-gradient-to-br from-green-500/5 via-transparent to-red-500/5' 
