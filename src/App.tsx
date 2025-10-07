@@ -242,7 +242,7 @@ const GOB = () => {
       const defaultApps: App[] = [
         { id: '1', name: 'Seeking Alpha', url: '/seeking-alpha/index.html', logo: '📈', order: 0 },
         { id: '2', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 1 },
-        { id: '3', name: 'Dashboard Beta', url: '/beta-combined-dashboard.html', logo: '🚀', order: 2 }
+        { id: '3', name: 'Dashboard Beta', url: 'https://mygob.vercel.app/beta-combined-dashboard.html', logo: '🚀', order: 2 }
       ];
       setApps(defaultApps);
     }
