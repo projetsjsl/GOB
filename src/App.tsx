@@ -204,8 +204,7 @@ const GOB = () => {
     } else {
       const defaultApps: App[] = [
         { id: '1', name: 'Seeking Alpha', url: '/seeking-alpha/index.html', logo: '📈', order: 0 },
-        { id: '2', name: 'Login Page', url: '/login_page.html', logo: '🔐', order: 1 },
-        { id: '3', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 2 }
+        { id: '2', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 1 }
       ];
       setApps(defaultApps);
     }
