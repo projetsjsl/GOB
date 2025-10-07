@@ -578,6 +578,56 @@ const GOB = () => {
       }`}></div>
       
       <header className="relative z-10">
+        {/* Bandeau défilant des indices boursiers */}
+        <div className={`backdrop-blur-xl px-6 py-3 border-b overflow-hidden ${
+          isDarkMode 
+            ? 'bg-gradient-to-r from-gray-900/95 via-black/95 to-gray-800/95 text-white border-green-500/20' 
+            : 'bg-gradient-to-r from-blue-600/95 via-blue-700/95 to-blue-800/95 text-white border-blue-500/20'
+        }`}>
+          <div className="flex items-center space-x-8 text-sm font-medium animate-scroll">
+            <div className="flex items-center space-x-2 whitespace-nowrap">
+              <span className="text-xs font-semibold">S&P 500</span>
+              <span className="text-green-400 font-bold">+0.85%</span>
+              <span className="text-xs text-gray-300">4,567.89</span>
+            </div>
+            <div className="flex items-center space-x-2 whitespace-nowrap">
+              <span className="text-xs font-semibold">NASDAQ</span>
+              <span className="text-green-400 font-bold">+1.23%</span>
+              <span className="text-xs text-gray-300">14,234.56</span>
+            </div>
+            <div className="flex items-center space-x-2 whitespace-nowrap">
+              <span className="text-xs font-semibold">DOW JONES</span>
+              <span className="text-red-400 font-bold">-0.45%</span>
+              <span className="text-xs text-gray-300">34,567.89</span>
+            </div>
+            <div className="flex items-center space-x-2 whitespace-nowrap">
+              <span className="text-xs font-semibold">TSX</span>
+              <span className="text-green-400 font-bold">+0.67%</span>
+              <span className="text-xs text-gray-300">20,123.45</span>
+            </div>
+            <div className="flex items-center space-x-2 whitespace-nowrap">
+              <span className="text-xs font-semibold">EUR/USD</span>
+              <span className="text-green-400 font-bold">+0.12%</span>
+              <span className="text-xs text-gray-300">1.0845</span>
+            </div>
+            <div className="flex items-center space-x-2 whitespace-nowrap">
+              <span className="text-xs font-semibold">GOLD</span>
+              <span className="text-red-400 font-bold">-0.34%</span>
+              <span className="text-xs text-gray-300">$2,034.50</span>
+            </div>
+            <div className="flex items-center space-x-2 whitespace-nowrap">
+              <span className="text-xs font-semibold">OIL</span>
+              <span className="text-green-400 font-bold">+1.56%</span>
+              <span className="text-xs text-gray-300">$78.45</span>
+            </div>
+            <div className="flex items-center space-x-2 whitespace-nowrap">
+              <span className="text-xs font-semibold">BITCOIN</span>
+              <span className="text-green-400 font-bold">+2.34%</span>
+              <span className="text-xs text-gray-300">$43,567.89</span>
+            </div>
+          </div>
+        </div>
+        
         <div className={`backdrop-blur-xl px-6 py-2 border-b ${
           isDarkMode 
             ? 'bg-gradient-to-r from-gray-900/95 via-black/95 to-gray-800/95 text-white border-green-500/20' 
@@ -593,16 +643,6 @@ const GOB = () => {
               </div>
               <div className={isDarkMode ? 'text-gray-300' : 'text-blue-200'}>|</div>
               <span className={isDarkMode ? 'text-gray-300' : 'text-blue-200'}>Heure de Montréal: {currentTime || '00:00'}</span>
-            </div>
-            <div className="flex items-center space-x-4 text-xs">
-              <div className="flex items-center space-x-1">
-                <span className={isDarkMode ? 'text-gray-400' : 'text-blue-300'}>S&P 500:</span>
-                <span className="text-green-400 font-semibold">+0.85%</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <span className={isDarkMode ? 'text-gray-400' : 'text-blue-300'}>NASDAQ:</span>
-                <span className="text-green-400 font-semibold">+1.23%</span>
-              </div>
             </div>
           </div>
         </div>
@@ -646,16 +686,6 @@ const GOB = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <div className={`flex items-center space-x-2 rounded-lg px-3 py-2 border ${
-                  isDarkMode 
-                    ? 'bg-gray-800/50 border-gray-700/50' 
-                    : 'bg-white/50 border-gray-300/50'
-                }`}>
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Portfolio</span>
-                  <span className="text-green-400 font-semibold text-sm">+2.4%</span>
-                </div>
-                
                 <button
                   onClick={toggleDarkMode}
                   className={`w-10 h-10 backdrop-blur-md rounded-xl transition-all flex items-center justify-center border shadow-lg ${
