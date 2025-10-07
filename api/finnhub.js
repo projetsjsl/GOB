@@ -5,9 +5,26 @@ export default async function handler(req, res) {
     // Clé API Finnhub (à configurer dans les variables d'environnement Vercel)
     const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || 'YOUR_FINNHUB_API_KEY';
     
+    // Données de démonstration si pas de clé API
+    const demoData = {
+        'CVS': { c: 78.45, d: 1.23, dp: 1.59, h: 79.12, l: 77.89, o: 78.12, pc: 77.22, t: Date.now() },
+        'MSFT': { c: 378.85, d: -2.15, dp: -0.56, h: 381.20, l: 377.45, o: 380.00, pc: 381.00, t: Date.now() },
+        'AAPL': { c: 175.43, d: 0.87, dp: 0.50, h: 176.20, l: 174.89, o: 175.10, pc: 174.56, t: Date.now() }
+    };
+    
     if (!FINNHUB_API_KEY || FINNHUB_API_KEY === 'YOUR_FINNHUB_API_KEY') {
-        return res.status(500).json({ 
-            error: 'Clé API Finnhub non configurée. Veuillez configurer FINNHUB_API_KEY dans les variables d\'environnement Vercel.' 
+        // Retourner des données de démonstration
+        const demoResult = demoData[symbol] || {
+            c: 100.00, d: 0.50, dp: 0.50, h: 101.00, l: 99.50, o: 100.50, pc: 99.50, t: Date.now()
+        };
+        
+        return res.status(200).json({
+            ...demoResult,
+            symbol,
+            endpoint,
+            timestamp: new Date().toISOString(),
+            source: 'demo',
+            message: 'Données de démonstration - Configurez FINNHUB_API_KEY pour des données réelles'
         });
     }
 

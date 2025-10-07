@@ -203,7 +203,8 @@ const GOB = () => {
       setApps(JSON.parse(stored));
     } else {
       const defaultApps: App[] = [
-        { id: '1', name: 'Dashboard Financier', url: '/financial-dashboard.html', logo: '📊', order: 0 }
+        { id: '1', name: 'Seeking Alpha', url: '/seeking-alpha/index.html', logo: '📈', order: 0 },
+        { id: '2', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 1 }
       ];
       setApps(defaultApps);
     }
