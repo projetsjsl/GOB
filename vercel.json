@@ -1,31 +1,22 @@
 {
   "version": 2,
   "name": "gob-apps",
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/beta-combined-dashboard.html",
-      "dest": "/public/beta-combined-dashboard.html"
+      "source": "/beta-combined-dashboard.html",
+      "destination": "/public/beta-combined-dashboard.html"
     },
     {
-      "src": "/test-simple.html",
-      "dest": "/public/test-simple.html"
+      "source": "/test-simple.html",
+      "destination": "/public/test-simple.html"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/simple-dashboard.html",
+      "destination": "/public/simple-dashboard.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/test-page.html",
+      "destination": "/public/test-page.html"
     }
   ],
   "headers": [
@@ -45,21 +36,6 @@
           "value": "DENY"
         }
       ]
-    },
-    {
-      "source": "/public/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/beta-combined-dashboard.html",
-      "destination": "/public/beta-combined-dashboard.html"
     }
   ]
 }
