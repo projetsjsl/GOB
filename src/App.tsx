@@ -487,16 +487,20 @@ const GOB = () => {
               <div className="flex items-center space-x-4">
                 <div className={`backdrop-blur-md rounded-2xl p-3 shadow-xl border ${
                   isDarkMode 
-                    ? 'bg-gradient-to-br from-green-600 to-green-700 border-green-500/30' 
-                    : 'bg-gradient-to-br from-blue-600 to-blue-700 border-blue-500/30'
+                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600/30' 
+                    : 'bg-gradient-to-br from-white to-gray-100 border-gray-300/30'
                 }`}>
-                  <div className="text-2xl">📈</div>
+                  <img 
+                    src={isDarkMode ? '/logojslaidark.png' : '/logojslailight.png'} 
+                    alt="JSL AI Logo" 
+                    className="w-8 h-8 object-contain"
+                  />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg">GOB Finance</h1>
-                  <p className={`text-sm font-medium ${
+                  <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg font-['Inter']">GOB Apps</h1>
+                  <p className={`text-sm font-medium font-['Inter'] ${
                     isDarkMode ? 'text-green-400' : 'text-blue-200'
-                  }`}>Plateforme d'analyse financière • Propulsé par JSL AI</p>
+                  }`}>Plateforme financière • Propulsée par JSL AI</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">

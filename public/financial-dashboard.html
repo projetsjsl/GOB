@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Financier Unifié - JSL AI</title>
+    <title>GOB Apps - Dashboard Financier Unifié • Propulsé par JSL AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        * {
+            font-family: 'Inter', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .tab-button.active { 
@@ -375,12 +381,23 @@
                     {/* Header */}
                     <header className="bg-gradient-to-r from-purple-800 to-blue-800 p-6">
                         <div className="max-w-7xl mx-auto">
-                            <h1 className="text-3xl font-bold text-white mb-2">
-                                Dashboard Financier Unifié
-                            </h1>
-                            <p className="text-purple-200">
-                                Données en temps réel • Actualités • Analyses Seeking Alpha
-                            </p>
+                            <div className="flex items-center space-x-4">
+                                <div className="bg-white/20 backdrop-blur-md rounded-2xl p-3 shadow-xl border border-white/30">
+                                    <img 
+                                        src="/logojslaidark.png" 
+                                        alt="JSL AI Logo" 
+                                        className="w-8 h-8 object-contain"
+                                    />
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold text-white mb-2 font-['Inter']">
+                                        GOB Apps - Dashboard Financier Unifié
+                                    </h1>
+                                    <p className="text-purple-200 font-['Inter']">
+                                        Plateforme financière • Données en temps réel • Propulsée par JSL AI
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </header>
 
