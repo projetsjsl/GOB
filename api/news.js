@@ -49,11 +49,38 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Construire la requête pour NewsAPI.ai
+        // Construire la requête pour NewsAPI.ai selon la documentation
         const query = q || 'finance stock market';
-        const url = `https://newsapi.ai/api/v1/article/getArticles?apiKey=${NEWSAPI_KEY}&query=${encodeURIComponent(query)}&lang=${language}&max=${limit}&sortBy=date`;
+        const url = `https://newsapi.ai/api/v1/article/getArticles`;
         
-        const response = await fetch(url);
+        const requestBody = {
+            apiKey: NEWSAPI_KEY,
+            query: {
+                $query: {
+                    $and: [
+                        {
+                            $or: [
+                                { conceptUri: "http://en.wikipedia.org/wiki/Finance" },
+                                { conceptUri: "http://en.wikipedia.org/wiki/Stock_market" }
+                            ]
+                        }
+                    ]
+                }
+            },
+            resultType: "articles",
+            articlesSortBy: "date",
+            articlesCount: limit,
+            includeArticleImage: true,
+            includeArticleLinks: true
+        };
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody)
+        });
         
         if (!response.ok) {
             throw new Error(`NewsAPI.ai error: ${response.status}`);
@@ -61,14 +88,14 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         
-        // Transformer les données pour correspondre au format attendu
-        const articles = data.articles?.map(article => ({
+        // Transformer les données selon la structure NewsAPI.ai
+        const articles = data.articles?.results?.map(article => ({
             title: article.title,
             description: article.body?.substring(0, 200) + '...' || article.title,
             url: article.url,
             publishedAt: article.datePublished,
             source: {
-                name: article.source?.name || 'Source inconnue'
+                name: article.source?.title || 'Source inconnue'
             },
             urlToImage: article.image,
             content: article.body
@@ -87,19 +114,49 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('Erreur API NewsAPI.ai:', error);
         
-        // Fallback vers une API gratuite si NewsAPI.ai échoue
+        // Fallback vers une requête simplifiée NewsAPI.ai
         try {
-            const fallbackUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q || 'finance')}&language=${language}&pageSize=${limit}&apiKey=${process.env.NEWSAPI_ORG_KEY || 'demo'}`;
-            const fallbackResponse = await fetch(fallbackUrl);
+            console.log('Tentative avec requête simplifiée...');
+            const simpleRequestBody = {
+                apiKey: NEWSAPI_KEY,
+                query: {
+                    $query: {
+                        keyword: q || 'finance'
+                    }
+                },
+                resultType: "articles",
+                articlesSortBy: "date",
+                articlesCount: limit
+            };
+            
+            const fallbackResponse = await fetch('https://newsapi.ai/api/v1/article/getArticles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(simpleRequestBody)
+            });
             
             if (fallbackResponse.ok) {
                 const fallbackData = await fallbackResponse.json();
+                const articles = fallbackData.articles?.results?.map(article => ({
+                    title: article.title,
+                    description: article.body?.substring(0, 200) + '...' || article.title,
+                    url: article.url,
+                    publishedAt: article.datePublished,
+                    source: {
+                        name: article.source?.title || 'Source inconnue'
+                    },
+                    urlToImage: article.image,
+                    content: article.body
+                })) || [];
+                
                 res.status(200).json({
-                    articles: fallbackData.articles || [],
-                    totalResults: fallbackData.totalResults || 0,
+                    articles,
+                    totalResults: articles.length,
                     query: q,
                     timestamp: new Date().toISOString(),
-                    source: 'newsapi.org (fallback)'
+                    source: 'newsapi.ai (fallback)'
                 });
                 return;
             }
