@@ -249,24 +249,28 @@ const GOB = () => {
     setMarketData(newMarketData);
   };
 
-  // Fonction pour tester la connexion Finnhub
-  const testFinnhubConnection = async () => {
+  // Fonction pour tester la connexion des APIs
+  const testAPIConnection = async () => {
     try {
-      const response = await fetch('/api/finnhub-market-data?test=true');
+      const response = await fetch('/api/unified-market-data?test=true');
       const data = await response.json();
       
       if (data.success) {
-        setApiStatus(`✅ ${data.message}`);
-        console.log('✅ Connexion Finnhub réussie:', data);
+        // Compter les APIs configurées
+        const configured = Object.values(data.apis || {}).filter((api: any) => api.configured);
+        const working = Object.values(data.apis || {}).filter((api: any) => api.success);
+        
+        setApiStatus(`✅ ${working.length}/${configured.length} API(s) fonctionnelle(s)`);
+        console.log('✅ Test APIs réussi:', data);
         return true;
       } else {
-        setApiStatus(`❌ ${data.message}`);
-        console.error('❌ Échec connexion Finnhub:', data);
+        setApiStatus(`⚠️ Aucune API configurée`);
+        console.warn('⚠️ Aucune API configurée:', data);
         return false;
       }
     } catch (error) {
       setApiStatus(`❌ Erreur de connexion`);
-      console.error('❌ Erreur test Finnhub:', error);
+      console.error('❌ Erreur test APIs:', error);
       return false;
     }
   };
@@ -276,12 +280,13 @@ const GOB = () => {
     try {
       const symbols = ['SPX', 'IXIC', 'DJI', 'TSX', 'EURUSD', 'GOLD', 'OIL', 'BTCUSD'];
       const newMarketData: any = {};
+      const apiUsed = new Set<string>();
       
-      console.log('🔄 Récupération des données de marché via API Finnhub...');
+      console.log('🔄 Récupération des données de marché via API unifiée...');
       
       for (const symbol of symbols) {
         try {
-          const response = await fetch(`/api/finnhub-market-data?symbol=${symbol}`);
+          const response = await fetch(`/api/unified-market-data?symbol=${symbol}`);
           const data = await response.json();
           
           console.log(`📊 Données pour ${symbol}:`, data);
@@ -292,12 +297,17 @@ const GOB = () => {
               price: data.c,
               change: data.d,
               changePercent: data.dp,
-              source: data.source || 'unknown'
+              source: data.source || 'unknown',
+              api: data.api_used || 'unknown'
             };
             
-            if (data.source === 'finnhub') {
-              console.log(`✅ Données réelles Finnhub pour ${symbol}`);
-              setApiStatus('✅ Données en temps réel');
+            if (data.api_used && data.api_used !== 'none') {
+              apiUsed.add(data.api_used);
+            }
+            
+            // Log selon la source
+            if (data.source && !data.source.includes('fallback') && !data.source.includes('demo')) {
+              console.log(`✅ Données réelles ${data.api_used} pour ${symbol}`);
             } else {
               console.log(`📋 Données ${data.source} pour ${symbol}`);
             }
@@ -311,12 +321,15 @@ const GOB = () => {
         setMarketData(newMarketData);
         console.log('📈 Données de marché mises à jour:', newMarketData);
         
-        // Vérifier si toutes les données sont fictives
-        const allFictive = Object.values(newMarketData).every((data: any) => 
-          data.source && data.source !== 'finnhub'
+        // Vérifier si on a des vraies données
+        const hasRealData = Object.values(newMarketData).some((data: any) => 
+          data.source && !data.source.includes('fallback') && !data.source.includes('demo')
         );
         
-        if (allFictive) {
+        if (hasRealData && apiUsed.size > 0) {
+          const apiNames = Array.from(apiUsed).join(', ');
+          setApiStatus(`✅ Données réelles (${apiNames})`);
+        } else {
           setApiStatus('⚠️ Données fictives');
         }
       } else {
@@ -867,8 +880,8 @@ const GOB = () => {
               ? 'bg-gradient-to-br from-green-500/5 via-transparent to-red-500/5' 
               : 'bg-gradient-to-br from-blue-500/5 via-transparent to-green-500/5'
           }`}></div>
-          
-          <header className="relative z-10">
+      
+      <header className="relative z-10">
         {/* Bandeau défilant des indices boursiers */}
         <div className={`backdrop-blur-xl px-3 sm:px-6 py-2 sm:py-3 border-b overflow-hidden ${
           isDarkMode 

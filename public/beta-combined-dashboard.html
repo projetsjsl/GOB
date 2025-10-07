@@ -2,227 +2,29 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <title>GOB Apps - Dashboard Financier Beta</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * {
-            font-family: 'Inter', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .tab-button.active { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .stock-card {
-            transition: all 0.3s ease;
-        }
-        .stock-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .seeking-alpha-card {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        }
-        .stocks-news-card {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        }
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-        
-        /* Scrollbar personnalisée */
-        .scrollbar-thin {
-            scrollbar-width: thin;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 3px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 3px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-        
-        /* Dark mode scrollbar */
-        .dark .scrollbar-thin::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-        
-        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #475569;
-        }
-        
-        .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .news-card {
-            transition: all 0.3s ease;
-        }
-        .news-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-    </style>
 </head>
-<body class="min-h-screen">
+<body class="bg-gray-900 text-white min-h-screen">
     <div id="root"></div>
     
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect } = React;
 
         const BetaCombinedDashboard = () => {
-            // États principaux
             const [activeTab, setActiveTab] = useState('seeking-alpha');
             const [tickers, setTickers] = useState(['CVS', 'MSFT', 'MGA', 'GOOG', 'MU', 'BRK.B', 'UNH', 'PFE', 'BCE', 'T']);
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
-            const [seekingAlphaData, setSeekingAlphaData] = useState({});
-            const [seekingAlphaStockData, setSeekingAlphaStockData] = useState({});
             const [loading, setLoading] = useState(false);
-            const [message, setMessage] = useState(null);
-            const [selectedStock, setSelectedStock] = useState(null);
-            const [newTicker, setNewTicker] = useState('');
-            const [showTickerManager, setShowTickerManager] = useState(false);
-            const [lastUpdate, setLastUpdate] = useState(null);
-            const [showAdmin, setShowAdmin] = useState(false);
-            const [apiStatus, setApiStatus] = useState({});
-            const [viewMode, setViewMode] = useState('cards');
-            const [seekingAlphaViewMode, setSeekingAlphaViewMode] = useState('cards');
-            const [newsFilter, setNewsFilter] = useState('all');
-            const [filteredNews, setFilteredNews] = useState([]);
-            
-            // États pour l'interface Seeking Alpha
-            const [githubToken, setGithubToken] = useState('');
-            const [showSettings, setShowSettings] = useState(false);
-            const [showScraperPopup, setShowScraperPopup] = useState(false);
-            
-            // États pour le scraping
-            const [scrapingStatus, setScrapingStatus] = useState('idle');
-            const [scrapingProgress, setScrapingProgress] = useState(0);
-            const [scrapingLogs, setScrapingLogs] = useState([]);
-            
-            // État pour le thème
             const [isDarkMode, setIsDarkMode] = useState(true);
 
-            // Configuration API
             const API_BASE_URL = window.location.origin;
-            
-            // Configuration GitHub
-            const GITHUB_REPO = 'projetsjsl/GOB';
-            const GITHUB_BRANCH = 'main';
-            
-            // Fonction pour nettoyer l'encodage des caractères
-            const cleanText = (text) => {
-                if (!text) return '';
-                return text
-                    .replace(/Ã©/g, 'é')
-                    .replace(/Ã¨/g, 'è')
-                    .replace(/Ã /g, 'à')
-                    .replace(/Ã§/g, 'ç')
-                    .replace(/Ã´/g, 'ô')
-                    .replace(/Ã¢/g, 'â')
-                    .replace(/Ã®/g, 'î')
-                    .replace(/Ã¯/g, 'ï')
-                    .replace(/Ã¹/g, 'ù')
-                    .replace(/Ã»/g, 'û')
-                    .replace(/Ã«/g, 'ë')
-                    .replace(/Ã¤/g, 'ä')
-                    .replace(/Ã¶/g, 'ö')
-                    .replace(/Ã¼/g, 'ü')
-                    .replace(/â€™/g, "'")
-                    .replace(/â€œ/g, '"')
-                    .replace(/â€/g, '"')
-                    .replace(/â€"/g, '–')
-                    .replace(/â€"/g, '—');
-            };
 
-            // Fonction pour extraire le logo depuis les données de scraping
-            const getCompanyLogo = (ticker) => {
-                try {
-                    const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
-                    if (seekingAlphaItem?.raw_text) {
-                        const logoMatch = seekingAlphaItem.raw_text.match(/"logo":"([^"]+)"/);
-                        if (logoMatch && logoMatch[1]) {
-                            return logoMatch[1];
-                        }
-                    }
-                    
-                    const defaultLogos = {
-                        'CVS': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CVS.svg',
-                        'MSFT': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MSFT.svg',
-                        'AAPL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AAPL.svg',
-                        'GOOGL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/GOOGL.svg',
-                        'AMZN': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AMZN.svg',
-                        'TSLA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/TSLA.svg',
-                        'NVDA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NVDA.svg',
-                        'META': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/META.svg',
-                        'MGA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MGA.svg',
-                        'GOOG': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/GOOG.svg',
-                        'MU': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MU.svg',
-                        'BRK.B': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/BRK.B.svg',
-                        'UNH': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/UNH.svg',
-                        'PFE': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/PFE.svg',
-                        'BCE': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/BCE.svg',
-                        'T': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/T.svg'
-                    };
-                    
-                    return defaultLogos[ticker] || `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
-                } catch (error) {
-                    console.error(`Erreur extraction logo pour ${ticker}:`, error);
-                    return `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
-                }
-            };
-
-            // Messages
-            const showMessage = (text, type = 'info') => {
-                setMessage({ text, type });
-                setTimeout(() => setMessage(null), 5000);
-            };
-
-            // Fonction pour basculer le thème
-            const toggleTheme = () => {
-                setIsDarkMode(!isDarkMode);
-            };
-
-            // Données Finnhub
             const fetchStockData = async (ticker) => {
                 try {
                     const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
@@ -238,483 +40,60 @@
                 console.log('🔄 Actualisation des données stocks...');
                 setLoading(true);
                 const newStockData = {};
-                let successCount = 0;
-                let errorCount = 0;
                 
                 for (const ticker of tickers) {
-                    console.log(`📊 Récupération des données pour ${ticker}...`);
                     try {
                         const data = await fetchStockData(ticker);
                         if (data && !data.message) {
-                            newStockData[ticker] = {
-                                ...data,
-                                timestamp: new Date().toISOString()
-                            };
-                            successCount++;
-                            console.log(`✅ ${ticker}: Données récupérées`, data);
-                        } else {
-                            console.log(`⚠️ ${ticker}: Pas de données ou erreur API`, data);
-                            errorCount++;
+                            newStockData[ticker] = data;
                         }
                     } catch (error) {
                         console.error(`❌ ${ticker}: Erreur`, error);
-                        errorCount++;
                     }
                 }
                 
                 setStockData(newStockData);
-                setLastUpdate(new Date());
                 setLoading(false);
-                
-                const message = `Données mises à jour: ${successCount} succès, ${errorCount} erreurs`;
-                console.log(message);
-                showMessage(message, successCount > 0 ? 'success' : 'warning');
             };
 
-            // Actualités NewsAPI.ai
             const fetchNews = async () => {
-                console.log('📰 Récupération des actualités...');
                 try {
                     const tickersQuery = tickers.join(' OR ');
-                    console.log(`🔍 Recherche pour: ${tickersQuery}`);
-                    
                     const response = await fetch(`${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=20`);
-                    console.log(`📡 Réponse API News: ${response.status}`);
                     
                     if (!response.ok) throw new Error(`News API error: ${response.status}`);
                     
                     const data = await response.json();
-                    console.log('📊 Données news reçues:', data);
-                    
                     setNewsData(data.articles || []);
-                    setFilteredNews(data.articles || []);
-                    
-                    if (data.source === 'demo') {
-                        showMessage('Actualités de démonstration - Configurez NEWSAPI_KEY pour des actualités réelles', 'info');
-                    } else {
-                        showMessage(`${data.articles?.length || 0} actualités chargées`, 'success');
-                    }
                 } catch (error) {
                     console.error('❌ Erreur fetch news:', error);
-                    showMessage('Erreur chargement actualités', 'error');
-                    
-                    const fallbackNews = [
-                        {
-                            title: "Actualités financières non disponibles",
-                            description: "Impossible de charger les actualités. Vérifiez la configuration de l'API NewsAPI.",
-                            url: "#",
-                            publishedAt: new Date().toISOString(),
-                            source: { name: "Système" }
-                        }
-                    ];
-                    setNewsData(fallbackNews);
-                    setFilteredNews(fallbackNews);
                 }
             };
 
-            // Données Seeking Alpha
-            const fetchSeekingAlphaData = async () => {
-                try {
-                    const response = await fetch('/seeking-alpha/stock_analysis.json');
-                    if (response.ok) {
-                        const data = await response.json();
-                        setSeekingAlphaData(data);
-                    }
-                } catch (error) {
-                    console.error('Erreur fetch Seeking Alpha:', error);
-                }
-            };
-
-            const fetchSeekingAlphaStockData = async () => {
-                try {
-                    const response = await fetch('/seeking-alpha/stock_data.json');
-                    if (response.ok) {
-                        const data = await response.json();
-                        setSeekingAlphaStockData(data);
-                    }
-                } catch (error) {
-                    console.error('Erreur fetch Seeking Alpha stock data:', error);
-                }
-            };
-
-            // Monitoring Admin
-            const checkApiStatus = async () => {
-                const status = {
-                    finnhub: { status: 'checking', responseTime: 0, error: null },
-                    newsapi: { status: 'checking', responseTime: 0, error: null },
-                    seekingAlpha: { status: 'checking', responseTime: 0, error: null }
-                };
-
-                // Test Finnhub API
-                try {
-                    const startTime = Date.now();
-                    const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=AAPL`);
-                    const responseTime = Date.now() - startTime;
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        status.finnhub = {
-                            status: data.message ? 'warning' : 'success',
-                            responseTime,
-                            error: data.message || null
-                        };
-                    } else {
-                        status.finnhub = { status: 'error', responseTime, error: `HTTP ${response.status}` };
-                    }
-                } catch (error) {
-                    status.finnhub = { status: 'error', responseTime: 0, error: error.message };
-                }
-
-                // Test NewsAPI
-                try {
-                    const startTime = Date.now();
-                    const response = await fetch(`${API_BASE_URL}/api/news?q=finance&limit=5`);
-                    const responseTime = Date.now() - startTime;
-                    
-                    if (response.ok) {
-                        status.newsapi = { status: 'success', responseTime, error: null };
-                    } else {
-                        status.newsapi = { status: 'error', responseTime, error: `HTTP ${response.status}` };
-                    }
-                } catch (error) {
-                    status.newsapi = { status: 'error', responseTime: 0, error: error.message };
-                }
-
-                // Test Seeking Alpha
-                try {
-                    const startTime = Date.now();
-                    const response = await fetch('/seeking-alpha/stock_analysis.json');
-                    const responseTime = Date.now() - startTime;
-                    
-                    if (response.ok) {
-                        status.seekingAlpha = { status: 'success', responseTime, error: null };
-                    } else {
-                        status.seekingAlpha = { status: 'error', responseTime, error: `HTTP ${response.status}` };
-                    }
-                } catch (error) {
-                    status.seekingAlpha = { status: 'error', responseTime: 0, error: error.message };
-                }
-
-                setApiStatus(status);
-            };
-
-            // Initialisation
             useEffect(() => {
-                console.log('🚀 Initialisation du dashboard...');
-                
-                const loadAllData = async () => {
-                    console.log('📊 Chargement des données...');
-                    try {
-                        await Promise.all([
-                            fetchSeekingAlphaData(),
-                            fetchSeekingAlphaStockData(),
-                            refreshAllStocks(),
-                            fetchNews(),
-                            checkApiStatus()
-                        ]);
-                        console.log('✅ Toutes les données chargées');
-                    } catch (error) {
-                        console.error('❌ Erreur lors du chargement:', error);
-                    }
-                };
-                
-                loadAllData();
-                
-                const interval = setInterval(() => {
-                    console.log('🔄 Auto-refresh des données...');
-                    refreshAllStocks();
-                    fetchNews();
-                    fetchSeekingAlphaData();
-                    fetchSeekingAlphaStockData();
-                }, 300000);
-                
-                return () => clearInterval(interval);
+                refreshAllStocks();
+                fetchNews();
             }, []);
 
-            // Mettre à jour les actualités filtrées quand les actualités changent
-            useEffect(() => {
-                setFilteredNews(newsData);
-            }, [newsData]);
-
-            // Composant Admin
-            const AdminPanel = () => (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className={`rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto mx-4 ${
-                        isDarkMode ? 'bg-gray-900' : 'bg-white'
-                    }`}>
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                🔧 Panel d'Administration
-                            </h3>
-                            <button
-                                onClick={() => setShowAdmin(false)}
-                                className={`px-4 py-2 rounded-lg transition-colors ${
-                                    isDarkMode 
-                                        ? 'bg-gray-700 text-white hover:bg-gray-600' 
-                                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                                }`}
-                            >
-                                ✕ Fermer
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Section Gestion des Tickers */}
-                            <div className={`rounded-lg p-4 border ${
-                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'
-                            }`}>
-                                <h4 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    📊 Gestion des Tickers
-                                </h4>
-                                
-                                <div className="space-y-3">
-                                    <div>
-                                        <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Tickers actuels ({tickers.length})
-                                        </label>
-                                        <div className={`p-3 rounded-lg border max-h-32 overflow-y-auto ${
-                                            isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
-                                        }`}>
-                                            <div className="flex flex-wrap gap-2">
-                                                {tickers.map((ticker, index) => (
-                                                    <span
-                                                        key={ticker}
-                                                        className={`px-2 py-1 rounded text-sm flex items-center gap-1 ${
-                                                            isDarkMode 
-                                                                ? 'bg-blue-600 text-white' 
-                                                                : 'bg-blue-100 text-blue-800'
-                                                        }`}
-                                                    >
-                                                        {ticker}
-                                                        <button
-                                                            onClick={() => {
-                                                                const newTickers = tickers.filter((_, i) => i !== index);
-                                                                setTickers(newTickers);
-                                                            }}
-                                                            className="ml-1 hover:text-red-400"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Ajouter un ticker
-                                        </label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                value={newTicker}
-                                                onChange={(e) => setNewTicker(e.target.value.toUpperCase())}
-                                                placeholder="Ex: AAPL"
-                                                className={`flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                                    isDarkMode 
-                                                        ? 'bg-gray-700 border-gray-600 text-white' 
-                                                        : 'bg-white border-gray-300 text-gray-900'
-                                                }`}
-                                                onKeyPress={(e) => {
-                                                    if (e.key === 'Enter' && newTicker.trim()) {
-                                                        if (!tickers.includes(newTicker.trim())) {
-                                                            setTickers([...tickers, newTicker.trim()]);
-                                                            setNewTicker('');
-                                                        }
-                                                    }
-                                                }}
-                                            />
-                                            <button
-                                                onClick={() => {
-                                                    if (newTicker.trim() && !tickers.includes(newTicker.trim())) {
-                                                        setTickers([...tickers, newTicker.trim()]);
-                                                        setNewTicker('');
-                                                    }
-                                                }}
-                                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => {
-                                                const defaultTickers = ['CVS', 'MSFT', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META'];
-                                                setTickers(defaultTickers);
-                                            }}
-                                            className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                                        >
-                                            🔄 Reset Défaut
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                const allTickers = ['CVS', 'MSFT', 'MGA', 'GOOG', 'MU', 'BRK.B', 'UNH', 'PFE', 'BCE', 'T', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META'];
-                                                setTickers(allTickers);
-                                            }}
-                                            className="flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
-                                        >
-                                            📈 Tous les Tickers
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Section Debug des Données */}
-                            <div className={`rounded-lg p-4 border ${
-                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'
-                            }`}>
-                                <h4 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    🔍 Debug des Données
-                                </h4>
-                                
-                                <div className="space-y-3 text-sm">
-                                    <div className={`p-3 rounded-lg border ${
-                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
-                                    }`}>
-                                        <div className="text-blue-400 font-medium mb-2">📊 Stock Data</div>
-                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Tickers: {tickers.length} ({tickers.join(', ')})
-                                        </div>
-                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Données chargées: {Object.keys(stockData).length}
-                                        </div>
-                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
-                                        </div>
-                                    </div>
-
-                                    <div className={`p-3 rounded-lg border ${
-                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
-                                    }`}>
-                                        <div className="text-emerald-400 font-medium mb-2">📰 News Data</div>
-                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Articles: {newsData.length}
-                                        </div>
-                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
-                                        </div>
-                                    </div>
-
-                                    <div className={`p-3 rounded-lg border ${
-                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
-                                    }`}>
-                                        <div className="text-violet-400 font-medium mb-2">🎯 Seeking Alpha</div>
-                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Stocks: {seekingAlphaData.stocks?.length || 0}
-                                        </div>
-                                        <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Section Status des APIs */}
-                        <div className={`mt-6 rounded-lg p-4 border ${
-                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'
-                        }`}>
-                            <h4 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                🌐 Status des APIs
-                            </h4>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {Object.entries(apiStatus).map(([api, status]) => (
-                                    <div key={api} className={`flex items-center justify-between p-3 rounded-lg border ${
-                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
-                                    }`}>
-                                        <span className={`font-mono capitalize ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            {api}
-                                        </span>
-                                        <div className="flex items-center gap-2">
-                                            <span className={`w-3 h-3 rounded-full ${
-                                                status.status === 'success' ? 'bg-green-500' :
-                                                status.status === 'warning' ? 'bg-yellow-500' :
-                                                status.status === 'error' ? 'bg-red-500' : 'bg-gray-500'
-                                            }`}></span>
-                                            <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                {status.responseTime}ms
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="flex gap-2 mt-4">
-                                <button
-                                    onClick={checkApiStatus}
-                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    🔄 Vérifier les APIs
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setLoading(true);
-                                        refreshAllStocks();
-                                        fetchNews();
-                                    }}
-                                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                >
-                                    🔄 Actualiser Données
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-
             return (
-                <div className={`min-h-screen transition-colors duration-300 ${
-                    isDarkMode 
-                        ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900' 
-                        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
-                }`}>
+                <div className="min-h-screen bg-gray-900 text-white">
                     {/* Header */}
-                    <header className={`p-6 border-b transition-colors duration-300 ${
-                        isDarkMode 
-                            ? 'bg-gradient-to-r from-gray-800 to-gray-900 border-gray-700' 
-                            : 'bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300'
-                    }`}>
+                    <header className="p-6 border-b border-gray-700">
                         <div className="max-w-7xl mx-auto">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4">
-                                    <div className={`backdrop-blur-md rounded-2xl p-3 shadow-xl border transition-colors duration-300 ${
-                                        isDarkMode 
-                                            ? 'bg-white/10 border-white/20' 
-                                            : 'bg-gray-800/10 border-gray-800/20'
-                                    }`}>
-                                        <img 
-                                            src={isDarkMode ? "/logojslaidark.jpg" : "/logojslailight.png"} 
-                                            alt="JSL AI Logo" 
-                                            className="w-8 h-8 object-contain"
-                                        />
+                                    <div className="bg-blue-600 p-3 rounded-xl">
+                                        <span className="text-2xl">🚀</span>
                                     </div>
                                     <div>
-                                        <h1 className={`text-3xl font-bold mb-2 font-['Inter'] transition-colors duration-300 ${
-                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>
-                                            GOB Apps - Dashboard Financier Beta
-                                        </h1>
-                                        <p className={`font-['Inter'] transition-colors duration-300 ${
-                                            isDarkMode ? 'text-slate-300' : 'text-gray-600'
-                                        }`}>
-                                            Plateforme financière • Seeking Alpha + Stocks & News • Propulsée par JSL AI
-                                        </p>
+                                        <h1 className="text-3xl font-bold">GOB Apps - Dashboard Financier Beta</h1>
+                                        <p className="text-gray-300">Plateforme financière • Propulsée par JSL AI</p>
                                     </div>
                                 </div>
                                 
-                                {/* Bouton de basculement de thème */}
                                 <button
-                                    onClick={toggleTheme}
-                                    className={`p-3 rounded-xl transition-all duration-300 hover:scale-105 ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' 
-                                            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                                    }`}
-                                    title={isDarkMode ? 'Passer en mode clair' : 'Passer en mode sombre'}
+                                    onClick={() => setIsDarkMode(!isDarkMode)}
+                                    className="p-3 bg-gray-700 rounded-xl hover:bg-gray-600"
                                 >
                                     {isDarkMode ? '☀️' : '🌙'}
                                 </button>
@@ -722,43 +101,29 @@
                         </div>
                     </header>
 
-                    {/* Navigation par onglets */}
-                    <nav className={`backdrop-blur-sm border-b transition-colors duration-300 ${
-                        isDarkMode 
-                            ? 'bg-gray-800/50 border-gray-700' 
-                            : 'bg-gray-100/50 border-gray-300'
-                    }`}>
+                    {/* Navigation */}
+                    <nav className="bg-gray-800 border-b border-gray-700">
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="flex space-x-1">
-                                {[
-                                    { id: 'seeking-alpha', label: '📈 Seeking Alpha' },
-                                    { id: 'stocks-news', label: '📊 Stocks & News' }
-                                ].map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`tab-button px-6 py-3 rounded-t-lg font-medium transition-all ${
-                                            activeTab === tab.id 
-                                                ? (isDarkMode 
-                                                    ? 'bg-gray-700 text-white border-b-2 border-blue-500' 
-                                                    : 'bg-gray-200 text-gray-900 border-b-2 border-blue-600')
-                                                : (isDarkMode 
-                                                    ? 'text-slate-300 hover:text-white hover:bg-gray-700/50' 
-                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50')
-                                        }`}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
                                 <button
-                                    onClick={() => setShowAdmin(true)}
-                                    className={`ml-auto px-4 py-2 rounded transition-colors duration-300 ${
-                                        isDarkMode 
-                                            ? 'text-slate-300 hover:text-white hover:bg-gray-700/50' 
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
+                                    onClick={() => setActiveTab('seeking-alpha')}
+                                    className={`px-6 py-3 rounded-t-lg font-medium ${
+                                        activeTab === 'seeking-alpha' 
+                                            ? 'bg-gray-700 text-white border-b-2 border-blue-500' 
+                                            : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
                                     }`}
                                 >
-                                    ⚙️ Admin
+                                    📈 Seeking Alpha
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('stocks-news')}
+                                    className={`px-6 py-3 rounded-t-lg font-medium ${
+                                        activeTab === 'stocks-news' 
+                                            ? 'bg-gray-700 text-white border-b-2 border-blue-500' 
+                                            : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
+                                    }`}
+                                >
+                                    📊 Stocks & News
                                 </button>
                             </div>
                         </div>
@@ -769,118 +134,45 @@
                         {activeTab === 'seeking-alpha' && (
                             <div className="space-y-6">
                                 <div className="flex justify-between items-center">
-                                    <h2 className={`text-2xl font-bold transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>📈 Analyses Seeking Alpha</h2>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={refreshAllStocks}
-                                            disabled={loading}
-                                            className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
-                                        >
-                                            {loading ? 'Actualisation...' : 'Actualiser Stocks'}
-                                        </button>
-                                        <button
-                                            onClick={fetchNews}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                                        >
-                                            Actualiser News
-                                        </button>
-                                    </div>
+                                    <h2 className="text-2xl font-bold">📈 Analyses Seeking Alpha</h2>
+                                    <button
+                                        onClick={refreshAllStocks}
+                                        disabled={loading}
+                                        className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+                                    >
+                                        {loading ? 'Actualisation...' : 'Actualiser Stocks'}
+                                    </button>
                                 </div>
 
                                 {/* Tableau des tickers */}
-                                <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
-                                    isDarkMode 
-                                        ? 'bg-gray-800/50 border-gray-600' 
-                                        : 'bg-white/80 border-gray-300'
-                                }`}>
-                                    <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>📊 Données Financières & Actualités</h3>
-                                    <div className="overflow-x-auto max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 relative">
+                                <div className="bg-gray-800 rounded-lg p-4 border border-gray-600">
+                                    <h3 className="text-lg font-semibold mb-4">📊 Données Financières</h3>
+                                    <div className="overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <thead>
-                                                <tr className={`border-b transition-colors duration-300 ${
-                                                    isDarkMode ? 'border-gray-600' : 'border-gray-300'
-                                                }`}>
-                                                    <th className={`text-left py-2 transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>Ticker</th>
-                                                    <th className={`text-left py-2 transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>Prix</th>
-                                                    <th className={`text-left py-2 transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>Change</th>
-                                                    <th className={`text-left py-2 transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>P/E</th>
-                                                    <th className={`text-left py-2 transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>Dividende</th>
-                                                    <th className={`text-left py-2 transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>Secteur</th>
-                                                    <th className={`text-left py-2 transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>Actions</th>
+                                                <tr className="border-b border-gray-600">
+                                                    <th className="text-left py-2 text-gray-300">Ticker</th>
+                                                    <th className="text-left py-2 text-gray-300">Prix</th>
+                                                    <th className="text-left py-2 text-gray-300">Change</th>
+                                                    <th className="text-left py-2 text-gray-300">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {tickers.map(ticker => {
-                                                    const stockDataItem = stockData[ticker];
-                                                    const price = stockDataItem?.c ? `$${stockDataItem.c.toFixed(2)}` : 'N/A';
-                                                    const change = stockDataItem?.d ? `${stockDataItem.d > 0 ? '+' : ''}${stockDataItem.d.toFixed(2)}` : 'N/A';
-                                                    const changePercent = stockDataItem?.dp ? `${stockDataItem.dp > 0 ? '+' : ''}${stockDataItem.dp.toFixed(2)}%` : 'N/A';
-                                                    const changeColor = stockDataItem?.d > 0 ? 'text-green-400' : stockDataItem?.d < 0 ? 'text-red-400' : 'text-gray-400';
-                                                    
-                                                    const profile = stockDataItem?.profile;
-                                                    const peRatio = profile?.pe ? profile.pe.toFixed(2) : 'N/A';
-                                                    const dividendYield = profile?.dividend ? `${(profile.dividend * 100).toFixed(2)}%` : 'N/A';
-                                                    const sector = profile?.industry || 'N/A';
+                                                    const data = stockData[ticker];
+                                                    const price = data?.c ? `$${data.c.toFixed(2)}` : 'N/A';
+                                                    const change = data?.d ? `${data.d > 0 ? '+' : ''}${data.d.toFixed(2)}` : 'N/A';
+                                                    const changeColor = data?.d > 0 ? 'text-green-400' : data?.d < 0 ? 'text-red-400' : 'text-gray-400';
                                                     
                                                     return (
-                                                        <tr key={ticker} className={`border-b cursor-pointer transition-colors duration-300 ${
-                                                            isDarkMode 
-                                                                ? 'border-gray-700 hover:bg-gray-700/50' 
-                                                                : 'border-gray-300 hover:bg-gray-100/50'
-                                                        }`}
-                                                        onClick={() => setSelectedStock(ticker)}>
+                                                        <tr key={ticker} className="border-b border-gray-700 hover:bg-gray-700/50">
                                                             <td className="py-2">
-                                                                <div className="flex items-center gap-2">
-                                                                    <img 
-                                                                        src={getCompanyLogo(ticker)} 
-                                                                        alt={`${ticker} logo`}
-                                                                        className="w-5 h-5 rounded"
-                                                                        onError={(e) => {
-                                                                            e.target.style.display = 'none';
-                                                                        }}
-                                                                    />
-                                                                    <span className={`font-mono font-bold transition-colors duration-300 ${
-                                                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                                                    }`}>{ticker}</span>
-                                                                </div>
+                                                                <span className="font-mono font-bold text-white">{ticker}</span>
                                                             </td>
-                                                            <td className={`py-2 transition-colors duration-300 ${
-                                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                                            }`}>{price}</td>
-                                                            <td className={`py-2 ${changeColor}`}>{change} ({changePercent})</td>
-                                                            <td className={`py-2 transition-colors duration-300 ${
-                                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                                            }`}>{peRatio}</td>
-                                                            <td className={`py-2 transition-colors duration-300 ${
-                                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                                            }`}>{dividendYield}</td>
-                                                            <td className={`py-2 text-xs transition-colors duration-300 ${
-                                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                                            }`}>{cleanText(sector)}</td>
+                                                            <td className="py-2 text-white">{price}</td>
+                                                            <td className={`py-2 ${changeColor}`}>{change}</td>
                                                             <td className="py-2">
-                                                                <button className={`text-xs transition-colors duration-300 ${
-                                                                    isDarkMode 
-                                                                        ? 'text-blue-400 hover:text-blue-300' 
-                                                                        : 'text-blue-600 hover:text-blue-700'
-                                                                }`}>
+                                                                <button className="text-xs text-blue-400 hover:text-blue-300">
                                                                     Voir fiche →
                                                                 </button>
                                                             </td>
@@ -897,9 +189,7 @@
                         {activeTab === 'stocks-news' && (
                             <div className="space-y-6">
                                 <div className="flex justify-between items-center">
-                                    <h2 className={`text-2xl font-bold transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>📊 Stocks & News</h2>
+                                    <h2 className="text-2xl font-bold">📊 Stocks & News</h2>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={refreshAllStocks}
@@ -925,76 +215,36 @@
 
                                         const price = `$${data.c?.toFixed(2) || 'N/A'}`;
                                         const change = data.d ? `${data.d > 0 ? '+' : ''}${data.d.toFixed(2)}` : 'N/A';
-                                        const changePercent = data.dp ? `${data.dp > 0 ? '+' : ''}${data.dp.toFixed(2)}%` : 'N/A';
                                         const changeColor = data.d > 0 ? 'text-green-400' : data.d < 0 ? 'text-red-400' : 'text-gray-400';
                                         const changeBgColor = data.d > 0 ? 'bg-green-500' : 'bg-red-500';
                                         
-                                        const profile = data?.profile;
-                                        const peRatio = profile?.pe ? profile.pe.toFixed(2) : 'N/A';
-                                        const dividendYield = profile?.dividend ? `${(profile.dividend * 100).toFixed(2)}%` : 'N/A';
-                                        const sector = profile?.industry || 'N/A';
-                                        const marketCap = profile?.marketCapitalization ? `$${(profile.marketCapitalization / 1000000000).toFixed(1)}B` : 'N/A';
-                                        
                                         return (
-                                            <div key={ticker} className="bg-slate-800/50 rounded-lg p-6 border border-slate-600 hover:border-blue-400/50 transition-all cursor-pointer"
-                                                 onClick={() => setSelectedStock(ticker)}>
+                                            <div key={ticker} className="bg-gray-800 rounded-lg p-6 border border-gray-600 hover:border-blue-400/50 transition-all cursor-pointer">
                                                 
                                                 {/* Header avec ticker */}
                                                 <div className="flex justify-between items-start mb-6">
-                                                    <div className="flex items-center gap-3">
-                                                        <img 
-                                                            src={getCompanyLogo(ticker)} 
-                                                            alt={`${ticker} logo`}
-                                                            className="w-12 h-12 rounded-lg"
-                                                            onError={(e) => {
-                                                                e.target.style.display = 'none';
-                                                            }}
-                                                        />
-                                                        <div>
-                                                            <h3 className="text-2xl font-bold text-white">{ticker}</h3>
-                                                            <p className="text-sm text-slate-400">
-                                                                {cleanText(profile?.name || 'N/A')}
-                                                            </p>
-                                                        </div>
+                                                    <div>
+                                                        <h3 className="text-2xl font-bold text-white">{ticker}</h3>
+                                                        <p className="text-sm text-gray-400">Stock Data</p>
                                                     </div>
                                                 </div>
                                                 
                                                 {/* Prix et changement */}
-                                                <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
+                                                <div className="bg-gray-700 rounded-lg p-4 mb-6 border border-gray-600">
                                                     <div className="text-3xl font-bold text-white mb-1">
                                                         {price}
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <div className={`w-4 h-4 ${changeBgColor} rounded`}></div>
                                                         <span className={`text-sm font-medium ${changeColor}`}>
-                                                            {change} ({changePercent})
+                                                            {change}
                                                         </span>
                                                     </div>
                                                 </div>
                                                 
-                                                {/* Métriques clés */}
-                                                <div className="space-y-3 mb-6">
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-slate-400">Market Cap</span>
-                                                        <span className="text-white font-medium">{marketCap}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-slate-400">P/E Ratio</span>
-                                                        <span className="text-white font-medium">{peRatio}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-slate-400">Dividend</span>
-                                                        <span className="text-white font-medium">{dividendYield}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-slate-400">Secteur</span>
-                                                        <span className="text-white font-medium">{cleanText(sector)}</span>
-                                                    </div>
-                                                </div>
-
                                                 {/* Call to action */}
                                                 <div className="text-center">
-                                                    <div className="flex items-center justify-center gap-2 text-slate-400 text-sm">
+                                                    <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
                                                         <span>👆</span>
                                                         <span>Cliquez pour le rapport détaillé</span>
                                                     </div>
@@ -1003,22 +253,40 @@
                                         );
                                     })}
                                 </div>
+
+                                {/* Actualités */}
+                                <div className="bg-gray-800 rounded-lg p-4 border border-gray-600">
+                                    <h3 className="text-lg font-semibold mb-4">📰 Actualités Financières</h3>
+                                    {newsData.length > 0 ? (
+                                        <div className="space-y-3">
+                                            {newsData.slice(0, 5).map((article, index) => (
+                                                <div key={index} className="p-3 bg-gray-700 rounded hover:bg-gray-600">
+                                                    <h4 className="text-white font-medium mb-1">{article.title}</h4>
+                                                    <p className="text-gray-300 text-sm">{article.description}</p>
+                                                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
+                                                        <span>{article.source?.name || 'Source inconnue'}</span>
+                                                        <span>•</span>
+                                                        <span>
+                                                            {article.publishedAt ? 
+                                                                new Date(article.publishedAt).toLocaleString('fr-FR') : 
+                                                                'Date inconnue'
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8">
+                                            <div className="text-4xl mb-2">📰</div>
+                                            <p className="text-gray-400">Aucune actualité disponible</p>
+                                            <p className="text-sm text-gray-500 mt-1">Cliquez sur "Actualiser News" pour charger les actualités</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </main>
-
-                    {/* Messages */}
-                    {message && (
-                        <div className={`fixed top-4 right-4 p-4 rounded-lg z-50 ${
-                            message.type === 'error' ? 'bg-red-500' : 
-                            message.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
-                        } text-white`}>
-                            {message.text}
-                        </div>
-                    )}
-
-                    {/* Panel Admin */}
-                    {showAdmin && <AdminPanel />}
                 </div>
             );
         };
