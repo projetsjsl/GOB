@@ -484,26 +484,26 @@ const GOB = () => {
       {showWelcome && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 relative">
           {/* Logo en arrière-plan */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-10">
-            <img 
-              src="/logojslaidark.jpg" 
-              alt="JSL AI Logo Background" 
-              className="w-96 h-96 object-contain"
-              onError={(e) => {
-                const fallback = document.createElement('div');
-                fallback.className = 'w-96 h-96 bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center text-white text-8xl font-bold';
-                fallback.textContent = '🤖';
-                e.currentTarget.parentElement?.appendChild(fallback);
-              }}
-            />
-          </div>
+           <div className="absolute inset-0 flex items-center justify-center opacity-10">
+             <img 
+               src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
+               alt="JSL AI Logo Background" 
+               className="w-96 h-96 object-contain"
+               onError={(e) => {
+                 const fallback = document.createElement('div');
+                 fallback.className = 'w-96 h-96 bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center text-white text-8xl font-bold';
+                 fallback.textContent = '🤖';
+                 e.currentTarget.parentElement?.appendChild(fallback);
+               }}
+             />
+           </div>
           
           <div className="text-center relative z-10">
             {/* Logo avec animation */}
             <div className="mb-8 animate-pulse">
               <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-md border border-green-500/30 shadow-2xl shadow-green-500/20">
                 <img 
-                  src={isDarkMode ? '/logojslaidark.png' : '/logojslailight.png'} 
+                  src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
                   alt="JSL AI Logo" 
                   className="w-20 h-20 object-contain animate-bounce"
                   onLoad={() => console.log('Welcome logo loaded successfully')}
@@ -594,7 +594,7 @@ const GOB = () => {
                 }`}>
                   <div className="w-16 h-16 flex items-center justify-center">
                     <img 
-                      src={isDarkMode ? '/logojslaidark.png' : '/logojslailight.png'} 
+                      src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
                       alt="JSL AI Logo" 
                       className="w-14 h-14 object-contain"
                       onLoad={() => console.log('Logo loaded successfully')}
