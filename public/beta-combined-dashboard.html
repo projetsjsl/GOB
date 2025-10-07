@@ -77,7 +77,6 @@
 
             return (
                 <div className="min-h-screen bg-gray-900 text-white">
-                    {/* Header */}
                     <header className="p-6 border-b border-gray-700">
                         <div className="max-w-7xl mx-auto">
                             <div className="flex items-center justify-between">
@@ -101,7 +100,6 @@
                         </div>
                     </header>
 
-                    {/* Navigation */}
                     <nav className="bg-gray-800 border-b border-gray-700">
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="flex space-x-1">
@@ -129,7 +127,6 @@
                         </div>
                     </nav>
 
-                    {/* Contenu principal */}
                     <main className="max-w-7xl mx-auto p-6">
                         {activeTab === 'seeking-alpha' && (
                             <div className="space-y-6">
@@ -144,7 +141,6 @@
                                     </button>
                                 </div>
 
-                                {/* Tableau des tickers */}
                                 <div className="bg-gray-800 rounded-lg p-4 border border-gray-600">
                                     <h3 className="text-lg font-semibold mb-4">📊 Données Financières</h3>
                                     <div className="overflow-x-auto">
@@ -207,7 +203,6 @@
                                     </div>
                                 </div>
 
-                                {/* Cartes condensées */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {tickers.map(ticker => {
                                         const data = stockData[ticker];
@@ -220,8 +215,6 @@
                                         
                                         return (
                                             <div key={ticker} className="bg-gray-800 rounded-lg p-6 border border-gray-600 hover:border-blue-400/50 transition-all cursor-pointer">
-                                                
-                                                {/* Header avec ticker */}
                                                 <div className="flex justify-between items-start mb-6">
                                                     <div>
                                                         <h3 className="text-2xl font-bold text-white">{ticker}</h3>
@@ -229,7 +222,6 @@
                                                     </div>
                                                 </div>
                                                 
-                                                {/* Prix et changement */}
                                                 <div className="bg-gray-700 rounded-lg p-4 mb-6 border border-gray-600">
                                                     <div className="text-3xl font-bold text-white mb-1">
                                                         {price}
@@ -242,7 +234,6 @@
                                                     </div>
                                                 </div>
                                                 
-                                                {/* Call to action */}
                                                 <div className="text-center">
                                                     <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
                                                         <span>👆</span>
@@ -254,7 +245,6 @@
                                     })}
                                 </div>
 
-                                {/* Actualités */}
                                 <div className="bg-gray-800 rounded-lg p-4 border border-gray-600">
                                     <h3 className="text-lg font-semibold mb-4">📰 Actualités Financières</h3>
                                     {newsData.length > 0 ? (
