@@ -204,6 +204,7 @@ const GOB = () => {
     'BTCUSD': { symbol: 'BITCOIN', price: 121252.00, change: -4040.50, changePercent: -3.23 }
   });
   const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeFadeOut, setWelcomeFadeOut] = useState(false);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -368,15 +369,25 @@ const GOB = () => {
     }
   }, []);
 
-  // Welcome screen logic - affichage à chaque actualisation
+  // Welcome screen logic - affichage à chaque actualisation avec fade out
   useEffect(() => {
     setShowWelcome(true);
+    setWelcomeFadeOut(false);
     
-    const timer = setTimeout(() => {
+    // Commencer le fade out après 2.5 secondes
+    const fadeOutTimer = setTimeout(() => {
+      setWelcomeFadeOut(true);
+    }, 2500);
+    
+    // Masquer complètement après 3 secondes
+    const hideTimer = setTimeout(() => {
       setShowWelcome(false);
-    }, 3000); // 3 secondes d'animation
+    }, 3000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(fadeOutTimer);
+      clearTimeout(hideTimer);
+    };
   }, []);
 
   // Load dark mode preference
@@ -597,9 +608,11 @@ const GOB = () => {
 
   return (
     <div className={`min-h-screen ${currentTheme.colors.background} relative overflow-hidden`}>
-      {/* Écran de bienvenue */}
+      {/* Écran de bienvenue - Fullpage avec fade out */}
       {showWelcome && (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center relative ${
+        <div className={`fixed inset-0 z-50 flex items-center justify-center ${
+          welcomeFadeOut ? 'animate-fade-out' : ''
+        } ${
           isDarkMode 
             ? 'bg-gradient-to-br from-gray-900 via-black to-gray-800' 
             : 'bg-gradient-to-br from-blue-50 via-white to-gray-100'
