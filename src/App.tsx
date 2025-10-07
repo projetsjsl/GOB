@@ -234,9 +234,8 @@ const GOB = () => {
         { id: '29', name: 'Weather', url: 'https://weather.com', logo: '🌤️', order: 28 },
         { id: '30', name: 'News', url: 'https://news.google.com', logo: '📰', order: 29 },
         { id: '31', name: 'Seeking Alpha', url: '/seeking-alpha/', logo: '📈', order: 30 },
-        { id: '32', name: 'Homepage', url: '/homepage.html', logo: '🏠', order: 31 },
-        { id: '33', name: 'Login Page', url: '/login_page.html', logo: '🔐', order: 32 },
-        { id: '34', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 33 }
+        { id: '32', name: 'Login Page', url: '/login_page.html', logo: '🔐', order: 31 },
+        { id: '33', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 32 }
       ];
       setApps(defaultApps);
     }
