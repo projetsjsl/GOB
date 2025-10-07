@@ -208,6 +208,7 @@ const GOB = () => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [apiStatus, setApiStatus] = useState<string>('⏳ Vérification...');
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -248,17 +249,39 @@ const GOB = () => {
     setMarketData(newMarketData);
   };
 
+  // Fonction pour tester la connexion Finnhub
+  const testFinnhubConnection = async () => {
+    try {
+      const response = await fetch('/api/finnhub-market-data?test=true');
+      const data = await response.json();
+      
+      if (data.success) {
+        setApiStatus(`✅ ${data.message}`);
+        console.log('✅ Connexion Finnhub réussie:', data);
+        return true;
+      } else {
+        setApiStatus(`❌ ${data.message}`);
+        console.error('❌ Échec connexion Finnhub:', data);
+        return false;
+      }
+    } catch (error) {
+      setApiStatus(`❌ Erreur de connexion`);
+      console.error('❌ Erreur test Finnhub:', error);
+      return false;
+    }
+  };
+
   // Fonction pour récupérer les données des indices boursiers
   const fetchMarketData = async () => {
     try {
       const symbols = ['SPX', 'IXIC', 'DJI', 'TSX', 'EURUSD', 'GOLD', 'OIL', 'BTCUSD'];
       const newMarketData: any = {};
       
-      console.log('🔄 Récupération des données de marché via nouvelle API...');
+      console.log('🔄 Récupération des données de marché via API Finnhub...');
       
       for (const symbol of symbols) {
         try {
-          const response = await fetch(`/api/market-data?symbol=${symbol}`);
+          const response = await fetch(`/api/finnhub-market-data?symbol=${symbol}`);
           const data = await response.json();
           
           console.log(`📊 Données pour ${symbol}:`, data);
@@ -268,13 +291,15 @@ const GOB = () => {
               symbol: getSymbolName(symbol),
               price: data.c,
               change: data.d,
-              changePercent: data.dp
+              changePercent: data.dp,
+              source: data.source || 'unknown'
             };
             
-            if (data.source === 'alpha_vantage') {
-              console.log(`✅ Données réelles Alpha Vantage pour ${symbol}`);
+            if (data.source === 'finnhub') {
+              console.log(`✅ Données réelles Finnhub pour ${symbol}`);
+              setApiStatus('✅ Données en temps réel');
             } else {
-              console.log(`📋 Données réalistes pour ${symbol} (${data.source})`);
+              console.log(`📋 Données ${data.source} pour ${symbol}`);
             }
           }
         } catch (error) {
@@ -285,14 +310,25 @@ const GOB = () => {
       if (Object.keys(newMarketData).length > 0) {
         setMarketData(newMarketData);
         console.log('📈 Données de marché mises à jour:', newMarketData);
+        
+        // Vérifier si toutes les données sont fictives
+        const allFictive = Object.values(newMarketData).every((data: any) => 
+          data.source && data.source !== 'finnhub'
+        );
+        
+        if (allFictive) {
+          setApiStatus('⚠️ Données fictives');
+        }
       } else {
         // Utiliser des données réalistes générées si aucune donnée n'est disponible
         console.log('🎲 Génération de données réalistes...');
         generateRealisticMarketData();
+        setApiStatus('⚠️ Données fictives');
       }
     } catch (error) {
       console.log('❌ Erreur lors de la récupération des données de marché:', error);
       generateRealisticMarketData();
+      setApiStatus('❌ Erreur API');
     }
   };
 
@@ -343,8 +379,12 @@ const GOB = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch market data on component mount and every 30 seconds
+  // Test Finnhub connection and fetch market data on component mount
   useEffect(() => {
+    // Test de connexion Finnhub au démarrage
+    testFinnhubConnection();
+    
+    // Récupération des données de marché
     fetchMarketData();
     const marketInterval = setInterval(fetchMarketData, 30000); // Update every 30 seconds
     
@@ -836,8 +876,12 @@ const GOB = () => {
             : 'bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 text-gray-800 border-gray-300/20'
         }`}>
           <div className="text-center mb-1">
-            <span className={`text-xs font-semibold ${isDarkMode ? 'text-yellow-400' : 'text-orange-600'}`}>
-              ⚠️ VALEURS FICTIVES - EN DÉVELOPPEMENT
+            <span className={`text-xs font-semibold ${
+              apiStatus.includes('✅') 
+                ? isDarkMode ? 'text-green-400' : 'text-green-600'
+                : isDarkMode ? 'text-yellow-400' : 'text-orange-600'
+            }`}>
+              {apiStatus}
             </span>
           </div>
           <div className="flex items-center space-x-4 sm:space-x-8 text-xs sm:text-sm font-medium animate-scroll">
