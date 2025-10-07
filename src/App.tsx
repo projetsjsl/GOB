@@ -481,10 +481,35 @@ const GOB = () => {
             ? 'bg-gradient-to-br from-gray-900 via-black to-gray-800' 
             : 'bg-gradient-to-br from-blue-50 via-white to-gray-100'
         }`}>
+          {/* Logo en arrière-plan */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-20">
+            <img 
+              src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
+              alt="JSL AI Logo Background" 
+              className="w-96 h-96 object-contain"
+              onError={(e) => {
+                const fallback = document.createElement('div');
+                fallback.className = `w-96 h-96 bg-gradient-to-br ${
+                  isDarkMode 
+                    ? 'from-green-500/20 to-blue-500/20' 
+                    : 'from-blue-500/20 to-purple-500/20'
+                } rounded-full flex items-center justify-center ${
+                  isDarkMode ? 'text-white' : 'text-gray-600'
+                } text-8xl font-bold`;
+                fallback.textContent = '🤖';
+                e.currentTarget.parentElement?.appendChild(fallback);
+              }}
+            />
+          </div>
+          
+          {/* Bannière blanche pour mode light */}
+          {!isDarkMode && (
+            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+          )}
           
           <div className="text-center relative z-10">
             {/* Logo avec animation */}
-            <div className="mb-8 animate-pulse">
+            <div className="mb-8">
               <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-md border border-green-500/30 shadow-2xl shadow-green-500/20">
                 <img 
                   src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
