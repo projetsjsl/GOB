@@ -475,10 +475,20 @@
                         }, '*');
                         
                         // Écouter les messages de la fenêtre
-                        const messageHandler = (event) => {
+                        const messageHandler = async (event) => {
                             if (event.data.type === 'SCRAPING_RESULT' && event.data.ticker === ticker) {
                                 addScrapingLog(`✅ Scraping réussi pour ${ticker}`, 'success');
                                 addScrapingLog(`📄 Données extraites: ${event.data.data.innerText.length} caractères`, 'info');
+                                
+                                // Analyser avec Claude et mettre à jour les fichiers
+                                try {
+                                    await analyzeWithClaudeAndUpdate(ticker, event.data.data);
+                                    addScrapingLog(`🎉 Traitement complet terminé pour ${ticker}`, 'success');
+                                } catch (claudeError) {
+                                    addScrapingLog(`⚠️ Erreur analyse Claude pour ${ticker}: ${claudeError.message}`, 'warning');
+                                    addScrapingLog(`💾 Données scrapées sauvegardées localement`, 'info');
+                                }
+                                
                                 window.removeEventListener('message', messageHandler);
                             } else if (event.data.type === 'SCRAPING_ERROR' && event.data.ticker === ticker) {
                                 addScrapingLog(`❌ Erreur de scraping pour ${ticker}: ${event.data.error}`, 'error');
@@ -690,6 +700,164 @@
                 return script;
             };
 
+            // Fonction pour analyser les données avec Claude et mettre à jour les fichiers
+            const analyzeWithClaudeAndUpdate = async (ticker, scrapedData) => {
+                addScrapingLog(`🤖 Analyse avec Claude pour ${ticker}...`, 'info');
+                
+                try {
+                    // Préparer les données pour Claude
+                    const claudePrompt = `
+Analysez les données suivantes de Seeking Alpha pour ${ticker} et générez une analyse complète au format JSON.
+
+Données extraites:
+${JSON.stringify(scrapedData, null, 2)}
+
+Générez une réponse JSON avec cette structure exacte:
+{
+  "ticker": "${ticker}",
+  "companyName": "Nom de l'entreprise",
+  "lastUpdate": "${new Date().toISOString()}",
+  "metrics": {
+    "marketCap": "Capitalisation boursière",
+    "bpaGrowth": "Croissance BPA",
+    "peRatio": "Ratio P/E",
+    "sector": "Secteur",
+    "dividendYield": "Rendement dividende",
+    "dividendFrequency": "Fréquence dividende",
+    "exDivDate": "Date ex-dividende",
+    "annualPayout": "Paiement annuel",
+    "price": "Prix actuel",
+    "priceChange": "Changement de prix"
+  },
+  "companyProfile": {
+    "description": "Description de l'entreprise en français",
+    "employees": "Nombre d'employés si disponible",
+    "innovation": "Innovations et investissements clés"
+  },
+  "competition": {
+    "competitors": ["Concurrent 1", "Concurrent 2"],
+    "valueProposition": "Proposition de valeur unique",
+    "advantages": "Avantages concurrentiels"
+  },
+  "quantRating": {
+    "valuation": "Grade A-F",
+    "growth": "Grade A-F", 
+    "profitability": "Grade A-F",
+    "momentum": "Grade A-F",
+    "revisions": "Grade A-F"
+  },
+  "sectorAnalysis": {
+    "valuation": "Analyse de valorisation",
+    "growth": "Analyse de croissance",
+    "profitability": "Analyse de rentabilité",
+    "momentum": "Analyse de momentum",
+    "revisions": "Analyse des révisions"
+  },
+  "intermediateConclusion": "Conclusion intermédiaire",
+  "strengths": ["Force 1", "Force 2", "Force 3"],
+  "concerns": ["Préoccupation 1", "Préoccupation 2", "Préoccupation 3"],
+  "finalConclusion": {
+    "strengths": "Résumé des forces",
+    "weaknesses": "Résumé des faiblesses", 
+    "recommendation": "Recommandation détaillée",
+    "rating": "Buy/Hold/Sell"
+  }
+}
+
+Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
+                    `;
+
+                    // Appeler l'API Claude (vous devrez configurer votre endpoint)
+                    const response = await fetch(`${API_BASE_URL}/api/claude`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            prompt: claudePrompt,
+                            ticker: ticker
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Erreur API Claude: ${response.status}`);
+                    }
+
+                    const claudeResponse = await response.json();
+                    const analysisData = JSON.parse(claudeResponse.analysis);
+
+                    addScrapingLog(`✅ Analyse Claude terminée pour ${ticker}`, 'success');
+
+                    // Mettre à jour les fichiers JSON via GitHub API
+                    await updateStockDataFiles(ticker, analysisData, scrapedData);
+
+                    return analysisData;
+
+                } catch (error) {
+                    addScrapingLog(`❌ Erreur analyse Claude pour ${ticker}: ${error.message}`, 'error');
+                    throw error;
+                }
+            };
+
+            // Fonction pour mettre à jour les fichiers JSON via GitHub API
+            const updateStockDataFiles = async (ticker, analysisData, scrapedData) => {
+                addScrapingLog(`📝 Mise à jour des fichiers JSON pour ${ticker}...`, 'info');
+
+                try {
+                    // Mettre à jour stock_data.json
+                    const stockDataResponse = await fetch(`${API_BASE_URL}/api/github-update`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            file: 'public/seeking-alpha/stock_data.json',
+                            ticker: ticker,
+                            data: analysisData,
+                            action: 'update_stock'
+                        })
+                    });
+
+                    if (!stockDataResponse.ok) {
+                        throw new Error(`Erreur mise à jour stock_data.json: ${stockDataResponse.status}`);
+                    }
+
+                    // Mettre à jour stock_analysis.json
+                    const analysisResponse = await fetch(`${API_BASE_URL}/api/github-update`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            file: 'public/seeking-alpha/stock_analysis.json',
+                            ticker: ticker,
+                            data: {
+                                ticker: ticker,
+                                timestamp: new Date().toISOString(),
+                                raw_text: scrapedData.fullText || scrapedData.content,
+                                url: scrapedData.url
+                            },
+                            action: 'update_analysis'
+                        })
+                    });
+
+                    if (!analysisResponse.ok) {
+                        throw new Error(`Erreur mise à jour stock_analysis.json: ${analysisResponse.status}`);
+                    }
+
+                    addScrapingLog(`✅ Fichiers JSON mis à jour pour ${ticker}`, 'success');
+                    addScrapingLog(`🔄 Rechargement des données...`, 'info');
+
+                    // Recharger les données
+                    await fetchSeekingAlphaData();
+                    await fetchSeekingAlphaStockData();
+
+                } catch (error) {
+                    addScrapingLog(`❌ Erreur mise à jour fichiers pour ${ticker}: ${error.message}`, 'error');
+                    throw error;
+                }
+            };
+
             // Composant onglet Seeking Alpha
             const SeekingAlphaTab = () => (
                 <div className="space-y-6">
@@ -735,6 +903,30 @@
                                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                             >
                                 📋 Script F12
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    addScrapingLog('🤖 Démarrage de l\'analyse Claude sur les données existantes...', 'info');
+                                    try {
+                                        for (const ticker of tickers) {
+                                            const existingData = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                                            if (existingData) {
+                                                addScrapingLog(`🔄 Analyse de ${ticker} avec Claude...`, 'info');
+                                                await analyzeWithClaudeAndUpdate(ticker, {
+                                                    fullText: existingData.raw_text,
+                                                    url: existingData.url,
+                                                    content: {}
+                                                });
+                                            }
+                                        }
+                                        addScrapingLog('🎉 Analyse Claude terminée pour tous les tickers', 'success');
+                                    } catch (error) {
+                                        addScrapingLog(`❌ Erreur analyse Claude: ${error.message}`, 'error');
+                                    }
+                                }}
+                                className="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition-colors"
+                            >
+                                🤖 Analyser avec Claude
                             </button>
                         </div>
                     </div>
@@ -820,6 +1012,25 @@
                                 <div>• <strong>Firefox:</strong> Cliquez sur l'icône bouclier → "Désactiver la protection"</div>
                                 <div>• <strong>Safari:</strong> Safari → Préférences → Sites web → Pop-ups → Autoriser</div>
                                 <div>• <strong>Alternative:</strong> Utilisez le bouton "🌐 Ouvrir Seeking Alpha" ou le script F12</div>
+                            </div>
+                        </div>
+
+                        {/* Configuration des API */}
+                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-green-900/30' 
+                                : 'bg-green-100/80'
+                        }`}>
+                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🤖 Configuration des API</h4>
+                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-green-200' : 'text-green-800'
+                            }`}>
+                                <div>• <strong>Claude API:</strong> Configurez ANTHROPIC_API_KEY pour l'analyse automatique</div>
+                                <div>• <strong>GitHub API:</strong> Configurez GITHUB_TOKEN pour la mise à jour des fichiers</div>
+                                <div>• <strong>Fonctionnalité:</strong> Scraping → Analyse Claude → Mise à jour JSON automatique</div>
+                                <div>• <strong>Bouton:</strong> "🤖 Analyser avec Claude" pour traiter les données existantes</div>
                             </div>
                         </div>
 
