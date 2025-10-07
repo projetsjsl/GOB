@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple - GOB Apps</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 3em;
+            margin: 0 0 20px 0;
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .success {
+            color: #4ade80;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .info {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        .link {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .link:hover {
+            transform: scale(1.05);
+        }
+        .timestamp {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Test Simple</h1>
+        <div class="status">
+            <div class="success">✅ Page chargée avec succès!</div>
+            <div class="info">Serveur: <strong>gobapps.com</strong></div>
+            <div class="info">Statut: <strong>Opérationnel</strong></div>
+            <div class="info">Tickers: <strong>CVS, MSFT, MGA, GOOG, MU, BRK.B, UNH, PFE, BCE, T</strong></div>
+        </div>
+        
+        <a href="/beta-combined-dashboard.html" class="link">
+            📊 Aller au Dashboard Complet
+        </a>
+        
+        <div class="timestamp">
+            Dernière mise à jour: <span id="timestamp"></span>
+        </div>
+    </div>
+    
+    <script>
+        // Afficher l'heure actuelle
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('fr-FR');
+        
+        // Tester les APIs
+        console.log('🚀 Test Simple - Page chargée');
+        console.log('📍 URL:', window.location.href);
+        console.log('🕐 Heure:', new Date().toLocaleString('fr-FR'));
+    </script>
+</body>
+</html>
+
