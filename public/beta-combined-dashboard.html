@@ -264,6 +264,24 @@
                 showMessage('Instructions de scraping ouvertes', 'info');
             };
 
+            // Fonction simple pour ouvrir Seeking Alpha
+            const openSeekingAlpha = (ticker) => {
+                const url = `https://seekingalpha.com/symbol/${ticker}/virtual_analyst_report`;
+                addScrapingLog(`🌐 Ouverture de Seeking Alpha pour ${ticker}`, 'info');
+                addScrapingLog(`📍 URL: ${url}`, 'info');
+                
+                // Ouvrir dans un nouvel onglet
+                const newWindow = window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+                
+                if (!newWindow) {
+                    addScrapingLog(`❌ Impossible d'ouvrir la fenêtre pour ${ticker}`, 'error');
+                    showMessage('Bloqueur de popup détecté. Veuillez autoriser les popups.', 'error');
+                } else {
+                    addScrapingLog(`✅ Fenêtre ouverte pour ${ticker}`, 'success');
+                    showMessage(`Page Seeking Alpha ouverte pour ${ticker}`, 'success');
+                }
+            };
+
             // Données Finnhub (pour l'onglet Stocks & News)
             const fetchStockData = async (ticker) => {
                 try {
@@ -448,9 +466,22 @@
                 
                 // Ouvrir Seeking Alpha dans un nouvel onglet
                 const seekingAlphaUrl = `https://seekingalpha.com/symbol/${ticker}/virtual_analyst_report`;
-                const newWindow = window.open(seekingAlphaUrl, '_blank', 'width=1200,height=800');
+                addScrapingLog(`🌐 Ouverture de: ${seekingAlphaUrl}`, 'info');
                 
-                if (!newWindow) {
+                // Essayer d'ouvrir la fenêtre
+                let newWindow;
+                try {
+                    newWindow = window.open(seekingAlphaUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+                } catch (error) {
+                    addScrapingLog(`❌ Erreur lors de l'ouverture: ${error.message}`, 'error');
+                    return {
+                        ticker: ticker,
+                        error: 'Window open failed',
+                        timestamp: new Date().toISOString()
+                    };
+                }
+                
+                if (!newWindow || newWindow.closed) {
                     addScrapingLog(`❌ Impossible d'ouvrir la fenêtre popup pour ${ticker}`, 'error');
                     showMessage('Bloqueur de popup détecté. Veuillez autoriser les popups pour ce site.', 'error');
                     return {
@@ -460,19 +491,33 @@
                     };
                 }
                 
-                addScrapingLog(`✅ Fenêtre ouverte pour ${ticker}: ${seekingAlphaUrl}`, 'success');
+                addScrapingLog(`✅ Fenêtre ouverte pour ${ticker}`, 'success');
                 
                 // Attendre que la page se charge
-                await wait(3000);
+                addScrapingLog(`⏳ Attente du chargement de la page...`, 'info');
+                await wait(5000);
                 
                 try {
+                    // Vérifier si la fenêtre est toujours ouverte
+                    if (newWindow.closed) {
+                        addScrapingLog(`❌ Fenêtre fermée prématurément pour ${ticker}`, 'error');
+                        return {
+                            ticker: ticker,
+                            error: 'Window closed',
+                            timestamp: new Date().toISOString()
+                        };
+                    }
+                    
+                    addScrapingLog(`📝 Injection du script de scraping pour ${ticker}`, 'info');
+                    
                     // Exécuter le code de scraping dans la console de la nouvelle fenêtre
                     const scrapingScript = `
                         console.log('🚀 Script de scraping exécuté pour ${ticker}');
+                        console.log('📍 URL actuelle:', window.location.href);
                         
-                        // Attendre que la page soit complètement chargée
-                        setTimeout(() => {
-                            console.log('📄 Page chargée, extraction des données...');
+                        // Fonction pour extraire les données
+                        function extractData() {
+                            console.log('📄 Extraction des données...');
                             
                             // Extraire le contenu de la page
                             const pageContent = document.body ? document.body.innerText : '';
@@ -482,23 +527,9 @@
                                 ticker: '${ticker}',
                                 contentLength: pageContent.length,
                                 htmlLength: pageHTML.length,
+                                url: window.location.href,
                                 timestamp: new Date().toISOString()
                             });
-                            
-                            // Créer un élément pour stocker les données
-                            const dataElement = document.createElement('div');
-                            dataElement.id = 'scraping-data-${ticker}';
-                            dataElement.style.display = 'none';
-                            dataElement.textContent = JSON.stringify({
-                                ticker: '${ticker}',
-                            timestamp: new Date().toISOString(),
-                                raw_text: pageContent,
-                                url: window.location.href,
-                                success: true
-                            });
-                            document.body.appendChild(dataElement);
-                            
-                            console.log('✅ Données sauvegardées dans la page');
                             
                             // Notifier la fenêtre parent
                             if (window.opener) {
@@ -513,15 +544,40 @@
                                         success: true
                                     }
                                 }, '*');
+                                console.log('✅ Message envoyé à la fenêtre parent');
+                            } else {
+                                console.log('❌ Pas de fenêtre parent trouvée');
                             }
+                        }
+                        
+                        // Attendre que la page soit complètement chargée
+                        if (document.readyState === 'complete') {
+                            console.log('📄 Page déjà chargée');
+                            extractData();
+                        } else {
+                            console.log('⏳ Attente du chargement complet...');
+                            window.addEventListener('load', extractData);
                             
-                        }, 2000);
+                            // Timeout de sécurité
+                            setTimeout(() => {
+                                console.log('⏰ Timeout - extraction forcée');
+                                extractData();
+                            }, 10000);
+                        }
                     `;
                     
                     // Exécuter le script dans la nouvelle fenêtre
-                    newWindow.eval(scrapingScript);
-                    
-                    addScrapingLog(`📝 Script de scraping injecté pour ${ticker}`, 'info');
+                    try {
+                        newWindow.eval(scrapingScript);
+                        addScrapingLog(`✅ Script injecté avec succès pour ${ticker}`, 'success');
+                    } catch (evalError) {
+                        addScrapingLog(`❌ Erreur lors de l'injection du script: ${evalError.message}`, 'error');
+                        return {
+                            ticker: ticker,
+                            error: 'Script injection failed',
+                            timestamp: new Date().toISOString()
+                        };
+                    }
                     
                     // Attendre la réponse de la fenêtre
                     return new Promise((resolve) => {
@@ -568,6 +624,7 @@
                 try {
                     addScrapingLog('🚀 Démarrage du scraping Seeking Alpha...', 'info');
                     addScrapingLog(`📋 Tickers à traiter: ${tickers.join(', ')}`, 'info');
+                    addScrapingLog('⚠️ IMPORTANT: Autorisez les popups pour ce site!', 'warning');
                     showMessage('Démarrage du scraping...', 'info');
                     
                     const results = [];
@@ -928,6 +985,12 @@
                             >
                                 Instructions Scraper
                             </button>
+                            <button
+                                onClick={() => openSeekingAlpha('CVS')}
+                                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                            >
+                                🌐 Ouvrir Seeking Alpha
+                            </button>
                         </div>
                     </div>
 
@@ -972,9 +1035,9 @@
                         </div>
                     </div>
 
-                    {/* Tableau de données financières (comme l'original) */}
+                    {/* Tableau de données financières avec actualités */}
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-blue-300/20">
-                        <h3 className="text-lg font-semibold text-white mb-4">📊 Données Financières</h3>
+                        <h3 className="text-lg font-semibold text-white mb-4">📊 Données Financières & Actualités</h3>
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
@@ -985,6 +1048,7 @@
                                         <th className="text-left py-2 text-blue-200">P/E</th>
                                         <th className="text-left py-2 text-blue-200">Dividende</th>
                                         <th className="text-left py-2 text-blue-200">Secteur</th>
+                                        <th className="text-left py-2 text-blue-200">Sentiment</th>
                                         <th className="text-left py-2 text-blue-200">Actions</th>
                                     </tr>
                                 </thead>
@@ -1004,21 +1068,90 @@
                                         
                                         const changeColor = (change.includes('+') || change.includes('green')) ? 'text-green-400' : 'text-red-400';
                                         
+                                        // Trouver la nouvelle la plus récente pour ce ticker
+                                        const latestNews = newsData.find(article => {
+                                            const text = (article.title + ' ' + article.description).toLowerCase();
+                                            return text.includes(ticker.toLowerCase());
+                                        });
+                                        
+                                        // Analyser le sentiment basé sur le titre et la description
+                                        const analyzeSentiment = (title, description) => {
+                                            if (!title && !description) return { sentiment: 'Neutre', color: 'text-gray-400', icon: '😐' };
+                                            
+                                            const text = (title + ' ' + description).toLowerCase();
+                                            const positiveWords = ['strong', 'growth', 'increase', 'rise', 'gain', 'positive', 'beat', 'exceed', 'surge', 'rally', 'boost', 'fort', 'croissance', 'hausse', 'gain', 'positif', 'dépasser'];
+                                            const negativeWords = ['decline', 'fall', 'drop', 'loss', 'negative', 'miss', 'weak', 'concern', 'risk', 'challenge', 'baisse', 'chute', 'perte', 'négatif', 'manquer', 'faible', 'préoccupation', 'risque'];
+                                            
+                                            const positiveCount = positiveWords.filter(word => text.includes(word)).length;
+                                            const negativeCount = negativeWords.filter(word => text.includes(word)).length;
+                                            
+                                            if (positiveCount > negativeCount) {
+                                                return { sentiment: 'Positif', color: 'text-green-400', icon: '📈' };
+                                            } else if (negativeCount > positiveCount) {
+                                                return { sentiment: 'Négatif', color: 'text-red-400', icon: '📉' };
+                                            } else {
+                                                return { sentiment: 'Neutre', color: 'text-gray-400', icon: '😐' };
+                                            }
+                                        };
+                                        
+                                        const sentiment = latestNews ? analyzeSentiment(latestNews.title, latestNews.description) : { sentiment: 'N/A', color: 'text-gray-400', icon: '❓' };
+                                        
                                         return (
-                                            <tr key={ticker} className="border-b border-blue-300/10 hover:bg-blue-900/20 cursor-pointer"
-                                                onClick={() => setSelectedStock(ticker)}>
-                                                <td className="py-2 font-mono text-white">{ticker}</td>
-                                                <td className="py-2 text-white">{price}</td>
-                                                <td className={`py-2 ${changeColor}`}>{change}</td>
-                                                <td className="py-2 text-white">{peRatio}</td>
-                                                <td className="py-2 text-white">{dividendYield}</td>
-                                                <td className="py-2 text-white">{sector}</td>
-                                                <td className="py-2">
-                                                    <button className="text-blue-300 hover:text-blue-200 text-xs">
-                                                        Voir fiche →
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            <React.Fragment key={ticker}>
+                                                {/* Ligne principale avec données financières */}
+                                                <tr className="border-b border-blue-300/10 hover:bg-blue-900/20 cursor-pointer"
+                                                    onClick={() => setSelectedStock(ticker)}>
+                                                    <td className="py-2 font-mono text-white font-bold">{ticker}</td>
+                                                    <td className="py-2 text-white">{price}</td>
+                                                    <td className={`py-2 ${changeColor}`}>{change}</td>
+                                                    <td className="py-2 text-white">{peRatio}</td>
+                                                    <td className="py-2 text-white">{dividendYield}</td>
+                                                    <td className="py-2 text-white text-xs">{cleanText(sector)}</td>
+                                                    <td className="py-2">
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-sm">{sentiment.icon}</span>
+                                                            <span className={`text-xs ${sentiment.color}`}>{sentiment.sentiment}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-2">
+                                                        <button className="text-blue-300 hover:text-blue-200 text-xs">
+                                                            Voir fiche →
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                
+                                                {/* Ligne avec actualité récente */}
+                                                {latestNews && (
+                                                    <tr className="border-b border-blue-300/5 hover:bg-blue-900/10">
+                                                        <td className="py-1"></td>
+                                                        <td colSpan="7" className="py-1">
+                                                            <div className="bg-blue-900/20 rounded p-2 text-xs">
+                                                                <div className="flex items-start gap-2">
+                                                                    <span className="text-blue-300">📰</span>
+                                                                    <div className="flex-1">
+                                                                        <div className="text-blue-200 font-medium mb-1">
+                                                                            {cleanText(latestNews.title)}
+                                                                        </div>
+                                                                        <div className="text-blue-300/80 line-clamp-2">
+                                                                            {cleanText(latestNews.description)}
+                                                                        </div>
+                                                                        <div className="flex items-center gap-2 mt-1 text-blue-400/60">
+                                                                            <span>{latestNews.source?.name || 'Source inconnue'}</span>
+                                                                            <span>•</span>
+                                                                            <span>
+                                                                                {latestNews.publishedAt ? 
+                                                                                    new Date(latestNews.publishedAt).toLocaleString('fr-FR') : 
+                                                                                    'Date inconnue'
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </React.Fragment>
                                         );
                                     })}
                                 </tbody>
