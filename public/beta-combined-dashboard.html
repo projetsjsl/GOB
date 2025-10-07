@@ -62,8 +62,8 @@
             const [apiStatus, setApiStatus] = useState({});
             
             // États pour l'interface Seeking Alpha (comme l'original)
-            const [githubToken, setGithubToken] = useState(localStorage.getItem('github_token') || '');
-            const [showSettings, setShowSettings] = useState(!localStorage.getItem('github_token'));
+            const [githubToken, setGithubToken] = useState('');
+            const [showSettings, setShowSettings] = useState(false);
             const [showScraperPopup, setShowScraperPopup] = useState(false);
 
             // Configuration API
@@ -72,6 +72,20 @@
             // Configuration GitHub (comme l'original)
             const GITHUB_REPO = 'projetsjsl/GOB';
             const GITHUB_BRANCH = 'main';
+            
+            // Récupérer le token GitHub depuis l'environnement
+            const getGithubToken = async () => {
+                try {
+                    const response = await fetch('/api/github-token');
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.token;
+                    }
+                } catch (error) {
+                    console.error('Erreur récupération token GitHub:', error);
+                }
+                return null;
+            };
 
             // Messages
             const showMessage = (text, type = 'info') => {
@@ -202,11 +216,14 @@
                 }
             };
 
-            const saveSettings = () => {
-                localStorage.setItem('github_token', githubToken);
-                setShowSettings(false);
-                loadTickers();
-                showMessage('Configuration sauvegardée', 'success');
+            const initializeGithubToken = async () => {
+                const token = await getGithubToken();
+                if (token) {
+                    setGithubToken(token);
+                    showMessage('Token GitHub configuré automatiquement', 'success');
+                } else {
+                    showMessage('Token GitHub non disponible - Vérifiez la configuration serveur', 'error');
+                }
             };
 
             const openScraperInstructions = () => {
@@ -478,9 +495,9 @@
 
             // Initialisation
             useEffect(() => {
-                if (githubToken && !showSettings) {
-                    loadTickers();
-                }
+                // Initialiser le token GitHub automatiquement
+                initializeGithubToken();
+                
                 fetchSeekingAlphaData();
                 fetchSeekingAlphaStockData();
                 refreshAllStocks();
@@ -496,47 +513,56 @@
                 }, 300000);
                 
                 return () => clearInterval(interval);
-            }, [githubToken, showSettings]);
+            }, []);
 
-            // Composant de configuration GitHub (comme l'original)
+            // Charger les tickers quand le token est disponible
+            useEffect(() => {
+                if (githubToken) {
+                    loadTickers();
+                }
+            }, [githubToken]);
+
+            // Composant de statut GitHub (simplifié)
             const SettingsPanel = () => (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
-                        <h3 className="text-lg font-bold mb-4">Configuration GitHub</h3>
+                        <h3 className="text-lg font-bold mb-4">Statut GitHub</h3>
                         
                         <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    GitHub Personal Access Token
-                                </label>
-                                <input
-                                    type="password"
-                                    value={githubToken}
-                                    onChange={(e) => setGithubToken(e.target.value)}
-                                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                                <p className="mt-2 text-sm text-gray-500">
-                                    Créez un token sur{' '}
-                                    <a 
-                                        href="https://github.com/settings/tokens" 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 hover:underline"
-                                    >
-                                        github.com/settings/tokens
-                                    </a>
-                                    {' '}avec les permissions "repo"
-                                </p>
+                            <div className="text-center">
+                                {githubToken ? (
+                                    <div className="text-green-600">
+                                        <div className="text-4xl mb-2">✅</div>
+                                        <p className="font-medium">Token GitHub configuré</p>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            Le token est récupéré automatiquement depuis l'environnement serveur
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="text-red-600">
+                                        <div className="text-4xl mb-2">❌</div>
+                                        <p className="font-medium">Token GitHub non disponible</p>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            Vérifiez que GITHUB_TOKEN est configuré sur le serveur
+                                        </p>
+                                    </div>
+                                )}
                             </div>
 
-                            <button
-                                onClick={saveSettings}
-                                disabled={!githubToken}
-                                className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                            >
-                                Sauvegarder et Continuer
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={initializeGithubToken}
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                >
+                                    Actualiser
+                                </button>
+                                <button
+                                    onClick={() => setShowSettings(false)}
+                                    className="flex-1 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                >
+                                    Fermer
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -668,7 +694,7 @@
                                 onClick={() => setShowSettings(true)}
                                 className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600"
                             >
-                                Paramètres
+                                Statut GitHub
                             </button>
                             <button
                                 onClick={() => setShowTickerManager(true)}
