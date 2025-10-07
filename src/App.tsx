@@ -482,21 +482,36 @@ const GOB = () => {
     <div className={`min-h-screen ${currentTheme.colors.background} relative overflow-hidden`}>
       {/* Écran de bienvenue */}
       {showWelcome && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 relative">
+        <div className={`fixed inset-0 z-50 flex items-center justify-center relative ${
+          isDarkMode 
+            ? 'bg-gradient-to-br from-gray-900 via-black to-gray-800' 
+            : 'bg-gradient-to-br from-blue-50 via-white to-gray-100'
+        }`}>
           {/* Logo en arrière-plan */}
-           <div className="absolute inset-0 flex items-center justify-center opacity-10">
-             <img 
-               src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
-               alt="JSL AI Logo Background" 
-               className="w-96 h-96 object-contain"
-               onError={(e) => {
-                 const fallback = document.createElement('div');
-                 fallback.className = 'w-96 h-96 bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full flex items-center justify-center text-white text-8xl font-bold';
-                 fallback.textContent = '🤖';
-                 e.currentTarget.parentElement?.appendChild(fallback);
-               }}
-             />
-           </div>
+          <div className="absolute inset-0 flex items-center justify-center opacity-20">
+            <img 
+              src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
+              alt="JSL AI Logo Background" 
+              className="w-96 h-96 object-contain"
+              onError={(e) => {
+                const fallback = document.createElement('div');
+                fallback.className = `w-96 h-96 bg-gradient-to-br ${
+                  isDarkMode 
+                    ? 'from-green-500/20 to-blue-500/20' 
+                    : 'from-blue-500/20 to-purple-500/20'
+                } rounded-full flex items-center justify-center ${
+                  isDarkMode ? 'text-white' : 'text-gray-600'
+                } text-8xl font-bold`;
+                fallback.textContent = '🤖';
+                e.currentTarget.parentElement?.appendChild(fallback);
+              }}
+            />
+          </div>
+          
+          {/* Bannière blanche pour mode light */}
+          {!isDarkMode && (
+            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+          )}
           
           <div className="text-center relative z-10">
             {/* Logo avec animation */}
@@ -521,21 +536,35 @@ const GOB = () => {
             
             {/* Texte de bienvenue */}
             <div className="space-y-4">
-              <h1 className="text-6xl font-bold text-white font-['Inter'] animate-fade-in">
+              <h1 className={`text-6xl font-bold font-['Inter'] animate-fade-in ${
+                isDarkMode ? 'text-white' : 'text-gray-800'
+              }`}>
                 Bienvenue
               </h1>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent font-['Inter'] animate-fade-in-delay">
+              <h2 className={`text-4xl font-bold bg-gradient-to-r font-['Inter'] animate-fade-in-delay ${
+                isDarkMode 
+                  ? 'from-green-400 to-blue-400 bg-clip-text text-transparent' 
+                  : 'from-blue-600 to-purple-600 bg-clip-text text-transparent'
+              }`}>
                 GOB
               </h2>
-              <p className="text-xl text-gray-300 font-['Inter'] animate-fade-in-delay-2">
+              <p className={`text-xl font-['Inter'] animate-fade-in-delay-2 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+              }`}>
                 Plateforme financière • Propulsée par JSL AI
               </p>
             </div>
             
             {/* Barre de progression */}
             <div className="mt-12 w-64 mx-auto">
-              <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full animate-progress"></div>
+              <div className={`h-1 rounded-full overflow-hidden ${
+                isDarkMode ? 'bg-gray-700' : 'bg-gray-300'
+              }`}>
+                <div className={`h-full rounded-full animate-progress ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-r from-green-500 to-blue-500' 
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600'
+                }`}></div>
               </div>
             </div>
           </div>
