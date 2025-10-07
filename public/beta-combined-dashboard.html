@@ -294,13 +294,95 @@
                 }
             };
 
+            // Parser les données brutes de Seeking Alpha
+            const parseSeekingAlphaData = (rawText) => {
+                try {
+                    // Extraire les informations clés du texte brut
+                    const data = {
+                        price: null,
+                        change: null,
+                        marketCap: null,
+                        peRatio: null,
+                        dividendYield: null,
+                        sector: null,
+                        quantRating: null,
+                        analysis: null,
+                        companyName: null
+                    };
+
+                    // Extraire le prix et le changement
+                    const priceMatch = rawText.match(/\$(\d+\.?\d*)\s*([+-]?\d+\.?\d*)\s*\(([+-]?\d+\.?\d*)%\)/);
+                    if (priceMatch) {
+                        data.price = `$${priceMatch[1]}`;
+                        data.change = `${priceMatch[2]} (${priceMatch[3]}%)`;
+                    }
+
+                    // Extraire Market Cap
+                    const marketCapMatch = rawText.match(/Market Cap\$(\d+\.?\d*[BMT])/i);
+                    if (marketCapMatch) {
+                        data.marketCap = `$${marketCapMatch[1]}`;
+                    }
+
+                    // Extraire P/E Ratio
+                    const peMatch = rawText.match(/P\/E \(FWD\)(\d+\.?\d*)/i);
+                    if (peMatch) {
+                        data.peRatio = peMatch[1];
+                    }
+
+                    // Extraire Dividend Yield
+                    const dividendMatch = rawText.match(/Yield \(FWD\)(\d+\.?\d*)%/i);
+                    if (dividendMatch) {
+                        data.dividendYield = `${dividendMatch[1]}%`;
+                    }
+
+                    // Extraire le secteur
+                    const sectorMatch = rawText.match(/Industry([^\\n]+)/i);
+                    if (sectorMatch) {
+                        data.sector = sectorMatch[1].trim();
+                    }
+
+                    // Extraire le rating Quant
+                    const ratingMatch = rawText.match(/Quant Rating([^\\n]+)/i);
+                    if (ratingMatch) {
+                        data.quantRating = ratingMatch[1].trim();
+                    }
+
+                    // Extraire le nom de l'entreprise
+                    const companyMatch = rawText.match(/([A-Z][a-z]+ [A-Z][a-z]+ Corporation)/);
+                    if (companyMatch) {
+                        data.companyName = companyMatch[1];
+                    }
+
+                    // Extraire l'analyse (premiers paragraphes du Virtual Analyst Report)
+                    const analysisMatch = rawText.match(/Virtual Analyst Report[\\s\\S]*?Company Description\\s*([\\s\\S]*?)(?=Competitors|$)/);
+                    if (analysisMatch) {
+                        data.analysis = analysisMatch[1].trim().substring(0, 500) + '...';
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('Erreur parsing Seeking Alpha data:', error);
+                    return null;
+                }
+            };
+
             // Données Seeking Alpha (PRÉSERVÉES - sources actuelles)
             const fetchSeekingAlphaData = async () => {
                 try {
                     const response = await fetch('/seeking-alpha/stock_analysis.json');
                     if (response.ok) {
                         const data = await response.json();
-                        setSeekingAlphaData(data);
+                        
+                        // Parser les données brutes pour chaque stock
+                        const parsedStocks = data.stocks?.map(stock => ({
+                            ...stock,
+                            parsedData: parseSeekingAlphaData(stock.raw_text)
+                        })) || [];
+                        
+                        setSeekingAlphaData({
+                            ...data,
+                            stocks: parsedStocks
+                        });
                     }
                 } catch (error) {
                     console.error('Erreur fetch Seeking Alpha:', error);
@@ -778,7 +860,8 @@
                                 <tbody>
                                     {tickers.map(ticker => {
                                         const stockDataItem = stockData[ticker];
-                                        const seekingAlphaItem = seekingAlphaStockData.stocks?.[ticker];
+                                        const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                                        const parsedData = seekingAlphaItem?.parsedData;
                                         const change = stockDataItem?.dp || 0;
                                         const changeColor = change >= 0 ? 'text-green-400' : 'text-red-400';
                                         
@@ -787,19 +870,19 @@
                                                 onClick={() => setSelectedStock(ticker)}>
                                                 <td className="py-2 font-mono text-white">{ticker}</td>
                                                 <td className="py-2 text-white">
-                                                    ${stockDataItem?.c?.toFixed(2) || seekingAlphaItem?.metrics?.price || 'N/A'}
+                                                    {parsedData?.price || `$${stockDataItem?.c?.toFixed(2) || 'N/A'}`}
                                                 </td>
                                                 <td className={`py-2 ${changeColor}`}>
-                                                    {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+                                                    {parsedData?.change || (change >= 0 ? '+' : '') + change.toFixed(2) + '%'}
                                                 </td>
                                                 <td className="py-2 text-white">
-                                                    {seekingAlphaItem?.metrics?.peRatio || 'N/A'}
+                                                    {parsedData?.peRatio || 'N/A'}
                                                 </td>
                                                 <td className="py-2 text-white">
-                                                    {seekingAlphaItem?.metrics?.dividendYield || 'N/A'}
+                                                    {parsedData?.dividendYield || 'N/A'}
                                                 </td>
                                                 <td className="py-2 text-white">
-                                                    {seekingAlphaItem?.metrics?.sector || 'N/A'}
+                                                    {parsedData?.sector || 'N/A'}
                                                 </td>
                                                 <td className="py-2">
                                                     <button className="text-blue-300 hover:text-blue-200 text-xs">
@@ -876,52 +959,80 @@
                             </div>
                             
                             {/* Données financières détaillées */}
-                            {seekingAlphaStockData.stocks?.[selectedStock] && (
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <div className="bg-blue-900/30 rounded p-3">
-                                        <div className="text-blue-200 text-sm">Prix</div>
-                                        <div className="text-white font-bold">
-                                            {seekingAlphaStockData.stocks[selectedStock].metrics?.price || 'N/A'}
+                            {(() => {
+                                const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === selectedStock);
+                                const parsedData = seekingAlphaItem?.parsedData;
+                                
+                                if (parsedData) {
+                                    return (
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            <div className="bg-blue-900/30 rounded p-3">
+                                                <div className="text-blue-200 text-sm">Prix</div>
+                                                <div className="text-white font-bold">
+                                                    {parsedData.price || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div className="bg-blue-900/30 rounded p-3">
+                                                <div className="text-blue-200 text-sm">P/E</div>
+                                                <div className="text-white font-bold">
+                                                    {parsedData.peRatio || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div className="bg-blue-900/30 rounded p-3">
+                                                <div className="text-blue-200 text-sm">Dividende</div>
+                                                <div className="text-white font-bold">
+                                                    {parsedData.dividendYield || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div className="bg-blue-900/30 rounded p-3">
+                                                <div className="text-blue-200 text-sm">Secteur</div>
+                                                <div className="text-white font-bold">
+                                                    {parsedData.sector || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div className="bg-blue-900/30 rounded p-3">
+                                                <div className="text-blue-200 text-sm">Market Cap</div>
+                                                <div className="text-white font-bold">
+                                                    {parsedData.marketCap || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div className="bg-blue-900/30 rounded p-3">
+                                                <div className="text-blue-200 text-sm">Rating Quant</div>
+                                                <div className="text-white font-bold">
+                                                    {parsedData.quantRating || 'N/A'}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="bg-blue-900/30 rounded p-3">
-                                        <div className="text-blue-200 text-sm">P/E</div>
-                                        <div className="text-white font-bold">
-                                            {seekingAlphaStockData.stocks[selectedStock].metrics?.peRatio || 'N/A'}
-                                        </div>
-                                    </div>
-                                    <div className="bg-blue-900/30 rounded p-3">
-                                        <div className="text-blue-200 text-sm">Dividende</div>
-                                        <div className="text-white font-bold">
-                                            {seekingAlphaStockData.stocks[selectedStock].metrics?.dividendYield || 'N/A'}
-                                        </div>
-                                    </div>
-                                    <div className="bg-blue-900/30 rounded p-3">
-                                        <div className="text-blue-200 text-sm">Secteur</div>
-                                        <div className="text-white font-bold">
-                                            {seekingAlphaStockData.stocks[selectedStock].metrics?.sector || 'N/A'}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+                                    );
+                                }
+                                return null;
+                            })()}
                             
                             {/* Analyse Seeking Alpha */}
-                            {seekingAlphaData.stocks?.find(s => s.ticker === selectedStock) && (
-                                <div className="mb-4">
-                                    <h4 className="text-lg font-semibold text-white mb-2">📈 Analyse Seeking Alpha</h4>
-                                    <div className="text-gray-200 text-sm leading-relaxed">
-                                        {seekingAlphaData.stocks.find(s => s.ticker === selectedStock).raw_text?.substring(0, 500)}...
-                                    </div>
-                                    <a
-                                        href={seekingAlphaData.stocks.find(s => s.ticker === selectedStock).url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline"
-                                    >
-                                        Lire l'analyse complète sur Seeking Alpha →
-                                    </a>
-                                </div>
-                            )}
+                            {(() => {
+                                const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === selectedStock);
+                                const parsedData = seekingAlphaItem?.parsedData;
+                                
+                                if (parsedData?.analysis) {
+                                    return (
+                                        <div className="mb-4">
+                                            <h4 className="text-lg font-semibold text-white mb-2">📈 Analyse Seeking Alpha</h4>
+                                            <div className="text-gray-200 text-sm leading-relaxed">
+                                                {parsedData.analysis}
+                                            </div>
+                                            <a
+                                                href={seekingAlphaItem.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline"
+                                            >
+                                                Lire l'analyse complète sur Seeking Alpha →
+                                            </a>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })()}
                             
                             {/* Données en temps réel */}
                             {stockData[selectedStock] && (
@@ -950,34 +1061,64 @@
                     {!selectedStock && seekingAlphaData.stocks && (
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold text-white">📈 Analyses Complètes</h3>
-                            {seekingAlphaData.stocks.map((stock, index) => (
-                                <div key={index} className="seeking-alpha-card rounded-lg p-6 border border-blue-300/20">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <h3 className="text-xl font-bold text-white">{stock.ticker}</h3>
-                                        <span className="text-sm text-blue-200">
-                                            {new Date(stock.timestamp).toLocaleString('fr-FR')}
-                                        </span>
+                            {seekingAlphaData.stocks.map((stock, index) => {
+                                const parsedData = stock.parsedData;
+                                return (
+                                    <div key={index} className="seeking-alpha-card rounded-lg p-6 border border-blue-300/20">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h3 className="text-xl font-bold text-white">{stock.ticker}</h3>
+                                                {parsedData?.companyName && (
+                                                    <p className="text-sm text-blue-200">{parsedData.companyName}</p>
+                                                )}
+                                            </div>
+                                            <span className="text-sm text-blue-200">
+                                                {new Date(stock.timestamp).toLocaleString('fr-FR')}
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Métriques clés */}
+                                        {parsedData && (
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                                                <div className="bg-blue-900/30 rounded p-2">
+                                                    <div className="text-blue-200 text-xs">Prix</div>
+                                                    <div className="text-white font-bold text-sm">{parsedData.price || 'N/A'}</div>
+                                                </div>
+                                                <div className="bg-blue-900/30 rounded p-2">
+                                                    <div className="text-blue-200 text-xs">P/E</div>
+                                                    <div className="text-white font-bold text-sm">{parsedData.peRatio || 'N/A'}</div>
+                                                </div>
+                                                <div className="bg-blue-900/30 rounded p-2">
+                                                    <div className="text-blue-200 text-xs">Dividende</div>
+                                                    <div className="text-white font-bold text-sm">{parsedData.dividendYield || 'N/A'}</div>
+                                                </div>
+                                                <div className="bg-blue-900/30 rounded p-2">
+                                                    <div className="text-blue-200 text-xs">Rating</div>
+                                                    <div className="text-white font-bold text-sm">{parsedData.quantRating || 'N/A'}</div>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="text-gray-200 mb-4">
+                                            {parsedData?.analysis || stock.raw_text?.substring(0, 300) + '...'}
+                                        </div>
+                                        
+                                        <div className="flex justify-between items-center">
+                                            <a
+                                                href={stock.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-300 hover:text-blue-200 underline"
+                                            >
+                                                Voir l'analyse complète →
+                                            </a>
+                                            <span className="text-xs text-blue-300">
+                                                Source: Seeking Alpha
+                                            </span>
+                                        </div>
                                     </div>
-                                    
-                                    <div className="text-gray-200 mb-4">
-                                        {stock.raw_text?.substring(0, 300)}...
-                                    </div>
-                                    
-                                    <div className="flex justify-between items-center">
-                                        <a
-                                            href={stock.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-300 hover:text-blue-200 underline"
-                                        >
-                                            Voir l'analyse complète →
-                                        </a>
-                                        <span className="text-xs text-blue-300">
-                                            Source: Seeking Alpha
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
 
