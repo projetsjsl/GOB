@@ -520,13 +520,13 @@ const GOB = () => {
                 <img 
                   src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
                   alt="JSL AI Logo" 
-                  className="w-20 h-20 object-contain animate-bounce"
+                  className="w-20 h-20 object-contain"
                   onLoad={() => console.log('Welcome logo loaded successfully')}
                   onError={(e) => {
                     console.log('Welcome logo failed to load, showing fallback');
                     e.currentTarget.style.display = 'none';
                     const fallback = document.createElement('div');
-                    fallback.className = 'w-20 h-20 flex items-center justify-center text-6xl animate-bounce';
+                    fallback.className = 'w-20 h-20 flex items-center justify-center text-6xl';
                     fallback.textContent = '🤖';
                     e.currentTarget.parentElement?.appendChild(fallback);
                   }}
