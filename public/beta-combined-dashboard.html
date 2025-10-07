@@ -294,10 +294,21 @@
                 }
             };
 
-            // Parser les données brutes de Seeking Alpha
+            // Fonction pour obtenir la couleur des grades Quant
+            const getGradeColor = (grade) => {
+                if (!grade) return 'bg-gray-100 text-gray-600';
+                const letter = grade.charAt(0);
+                if (letter === 'A') return 'bg-green-100 text-green-700';
+                if (letter === 'B') return 'bg-blue-100 text-blue-700';
+                if (letter === 'C') return 'bg-yellow-100 text-yellow-700';
+                if (letter === 'D') return 'bg-orange-100 text-orange-700';
+                if (letter === 'F') return 'bg-red-100 text-red-700';
+                return 'bg-gray-100 text-gray-600';
+            };
+
+            // Parser les données brutes de Seeking Alpha (fallback)
             const parseSeekingAlphaData = (rawText) => {
                 try {
-                    // Extraire les informations clés du texte brut
                     const data = {
                         price: null,
                         change: null,
@@ -310,50 +321,42 @@
                         companyName: null
                     };
 
-                    // Extraire le prix et le changement
                     const priceMatch = rawText.match(/\$(\d+\.?\d*)\s*([+-]?\d+\.?\d*)\s*\(([+-]?\d+\.?\d*)%\)/);
                     if (priceMatch) {
                         data.price = `$${priceMatch[1]}`;
                         data.change = `${priceMatch[2]} (${priceMatch[3]}%)`;
                     }
 
-                    // Extraire Market Cap
                     const marketCapMatch = rawText.match(/Market Cap\$(\d+\.?\d*[BMT])/i);
                     if (marketCapMatch) {
                         data.marketCap = `$${marketCapMatch[1]}`;
                     }
 
-                    // Extraire P/E Ratio
                     const peMatch = rawText.match(/P\/E \(FWD\)(\d+\.?\d*)/i);
                     if (peMatch) {
                         data.peRatio = peMatch[1];
                     }
 
-                    // Extraire Dividend Yield
                     const dividendMatch = rawText.match(/Yield \(FWD\)(\d+\.?\d*)%/i);
                     if (dividendMatch) {
                         data.dividendYield = `${dividendMatch[1]}%`;
                     }
 
-                    // Extraire le secteur
                     const sectorMatch = rawText.match(/Industry([^\\n]+)/i);
                     if (sectorMatch) {
                         data.sector = sectorMatch[1].trim();
                     }
 
-                    // Extraire le rating Quant
                     const ratingMatch = rawText.match(/Quant Rating([^\\n]+)/i);
                     if (ratingMatch) {
                         data.quantRating = ratingMatch[1].trim();
                     }
 
-                    // Extraire le nom de l'entreprise
                     const companyMatch = rawText.match(/([A-Z][a-z]+ [A-Z][a-z]+ Corporation)/);
                     if (companyMatch) {
                         data.companyName = companyMatch[1];
                     }
 
-                    // Extraire l'analyse (premiers paragraphes du Virtual Analyst Report)
                     const analysisMatch = rawText.match(/Virtual Analyst Report[\\s\\S]*?Company Description\\s*([\\s\\S]*?)(?=Competitors|$)/);
                     if (analysisMatch) {
                         data.analysis = analysisMatch[1].trim().substring(0, 500) + '...';
@@ -373,7 +376,7 @@
                     if (response.ok) {
                         const data = await response.json();
                         
-                        // Parser les données brutes pour chaque stock
+                        // Parser les données brutes pour chaque stock (fallback)
                         const parsedStocks = data.stocks?.map(stock => ({
                             ...stock,
                             parsedData: parseSeekingAlphaData(stock.raw_text)
@@ -861,29 +864,27 @@
                                     {tickers.map(ticker => {
                                         const stockDataItem = stockData[ticker];
                                         const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                                        const claudeData = seekingAlphaStockData.stocks?.[ticker];
                                         const parsedData = seekingAlphaItem?.parsedData;
-                                        const change = stockDataItem?.dp || 0;
-                                        const changeColor = change >= 0 ? 'text-green-400' : 'text-red-400';
+                                        
+                                        // Priorité: Claude > Parsed > Finnhub
+                                        const price = claudeData?.metrics?.price || parsedData?.price || `$${stockDataItem?.c?.toFixed(2) || 'N/A'}`;
+                                        const change = claudeData?.metrics?.priceChange || parsedData?.change || (stockDataItem?.dp >= 0 ? '+' : '') + (stockDataItem?.dp?.toFixed(2) || '0') + '%';
+                                        const peRatio = claudeData?.metrics?.peRatio || parsedData?.peRatio || 'N/A';
+                                        const dividendYield = claudeData?.metrics?.dividendYield || parsedData?.dividendYield || 'N/A';
+                                        const sector = claudeData?.metrics?.sector || parsedData?.sector || 'N/A';
+                                        
+                                        const changeColor = (change.includes('+') || change.includes('green')) ? 'text-green-400' : 'text-red-400';
                                         
                                         return (
                                             <tr key={ticker} className="border-b border-blue-300/10 hover:bg-blue-900/20 cursor-pointer"
                                                 onClick={() => setSelectedStock(ticker)}>
                                                 <td className="py-2 font-mono text-white">{ticker}</td>
-                                                <td className="py-2 text-white">
-                                                    {parsedData?.price || `$${stockDataItem?.c?.toFixed(2) || 'N/A'}`}
-                                                </td>
-                                                <td className={`py-2 ${changeColor}`}>
-                                                    {parsedData?.change || (change >= 0 ? '+' : '') + change.toFixed(2) + '%'}
-                                                </td>
-                                                <td className="py-2 text-white">
-                                                    {parsedData?.peRatio || 'N/A'}
-                                                </td>
-                                                <td className="py-2 text-white">
-                                                    {parsedData?.dividendYield || 'N/A'}
-                                                </td>
-                                                <td className="py-2 text-white">
-                                                    {parsedData?.sector || 'N/A'}
-                                                </td>
+                                                <td className="py-2 text-white">{price}</td>
+                                                <td className={`py-2 ${changeColor}`}>{change}</td>
+                                                <td className="py-2 text-white">{peRatio}</td>
+                                                <td className="py-2 text-white">{dividendYield}</td>
+                                                <td className="py-2 text-white">{sector}</td>
                                                 <td className="py-2">
                                                     <button className="text-blue-300 hover:text-blue-200 text-xs">
                                                         Voir fiche →
@@ -960,48 +961,112 @@
                             
                             {/* Données financières détaillées */}
                             {(() => {
+                                const claudeData = seekingAlphaStockData.stocks?.[selectedStock];
                                 const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === selectedStock);
                                 const parsedData = seekingAlphaItem?.parsedData;
                                 
-                                if (parsedData) {
+                                if (claudeData || parsedData) {
                                     return (
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                            <div className="bg-blue-900/30 rounded p-3">
-                                                <div className="text-blue-200 text-sm">Prix</div>
-                                                <div className="text-white font-bold">
-                                                    {parsedData.price || 'N/A'}
+                                        <div className="space-y-6">
+                                            {/* Métriques principales */}
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                <div className="bg-blue-900/30 rounded p-3">
+                                                    <div className="text-blue-200 text-sm">Prix</div>
+                                                    <div className="text-white font-bold">
+                                                        {claudeData?.metrics?.price || parsedData?.price || 'N/A'}
+                                                    </div>
+                                                </div>
+                                                <div className="bg-blue-900/30 rounded p-3">
+                                                    <div className="text-blue-200 text-sm">P/E</div>
+                                                    <div className="text-white font-bold">
+                                                        {claudeData?.metrics?.peRatio || parsedData?.peRatio || 'N/A'}
+                                                    </div>
+                                                </div>
+                                                <div className="bg-blue-900/30 rounded p-3">
+                                                    <div className="text-blue-200 text-sm">Dividende</div>
+                                                    <div className="text-white font-bold">
+                                                        {claudeData?.metrics?.dividendYield || parsedData?.dividendYield || 'N/A'}
+                                                    </div>
+                                                </div>
+                                                <div className="bg-blue-900/30 rounded p-3">
+                                                    <div className="text-blue-200 text-sm">Secteur</div>
+                                                    <div className="text-white font-bold">
+                                                        {claudeData?.metrics?.sector || parsedData?.sector || 'N/A'}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="bg-blue-900/30 rounded p-3">
-                                                <div className="text-blue-200 text-sm">P/E</div>
-                                                <div className="text-white font-bold">
-                                                    {parsedData.peRatio || 'N/A'}
+
+                                            {/* Quant Ratings (si disponible via Claude) */}
+                                            {claudeData?.quantRating && (
+                                                <div className="bg-blue-900/20 rounded-lg p-4">
+                                                    <h4 className="text-lg font-semibold text-white mb-3">📊 Quant Ratings</h4>
+                                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                                        {Object.entries(claudeData.quantRating).map(([key, value]) => {
+                                                            if (!value || key === 'overall') return null;
+                                                            return (
+                                                                <div key={key} className="flex items-center justify-between">
+                                                                    <span className="text-xs text-blue-200 capitalize">{key}</span>
+                                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${getGradeColor(value)}`}>
+                                                                        {value}
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="bg-blue-900/30 rounded p-3">
-                                                <div className="text-blue-200 text-sm">Dividende</div>
-                                                <div className="text-white font-bold">
-                                                    {parsedData.dividendYield || 'N/A'}
+                                            )}
+
+                                            {/* Profil entreprise (si disponible via Claude) */}
+                                            {claudeData?.companyProfile && (
+                                                <div className="bg-blue-900/20 rounded-lg p-4">
+                                                    <h4 className="text-lg font-semibold text-white mb-3">🏢 Profil Entreprise</h4>
+                                                    <div className="text-gray-200 text-sm leading-relaxed">
+                                                        {claudeData.companyProfile.description}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="bg-blue-900/30 rounded p-3">
-                                                <div className="text-blue-200 text-sm">Secteur</div>
-                                                <div className="text-white font-bold">
-                                                    {parsedData.sector || 'N/A'}
+                                            )}
+
+                                            {/* Points positifs et préoccupations (si disponible via Claude) */}
+                                            {claudeData?.strengths && claudeData?.concerns && (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="bg-green-900/20 rounded-lg p-4">
+                                                        <h4 className="text-lg font-semibold text-green-300 mb-3">✅ Points Positifs</h4>
+                                                        <ul className="space-y-2">
+                                                            {claudeData.strengths.map((strength, index) => (
+                                                                <li key={index} className="text-green-200 text-sm">
+                                                                    • {strength}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                    <div className="bg-red-900/20 rounded-lg p-4">
+                                                        <h4 className="text-lg font-semibold text-red-300 mb-3">⚠️ Préoccupations</h4>
+                                                        <ul className="space-y-2">
+                                                            {claudeData.concerns.map((concern, index) => (
+                                                                <li key={index} className="text-red-200 text-sm">
+                                                                    • {concern}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="bg-blue-900/30 rounded p-3">
-                                                <div className="text-blue-200 text-sm">Market Cap</div>
-                                                <div className="text-white font-bold">
-                                                    {parsedData.marketCap || 'N/A'}
+                                            )}
+
+                                            {/* Conclusion finale (si disponible via Claude) */}
+                                            {claudeData?.finalConclusion && (
+                                                <div className="bg-blue-900/20 rounded-lg p-4">
+                                                    <h4 className="text-lg font-semibold text-white mb-3">🎯 Conclusion</h4>
+                                                    <div className="text-gray-200 text-sm leading-relaxed mb-3">
+                                                        {claudeData.finalConclusion.recommendation}
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-200 text-sm">Rating:</span>
+                                                        <span className={`px-3 py-1 rounded font-bold ${getGradeColor(claudeData.finalConclusion.rating)}`}>
+                                                            {claudeData.finalConclusion.rating}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="bg-blue-900/30 rounded p-3">
-                                                <div className="text-blue-200 text-sm">Rating Quant</div>
-                                                <div className="text-white font-bold">
-                                                    {parsedData.quantRating || 'N/A'}
-                                                </div>
-                                            </div>
+                                            )}
                                         </div>
                                     );
                                 }
@@ -1062,59 +1127,79 @@
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold text-white">📈 Analyses Complètes</h3>
                             {seekingAlphaData.stocks.map((stock, index) => {
+                                const claudeData = seekingAlphaStockData.stocks?.[stock.ticker];
                                 const parsedData = stock.parsedData;
+                                
                                 return (
                                     <div key={index} className="seeking-alpha-card rounded-lg p-6 border border-blue-300/20">
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
                                                 <h3 className="text-xl font-bold text-white">{stock.ticker}</h3>
-                                                {parsedData?.companyName && (
-                                                    <p className="text-sm text-blue-200">{parsedData.companyName}</p>
+                                                <p className="text-sm text-blue-200">
+                                                    {claudeData?.companyName || parsedData?.companyName || 'N/A'}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                {claudeData?.metrics?.price && (
+                                                    <div className="text-xl font-bold text-white">{claudeData.metrics.price}</div>
+                                                )}
+                                                {claudeData?.metrics?.priceChange && (
+                                                    <div className={`text-sm ${claudeData.metrics.priceChange.includes('+') ? 'text-green-400' : 'text-red-400'}`}>
+                                                        {claudeData.metrics.priceChange}
+                                                    </div>
                                                 )}
                                             </div>
-                                            <span className="text-sm text-blue-200">
-                                                {new Date(stock.timestamp).toLocaleString('fr-FR')}
-                                            </span>
                                         </div>
-                                        
+
                                         {/* Métriques clés */}
-                                        {parsedData && (
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                                                <div className="bg-blue-900/30 rounded p-2">
-                                                    <div className="text-blue-200 text-xs">Prix</div>
-                                                    <div className="text-white font-bold text-sm">{parsedData.price || 'N/A'}</div>
+                                        <div className="space-y-2 mb-4">
+                                            {claudeData?.metrics?.marketCap && (
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-slate-400">Market Cap</span>
+                                                    <span className="text-white font-medium">{claudeData.metrics.marketCap}</span>
                                                 </div>
-                                                <div className="bg-blue-900/30 rounded p-2">
-                                                    <div className="text-blue-200 text-xs">P/E</div>
-                                                    <div className="text-white font-bold text-sm">{parsedData.peRatio || 'N/A'}</div>
+                                            )}
+                                            {claudeData?.metrics?.peRatio && (
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-slate-400">P/E Ratio</span>
+                                                    <span className="text-white font-medium">{claudeData.metrics.peRatio}</span>
                                                 </div>
-                                                <div className="bg-blue-900/30 rounded p-2">
-                                                    <div className="text-blue-200 text-xs">Dividende</div>
-                                                    <div className="text-white font-bold text-sm">{parsedData.dividendYield || 'N/A'}</div>
+                                            )}
+                                            {claudeData?.metrics?.dividendYield && (
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-slate-400">Dividend Yield</span>
+                                                    <span className="text-white font-medium">{claudeData.metrics.dividendYield}</span>
                                                 </div>
-                                                <div className="bg-blue-900/30 rounded p-2">
-                                                    <div className="text-blue-200 text-xs">Rating</div>
-                                                    <div className="text-white font-bold text-sm">{parsedData.quantRating || 'N/A'}</div>
+                                            )}
+                                        </div>
+
+                                        {/* Quant Ratings */}
+                                        {claudeData?.quantRating && (
+                                            <div className="space-y-2 mb-4">
+                                                <h4 className="text-sm font-medium text-slate-300 mb-2">Quant Ratings</h4>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    {Object.entries(claudeData.quantRating).map(([key, value]) => {
+                                                        if (!value || key === 'overall') return null;
+                                                        return (
+                                                            <div key={key} className="flex items-center justify-between">
+                                                                <span className="text-xs text-slate-400 capitalize">{key}</span>
+                                                                <span className={`px-2 py-1 rounded text-xs font-bold ${getGradeColor(value)}`}>
+                                                                    {value}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         )}
-                                        
+
+                                        {/* Description/analyse */}
                                         <div className="text-gray-200 mb-4">
-                                            {parsedData?.analysis || stock.raw_text?.substring(0, 300) + '...'}
+                                            {claudeData?.companyProfile?.description || parsedData?.analysis || stock.raw_text?.substring(0, 300) + '...'}
                                         </div>
                                         
-                                        <div className="flex justify-between items-center">
-                                            <a
-                                                href={stock.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-300 hover:text-blue-200 underline"
-                                            >
-                                                Voir l'analyse complète →
-                                            </a>
-                                            <span className="text-xs text-blue-300">
-                                                Source: Seeking Alpha
-                                            </span>
+                                        <div className="mt-4 text-xs text-slate-500">
+                                            Mis à jour: {claudeData?.lastUpdate ? new Date(claudeData.lastUpdate).toLocaleString('fr-FR') : new Date(stock.timestamp).toLocaleString('fr-FR')}
                                         </div>
                                     </div>
                                 );
