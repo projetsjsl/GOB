@@ -555,7 +555,7 @@ const GOB = () => {
         <div className={`backdrop-blur-xl px-3 sm:px-6 py-2 sm:py-3 border-b overflow-hidden ${
           isDarkMode 
             ? 'bg-gradient-to-r from-gray-900/95 via-black/95 to-gray-800/95 text-white border-green-500/20' 
-            : 'bg-gradient-to-r from-blue-600/95 via-blue-700/95 to-blue-800/95 text-white border-blue-500/20'
+            : 'bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 text-gray-800 border-gray-300/20'
         }`}>
           <div className="flex items-center space-x-4 sm:space-x-8 text-xs sm:text-sm font-medium animate-scroll">
             <div className="flex items-center space-x-2 whitespace-nowrap">
@@ -604,7 +604,7 @@ const GOB = () => {
         <div className={`backdrop-blur-xl px-3 sm:px-6 py-2 border-b ${
           isDarkMode 
             ? 'bg-gradient-to-r from-gray-900/95 via-black/95 to-gray-800/95 text-white border-green-500/20' 
-            : 'bg-gradient-to-r from-blue-600/95 via-blue-700/95 to-blue-800/95 text-white border-blue-500/20'
+            : 'bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 text-gray-800 border-gray-300/20'
         }`}>
           <div className="flex items-center justify-between text-xs sm:text-sm font-medium">
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -625,28 +625,28 @@ const GOB = () => {
         <div className={`backdrop-blur-2xl border-b shadow-2xl ${
           isDarkMode 
             ? 'bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-800/90 border-green-500/20' 
-            : 'bg-gradient-to-r from-blue-600/90 via-blue-700/90 to-blue-800/90 border-blue-500/20'
+            : 'bg-gradient-to-r from-white/90 via-gray-50/90 to-white/90 border-gray-300/20'
         }`}>
-          <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 {/* Logo JSL AI avec fallback robuste */}
-                <div className={`backdrop-blur-md rounded-2xl p-2 shadow-xl border ${
+                <div className={`backdrop-blur-md rounded-xl sm:rounded-2xl p-1 sm:p-2 shadow-xl border ${
                   isDarkMode 
                     ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600/30' 
                     : 'bg-gradient-to-br from-white to-gray-100 border-gray-300/30'
                 }`}>
-                  <div className="w-16 h-16 flex items-center justify-center">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
                     <img 
                       src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
                       alt="JSL AI Logo" 
-                      className="w-14 h-14 object-contain"
+                      className="w-10 h-10 sm:w-14 sm:h-14 object-contain"
                       onLoad={() => console.log('Logo loaded successfully')}
                       onError={(e) => {
                         console.log('Logo failed to load, showing fallback');
                         e.currentTarget.style.display = 'none';
                         const fallback = document.createElement('div');
-                        fallback.className = 'w-14 h-14 flex items-center justify-center text-3xl';
+                        fallback.className = 'w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center text-2xl sm:text-3xl';
                         fallback.textContent = '🤖';
                         e.currentTarget.parentElement?.appendChild(fallback);
                       }}
@@ -654,9 +654,11 @@ const GOB = () => {
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg font-['Inter']">GOB Apps</h1>
-                  <p className={`text-sm font-medium font-['Inter'] ${
-                    isDarkMode ? 'text-green-400' : 'text-blue-200'
+                  <h1 className={`text-xl sm:text-3xl font-bold tracking-tight drop-shadow-lg font-['Inter'] ${
+                    isDarkMode ? 'text-white' : 'text-gray-800'
+                  }`}>GOB Apps</h1>
+                  <p className={`text-xs sm:text-sm font-medium font-['Inter'] ${
+                    isDarkMode ? 'text-green-400' : 'text-gray-600'
                   }`}>Plateforme financière • Propulsée par JSL AI</p>
                 </div>
               </div>
