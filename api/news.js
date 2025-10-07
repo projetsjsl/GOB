@@ -5,9 +5,46 @@ export default async function handler(req, res) {
     // Clé API NewsAPI.ai (à configurer dans les variables d'environnement Vercel)
     const NEWSAPI_KEY = process.env.NEWSAPI_KEY || 'YOUR_NEWSAPI_KEY';
     
+    // Données de démonstration si pas de clé API
+    const demoNews = [
+        {
+            title: "CVS Health Reports Strong Q3 Earnings",
+            description: "CVS Health Corporation reported better-than-expected third quarter earnings, driven by strong performance in its pharmacy and health services segments.",
+            url: "https://example.com/cvs-earnings",
+            publishedAt: new Date().toISOString(),
+            source: { name: "Financial News" },
+            urlToImage: null,
+            content: "CVS Health Corporation reported better-than-expected third quarter earnings..."
+        },
+        {
+            title: "Microsoft Azure Growth Continues in Cloud Market",
+            description: "Microsoft's cloud computing division Azure continues to show strong growth, maintaining its competitive position against AWS and Google Cloud.",
+            url: "https://example.com/microsoft-azure",
+            publishedAt: new Date(Date.now() - 3600000).toISOString(),
+            source: { name: "Tech News" },
+            urlToImage: null,
+            content: "Microsoft's cloud computing division Azure continues to show strong growth..."
+        },
+        {
+            title: "Stock Market Shows Mixed Signals",
+            description: "The stock market showed mixed signals today with technology stocks leading gains while healthcare stocks faced some pressure.",
+            url: "https://example.com/market-update",
+            publishedAt: new Date(Date.now() - 7200000).toISOString(),
+            source: { name: "Market Watch" },
+            urlToImage: null,
+            content: "The stock market showed mixed signals today with technology stocks leading gains..."
+        }
+    ];
+
     if (!NEWSAPI_KEY || NEWSAPI_KEY === 'YOUR_NEWSAPI_KEY') {
-        return res.status(500).json({ 
-            error: 'Clé API NewsAPI.ai non configurée. Veuillez configurer NEWSAPI_KEY dans les variables d\'environnement Vercel.' 
+        // Retourner des données de démonstration
+        return res.status(200).json({
+            articles: demoNews,
+            totalResults: demoNews.length,
+            query: q || 'finance',
+            timestamp: new Date().toISOString(),
+            source: 'demo',
+            message: 'Données de démonstration - Configurez NEWSAPI_KEY pour des actualités réelles'
         });
     }
 

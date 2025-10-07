@@ -154,9 +154,26 @@
                     if (!response.ok) throw new Error(`News API error: ${response.status}`);
                     const data = await response.json();
                     setNewsData(data.articles || []);
+                    
+                    // Afficher un message si c'est des données de démonstration
+                    if (data.source === 'demo') {
+                        showMessage('Actualités de démonstration - Configurez NEWSAPI_KEY pour des actualités réelles', 'info');
+                    }
                 } catch (error) {
                     console.error('Erreur fetch news:', error);
                     showMessage('Erreur chargement actualités', 'error');
+                    
+                    // Données de fallback en cas d'erreur
+                    const fallbackNews = [
+                        {
+                            title: "Actualités financières non disponibles",
+                            description: "Impossible de charger les actualités. Vérifiez la configuration de l'API NewsAPI.",
+                            url: "#",
+                            publishedAt: new Date().toISOString(),
+                            source: { name: "Système" }
+                        }
+                    ];
+                    setNewsData(fallbackNews);
                 }
             };
 
