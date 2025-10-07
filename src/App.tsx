@@ -203,40 +203,9 @@ const GOB = () => {
       setApps(JSON.parse(stored));
     } else {
       const defaultApps: App[] = [
-        { id: '1', name: 'GitHub', url: 'https://github.com', logo: '💻', order: 0 },
-        { id: '2', name: 'LinkedIn', url: 'https://linkedin.com', logo: '💼', order: 1 },
-        { id: '3', name: 'Google', url: 'https://google.com', logo: '🌐', order: 2 },
-        { id: '4', name: 'Yahoo', url: 'https://yahoo.com', logo: '📧', order: 3 },
-        { id: '5', name: 'YouTube', url: 'https://youtube.com', logo: '🎬', order: 4 },
-        { id: '6', name: 'Netflix', url: 'https://netflix.com', logo: '🎭', order: 5 },
-        { id: '7', name: 'Spotify', url: 'https://spotify.com', logo: '🎵', order: 6 },
-        { id: '8', name: 'Twitter', url: 'https://twitter.com', logo: '🐦', order: 7 },
-        { id: '9', name: 'Facebook', url: 'https://facebook.com', logo: '📘', order: 8 },
-        { id: '10', name: 'Instagram', url: 'https://instagram.com', logo: '📷', order: 9 },
-        { id: '11', name: 'Discord', url: 'https://discord.com', logo: '💬', order: 10 },
-        { id: '12', name: 'Twitch', url: 'https://twitch.tv', logo: '🎮', order: 11 },
-        { id: '13', name: 'Reddit', url: 'https://reddit.com', logo: '🤖', order: 12 },
-        { id: '14', name: 'Stack Overflow', url: 'https://stackoverflow.com', logo: '🔧', order: 13 },
-        { id: '15', name: 'Gmail', url: 'https://gmail.com', logo: '📧', order: 14 },
-        { id: '16', name: 'Outlook', url: 'https://outlook.com', logo: '📮', order: 15 },
-        { id: '17', name: 'Dropbox', url: 'https://dropbox.com', logo: '📦', order: 16 },
-        { id: '18', name: 'Google Drive', url: 'https://drive.google.com', logo: '💾', order: 17 },
-        { id: '19', name: 'Notion', url: 'https://notion.so', logo: '📝', order: 18 },
-        { id: '20', name: 'Trello', url: 'https://trello.com', logo: '📋', order: 19 },
-        { id: '21', name: 'Slack', url: 'https://slack.com', logo: '💼', order: 20 },
-        { id: '22', name: 'Zoom', url: 'https://zoom.us', logo: '📞', order: 21 },
-        { id: '23', name: 'WhatsApp', url: 'https://web.whatsapp.com', logo: '💬', order: 22 },
-        { id: '24', name: 'Telegram', url: 'https://web.telegram.org', logo: '✈️', order: 23 },
-        { id: '25', name: 'Amazon', url: 'https://amazon.com', logo: '🛒', order: 24 },
-        { id: '26', name: 'eBay', url: 'https://ebay.com', logo: '🏪', order: 25 },
-        { id: '27', name: 'PayPal', url: 'https://paypal.com', logo: '💰', order: 26 },
-        { id: '28', name: 'Banking', url: 'https://banking.example.com', logo: '🏦', order: 27 },
-        { id: '29', name: 'Weather', url: 'https://weather.com', logo: '🌤️', order: 28 },
-        { id: '30', name: 'News', url: 'https://news.google.com', logo: '📰', order: 29 },
-        { id: '31', name: 'Seeking Alpha', url: '/seeking-alpha/', logo: '📈', order: 30 },
-        { id: '32', name: 'Homepage', url: '/homepage.html', logo: '🏠', order: 31 },
-        { id: '33', name: 'Login Page', url: '/login_page.html', logo: '🔐', order: 32 },
-        { id: '34', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 33 }
+        { id: '1', name: 'Seeking Alpha', url: '/seeking-alpha/', logo: '📈', order: 0 },
+        { id: '2', name: 'Login Page', url: '/login_page.html', logo: '🔐', order: 1 },
+        { id: '3', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 2 }
       ];
       setApps(defaultApps);
     }
