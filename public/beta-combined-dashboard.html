@@ -403,66 +403,117 @@
                 addScrapingLog(`🚀 Démarrage du scraping pour ${ticker}...`, 'info');
                 
                 try {
-                    // Ouvrir Seeking Alpha dans une nouvelle fenêtre
                     const url = `https://seekingalpha.com/symbol/${ticker}/virtual_analyst_report`;
                     addScrapingLog(`🌐 Ouverture de ${url}`, 'info');
                     
-                    const newWindow = window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
-                    
-                    if (!newWindow) {
-                        throw new Error('Popup bloqué - Veuillez autoriser les popups pour ce site');
+                    // Méthode 1: Essayer window.open avec popup
+                    let newWindow = null;
+                    try {
+                        newWindow = window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+                        
+                        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                            throw new Error('Popup bloqué');
+                        }
+                        
+                        addScrapingLog(`✅ Popup ouvert avec succès pour ${ticker}`, 'success');
+                        
+                    } catch (popupError) {
+                        addScrapingLog(`⚠️ Popup bloqué pour ${ticker}, tentative méthode alternative...`, 'warning');
+                        
+                        // Méthode 2: Créer un lien temporaire et le cliquer
+                        try {
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                            link.style.display = 'none';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            
+                            addScrapingLog(`✅ Lien ouvert dans un nouvel onglet pour ${ticker}`, 'success');
+                            
+                        } catch (linkError) {
+                            addScrapingLog(`⚠️ Méthode lien échouée, utilisation de la méthode directe...`, 'warning');
+                            
+                            // Méthode 3: Utiliser location.href (ouvre dans le même onglet)
+                            addScrapingLog(`🔄 Ouverture directe dans le même onglet...`, 'info');
+                            addScrapingLog(`⚠️ ATTENTION: Cela va quitter cette page!`, 'warning');
+                            
+                            // Demander confirmation avant de quitter
+                            const confirmLeave = confirm(`Voulez-vous ouvrir ${url} dans le même onglet? Cela fermera cette page.`);
+                            if (confirmLeave) {
+                                window.location.href = url;
+                                return;
+                            } else {
+                                addScrapingLog(`❌ Utilisateur a annulé l'ouverture pour ${ticker}`, 'error');
+                                throw new Error('Utilisateur a annulé l\'ouverture');
+                            }
+                        }
                     }
                     
-                    // Attendre que la page se charge
-                    addScrapingLog(`⏳ Attente du chargement de la page (8 secondes)...`, 'info');
-                    await wait(8000);
-                    
-                    // Vérifier si la fenêtre est toujours ouverte
-                    if (newWindow.closed) {
-                        addScrapingLog(`⚠️ Fenêtre fermée prématurément pour ${ticker}`, 'warning');
-                        return;
+                    // Si on a réussi à ouvrir une fenêtre, continuer avec la logique normale
+                    if (newWindow && !newWindow.closed) {
+                        // Attendre que la page se charge
+                        addScrapingLog(`⏳ Attente du chargement de la page (8 secondes)...`, 'info');
+                        await wait(8000);
+                        
+                        // Vérifier si la fenêtre est toujours ouverte
+                        if (newWindow.closed) {
+                            addScrapingLog(`⚠️ Fenêtre fermée prématurément pour ${ticker}`, 'warning');
+                            return;
+                        }
+                        
+                        // Méthode alternative : utiliser postMessage pour communiquer
+                        addScrapingLog(`📡 Tentative de communication avec la fenêtre...`, 'info');
+                        
+                        // Envoyer un message à la fenêtre pour demander les données
+                        newWindow.postMessage({
+                            type: 'REQUEST_SCRAPING_DATA',
+                            ticker: ticker,
+                            source: 'parent'
+                        }, '*');
+                        
+                        // Écouter les messages de la fenêtre
+                        const messageHandler = (event) => {
+                            if (event.data.type === 'SCRAPING_RESULT' && event.data.ticker === ticker) {
+                                addScrapingLog(`✅ Scraping réussi pour ${ticker}`, 'success');
+                                addScrapingLog(`📄 Données extraites: ${event.data.data.innerText.length} caractères`, 'info');
+                                window.removeEventListener('message', messageHandler);
+                            } else if (event.data.type === 'SCRAPING_ERROR' && event.data.ticker === ticker) {
+                                addScrapingLog(`❌ Erreur de scraping pour ${ticker}: ${event.data.error}`, 'error');
+                                window.removeEventListener('message', messageHandler);
+                            }
+                        };
+                        
+                        window.addEventListener('message', messageHandler);
+                        
+                        // Timeout de sécurité
+                        setTimeout(() => {
+                            window.removeEventListener('message', messageHandler);
+                            if (!newWindow.closed) {
+                                addScrapingLog(`⏰ Timeout atteint pour ${ticker} - Fenêtre ouverte manuellement`, 'warning');
+                                addScrapingLog(`💡 Vous pouvez maintenant extraire les données manuellement`, 'info');
+                            }
+                        }, 15000);
+                        
+                        addScrapingLog(`📋 Instructions: La page Seeking Alpha est maintenant ouverte`, 'info');
+                        addScrapingLog(`🔍 Vous pouvez copier les données manuellement si nécessaire`, 'info');
+                    } else {
+                        addScrapingLog(`✅ Page ouverte avec succès pour ${ticker}`, 'success');
+                        addScrapingLog(`📋 Instructions: Utilisez F12 pour inspecter la page`, 'info');
+                        addScrapingLog(`💡 Copiez les données manuellement depuis la console`, 'info');
                     }
-                    
-                    // Méthode alternative : utiliser postMessage pour communiquer
-                    addScrapingLog(`📡 Tentative de communication avec la fenêtre...`, 'info');
-                    
-                    // Envoyer un message à la fenêtre pour demander les données
-                    newWindow.postMessage({
-                        type: 'REQUEST_SCRAPING_DATA',
-                        ticker: ticker,
-                        source: 'parent'
-                    }, '*');
-                    
-                    // Écouter les messages de la fenêtre
-                    const messageHandler = (event) => {
-                        if (event.data.type === 'SCRAPING_RESULT' && event.data.ticker === ticker) {
-                            addScrapingLog(`✅ Scraping réussi pour ${ticker}`, 'success');
-                            addScrapingLog(`📄 Données extraites: ${event.data.data.innerText.length} caractères`, 'info');
-                            window.removeEventListener('message', messageHandler);
-                        } else if (event.data.type === 'SCRAPING_ERROR' && event.data.ticker === ticker) {
-                            addScrapingLog(`❌ Erreur de scraping pour ${ticker}: ${event.data.error}`, 'error');
-                            window.removeEventListener('message', messageHandler);
-                        }
-                    };
-                    
-                    window.addEventListener('message', messageHandler);
-                    
-                    // Timeout de sécurité
-                    setTimeout(() => {
-                        window.removeEventListener('message', messageHandler);
-                        if (!newWindow.closed) {
-                            addScrapingLog(`⏰ Timeout atteint pour ${ticker} - Fenêtre ouverte manuellement`, 'warning');
-                            addScrapingLog(`💡 Vous pouvez maintenant extraire les données manuellement`, 'info');
-                        }
-                    }, 15000);
-                    
-                    // Simuler un succès après l'ouverture
-                    addScrapingLog(`✅ Fenêtre ouverte avec succès pour ${ticker}`, 'success');
-                    addScrapingLog(`📋 Instructions: La page Seeking Alpha est maintenant ouverte`, 'info');
-                    addScrapingLog(`🔍 Vous pouvez copier les données manuellement si nécessaire`, 'info');
                     
                 } catch (error) {
                     addScrapingLog(`❌ Erreur lors du scraping de ${ticker}: ${error.message}`, 'error');
+                    
+                    // Ne pas faire échouer tout le processus pour un popup bloqué
+                    if (error.message.includes('Popup bloqué') || error.message.includes('annulé')) {
+                        addScrapingLog(`💡 Conseil: Autorisez les popups pour ce site ou utilisez le script F12`, 'info');
+                        return; // Continuer avec le prochain ticker
+                    }
+                    
                     throw error;
                 }
             };
@@ -480,6 +531,9 @@
                 addScrapingLog('🚀 Démarrage du scraper Seeking Alpha', 'info');
                 addScrapingLog(`📊 Tickers à traiter: ${tickers.join(', ')}`, 'info');
                 
+                let successCount = 0;
+                let errorCount = 0;
+                
                 try {
                     for (let i = 0; i < tickers.length; i++) {
                         const ticker = tickers[i];
@@ -488,7 +542,15 @@
                         setScrapingProgress(progress);
                         addScrapingLog(`📈 Progression: ${progress}% (${i + 1}/${tickers.length})`, 'info');
                         
-                        await scrapeTicker(ticker);
+                        try {
+                            await scrapeTicker(ticker);
+                            successCount++;
+                            addScrapingLog(`✅ ${ticker} traité avec succès`, 'success');
+                        } catch (tickerError) {
+                            errorCount++;
+                            addScrapingLog(`❌ Erreur pour ${ticker}: ${tickerError.message}`, 'error');
+                            addScrapingLog(`🔄 Continuation avec le prochain ticker...`, 'info');
+                        }
                         
                         // Pause entre les scrapings pour éviter d'être bloqué
                         if (i < tickers.length - 1) {
@@ -497,8 +559,14 @@
                         }
                     }
                     
-                    setScrapingStatus('completed');
-                    addScrapingLog('🎉 Scraping terminé avec succès!', 'success');
+                    // Déterminer le statut final
+                    if (successCount > 0) {
+                        setScrapingStatus('completed');
+                        addScrapingLog(`🎉 Scraping terminé! ${successCount} succès, ${errorCount} erreurs`, 'success');
+                    } else {
+                        setScrapingStatus('error');
+                        addScrapingLog(`💥 Aucun ticker n'a pu être traité (${errorCount} erreurs)`, 'error');
+                    }
                     
                 } catch (error) {
                     setScrapingStatus('error');
@@ -509,7 +577,32 @@
             const openSeekingAlpha = (ticker) => {
                 const url = `https://seekingalpha.com/symbol/${ticker}/virtual_analyst_report`;
                 addScrapingLog(`🌐 Ouverture directe de Seeking Alpha pour ${ticker}`, 'info');
-                window.open(url, '_blank');
+                
+                try {
+                    // Essayer d'abord window.open
+                    const newWindow = window.open(url, '_blank');
+                    
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                        addScrapingLog(`⚠️ Popup bloqué, utilisation de la méthode alternative...`, 'warning');
+                        
+                        // Méthode alternative : créer un lien temporaire
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        addScrapingLog(`✅ Lien ouvert dans un nouvel onglet`, 'success');
+                    } else {
+                        addScrapingLog(`✅ Fenêtre popup ouverte avec succès`, 'success');
+                    }
+                } catch (error) {
+                    addScrapingLog(`❌ Erreur lors de l'ouverture: ${error.message}`, 'error');
+                    addScrapingLog(`💡 Essayez d'autoriser les popups pour ce site`, 'info');
+                }
             };
 
             // Fonction alternative pour le scraping sans cross-origin
@@ -708,6 +801,25 @@
                                 <div>• <strong>Méthode 2:</strong> Cliquez sur "📋 Script F12" pour copier un script</div>
                                 <div>• <strong>Étapes:</strong> Ouvrez F12 → Console → Collez le script → Entrée</div>
                                 <div>• <strong>Résultat:</strong> Les données seront affichées et copiées automatiquement</div>
+                            </div>
+                        </div>
+
+                        {/* Aide pour les popups bloqués */}
+                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-yellow-900/30' 
+                                : 'bg-yellow-100/80'
+                        }`}>
+                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🔧 Résolution des Popups Bloqués</h4>
+                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-yellow-200' : 'text-yellow-800'
+                            }`}>
+                                <div>• <strong>Chrome/Edge:</strong> Cliquez sur l'icône popup dans la barre d'adresse → "Toujours autoriser"</div>
+                                <div>• <strong>Firefox:</strong> Cliquez sur l'icône bouclier → "Désactiver la protection"</div>
+                                <div>• <strong>Safari:</strong> Safari → Préférences → Sites web → Pop-ups → Autoriser</div>
+                                <div>• <strong>Alternative:</strong> Utilisez le bouton "🌐 Ouvrir Seeking Alpha" ou le script F12</div>
                             </div>
                         </div>
 
