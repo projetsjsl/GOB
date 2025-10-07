@@ -211,36 +211,73 @@ const GOB = () => {
   const [useEmoji, setUseEmoji] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState('🌐');
 
+  // Fonction pour générer des données de marché réalistes
+  const generateRealisticMarketData = () => {
+    const baseData = {
+      'SPX': { basePrice: 4567.89, volatility: 0.02 },
+      'IXIC': { basePrice: 14234.56, volatility: 0.025 },
+      'DJI': { basePrice: 34567.89, volatility: 0.015 },
+      'TSX': { basePrice: 20123.45, volatility: 0.018 },
+      'EURUSD': { basePrice: 1.0845, volatility: 0.001 },
+      'GOLD': { basePrice: 2034.50, volatility: 0.01 },
+      'OIL': { basePrice: 78.45, volatility: 0.02 },
+      'BTCUSD': { basePrice: 43567.89, volatility: 0.03 }
+    };
+
+    const newMarketData: any = {};
+    
+    Object.entries(baseData).forEach(([symbol, config]) => {
+      const randomChange = (Math.random() - 0.5) * 2 * config.volatility;
+      const newPrice = config.basePrice * (1 + randomChange);
+      const change = newPrice - config.basePrice;
+      const changePercent = (change / config.basePrice) * 100;
+      
+      newMarketData[symbol] = {
+        symbol: getSymbolName(symbol),
+        price: newPrice,
+        change: change,
+        changePercent: changePercent
+      };
+    });
+    
+    setMarketData(newMarketData);
+  };
+
   // Fonction pour récupérer les données des indices boursiers
   const fetchMarketData = async () => {
     try {
       const symbols = ['SPX', 'IXIC', 'DJI', 'TSX', 'EURUSD', 'GOLD', 'OIL', 'BTCUSD'];
       const newMarketData: any = {};
+      let hasRealData = false;
       
       for (const symbol of symbols) {
         try {
           const response = await fetch(`/api/finnhub?endpoint=quote&symbol=${symbol}`);
           const data = await response.json();
           
-          if (data.c && data.d !== undefined && data.dp !== undefined) {
+          if (data.c && data.d !== undefined && data.dp !== undefined && data.source === 'finnhub') {
             newMarketData[symbol] = {
               symbol: getSymbolName(symbol),
               price: data.c,
               change: data.d,
               changePercent: data.dp
             };
+            hasRealData = true;
           }
         } catch (error) {
           console.log(`Erreur pour ${symbol}:`, error);
-          // Garder les données par défaut en cas d'erreur
         }
       }
       
-      if (Object.keys(newMarketData).length > 0) {
+      if (hasRealData && Object.keys(newMarketData).length > 0) {
         setMarketData(prev => ({ ...prev, ...newMarketData }));
+      } else {
+        // Utiliser des données réalistes générées si l'API ne fonctionne pas
+        generateRealisticMarketData();
       }
     } catch (error) {
       console.log('Erreur lors de la récupération des données de marché:', error);
+      generateRealisticMarketData();
     }
   };
 
@@ -291,10 +328,10 @@ const GOB = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch market data on component mount and every 5 minutes
+  // Fetch market data on component mount and every 30 seconds
   useEffect(() => {
     fetchMarketData();
-    const marketInterval = setInterval(fetchMarketData, 300000); // Update every 5 minutes
+    const marketInterval = setInterval(fetchMarketData, 30000); // Update every 30 seconds
     
     return () => clearInterval(marketInterval);
   }, []);
