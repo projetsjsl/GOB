@@ -1,64 +1,62 @@
-// api/finnhub.js
-// API Route serverless Vercel pour gérer les appels Finnhub
-
+// API Finnhub pour les données financières
 export default async function handler(req, res) {
-  // Configurer CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  // Récupérer la clé API depuis les variables d'environnement Vercel
-  const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
-
-  if (!FINNHUB_API_KEY) {
-    return res.status(200).json({ 
-      message: 'FINNHUB_API_KEY non configurée - Veuillez configurer la variable d\'environnement dans Vercel',
-      c: 0,
-      d: 0,
-      dp: 0,
-      h: 0,
-      l: 0,
-      o: 0,
-      pc: 0,
-      t: Date.now()
-    });
-  }
-
-  const { endpoint, ...params } = req.query;
-
-  if (!endpoint) {
-    return res.status(400).json({ error: 'Paramètre endpoint manquant' });
-  }
-
-  try {
-    // Construire l'URL Finnhub
-    const queryParams = new URLSearchParams(params);
-    queryParams.append('token', FINNHUB_API_KEY);
+    const { endpoint, symbol } = req.query;
     
-    const finnhubUrl = `https://finnhub.io/api/v1/${endpoint}?${queryParams.toString()}`;
-
-    // Appeler Finnhub API
-    const response = await fetch(finnhubUrl);
-
-    if (!response.ok) {
-      throw new Error(`Finnhub API error: ${response.status}`);
+    // Clé API Finnhub (à configurer dans les variables d'environnement Vercel)
+    const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || 'YOUR_FINNHUB_API_KEY';
+    
+    if (!FINNHUB_API_KEY || FINNHUB_API_KEY === 'YOUR_FINNHUB_API_KEY') {
+        return res.status(500).json({ 
+            error: 'Clé API Finnhub non configurée. Veuillez configurer FINNHUB_API_KEY dans les variables d\'environnement Vercel.' 
+        });
     }
 
-    const data = await response.json();
+    try {
+        let url;
+        
+        switch (endpoint) {
+            case 'quote':
+                url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
+                break;
+            case 'profile':
+                url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
+                break;
+            case 'news':
+                const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+                const to = new Date().toISOString().split('T')[0];
+                url = `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`;
+                break;
+            case 'recommendation':
+                url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
+                break;
+            default:
+                return res.status(400).json({ error: 'Endpoint non supporté' });
+        }
 
-    // Mettre en cache pendant 60 secondes
-    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Finnhub API error: ${response.status}`);
+        }
 
-    return res.status(200).json(data);
-  } catch (error) {
-    console.error('Erreur Finnhub API:', error);
-    return res.status(500).json({ 
-      error: 'Erreur lors de l\'appel à Finnhub API',
-      details: error.message 
-    });
-  }
+        const data = await response.json();
+        
+        // Ajouter des métadonnées
+        const result = {
+            ...data,
+            symbol,
+            endpoint,
+            timestamp: new Date().toISOString(),
+            source: 'finnhub'
+        };
+
+        res.status(200).json(result);
+        
+    } catch (error) {
+        console.error('Erreur API Finnhub:', error);
+        res.status(500).json({ 
+            error: 'Erreur lors de la récupération des données Finnhub',
+            details: error.message 
+        });
+    }
 }

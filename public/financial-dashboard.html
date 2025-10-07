@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financier Unifié - JSL AI</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-button.active { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .stock-card {
+            transition: all 0.3s ease;
+        }
+        .stock-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const FinancialDashboard = () => {
+            // États principaux
+            const [activeTab, setActiveTab] = useState('stocks');
+            const [tickers, setTickers] = useState(['CVS', 'MSFT']);
+            const [stockData, setStockData] = useState({});
+            const [newsData, setNewsData] = useState([]);
+            const [seekingAlphaData, setSeekingAlphaData] = useState({});
+            const [loading, setLoading] = useState(false);
+            const [message, setMessage] = useState(null);
+            const [selectedStock, setSelectedStock] = useState(null);
+            const [newTicker, setNewTicker] = useState('');
+            const [showTickerManager, setShowTickerManager] = useState(false);
+            const [lastUpdate, setLastUpdate] = useState(null);
+
+            // Configuration API
+            const API_BASE_URL = window.location.origin;
+            const FINNHUB_API_KEY = 'YOUR_FINNHUB_API_KEY'; // À configurer
+            const NEWSAPI_KEY = 'YOUR_NEWSAPI_KEY'; // À configurer
+
+            // Messages
+            const showMessage = (text, type = 'info') => {
+                setMessage({ text, type });
+                setTimeout(() => setMessage(null), 5000);
+            };
+
+            // Gestion des titres centralisée
+            const loadTickers = async () => {
+                try {
+                    const response = await fetch('/tickers.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        setTickers(data.tickers || []);
+                    }
+                } catch (error) {
+                    console.error('Erreur chargement tickers:', error);
+                }
+            };
+
+            const saveTickers = async (newTickers) => {
+                try {
+                    const response = await fetch('/api/save-tickers', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tickers: newTickers })
+                    });
+                    if (response.ok) {
+                        setTickers(newTickers);
+                        showMessage('Liste des titres mise à jour', 'success');
+                    }
+                } catch (error) {
+                    console.error('Erreur sauvegarde tickers:', error);
+                    showMessage('Erreur sauvegarde', 'error');
+                }
+            };
+
+            const addTicker = (ticker) => {
+                const upperTicker = ticker.toUpperCase();
+                if (!tickers.includes(upperTicker)) {
+                    const newTickers = [...tickers, upperTicker];
+                    saveTickers(newTickers);
+                    setNewTicker('');
+                }
+            };
+
+            const removeTicker = (ticker) => {
+                const newTickers = tickers.filter(t => t !== ticker);
+                saveTickers(newTickers);
+            };
+
+            // Données Finnhub
+            const fetchStockData = async (ticker) => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
+                    if (!response.ok) throw new Error(`API error: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erreur fetch stock data:', error);
+                    return null;
+                }
+            };
+
+            const refreshAllStocks = async () => {
+                setLoading(true);
+                const newStockData = {};
+                
+                for (const ticker of tickers) {
+                    const data = await fetchStockData(ticker);
+                    if (data) {
+                        newStockData[ticker] = {
+                            ...data,
+                            timestamp: new Date().toISOString()
+                        };
+                    }
+                }
+                
+                setStockData(newStockData);
+                setLastUpdate(new Date());
+                setLoading(false);
+                showMessage('Données mises à jour', 'success');
+            };
+
+            // Actualités NewsAPI.ai
+            const fetchNews = async () => {
+                try {
+                    const tickersQuery = tickers.join(' OR ');
+                    const response = await fetch(`${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=20`);
+                    if (!response.ok) throw new Error(`News API error: ${response.status}`);
+                    const data = await response.json();
+                    setNewsData(data.articles || []);
+                } catch (error) {
+                    console.error('Erreur fetch news:', error);
+                    showMessage('Erreur chargement actualités', 'error');
+                }
+            };
+
+            // Données Seeking Alpha (conservées de la source actuelle)
+            const fetchSeekingAlphaData = async () => {
+                try {
+                    const response = await fetch('/seeking-alpha/stock_analysis.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        setSeekingAlphaData(data);
+                    }
+                } catch (error) {
+                    console.error('Erreur fetch Seeking Alpha:', error);
+                }
+            };
+
+            // Initialisation
+            useEffect(() => {
+                loadTickers();
+                refreshAllStocks();
+                fetchNews();
+                fetchSeekingAlphaData();
+                
+                // Auto-refresh toutes les 5 minutes
+                const interval = setInterval(() => {
+                    refreshAllStocks();
+                    fetchNews();
+                }, 300000);
+                
+                return () => clearInterval(interval);
+            }, []);
+
+            // Composant de gestion des titres
+            const TickerManager = () => (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
+                        <h3 className="text-lg font-bold mb-4">Gestion des Titres</h3>
+                        
+                        <div className="mb-4">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newTicker}
+                                    onChange={(e) => setNewTicker(e.target.value)}
+                                    placeholder="Ajouter un titre (ex: AAPL)"
+                                    className="flex-1 px-3 py-2 border rounded"
+                                    onKeyPress={(e) => e.key === 'Enter' && addTicker(newTicker)}
+                                />
+                                <button
+                                    onClick={() => addTicker(newTicker)}
+                                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Ajouter
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {tickers.map(ticker => (
+                                <div key={ticker} className="flex items-center justify-between p-2 bg-gray-100 rounded">
+                                    <span className="font-mono">{ticker}</span>
+                                    <button
+                                        onClick={() => removeTicker(ticker)}
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-2 mt-4">
+                            <button
+                                onClick={() => setShowTickerManager(false)}
+                                className="flex-1 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                            >
+                                Fermer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Composant onglet Stocks
+            const StocksTab = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold text-white">Données Financières</h2>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowTickerManager(true)}
+                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                            >
+                                Gérer les Titres
+                            </button>
+                            <button
+                                onClick={refreshAllStocks}
+                                disabled={loading}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                            >
+                                {loading ? 'Actualisation...' : 'Actualiser'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {lastUpdate && (
+                        <p className="text-gray-400 text-sm">
+                            Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
+                        </p>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {tickers.map(ticker => {
+                            const data = stockData[ticker];
+                            if (!data) return null;
+
+                            const change = data.dp || 0;
+                            const changeColor = change >= 0 ? 'text-green-400' : 'text-red-400';
+                            const bgColor = change >= 0 ? 'bg-green-900/20' : 'bg-red-900/20';
+
+                            return (
+                                <div key={ticker} className={`stock-card p-4 rounded-lg border ${bgColor}`}>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="text-xl font-bold text-white">{ticker}</h3>
+                                        <span className={`text-sm ${changeColor}`}>
+                                            {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="text-2xl font-bold text-white mb-2">
+                                        ${data.c?.toFixed(2) || 'N/A'}
+                                    </div>
+                                    
+                                    <div className="text-sm text-gray-400 space-y-1">
+                                        <div>Ouverture: ${data.o?.toFixed(2) || 'N/A'}</div>
+                                        <div>Plus haut: ${data.h?.toFixed(2) || 'N/A'}</div>
+                                        <div>Plus bas: ${data.l?.toFixed(2) || 'N/A'}</div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+
+            // Composant onglet Actualités
+            const NewsTab = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold text-white">Actualités Financières</h2>
+                        <button
+                            onClick={fetchNews}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Actualiser
+                        </button>
+                    </div>
+
+                    <div className="space-y-4">
+                        {newsData.map((article, index) => (
+                            <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                                <h3 className="text-lg font-semibold text-white mb-2">
+                                    {article.title}
+                                </h3>
+                                <p className="text-gray-300 mb-3 line-clamp-3">
+                                    {article.description}
+                                </p>
+                                <div className="flex justify-between items-center text-sm text-gray-400">
+                                    <span>{article.source?.name || 'Source inconnue'}</span>
+                                    <span>{new Date(article.publishedAt).toLocaleString('fr-FR')}</span>
+                                </div>
+                                {article.url && (
+                                    <a
+                                        href={article.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-block mt-2 text-blue-400 hover:text-blue-300"
+                                    >
+                                        Lire l'article →
+                                    </a>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            // Composant onglet Seeking Alpha
+            const SeekingAlphaTab = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold text-white">Analyses Seeking Alpha</h2>
+                        <button
+                            onClick={fetchSeekingAlphaData}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Actualiser
+                        </button>
+                    </div>
+
+                    {seekingAlphaData.stocks && (
+                        <div className="space-y-4">
+                            {seekingAlphaData.stocks.map((stock, index) => (
+                                <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                                    <h3 className="text-lg font-semibold text-white mb-2">
+                                        {stock.ticker}
+                                    </h3>
+                                    <p className="text-gray-300 mb-3">
+                                        {stock.raw_text?.substring(0, 200)}...
+                                    </p>
+                                    <div className="text-sm text-gray-400">
+                                        Mis à jour: {new Date(stock.timestamp).toLocaleString('fr-FR')}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen">
+                    {/* Header */}
+                    <header className="bg-gradient-to-r from-purple-800 to-blue-800 p-6">
+                        <div className="max-w-7xl mx-auto">
+                            <h1 className="text-3xl font-bold text-white mb-2">
+                                Dashboard Financier Unifié
+                            </h1>
+                            <p className="text-purple-200">
+                                Données en temps réel • Actualités • Analyses Seeking Alpha
+                            </p>
+                        </div>
+                    </header>
+
+                    {/* Navigation par onglets */}
+                    <nav className="bg-white/10 backdrop-blur-sm border-b border-white/20">
+                        <div className="max-w-7xl mx-auto px-6">
+                            <div className="flex space-x-1">
+                                {[
+                                    { id: 'stocks', label: '📊 Données Financières', component: StocksTab },
+                                    { id: 'news', label: '📰 Actualités', component: NewsTab },
+                                    { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab }
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`tab-button px-6 py-3 rounded-t-lg font-medium transition-all ${
+                                            activeTab === tab.id 
+                                                ? 'active' 
+                                                : 'text-gray-300 hover:text-white hover:bg-white/10'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Contenu principal */}
+                    <main className="max-w-7xl mx-auto p-6">
+                        {activeTab === 'stocks' && <StocksTab />}
+                        {activeTab === 'news' && <NewsTab />}
+                        {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
+                    </main>
+
+                    {/* Messages */}
+                    {message && (
+                        <div className={`fixed top-4 right-4 p-4 rounded-lg z-50 ${
+                            message.type === 'error' ? 'bg-red-500' : 
+                            message.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                        } text-white`}>
+                            {message.text}
+                        </div>
+                    )}
+
+                    {/* Gestionnaire de titres */}
+                    {showTickerManager && <TickerManager />}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<FinancialDashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>
