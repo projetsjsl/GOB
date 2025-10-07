@@ -60,9 +60,18 @@
             const [lastUpdate, setLastUpdate] = useState(null);
             const [showAdmin, setShowAdmin] = useState(false);
             const [apiStatus, setApiStatus] = useState({});
+            
+            // États pour l'interface Seeking Alpha (comme l'original)
+            const [githubToken, setGithubToken] = useState(localStorage.getItem('github_token') || '');
+            const [showSettings, setShowSettings] = useState(!localStorage.getItem('github_token'));
+            const [showScraperPopup, setShowScraperPopup] = useState(false);
 
             // Configuration API
             const API_BASE_URL = window.location.origin;
+            
+            // Configuration GitHub (comme l'original)
+            const GITHUB_REPO = 'projetsjsl/GOB';
+            const GITHUB_BRANCH = 'main';
 
             // Messages
             const showMessage = (text, type = 'info') => {
@@ -70,48 +79,139 @@
                 setTimeout(() => setMessage(null), 5000);
             };
 
-            // Gestion des titres centralisée
-            const loadTickers = async () => {
+            // Fonctions GitHub (comme l'original)
+            const githubFetch = async (path, options = {}) => {
+                const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`;
+                const headers = {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    ...options.headers
+                };
+
+                const response = await fetch(url, { ...options, headers });
+                if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
+                return response.json();
+            };
+
+            const getFileContent = async (path) => {
                 try {
-                    const response = await fetch('/tickers.json');
-                    if (response.ok) {
-                        const data = await response.json();
-                        setTickers(data.tickers || ['CVS', 'MSFT']);
-                    }
+                    const data = await githubFetch(path);
+                    return JSON.parse(atob(data.content));
                 } catch (error) {
-                    console.error('Erreur chargement tickers:', error);
+                    console.error(`Error fetching ${path}:`, error);
+                    return null;
                 }
             };
 
-            const saveTickers = async (newTickers) => {
+            const updateFile = async (path, content, message) => {
                 try {
-                    const response = await fetch('/api/save-tickers', {
-                        method: 'POST',
+                    let sha = null;
+                    try {
+                        const existing = await githubFetch(path);
+                        sha = existing.sha;
+                    } catch (e) {}
+
+                    const body = {
+                        message,
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+                        branch: GITHUB_BRANCH
+                    };
+
+                    if (sha) body.sha = sha;
+
+                    await githubFetch(path, {
+                        method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ tickers: newTickers })
+                        body: JSON.stringify(body)
                     });
-                    if (response.ok) {
-                        setTickers(newTickers);
-                        showMessage('Liste des titres mise à jour', 'success');
-                    }
+
+                    return true;
                 } catch (error) {
-                    console.error('Erreur sauvegarde tickers:', error);
-                    showMessage('Erreur sauvegarde', 'error');
+                    console.error(`Error updating ${path}:`, error);
+                    throw error;
                 }
             };
 
-            const addTicker = (ticker) => {
-                const upperTicker = ticker.toUpperCase();
-                if (!tickers.includes(upperTicker)) {
-                    const newTickers = [...tickers, upperTicker];
-                    saveTickers(newTickers);
+            // Gestion des titres (comme l'original)
+            const loadTickers = async () => {
+                if (!githubToken) return;
+                
+                setLoading(true);
+                try {
+                    const tickersData = await getFileContent('public/seeking-alpha/tickers.json');
+                    if (tickersData) {
+                        setTickers(tickersData.tickers || []);
+                    } else {
+                        await updateFile('public/seeking-alpha/tickers.json', { tickers: [] }, 'Initialize tickers.json');
+                        setTickers([]);
+                    }
+
+                    const stocksData = await getFileContent('public/seeking-alpha/stock_data.json');
+                    if (stocksData) {
+                        setSeekingAlphaStockData(stocksData);
+                    }
+
+                    showMessage('Données chargées avec succès', 'success');
+                } catch (error) {
+                    showMessage('Erreur lors du chargement des données', 'error');
+                    console.error(error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const addTicker = async () => {
+                if (!newTicker.trim()) return;
+                
+                const ticker = newTicker.trim().toUpperCase();
+                if (tickers.includes(ticker)) {
+                    showMessage('Ce ticker existe déjà', 'warning');
+                    return;
+                }
+
+                setLoading(true);
+                try {
+                    const newTickers = [...tickers, ticker];
+                    await updateFile('public/seeking-alpha/tickers.json', { tickers: newTickers }, `Add ticker ${ticker}`);
+                    setTickers(newTickers);
                     setNewTicker('');
+                    showMessage(`Ticker ${ticker} ajouté avec succès`, 'success');
+                } catch (error) {
+                    showMessage('Erreur lors de l\'ajout du ticker', 'error');
+                    console.error(error);
+                } finally {
+                    setLoading(false);
                 }
             };
 
-            const removeTicker = (ticker) => {
-                const newTickers = tickers.filter(t => t !== ticker);
-                saveTickers(newTickers);
+            const removeTicker = async (ticker) => {
+                if (!confirm(`Supprimer ${ticker} ?`)) return;
+
+                setLoading(true);
+                try {
+                    const newTickers = tickers.filter(t => t !== ticker);
+                    await updateFile('public/seeking-alpha/tickers.json', { tickers: newTickers }, `Remove ticker ${ticker}`);
+                    setTickers(newTickers);
+                    
+                    showMessage(`Ticker ${ticker} supprimé`, 'success');
+                } catch (error) {
+                    showMessage('Erreur lors de la suppression', 'error');
+                    console.error(error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const saveSettings = () => {
+                localStorage.setItem('github_token', githubToken);
+                setShowSettings(false);
+                loadTickers();
+                showMessage('Configuration sauvegardée', 'success');
+            };
+
+            const openScraperInstructions = () => {
+                setShowScraperPopup(true);
+                showMessage('Instructions de scraping ouvertes', 'info');
             };
 
             // Données Finnhub (pour l'onglet Stocks & News)
@@ -378,7 +478,9 @@
 
             // Initialisation
             useEffect(() => {
-                loadTickers();
+                if (githubToken && !showSettings) {
+                    loadTickers();
+                }
                 fetchSeekingAlphaData();
                 fetchSeekingAlphaStockData();
                 refreshAllStocks();
@@ -394,9 +496,53 @@
                 }, 300000);
                 
                 return () => clearInterval(interval);
-            }, []);
+            }, [githubToken, showSettings]);
 
-            // Composant de gestion des titres
+            // Composant de configuration GitHub (comme l'original)
+            const SettingsPanel = () => (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
+                        <h3 className="text-lg font-bold mb-4">Configuration GitHub</h3>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    GitHub Personal Access Token
+                                </label>
+                                <input
+                                    type="password"
+                                    value={githubToken}
+                                    onChange={(e) => setGithubToken(e.target.value)}
+                                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <p className="mt-2 text-sm text-gray-500">
+                                    Créez un token sur{' '}
+                                    <a 
+                                        href="https://github.com/settings/tokens" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        github.com/settings/tokens
+                                    </a>
+                                    {' '}avec les permissions "repo"
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={saveSettings}
+                                disabled={!githubToken}
+                                className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Sauvegarder et Continuer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Composant de gestion des titres (comme l'original)
             const TickerManager = () => (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
@@ -407,35 +553,40 @@
                                 <input
                                     type="text"
                                     value={newTicker}
-                                    onChange={(e) => setNewTicker(e.target.value)}
-                                    placeholder="Ajouter un titre (ex: AAPL)"
-                                    className="flex-1 px-3 py-2 border rounded"
-                                    onKeyPress={(e) => e.key === 'Enter' && addTicker(newTicker)}
+                                    onChange={(e) => setNewTicker(e.target.value.toUpperCase())}
+                                    placeholder="Ex: MSFT, GOOGL, TSLA..."
+                                    className="flex-1 px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:border-blue-500 focus:outline-none"
+                                    onKeyPress={(e) => e.key === 'Enter' && addTicker()}
                                 />
                                 <button
-                                    onClick={() => addTicker(newTicker)}
-                                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    onClick={addTicker}
+                                    disabled={loading || !newTicker.trim()}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                                 >
                                     Ajouter
                                 </button>
                             </div>
                         </div>
 
-                        <div className="space-y-2 max-h-60 overflow-y-auto">
-                            {tickers.map(ticker => (
-                                <div key={ticker} className="flex items-center justify-between p-2 bg-gray-100 rounded">
-                                    <span className="font-mono">{ticker}</span>
-                                    <button
-                                        onClick={() => removeTicker(ticker)}
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                            ))}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {tickers.length === 0 ? (
+                                <p className="text-slate-400">Aucun ticker ajouté</p>
+                            ) : (
+                                tickers.map(ticker => (
+                                    <div key={ticker} className="flex items-center gap-2 bg-slate-700 px-4 py-2 rounded-lg">
+                                        <span className="text-white font-medium">{ticker}</span>
+                                        <button 
+                                            onClick={() => removeTicker(ticker)} 
+                                            className="text-red-400 hover:text-red-300"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))
+                            )}
                         </div>
 
-                        <div className="flex gap-2 mt-4">
+                        <div className="flex gap-2">
                             <button
                                 onClick={() => setShowTickerManager(false)}
                                 className="flex-1 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
@@ -447,12 +598,78 @@
                 </div>
             );
 
-            // Composant onglet Seeking Alpha (AMÉLIORÉ avec éléments programmés)
+            // Composant popup de scraping
+            const ScraperPopup = () => (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+                        <h3 className="text-lg font-bold mb-4">🚀 Instructions de Scraping Seeking Alpha</h3>
+                        
+                        <div className="space-y-4 text-sm">
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                                <h4 className="font-semibold text-blue-800 mb-2">📋 Étapes à suivre :</h4>
+                                <ol className="list-decimal list-inside space-y-1 text-blue-700">
+                                    <li>Ouvrez un nouvel onglet et connectez-vous à <a href="https://seekingalpha.com" target="_blank" className="underline">Seeking Alpha</a></li>
+                                    <li>Assurez-vous d'être connecté avec votre compte</li>
+                                    <li>Revenez sur cette page et cliquez sur "Lancer le Scraper"</li>
+                                    <li>Le scraper va automatiquement récupérer les données pour tous vos tickers</li>
+                                    <li>Les données seront sauvegardées sur GitHub</li>
+                                </ol>
+                            </div>
+                            
+                            <div className="bg-yellow-50 p-4 rounded-lg">
+                                <h4 className="font-semibold text-yellow-800 mb-2">⚠️ Important :</h4>
+                                <ul className="list-disc list-inside space-y-1 text-yellow-700">
+                                    <li>Vous devez être connecté à Seeking Alpha pour que le scraping fonctionne</li>
+                                    <li>Le processus peut prendre plusieurs minutes selon le nombre de tickers</li>
+                                    <li>Ne fermez pas cette page pendant le scraping</li>
+                                </ul>
+                            </div>
+                            
+                            <div className="bg-green-50 p-4 rounded-lg">
+                                <h4 className="font-semibold text-green-800 mb-2">✅ Tickers configurés :</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {tickers.map(ticker => (
+                                        <span key={ticker} className="px-2 py-1 bg-green-200 text-green-800 rounded text-xs font-mono">
+                                            {ticker}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-6">
+                            <button
+                                onClick={() => setShowScraperPopup(false)}
+                                className="flex-1 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                            >
+                                Fermer
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowScraperPopup(false);
+                                    runSeekingAlphaScraper();
+                                }}
+                                className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                            >
+                                🚀 Lancer le Scraper
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Composant onglet Seeking Alpha (AMÉLIORÉ avec interface complète)
             const SeekingAlphaTab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold text-white">📈 Analyses Seeking Alpha</h2>
                         <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowSettings(true)}
+                                className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600"
+                            >
+                                Paramètres
+                            </button>
                             <button
                                 onClick={() => setShowTickerManager(true)}
                                 className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
@@ -460,26 +677,59 @@
                                 Gérer les Titres
                             </button>
                             <button
-                                onClick={() => {
-                                    fetchSeekingAlphaData();
-                                    fetchSeekingAlphaStockData();
-                                    refreshAllStocks();
-                                }}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                onClick={loadTickers}
+                                disabled={loading}
+                                className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 disabled:opacity-50"
                             >
                                 Actualiser
                             </button>
                             <button
-                                onClick={runSeekingAlphaScraper}
-                                disabled={scrapingStatus === 'running'}
-                                className={`px-4 py-2 text-white rounded ${
-                                    scrapingStatus === 'running' 
-                                        ? 'bg-orange-500 cursor-not-allowed' 
-                                        : 'bg-green-600 hover:bg-green-700'
-                                }`}
+                                onClick={openScraperInstructions}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                             >
-                                {scrapingStatus === 'running' ? '🔄 Scraping...' : '🚀 Scraper'}
+                                Instructions Scraper
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Gestion des tickers (comme l'original) */}
+                    <div className="bg-slate-800 rounded-lg p-6">
+                        <h3 className="text-xl font-bold text-white mb-4">Gestion des Tickers</h3>
+                        
+                        <div className="flex gap-3 mb-6">
+                            <input
+                                type="text"
+                                value={newTicker}
+                                onChange={(e) => setNewTicker(e.target.value.toUpperCase())}
+                                onKeyPress={(e) => e.key === 'Enter' && addTicker()}
+                                placeholder="Ex: MSFT, GOOGL, TSLA..."
+                                className="flex-1 px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:border-blue-500 focus:outline-none"
+                            />
+                            <button
+                                onClick={addTicker}
+                                disabled={loading || !newTicker.trim()}
+                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                            >
+                                Ajouter
+                            </button>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                            {tickers.length === 0 ? (
+                                <p className="text-slate-400">Aucun ticker ajouté</p>
+                            ) : (
+                                tickers.map(ticker => (
+                                    <div key={ticker} className="flex items-center gap-2 bg-slate-700 px-4 py-2 rounded-lg">
+                                        <span className="text-white font-medium">{ticker}</span>
+                                        <button 
+                                            onClick={() => removeTicker(ticker)} 
+                                            className="text-red-400 hover:text-red-300"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
 
@@ -975,8 +1225,10 @@
                         </div>
                     )}
 
-                    {/* Gestionnaire de titres */}
+                    {/* Panels de configuration */}
+                    {showSettings && <SettingsPanel />}
                     {showTickerManager && <TickerManager />}
+                    {showScraperPopup && <ScraperPopup />}
 
                     {/* Panel Admin */}
                     {showAdmin && <AdminPanel />}
