@@ -138,6 +138,38 @@
                     .replace(/â€"/g, '—');
             };
 
+            // Fonction pour extraire le logo depuis les données de scraping
+            const getCompanyLogo = (ticker) => {
+                try {
+                    // Chercher dans les données de scraping
+                    const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                    if (seekingAlphaItem?.raw_text) {
+                        // Extraire le logo depuis le JSON dans raw_text
+                        const logoMatch = seekingAlphaItem.raw_text.match(/"logo":"([^"]+)"/);
+                        if (logoMatch && logoMatch[1]) {
+                            return logoMatch[1];
+                        }
+                    }
+                    
+                    // Fallback vers des logos par défaut
+                    const defaultLogos = {
+                        'CVS': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CVS.svg',
+                        'MSFT': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MSFT.svg',
+                        'AAPL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AAPL.svg',
+                        'GOOGL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/GOOGL.svg',
+                        'AMZN': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AMZN.svg',
+                        'TSLA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/TSLA.svg',
+                        'NVDA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NVDA.svg',
+                        'META': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/META.svg'
+                    };
+                    
+                    return defaultLogos[ticker] || `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
+                } catch (error) {
+                    console.error(`Erreur extraction logo pour ${ticker}:`, error);
+                    return `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
+                }
+            };
+
             // Messages
             const showMessage = (text, type = 'info') => {
                 setMessage({ text, type });
@@ -1158,9 +1190,21 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                         : 'border-gray-300 hover:bg-gray-100/50'
                                                 }`}
                                                 onClick={() => setSelectedStock(ticker)}>
-                                                    <td className={`py-2 font-mono font-bold transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                                    }`}>{ticker}</td>
+                                                    <td className="py-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <img 
+                                                                src={getCompanyLogo(ticker)} 
+                                                                alt={`${ticker} logo`}
+                                                                className="w-5 h-5 rounded"
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                }}
+                                                            />
+                                                            <span className={`font-mono font-bold transition-colors duration-300 ${
+                                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                                            }`}>{ticker}</span>
+                                                        </div>
+                                                    </td>
                                                     <td className={`py-2 transition-colors duration-300 ${
                                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                                     }`}>{price}</td>
@@ -1594,7 +1638,19 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 return (
                                                         <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer"
                                                             onClick={() => setSelectedStock(stock.ticker)}>
-                                                            <td className="py-3 font-mono text-white font-bold">{stock.ticker}</td>
+                                                            <td className="py-3">
+                                                                <div className="flex items-center gap-2">
+                                                                    <img 
+                                                                        src={getCompanyLogo(stock.ticker)} 
+                                                                        alt={`${stock.ticker} logo`}
+                                                                        className="w-6 h-6 rounded"
+                                                                        onError={(e) => {
+                                                                            e.target.style.display = 'none';
+                                                                        }}
+                                                                    />
+                                                                    <span className="font-mono text-white font-bold">{stock.ticker}</span>
+                                                                </div>
+                                                            </td>
                                                             <td className="py-3 text-white">{price}</td>
                                                             <td className={`py-3 ${changeColor}`}>{change}</td>
                                                             <td className="py-3 text-white">{peRatio}</td>
@@ -1632,11 +1688,21 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 
                                         {/* Header avec ticker et rating */}
                                         <div className="flex justify-between items-start mb-6">
-                                            <div>
-                                                <h3 className="text-2xl font-bold text-white">{stock.ticker}</h3>
-                                                <p className="text-sm text-slate-400">
-                                                    {claudeData?.companyName || parsedData?.companyName || 'N/A'}
-                                                </p>
+                                            <div className="flex items-center gap-3">
+                                                <img 
+                                                    src={getCompanyLogo(stock.ticker)} 
+                                                    alt={`${stock.ticker} logo`}
+                                                    className="w-12 h-12 rounded-lg"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                    }}
+                                                />
+                                                <div>
+                                                    <h3 className="text-2xl font-bold text-white">{stock.ticker}</h3>
+                                                    <p className="text-sm text-slate-400">
+                                                        {claudeData?.companyName || parsedData?.companyName || 'N/A'}
+                                                    </p>
+                                                </div>
                                             </div>
                                             <div className="bg-yellow-400 text-black px-3 py-1 rounded font-bold text-sm">
                                                 {claudeData?.finalConclusion?.rating || 'Hold'}
@@ -1847,7 +1913,19 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             return (
                                                 <tr key={ticker} className="border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer"
                                                     onClick={() => setSelectedStock(ticker)}>
-                                                    <td className="py-3 font-mono text-white font-bold">{ticker}</td>
+                                                    <td className="py-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <img 
+                                                                src={getCompanyLogo(ticker)} 
+                                                                alt={`${ticker} logo`}
+                                                                className="w-6 h-6 rounded"
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                }}
+                                                            />
+                                                            <span className="font-mono text-white font-bold">{ticker}</span>
+                                                        </div>
+                                                    </td>
                                                     <td className="py-3 text-white">{price}</td>
                                                     <td className={`py-3 ${changeColor}`}>{change}</td>
                                                     <td className="py-3 text-white">{peRatio}</td>
@@ -1902,11 +1980,21 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                         
                                         {/* Header avec ticker et rating */}
                                         <div className="flex justify-between items-start mb-6">
-                                            <div>
-                                                <h3 className="text-2xl font-bold text-white">{ticker}</h3>
-                                                <p className="text-sm text-slate-400">
-                                                    {cleanText(companyName)}
-                                                </p>
+                                            <div className="flex items-center gap-3">
+                                                <img 
+                                                    src={getCompanyLogo(ticker)} 
+                                                    alt={`${ticker} logo`}
+                                                    className="w-12 h-12 rounded-lg"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                    }}
+                                                />
+                                                <div>
+                                                    <h3 className="text-2xl font-bold text-white">{ticker}</h3>
+                                                    <p className="text-sm text-slate-400">
+                                                        {cleanText(companyName)}
+                                                    </p>
+                                                </div>
                                             </div>
                                             <div className="bg-yellow-400 text-black px-3 py-1 rounded font-bold text-sm">
                                                 {rating}
