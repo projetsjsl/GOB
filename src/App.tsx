@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List } from 'lucide-react';
+import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon } from 'lucide-react';
 
 // Popular emojis for app icons
 const popularEmojis = [
@@ -41,8 +41,8 @@ interface Theme {
 
 const themes: Theme[] = [
   {
-    id: 'finance',
-    name: 'Finance Pro',
+    id: 'finance-dark',
+    name: 'Finance Pro (Sombre)',
     sector: 'Finance',
     description: 'Interface sombre professionnelle pour traders et investisseurs',
     colors: {
@@ -57,6 +57,25 @@ const themes: Theme[] = [
       accentHover: 'hover:bg-green-700',
       textPrimary: 'text-white',
       textSecondary: 'text-gray-300'
+    }
+  },
+  {
+    id: 'finance-light',
+    name: 'Finance Pro (Clair)',
+    sector: 'Finance',
+    description: 'Interface claire professionnelle pour traders et investisseurs',
+    colors: {
+      headerFrom: 'from-blue-600',
+      headerVia: 'via-blue-700',
+      headerTo: 'to-blue-800',
+      headerBorder: 'border-blue-500',
+      background: 'bg-gradient-to-br from-blue-50 via-white to-gray-100',
+      cardBg: 'bg-white/90',
+      cardHover: 'hover:bg-gray-50/90',
+      accent: 'bg-blue-600',
+      accentHover: 'hover:bg-blue-700',
+      textPrimary: 'text-gray-900',
+      textSecondary: 'text-gray-700'
     }
   },
   {
@@ -169,6 +188,7 @@ const GOB = () => {
   const [selectedApps, setSelectedApps] = useState<Set<string>>(new Set());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -214,6 +234,11 @@ const GOB = () => {
     if (storedTheme) {
       const theme = themes.find(t => t.id === storedTheme);
       if (theme) setCurrentTheme(theme);
+    }
+
+    const storedDarkMode = localStorage.getItem('gobapps-dark-mode');
+    if (storedDarkMode !== null) {
+      setIsDarkMode(storedDarkMode === 'true');
     }
   }, []);
 
@@ -384,6 +409,27 @@ const GOB = () => {
     setShowThemeModal(false);
   };
 
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    localStorage.setItem('gobapps-dark-mode', newDarkMode.toString());
+    
+    // Changer automatiquement le thème selon le mode
+    if (newDarkMode) {
+      const darkTheme = themes.find(t => t.id === 'finance-dark');
+      if (darkTheme) {
+        setCurrentTheme(darkTheme);
+        localStorage.setItem('gobapps-theme', 'finance-dark');
+      }
+    } else {
+      const lightTheme = themes.find(t => t.id === 'finance-light');
+      if (lightTheme) {
+        setCurrentTheme(lightTheme);
+        localStorage.setItem('gobapps-theme', 'finance-light');
+      }
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -397,31 +443,92 @@ const GOB = () => {
 
   return (
     <div className={`min-h-screen ${currentTheme.colors.background} relative overflow-hidden`}>
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-400/10 via-purple-400/10 to-pink-400/10 pointer-events-none"></div>
+      <div className={`fixed inset-0 pointer-events-none ${
+        isDarkMode 
+          ? 'bg-gradient-to-br from-green-500/5 via-transparent to-red-500/5' 
+          : 'bg-gradient-to-br from-blue-500/5 via-transparent to-green-500/5'
+      }`}></div>
       
       <header className="relative z-10">
-        <div className="bg-gradient-to-r from-slate-900/95 via-slate-800/95 to-blue-900/95 backdrop-blur-xl text-white px-6 py-2 border-b border-white/10">
-          <div className="flex items-center justify-center text-sm font-medium">
-            <span>{currentTime || '00:00'}</span>
+        <div className={`backdrop-blur-xl px-6 py-2 border-b ${
+          isDarkMode 
+            ? 'bg-gradient-to-r from-gray-900/95 via-black/95 to-gray-800/95 text-white border-green-500/20' 
+            : 'bg-gradient-to-r from-blue-600/95 via-blue-700/95 to-blue-800/95 text-white border-blue-500/20'
+        }`}>
+          <div className="flex items-center justify-between text-sm font-medium">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-green-400 font-semibold">MARCHÉ OUVERT</span>
+              </div>
+              <div className={isDarkMode ? 'text-gray-300' : 'text-blue-200'}>|</div>
+              <span className={isDarkMode ? 'text-gray-300' : 'text-blue-200'}>Heure de Montréal: {currentTime || '00:00'}</span>
+            </div>
+            <div className="flex items-center space-x-4 text-xs">
+              <div className="flex items-center space-x-1">
+                <span className={isDarkMode ? 'text-gray-400' : 'text-blue-300'}>S&P 500:</span>
+                <span className="text-green-400 font-semibold">+0.85%</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <span className={isDarkMode ? 'text-gray-400' : 'text-blue-300'}>NASDAQ:</span>
+                <span className="text-green-400 font-semibold">+1.23%</span>
+              </div>
+            </div>
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-slate-900/80 via-slate-800/80 to-blue-900/80 backdrop-blur-2xl border-b border-white/10 shadow-2xl">
-          <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className={`backdrop-blur-2xl border-b shadow-2xl ${
+          isDarkMode 
+            ? 'bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-800/90 border-green-500/20' 
+            : 'bg-gradient-to-r from-blue-600/90 via-blue-700/90 to-blue-800/90 border-blue-500/20'
+        }`}>
+          <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="bg-white/20 backdrop-blur-md rounded-2xl p-2.5 shadow-xl border border-white/30">
-                  <div className="text-3xl">🤖</div>
+                <div className={`backdrop-blur-md rounded-2xl p-3 shadow-xl border ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-br from-green-600 to-green-700 border-green-500/30' 
+                    : 'bg-gradient-to-br from-blue-600 to-blue-700 border-blue-500/30'
+                }`}>
+                  <div className="text-2xl">📈</div>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold tracking-tight drop-shadow-lg">GOB</h1>
-                  <p className="text-xs text-blue-100 font-medium">Propulsé par JSL AI</p>
+                  <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-lg">GOB Finance</h1>
+                  <p className={`text-sm font-medium ${
+                    isDarkMode ? 'text-green-400' : 'text-blue-200'
+                  }`}>Plateforme d'analyse financière • Propulsé par JSL AI</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
+                <div className={`flex items-center space-x-2 rounded-lg px-3 py-2 border ${
+                  isDarkMode 
+                    ? 'bg-gray-800/50 border-gray-700/50' 
+                    : 'bg-white/50 border-gray-300/50'
+                }`}>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Portfolio</span>
+                  <span className="text-green-400 font-semibold text-sm">+2.4%</span>
+                </div>
+                
+                <button
+                  onClick={toggleDarkMode}
+                  className={`w-10 h-10 backdrop-blur-md rounded-xl transition-all flex items-center justify-center border shadow-lg ${
+                    isDarkMode 
+                      ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white border-gray-700/50' 
+                      : 'bg-white/50 hover:bg-gray-100/50 text-gray-700 border-gray-300/50'
+                  }`}
+                  title={isDarkMode ? 'Passer en mode clair' : 'Passer en mode sombre'}
+                >
+                  {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+                
                 <button
                   onClick={() => setShowThemeModal(true)}
-                  className="w-10 h-10 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-xl transition-all flex items-center justify-center border border-white/20 shadow-lg"
+                  className={`w-10 h-10 backdrop-blur-md rounded-xl transition-all flex items-center justify-center border shadow-lg ${
+                    isDarkMode 
+                      ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white border-gray-700/50' 
+                      : 'bg-white/50 hover:bg-gray-100/50 text-gray-700 border-gray-300/50'
+                  }`}
                   title="Changer le thème"
                 >
                   <Palette size={18} />
@@ -430,21 +537,21 @@ const GOB = () => {
                 <div className="relative admin-menu-container">
                   <button
                     onClick={() => setShowAdminMenu(!showAdminMenu)}
-                    className="w-10 h-10 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-xl transition-all flex items-center justify-center border border-white/20 shadow-lg"
+                    className="w-10 h-10 bg-gray-800/50 backdrop-blur-md hover:bg-gray-700/50 text-white rounded-xl transition-all flex items-center justify-center border border-gray-700/50 shadow-lg"
                     title="Administration"
                   >
                     <Settings size={18} />
                   </button>
                   
                   {showAdminMenu && (
-                    <div className="absolute top-12 right-0 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl p-3 w-56 border border-white/50 z-50">
+                    <div className="absolute top-12 right-0 bg-gray-800/95 backdrop-blur-2xl rounded-2xl shadow-2xl p-3 w-56 border border-gray-700/50 z-50">
                       <div className="space-y-2">
                         <button
                           onClick={() => {
                             setShowManageApps(true);
                             setShowAdminMenu(false);
                           }}
-                          className="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all shadow-lg shadow-purple-500/30 flex items-center space-x-2 text-sm font-semibold active:scale-95"
+                          className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl transition-all shadow-lg shadow-green-500/30 flex items-center space-x-2 text-sm font-semibold active:scale-95"
                         >
                           <List size={18} />
                           <span>Gérer les apps</span>
@@ -454,12 +561,12 @@ const GOB = () => {
                             handleExport();
                             setShowAdminMenu(false);
                           }}
-                          className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all shadow-lg shadow-blue-500/30 flex items-center space-x-2 text-sm font-semibold active:scale-95"
+                          className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all shadow-lg shadow-blue-500/30 flex items-center space-x-2 text-sm font-semibold active:scale-95"
                         >
                           <Download size={18} />
                           <span>Exporter</span>
                         </button>
-                        <label className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl transition-all shadow-lg shadow-green-500/30 flex items-center space-x-2 cursor-pointer text-sm font-semibold block active:scale-95">
+                        <label className="w-full px-4 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-xl transition-all shadow-lg shadow-gray-500/30 flex items-center space-x-2 cursor-pointer text-sm font-semibold block active:scale-95">
                           <Upload size={18} />
                           <span>Importer</span>
                           <input 
@@ -483,6 +590,83 @@ const GOB = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-32">
+        {/* Section de navigation financière */}
+        <div className="mb-8">
+          <div className={`backdrop-blur-xl rounded-2xl p-6 border shadow-2xl ${
+            isDarkMode 
+              ? 'bg-gray-800/50 border-gray-700/50' 
+              : 'bg-white/50 border-gray-300/50'
+          }`}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Tableau de bord financier</h2>
+              <div className="flex items-center space-x-4 text-sm">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Temps réel</span>
+                </div>
+                <div className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>|</div>
+                <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Dernière mise à jour: {new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-r from-green-600/20 to-green-700/20 rounded-xl p-4 border border-green-500/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-400 text-sm font-medium">Portfolio Total</p>
+                    <p className="text-white text-2xl font-bold">$125,430</p>
+                    <p className="text-green-400 text-sm">+2.4% (+$2,940)</p>
+                  </div>
+                  <div className="text-2xl">📈</div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-blue-600/20 to-blue-700/20 rounded-xl p-4 border border-blue-500/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-400 text-sm font-medium">Actions</p>
+                    <p className="text-white text-2xl font-bold">$89,200</p>
+                    <p className="text-green-400 text-sm">+1.8% (+$1,580)</p>
+                  </div>
+                  <div className="text-2xl">📊</div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-purple-600/20 to-purple-700/20 rounded-xl p-4 border border-purple-500/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-400 text-sm font-medium">Crypto</p>
+                    <p className="text-white text-2xl font-bold">$28,150</p>
+                    <p className="text-red-400 text-sm">-0.5% (-$140)</p>
+                  </div>
+                  <div className="text-2xl">₿</div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-orange-600/20 to-orange-700/20 rounded-xl p-4 border border-orange-500/30">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-orange-400 text-sm font-medium">Cash</p>
+                    <p className="text-white text-2xl font-bold">$8,080</p>
+                    <p className="text-gray-400 text-sm">0.0%</p>
+                  </div>
+                  <div className="text-2xl">💰</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Applications financières */}
+        <div className="mb-6">
+          <h3 className={`text-lg font-semibold mb-4 flex items-center space-x-2 ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}>
+            <span>📱</span>
+            <span>Applications financières</span>
+          </h3>
+        </div>
+        
         <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4">
           {apps.sort((a, b) => a.order - b.order).map(app => (
             <div
@@ -495,14 +679,26 @@ const GOB = () => {
             >
               <div
                 onClick={() => isEditing ? handleEdit(app) : handleOpenApp(app.url)}
-                className={`flex flex-col items-center space-y-2 p-3 rounded-3xl transition-all duration-300 ${
+                className={`flex flex-col items-center space-y-2 p-4 rounded-2xl transition-all duration-300 ${
                   isEditing 
-                    ? 'cursor-pointer bg-white/40 backdrop-blur-xl border border-white/40 shadow-xl' 
-                    : 'cursor-pointer hover:bg-white/30 hover:backdrop-blur-xl hover:scale-105 active:scale-95'
+                    ? `cursor-pointer backdrop-blur-xl shadow-xl ${
+                        isDarkMode 
+                          ? 'bg-gray-700/60 border border-gray-600/60' 
+                          : 'bg-gray-200/60 border border-gray-400/60'
+                      }` 
+                    : `cursor-pointer hover:backdrop-blur-xl hover:scale-105 active:scale-95 ${
+                        isDarkMode 
+                          ? 'hover:bg-gray-700/40 bg-gray-800/40 border border-gray-700/40' 
+                          : 'hover:bg-gray-100/40 bg-white/40 border border-gray-300/40'
+                      }`
                 }`}
               >
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-2xl shadow-2xl flex items-center justify-center border border-white/50 relative hexagon">
+                  <div className={`w-16 h-16 backdrop-blur-2xl shadow-2xl flex items-center justify-center border relative rounded-xl ${
+                    isDarkMode 
+                      ? 'bg-gradient-to-br from-gray-700/90 to-gray-800/90 border-gray-600/50' 
+                      : 'bg-gradient-to-br from-white/90 to-gray-100/90 border-gray-400/50'
+                  }`}>
                     <div className="w-10 h-10 flex items-center justify-center">
                       {app.logo && app.logo.length <= 4 && /\p{Emoji}/u.test(app.logo) ? (
                         <div className="text-3xl">{app.logo}</div>
@@ -516,28 +712,36 @@ const GOB = () => {
                             const parent = e.currentTarget.parentElement;
                             if (parent && !parent.querySelector('.fallback-initial')) {
                               const fallback = document.createElement('div');
-                              fallback.className = 'fallback-initial w-10 h-10 bg-gradient-to-br from-slate-400 to-slate-500 flex items-center justify-center text-white font-bold text-lg rounded';
+                              fallback.className = `fallback-initial w-10 h-10 flex items-center justify-center text-white font-bold text-lg rounded ${
+                                isDarkMode 
+                                  ? 'bg-gradient-to-br from-gray-500 to-gray-600' 
+                                  : 'bg-gradient-to-br from-gray-400 to-gray-500'
+                              }`;
                               fallback.textContent = app.name.charAt(0).toUpperCase();
                               parent.appendChild(fallback);
                             }
                           }}
                         />
                       ) : (
-                        <div className="w-10 h-10 bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center text-white font-bold text-lg rounded">
+                        <div className={`w-10 h-10 flex items-center justify-center text-white font-bold text-lg rounded ${
+                          isDarkMode 
+                            ? 'bg-gradient-to-br from-gray-500 to-gray-600' 
+                            : 'bg-gradient-to-br from-gray-400 to-gray-500'
+                        }`}>
                           {app.name.charAt(0).toUpperCase()}
                         </div>
                       )}
                     </div>
-                    <div className="neural-dot neural-dot-1"></div>
-                    <div className="neural-dot neural-dot-2"></div>
-                    <div className="neural-dot neural-dot-3"></div>
-                    <div className="neural-dot neural-dot-4"></div>
-                    <div className="neural-dot neural-dot-5"></div>
-                    <div className="neural-dot neural-dot-6"></div>
+                    <div className="financial-indicator financial-indicator-1"></div>
+                    <div className="financial-indicator financial-indicator-2"></div>
+                    <div className="financial-indicator financial-indicator-3"></div>
+                    <div className="financial-indicator financial-indicator-4"></div>
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className="text-[10px] font-semibold text-slate-900 line-clamp-1 drop-shadow-sm">{app.name}</p>
+                  <p className={`text-[10px] font-semibold line-clamp-1 drop-shadow-sm ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}>{app.name}</p>
                 </div>
               </div>
             </div>
@@ -546,12 +750,22 @@ const GOB = () => {
           {isEditing && (
             <div
               onClick={handleAddNew}
-              className="flex flex-col items-center justify-center p-3 rounded-3xl cursor-pointer hover:bg-white/30 hover:backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95"
+              className={`flex flex-col items-center justify-center p-4 rounded-2xl cursor-pointer hover:backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 ${
+                isDarkMode 
+                  ? 'hover:bg-gray-700/40 bg-gray-800/40 border border-gray-700/40' 
+                  : 'hover:bg-gray-100/40 bg-white/40 border border-gray-300/40'
+              }`}
             >
-              <div className="w-16 h-16 bg-gradient-to-br from-white/70 to-white/50 backdrop-blur-2xl shadow-2xl flex items-center justify-center border-2 border-dashed border-white/60 hover:border-blue-400/60 transition-all hexagon">
-                <Plus size={28} className="text-slate-600" />
+              <div className={`w-16 h-16 backdrop-blur-2xl shadow-2xl flex items-center justify-center border-2 border-dashed transition-all rounded-xl ${
+                isDarkMode 
+                  ? 'bg-gradient-to-br from-gray-700/70 to-gray-800/50 border-gray-600/60 hover:border-green-400/60' 
+                  : 'bg-gradient-to-br from-gray-200/70 to-gray-300/50 border-gray-400/60 hover:border-blue-400/60'
+              }`}>
+                <Plus size={28} className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} />
               </div>
-              <p className="text-[10px] font-semibold text-slate-700 mt-2">Ajouter</p>
+              <p className={`text-[10px] font-semibold mt-2 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>Ajouter</p>
             </div>
           )}
         </div>
@@ -562,8 +776,12 @@ const GOB = () => {
           onClick={() => setIsEditing(!isEditing)}
           className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${
             isEditing 
-              ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-blue-500/50' 
-              : 'bg-white/90 backdrop-blur-xl text-slate-700 border-2 border-white/50 shadow-xl'
+              ? 'bg-gradient-to-br from-green-600 to-green-700 text-white shadow-green-500/50' 
+              : `backdrop-blur-xl text-white border-2 shadow-xl ${
+                  isDarkMode 
+                    ? 'bg-gray-800/90 border-gray-700/50' 
+                    : 'bg-white/90 border-gray-300/50 text-gray-700'
+                }`
           }`}
         >
           {isEditing ? <Check size={28} /> : <Edit3 size={24} />}
@@ -572,25 +790,31 @@ const GOB = () => {
 
       <footer className="fixed bottom-0 left-0 right-0 pointer-events-none z-50">
         <div className="max-w-md mx-auto px-4">
-          <div className="bg-white/90 backdrop-blur-3xl rounded-t-[2.5rem] shadow-2xl px-6 py-4 border-t border-white/50">
+          <div className={`backdrop-blur-3xl rounded-t-[2.5rem] shadow-2xl px-6 py-4 border-t ${
+            isDarkMode 
+              ? 'bg-gray-800/90 border-gray-700/50' 
+              : 'bg-white/90 border-gray-300/50'
+          }`}>
             <div className="flex justify-center">
-              <div className="w-32 h-1.5 bg-slate-900/40 rounded-full"></div>
+              <div className={`w-32 h-1.5 rounded-full ${
+                isDarkMode ? 'bg-green-500/40' : 'bg-blue-500/40'
+              }`}></div>
             </div>
           </div>
         </div>
       </footer>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50" onMouseDown={(e) => {
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" onMouseDown={(e) => {
           if (e.target === e.currentTarget) setShowModal(false);
         }}>
-          <div className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-6 border border-white/50" onMouseDown={(e) => e.stopPropagation()}>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">
+          <div className="bg-gray-800/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-6 border border-gray-700/50" onMouseDown={(e) => e.stopPropagation()}>
+            <h2 className="text-2xl font-bold text-white mb-6">
               {editingApp ? 'Modifier l\'app' : 'Nouvelle app'}
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Nom de l'application
                 </label>
                 <input
@@ -598,11 +822,11 @@ const GOB = () => {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Ex: GitHub, LinkedIn..."
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   URL
                 </label>
                 <input
@@ -610,12 +834,12 @@ const GOB = () => {
                   value={formUrl}
                   onChange={(e) => setFormUrl(e.target.value)}
                   placeholder="https://example.com"
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Icône
                 </label>
                 <div className="flex space-x-2 mb-3">
@@ -624,8 +848,8 @@ const GOB = () => {
                     onClick={() => setUseEmoji(true)}
                     className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                       useEmoji 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
                     😀 Emoji
@@ -635,8 +859,8 @@ const GOB = () => {
                     onClick={() => setUseEmoji(false)}
                     className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                       !useEmoji 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
                     🔗 URL
@@ -914,20 +1138,19 @@ const GOB = () => {
         .hexagon {
           clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
         }
-        .neural-dot {
+        .financial-indicator {
           position: absolute;
-          width: 4px;
-          height: 4px;
-          background: #ea580c;
+          width: 3px;
+          height: 3px;
+          background: #10b981;
           border-radius: 50%;
-          opacity: 0.6;
+          opacity: 0.8;
+          animation: pulse 2s infinite;
         }
-        .neural-dot-1 { top: 0; left: 50%; transform: translateX(-50%); }
-        .neural-dot-2 { top: 25%; right: 0; }
-        .neural-dot-3 { bottom: 25%; right: 0; }
-        .neural-dot-4 { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .neural-dot-5 { bottom: 25%; left: 0; }
-        .neural-dot-6 { top: 25%; left: 0; }
+        .financial-indicator-1 { top: 2px; left: 50%; transform: translateX(-50%); }
+        .financial-indicator-2 { top: 50%; right: 2px; transform: translateY(-50%); }
+        .financial-indicator-3 { bottom: 2px; left: 50%; transform: translateX(-50%); }
+        .financial-indicator-4 { top: 50%; left: 2px; transform: translateY(-50%); }
       `}</style>
     </div>
   );
