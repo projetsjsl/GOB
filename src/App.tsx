@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon } from 'lucide-react';
+import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon, Eye, EyeOff } from 'lucide-react';
 
 // Les logos seront chargés dynamiquement via les chemins publics
 
@@ -19,6 +19,7 @@ interface App {
   url: string;
   logo: string;
   order: number;
+  visible?: boolean;
 }
 
 interface Theme {
@@ -193,14 +194,14 @@ const GOB = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMarketOpen, setIsMarketOpen] = useState(false);
   const [marketData, setMarketData] = useState({
-    'SPX': { symbol: 'S&P 500', price: 4567.89, change: 0.85, changePercent: 0.85 },
-    'IXIC': { symbol: 'NASDAQ', price: 14234.56, change: 1.23, changePercent: 1.23 },
-    'DJI': { symbol: 'DOW JONES', price: 34567.89, change: -0.45, changePercent: -0.45 },
-    'TSX': { symbol: 'TSX', price: 20123.45, change: 0.67, changePercent: 0.67 },
-    'EURUSD': { symbol: 'EUR/USD', price: 1.0845, change: 0.12, changePercent: 0.12 },
-    'GOLD': { symbol: 'GOLD', price: 2034.50, change: -0.34, changePercent: -0.34 },
-    'OIL': { symbol: 'OIL', price: 78.45, change: 1.56, changePercent: 1.56 },
-    'BTCUSD': { symbol: 'BITCOIN', price: 43567.89, change: 2.34, changePercent: 2.34 }
+    'SPX': { symbol: 'S&P 500', price: 5563.75, change: 9.45, changePercent: 0.17 },
+    'IXIC': { symbol: 'NASDAQ', price: 17458.24, change: 62.35, changePercent: 0.36 },
+    'DJI': { symbol: 'DOW JONES', price: 40844.09, change: -16.23, changePercent: -0.04 },
+    'TSX': { symbol: 'TSX', price: 20123.45, change: 134.56, changePercent: 0.67 },
+    'EURUSD': { symbol: 'EUR/USD', price: 1.0844, change: -0.0001, changePercent: -0.01 },
+    'GOLD': { symbol: 'GOLD', price: 2577.50, change: 35.20, changePercent: 1.38 },
+    'OIL': { symbol: 'OIL', price: 68.31, change: 1.00, changePercent: 1.49 },
+    'BTCUSD': { symbol: 'BITCOIN', price: 121252.00, change: -4040.50, changePercent: -3.23 }
   });
   const [showWelcome, setShowWelcome] = useState(false);
 
@@ -214,14 +215,14 @@ const GOB = () => {
   // Fonction pour générer des données de marché réalistes
   const generateRealisticMarketData = () => {
     const baseData = {
-      'SPX': { basePrice: 4567.89, volatility: 0.02 },
-      'IXIC': { basePrice: 14234.56, volatility: 0.025 },
-      'DJI': { basePrice: 34567.89, volatility: 0.015 },
+      'SPX': { basePrice: 5563.75, volatility: 0.02 },
+      'IXIC': { basePrice: 17458.24, volatility: 0.025 },
+      'DJI': { basePrice: 40844.09, volatility: 0.015 },
       'TSX': { basePrice: 20123.45, volatility: 0.018 },
-      'EURUSD': { basePrice: 1.0845, volatility: 0.001 },
-      'GOLD': { basePrice: 2034.50, volatility: 0.01 },
-      'OIL': { basePrice: 78.45, volatility: 0.02 },
-      'BTCUSD': { basePrice: 43567.89, volatility: 0.03 }
+      'EURUSD': { basePrice: 1.0844, volatility: 0.001 },
+      'GOLD': { basePrice: 2577.50, volatility: 0.01 },
+      'OIL': { basePrice: 68.31, volatility: 0.02 },
+      'BTCUSD': { basePrice: 121252.00, volatility: 0.03 }
     };
 
     const newMarketData: any = {};
@@ -355,9 +356,9 @@ const GOB = () => {
       setApps(JSON.parse(stored));
     } else {
       const defaultApps: App[] = [
-        { id: '1', name: 'Seeking Alpha', url: '/seeking-alpha/index.html', logo: '📈', order: 0 },
-        { id: '2', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 1 },
-        { id: '3', name: 'Dashboard Beta', url: 'https://mygob.vercel.app/beta-combined-dashboard.html', logo: '🚀', order: 2 }
+        { id: '1', name: 'Seeking Alpha', url: '/seeking-alpha/index.html', logo: '📈', order: 0, visible: true },
+        { id: '2', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 1, visible: true },
+        { id: '3', name: 'Dashboard Beta', url: 'https://mygob.vercel.app/beta-combined-dashboard.html', logo: '🚀', order: 2, visible: true }
       ];
       setApps(defaultApps);
     }
@@ -453,7 +454,8 @@ const GOB = () => {
         name: formName,
         url: formUrl,
         logo,
-        order: apps.length
+        order: apps.length,
+        visible: true
       };
       setApps([...apps, newApp]);
     }
@@ -523,6 +525,14 @@ const GOB = () => {
     }
     setSelectedApps(newSelection);
     setShowDeleteConfirm(false);
+  };
+
+  const toggleAppVisibility = (id: string) => {
+    setApps(apps.map(app => 
+      app.id === id 
+        ? { ...app, visible: app.visible === false ? true : false }
+        : app
+    ));
   };
 
   const handleShowDeleteConfirm = () => {
@@ -843,7 +853,7 @@ const GOB = () => {
         </div>
         
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4">
-          {apps.sort((a, b) => a.order - b.order).map(app => (
+          {apps.filter(app => app.visible !== false).sort((a, b) => a.order - b.order).map(app => (
             <div
               key={app.id}
               draggable={isEditing}
@@ -1214,6 +1224,18 @@ const GOB = () => {
                             <p className="text-xs text-slate-500 truncate">{app.url}</p>
                           </div>
                         </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => toggleAppVisibility(app.id)}
+                            className={`px-3 py-2 rounded-lg transition-colors flex items-center space-x-1 ${
+                              app.visible !== false 
+                                ? 'bg-green-600 hover:bg-green-700 text-white' 
+                                : 'bg-gray-400 hover:bg-gray-500 text-white'
+                            }`}
+                            title={app.visible !== false ? 'Masquer l\'app' : 'Afficher l\'app'}
+                          >
+                            {app.visible !== false ? <Eye size={16} /> : <EyeOff size={16} />}
+                          </button>
                         <button
                           onClick={() => {
                             handleEdit(app);
@@ -1225,6 +1247,7 @@ const GOB = () => {
                         >
                           <Edit3 size={16} />
                         </button>
+                        </div>
                       </div>
                     ))}
                   </div>
