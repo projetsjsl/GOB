@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon } from 'lucide-react';
 
+// Import des logos
+import logojslaidark from '/logojslaidark.png';
+import logojslailight from '/logojslailight.png';
+
 // Popular emojis for app icons
 const popularEmojis = [
   '🌐', '📱', '💼', '📧', '📅', '📝', '💬', '🎵', '🎮', '📷',
@@ -507,19 +511,35 @@ const GOB = () => {
                     : 'bg-gradient-to-br from-white to-gray-100 border-gray-300/30'
                 }`}>
                   <img 
-                    src={isDarkMode ? './logojslaidark.png' : './logojslailight.png'} 
+                    src={isDarkMode ? logojslaidark : logojslailight} 
                     alt="JSL AI Logo" 
                     className="w-16 h-16 object-contain"
                     onError={(e) => {
-                      console.log('Logo error, trying fallback');
-                      e.currentTarget.src = isDarkMode ? '/logojslaidark.png' : '/logojslailight.png';
-                      e.currentTarget.onerror = () => {
-                        e.currentTarget.style.display = 'none';
-                        const fallback = document.createElement('div');
-                        fallback.className = 'w-16 h-16 flex items-center justify-center text-4xl';
-                        fallback.textContent = '🤖';
-                        e.currentTarget.parentElement?.appendChild(fallback);
+                      console.log('Logo error, trying fallback paths');
+                      // Essayer différents chemins
+                      const paths = [
+                        isDarkMode ? '/logojslaidark.png' : '/logojslailight.png',
+                        isDarkMode ? './logojslaidark.png' : './logojslailight.png',
+                        isDarkMode ? 'public/logojslaidark.png' : 'public/logojslailight.png'
+                      ];
+                      
+                      let currentPathIndex = 0;
+                      const tryNextPath = () => {
+                        if (currentPathIndex < paths.length) {
+                          e.currentTarget.src = paths[currentPathIndex];
+                          currentPathIndex++;
+                        } else {
+                          // Tous les chemins ont échoué, afficher l'emoji
+                          e.currentTarget.style.display = 'none';
+                          const fallback = document.createElement('div');
+                          fallback.className = 'w-16 h-16 flex items-center justify-center text-4xl';
+                          fallback.textContent = '🤖';
+                          e.currentTarget.parentElement?.appendChild(fallback);
+                        }
                       };
+                      
+                      e.currentTarget.onerror = tryNextPath;
+                      tryNextPath();
                     }}
                   />
                 </div>
