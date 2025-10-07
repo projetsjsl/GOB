@@ -513,7 +513,7 @@ const GOB = () => {
                     onError={(e) => {
                       console.log('Logo error, trying fallback');
                       e.currentTarget.src = isDarkMode ? '/logojslaidark.png' : '/logojslailight.png';
-                      e.currentTarget.onError = () => {
+                      e.currentTarget.onerror = () => {
                         e.currentTarget.style.display = 'none';
                         const fallback = document.createElement('div');
                         fallback.className = 'w-16 h-16 flex items-center justify-center text-4xl';
