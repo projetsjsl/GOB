@@ -481,21 +481,21 @@ const GOB = () => {
             ? 'bg-gradient-to-br from-gray-900 via-black to-gray-800' 
             : 'bg-gradient-to-br from-blue-50 via-white to-gray-100'
         }`}>
-          {/* Logo en arrière-plan */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-20">
-            <img 
-              src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
-              alt="JSL AI Logo Background" 
-              className="w-96 h-96 object-contain"
+              {/* Logo en arrière-plan */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-20">
+                <img 
+                  src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
+                  alt="JSL AI Logo Background" 
+                  className="w-64 h-64 sm:w-96 sm:h-96 object-contain"
               onError={(e) => {
                 const fallback = document.createElement('div');
-                fallback.className = `w-96 h-96 bg-gradient-to-br ${
+                fallback.className = `w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br ${
                   isDarkMode 
                     ? 'from-green-500/20 to-blue-500/20' 
                     : 'from-blue-500/20 to-purple-500/20'
                 } rounded-full flex items-center justify-center ${
                   isDarkMode ? 'text-white' : 'text-gray-600'
-                } text-8xl font-bold`;
+                } text-6xl sm:text-8xl font-bold`;
                 fallback.textContent = '🤖';
                 e.currentTarget.parentElement?.appendChild(fallback);
               }}
@@ -509,27 +509,27 @@ const GOB = () => {
           
           <div className="text-center relative z-10">
             
-            {/* Texte de bienvenue */}
-            <div className="space-y-4">
-              <h1 className={`text-4xl font-bold font-['Inter'] animate-fade-in ${
-                isDarkMode ? 'text-white' : 'text-gray-800'
-              }`}>
-                Bienvenue
-              </h1>
-              <h2 className={`text-6xl font-bold font-['Inter'] animate-fade-in-delay ${
-                isDarkMode ? 'text-green-400' : 'text-green-600'
-              }`}>
-                GOB
-              </h2>
-              <p className={`text-xl font-['Inter'] animate-fade-in-delay-2 ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-              }`}>
-                Plateforme financière • Propulsée par JSL AI
-              </p>
-            </div>
+                {/* Texte de bienvenue */}
+                <div className="space-y-3 sm:space-y-4">
+                  <h1 className={`text-3xl sm:text-4xl font-bold font-['Inter'] animate-fade-in ${
+                    isDarkMode ? 'text-white' : 'text-gray-800'
+                  }`}>
+                    Bienvenue
+                  </h1>
+                  <h2 className={`text-5xl sm:text-6xl font-bold font-['Inter'] animate-fade-in-delay ${
+                    isDarkMode ? 'text-green-400' : 'text-green-600'
+                  }`}>
+                    GOB
+                  </h2>
+                  <p className={`text-lg sm:text-xl font-['Inter'] animate-fade-in-delay-2 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                  }`}>
+                    Plateforme financière • Propulsée par JSL AI
+                  </p>
+                </div>
             
             {/* Barre de progression */}
-            <div className="mt-12 w-64 mx-auto">
+            <div className="mt-8 sm:mt-12 w-48 sm:w-64 mx-auto">
               <div className={`h-1 rounded-full overflow-hidden ${
                 isDarkMode ? 'bg-gray-700' : 'bg-gray-300'
               }`}>
@@ -561,42 +561,42 @@ const GOB = () => {
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">S&P 500</span>
               <span className="text-green-400 font-bold">+0.85%</span>
-              <span className="text-xs text-gray-300">4,567.89</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>4,567.89</span>
             </div>
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">NASDAQ</span>
               <span className="text-green-400 font-bold">+1.23%</span>
-              <span className="text-xs text-gray-300">14,234.56</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>14,234.56</span>
             </div>
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">DOW JONES</span>
               <span className="text-red-400 font-bold">-0.45%</span>
-              <span className="text-xs text-gray-300">34,567.89</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>34,567.89</span>
             </div>
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">TSX</span>
               <span className="text-green-400 font-bold">+0.67%</span>
-              <span className="text-xs text-gray-300">20,123.45</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>20,123.45</span>
             </div>
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">EUR/USD</span>
               <span className="text-green-400 font-bold">+0.12%</span>
-              <span className="text-xs text-gray-300">1.0845</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>1.0845</span>
             </div>
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">GOLD</span>
               <span className="text-red-400 font-bold">-0.34%</span>
-              <span className="text-xs text-gray-300">$2,034.50</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>$2,034.50</span>
             </div>
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">OIL</span>
               <span className="text-green-400 font-bold">+1.56%</span>
-              <span className="text-xs text-gray-300">$78.45</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>$78.45</span>
             </div>
             <div className="flex items-center space-x-2 whitespace-nowrap">
               <span className="text-xs font-semibold">BITCOIN</span>
               <span className="text-green-400 font-bold">+2.34%</span>
-              <span className="text-xs text-gray-300">$43,567.89</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>$43,567.89</span>
             </div>
           </div>
         </div>
@@ -614,8 +614,8 @@ const GOB = () => {
                   {isMarketOpen ? 'MARCHÉ OUVERT' : 'MARCHÉ FERMÉ'}
                 </span>
               </div>
-              <div className={`hidden sm:block ${isDarkMode ? 'text-gray-300' : 'text-blue-200'}`}>|</div>
-              <span className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-blue-200'}`}>
+              <div className={`hidden sm:block ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>|</div>
+              <span className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 {isDarkMode ? 'Montréal:' : 'Heure de Montréal:'} {currentTime || '00:00'}
               </span>
             </div>
@@ -742,11 +742,11 @@ const GOB = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-32">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 relative z-10 pb-32">
 
         {/* Applications financières */}
         <div className="mb-6">
-          <h3 className={`text-lg font-semibold mb-4 flex items-center space-x-2 ${
+          <h3 className={`text-base sm:text-lg font-semibold mb-4 flex items-center space-x-2 ${
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>
             <span>📱</span>
@@ -754,7 +754,7 @@ const GOB = () => {
           </h3>
         </div>
         
-        <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4">
           {apps.sort((a, b) => a.order - b.order).map(app => (
             <div
               key={app.id}
@@ -766,7 +766,7 @@ const GOB = () => {
             >
               <div
                 onClick={() => isEditing ? handleEdit(app) : handleOpenApp(app.url)}
-                className={`flex flex-col items-center space-y-2 p-4 rounded-2xl transition-all duration-300 ${
+                className={`flex flex-col items-center space-y-1 sm:space-y-2 p-2 sm:p-4 rounded-xl sm:rounded-2xl transition-all duration-300 ${
                   isEditing 
                     ? `cursor-pointer backdrop-blur-xl shadow-xl ${
                         isDarkMode 
@@ -781,19 +781,19 @@ const GOB = () => {
                 }`}
               >
                 <div className="relative">
-                  <div className={`w-16 h-16 backdrop-blur-2xl shadow-2xl flex items-center justify-center border relative rounded-xl ${
+                  <div className={`w-12 h-12 sm:w-16 sm:h-16 backdrop-blur-2xl shadow-2xl flex items-center justify-center border relative rounded-lg sm:rounded-xl ${
                     isDarkMode 
                       ? 'bg-gradient-to-br from-gray-700/90 to-gray-800/90 border-gray-600/50' 
                       : 'bg-gradient-to-br from-white/90 to-gray-100/90 border-gray-400/50'
                   }`}>
-                    <div className="w-10 h-10 flex items-center justify-center">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
                       {app.logo && app.logo.length <= 4 && /\p{Emoji}/u.test(app.logo) ? (
-                        <div className="text-3xl">{app.logo}</div>
+                        <div className="text-2xl sm:text-3xl">{app.logo}</div>
                       ) : app.logo ? (
                         <img 
                           src={app.logo} 
                           alt={app.name} 
-                          className="w-10 h-10 object-contain"
+                          className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
                             const parent = e.currentTarget.parentElement;
@@ -810,7 +810,7 @@ const GOB = () => {
                           }}
                         />
                       ) : (
-                        <div className={`w-10 h-10 flex items-center justify-center text-white font-bold text-lg rounded ${
+                        <div className={`w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-white font-bold text-sm sm:text-lg rounded ${
                           isDarkMode 
                             ? 'bg-gradient-to-br from-gray-500 to-gray-600' 
                             : 'bg-gradient-to-br from-gray-400 to-gray-500'
@@ -826,7 +826,7 @@ const GOB = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className={`text-[10px] font-semibold line-clamp-1 drop-shadow-sm ${
+                  <p className={`text-[9px] sm:text-[10px] font-semibold line-clamp-1 drop-shadow-sm ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                   }`}>{app.name}</p>
                 </div>
