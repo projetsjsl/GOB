@@ -61,15 +61,20 @@ export default async function handler(req, res) {
                         {
                             $or: [
                                 { conceptUri: "http://en.wikipedia.org/wiki/Finance" },
-                                { conceptUri: "http://en.wikipedia.org/wiki/Stock_market" }
+                                { conceptUri: "http://en.wikipedia.org/wiki/Stock_market" },
+                                { conceptUri: "http://en.wikipedia.org/wiki/Investment" },
+                                { conceptUri: "http://en.wikipedia.org/wiki/Economics" }
                             ]
+                        },
+                        {
+                            lang: ["eng", "fra"]
                         }
                     ]
                 }
             },
             resultType: "articles",
             articlesSortBy: "date",
-            articlesCount: limit,
+            articlesCount: limit * 2, // Récupérer plus pour filtrer
             includeArticleImage: true,
             includeArticleLinks: true
         };
@@ -88,8 +93,8 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         
-        // Transformer les données selon la structure NewsAPI.ai
-        const articles = data.articles?.results?.map(article => ({
+        // Transformer et filtrer les données selon la structure NewsAPI.ai
+        const allArticles = data.articles?.results?.map(article => ({
             title: article.title,
             description: article.body?.substring(0, 200) + '...' || article.title,
             url: article.url,
@@ -100,6 +105,20 @@ export default async function handler(req, res) {
             urlToImage: article.image,
             content: article.body
         })) || [];
+
+        // Filtrer pour ne garder que les actualités financières pertinentes
+        const financialKeywords = [
+            'stock', 'market', 'finance', 'investment', 'trading', 'earnings', 'revenue', 'profit',
+            'bourse', 'finance', 'investissement', 'trading', 'bénéfices', 'revenus', 'profit',
+            'crypto', 'bitcoin', 'ethereum', 'blockchain', 'economy', 'economic', 'économie'
+        ];
+
+        const articles = allArticles
+            .filter(article => {
+                const text = (article.title + ' ' + article.description).toLowerCase();
+                return financialKeywords.some(keyword => text.includes(keyword));
+            })
+            .slice(0, limit); // Limiter au nombre demandé
 
         const result = {
             articles,
@@ -121,12 +140,25 @@ export default async function handler(req, res) {
                 apiKey: NEWSAPI_KEY,
                 query: {
                     $query: {
-                        keyword: q || 'finance'
+                        $and: [
+                            {
+                                $or: [
+                                    { keyword: "stock market" },
+                                    { keyword: "finance" },
+                                    { keyword: "investment" },
+                                    { keyword: "trading" },
+                                    { keyword: "earnings" }
+                                ]
+                            },
+                            {
+                                lang: ["eng", "fra"]
+                            }
+                        ]
                     }
                 },
                 resultType: "articles",
                 articlesSortBy: "date",
-                articlesCount: limit
+                articlesCount: limit * 2
             };
             
             const fallbackResponse = await fetch('https://newsapi.ai/api/v1/article/getArticles', {
