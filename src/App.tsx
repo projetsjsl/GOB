@@ -189,6 +189,7 @@ const GOB = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isMarketOpen, setIsMarketOpen] = useState(false);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -197,7 +198,7 @@ const GOB = () => {
   const [useEmoji, setUseEmoji] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState('🌐');
 
-  // Update time every minute
+  // Update time every minute and check market status
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -208,6 +209,19 @@ const GOB = () => {
         hour12: false
       });
       setCurrentTime(timeString);
+      
+      // Check if market is open (9:30 AM - 4:00 PM EST, Monday-Friday)
+      const montrealTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Montreal"}));
+      const day = montrealTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const hour = montrealTime.getHours();
+      const minute = montrealTime.getMinutes();
+      const timeInMinutes = hour * 60 + minute;
+      
+      // Market hours: 9:30 AM (570 minutes) to 4:00 PM (960 minutes), Monday to Friday
+      const isWeekday = day >= 1 && day <= 5;
+      const isMarketHours = timeInMinutes >= 570 && timeInMinutes <= 960;
+      
+      setIsMarketOpen(isWeekday && isMarketHours);
     };
     
     updateTime();
@@ -458,8 +472,10 @@ const GOB = () => {
           <div className="flex items-center justify-between text-sm font-medium">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-green-400 font-semibold">MARCHÉ OUVERT</span>
+                <div className={`w-2 h-2 rounded-full ${isMarketOpen ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                <span className={`font-semibold ${isMarketOpen ? 'text-green-400' : 'text-red-400'}`}>
+                  {isMarketOpen ? 'MARCHÉ OUVERT' : 'MARCHÉ FERMÉ'}
+                </span>
               </div>
               <div className={isDarkMode ? 'text-gray-300' : 'text-blue-200'}>|</div>
               <span className={isDarkMode ? 'text-gray-300' : 'text-blue-200'}>Heure de Montréal: {currentTime || '00:00'}</span>
@@ -485,15 +501,26 @@ const GOB = () => {
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className={`backdrop-blur-md rounded-2xl p-3 shadow-xl border ${
+                <div className={`backdrop-blur-md rounded-2xl p-1 shadow-xl border ${
                   isDarkMode 
                     ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600/30' 
                     : 'bg-gradient-to-br from-white to-gray-100 border-gray-300/30'
                 }`}>
                   <img 
-                    src={isDarkMode ? '/logojslaidark.png' : '/logojslailight.png'} 
+                    src={isDarkMode ? './logojslaidark.png' : './logojslailight.png'} 
                     alt="JSL AI Logo" 
-                    className="w-8 h-8 object-contain"
+                    className="w-16 h-16 object-contain"
+                    onError={(e) => {
+                      console.log('Logo error, trying fallback');
+                      e.currentTarget.src = isDarkMode ? '/logojslaidark.png' : '/logojslailight.png';
+                      e.currentTarget.onError = () => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.className = 'w-16 h-16 flex items-center justify-center text-4xl';
+                        fallback.textContent = '🤖';
+                        e.currentTarget.parentElement?.appendChild(fallback);
+                      };
+                    }}
                   />
                 </div>
                 <div>
