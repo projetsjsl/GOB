@@ -511,15 +511,13 @@ const GOB = () => {
             
             {/* Texte de bienvenue */}
             <div className="space-y-4">
-              <h1 className={`text-6xl font-bold font-['Inter'] animate-fade-in ${
+              <h1 className={`text-4xl font-bold font-['Inter'] animate-fade-in ${
                 isDarkMode ? 'text-white' : 'text-gray-800'
               }`}>
                 Bienvenue
               </h1>
-              <h2 className={`text-4xl font-bold bg-gradient-to-r font-['Inter'] animate-fade-in-delay ${
-                isDarkMode 
-                  ? 'from-green-400 to-blue-400 bg-clip-text text-transparent' 
-                  : 'from-blue-600 to-purple-600 bg-clip-text text-transparent'
+              <h2 className={`text-6xl font-bold font-['Inter'] animate-fade-in-delay ${
+                isDarkMode ? 'text-green-400' : 'text-green-600'
               }`}>
                 GOB
               </h2>
