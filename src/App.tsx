@@ -192,6 +192,16 @@ const GOB = () => {
   const [currentTime, setCurrentTime] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMarketOpen, setIsMarketOpen] = useState(false);
+  const [marketData, setMarketData] = useState({
+    'SPX': { symbol: 'S&P 500', price: 4567.89, change: 0.85, changePercent: 0.85 },
+    'IXIC': { symbol: 'NASDAQ', price: 14234.56, change: 1.23, changePercent: 1.23 },
+    'DJI': { symbol: 'DOW JONES', price: 34567.89, change: -0.45, changePercent: -0.45 },
+    'TSX': { symbol: 'TSX', price: 20123.45, change: 0.67, changePercent: 0.67 },
+    'EURUSD': { symbol: 'EUR/USD', price: 1.0845, change: 0.12, changePercent: 0.12 },
+    'GOLD': { symbol: 'GOLD', price: 2034.50, change: -0.34, changePercent: -0.34 },
+    'OIL': { symbol: 'OIL', price: 78.45, change: 1.56, changePercent: 1.56 },
+    'BTCUSD': { symbol: 'BITCOIN', price: 43567.89, change: 2.34, changePercent: 2.34 }
+  });
   const [showWelcome, setShowWelcome] = useState(false);
 
   // Form state
@@ -200,6 +210,54 @@ const GOB = () => {
   const [formLogo, setFormLogo] = useState('');
   const [useEmoji, setUseEmoji] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState('🌐');
+
+  // Fonction pour récupérer les données des indices boursiers
+  const fetchMarketData = async () => {
+    try {
+      const symbols = ['SPX', 'IXIC', 'DJI', 'TSX', 'EURUSD', 'GOLD', 'OIL', 'BTCUSD'];
+      const newMarketData: any = {};
+      
+      for (const symbol of symbols) {
+        try {
+          const response = await fetch(`/api/finnhub?endpoint=quote&symbol=${symbol}`);
+          const data = await response.json();
+          
+          if (data.c && data.d !== undefined && data.dp !== undefined) {
+            newMarketData[symbol] = {
+              symbol: getSymbolName(symbol),
+              price: data.c,
+              change: data.d,
+              changePercent: data.dp
+            };
+          }
+        } catch (error) {
+          console.log(`Erreur pour ${symbol}:`, error);
+          // Garder les données par défaut en cas d'erreur
+        }
+      }
+      
+      if (Object.keys(newMarketData).length > 0) {
+        setMarketData(prev => ({ ...prev, ...newMarketData }));
+      }
+    } catch (error) {
+      console.log('Erreur lors de la récupération des données de marché:', error);
+    }
+  };
+
+  // Fonction pour obtenir le nom affiché du symbole
+  const getSymbolName = (symbol: string) => {
+    const names: { [key: string]: string } = {
+      'SPX': 'S&P 500',
+      'IXIC': 'NASDAQ',
+      'DJI': 'DOW JONES',
+      'TSX': 'TSX',
+      'EURUSD': 'EUR/USD',
+      'GOLD': 'GOLD',
+      'OIL': 'OIL',
+      'BTCUSD': 'BITCOIN'
+    };
+    return names[symbol] || symbol;
+  };
 
   // Update time every minute and check market status
   useEffect(() => {
@@ -231,6 +289,14 @@ const GOB = () => {
     const interval = setInterval(updateTime, 60000); // Update every minute
     
     return () => clearInterval(interval);
+  }, []);
+
+  // Fetch market data on component mount and every 5 minutes
+  useEffect(() => {
+    fetchMarketData();
+    const marketInterval = setInterval(fetchMarketData, 300000); // Update every 5 minutes
+    
+    return () => clearInterval(marketInterval);
   }, []);
 
   // Load apps from localStorage

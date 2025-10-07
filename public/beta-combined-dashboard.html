@@ -1213,7 +1213,23 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                                         <div className={`font-medium mb-1 transition-colors duration-300 ${
                                                                             isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                                                         }`}>
-                                                                            {cleanText(latestNews.title)}
+                                                                            {latestNews.url ? (
+                                                                                <a 
+                                                                                    href={latestNews.url} 
+                                                                                    target="_blank" 
+                                                                                    rel="noopener noreferrer"
+                                                                                    className={`hover:underline transition-colors duration-300 ${
+                                                                                        isDarkMode 
+                                                                                            ? 'text-blue-400 hover:text-blue-300' 
+                                                                                            : 'text-blue-600 hover:text-blue-700'
+                                                                                    }`}
+                                                                                    onClick={(e) => e.stopPropagation()}
+                                                                                >
+                                                                                    {cleanText(latestNews.title)}
+                                                                                </a>
+                                                                            ) : (
+                                                                                cleanText(latestNews.title)
+                                                                            )}
                                                                         </div>
                                                                         <div className={`line-clamp-2 transition-colors duration-300 ${
                                                                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
@@ -1231,6 +1247,24 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                                                     'Date inconnue'
                                                                                 }
                                                                             </span>
+                                                                            {latestNews.url && (
+                                                                                <>
+                                                                                    <span>•</span>
+                                                                                    <a 
+                                                                                        href={latestNews.url} 
+                                                                                        target="_blank" 
+                                                                                        rel="noopener noreferrer"
+                                                                                        className={`text-xs hover:underline transition-colors duration-300 ${
+                                                                                            isDarkMode 
+                                                                                                ? 'text-blue-400 hover:text-blue-300' 
+                                                                                                : 'text-blue-600 hover:text-blue-700'
+                                                                                        }`}
+                                                                                        onClick={(e) => e.stopPropagation()}
+                                                                                    >
+                                                                                        Lire l'article →
+                                                                                    </a>
+                                                                                </>
+                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1945,6 +1979,240 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                     </div>
                                 );
                             })}
+                        </div>
+                    )}
+
+                    {/* Section Actualités par Ticker */}
+                    {tickers.length > 0 && (
+                        <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-gray-800/50 border-gray-600' 
+                                : 'bg-white/80 border-gray-300'
+                        }`}>
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>📰 Actualités par Ticker</h3>
+                                <button 
+                                    onClick={fetchNews}
+                                    className={`px-3 py-1 text-sm rounded transition-colors duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    }`}
+                                >
+                                    🔄 Actualiser
+                                </button>
+                            </div>
+                            
+                            {newsData.length === 0 ? (
+                                <div className={`text-center py-8 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`}>
+                                    <div className="text-4xl mb-2">📰</div>
+                                    <p>Aucune actualité disponible</p>
+                                    <p className="text-sm mt-1">Cliquez sur "Actualiser" pour charger les actualités</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {tickers.map(ticker => {
+                                        // Filtrer les actualités pour ce ticker
+                                        const tickerNews = newsData.filter(article => {
+                                            const text = (article.title + ' ' + article.description).toLowerCase();
+                                            return text.includes(ticker.toLowerCase());
+                                        });
+                                        
+                                        if (tickerNews.length === 0) return null;
+                                        
+                                        return (
+                                            <div key={ticker} className={`rounded-lg p-4 transition-colors duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700/30 border border-gray-600' 
+                                                    : 'bg-gray-100/50 border border-gray-300'
+                                            }`}>
+                                                <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>
+                                                    📈 {ticker} - {tickerNews.length} actualité{tickerNews.length > 1 ? 's' : ''}
+                                                </h4>
+                                                <div className="space-y-3">
+                                                    {tickerNews.slice(0, 3).map((article, index) => (
+                                                        <div key={index} className={`p-3 rounded transition-colors duration-300 ${
+                                                            isDarkMode 
+                                                                ? 'bg-gray-800/50 hover:bg-gray-800/70' 
+                                                                : 'bg-white/70 hover:bg-white/90'
+                                                        }`}>
+                                                            <div className="flex items-start gap-3">
+                                                                <span className={`text-sm transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                                                }`}>📰</span>
+                                                                <div className="flex-1">
+                                                                    <h5 className={`font-medium mb-1 transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                                                    }`}>
+                                                                        {article.url ? (
+                                                                            <a 
+                                                                                href={article.url} 
+                                                                                target="_blank" 
+                                                                                rel="noopener noreferrer"
+                                                                                className={`hover:underline transition-colors duration-300 ${
+                                                                                    isDarkMode 
+                                                                                        ? 'text-blue-400 hover:text-blue-300' 
+                                                                                        : 'text-blue-600 hover:text-blue-700'
+                                                                                }`}
+                                                                            >
+                                                                                {cleanText(article.title)}
+                                                                            </a>
+                                                                        ) : (
+                                                                            cleanText(article.title)
+                                                                        )}
+                                                                    </h5>
+                                                                    <p className={`text-sm mb-2 transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                                    }`}>
+                                                                        {cleanText(article.description)}
+                                                                    </p>
+                                                                    <div className={`flex items-center gap-2 text-xs transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                    }`}>
+                                                                        <span>{article.source?.name || 'Source inconnue'}</span>
+                                                                        <span>•</span>
+                                                                        <span>
+                                                                            {article.publishedAt ? 
+                                                                                new Date(article.publishedAt).toLocaleString('fr-FR') : 
+                                                                                'Date inconnue'
+                                                                            }
+                                                                        </span>
+                                                                        {article.url && (
+                                                                            <>
+                                                                                <span>•</span>
+                                                                                <a 
+                                                                                    href={article.url} 
+                                                                                    target="_blank" 
+                                                                                    rel="noopener noreferrer"
+                                                                                    className={`hover:underline transition-colors duration-300 ${
+                                                                                        isDarkMode 
+                                                                                            ? 'text-blue-400 hover:text-blue-300' 
+                                                                                            : 'text-blue-600 hover:text-blue-700'
+                                                                                    }`}
+                                                                                >
+                                                                                    Lire l'article →
+                                                                                </a>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    {tickerNews.length > 3 && (
+                                                        <div className={`text-center text-sm transition-colors duration-300 ${
+                                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                        }`}>
+                                                            ... et {tickerNews.length - 3} autre{tickerNews.length - 3 > 1 ? 's' : ''} actualité{tickerNews.length - 3 > 1 ? 's' : ''}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                    
+                                    {/* Actualités générales */}
+                                    {(() => {
+                                        const generalNews = newsData.filter(article => {
+                                            const text = (article.title + ' ' + article.description).toLowerCase();
+                                            return !tickers.some(ticker => text.includes(ticker.toLowerCase()));
+                                        });
+                                        
+                                        if (generalNews.length === 0) return null;
+                                        
+                                        return (
+                                            <div className={`rounded-lg p-4 transition-colors duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700/30 border border-gray-600' 
+                                                    : 'bg-gray-100/50 border border-gray-300'
+                                            }`}>
+                                                <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>
+                                                    🌐 Actualités Générales - {generalNews.length} actualité{generalNews.length > 1 ? 's' : ''}
+                                                </h4>
+                                                <div className="space-y-3">
+                                                    {generalNews.slice(0, 5).map((article, index) => (
+                                                        <div key={index} className={`p-3 rounded transition-colors duration-300 ${
+                                                            isDarkMode 
+                                                                ? 'bg-gray-800/50 hover:bg-gray-800/70' 
+                                                                : 'bg-white/70 hover:bg-white/90'
+                                                        }`}>
+                                                            <div className="flex items-start gap-3">
+                                                                <span className={`text-sm transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                                                }`}>🌐</span>
+                                                                <div className="flex-1">
+                                                                    <h5 className={`font-medium mb-1 transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                                                    }`}>
+                                                                        {article.url ? (
+                                                                            <a 
+                                                                                href={article.url} 
+                                                                                target="_blank" 
+                                                                                rel="noopener noreferrer"
+                                                                                className={`hover:underline transition-colors duration-300 ${
+                                                                                    isDarkMode 
+                                                                                        ? 'text-blue-400 hover:text-blue-300' 
+                                                                                        : 'text-blue-600 hover:text-blue-700'
+                                                                                }`}
+                                                                            >
+                                                                                {cleanText(article.title)}
+                                                                            </a>
+                                                                        ) : (
+                                                                            cleanText(article.title)
+                                                                        )}
+                                                                    </h5>
+                                                                    <p className={`text-sm mb-2 transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                                    }`}>
+                                                                        {cleanText(article.description)}
+                                                                    </p>
+                                                                    <div className={`flex items-center gap-2 text-xs transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                    }`}>
+                                                                        <span>{article.source?.name || 'Source inconnue'}</span>
+                                                                        <span>•</span>
+                                                                        <span>
+                                                                            {article.publishedAt ? 
+                                                                                new Date(article.publishedAt).toLocaleString('fr-FR') : 
+                                                                                'Date inconnue'
+                                                                            }
+                                                                        </span>
+                                                                        {article.url && (
+                                                                            <>
+                                                                                <span>•</span>
+                                                                                <a 
+                                                                                    href={article.url} 
+                                                                                    target="_blank" 
+                                                                                    rel="noopener noreferrer"
+                                                                                    className={`hover:underline transition-colors duration-300 ${
+                                                                                        isDarkMode 
+                                                                                            ? 'text-blue-400 hover:text-blue-300' 
+                                                                                            : 'text-blue-600 hover:text-blue-700'
+                                                                                    }`}
+                                                                                >
+                                                                                    Lire l'article →
+                                                                                </a>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                            )}
                         </div>
                     )}
 
