@@ -254,21 +254,15 @@ const GOB = () => {
     }
   }, []);
 
-  // Welcome screen logic
+  // Welcome screen logic - affichage à chaque actualisation
   useEffect(() => {
-    // Vérifier si c'est le premier chargement
-    const hasSeenWelcome = localStorage.getItem('gobapps-welcome-seen');
+    setShowWelcome(true);
     
-    if (!hasSeenWelcome) {
-      setShowWelcome(true);
-      localStorage.setItem('gobapps-welcome-seen', 'true');
-      
-      const timer = setTimeout(() => {
-        setShowWelcome(false);
-      }, 3000); // 3 secondes d'animation
+    const timer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 3000); // 3 secondes d'animation
 
-      return () => clearTimeout(timer);
-    }
+    return () => clearTimeout(timer);
   }, []);
 
   // Load dark mode preference

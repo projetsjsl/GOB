@@ -598,26 +598,26 @@
                             <button
                                 onClick={refreshAllStocks}
                                 disabled={loading}
-                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                                className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
                             >
                                 {loading ? 'Actualisation...' : 'Actualiser Stocks'}
                             </button>
                             <button
                                 onClick={fetchNews}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                             >
                                 Actualiser News
                             </button>
                             <button
                                 onClick={runSeekingAlphaScraper}
                                 disabled={scrapingStatus === 'running'}
-                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+                                className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
                             >
                                 {scrapingStatus === 'running' ? 'Scraping...' : '🚀 Lancer le Scraper'}
                             </button>
                             <button
                                 onClick={() => openSeekingAlpha('AAPL')}
-                                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
+                                className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
                             >
                                 🌐 Ouvrir Seeking Alpha
                             </button>
@@ -629,7 +629,7 @@
                                         addScrapingLog('💡 Collez-le dans la console F12 de Seeking Alpha', 'info');
                                     });
                                 }}
-                                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                             >
                                 📋 Script F12
                             </button>
@@ -831,12 +831,12 @@
 
                     {/* Fiche détaillée du titre sélectionné */}
                     {selectedStock && (
-                        <div className="seeking-alpha-card rounded-lg p-6 border border-blue-300/20">
+                        <div className="seeking-alpha-card rounded-lg p-6 border border-slate-600">
                             <div className="flex justify-between items-start mb-4">
                                 <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
                                 <button
                                     onClick={() => setSelectedStock(null)}
-                                    className="text-blue-300 hover:text-blue-200"
+                                    className="text-blue-400 hover:text-blue-300"
                                 >
                                     ✕ Fermer
                                 </button>
@@ -1316,36 +1316,36 @@
                     )}
 
                     {/* Debug des données */}
-                    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-600">
                         <h3 className="text-lg font-semibold text-white mb-4">🔍 Debug des Données</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div className="bg-slate-700 rounded p-3">
-                                <div className="text-blue-300 font-medium mb-2">📊 Stock Data</div>
-                                <div className="text-white">
+                            <div className="bg-slate-700/50 rounded p-3 border border-slate-600">
+                                <div className="text-blue-400 font-medium mb-2">📊 Stock Data</div>
+                                <div className="text-slate-200">
                                     Tickers: {tickers.length} ({tickers.join(', ')})
                                 </div>
-                                <div className="text-white">
+                                <div className="text-slate-200">
                                     Données chargées: {Object.keys(stockData).length}
                                 </div>
-                                <div className="text-white">
+                                <div className="text-slate-200">
                                     Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
                                 </div>
                             </div>
-                            <div className="bg-slate-700 rounded p-3">
-                                <div className="text-green-300 font-medium mb-2">📰 News Data</div>
-                                <div className="text-white">
+                            <div className="bg-slate-700/50 rounded p-3 border border-slate-600">
+                                <div className="text-emerald-400 font-medium mb-2">📰 News Data</div>
+                                <div className="text-slate-200">
                                     Articles: {newsData.length}
                                 </div>
-                                <div className="text-white">
+                                <div className="text-slate-200">
                                     Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
                                 </div>
                             </div>
-                            <div className="bg-slate-700 rounded p-3">
-                                <div className="text-purple-300 font-medium mb-2">🎯 Seeking Alpha</div>
-                                <div className="text-white">
+                            <div className="bg-slate-700/50 rounded p-3 border border-slate-600">
+                                <div className="text-violet-400 font-medium mb-2">🎯 Seeking Alpha</div>
+                                <div className="text-slate-200">
                                     Stocks: {seekingAlphaData.stocks?.length || 0}
                                 </div>
-                                <div className="text-white">
+                                <div className="text-slate-200">
                                     Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
                                 </div>
                             </div>
@@ -1354,7 +1354,7 @@
 
                     {/* Vue en liste compacte */}
                     {viewMode === 'list' && tickers.length > 0 && (
-                        <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+                        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-600">
                             <h3 className="text-lg font-semibold text-white mb-4">📋 Vue Liste</h3>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
@@ -1404,7 +1404,7 @@
                                         </span>
                                                     </td>
                                                     <td className="py-3">
-                                                        <button className="text-blue-300 hover:text-blue-200 text-xs">
+                                                        <button className="text-blue-400 hover:text-blue-300 text-xs">
                                                             Voir fiche →
                                                         </button>
                                                     </td>
@@ -1442,7 +1442,7 @@
                                 const changeBgColor = (change.includes('+') || change.includes('green')) ? 'bg-green-500' : 'bg-red-500';
 
                                 return (
-                                    <div key={ticker} className="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-blue-300/40 transition-all cursor-pointer"
+                                    <div key={ticker} className="bg-slate-800/50 rounded-lg p-6 border border-slate-600 hover:border-blue-400/50 transition-all cursor-pointer"
                                          onClick={() => setSelectedStock(ticker)}>
                                         
                                         {/* Header avec ticker et rating */}
@@ -1459,7 +1459,7 @@
                                     </div>
                                     
                                         {/* Prix et changement */}
-                                        <div className="bg-slate-700 rounded-lg p-4 mb-6">
+                                        <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
                                             <div className="text-3xl font-bold text-white mb-1">
                                                 {price}
                                             </div>
@@ -1469,7 +1469,7 @@
                                                     {change}
                                                 </span>
                                             </div>
-                                    </div>
+                                        </div>
                                     
                                         {/* Métriques clés */}
                                         <div className="space-y-3 mb-6">
