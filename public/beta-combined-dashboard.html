@@ -447,7 +447,7 @@
                 </div>
             );
 
-            // Composant onglet Seeking Alpha (PRÉSERVÉ)
+            // Composant onglet Seeking Alpha (AMÉLIORÉ avec éléments programmés)
             const SeekingAlphaTab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
@@ -463,6 +463,7 @@
                                 onClick={() => {
                                     fetchSeekingAlphaData();
                                     fetchSeekingAlphaStockData();
+                                    refreshAllStocks();
                                 }}
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
@@ -479,6 +480,61 @@
                             >
                                 {scrapingStatus === 'running' ? '🔄 Scraping...' : '🚀 Scraper'}
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Tableau de données financières (comme l'original) */}
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-blue-300/20">
+                        <h3 className="text-lg font-semibold text-white mb-4">📊 Données Financières</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-blue-300/20">
+                                        <th className="text-left py-2 text-blue-200">Ticker</th>
+                                        <th className="text-left py-2 text-blue-200">Prix</th>
+                                        <th className="text-left py-2 text-blue-200">Change</th>
+                                        <th className="text-left py-2 text-blue-200">P/E</th>
+                                        <th className="text-left py-2 text-blue-200">Dividende</th>
+                                        <th className="text-left py-2 text-blue-200">Secteur</th>
+                                        <th className="text-left py-2 text-blue-200">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {tickers.map(ticker => {
+                                        const stockDataItem = stockData[ticker];
+                                        const seekingAlphaItem = seekingAlphaStockData.stocks?.[ticker];
+                                        const change = stockDataItem?.dp || 0;
+                                        const changeColor = change >= 0 ? 'text-green-400' : 'text-red-400';
+                                        
+                                        return (
+                                            <tr key={ticker} className="border-b border-blue-300/10 hover:bg-blue-900/20 cursor-pointer"
+                                                onClick={() => setSelectedStock(ticker)}>
+                                                <td className="py-2 font-mono text-white">{ticker}</td>
+                                                <td className="py-2 text-white">
+                                                    ${stockDataItem?.c?.toFixed(2) || seekingAlphaItem?.metrics?.price || 'N/A'}
+                                                </td>
+                                                <td className={`py-2 ${changeColor}`}>
+                                                    {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+                                                </td>
+                                                <td className="py-2 text-white">
+                                                    {seekingAlphaItem?.metrics?.peRatio || 'N/A'}
+                                                </td>
+                                                <td className="py-2 text-white">
+                                                    {seekingAlphaItem?.metrics?.dividendYield || 'N/A'}
+                                                </td>
+                                                <td className="py-2 text-white">
+                                                    {seekingAlphaItem?.metrics?.sector || 'N/A'}
+                                                </td>
+                                                <td className="py-2">
+                                                    <button className="text-blue-300 hover:text-blue-200 text-xs">
+                                                        Voir fiche →
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -530,9 +586,94 @@
                         </div>
                     )}
 
+                    {/* Fiche détaillée du titre sélectionné */}
+                    {selectedStock && (
+                        <div className="seeking-alpha-card rounded-lg p-6 border border-blue-300/20">
+                            <div className="flex justify-between items-start mb-4">
+                                <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
+                                <button
+                                    onClick={() => setSelectedStock(null)}
+                                    className="text-blue-300 hover:text-blue-200"
+                                >
+                                    ✕ Fermer
+                                </button>
+                            </div>
+                            
+                            {/* Données financières détaillées */}
+                            {seekingAlphaStockData.stocks?.[selectedStock] && (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                    <div className="bg-blue-900/30 rounded p-3">
+                                        <div className="text-blue-200 text-sm">Prix</div>
+                                        <div className="text-white font-bold">
+                                            {seekingAlphaStockData.stocks[selectedStock].metrics?.price || 'N/A'}
+                                        </div>
+                                    </div>
+                                    <div className="bg-blue-900/30 rounded p-3">
+                                        <div className="text-blue-200 text-sm">P/E</div>
+                                        <div className="text-white font-bold">
+                                            {seekingAlphaStockData.stocks[selectedStock].metrics?.peRatio || 'N/A'}
+                                        </div>
+                                    </div>
+                                    <div className="bg-blue-900/30 rounded p-3">
+                                        <div className="text-blue-200 text-sm">Dividende</div>
+                                        <div className="text-white font-bold">
+                                            {seekingAlphaStockData.stocks[selectedStock].metrics?.dividendYield || 'N/A'}
+                                        </div>
+                                    </div>
+                                    <div className="bg-blue-900/30 rounded p-3">
+                                        <div className="text-blue-200 text-sm">Secteur</div>
+                                        <div className="text-white font-bold">
+                                            {seekingAlphaStockData.stocks[selectedStock].metrics?.sector || 'N/A'}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Analyse Seeking Alpha */}
+                            {seekingAlphaData.stocks?.find(s => s.ticker === selectedStock) && (
+                                <div className="mb-4">
+                                    <h4 className="text-lg font-semibold text-white mb-2">📈 Analyse Seeking Alpha</h4>
+                                    <div className="text-gray-200 text-sm leading-relaxed">
+                                        {seekingAlphaData.stocks.find(s => s.ticker === selectedStock).raw_text?.substring(0, 500)}...
+                                    </div>
+                                    <a
+                                        href={seekingAlphaData.stocks.find(s => s.ticker === selectedStock).url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline"
+                                    >
+                                        Lire l'analyse complète sur Seeking Alpha →
+                                    </a>
+                                </div>
+                            )}
+                            
+                            {/* Données en temps réel */}
+                            {stockData[selectedStock] && (
+                                <div className="mb-4">
+                                    <h4 className="text-lg font-semibold text-white mb-2">📊 Données Temps Réel</h4>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                                        <div>
+                                            <span className="text-blue-200">Ouverture:</span>
+                                            <span className="text-white ml-2">${stockData[selectedStock].o?.toFixed(2) || 'N/A'}</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-blue-200">Plus haut:</span>
+                                            <span className="text-white ml-2">${stockData[selectedStock].h?.toFixed(2) || 'N/A'}</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-blue-200">Plus bas:</span>
+                                            <span className="text-white ml-2">${stockData[selectedStock].l?.toFixed(2) || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Données Seeking Alpha préservées */}
-                    {seekingAlphaData.stocks && (
+                    {!selectedStock && seekingAlphaData.stocks && (
                         <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-white">📈 Analyses Complètes</h3>
                             {seekingAlphaData.stocks.map((stock, index) => (
                                 <div key={index} className="seeking-alpha-card rounded-lg p-6 border border-blue-300/20">
                                     <div className="flex justify-between items-start mb-4">
