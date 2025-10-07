@@ -48,7 +48,43 @@
             -webkit-line-clamp: 2;
             line-clamp: 2;
             -webkit-box-orient: vertical;
-            overflow: hidden;
+        }
+        
+        /* Scrollbar personnalisée */
+        .scrollbar-thin {
+            scrollbar-width: thin;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* Dark mode scrollbar */
+        .dark .scrollbar-thin::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
         }
         .line-clamp-3 {
             display: -webkit-box;
@@ -1105,7 +1141,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>📊 Données Financières & Actualités</h3>
-                        <div className="overflow-x-auto">
+                        <div className="overflow-x-auto max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 relative">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className={`border-b transition-colors duration-300 ${
@@ -1321,6 +1357,11 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                     })}
                                 </tbody>
                             </table>
+                            </div>
+                            <div className={`text-xs text-center mt-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>
+                                📜 Faites défiler pour voir toutes les données
                             </div>
                             </div>
 
@@ -2102,7 +2143,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                     <p className="text-sm mt-1">Cliquez sur "Actualiser" pour charger les actualités</p>
                                 </div>
                             ) : (
-                                <div className="space-y-4">
+                                <div className="space-y-4 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 relative">
                                     {tickers.map(ticker => {
                                         // Filtrer les actualités pour ce ticker
                                         const tickerNews = newsData.filter(article => {
@@ -2301,6 +2342,11 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                     })()}
                                 </div>
                             )}
+                            <div className={`text-xs text-center mt-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>
+                                📰 Faites défiler pour voir toutes les actualités
+                            </div>
                         </div>
                     )}
 
