@@ -43,20 +43,20 @@ const themes: Theme[] = [
   {
     id: 'finance',
     name: 'Finance Pro',
-    sector: '',
-    description: '',
+    sector: 'Finance',
+    description: 'Interface sombre professionnelle pour traders et investisseurs',
     colors: {
-      headerFrom: 'from-slate-800',
-      headerVia: 'via-slate-900',
-      headerTo: 'to-blue-900',
-      headerBorder: 'border-blue-600',
-      background: 'bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200',
-      cardBg: 'bg-white',
-      cardHover: 'hover:bg-white/70',
-      accent: 'bg-amber-600',
-      accentHover: 'hover:bg-amber-700',
-      textPrimary: 'text-slate-900',
-      textSecondary: 'text-slate-700'
+      headerFrom: 'from-gray-900',
+      headerVia: 'via-black',
+      headerTo: 'to-gray-800',
+      headerBorder: 'border-green-500',
+      background: 'bg-gradient-to-br from-gray-900 via-black to-gray-800',
+      cardBg: 'bg-gray-800/90',
+      cardHover: 'hover:bg-gray-700/90',
+      accent: 'bg-green-600',
+      accentHover: 'hover:bg-green-700',
+      textPrimary: 'text-white',
+      textSecondary: 'text-gray-300'
     }
   },
   {
@@ -204,7 +204,8 @@ const GOB = () => {
     } else {
       const defaultApps: App[] = [
         { id: '1', name: 'Seeking Alpha', url: '/seeking-alpha/index.html', logo: '📈', order: 0 },
-        { id: '2', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 1 }
+        { id: '2', name: 'Stocks & News', url: '/stocksandnews.html', logo: '📊', order: 1 },
+        { id: '3', name: 'Dashboard Beta', url: '/beta-combined-dashboard.html', logo: '🚀', order: 2 }
       ];
       setApps(defaultApps);
     }
