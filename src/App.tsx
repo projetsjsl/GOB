@@ -575,7 +575,7 @@ const GOB = () => {
                     : 'bg-gradient-to-br from-white to-gray-100 border-gray-300/30'
                 }`}>
                   <img 
-                    src={isDarkMode ? logojslaidark : logojslailight} 
+                    src={isDarkMode ? '/logojslaidark.jpg' : '/logojslailight.jpg'} 
                     alt="JSL AI Logo" 
                     className="w-16 h-16 object-contain"
                     onError={(e) => {
