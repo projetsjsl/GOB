@@ -194,7 +194,7 @@ const GOB = () => {
   const [currentTime, setCurrentTime] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMarketOpen, setIsMarketOpen] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -256,13 +256,21 @@ const GOB = () => {
     }
   }, []);
 
-  // Welcome screen timer
+  // Welcome screen logic
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowWelcome(false);
-    }, 3000); // 3 secondes d'animation
+    // Vérifier si c'est le premier chargement
+    const hasSeenWelcome = localStorage.getItem('gobapps-welcome-seen');
+    
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+      localStorage.setItem('gobapps-welcome-seen', 'true');
+      
+      const timer = setTimeout(() => {
+        setShowWelcome(false);
+      }, 3000); // 3 secondes d'animation
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   // Load dark mode preference
