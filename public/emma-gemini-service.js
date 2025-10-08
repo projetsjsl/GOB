@@ -4,9 +4,41 @@
 
 class EmmaGeminiService {
   constructor() {
-    this.apiKey = localStorage.getItem('gemini-api-key') || '';
+    // Priorité : Variable d'environnement Vercel > localStorage
+    this.apiKey = '';
     this.baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
     this.isConnected = false;
+    this.initializeApiKey();
+  }
+
+  // Initialiser la clé API de manière asynchrone
+  async initializeApiKey() {
+    this.apiKey = await this.getApiKey();
+  }
+
+  // Obtenir la clé API (Vercel env var en priorité)
+  async getApiKey() {
+    // En production sur Vercel, utiliser la variable d'environnement
+    if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+      return await this.getVercelApiKey();
+    }
+    // En développement ou si pas sur Vercel, utiliser localStorage
+    return localStorage.getItem('gemini-api-key') || '';
+  }
+
+  // Obtenir la clé API depuis Vercel (via une API route)
+  async getVercelApiKey() {
+    try {
+      // Appeler une API route qui retourne la clé (sécurisé côté serveur)
+      const response = await fetch('/api/gemini-key');
+      if (response.ok) {
+        const data = await response.json();
+        return data.apiKey || '';
+      }
+    } catch (error) {
+      console.log('Variable d\'environnement Vercel non disponible, utilisation du localStorage');
+    }
+    return localStorage.getItem('gemini-api-key') || '';
   }
 
   // Sauvegarder la clé API
@@ -53,6 +85,11 @@ class EmmaGeminiService {
 
   // Générer une réponse avec le prompt personnalisé
   async generateResponse(userMessage, customPrompt = null) {
+    // S'assurer que la clé API est chargée
+    if (!this.apiKey) {
+      this.apiKey = await this.getApiKey();
+    }
+    
     if (!this.apiKey) {
       throw new Error('Clé API Gemini non configurée');
     }
