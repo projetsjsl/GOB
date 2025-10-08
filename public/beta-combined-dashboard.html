@@ -2144,7 +2144,7 @@ Réponds toujours en français et adapte ton niveau d'expertise à la question p
                         const errorMessage = {
                             id: Date.now() + 1,
                             type: 'error',
-                            content: 'Désolé, je ne peux pas répondre pour le moment. Vérifiez votre configuration Gemini.',
+                            content: `Désolé, je ne peux pas répondre pour le moment. Erreur: ${error.message}. Vérifiez que la variable d'environnement GEMINI_API_KEY est configurée dans Vercel.`,
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
                         setEmmaMessages(prev => [...prev, errorMessage]);
@@ -2296,54 +2296,74 @@ Réponds toujours en français et adapte ton niveau d'expertise à la question p
                                 : 'bg-gray-50 border-gray-200'
                         }`}>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
-                                    isDarkMode ? 'bg-blue-600' : 'bg-blue-500'
-                                }`}>
-                                    🤖
+                                <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                                    <img 
+                                        src={isDarkMode ? 'emma-avatar-gob-dark.jpg' : 'emma-avatar-gob-light.jpg'} 
+                                        alt="Emma" 
+                                        className="w-full h-full object-cover"
+                                    />
                                 </div>
                                 <div>
                                     <h3 className={`text-lg font-semibold transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>Emma - Assistante Financière</h3>
+                                    }`}>Emma - Consultations Gratuites</h3>
                                     <p className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                    }`}>Votre guide pour naviguer dans l'interface et interpréter les données</p>
+                                    }`}>Analyse Financière</p>
                                 </div>
                             </div>
 
                             {/* Messages */}
-                            <div className={`h-96 overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 ${
+                            <div className={`h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
                             }`}>
                                 {emmaMessages.length === 0 ? (
-                                    <div className={`text-center py-8 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                    }`}>
-                                        <div className="text-4xl mb-4">🤖</div>
-                                        <p className="text-lg font-medium mb-2">Bonjour ! Je suis Emma</p>
-                                        <p className="text-sm">Votre assistante financière. Posez-moi vos questions !</p>
-                                        <div className="mt-4 space-y-2">
-                                            <div className={`text-xs p-2 rounded transition-colors duration-300 ${
-                                                isDarkMode ? 'bg-gray-800' : 'bg-gray-200'
+                                    <div className="flex gap-3 mb-4">
+                                        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                                            <img 
+                                                src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
+                                                alt="Emma" 
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className={`flex-1 p-4 rounded-lg ${
+                                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                        } shadow-sm`}>
+                                            <p className={`text-sm leading-relaxed mb-3 ${
+                                                isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                             }`}>
-                                                💡 "Quel est le cours de AAPL ?"
-                                            </div>
-                                            <div className={`text-xs p-2 rounded transition-colors duration-300 ${
-                                                isDarkMode ? 'bg-gray-800' : 'bg-gray-200'
+                                                Bonjour, je suis Emma, assistante virtuelle en analyse financière. Je peux vous aider avec l'analyse et l'évaluation financière. Quel est votre défi financier ?
+                                            </p>
+                                            <div className={`flex items-start gap-2 p-3 rounded-lg mb-3 ${
+                                                isDarkMode ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'
                                             }`}>
-                                                💡 "Peux-tu m'expliquer cette analyse ?"
+                                                <span className="text-red-500 text-sm">📌</span>
+                                                <span className={`text-xs ${
+                                                    isDarkMode ? 'text-red-300' : 'text-red-700'
+                                                }`}>
+                                                    Rappel : Pour des conseils personnalisés, consultez toujours un expert qualifié du domaine.
+                                                </span>
                                             </div>
-                                            <div className={`text-xs p-2 rounded transition-colors duration-300 ${
-                                                isDarkMode ? 'bg-gray-800' : 'bg-gray-200'
+                                            <p className={`text-sm ${
+                                                isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                             }`}>
-                                                💡 "Comment utiliser le scraping ?"
-                                            </div>
+                                                Comment puis-je vous aider ?
+                                            </p>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
                                         {emmaMessages.map((message) => (
-                                            <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                            <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                                {message.type !== 'user' && (
+                                                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                                        <img 
+                                                            src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
+                                                            alt="Emma" 
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                )}
                                                 <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                                                     message.type === 'user' 
                                                         ? 'bg-blue-600 text-white' 
@@ -2363,7 +2383,14 @@ Réponds toujours en français et adapte ton niveau d'expertise à la question p
                                             </div>
                                         ))}
                                         {emmaLoading && (
-                                            <div className="flex justify-start">
+                                            <div className="flex gap-3 justify-start">
+                                                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                                    <img 
+                                                        src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
+                                                        alt="Emma" 
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
                                                 <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                                                     isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900'
                                                 }`}>
