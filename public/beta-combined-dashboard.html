@@ -20,7 +20,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .tab-button.active { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
             color: white;
         }
         .pulse-animation {
@@ -38,7 +38,7 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         .seeking-alpha-card {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
         }
         .stocks-news-card {
             background: linear-gradient(135deg, #059669 0%, #10b981 100%);
@@ -326,7 +326,7 @@
                 if (!grade) return 'bg-gray-100 text-gray-600';
                 const letter = grade.charAt(0);
                 if (letter === 'A') return 'bg-green-100 text-green-700';
-                if (letter === 'B') return 'bg-blue-100 text-blue-700';
+                if (letter === 'B') return 'bg-gray-100 text-gray-700';
                 if (letter === 'C') return 'bg-yellow-100 text-yellow-700';
                 if (letter === 'D') return 'bg-orange-100 text-orange-700';
                 if (letter === 'F') return 'bg-red-100 text-red-700';
@@ -943,7 +943,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             </button>
                             <button
                                 onClick={fetchNews}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                             >
                                 Actualiser News
                             </button>
@@ -1045,7 +1045,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 {/* Métriques Clés */}
                                                 <div>
                                                     <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                                                        <div className="w-1 h-6 bg-blue-600 mr-3"></div>
+                                                        <div className="w-1 h-6 bg-green-600 mr-3"></div>
                                                         Métriques Clés
                                                     </h4>
                                                     <div className="grid grid-cols-3 gap-4">
@@ -1122,7 +1122,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 {claudeData?.sectorAnalysis && (
                                                     <div>
                                                         <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                                                            <div className="w-1 h-6 bg-blue-600 mr-3"></div>
+                                                            <div className="w-1 h-6 bg-green-600 mr-3"></div>
                                                             Analyse Sectorielle
                                                         </h4>
                                                         <div className="bg-blue-50 rounded-lg p-4">
@@ -1608,7 +1608,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             </button>
                             <button
                                 onClick={fetchNews}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                             >
                                 Actualiser News
                             </button>
@@ -1704,7 +1704,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 {/* Métriques Clés */}
                                                 <div>
                                                     <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                                                        <div className="w-1 h-6 bg-blue-600 mr-3"></div>
+                                                        <div className="w-1 h-6 bg-green-600 mr-3"></div>
                                                         Métriques Clés
                                                     </h4>
                                                     <div className="grid grid-cols-3 gap-4">
@@ -1781,7 +1781,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 {claudeData?.sectorAnalysis && (
                                                     <div>
                                                         <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                                                            <div className="w-1 h-6 bg-blue-600 mr-3"></div>
+                                                            <div className="w-1 h-6 bg-green-600 mr-3"></div>
                                                             Analyse Sectorielle
                                                         </h4>
                                                         <div className="bg-blue-50 rounded-lg p-4">
@@ -2127,7 +2127,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 </button>
                                 <button
                                     onClick={() => setEmmaInput('Bonjour Emma, peux-tu m\'aider ?')}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                                 >
                                     💡 Exemple
                                 </button>
@@ -3417,8 +3417,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                         className={`tab-button px-6 py-3 rounded-t-lg font-medium transition-all ${
                                             activeTab === tab.id 
                                                 ? (isDarkMode 
-                                                    ? 'bg-gray-700 text-white border-b-2 border-blue-500' 
-                                                    : 'bg-gray-200 text-gray-900 border-b-2 border-blue-600')
+                                                    ? 'bg-gray-700 text-white border-b-2 border-green-500' 
+                                                    : 'bg-gray-200 text-gray-900 border-b-2 border-green-600')
                                                 : (isDarkMode 
                                                     ? 'text-slate-300 hover:text-white hover:bg-gray-700/50' 
                                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50')
