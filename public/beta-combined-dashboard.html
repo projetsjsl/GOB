@@ -110,7 +110,7 @@
 
         const BetaCombinedDashboard = () => {
             // États principaux
-            const [activeTab, setActiveTab] = useState('scrapping-sa');
+            const [activeTab, setActiveTab] = useState('ask-emma');
             const [tickers, setTickers] = useState(['CVS', 'MSFT']);
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
@@ -2033,6 +2033,280 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 </div>
             );
 
+            // Composant onglet Ask Emma
+            const AskEmmaTab = () => {
+                const [emmaMessages, setEmmaMessages] = useState([]);
+                const [emmaInput, setEmmaInput] = useState('');
+                const [emmaLoading, setEmmaLoading] = useState(false);
+
+                const sendMessageToEmma = async () => {
+                    if (!emmaInput.trim()) return;
+                    
+                    const userMessage = {
+                        id: Date.now(),
+                        type: 'user',
+                        content: emmaInput,
+                        timestamp: new Date().toLocaleTimeString('fr-FR')
+                    };
+                    
+                    setEmmaMessages(prev => [...prev, userMessage]);
+                    setEmmaLoading(true);
+                    
+                    try {
+                        // Simulation d'une réponse d'Emma
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        
+                        const emmaResponse = {
+                            id: Date.now() + 1,
+                            type: 'emma',
+                            content: generateEmmaResponse(emmaInput),
+                            timestamp: new Date().toLocaleTimeString('fr-FR')
+                        };
+                        
+                        setEmmaMessages(prev => [...prev, emmaResponse]);
+                    } catch (error) {
+                        const errorMessage = {
+                            id: Date.now() + 1,
+                            type: 'error',
+                            content: 'Désolé, Emma n\'est pas disponible pour le moment.',
+                            timestamp: new Date().toLocaleTimeString('fr-FR')
+                        };
+                        setEmmaMessages(prev => [...prev, errorMessage]);
+                    } finally {
+                        setEmmaLoading(false);
+                        setEmmaInput('');
+                    }
+                };
+
+                const generateEmmaResponse = (input) => {
+                    const lowerInput = input.toLowerCase();
+                    
+                    if (lowerInput.includes('bonjour') || lowerInput.includes('salut') || lowerInput.includes('hello')) {
+                        return 'Bonjour ! Je suis Emma, votre assistante financière. Comment puis-je vous aider aujourd\'hui ?';
+                    }
+                    
+                    if (lowerInput.includes('prix') || lowerInput.includes('cours') || lowerInput.includes('action')) {
+                        return 'Je peux vous aider à analyser les cours des actions. Voulez-vous des informations sur un titre spécifique ?';
+                    }
+                    
+                    if (lowerInput.includes('analyse') || lowerInput.includes('recommandation')) {
+                        return 'Pour une analyse approfondie, je recommande de consulter l\'onglet "Analyses Seeking Alpha" qui contient des analyses détaillées.';
+                    }
+                    
+                    if (lowerInput.includes('actualité') || lowerInput.includes('news') || lowerInput.includes('nouvelle')) {
+                        return 'Les dernières actualités financières sont disponibles dans l\'onglet "Stocks & News". Je peux vous aider à les interpréter.';
+                    }
+                    
+                    if (lowerInput.includes('scraping') || lowerInput.includes('données')) {
+                        return 'Pour le scraping de données, utilisez l\'onglet "Scrapping SA" qui contient tous les outils nécessaires.';
+                    }
+                    
+                    if (lowerInput.includes('aide') || lowerInput.includes('help')) {
+                        return 'Je peux vous aider avec :\n• Analyse des cours d\'actions\n• Interprétation des actualités\n• Navigation dans l\'interface\n• Recommandations d\'utilisation\n\nQue souhaitez-vous savoir ?';
+                    }
+                    
+                    return 'C\'est une excellente question ! Je peux vous aider à naviguer dans l\'interface et à interpréter les données financières. Pouvez-vous être plus spécifique ?';
+                };
+
+                const clearChat = () => {
+                    setEmmaMessages([]);
+                };
+
+                return (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🤖 Ask Emma</h2>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={clearChat}
+                                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                                >
+                                    🗑️ Effacer
+                                </button>
+                                <button
+                                    onClick={() => setEmmaInput('Bonjour Emma, peux-tu m\'aider ?')}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    💡 Exemple
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Zone de chat */}
+                        <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-gray-800/50 border-gray-600' 
+                                : 'bg-white/80 border-gray-300'
+                        }`}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+                                    isDarkMode ? 'bg-blue-600' : 'bg-blue-500'
+                                }`}>
+                                    🤖
+                                </div>
+                                <div>
+                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>Emma - Assistante Financière</h3>
+                                    <p className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                    }`}>Votre guide pour naviguer dans l'interface et interpréter les données</p>
+                                </div>
+                            </div>
+
+                            {/* Messages */}
+                            <div className={`h-96 overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 ${
+                                isDarkMode ? 'bg-black/30' : 'bg-gray-50/80'
+                            }`}>
+                                {emmaMessages.length === 0 ? (
+                                    <div className={`text-center py-8 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>
+                                        <div className="text-4xl mb-4">🤖</div>
+                                        <p className="text-lg font-medium mb-2">Bonjour ! Je suis Emma</p>
+                                        <p className="text-sm">Votre assistante financière. Posez-moi vos questions !</p>
+                                        <div className="mt-4 space-y-2">
+                                            <div className={`text-xs p-2 rounded transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/50'
+                                            }`}>
+                                                💡 "Quel est le cours de AAPL ?"
+                                            </div>
+                                            <div className={`text-xs p-2 rounded transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/50'
+                                            }`}>
+                                                💡 "Peux-tu m'expliquer cette analyse ?"
+                                            </div>
+                                            <div className={`text-xs p-2 rounded transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/50'
+                                            }`}>
+                                                💡 "Comment utiliser le scraping ?"
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {emmaMessages.map((message) => (
+                                            <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                                                    message.type === 'user' 
+                                                        ? 'bg-blue-600 text-white' 
+                                                        : message.type === 'error'
+                                                        ? 'bg-red-600 text-white'
+                                                        : isDarkMode 
+                                                            ? 'bg-gray-700 text-white' 
+                                                            : 'bg-gray-200 text-gray-900'
+                                                }`}>
+                                                    <div className="whitespace-pre-wrap">{message.content}</div>
+                                                    <div className={`text-xs mt-1 ${
+                                                        message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
+                                                    }`}>
+                                                        {message.timestamp}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {emmaLoading && (
+                                            <div className="flex justify-start">
+                                                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                                                    isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900'
+                                                }`}>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="animate-spin w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
+                                                        <span>Emma réfléchit...</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Input */}
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={emmaInput}
+                                    onChange={(e) => setEmmaInput(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && sendMessageToEmma()}
+                                    placeholder="Posez votre question à Emma..."
+                                    className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                    disabled={emmaLoading}
+                                />
+                                <button
+                                    onClick={sendMessageToEmma}
+                                    disabled={emmaLoading || !emmaInput.trim()}
+                                    className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${
+                                        emmaLoading || !emmaInput.trim()
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                                    }`}
+                                >
+                                    {emmaLoading ? '⏳' : '📤'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Suggestions rapides */}
+                        <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-gray-800/50 border-gray-600' 
+                                : 'bg-white/80 border-gray-300'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>💡 Suggestions rapides</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {[
+                                    "Comment analyser une action ?",
+                                    "Où trouver les actualités ?",
+                                    "Comment utiliser le scraping ?",
+                                    "Explique-moi cette donnée",
+                                    "Qu'est-ce que le P/E ratio ?",
+                                    "Comment interpréter les graphiques ?"
+                                ].map((suggestion, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setEmmaInput(suggestion)}
+                                        className={`p-3 rounded-lg text-left transition-colors duration-300 ${
+                                            isDarkMode 
+                                                ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                                                : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                                        }`}
+                                    >
+                                        <div className="text-sm font-medium">{suggestion}</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Aide contextuelle */}
+                        <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-blue-900/30 border-blue-600' 
+                                : 'bg-blue-100/80 border-blue-300'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>ℹ️ À propos d'Emma</h3>
+                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                            }`}>
+                                <div>• <strong>Navigation :</strong> Emma vous guide dans l'interface</div>
+                                <div>• <strong>Interprétation :</strong> Explique les données financières</div>
+                                <div>• <strong>Recommandations :</strong> Suggère les meilleures pratiques</div>
+                                <div>• <strong>Support :</strong> Répond à vos questions techniques</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
             // Composant onglet Stocks & News
             const StocksNewsTab = () => (
                 <div className="space-y-6">
@@ -3132,6 +3406,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="flex space-x-1">
                                 {[
+                                    { id: 'ask-emma', label: '🤖 Ask Emma', component: AskEmmaTab },
                                     { id: 'scrapping-sa', label: '🔧 Scrapping SA', component: ScrappingSATab },
                                     { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab },
                                     { id: 'stocks-news', label: '📊 Stocks & News', component: StocksNewsTab }
@@ -3168,6 +3443,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
 
                     {/* Contenu principal */}
                     <main className="max-w-7xl mx-auto p-6">
+                        {activeTab === 'ask-emma' && <AskEmmaTab />}
                         {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                         {activeTab === 'stocks-news' && <StocksNewsTab />}
