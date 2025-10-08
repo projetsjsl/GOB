@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma - Démarrage Rapide</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, sans-serif;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .steps {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .step {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .step h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+        .step p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        .status h3 {
+            margin: 0 0 15px 0;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            justify-content: center;
+        }
+        .icon {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Emma</h1>
+            <p>Assistante Financière - Démarrage Rapide</p>
+        </div>
+
+        <div class="steps">
+            <div class="step">
+                <h3>1️⃣ Configuration</h3>
+                <p>Configurez votre clé API Gemini pour activer Emma</p>
+            </div>
+            <div class="step">
+                <h3>2️⃣ Personnalisation</h3>
+                <p>Adaptez le prompt d'Emma à vos besoins spécifiques</p>
+            </div>
+            <div class="step">
+                <h3>3️⃣ Utilisation</h3>
+                <p>Commencez à chatter avec Emma pour vos analyses financières</p>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="beta-combined-dashboard.html" class="btn btn-primary">
+                🚀 Dashboard Principal
+            </a>
+            <a href="emma-demo.html" class="btn btn-secondary">
+                🎭 Démonstration
+            </a>
+            <a href="emma-test.html" class="btn btn-secondary">
+                🧪 Tests
+            </a>
+        </div>
+
+        <div class="status">
+            <h3>📊 Statut de l'Installation</h3>
+            <div id="status-items">
+                <div class="status-item">
+                    <span class="icon">⏳</span>
+                    <span>Vérification en cours...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import des modules Emma
+        import { emmaVerification } from './emma-verification.js';
+
+        // Fonction pour mettre à jour le statut
+        function updateStatus() {
+            const statusContainer = document.getElementById('status-items');
+            
+            // Vérifications de base
+            const checks = [
+                { name: 'Fichiers Emma', check: () => checkFiles() },
+                { name: 'Modules ES6', check: () => checkModules() },
+                { name: 'Configuration', check: () => checkConfig() },
+                { name: 'Navigateur', check: () => checkBrowser() }
+            ];
+
+            statusContainer.innerHTML = '';
+
+            checks.forEach((check, index) => {
+                setTimeout(async () => {
+                    try {
+                        const result = await check.check();
+                        const statusItem = document.createElement('div');
+                        statusItem.className = 'status-item';
+                        statusItem.innerHTML = `
+                            <span class="icon">${result ? '✅' : '❌'}</span>
+                            <span>${check.name}: ${result ? 'OK' : 'Erreur'}</span>
+                        `;
+                        statusContainer.appendChild(statusItem);
+                    } catch (error) {
+                        const statusItem = document.createElement('div');
+                        statusItem.className = 'status-item';
+                        statusItem.innerHTML = `
+                            <span class="icon">❌</span>
+                            <span>${check.name}: Erreur</span>
+                        `;
+                        statusContainer.appendChild(statusItem);
+                    }
+                }, index * 500);
+            });
+        }
+
+        // Vérifier les fichiers
+        async function checkFiles() {
+            const files = [
+                'emma-financial-profile.js',
+                'emma-gemini-service.js',
+                'emma-ui-components.js',
+                'emma-styles.css',
+                'emma-dashboard-integration.js'
+            ];
+
+            for (const file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (!response.ok) return false;
+                } catch (error) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Vérifier les modules
+        async function checkModules() {
+            try {
+                await import('./emma-financial-profile.js');
+                await import('./emma-gemini-service.js');
+                await import('./emma-ui-components.js');
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Vérifier la configuration
+        async function checkConfig() {
+            try {
+                const { getFinancialProfile } = await import('./emma-financial-profile.js');
+                const profile = getFinancialProfile();
+                return profile && profile.name && profile.prompt;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Vérifier le navigateur
+        function checkBrowser() {
+            return (
+                typeof fetch !== 'undefined' &&
+                typeof Promise !== 'undefined' &&
+                typeof import !== 'undefined' &&
+                typeof Storage !== 'undefined'
+            );
+        }
+
+        // Démarrer la vérification
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus();
+        });
+    </script>
+</body>
+</html>
