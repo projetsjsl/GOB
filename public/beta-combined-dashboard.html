@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,6 +88,106 @@
         
         .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
             background: #64748b;
+        }
+
+        /* Masquer la scrollbar pour les onglets mobiles */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Empêcher le débordement horizontal */
+        body, html {
+            overflow-x: hidden;
+        }
+        
+        .min-h-screen {
+            min-width: 0;
+        }
+
+        /* Optimisations Mobile iPhone Portrait */
+        @media (max-width: 768px) {
+            /* Réduire les polices pour mobile */
+            .text-3xl { font-size: 1.5rem !important; }
+            .text-2xl { font-size: 1.25rem !important; }
+            .text-xl { font-size: 1.125rem !important; }
+            .text-lg { font-size: 1rem !important; }
+            
+            /* Ajuster les espacements */
+            .p-6 { padding: 1rem !important; }
+            .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+            .py-3 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+            
+            /* Optimiser les grilles pour mobile */
+            .grid-cols-2 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+            .grid-cols-3 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+            .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            
+            /* Réduire les largeurs maximales */
+            .max-w-7xl { max-width: 100% !important; }
+            .max-w-xs { max-width: 100% !important; }
+            .max-w-md { max-width: 100% !important; }
+            
+            /* Ajuster les onglets pour mobile */
+            .tab-button {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Optimiser les cartes de stocks */
+            .stock-card {
+                margin-bottom: 0.75rem !important;
+            }
+            
+            /* Réduire les hauteurs fixes */
+            .h-[500px] { height: 300px !important; }
+            .h-64 { height: 12rem !important; }
+            .h-48 { height: 10rem !important; }
+            
+            /* Ajuster les boutons */
+            .px-4 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+            .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+            
+            /* Optimiser les inputs */
+            input, textarea {
+                font-size: 16px !important; /* Évite le zoom sur iOS */
+            }
+            
+            /* Réduire les gaps */
+            .gap-6 { gap: 1rem !important; }
+            .gap-4 { gap: 0.75rem !important; }
+            .space-x-1 > * + * { margin-left: 0.25rem !important; }
+        }
+
+        /* Optimisations spécifiques iPhone Portrait */
+        @media (max-width: 414px) and (orientation: portrait) {
+            /* Polices encore plus petites pour iPhone */
+            .text-3xl { font-size: 1.25rem !important; }
+            .text-2xl { font-size: 1.125rem !important; }
+            .text-xl { font-size: 1rem !important; }
+            
+            /* Réduire les espacements */
+            .p-6 { padding: 0.75rem !important; }
+            .px-6 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+            
+            /* Onglets plus compacts */
+            .tab-button {
+                padding: 0.375rem 0.5rem !important;
+                font-size: 0.75rem !important;
+            }
+            
+            /* Grilles en une colonne */
+            .grid-cols-2, .grid-cols-3, .grid-cols-4 { 
+                grid-template-columns: repeat(1, minmax(0, 1fr)) !important; 
+            }
+            
+            /* Réduire les hauteurs */
+            .h-[500px] { height: 250px !important; }
+            .h-64 { height: 10rem !important; }
+            .h-48 { height: 8rem !important; }
         }
         .line-clamp-3 {
             display: -webkit-box;
@@ -508,10 +608,10 @@
                     status.claude = { status: 'error', responseTime: 0, error: error.message };
                 }
 
-                // Test Vercel API Routes
+                // Test Vercel API Routes (via gemini-key)
                 try {
                     const startTime = Date.now();
-                    const response = await fetch('/api/test-gemini');
+                    const response = await fetch('/api/gemini-key');
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {
@@ -2709,6 +2809,252 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 </div>
             );
 
+            // Composant onglet Envoyer par courriel
+            const EmailReportTab = () => {
+                const [emailData, setEmailData] = useState({
+                    to: '',
+                    subject: 'Rapport Financier GOB - Dashboard',
+                    content: '',
+                    includeStocks: true,
+                    includeNews: true,
+                    includeWatchlist: true,
+                    includeSeekingAlpha: true
+                });
+
+                const generateReportContent = () => {
+                    let content = `📊 RAPPORT FINANCIER GOB - ${new Date().toLocaleDateString('fr-FR')}\n\n`;
+                    
+                    if (emailData.includeStocks) {
+                        content += `📈 DONNÉES BOURSIÈRES\n`;
+                        content += `========================\n`;
+                        Object.entries(stockData).forEach(([ticker, data]) => {
+                            if (data) {
+                                const change = data.dp ? (data.dp >= 0 ? '+' : '') + data.dp.toFixed(2) + '%' : 'N/A';
+                                content += `${ticker}: $${data.c?.toFixed(2) || 'N/A'} (${change})\n`;
+                            }
+                        });
+                        content += `\n`;
+                    }
+
+                    if (emailData.includeNews && newsData.length > 0) {
+                        content += `📰 ACTUALITÉS FINANCIÈRES\n`;
+                        content += `==========================\n`;
+                        newsData.slice(0, 5).forEach(article => {
+                            content += `• ${article.title}\n`;
+                            content += `  ${article.description?.substring(0, 100)}...\n`;
+                            content += `  Source: ${article.source?.name || 'Inconnue'}\n\n`;
+                        });
+                    }
+
+                    if (emailData.includeWatchlist && watchlistTickers.length > 0) {
+                        content += `👀 WATCHLIST DAN\n`;
+                        content += `==================\n`;
+                        watchlistTickers.forEach(ticker => {
+                            const data = watchlistStockData[ticker];
+                            if (data) {
+                                const change = data.dp ? (data.dp >= 0 ? '+' : '') + data.dp.toFixed(2) + '%' : 'N/A';
+                                content += `${ticker}: $${data.c?.toFixed(2) || 'N/A'} (${change})\n`;
+                            }
+                        });
+                        content += `\n`;
+                    }
+
+                    if (emailData.includeSeekingAlpha && seekingAlphaData.stocks?.length > 0) {
+                        content += `📊 ANALYSES SEEKING ALPHA\n`;
+                        content += `==========================\n`;
+                        seekingAlphaData.stocks.slice(0, 3).forEach(stock => {
+                            const claudeData = seekingAlphaStockData.stocks?.[stock.ticker];
+                            content += `${stock.ticker}: ${claudeData?.finalConclusion?.rating || 'Hold'}\n`;
+                        });
+                        content += `\n`;
+                    }
+
+                    content += `---\n`;
+                    content += `Rapport généré automatiquement par GOB Dashboard\n`;
+                    content += `Propulsé par JSL AI\n`;
+                    content += `Date: ${new Date().toLocaleString('fr-FR')}`;
+
+                    return content;
+                };
+
+                const sendEmail = async () => {
+                    if (!emailData.to.trim()) {
+                        showMessage('Veuillez saisir une adresse email', 'error');
+                        return;
+                    }
+
+                    try {
+                        const reportContent = generateReportContent();
+                        
+                        // Simuler l'envoi d'email (à remplacer par une vraie API)
+                        showMessage('Fonctionnalité d\'envoi d\'email en développement', 'info');
+                        
+                        // Pour l'instant, copier le contenu dans le presse-papiers
+                        await navigator.clipboard.writeText(reportContent);
+                        showMessage('Contenu du rapport copié dans le presse-papiers', 'success');
+                        
+                    } catch (error) {
+                        showMessage('Erreur lors de la génération du rapport', 'error');
+                    }
+                };
+
+                return (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📧 Envoyer par courriel</h2>
+                        </div>
+
+                        {/* Configuration de l'email */}
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📧 Configuration de l'Email</h3>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Destinataire
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={emailData.to}
+                                        onChange={(e) => setEmailData({...emailData, to: e.target.value})}
+                                        placeholder="exemple@entreprise.com"
+                                        className={`w-full px-3 py-2 rounded-lg border transition-colors duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                        }`}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Sujet
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={emailData.subject}
+                                        onChange={(e) => setEmailData({...emailData, subject: e.target.value})}
+                                        className={`w-full px-3 py-2 rounded-lg border transition-colors duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                        }`}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Contenu personnalisé (optionnel)
+                                    </label>
+                                    <textarea
+                                        value={emailData.content}
+                                        onChange={(e) => setEmailData({...emailData, content: e.target.value})}
+                                        placeholder="Ajoutez un message personnalisé..."
+                                        rows={3}
+                                        className={`w-full px-3 py-2 rounded-lg border transition-colors duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                        }`}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Sections à inclure */}
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📋 Sections à inclure</h3>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {[
+                                    { key: 'includeStocks', label: '📈 Données Boursières', icon: '📊' },
+                                    { key: 'includeNews', label: '📰 Actualités', icon: '📰' },
+                                    { key: 'includeWatchlist', label: '👀 Watchlist Dan', icon: '👀' },
+                                    { key: 'includeSeekingAlpha', label: '📊 Seeking Alpha', icon: '📈' }
+                                ].map(section => (
+                                    <label key={section.key} className={`flex items-center space-x-2 p-3 rounded-lg border transition-colors duration-300 cursor-pointer ${
+                                        isDarkMode
+                                            ? emailData[section.key]
+                                                ? 'bg-blue-900/30 border-blue-600'
+                                                : 'bg-gray-800 border-gray-600'
+                                            : emailData[section.key]
+                                                ? 'bg-blue-100 border-blue-300'
+                                                : 'bg-gray-100 border-gray-300'
+                                    }`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={emailData[section.key]}
+                                            onChange={(e) => setEmailData({...emailData, [section.key]: e.target.checked})}
+                                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                        />
+                                        <span className={`text-sm font-medium transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-200' : 'text-gray-700'
+                                        }`}>
+                                            {section.icon} {section.label}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Aperçu du rapport */}
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>👁️ Aperçu du rapport</h3>
+                            
+                            <div className={`max-h-64 overflow-y-auto p-4 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300'
+                            }`}>
+                                <pre className={`text-sm whitespace-pre-wrap transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                }`}>
+                                    {generateReportContent()}
+                                </pre>
+                            </div>
+                        </div>
+
+                        {/* Boutons d'action */}
+                        <div className="flex gap-4">
+                            <button
+                                onClick={sendEmail}
+                                disabled={!emailData.to.trim()}
+                                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                            >
+                                📧 Envoyer par Email
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    await navigator.clipboard.writeText(generateReportContent());
+                                    showMessage('Rapport copié dans le presse-papiers', 'success');
+                                }}
+                                className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                                📋 Copier le rapport
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
             // Composant onglet Ask Emma avec intégration Gemini
             const AskEmmaTab = () => {
                 const [emmaMessages, setEmmaMessages] = useState([]);
@@ -2971,6 +3317,7 @@ Curiosité intellectuelle continue
 Tu es maintenant Emma, Analyste Financière Experte.
 Réponds toujours en français québécois, adopte un ton professionnel équilibré, et structure tes analyses selon la méthodologie décrite. N'hésite pas à rechercher sur le web pour fournir des données actuelles et citer tes sources.
 Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
+            const [showEmmaAnimation, setShowEmmaAnimation] = useState(true);
 
                 // Initialiser Emma au chargement
                 React.useEffect(() => {
@@ -3127,32 +3474,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                 };
                                 console.log('❌ Échec récupération depuis Vercel:', response.status, errorData);
                                 
-                                // Si c'est une erreur 404, essayer de diagnostiquer
+                                // Si c'est une erreur 404, diagnostic simplifié
                                 if (response.status === 404) {
-                                    console.log('🔍 Diagnostic 404 - Test de l\'API route de base...');
-                                    try {
-                                        const testResponse = await fetch('/api/test');
-                                        if (testResponse.ok) {
-                                            const testData = await testResponse.json();
-                                            debugInfo.diagnostic = {
-                                                apiRoutesWorking: true,
-                                                testResponse: testData
-                                            };
-                                            console.log('✅ API routes fonctionnelles, problème spécifique à gemini-key');
-                                        } else {
-                                            debugInfo.diagnostic = {
-                                                apiRoutesWorking: false,
-                                                testStatus: testResponse.status
-                                            };
-                                            console.log('❌ API routes non fonctionnelles');
-                                        }
-                                    } catch (testError) {
-                                        debugInfo.diagnostic = {
-                                            apiRoutesWorking: false,
-                                            testError: testError.message
-                                        };
-                                        console.log('❌ Erreur test API routes:', testError.message);
-                                    }
+                                    debugInfo.diagnostic = {
+                                        apiRoutesWorking: false,
+                                        message: 'API route gemini-key non trouvée - vérifiez le déploiement'
+                                    };
+                                    console.log('❌ API route gemini-key non accessible');
                                 }
                             }
                         } catch (error) {
@@ -3493,10 +3821,74 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 return (
                     <div className="space-y-6">
+                        {/* Animation d'entrée Emma */}
+                        {showEmmaAnimation && (
+                            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                                <div className="relative">
+                                    {/* Animation de marché boursier qui monte */}
+                                    <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
+                                        <div className="flex space-x-2">
+                                            {['📈', '📊', '💰', '📈', '📊'].map((icon, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="text-2xl animate-bounce"
+                                                    style={{
+                                                        animationDelay: `${index * 0.2}s`,
+                                                        animationDuration: '1s'
+                                                    }}
+                                                >
+                                                    {icon}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Image d'Emma avec effet de fade */}
+                                    <div className="relative">
+                                        <img
+                                            src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
+                                            alt="Emma - Experte Financière IA"
+                                            className="w-64 h-64 rounded-full object-cover shadow-2xl animate-pulse"
+                                            style={{
+                                                animation: 'fadeInScale 2s ease-in-out'
+                                            }}
+                                        />
+                                        
+                                        {/* Effet de brillance */}
+                                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                                    </div>
+                                    
+                                    {/* Message de bienvenue animé */}
+                                    <div className="text-center mt-6">
+                                        <h3 className="text-3xl font-bold text-white mb-2 animate-fadeIn">
+                                            Bonjour ! Je suis Emma
+                                        </h3>
+                                        <p className="text-xl text-gray-300 animate-fadeIn" style={{animationDelay: '0.5s'}}>
+                                            Votre Experte Financière IA
+                                        </p>
+                                        <div className="mt-4 flex justify-center space-x-2">
+                                            <span className="text-2xl animate-bounce" style={{animationDelay: '1s'}}>📊</span>
+                                            <span className="text-2xl animate-bounce" style={{animationDelay: '1.2s'}}>💰</span>
+                                            <span className="text-2xl animate-bounce" style={{animationDelay: '1.4s'}}>📈</span>
+                                            <span className="text-2xl animate-bounce" style={{animationDelay: '1.6s'}}>🎯</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Bouton pour fermer l'animation */}
+                                    <button
+                                        onClick={() => setShowEmmaAnimation(false)}
+                                        className="absolute top-4 right-4 text-white hover:text-gray-300 text-2xl"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="flex justify-between items-center">
                             <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🤖 Ask Emma</h2>
+                            }`}>🤖 Emma IA</h2>
                             <div className="flex gap-2">
                                 <button
                                     onClick={clearChat}
@@ -3567,22 +3959,26 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             <p className={`text-sm leading-relaxed mb-3 ${
                                                 isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                             }`}>
-                                                Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière. Quel est votre défi financier ?
+                                                🎯 Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, votre Experte financière IA de JSLAI ! 💼✨
+                                                
+                                                📊 Je peux vous aider avec l'analyse et l'évaluation financière, l'interprétation des données boursières, et bien plus encore ! 📈💰
+                                                
+                                                🚀 Quel est votre défi financier aujourd'hui ?
                                             </p>
                                             <div className={`flex items-start gap-2 p-3 rounded-lg mb-3 ${
-                                                isDarkMode ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'
+                                                isDarkMode ? 'bg-green-900/30 border border-green-800' : 'bg-green-50 border border-green-200'
                                             }`}>
-                                                <span className="text-red-500 text-sm">📌</span>
+                                                <span className="text-green-500 text-sm">📧</span>
                                                 <span className={`text-xs ${
-                                                    isDarkMode ? 'text-red-300' : 'text-red-700'
+                                                    isDarkMode ? 'text-green-300' : 'text-green-700'
                                                 }`}>
-                                                    Rappel : Pour des conseils personnalisés, consultez toujours un expert qualifié du domaine.
+                                                    💡 Astuce : Vous pouvez envoyer cette conversation par courriel en utilisant l'onglet "Envoyer par courriel" ci-dessus !
                                                 </span>
                                             </div>
                                             <p className={`text-sm ${
                                                 isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                             }`}>
-                                                Comment puis-je vous aider ?
+                                                🤔 Comment puis-je vous aider aujourd'hui ? 💡
                                             </p>
                                         </div>
                                     </div>
@@ -4868,7 +5264,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         : 'bg-white'
                 }`}>
                     {/* Header */}
-                    <header className={`p-6 border-b transition-colors duration-300 ${
+                    <header className={`p-3 md:p-6 border-b transition-colors duration-300 ${
                         isDarkMode 
                             ? 'bg-black border-gray-700' 
                             : 'bg-white border-gray-300'
@@ -4896,7 +5292,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <p className={`font-['Inter'] transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                         }`}>
-                                            Plateforme financière • Seeking Alpha + Stocks & News • Propulsée par JSL AI
+                                            Plateforme financière • Propulsée par JSL AI
                                         </p>
                                     </div>
                                 </div>
@@ -4923,14 +5319,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             ? 'bg-black border-gray-700' 
                             : 'bg-white border-gray-300'
                     }`}>
-                        <div className="max-w-7xl mx-auto px-6">
-                            <div className="flex space-x-1">
+                        <div className="max-w-7xl mx-auto px-3 md:px-6">
+                            <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
                                 {[
                                     { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
                                     { id: 'dans-watchlist', label: '👀 Dan\'s Watchlist', component: DansWatchlistTab },
                                     { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab },
                                     { id: 'ask-emma', label: '🤖 Emma IA', component: AskEmmaTab },
                                     { id: 'scrapping-sa', label: '🔧 Scrapping SA', component: ScrappingSATab },
+                                    { id: 'email-report', label: '📧 Envoyer par courriel', component: EmailReportTab },
                                     { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab }
                                 ].map(tab => (
                                     <button
@@ -4954,12 +5351,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </nav>
 
                     {/* Contenu principal */}
-                    <main className="max-w-7xl mx-auto p-6">
+                    <main className="max-w-7xl mx-auto p-3 md:p-6">
                         {activeTab === 'stocks-news' && <StocksNewsTab />}
                         {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                         {activeTab === 'ask-emma' && <AskEmmaTab />}
                         {activeTab === 'scrapping-sa' && <ScrappingSATab />}
+                        {activeTab === 'email-report' && <EmailReportTab />}
                         {activeTab === 'admin-jsla' && <AdminJSLaiTab />}
                     </main>
 
