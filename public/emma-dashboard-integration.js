@@ -33,7 +33,7 @@ class EmmaDashboardIntegration {
       await this.checkGeminiConnection();
       
       this.isInitialized = true;
-      console.log('✅ Emma intégrée avec succès dans le dashboard');
+      console.log('✅ Emma IA intégrée avec succès dans le dashboard');
     } catch (error) {
       console.error('❌ Erreur lors de l\'initialisation d\'Emma:', error);
     }
@@ -41,9 +41,9 @@ class EmmaDashboardIntegration {
 
   // Créer l'interface Emma
   createEmmaInterface() {
-    const askEmmaTab = document.querySelector('#ask-emma-tab');
+    const askEmmaTab = document.querySelector('#ask-emma');
     if (!askEmmaTab) {
-      console.error('Onglet Ask Emma non trouvé');
+      console.error('Onglet Emma IA non trouvé');
       return;
     }
 

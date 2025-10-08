@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -154,6 +154,8 @@
             /* Optimiser les inputs */
             input, textarea {
                 font-size: 16px !important; /* Évite le zoom sur iOS */
+                -webkit-text-size-adjust: 100%;
+                text-size-adjust: 100%;
             }
             
             /* Réduire les gaps */
@@ -1471,7 +1473,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
             // Composant onglet Dan's Watchlist
             const DansWatchlistTab = () => {
                 const [watchlistTickers, setWatchlistTickers] = useState([]);
-                const [newTicker, setNewTicker] = useState('');
+                const [newWatchlistTicker, setNewWatchlistTicker] = useState('');
                 const [watchlistStockData, setWatchlistStockData] = useState({});
                 const [watchlistLoading, setWatchlistLoading] = useState(false);
 
@@ -1512,9 +1514,9 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
 
                 // Ajouter un ticker à la watchlist
                 const addTickerToWatchlist = async () => {
-                    if (!newTicker.trim()) return;
+                    if (!newWatchlistTicker.trim()) return;
                     
-                    const ticker = newTicker.trim().toUpperCase();
+                    const ticker = newWatchlistTicker.trim().toUpperCase();
                     if (watchlistTickers.includes(ticker)) {
                         showMessage('Ce ticker est déjà dans la watchlist', 'warning');
                         return;
@@ -1523,7 +1525,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     const updatedTickers = [...watchlistTickers, ticker];
                     setWatchlistTickers(updatedTickers);
                     localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
-                    setNewTicker('');
+                    setNewWatchlistTicker('');
                     
                     // Sauvegarder sur GitHub
                     await saveWatchlistToGitHub(updatedTickers);
@@ -1603,8 +1605,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             <div className="flex gap-2">
                                 <input
                                     type="text"
-                                    value={newTicker}
-                                    onChange={(e) => setNewTicker(e.target.value)}
+                                    value={newWatchlistTicker}
+                                    onChange={(e) => setNewWatchlistTicker(e.target.value)}
                                     placeholder="Ex: AAPL, TSLA, GOOGL..."
                                     className={`flex-1 px-3 py-2 rounded-lg border transition-colors duration-300 ${
                                         isDarkMode 
