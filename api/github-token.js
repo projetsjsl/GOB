@@ -2,7 +2,7 @@
 // API ROUTE VERCEL - TOKEN GITHUB
 // ========================================
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Headers CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');

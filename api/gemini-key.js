@@ -2,7 +2,7 @@
 // API ROUTE VERCEL - CLÉ GEMINI
 // ========================================
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   try {
     // Headers CORS
     res.setHeader('Access-Control-Allow-Origin', '*');

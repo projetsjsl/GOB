@@ -1,5 +1,15 @@
 // API News multi-sources pour les actualités financières
 export default async function handler(req, res) {
+    // Headers CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Gérer les requêtes OPTIONS (preflight)
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     const { q, limit = 20, language = 'fr' } = req.query;
     
     // Clés API multiples (à configurer dans les variables d'environnement Vercel)
