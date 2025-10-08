@@ -6,54 +6,10 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/seeking-alpha",
-      "dest": "/public/seeking-alpha/index.html"
-    },
-    {
-      "src": "/stocksandnews",
-      "dest": "/public/stocksandnews.html"
-    },
-    {
-      "src": "/beta-combined-dashboard",
-      "dest": "/public/beta-combined-dashboard.html"
-    },
-    {
-      "src": "/financial-dashboard",
-      "dest": "/public/financial-dashboard.html"
-    },
-    {
-      "src": "/emma-demo",
-      "dest": "/public/emma-demo.html"
-    },
-    {
-      "src": "/emma-test",
-      "dest": "/public/emma-test.html"
-    },
-    {
-      "src": "/emma-quick-start",
-      "dest": "/public/emma-quick-start.html"
-    },
-    {
-      "src": "/diagnostic",
-      "dest": "/public/diagnostic.html"
-    },
-    {
-      "src": "/404",
-      "dest": "/public/404.html"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "functions": {
