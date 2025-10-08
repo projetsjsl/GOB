@@ -1,5 +1,15 @@
 // API Finnhub améliorée pour les données financières
 export default async function handler(req, res) {
+    // Headers CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Gérer les requêtes OPTIONS (preflight)
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     const { endpoint, symbol, limit = 10 } = req.query;
     
     // Clé API Finnhub (à configurer dans les variables d'environnement Vercel)
