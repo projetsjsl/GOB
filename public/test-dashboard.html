@@ -348,7 +348,7 @@
             
             for (const ticker of testTickers) {
                 try {
-                    const response = await fetch(`/api/finnhub?endpoint=quote&symbol=${ticker}`);
+                    const response = await fetch(`/api/unified?action=finnhub&endpoint=quote&symbol=${ticker}`);
                     if (response.ok) {
                         const data = await response.json();
                         if (data && typeof data.c === 'number') {
@@ -378,7 +378,7 @@
             addTestResult('data', 'Test Actualités', 'info', 'Test des actualités...');
             
             try {
-                const response = await fetch('/api/news?tickers=AAPL,MSFT');
+                const response = await fetch('/api/unified?action=news&q=AAPL%20OR%20MSFT');
                 if (response.ok) {
                     const data = await response.json();
                     if (data.articles && Array.isArray(data.articles)) {

@@ -30,7 +30,7 @@ class EmmaGeminiService {
   async getVercelApiKey() {
     try {
       // Appeler une API route qui retourne la clé (sécurisé côté serveur)
-      const response = await fetch('/api/gemini-key');
+      const response = await fetch('/api/unified?action=gemini_key');
       if (response.ok) {
         const data = await response.json();
         return data.apiKey || '';
