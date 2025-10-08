@@ -2570,11 +2570,11 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 (recommendation[0].buy + recommendation[0].strongBuy > recommendation[0].sell + recommendation[0].strongSell ? 'Achat' : 
                                                  recommendation[0].sell + recommendation[0].strongSell > recommendation[0].buy + recommendation[0].strongBuy ? 'Vente' : 'Neutre') : 'N/A';
                                             
-                                            // Actualité la plus récente pour ce ticker
-                                            const latestNews = newsData.find(article => {
+                                            // 3 actualités les plus récentes pour ce ticker
+                                            const tickerNews = newsData.filter(article => {
                                                 const text = (article.title + ' ' + article.description).toLowerCase();
                                                 return text.includes(ticker.toLowerCase());
-                                            });
+                                            }).slice(0, 3);
                                             
                                             // Analyse du sentiment
                                             const analyzeSentiment = (title, description) => {
@@ -2590,7 +2590,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 return { sentiment: 'Neutre', color: 'text-gray-400' };
                                             };
                                             
-                                            const sentiment = latestNews ? analyzeSentiment(latestNews.title, latestNews.description) : { sentiment: 'N/A', color: 'text-gray-400' };
+                                            const sentiment = tickerNews.length > 0 ? analyzeSentiment(tickerNews[0].title, tickerNews[0].description) : { sentiment: 'N/A', color: 'text-gray-400' };
                                             
                                             return (
                                                 <React.Fragment key={ticker}>
@@ -2648,9 +2648,9 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                         </td>
                                                     </tr>
                                                     
-                                                    {/* Ligne d'actualité */}
-                                                    {latestNews && (
-                                                        <tr className={`border-b transition-colors duration-300 ${
+                                                    {/* Lignes d'actualités (3 maximum) */}
+                                                    {tickerNews.map((news, newsIndex) => (
+                                                        <tr key={`${ticker}-news-${newsIndex}`} className={`border-b transition-colors duration-300 ${
                                                             isDarkMode ? 'border-gray-700 bg-gray-800/30' : 'border-gray-200 bg-gray-50/50'
                                                         }`}>
                                                             <td colSpan="9" className="py-3">
@@ -2663,9 +2663,9 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                                             <h5 className={`font-medium mb-1 transition-colors duration-300 ${
                                                                                 isDarkMode ? 'text-white' : 'text-gray-900'
                                                                             }`}>
-                                                                                {latestNews.url ? (
+                                                                                {news.url ? (
                                                                                     <a 
-                                                                                        href={latestNews.url} 
+                                                                                        href={news.url} 
                                                                                         target="_blank" 
                                                                                         rel="noopener noreferrer"
                                                                                         className={`hover:underline transition-colors duration-300 ${
@@ -2674,33 +2674,33 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                                                                 : 'text-blue-600 hover:text-blue-700'
                                                                                         }`}
                                                                                     >
-                                                                                        {cleanText(latestNews.title)}
+                                                                                        {cleanText(news.title)}
                                                                                     </a>
                                                                                 ) : (
-                                                                                    cleanText(latestNews.title)
+                                                                                    cleanText(news.title)
                                                                                 )}
                                                                             </h5>
                                                                             <p className={`text-xs mb-2 transition-colors duration-300 ${
                                                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                                                             }`}>
-                                                                                {cleanText(latestNews.description)}
+                                                                                {cleanText(news.description)}
                                                                             </p>
                                                                             <div className={`flex items-center gap-2 text-xs transition-colors duration-300 ${
                                                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                                                             }`}>
-                                                                                <span>{latestNews.source?.name || 'Source inconnue'}</span>
+                                                                                <span>{news.source?.name || 'Source inconnue'}</span>
                                                                                 <span>•</span>
                                                                                 <span>
-                                                                                    {latestNews.publishedAt ? 
-                                                                                        new Date(latestNews.publishedAt).toLocaleString('fr-FR') : 
+                                                                                    {news.publishedAt ? 
+                                                                                        new Date(news.publishedAt).toLocaleString('fr-FR') : 
                                                                                         'Date inconnue'
                                                                                     }
                                                                                 </span>
-                                                                                {latestNews.url && (
+                                                                                {news.url && (
                                                                                     <>
                                                                                         <span>•</span>
                                                                                         <a 
-                                                                                            href={latestNews.url} 
+                                                                                            href={news.url} 
                                                                                             target="_blank" 
                                                                                             rel="noopener noreferrer"
                                                                                             className={`hover:underline transition-colors duration-300 ${
@@ -2719,7 +2719,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                                 </div>
                                                             </td>
                                                         </tr>
-                                                    )}
+                                                    ))}
                                                 </React.Fragment>
                                             );
                                         })}
