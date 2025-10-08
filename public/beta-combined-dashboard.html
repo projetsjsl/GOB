@@ -13,6 +13,9 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Styles Emma -->
+    <link rel="stylesheet" href="emma-styles.css">
     <style>
         * {
             font-family: 'Inter', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -3362,7 +3365,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                             : 'bg-gray-800/10 border-gray-800/20'
                                     }`}>
                                         <img 
-                                            src={isDarkMode ? "/logojslaidark.jpg" : "/logojslailight.png"} 
+                                            src={isDarkMode ? "/logojslaidark.jpg" : "/logojslailight.jpg"} 
                                             alt="JSL AI Logo" 
                                             className="w-8 h-8 object-contain"
                                         />
@@ -3466,6 +3469,17 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
         };
 
         ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+    </script>
+    
+    <!-- Scripts Emma -->
+    <script type="module">
+        // Import des modules Emma
+        import { emmaDashboard } from './emma-dashboard-integration.js';
+        
+        // Initialiser Emma après le rendu du dashboard
+        setTimeout(() => {
+            emmaDashboard.initialize();
+        }, 1000);
     </script>
 </body>
 </html>

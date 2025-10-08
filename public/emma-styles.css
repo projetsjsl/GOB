@@ -1,0 +1,743 @@
+/* ========================================
+   STYLES EMMA POUR LE DASHBOARD
+   ======================================== */
+
+.emma-chat-container {
+  display: flex;
+  height: 100%;
+  min-height: 600px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar gauche */
+.emma-sidebar {
+  width: 25%;
+  min-width: 280px;
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.emma-profile-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.emma-profile-icon {
+  width: 48px;
+  height: 48px;
+  background: #6366f1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.emma-profile-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.emma-profile-info p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+/* Spécialités */
+.emma-specialties-section h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+}
+
+.emma-specialties-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.emma-tag {
+  padding: 6px 12px;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emma-tag:hover {
+  background: #c7d2fe;
+}
+
+.emma-tag.active {
+  background: #6366f1;
+  color: white;
+}
+
+/* Personnalisation */
+.emma-personalization-section {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.emma-personalization-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.emma-personalization-header span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.hide-text {
+  font-size: 12px;
+  color: #64748b;
+  margin-left: auto;
+}
+
+.emma-personalization-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emma-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emma-option-bullet {
+  width: 8px;
+  height: 8px;
+  background: #6366f1;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.emma-option span {
+  font-size: 14px;
+  color: #374151;
+  min-width: 80px;
+}
+
+.emma-select {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+}
+
+/* Sources fiables */
+.emma-sources-section {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.emma-sources-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.emma-sources-header span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.emma-sources-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.emma-source-item {
+  padding: 8px 12px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #475569;
+}
+
+/* Zone de chat principale */
+.emma-main-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.emma-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
+}
+
+.emma-back-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.emma-back-button:hover {
+  background: #e2e8f0;
+  color: #374151;
+}
+
+.emma-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.emma-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.emma-title {
+  flex: 1;
+}
+
+.emma-title h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.emma-title p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+.emma-send-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emma-send-button:hover {
+  background: #059669;
+}
+
+/* Zone de messages */
+.emma-messages-container {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+
+.emma-welcome-message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.emma-message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.emma-message-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.emma-message-content {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-width: 80%;
+}
+
+.emma-message-content p {
+  margin: 0 0 12px 0;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.emma-reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+.emma-reminder span {
+  font-size: 14px;
+  color: #dc2626;
+  line-height: 1.4;
+}
+
+/* Zone de saisie */
+.emma-input-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e2e8f0;
+  background: white;
+}
+
+.emma-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.emma-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.emma-send-input {
+  width: 44px;
+  height: 44px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emma-send-input:hover {
+  background: #4f46e5;
+}
+
+/* Éditeur de prompt */
+.emma-prompt-editor {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.emma-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.emma-editor-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.emma-editor-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.emma-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emma-btn-primary {
+  background: #6366f1;
+  color: white;
+}
+
+.emma-btn-primary:hover {
+  background: #4f46e5;
+}
+
+.emma-btn-secondary {
+  background: #f1f5f9;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.emma-btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+.emma-btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.emma-btn-danger:hover {
+  background: #dc2626;
+}
+
+.emma-prompt-textarea {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.emma-prompt-textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.emma-editor-info {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.emma-editor-info p {
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  color: #374151;
+}
+
+.emma-editor-info ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.emma-editor-info li {
+  margin: 4px 0;
+  color: #64748b;
+}
+
+.emma-editor-info code {
+  background: #e2e8f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+}
+
+/* Configuration Gemini */
+.emma-gemini-config {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.emma-config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.emma-config-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.emma-connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emma-status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.emma-connection-status.connected .emma-status-indicator {
+  background: #10b981;
+}
+
+.emma-status-text {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.emma-api-key-section {
+  margin-bottom: 24px;
+}
+
+.emma-api-key-section label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.emma-api-key-input {
+  display: flex;
+  gap: 8px;
+}
+
+.emma-api-key-input .emma-input {
+  flex: 1;
+}
+
+.emma-config-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.emma-config-info {
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.emma-config-info p {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  color: #374151;
+}
+
+.emma-config-info ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.emma-config-info li {
+  margin: 4px 0;
+  color: #64748b;
+}
+
+.emma-config-info a {
+  color: #6366f1;
+  text-decoration: none;
+}
+
+.emma-config-info a:hover {
+  text-decoration: underline;
+}
+
+/* Messages de chat */
+.emma-message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.emma-message.user {
+  flex-direction: row-reverse;
+}
+
+.emma-message-content {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.emma-message.emma .emma-message-content {
+  background: white;
+  color: #374151;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.emma-message.user .emma-message-content {
+  background: #6366f1;
+  color: white;
+}
+
+.emma-message.error .emma-message-content {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.emma-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-width: 80px;
+}
+
+.emma-typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.emma-typing-dot {
+  width: 8px;
+  height: 8px;
+  background: #9ca3af;
+  border-radius: 50%;
+  animation: emma-typing 1.4s infinite ease-in-out;
+}
+
+.emma-typing-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.emma-typing-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes emma-typing {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .emma-chat-container {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .emma-sidebar {
+    width: 100%;
+    min-width: auto;
+    order: 2;
+  }
+  
+  .emma-main-chat {
+    order: 1;
+    min-height: 400px;
+  }
+  
+  .emma-specialties-tags {
+    justify-content: center;
+  }
+  
+  .emma-personalization-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .emma-option {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 120px;
+  }
+  
+  .emma-option span {
+    min-width: auto;
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .emma-sidebar {
+    padding: 16px;
+  }
+  
+  .emma-chat-header {
+    padding: 16px;
+  }
+  
+  .emma-messages-container {
+    padding: 16px;
+  }
+  
+  .emma-input-container {
+    padding: 16px;
+  }
+  
+  .emma-title h2 {
+    font-size: 18px;
+  }
+  
+  .emma-send-button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}

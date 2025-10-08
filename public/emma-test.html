@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Emma - Assistante Financière</title>
+    <link rel="stylesheet" href="emma-styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-header h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .test-header p {
+            color: #64748b;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .test-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .test-btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+        .test-btn-primary:hover {
+            background: #4f46e5;
+        }
+        .test-btn-secondary {
+            background: #f1f5f9;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .test-btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .test-status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .test-status.success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        .test-status.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .test-status.info {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🧪 Test Emma - Assistante Financière</h1>
+            <p>Page de test pour vérifier le fonctionnement d'Emma</p>
+        </div>
+
+        <div class="test-controls">
+            <button class="test-btn test-btn-primary" onclick="testEmmaInterface()">
+                🎨 Tester l'Interface
+            </button>
+            <button class="test-btn test-btn-secondary" onclick="testGeminiConnection()">
+                🔗 Tester Gemini
+            </button>
+            <button class="test-btn test-btn-secondary" onclick="testPromptEditor()">
+                📝 Tester l'Éditeur
+            </button>
+            <button class="test-btn test-btn-secondary" onclick="clearTestResults()">
+                🗑️ Effacer
+            </button>
+        </div>
+
+        <div id="test-status" class="test-status info">
+            Prêt pour les tests - Cliquez sur un bouton pour commencer
+        </div>
+
+        <div id="emma-test-container">
+            <!-- L'interface Emma sera injectée ici -->
+        </div>
+    </div>
+
+    <script type="module">
+        // Import des modules Emma
+        import { EmmaChatInterface, EmmaPromptEditor, EmmaGeminiConfig } from './emma-ui-components.js';
+        import { emmaGeminiService } from './emma-gemini-service.js';
+        import { getFinancialProfile, updateFinancialPrompt, loadFinancialPrompt, resetFinancialPrompt } from './emma-financial-profile.js';
+
+        // Variables globales pour les tests
+        window.testResults = [];
+        window.currentTest = null;
+
+        // Fonction pour afficher le statut
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('test-status');
+            statusDiv.className = `test-status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        // Fonction pour ajouter un résultat de test
+        function addTestResult(test, result, details = '') {
+            window.testResults.push({
+                test: test,
+                result: result,
+                details: details,
+                timestamp: new Date().toLocaleTimeString('fr-FR')
+            });
+            console.log(`[${result ? '✅' : '❌'}] ${test}: ${details}`);
+        }
+
+        // Test de l'interface Emma
+        window.testEmmaInterface = async function() {
+            showStatus('Test de l\'interface Emma en cours...', 'info');
+            
+            try {
+                // Charger le profil financier
+                const profile = getFinancialProfile();
+                addTestResult('Chargement du profil', true, `Profil chargé: ${profile.name}`);
+
+                // Injecter l'interface
+                const container = document.getElementById('emma-test-container');
+                container.innerHTML = EmmaChatInterface();
+                addTestResult('Injection de l\'interface', true, 'Interface Emma injectée');
+
+                // Attacher les événements de test
+                attachTestEvents();
+
+                showStatus('✅ Interface Emma testée avec succès !', 'success');
+                addTestResult('Test complet de l\'interface', true, 'Tous les composants chargés');
+
+            } catch (error) {
+                showStatus(`❌ Erreur lors du test de l'interface: ${error.message}`, 'error');
+                addTestResult('Test de l\'interface', false, error.message);
+            }
+        };
+
+        // Test de la connexion Gemini
+        window.testGeminiConnection = async function() {
+            showStatus('Test de la connexion Gemini en cours...', 'info');
+            
+            try {
+                // Vérifier le statut actuel
+                const status = emmaGeminiService.getConnectionStatus();
+                addTestResult('Statut Gemini', true, `API Key: ${status.hasApiKey ? 'Présente' : 'Absente'}, Connecté: ${status.isConnected ? 'Oui' : 'Non'}`);
+
+                if (status.hasApiKey) {
+                    // Tester la connexion
+                    await emmaGeminiService.testConnection();
+                    addTestResult('Test de connexion Gemini', true, 'Connexion réussie');
+                    showStatus('✅ Connexion Gemini réussie !', 'success');
+                } else {
+                    addTestResult('Test de connexion Gemini', false, 'Aucune clé API configurée');
+                    showStatus('⚠️ Aucune clé API Gemini configurée. Configurez-la d\'abord.', 'error');
+                }
+
+            } catch (error) {
+                showStatus(`❌ Erreur de connexion Gemini: ${error.message}`, 'error');
+                addTestResult('Test de connexion Gemini', false, error.message);
+            }
+        };
+
+        // Test de l'éditeur de prompt
+        window.testPromptEditor = async function() {
+            showStatus('Test de l\'éditeur de prompt en cours...', 'info');
+            
+            try {
+                // Charger le prompt actuel
+                const profile = getFinancialProfile();
+                addTestResult('Chargement du prompt', true, `Prompt chargé (${profile.prompt.length} caractères)`);
+
+                // Injecter l'éditeur
+                const container = document.getElementById('emma-test-container');
+                container.innerHTML = EmmaPromptEditor();
+                addTestResult('Injection de l\'éditeur', true, 'Éditeur de prompt injecté');
+
+                // Remplir le textarea
+                const textarea = document.getElementById('emma-prompt-textarea');
+                if (textarea) {
+                    textarea.value = profile.prompt;
+                    addTestResult('Remplissage du textarea', true, 'Prompt chargé dans l\'éditeur');
+                }
+
+                // Attacher les événements de test
+                attachPromptEditorEvents();
+
+                showStatus('✅ Éditeur de prompt testé avec succès !', 'success');
+                addTestResult('Test complet de l\'éditeur', true, 'Éditeur fonctionnel');
+
+            } catch (error) {
+                showStatus(`❌ Erreur lors du test de l'éditeur: ${error.message}`, 'error');
+                addTestResult('Test de l\'éditeur', false, error.message);
+            }
+        };
+
+        // Effacer les résultats de test
+        window.clearTestResults = function() {
+            window.testResults = [];
+            document.getElementById('emma-test-container').innerHTML = '';
+            showStatus('Résultats effacés - Prêt pour de nouveaux tests', 'info');
+        };
+
+        // Attacher les événements de test pour l'interface
+        function attachTestEvents() {
+            // Test d'envoi de message
+            const sendButton = document.getElementById('emma-send-input');
+            const inputField = document.querySelector('.emma-input');
+            
+            if (sendButton && inputField) {
+                sendButton.addEventListener('click', () => {
+                    const message = inputField.value.trim();
+                    if (message) {
+                        addTestResult('Envoi de message', true, `Message envoyé: "${message}"`);
+                        // Simuler une réponse
+                        setTimeout(() => {
+                            addTestResult('Réception de réponse', true, 'Réponse simulée reçue');
+                        }, 1000);
+                    }
+                });
+            }
+
+            // Test des boutons de contrôle
+            const clearButton = document.getElementById('emma-clear-chat');
+            if (clearButton) {
+                clearButton.addEventListener('click', () => {
+                    addTestResult('Effacement du chat', true, 'Chat effacé');
+                });
+            }
+        }
+
+        // Attacher les événements de test pour l'éditeur
+        function attachPromptEditorEvents() {
+            const saveButton = document.getElementById('emma-save-prompt');
+            const resetButton = document.getElementById('emma-reset-prompt');
+            const textarea = document.getElementById('emma-prompt-textarea');
+
+            if (saveButton) {
+                saveButton.addEventListener('click', () => {
+                    const newPrompt = textarea.value.trim();
+                    updateFinancialPrompt(newPrompt);
+                    addTestResult('Sauvegarde du prompt', true, `Prompt sauvegardé (${newPrompt.length} caractères)`);
+                });
+            }
+
+            if (resetButton) {
+                resetButton.addEventListener('click', () => {
+                    resetFinancialPrompt();
+                    textarea.value = getFinancialProfile().prompt;
+                    addTestResult('Réinitialisation du prompt', true, 'Prompt réinitialisé');
+                });
+            }
+        }
+
+        // Test automatique au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatus('Page de test chargée - Prêt pour les tests', 'success');
+            addTestResult('Chargement de la page', true, 'Page de test initialisée');
+        });
+
+        // Afficher les résultats dans la console
+        setInterval(() => {
+            if (window.testResults.length > 0) {
+                console.table(window.testResults);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
