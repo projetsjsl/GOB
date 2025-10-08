@@ -1,6 +1,30 @@
 {
   "tickers": [
+    "GOOGL",
+    "T",
+    "BNS",
+    "TD",
+    "BCE",
+    "CNR",
+    "CSCO",
     "CVS",
-    "MSFT"
+    "DEO",
+    "MDT",
+    "JNJ",
+    "JPM",
+    "LVMHF",
+    "MG",
+    "MFC",
+    "MU",
+    "NSRGY",
+    "NKE",
+    "NTR",
+    "PFE",
+    "TRP",
+    "T",
+    "UNH",
+    "UL",
+    "VZ",
+    "WFC"
   ]
 }

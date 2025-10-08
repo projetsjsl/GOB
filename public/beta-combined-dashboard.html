@@ -114,7 +114,7 @@
         const BetaCombinedDashboard = () => {
             // États principaux
             const [activeTab, setActiveTab] = useState('ask-emma');
-            const [tickers, setTickers] = useState(['CVS', 'MSFT']);
+            const [tickers, setTickers] = useState(['GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT', 'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE', 'TRP', 'T', 'UNH', 'UL', 'VZ', 'WFC']);
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
             const [seekingAlphaData, setSeekingAlphaData] = useState({});
@@ -192,10 +192,38 @@
                     
                     // Fallback vers des logos par défaut
                     const defaultLogos = {
-                        'CVS': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CVS.svg',
-                        'MSFT': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MSFT.svg',
-                        'AAPL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AAPL.svg',
+                        // Tickers US
                         'GOOGL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/GOOGL.svg',
+                        'T': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/T.svg',
+                        'CSCO': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CSCO.svg',
+                        'CVS': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CVS.svg',
+                        'DEO': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/DEO.svg',
+                        'MDT': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MDT.svg',
+                        'JNJ': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/JNJ.svg',
+                        'JPM': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/JPM.svg',
+                        'LVMHF': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/LVMHF.svg',
+                        'MU': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MU.svg',
+                        'NSRGY': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NSRGY.svg',
+                        'NKE': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NKE.svg',
+                        'PFE': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/PFE.svg',
+                        'UNH': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/UNH.svg',
+                        'UL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/UL.svg',
+                        'VZ': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/VZ.svg',
+                        'WFC': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/WFC.svg',
+                        
+                        // Tickers TSX (Canada)
+                        'BNS': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/BNS.svg',
+                        'TD': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/TD.svg',
+                        'BCE': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/BCE.svg',
+                        'CNR': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/CNR.svg',
+                        'MG': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MG.svg',
+                        'MFC': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MFC.svg',
+                        'NTR': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NTR.svg',
+                        'TRP': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/TRP.svg',
+                        
+                        // Autres tickers populaires
+                        'AAPL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AAPL.svg',
+                        'MSFT': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/MSFT.svg',
                         'AMZN': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/AMZN.svg',
                         'TSLA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/TSLA.svg',
                         'NVDA': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/NVDA.svg',
@@ -417,6 +445,89 @@
                     }
                 } catch (error) {
                     status.seekingAlpha = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test Gemini API
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch('/api/gemini-key');
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        status.gemini = {
+                            status: data.apiKey ? 'success' : 'warning',
+                            responseTime,
+                            error: data.apiKey ? null : 'Clé API non configurée'
+                        };
+                    } else {
+                        status.gemini = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.gemini = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test GitHub API (si token configuré)
+                if (githubToken) {
+                    try {
+                        const startTime = Date.now();
+                        const response = await fetch('https://api.github.com/user', {
+                            headers: {
+                                'Authorization': `token ${githubToken}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        });
+                        const responseTime = Date.now() - startTime;
+                        
+                        if (response.ok) {
+                            status.github = { status: 'success', responseTime, error: null };
+                        } else {
+                            status.github = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                        }
+                    } catch (error) {
+                        status.github = { status: 'error', responseTime: 0, error: error.message };
+                    }
+                } else {
+                    status.github = { status: 'warning', responseTime: 0, error: 'Token GitHub non configuré' };
+                }
+
+                // Test Claude API (si configuré)
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(`${API_BASE_URL}/api/claude`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: 'Test de connexion', ticker: 'TEST' })
+                    });
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        status.claude = { status: 'success', responseTime, error: null };
+                    } else {
+                        status.claude = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.claude = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test Vercel API Routes
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch('/api/test-gemini');
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        status.vercel = {
+                            status: data.status === 'success' ? 'success' : 'warning',
+                            responseTime,
+                            error: data.status === 'success' ? null : data.message
+                        };
+                    } else {
+                        status.vercel = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.vercel = { status: 'error', responseTime: 0, error: error.message };
                 }
 
                 setApiStatus(status);
@@ -929,14 +1040,25 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 }
             };
 
-            // Composant onglet Scrapping SA
-            const ScrappingSATab = () => (
+            // Composant onglet Admin-JSLAI
+            const AdminJSLaiTab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Scrapping SA</h2>
-                        <div className="flex gap-2">
+                        }`}>⚙️ Admin-JSLAI</h2>
+                    </div>
+
+                    {/* Section Administration des Stocks */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-900 border-gray-700' 
+                            : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>📊 Gestion des Stocks</h3>
+                        <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={refreshAllStocks}
                                 disabled={loading}
@@ -950,6 +1072,19 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             >
                                 Actualiser News
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Section Scraping Seeking Alpha */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-900 border-gray-700' 
+                            : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🔧 Scraping Seeking Alpha</h3>
+                        <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={runSeekingAlphaScraper}
                                 disabled={scrapingStatus === 'running'}
@@ -999,6 +1134,404 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             >
                                 🤖 Analyser avec Claude
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Section Logs de Scraping */}
+                    {scrapingLogs.length > 0 && (
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-gray-900 border-gray-700' 
+                                : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📋 Logs de Scraping</h3>
+                            <div className={`max-h-64 overflow-y-auto space-y-2 ${
+                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                            } rounded-lg p-4`}>
+                                {scrapingLogs.map((log, index) => (
+                                    <div key={index} className={`text-sm p-2 rounded ${
+                                        log.type === 'error' ? 'bg-red-100 text-red-800' :
+                                        log.type === 'success' ? 'bg-green-100 text-green-800' :
+                                        log.type === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                                        'bg-blue-100 text-blue-800'
+                                    }`}>
+                                        <span className="font-mono text-xs opacity-70">
+                                            {new Date(log.timestamp).toLocaleTimeString()}
+                                        </span>
+                                        <span className="ml-2">{log.message}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Section État des Connexions */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-900 border-gray-700' 
+                            : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🔗 État des Connexions</h3>
+                        <div className="space-y-3">
+                            {Object.entries(apiStatus).map(([api, status]) => (
+                                <div key={api} className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                                }`}>
+                                    <span className={`font-mono capitalize transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>{api}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`w-3 h-3 rounded-full ${
+                                            status.status === 'success' ? 'bg-green-500' :
+                                            status.status === 'warning' ? 'bg-yellow-500' :
+                                            status.status === 'error' ? 'bg-red-500' : 'bg-gray-500'
+                                        }`}></span>
+                                        <span className={`text-sm transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        }`}>
+                                            {status.responseTime}ms
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex gap-2 mt-4">
+                            <button
+                                onClick={checkApiStatus}
+                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                            >
+                                🔄 Vérifier
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Section Configuration */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-900 border-gray-700' 
+                            : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>⚙️ Configuration</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    Token GitHub (pour les mises à jour)
+                                </label>
+                                <input
+                                    type="password"
+                                    value={githubToken}
+                                    onChange={(e) => setGithubToken(e.target.value)}
+                                    placeholder="Entrez votre token GitHub"
+                                    className={`w-full px-3 py-2 rounded-lg border transition-colors duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                />
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setShowSettings(!showSettings)}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    {showSettings ? 'Masquer' : 'Afficher'} les paramètres
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Composant onglet Dan's Watchlist
+            const DansWatchlistTab = () => {
+                const [watchlistTickers, setWatchlistTickers] = useState([]);
+                const [newTicker, setNewTicker] = useState('');
+                const [watchlistStockData, setWatchlistStockData] = useState({});
+                const [watchlistLoading, setWatchlistLoading] = useState(false);
+
+                // Charger la watchlist depuis localStorage
+                useEffect(() => {
+                    const savedWatchlist = localStorage.getItem('dans-watchlist');
+                    if (savedWatchlist) {
+                        const tickers = JSON.parse(savedWatchlist);
+                        setWatchlistTickers(tickers);
+                        loadWatchlistData(tickers);
+                    }
+                }, []);
+
+                // Charger les données pour les tickers de la watchlist
+                const loadWatchlistData = async (tickers) => {
+                    if (tickers.length === 0) return;
+                    
+                    setWatchlistLoading(true);
+                    const newData = {};
+                    
+                    for (const ticker of tickers) {
+                        try {
+                            const data = await fetchStockData(ticker);
+                            if (data && !data.message) {
+                                newData[ticker] = {
+                                    ...data,
+                                    timestamp: new Date().toISOString()
+                                };
+                            }
+                        } catch (error) {
+                            console.error(`Erreur pour ${ticker}:`, error);
+                        }
+                    }
+                    
+                    setWatchlistStockData(newData);
+                    setWatchlistLoading(false);
+                };
+
+                // Ajouter un ticker à la watchlist
+                const addTickerToWatchlist = () => {
+                    if (!newTicker.trim()) return;
+                    
+                    const ticker = newTicker.trim().toUpperCase();
+                    if (watchlistTickers.includes(ticker)) {
+                        showMessage('Ce ticker est déjà dans la watchlist', 'warning');
+                        return;
+                    }
+                    
+                    const updatedTickers = [...watchlistTickers, ticker];
+                    setWatchlistTickers(updatedTickers);
+                    localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
+                    setNewTicker('');
+                    
+                    // Charger les données pour le nouveau ticker
+                    loadWatchlistData([ticker]);
+                    showMessage(`${ticker} ajouté à la watchlist`, 'success');
+                };
+
+                // Supprimer un ticker de la watchlist
+                const removeTickerFromWatchlist = (ticker) => {
+                    const updatedTickers = watchlistTickers.filter(t => t !== ticker);
+                    setWatchlistTickers(updatedTickers);
+                    localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
+                    
+                    // Supprimer les données du ticker
+                    setWatchlistStockData(prev => {
+                        const newData = { ...prev };
+                        delete newData[ticker];
+                        return newData;
+                    });
+                    
+                    showMessage(`${ticker} supprimé de la watchlist`, 'success');
+                };
+
+                // Actualiser les données de la watchlist
+                const refreshWatchlist = async () => {
+                    await loadWatchlistData(watchlistTickers);
+                    showMessage('Watchlist actualisée', 'success');
+                };
+
+                return (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>👀 Dan's Watchlist</h2>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={refreshWatchlist}
+                                    disabled={watchlistLoading || watchlistTickers.length === 0}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {watchlistLoading ? 'Actualisation...' : '🔄 Actualiser'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Section d'ajout de ticker */}
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-gray-900 border-gray-700' 
+                                : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>➕ Ajouter un Ticker</h3>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newTicker}
+                                    onChange={(e) => setNewTicker(e.target.value)}
+                                    placeholder="Ex: AAPL, TSLA, GOOGL..."
+                                    className={`flex-1 px-3 py-2 rounded-lg border transition-colors duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                    onKeyPress={(e) => e.key === 'Enter' && addTickerToWatchlist()}
+                                />
+                                <button
+                                    onClick={addTickerToWatchlist}
+                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                >
+                                    ➕ Ajouter
+                                </button>
+                            </div>
+                            <p className={`text-sm mt-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                💡 Ces tickers ne seront visibles que dans cette watchlist personnalisée
+                            </p>
+                        </div>
+
+                        {/* Liste des tickers de la watchlist */}
+                        {watchlistTickers.length > 0 ? (
+                            <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                                isDarkMode 
+                                    ? 'bg-gray-900 border-gray-700' 
+                                    : 'bg-gray-50 border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📊 Tickers de la Watchlist ({watchlistTickers.length})
+                                </h3>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {watchlistTickers.map(ticker => {
+                                        const data = watchlistStockData[ticker];
+                                        const change = data?.dp ? (data.dp >= 0 ? '+' : '') + data.dp.toFixed(2) + '%' : 'N/A';
+                                        const changeColor = data?.dp >= 0 ? 'text-green-400' : 'text-red-400';
+                                        const changeBgColor = data?.dp >= 0 ? 'bg-green-500' : 'bg-red-500';
+                                        
+                                        return (
+                                            <div key={ticker} className={`rounded-lg p-4 border transition-colors duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-800 border-gray-600 hover:border-blue-400/50' 
+                                                    : 'bg-white border-gray-300 hover:border-blue-300'
+                                            }`}>
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <img 
+                                                            src={getCompanyLogo(ticker)} 
+                                                            alt={`${ticker} logo`}
+                                                            className="w-8 h-8 rounded"
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                            }}
+                                                        />
+                                                        <h4 className={`font-bold text-lg transition-colors duration-300 ${
+                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}>{ticker}</h4>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeTickerFromWatchlist(ticker)}
+                                                        className={`p-1 rounded transition-colors duration-300 ${
+                                                            isDarkMode 
+                                                                ? 'text-gray-400 hover:text-red-400 hover:bg-red-900/20' 
+                                                                : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+                                                        }`}
+                                                        title="Supprimer de la watchlist"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                                
+                                                {data ? (
+                                                    <>
+                                                        <div className={`rounded-lg p-3 mb-3 transition-colors duration-300 ${
+                                                            isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                                                        }`}>
+                                                            <div className={`text-2xl font-bold mb-1 transition-colors duration-300 ${
+                                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                                            }`}>
+                                                                ${data.c?.toFixed(2) || 'N/A'}
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className={`w-3 h-3 ${changeBgColor} rounded`}></div>
+                                                                <span className={`text-sm font-medium ${changeColor}`}>
+                                                                    {change}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="space-y-2 text-sm">
+                                                            <div className="flex justify-between">
+                                                                <span className={`transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                                }`}>Volume:</span>
+                                                                <span className={`transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                }`}>{data.v?.toLocaleString() || 'N/A'}</span>
+                                                            </div>
+                                                            <div className="flex justify-between">
+                                                                <span className={`transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                                }`}>High:</span>
+                                                                <span className={`transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                }`}>${data.h?.toFixed(2) || 'N/A'}</span>
+                                                            </div>
+                                                            <div className="flex justify-between">
+                                                                <span className={`transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                                }`}>Low:</span>
+                                                                <span className={`transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                }`}>${data.l?.toFixed(2) || 'N/A'}</span>
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <div className={`text-center py-4 transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    }`}>
+                                                        <div className="animate-spin w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full mx-auto mb-2"></div>
+                                                        <span className="text-sm">Chargement...</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={`backdrop-blur-sm rounded-lg p-8 border transition-colors duration-300 ${
+                                isDarkMode 
+                                    ? 'bg-gray-900 border-gray-700' 
+                                    : 'bg-gray-50 border-gray-200'
+                            } text-center`}>
+                                <div className="text-6xl mb-4">👀</div>
+                                <h3 className={`text-xl font-semibold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>Watchlist Vide</h3>
+                                <p className={`transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Ajoutez des tickers pour commencer à suivre vos investissements personnalisés
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            // Composant onglet Scrapping SA (simplifié)
+            const ScrappingSATab = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🔧 Scrapping SA</h2>
+                        <div className="flex gap-2">
+                            <span className={`text-sm transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                Outils d'administration déplacés vers l'onglet Admin-JSLAI
+                            </span>
                         </div>
                     </div>
 
@@ -2366,10 +2899,42 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         setEmmaMessages(prev => [...prev, emmaResponse]);
                     } catch (error) {
                         console.error('Erreur Gemini:', error);
+                        // Analyser le type d'erreur pour un message plus précis
+                        let errorContent = '';
+                        if (error.message.includes('404')) {
+                            errorContent = `🔧 Problème de configuration détecté ! L'API route n'est pas accessible (erreur 404). 
+
+**Solutions possibles :**
+1. Vérifiez que le déploiement Vercel est à jour
+2. Assurez-vous que la variable GEMINI_API_KEY est bien configurée dans Vercel
+3. Redéployez votre application si nécessaire
+
+**Diagnostic :** ${error.message}`;
+                        } else if (error.message.includes('Clé API Gemini non configurée')) {
+                            errorContent = `🔑 Clé API Gemini manquante !
+
+**Configuration requise :**
+1. Allez dans votre dashboard Vercel
+2. Section "Settings" → "Environment Variables"
+3. Ajoutez : GEMINI_API_KEY = votre_clé_api
+4. Redéployez l'application
+
+**Diagnostic :** ${error.message}`;
+                        } else {
+                            errorContent = `❌ Erreur de connexion à l'API Gemini.
+
+**Diagnostic :** ${error.message}
+
+**Solutions :**
+- Vérifiez votre connexion internet
+- Vérifiez la configuration de la clé API
+- Consultez la console pour plus de détails`;
+                        }
+
                         const errorMessage = {
                             id: Date.now() + 1,
                             type: 'error',
-                            content: `Désolé, je ne peux pas répondre pour le moment. Erreur: ${error.message}. Vérifiez que la variable d'environnement GEMINI_API_KEY est configurée dans Vercel.`,
+                            content: errorContent,
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
                         setEmmaMessages(prev => [...prev, errorMessage]);
@@ -2381,21 +2946,60 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const generateGeminiResponse = async (userMessage) => {
                     try {
-                        // Récupérer la clé API
+                        // Récupérer la clé API avec diagnostic détaillé
                         let apiKey = '';
+                        let apiSource = '';
+                        let debugInfo = {};
+                        
                         try {
+                            console.log('🔍 Tentative de récupération de la clé API via /api/gemini-key...');
                             const response = await fetch('/api/gemini-key');
+                            console.log('📡 Réponse API route:', response.status, response.statusText);
+                            
                             if (response.ok) {
                                 const data = await response.json();
                                 apiKey = data.apiKey;
+                                apiSource = 'vercel-env';
+                                debugInfo = {
+                                    source: 'vercel-env',
+                                    status: response.status,
+                                    hasApiKey: !!apiKey
+                                };
+                                console.log('✅ Clé API récupérée depuis Vercel');
+                            } else {
+                                const errorData = await response.json().catch(() => ({}));
+                                debugInfo = {
+                                    source: 'vercel-env-failed',
+                                    status: response.status,
+                                    error: errorData
+                                };
+                                console.log('❌ Échec récupération depuis Vercel:', response.status, errorData);
                             }
                         } catch (error) {
-                            // Fallback vers localStorage
+                            debugInfo = {
+                                source: 'vercel-env-error',
+                                error: error.message
+                            };
+                            console.log('❌ Erreur réseau API route:', error.message);
+                        }
+
+                        // Fallback vers localStorage si Vercel échoue
+                        if (!apiKey) {
+                            console.log('🔄 Tentative de fallback vers localStorage...');
                             apiKey = localStorage.getItem('gemini-api-key') || '';
+                            if (apiKey) {
+                                apiSource = 'localStorage';
+                                debugInfo.fallback = 'localStorage';
+                                console.log('✅ Clé API récupérée depuis localStorage');
+                            } else {
+                                console.log('❌ Aucune clé API trouvée dans localStorage');
+                            }
                         }
 
                         if (!apiKey) {
-                            throw new Error('Clé API Gemini non configurée');
+                            const errorMsg = `Clé API Gemini non configurée. Diagnostic: ${JSON.stringify(debugInfo)}`;
+                            console.error('❌', errorMsg);
+                            throw new Error(errorMsg);
                         }
 
                         // Construire le prompt complet
@@ -2996,7 +3600,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📊 Stocks & News</h2>
+                        }`}>📊 Titres & nouvelles</h2>
                         <div className="flex gap-2">
                             <div className={`rounded-lg p-1 transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
@@ -3982,47 +4586,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 </div>
             );
 
-            // Composant Admin
-            const AdminPanel = () => (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
-                        <h3 className="text-lg font-bold mb-4">Panel d'Administration</h3>
-                        
-                        <div className="space-y-3">
-                            {Object.entries(apiStatus).map(([api, status]) => (
-                                <div key={api} className="flex items-center justify-between p-2 bg-gray-100 rounded">
-                                    <span className="font-mono capitalize">{api}</span>
-                                    <div className="flex items-center gap-2">
-                                        <span className={`w-3 h-3 rounded-full ${
-                                            status.status === 'success' ? 'bg-green-500' :
-                                            status.status === 'warning' ? 'bg-yellow-500' :
-                                            status.status === 'error' ? 'bg-red-500' : 'bg-gray-500'
-                                        }`}></span>
-                                        <span className="text-sm">
-                                            {status.responseTime}ms
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex gap-2 mt-4">
-                            <button
-                                onClick={checkApiStatus}
-                                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            >
-                                Vérifier
-                            </button>
-                            <button
-                                onClick={() => setShowAdmin(false)}
-                                className="flex-1 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                            >
-                                Fermer
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
 
             return (
                 <div className={`min-h-screen transition-colors duration-300 ${
@@ -4089,10 +4652,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="flex space-x-1">
                                 {[
-                                    { id: 'ask-emma', label: '🤖 Ask Emma', component: AskEmmaTab },
+                                    { id: 'ask-emma', label: '🤖 Emma IA', component: AskEmmaTab },
+                                    { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
+                                    { id: 'dans-watchlist', label: '👀 Dan\'s Watchlist', component: DansWatchlistTab },
                                     { id: 'scrapping-sa', label: '🔧 Scrapping SA', component: ScrappingSATab },
                                     { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab },
-                                    { id: 'stocks-news', label: '📊 Stocks & News', component: StocksNewsTab }
+                                    { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab }
                                 ].map(tab => (
                                     <button
                                         key={tab.id}
@@ -4110,16 +4675,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         {tab.label}
                                     </button>
                                 ))}
-                                <button
-                                    onClick={() => setShowAdmin(true)}
-                                    className={`ml-auto px-4 py-2 rounded transition-colors duration-300 ${
-                                        isDarkMode 
-                                            ? 'text-gray-300 hover:text-white hover:bg-gray-900' 
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                    }`}
-                                >
-                                    ⚙️ Admin
-                                </button>
                             </div>
                         </div>
                     </nav>
@@ -4127,6 +4682,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {/* Contenu principal */}
                     <main className="max-w-7xl mx-auto p-6">
                         {activeTab === 'ask-emma' && <AskEmmaTab />}
+                        {activeTab === 'admin-jsla' && <AdminJSLaiTab />}
+                        {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                         {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                         {activeTab === 'stocks-news' && <StocksNewsTab />}
@@ -4142,8 +4699,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     )}
 
-                    {/* Panel Admin */}
-                    {showAdmin && <AdminPanel />}
                 </div>
             );
         };
