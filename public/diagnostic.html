@@ -157,8 +157,8 @@
         async function checkAPIs() {
             const container = document.getElementById('apiCheck');
             const apis = [
-                { name: 'Finnhub Quote', url: '/api/finnhub?endpoint=quote&symbol=AAPL' },
-                { name: 'Status', url: '/api/status' }
+                { name: 'Finnhub Quote', url: '/api/unified?action=finnhub&endpoint=quote&symbol=AAPL' },
+                { name: 'Status', url: '/api/unified?action=status' }
             ];
             
             let html = '';

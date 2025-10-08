@@ -683,12 +683,14 @@ async function handleGithubToken(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { action, file, data } = req.body || {};
+    const { actionInner, action: actionBody, file, data } = req.body || {};
     const githubToken = process.env.GITHUB_TOKEN;
     if (!githubToken) {
       return res.status(500).json({ error: 'Token GitHub non configuré', message: "Configurez GITHUB_TOKEN" });
     }
-    switch (action) {
+    // supporte soit actionInner, soit action lorsque ce n'est pas la clé top-level 'github_token'
+    const subAction = actionInner || (actionBody && actionBody !== 'github_token' ? actionBody : undefined);
+    switch (subAction) {
       case 'update_file':
         return updateGitHubFile(githubToken, file, data, res);
       case 'get_file':

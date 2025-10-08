@@ -553,7 +553,7 @@
                 // Test Gemini API
                 try {
                     const startTime = Date.now();
-                    const response = await fetch('/api/gemini-key');
+                    const response = await fetch('/api/unified?action=gemini_key');
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {
@@ -573,7 +573,7 @@
                 // Test GitHub API (via variable d'environnement)
                 try {
                     const startTime = Date.now();
-                    const response = await fetch('/api/github-token');
+                    const response = await fetch('/api/unified?action=github_token');
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {
@@ -613,7 +613,7 @@
                 // Test Vercel API Routes (via gemini-key)
                 try {
                     const startTime = Date.now();
-                    const response = await fetch('/api/gemini-key');
+                    const response = await fetch('/api/unified?action=gemini_key');
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {
@@ -3398,7 +3398,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 const checkGeminiConnection = async () => {
                     try {
                         // Essayer de récupérer la clé API depuis Vercel
-                        const response = await fetch('/api/gemini-key');
+                        const response = await fetch('/api/unified?action=gemini_key');
                         if (response.ok) {
                             const data = await response.json();
                             setEmmaApiKey(data.apiKey ? '••••••••••••••••' : '');
@@ -3514,8 +3514,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         let debugInfo = {};
                         
                         try {
-                            console.log('🔍 Tentative de récupération de la clé API via /api/gemini-key...');
-                            const response = await fetch('/api/gemini-key');
+                            console.log('🔍 Tentative de récupération de la clé API via /api/unified?action=gemini_key...');
+                            const response = await fetch('/api/unified?action=gemini_key');
                             console.log('📡 Réponse API route:', response.status, response.statusText);
                             
                             if (response.ok) {
@@ -3580,12 +3580,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         const fullPrompt = `${emmaPrompt}\n\nQuestion de l'utilisateur: ${userMessage}`;
 
                         // Appeler l'API Gemini via notre route serveur
-                        const response = await fetch('/api/gemini-chat', {
+                        const response = await fetch('/api/unified', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
+                                action: 'gemini_chat',
                                 message: userMessage,
                                 prompt: emmaPrompt
                             })
@@ -5247,12 +5248,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             // Fonction pour sauvegarder les tickers sur GitHub
             const saveTickersToGitHub = async () => {
                 try {
-                    const response = await fetch('/api/github-tickers', {
+                    const response = await fetch('/api/unified', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ tickers })
+                        body: JSON.stringify({ action: 'github_tickers', tickers })
                     });
                     
                     if (response.ok) {
@@ -5268,7 +5269,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             // Fonction pour charger les tickers depuis GitHub
             const loadTickersFromGitHub = async () => {
                 try {
-                    const response = await fetch('/api/github-tickers');
+                    const response = await fetch('/api/unified?action=github_tickers');
                     if (response.ok) {
                         const data = await response.json();
                         if (data.tickers && Array.isArray(data.tickers)) {
@@ -5286,12 +5287,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             // Fonction pour sauvegarder la watchlist sur GitHub
             const saveWatchlistToGitHub = async (watchlistTickers) => {
                 try {
-                    const response = await fetch('/api/github-watchlist', {
+                    const response = await fetch('/api/unified', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ tickers: watchlistTickers })
+                        body: JSON.stringify({ action: 'github_watchlist', tickers: watchlistTickers })
                     });
                     
                     if (response.ok) {
@@ -5307,7 +5308,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             // Fonction pour charger la watchlist depuis GitHub
             const loadWatchlistFromGitHub = async () => {
                 try {
-                    const response = await fetch('/api/github-watchlist');
+                    const response = await fetch('/api/unified?action=github_watchlist');
                     if (response.ok) {
                         const data = await response.json();
                         if (data.tickers && Array.isArray(data.tickers)) {

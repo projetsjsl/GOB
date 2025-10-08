@@ -84,10 +84,10 @@
 
             const saveTickers = async (newTickers) => {
                 try {
-                    const response = await fetch('/api/save-tickers', {
+                    const response = await fetch('/api/unified', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ tickers: newTickers })
+                        body: JSON.stringify({ action: 'save_tickers', tickers: newTickers })
                     });
                     if (response.ok) {
                         setTickers(newTickers);
@@ -116,7 +116,7 @@
             // Données Finnhub
             const fetchStockData = async (ticker) => {
                 try {
-                    const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
+                    const response = await fetch(`${API_BASE_URL}/api/unified?action=finnhub&endpoint=quote&symbol=${ticker}`);
                     if (!response.ok) throw new Error(`API error: ${response.status}`);
                     return await response.json();
                 } catch (error) {
@@ -149,7 +149,7 @@
             const fetchNews = async () => {
                 try {
                     const tickersQuery = tickers.join(' OR ');
-                    const response = await fetch(`${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=20`);
+                    const response = await fetch(`${API_BASE_URL}/api/unified?action=news&q=${encodeURIComponent(tickersQuery)}&limit=20`);
                     if (!response.ok) throw new Error(`News API error: ${response.status}`);
                     const data = await response.json();
                     setNewsData(data.articles || []);
