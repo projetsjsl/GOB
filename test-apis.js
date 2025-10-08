@@ -37,22 +37,22 @@ async function runTests() {
     console.log('🚀 Démarrage des tests des APIs améliorées\n');
     
     // Test API Status
-    await testAPI('/api/status', 'Statut des APIs (sans test)');
-    await testAPI('/api/status?test=true', 'Statut des APIs (avec test)');
+    await testAPI('/api/unified?action=status', 'Statut des APIs (sans test)');
+    await testAPI('/api/unified?action=status&test=true', 'Statut des APIs (avec test)');
     
     // Test API News
-    await testAPI('/api/news?q=CVS OR MSFT&limit=5', 'API News multi-sources');
+    await testAPI('/api/unified?action=news&q=CVS OR MSFT&limit=5', 'API News multi-sources');
     
     // Test API Finnhub
-    await testAPI('/api/finnhub?endpoint=quote&symbol=AAPL', 'API Finnhub - Quote');
-    await testAPI('/api/finnhub?endpoint=profile&symbol=MSFT', 'API Finnhub - Profile');
-    await testAPI('/api/finnhub?endpoint=news&symbol=CVS', 'API Finnhub - News');
+    await testAPI('/api/unified?action=finnhub&endpoint=quote&symbol=AAPL', 'API Finnhub - Quote');
+    await testAPI('/api/unified?action=finnhub&endpoint=profile&symbol=MSFT', 'API Finnhub - Profile');
+    await testAPI('/api/unified?action=finnhub&endpoint=news&symbol=CVS', 'API Finnhub - News');
     
     // Test API Fallback
-    await testAPI('/api/fallback?type=stock&symbol=AAPL', 'API Fallback - Stock');
-    await testAPI('/api/fallback?type=news&limit=3', 'API Fallback - News');
-    await testAPI('/api/fallback?type=market', 'API Fallback - Market');
-    await testAPI('/api/fallback?type=search&symbol=MSFT', 'API Fallback - Search');
+    await testAPI('/api/unified?action=fallback&type=stock&symbol=AAPL', 'API Fallback - Stock');
+    await testAPI('/api/unified?action=fallback&type=news&limit=3', 'API Fallback - News');
+    await testAPI('/api/unified?action=fallback&type=market', 'API Fallback - Market');
+    await testAPI('/api/unified?action=fallback&type=search&symbol=MSFT', 'API Fallback - Search');
     
     console.log('\n🎉 Tests terminés !');
     console.log('\n📋 Résumé des améliorations:');
