@@ -110,7 +110,7 @@
 
         const BetaCombinedDashboard = () => {
             // États principaux
-            const [activeTab, setActiveTab] = useState('seeking-alpha');
+            const [activeTab, setActiveTab] = useState('scrapping-sa');
             const [tickers, setTickers] = useState(['CVS', 'MSFT']);
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
@@ -926,13 +926,13 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 }
             };
 
-            // Composant onglet Seeking Alpha
-            const SeekingAlphaTab = () => (
+            // Composant onglet Scrapping SA
+            const ScrappingSATab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📈 Analyses Seeking Alpha</h2>
+                        }`}>🔧 Scrapping SA</h2>
                         <div className="flex gap-2">
                             <button
                                 onClick={refreshAllStocks}
@@ -999,138 +999,6 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         </div>
                     </div>
 
-                    {/* Section Scraping */}
-                    <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode 
-                            ? 'bg-gray-800/50 border-gray-600' 
-                            : 'bg-white/80 border-gray-300'
-                    }`}>
-                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Outils de Scraping</h3>
-                        
-                        {/* Statut du scraping */}
-                        <div className="mb-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className={`font-medium transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>Statut:</span>
-                                <span className={`px-3 py-1 rounded text-sm font-bold ${
-                                    scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
-                                    scrapingStatus === 'running' ? 'bg-blue-500 text-white' :
-                                    scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
-                                    'bg-red-500 text-white'
-                                }`}>
-                                    {scrapingStatus === 'idle' ? '⏸️ En attente' :
-                                     scrapingStatus === 'running' ? '🔄 En cours' :
-                                     scrapingStatus === 'completed' ? '✅ Terminé' :
-                                     '❌ Erreur'}
-                                </span>
-                        </div>
-
-                            {/* Barre de progression */}
-                            {scrapingStatus === 'running' && (
-                                <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
-                                    <div 
-                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                        style={{ width: `${scrapingProgress}%` }}
-                                    ></div>
-                                </div>
-                            )}
-                            
-                            <div className={`text-sm transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                            }`}>
-                                Progression: {scrapingProgress}%
-                            </div>
-                        </div>
-
-                        {/* Instructions de scraping */}
-                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
-                            isDarkMode 
-                                ? 'bg-blue-900/30' 
-                                : 'bg-blue-100/80'
-                        }`}>
-                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📖 Instructions de Scraping</h4>
-                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-blue-200' : 'text-blue-800'
-                            }`}>
-                                <div>• <strong>Méthode 1:</strong> Cliquez sur "🚀 Lancer le Scraper" pour ouvrir les pages</div>
-                                <div>• <strong>Méthode 2:</strong> Cliquez sur "📋 Script F12" pour copier un script</div>
-                                <div>• <strong>Étapes:</strong> Ouvrez F12 → Console → Collez le script → Entrée</div>
-                                <div>• <strong>Résultat:</strong> Les données seront affichées et copiées automatiquement</div>
-                            </div>
-                        </div>
-
-                        {/* Aide pour les popups bloqués */}
-                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
-                            isDarkMode 
-                                ? 'bg-yellow-900/30' 
-                                : 'bg-yellow-100/80'
-                        }`}>
-                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🔧 Résolution des Popups Bloqués</h4>
-                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-yellow-200' : 'text-yellow-800'
-                            }`}>
-                                <div>• <strong>Chrome/Edge:</strong> Cliquez sur l'icône popup dans la barre d'adresse → "Toujours autoriser"</div>
-                                <div>• <strong>Firefox:</strong> Cliquez sur l'icône bouclier → "Désactiver la protection"</div>
-                                <div>• <strong>Safari:</strong> Safari → Préférences → Sites web → Pop-ups → Autoriser</div>
-                                <div>• <strong>Alternative:</strong> Utilisez le bouton "🌐 Ouvrir Seeking Alpha" ou le script F12</div>
-                            </div>
-                        </div>
-
-                        {/* Configuration des API */}
-                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
-                            isDarkMode 
-                                ? 'bg-green-900/30' 
-                                : 'bg-green-100/80'
-                        }`}>
-                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🤖 Configuration des API</h4>
-                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-green-200' : 'text-green-800'
-                            }`}>
-                                <div>• <strong>Claude API:</strong> Configurez ANTHROPIC_API_KEY pour l'analyse automatique</div>
-                                <div>• <strong>GitHub API:</strong> Configurez GITHUB_TOKEN pour la mise à jour des fichiers</div>
-                                <div>• <strong>Fonctionnalité:</strong> Scraping → Analyse Claude → Mise à jour JSON automatique</div>
-                                <div>• <strong>Bouton:</strong> "🤖 Analyser avec Claude" pour traiter les données existantes</div>
-                            </div>
-                        </div>
-
-                        {/* Logs de scraping */}
-                        <div className={`rounded-lg p-4 max-h-64 overflow-y-auto transition-colors duration-300 ${
-                            isDarkMode 
-                                ? 'bg-black/50' 
-                                : 'bg-gray-100/80'
-                        }`}>
-                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📋 Logs de Scraping</h4>
-                            {scrapingLogs.length === 0 ? (
-                                <div className={`text-sm transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                }`}>Aucun log pour le moment...</div>
-                            ) : (
-                                <div className="space-y-1">
-                                    {scrapingLogs.map((log, index) => (
-                                        <div key={index} className={`text-xs p-2 rounded ${
-                                            log.type === 'error' ? 'bg-red-900/50 text-red-300' :
-                                            log.type === 'success' ? 'bg-green-900/50 text-green-300' :
-                                            log.type === 'warning' ? 'bg-yellow-900/50 text-yellow-300' :
-                                            'bg-blue-900/50 text-blue-300'
-                                        }`}>
-                                            <span className="text-gray-400">[{log.timestamp}]</span> {log.message}
-                                    </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
 
                     {/* Fiche détaillée du titre sélectionné */}
                     {selectedStock && (
@@ -1585,6 +1453,581 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             })}
                         </div>
                     )}
+                        </div>
+                    )}
+
+                    {/* Section Scraping */}
+                    <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-800/50 border-gray-600' 
+                            : 'bg-white/80 border-gray-300'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🔧 Outils de Scraping</h3>
+                        
+                        {/* Statut du scraping */}
+                        <div className="mb-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className={`font-medium transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>Statut:</span>
+                                <span className={`px-3 py-1 rounded text-sm font-bold ${
+                                    scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
+                                    scrapingStatus === 'running' ? 'bg-blue-500 text-white' :
+                                    scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
+                                    'bg-red-500 text-white'
+                                }`}>
+                                    {scrapingStatus === 'idle' ? '⏸️ En attente' :
+                                     scrapingStatus === 'running' ? '🔄 En cours' :
+                                     scrapingStatus === 'completed' ? '✅ Terminé' :
+                                     '❌ Erreur'}
+                                </span>
+                        </div>
+
+                            {/* Barre de progression */}
+                            {scrapingStatus === 'running' && (
+                                <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                                    <div 
+                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                        style={{ width: `${scrapingProgress}%` }}
+                                    ></div>
+                                </div>
+                            )}
+                            
+                            <div className={`text-sm transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                            }`}>
+                                Progression: {scrapingProgress}%
+                            </div>
+                        </div>
+
+                        {/* Instructions de scraping */}
+                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-blue-900/30' 
+                                : 'bg-blue-100/80'
+                        }`}>
+                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📖 Instructions de Scraping</h4>
+                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                            }`}>
+                                <div>• <strong>Méthode 1:</strong> Cliquez sur "🚀 Lancer le Scraper" pour ouvrir les pages</div>
+                                <div>• <strong>Méthode 2:</strong> Cliquez sur "📋 Script F12" pour copier un script</div>
+                                <div>• <strong>Étapes:</strong> Ouvrez F12 → Console → Collez le script → Entrée</div>
+                                <div>• <strong>Résultat:</strong> Les données seront affichées et copiées automatiquement</div>
+                            </div>
+                        </div>
+
+                        {/* Aide pour les popups bloqués */}
+                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-yellow-900/30' 
+                                : 'bg-yellow-100/80'
+                        }`}>
+                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🔧 Résolution des Popups Bloqués</h4>
+                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-yellow-200' : 'text-yellow-800'
+                            }`}>
+                                <div>• <strong>Chrome/Edge:</strong> Cliquez sur l'icône popup dans la barre d'adresse → "Toujours autoriser"</div>
+                                <div>• <strong>Firefox:</strong> Cliquez sur l'icône bouclier → "Désactiver la protection"</div>
+                                <div>• <strong>Safari:</strong> Safari → Préférences → Sites web → Pop-ups → Autoriser</div>
+                                <div>• <strong>Alternative:</strong> Utilisez le bouton "🌐 Ouvrir Seeking Alpha" ou le script F12</div>
+                            </div>
+                        </div>
+
+                        {/* Configuration des API */}
+                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-green-900/30' 
+                                : 'bg-green-100/80'
+                        }`}>
+                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🤖 Configuration des API</h4>
+                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-green-200' : 'text-green-800'
+                            }`}>
+                                <div>• <strong>Claude API:</strong> Configurez ANTHROPIC_API_KEY pour l'analyse automatique</div>
+                                <div>• <strong>GitHub API:</strong> Configurez GITHUB_TOKEN pour la mise à jour des fichiers</div>
+                                <div>• <strong>Fonctionnalité:</strong> Scraping → Analyse Claude → Mise à jour JSON automatique</div>
+                                <div>• <strong>Bouton:</strong> "🤖 Analyser avec Claude" pour traiter les données existantes</div>
+                            </div>
+                        </div>
+
+                        {/* Logs de scraping */}
+                        <div className={`rounded-lg p-4 max-h-64 overflow-y-auto transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-black/50' 
+                                : 'bg-gray-100/80'
+                        }`}>
+                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📋 Logs de Scraping</h4>
+                            {scrapingLogs.length === 0 ? (
+                                <div className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`}>Aucun log pour le moment...</div>
+                            ) : (
+                                <div className="space-y-1">
+                                    {scrapingLogs.map((log, index) => (
+                                        <div key={index} className={`text-xs p-2 rounded ${
+                                            log.type === 'error' ? 'bg-red-900/50 text-red-300' :
+                                            log.type === 'success' ? 'bg-green-900/50 text-green-300' :
+                                            log.type === 'warning' ? 'bg-yellow-900/50 text-yellow-300' :
+                                            'bg-blue-900/50 text-blue-300'
+                                        }`}>
+                                            <span className="text-gray-400">[{log.timestamp}]</span> {log.message}
+                                    </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Composant onglet Seeking Alpha
+            const SeekingAlphaTab = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>📈 Analyses Seeking Alpha</h2>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={refreshAllStocks}
+                                disabled={loading}
+                                className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                            >
+                                {loading ? 'Actualisation...' : 'Actualiser Stocks'}
+                            </button>
+                            <button
+                                onClick={fetchNews}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                            >
+                                Actualiser News
+                            </button>
+                            <button
+                                onClick={runSeekingAlphaScraper}
+                                disabled={scrapingStatus === 'running'}
+                                className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
+                            >
+                                {scrapingStatus === 'running' ? 'Scraping...' : '🚀 Lancer le Scraper'}
+                            </button>
+                            <button
+                                onClick={() => openSeekingAlpha('AAPL')}
+                                className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
+                            >
+                                🌐 Ouvrir Seeking Alpha
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const script = generateScrapingScript('CVS');
+                                    navigator.clipboard.writeText(script).then(() => {
+                                        addScrapingLog('📋 Script de scraping copié dans le presse-papiers', 'success');
+                                        addScrapingLog('💡 Collez-le dans la console F12 de Seeking Alpha', 'info');
+                                    });
+                                }}
+                                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                            >
+                                📋 Script F12
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    addScrapingLog('🤖 Démarrage de l\'analyse Claude sur les données existantes...', 'info');
+                                    try {
+                                        for (const ticker of tickers) {
+                                            const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                                            if (seekingAlphaItem?.parsedData) {
+                                                await analyzeWithClaude(ticker, seekingAlphaItem.parsedData);
+                                            }
+                                        }
+                                        addScrapingLog('✅ Analyse Claude terminée pour tous les titres', 'success');
+                                    } catch (error) {
+                                        addScrapingLog(`❌ Erreur analyse Claude: ${error.message}`, 'error');
+                                    }
+                                }}
+                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                            >
+                                🤖 Analyser avec Claude
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Fiche détaillée du titre sélectionné */}
+                    {selectedStock && (
+                        <div className="seeking-alpha-card rounded-lg p-6 border border-slate-600">
+                            <div className="flex justify-between items-start mb-4">
+                                <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
+                                <button
+                                    onClick={() => setSelectedStock(null)}
+                                    className="text-blue-400 hover:text-blue-300"
+                                >
+                                    ✕ Fermer
+                                </button>
+                            </div>
+                            
+                            {/* Fiche détaillée comme dans les images */}
+                            {(() => {
+                                const claudeData = seekingAlphaStockData.stocks?.[selectedStock];
+                                const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === selectedStock);
+                                const parsedData = seekingAlphaItem?.parsedData;
+                                
+                                if (claudeData || parsedData) {
+                                    return (
+                                        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+                                            {/* Header avec gradient bleu */}
+                                            <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
+                                                        <p className="text-blue-100 text-sm">
+                                                            {claudeData?.companyName || parsedData?.companyName || 'N/A'}
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setSelectedStock(null)}
+                                                        className="text-white hover:text-gray-200 text-xl"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Contenu principal */}
+                                            <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+                                                {/* Métriques Clés */}
+                                                <div>
+                                                    <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                                        <div className="w-1 h-6 bg-blue-600 mr-3"></div>
+                                                        Métriques Clés
+                                                    </h4>
+                                                    <div className="grid grid-cols-3 gap-4">
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">Capitalisation</div>
+                                                            <div className="text-gray-800 font-bold text-lg">{claudeData?.metrics?.marketCap || 'N/A'}</div>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">Croissance BPA</div>
+                                                            <div className="text-gray-800 font-bold text-lg">{claudeData?.metrics?.bpaGrowth || 'N/A'}</div>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">P/E Ratio</div>
+                                                            <div className="text-gray-800 font-bold text-lg">{claudeData?.metrics?.peRatio || 'N/A'}</div>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">Secteur</div>
+                                                            <div className="text-gray-800 font-bold text-lg">{claudeData?.metrics?.sector || 'N/A'}</div>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">Rendement Dividende</div>
+                                                            <div className="text-green-600 font-bold text-lg">{claudeData?.metrics?.dividendYield || 'N/A'}</div>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">Fréquence</div>
+                                                            <div className="text-gray-800 font-bold text-lg">{claudeData?.metrics?.dividendFrequency || 'N/A'}</div>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">Ex-Dividende</div>
+                                                            <div className="text-gray-800 font-bold text-lg">{claudeData?.metrics?.exDivDate || 'N/A'}</div>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">Paiement Annuel</div>
+                                                            <div className="text-green-600 font-bold text-lg">{claudeData?.metrics?.annualPayout || 'N/A'}</div>
+                                                        </div>
+                                                        <div className="bg-gray-50 rounded-lg p-4">
+                                                            <div className="text-gray-600 text-sm">Prix Actuel</div>
+                                                            <div className="text-blue-600 font-bold text-lg">{claudeData?.metrics?.price || 'N/A'}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Profil de l'Entreprise */}
+                                                {claudeData?.companyProfile && (
+                                                    <div>
+                                                        <h4 className="text-lg font-bold text-gray-800 mb-4">Profil de l'Entreprise</h4>
+                                                        <div className="text-gray-700 leading-relaxed">
+                                                            {cleanText(claudeData.companyProfile.description)}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Analyse Quantitative */}
+                                                {claudeData?.quantRating && (
+                                                    <div>
+                                                        <h4 className="text-lg font-bold text-gray-800 mb-4">Analyse Quantitative</h4>
+                                                        <div className="flex gap-4 mb-6">
+                                                            {Object.entries(claudeData.quantRating).map(([key, value]) => {
+                                                                if (!value || key === 'overall') return null;
+                                                                return (
+                                                                    <div key={key} className="text-center">
+                                                                        <div className="text-gray-600 text-sm mb-2 capitalize">{key}</div>
+                                                                        <span className={`px-3 py-2 rounded-lg text-sm font-bold ${getGradeColor(value)}`}>
+                                                                            {value}
+                                                                        </span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Analyse Sectorielle */}
+                                                {claudeData?.sectorAnalysis && (
+                                                    <div>
+                                                        <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                                            <div className="w-1 h-6 bg-blue-600 mr-3"></div>
+                                                            Analyse Sectorielle
+                                                        </h4>
+                                                        <div className="bg-blue-50 rounded-lg p-4">
+                                                            <div className="text-gray-700 leading-relaxed">
+                                                                {typeof claudeData.sectorAnalysis === 'string' 
+                                                                    ? cleanText(claudeData.sectorAnalysis)
+                                                                    : Object.entries(claudeData.sectorAnalysis).map(([key, value]) => (
+                                                                        <div key={key} className="mb-3">
+                                                                            <div className="font-bold text-gray-800 capitalize mb-2">{cleanText(key)}:</div>
+                                                                            <div className="text-gray-700 leading-relaxed">{cleanText(value)}</div>
+                                                                </div>
+                                                                    ))
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Points Positifs */}
+                                                {claudeData?.strengths && (
+                                                    <div className="bg-green-50 rounded-lg p-4">
+                                                        <h4 className="text-lg font-bold text-green-800 mb-4 flex items-center">
+                                                            <span className="mr-2">✅</span>
+                                                            Points Positifs
+                                                        </h4>
+                                                        <div className="space-y-3">
+                                                            {claudeData.strengths.map((strength, index) => (
+                                                                <div key={index} className="text-green-700">
+                                                                    <span className="font-bold">{index + 1}.</span> {cleanText(strength)}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Préoccupations */}
+                                                {claudeData?.concerns && (
+                                                    <div className="bg-red-50 rounded-lg p-4">
+                                                        <h4 className="text-lg font-bold text-red-800 mb-4 flex items-center">
+                                                            <span className="mr-2">⚠️</span>
+                                                            Préoccupations
+                                                        </h4>
+                                                        <div className="space-y-3">
+                                                            {claudeData.concerns.map((concern, index) => (
+                                                                <div key={index} className="text-red-700">
+                                                                    <span className="font-bold">{index + 1}.</span> {cleanText(concern)}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Recommandation */}
+                                                {claudeData?.recommendation && (
+                                                    <div className="bg-blue-50 rounded-lg p-4">
+                                                        <h4 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
+                                                            <span className="mr-2">💡</span>
+                                                            Recommandation
+                                                        </h4>
+                                                        <div className="text-blue-700 leading-relaxed">
+                                                            {cleanText(claudeData.recommendation)}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Lien vers Seeking Alpha */}
+                                                {seekingAlphaItem?.url && (
+                                                    <div className="text-center pt-4 border-t">
+                                                        <a 
+                                                            href={seekingAlphaItem.url} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                                        >
+                                                            Lire l'analyse complète sur Seeking Alpha →
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })()}
+                        </div>
+                    )}
+
+                    {/* Affichage des analyses en cartes */}
+                    {seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {seekingAlphaData.stocks.map((stock, index) => {
+                                const claudeData = seekingAlphaStockData.stocks?.[stock.ticker];
+                                const parsedData = stock.parsedData;
+                                
+                                if (!claudeData && !parsedData) return null;
+                                
+                                return (
+                                    <div key={index} className="seeking-alpha-card rounded-lg p-6 border border-slate-600">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <h3 className="text-xl font-bold text-white">{stock.ticker}</h3>
+                                            <button
+                                                onClick={() => setSelectedStock(stock.ticker)}
+                                                className="text-blue-400 hover:text-blue-300 text-sm"
+                                            >
+                                                Voir détail
+                                            </button>
+                                        </div>
+                                        
+                                        {/* Métriques principales */}
+                                        <div className="space-y-3 mb-4">
+                                            {claudeData?.metrics?.marketCap && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-blue-200">Capitalisation:</span>
+                                                    <span className="text-white font-semibold">{claudeData.metrics.marketCap}</span>
+                                                </div>
+                                            )}
+                                            {claudeData?.metrics?.peRatio && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-blue-200">P/E:</span>
+                                                    <span className="text-white font-semibold">{claudeData.metrics.peRatio}</span>
+                                                </div>
+                                            )}
+                                            {claudeData?.metrics?.dividendYield && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-blue-200">Dividende:</span>
+                                                    <span className="text-green-300 font-semibold">{claudeData.metrics.dividendYield}</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Rating quantitatif */}
+                                        {claudeData?.quantRating?.overall && (
+                                            <div className="mb-4">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="text-blue-200">Rating Quantitatif:</span>
+                                                    <span className={`px-3 py-1 rounded text-sm font-bold ${getGradeColor(claudeData.quantRating.overall)}`}>
+                                                        {claudeData.quantRating.overall}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Recommandation courte */}
+                                        {claudeData?.recommendation && (
+                                            <div className="text-blue-100 text-sm line-clamp-3">
+                                                {cleanText(claudeData.recommendation).substring(0, 150)}...
+                                            </div>
+                                        )}
+
+                                        {/* Lien vers Seeking Alpha */}
+                                        {stock.url && (
+                                            <div className="mt-4 pt-4 border-t border-slate-500">
+                                                <a 
+                                                    href={stock.url} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-300 hover:text-blue-200 text-sm"
+                                                >
+                                                    Lire l'analyse complète →
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* Affichage en liste si pas de cartes */}
+                    {(!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && (
+                        <div className="seeking-alpha-card rounded-lg p-6 border border-slate-600">
+                            <h3 className="text-xl font-bold text-white mb-4">📋 Analyses Seeking Alpha</h3>
+                            <div className="space-y-4">
+                                {tickers.map((ticker, index) => {
+                                    const claudeData = seekingAlphaStockData.stocks?.[ticker];
+                                    const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                                    const parsedData = seekingAlphaItem?.parsedData;
+                                    
+                                    if (!claudeData && !parsedData) return null;
+                                    
+                                    return (
+                                        <div key={index} className="bg-white rounded-lg p-4">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <h4 className="text-lg font-bold text-gray-800">{ticker}</h4>
+                                                <button
+                                                    onClick={() => setSelectedStock(ticker)}
+                                                    className="text-blue-600 hover:text-blue-700 text-sm"
+                                                >
+                                                    Voir détail
+                                                </button>
+                                            </div>
+                                            
+                                            {/* Métriques principales */}
+                                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                                {claudeData?.metrics?.marketCap && (
+                                                    <div>
+                                                        <div className="text-gray-600 text-sm">Capitalisation</div>
+                                                        <div className="text-gray-800 font-semibold">{claudeData.metrics.marketCap}</div>
+                                                    </div>
+                                                )}
+                                                {claudeData?.metrics?.peRatio && (
+                                                    <div>
+                                                        <div className="text-gray-600 text-sm">P/E Ratio</div>
+                                                        <div className="text-gray-800 font-semibold">{claudeData.metrics.peRatio}</div>
+                                                    </div>
+                                                )}
+                                                {claudeData?.metrics?.dividendYield && (
+                                                    <div>
+                                                        <div className="text-gray-600 text-sm">Dividende</div>
+                                                        <div className="text-green-600 font-semibold">{claudeData.metrics.dividendYield}</div>
+                                                    </div>
+                                                )}
+                                                {claudeData?.quantRating?.overall && (
+                                                    <div>
+                                                        <div className="text-gray-600 text-sm">Rating</div>
+                                                        <span className={`px-2 py-1 rounded text-sm font-bold ${getGradeColor(claudeData.quantRating.overall)}`}>
+                                                            {claudeData.quantRating.overall}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Recommandation courte */}
+                                            {claudeData?.recommendation && (
+                                                <div className="text-gray-700 text-sm line-clamp-2">
+                                                    {cleanText(claudeData.recommendation).substring(0, 200)}...
+                                                </div>
+                                            )}
+
+                                            {/* Lien vers Seeking Alpha */}
+                                            {seekingAlphaItem?.url && (
+                                                <div className="mt-3 pt-3 border-t">
+                                                    <a 
+                                                        href={seekingAlphaItem.url} 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:text-blue-700 text-sm"
+                                                    >
+                                                        Lire l'analyse complète sur Seeking Alpha →
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -2689,6 +3132,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="flex space-x-1">
                                 {[
+                                    { id: 'scrapping-sa', label: '🔧 Scrapping SA', component: ScrappingSATab },
                                     { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab },
                                     { id: 'stocks-news', label: '📊 Stocks & News', component: StocksNewsTab }
                                 ].map(tab => (
@@ -2724,6 +3168,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
 
                     {/* Contenu principal */}
                     <main className="max-w-7xl mx-auto p-6">
+                        {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                         {activeTab === 'stocks-news' && <StocksNewsTab />}
                     </main>
