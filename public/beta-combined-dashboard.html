@@ -3390,6 +3390,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         await checkGeminiConnection();
                     } catch (error) {
                         console.warn('Emma non disponible:', error.message);
+                        // Continuer même en cas d'erreur
+                        setEmmaConnected(false);
                     }
                 };
 
@@ -3404,7 +3406,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             return;
                         }
                     } catch (error) {
-                        console.log('Variable d\'environnement Vercel non disponible');
+                        console.warn('Variable d\'environnement Vercel non disponible:', error.message);
+                        // En cas d'erreur webkit/CORS, continuer sans bloquer
+                        if (error.message.includes('webkit') || error.message.includes('CORS')) {
+                            console.warn('Erreur de sécurité détectée, Emma en mode hors ligne');
+                        }
                     }
                     
                     // Fallback vers localStorage
@@ -3497,6 +3503,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const generateGeminiResponse = async (userMessage) => {
                     try {
+                        // Vérifier si on est en mode hors ligne à cause d'erreurs webkit
+                        if (window.webkitErrorDetected) {
+                            throw new Error('Mode hors ligne détecté - erreur webkit');
+                        }
+                        
                         // Récupérer la clé API avec diagnostic détaillé
                         let apiKey = '';
                         let apiSource = '';
@@ -3596,7 +3607,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         // Gestion spécifique des erreurs webkit/CORS
                         if (error.message.includes('webkit') || error.message.includes('masked') || error.message.includes('CORS')) {
-                            throw new Error('Erreur de sécurité du navigateur. Veuillez recharger la page.');
+                            window.webkitErrorDetected = true;
+                            throw new Error('Erreur de sécurité du navigateur. Emma en mode hors ligne.');
                         }
                         
                         throw error;
@@ -3897,7 +3909,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     {/* Image d'Emma avec effet de fade */}
                                     <div className="relative">
                                         <img
-                                            src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
+                                            src={isDarkMode ? './EMMA-JSLAI-GOB-dark.jpg' : './EMMA-JSLAI-GOB-light.jpg'}
                                             alt="Emma - Experte Financière IA"
                                             className="w-64 h-64 rounded-full object-cover shadow-2xl animate-pulse"
                                             style={{
@@ -3976,7 +3988,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                                     <img 
-                                        src={isDarkMode ? 'emma-avatar-gob-dark.jpg' : 'emma-avatar-gob-light.jpg'} 
+                                        src={isDarkMode ? './emma-avatar-gob-dark.jpg' : './emma-avatar-gob-light.jpg'} 
                                         alt="Emma" 
                                         className="w-full h-full object-cover"
                                     />
