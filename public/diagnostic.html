@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic GOB Apps</title>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .status.success { background: #dcfce7; color: #166534; }
+        .status.error { background: #fef2f2; color: #dc2626; }
+        .status.warning { background: #fef3c7; color: #d97706; }
+        .code {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Diagnostic GOB Apps</h1>
+    
+    <div class="card">
+        <h2>Informations Système</h2>
+        <div id="systemInfo"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Vérification des Routes</h2>
+        <div id="routeCheck"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Vérification des Scripts</h2>
+        <div id="scriptCheck"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Vérification des APIs</h2>
+        <div id="apiCheck"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Erreurs Console</h2>
+        <div id="consoleErrors"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Actions</h2>
+        <button onclick="runDiagnostic()">🔄 Relancer le diagnostic</button>
+        <button onclick="clearCache()">🗑️ Vider le cache</button>
+        <button onclick="testAPIs()">🧪 Tester les APIs</button>
+    </div>
+
+    <script>
+        const errors = [];
+        
+        function addError(message) {
+            errors.push(message);
+        }
+        
+        function checkSystemInfo() {
+            const container = document.getElementById('systemInfo');
+            const info = {
+                'User Agent': navigator.userAgent,
+                'URL': window.location.href,
+                'Online': navigator.onLine ? 'Oui' : 'Non',
+                'Cookies': navigator.cookieEnabled ? 'Oui' : 'Non',
+                'Local Storage': typeof(Storage) !== 'undefined' ? 'Oui' : 'Non',
+                'Heure': new Date().toLocaleString('fr-FR')
+            };
+            
+            let html = '';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<div><strong>${key}:</strong> ${value}</div>`;
+            }
+            container.innerHTML = html;
+        }
+        
+        async function checkRoutes() {
+            const container = document.getElementById('routeCheck');
+            const routes = [
+                { name: 'Accueil', url: '/' },
+                { name: 'Seeking Alpha', url: '/seeking-alpha' },
+                { name: 'Stocks & News', url: '/stocksandnews' },
+                { name: 'Dashboard Beta', url: '/beta-combined-dashboard' },
+                { name: 'Dashboard Pro', url: '/financial-dashboard' }
+            ];
+            
+            let html = '';
+            for (const route of routes) {
+                try {
+                    const response = await fetch(route.url, { method: 'HEAD' });
+                    const status = response.ok ? 'success' : 'error';
+                    const statusText = response.ok ? 'OK' : `Erreur ${response.status}`;
+                    html += `<div><span class="status ${status}">${statusText}</span> ${route.name} (${route.url})</div>`;
+                    
+                    if (!response.ok) {
+                        addError(`Route ${route.name} retourne ${response.status}`);
+                    }
+                } catch (error) {
+                    html += `<div><span class="status error">Erreur</span> ${route.name} (${route.url}) - ${error.message}</div>`;
+                    addError(`Erreur de connexion pour ${route.name}: ${error.message}`);
+                }
+            }
+            container.innerHTML = html;
+        }
+        
+        function checkScripts() {
+            const container = document.getElementById('scriptCheck');
+            const scripts = document.querySelectorAll('script[src]');
+            
+            let html = '';
+            scripts.forEach(script => {
+                const src = script.src;
+                const loaded = script.readyState === 'complete' || script.readyState === 'loaded';
+                const status = loaded ? 'success' : 'warning';
+                const statusText = loaded ? 'Chargé' : 'En cours...';
+                html += `<div><span class="status ${status}">${statusText}</span> ${src}</div>`;
+            });
+            
+            container.innerHTML = html || '<div>Aucun script externe détecté</div>';
+        }
+        
+        async function checkAPIs() {
+            const container = document.getElementById('apiCheck');
+            const apis = [
+                { name: 'Finnhub Quote', url: '/api/finnhub?endpoint=quote&symbol=AAPL' },
+                { name: 'Status', url: '/api/status' }
+            ];
+            
+            let html = '';
+            for (const api of apis) {
+                try {
+                    const response = await fetch(api.url);
+                    const data = await response.json();
+                    const status = response.ok ? 'success' : 'error';
+                    const statusText = response.ok ? 'OK' : `Erreur ${response.status}`;
+                    html += `<div><span class="status ${status}">${statusText}</span> ${api.name}</div>`;
+                    
+                    if (!response.ok) {
+                        addError(`API ${api.name} retourne ${response.status}`);
+                    }
+                } catch (error) {
+                    html += `<div><span class="status error">Erreur</span> ${api.name} - ${error.message}</div>`;
+                    addError(`Erreur API ${api.name}: ${error.message}`);
+                }
+            }
+            container.innerHTML = html;
+        }
+        
+        function checkConsoleErrors() {
+            const container = document.getElementById('consoleErrors');
+            
+            if (errors.length === 0) {
+                container.innerHTML = '<div><span class="status success">Aucune erreur détectée</span></div>';
+            } else {
+                let html = '';
+                errors.forEach(error => {
+                    html += `<div><span class="status error">Erreur</span> ${error}</div>`;
+                });
+                container.innerHTML = html;
+            }
+        }
+        
+        async function runDiagnostic() {
+            errors.length = 0;
+            checkSystemInfo();
+            await checkRoutes();
+            checkScripts();
+            await checkAPIs();
+            checkConsoleErrors();
+        }
+        
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('Cache vidé ! Rechargez la page.');
+        }
+        
+        async function testAPIs() {
+            const container = document.getElementById('apiCheck');
+            container.innerHTML = '<div>Test en cours...</div>';
+            await checkAPIs();
+        }
+        
+        // Lancer le diagnostic au chargement
+        runDiagnostic();
+    </script>
+</body>
+</html>
