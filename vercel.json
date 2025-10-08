@@ -1,24 +1,10 @@
 {
   "functions": {
-    "api/**/*.js": {
-      "maxDuration": 10
+    "api/gemini-key.js": {
+      "runtime": "nodejs18.x"
     }
   },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*\\.html)",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/html; charset=utf-8"
-        }
-      ]
-    }
-  ]
+  "env": {
+    "GEMINI_API_KEY": "@gemini-api-key"
+  }
 }

@@ -2036,11 +2036,83 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 </div>
             );
 
-            // Composant onglet Ask Emma
+            // Composant onglet Ask Emma avec intégration Gemini
             const AskEmmaTab = () => {
                 const [emmaMessages, setEmmaMessages] = useState([]);
                 const [emmaInput, setEmmaInput] = useState('');
                 const [emmaLoading, setEmmaLoading] = useState(false);
+                const [emmaApiKey, setEmmaApiKey] = useState('');
+                const [emmaConnected, setEmmaConnected] = useState(false);
+                const [showPromptEditor, setShowPromptEditor] = useState(false);
+                const [emmaPrompt, setEmmaPrompt] = useState(`Tu es Emma, une assistante virtuelle spécialisée en analyse financière. Tu es professionnelle, experte et bienveillante.
+
+**Ton rôle :**
+- Aider les utilisateurs avec l'analyse et l'évaluation financière
+- Fournir des conseils basés sur des données fiables
+- Expliquer les concepts financiers de manière claire
+- Guider dans l'interprétation des données du dashboard
+
+**Ton style de communication :**
+- Professionnelle mais accessible
+- Précise et factuelle
+- Encourageante et rassurante
+- Adaptée au niveau intermédiaire
+
+**Règles importantes :**
+- Toujours rappeler que pour des conseils personnalisés, il faut consulter un expert qualifié
+- Baser tes réponses sur les données disponibles dans le dashboard
+- Être transparent sur les limites de tes conseils
+- Proposer des sources fiables quand possible
+
+**Contexte du dashboard :**
+L'utilisateur utilise un dashboard financier avec :
+- Cours d'actions en temps réel
+- Analyses Seeking Alpha
+- Actualités financières
+- Outils de scraping de données
+- Graphiques et métriques
+
+Réponds toujours en français et adapte ton niveau d'expertise à la question posée.`);
+
+                // Initialiser Emma au chargement
+                React.useEffect(() => {
+                    initializeEmma();
+                }, []);
+
+                const initializeEmma = async () => {
+                    try {
+                        // Charger le prompt depuis localStorage
+                        const savedPrompt = localStorage.getItem('emma-financial-prompt');
+                        if (savedPrompt) {
+                            setEmmaPrompt(savedPrompt);
+                        }
+                        
+                        // Vérifier la connexion Gemini
+                        await checkGeminiConnection();
+                    } catch (error) {
+                        console.error('Erreur initialisation Emma:', error);
+                    }
+                };
+
+                const checkGeminiConnection = async () => {
+                    try {
+                        // Essayer de récupérer la clé API depuis Vercel
+                        const response = await fetch('/api/gemini-key');
+                        if (response.ok) {
+                            const data = await response.json();
+                            setEmmaApiKey(data.apiKey ? '••••••••••••••••' : '');
+                            setEmmaConnected(!!data.apiKey);
+                            return;
+                        }
+                    } catch (error) {
+                        console.log('Variable d\'environnement Vercel non disponible');
+                    }
+                    
+                    // Fallback vers localStorage
+                    const localKey = localStorage.getItem('gemini-api-key');
+                    setEmmaApiKey(localKey ? '••••••••••••••••' : '');
+                    setEmmaConnected(!!localKey);
+                };
 
                 const sendMessageToEmma = async () => {
                     if (!emmaInput.trim()) return;
@@ -2056,22 +2128,23 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     setEmmaLoading(true);
                     
                     try {
-                        // Simulation d'une réponse d'Emma
-                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        // Utiliser l'API Gemini
+                        const response = await generateGeminiResponse(emmaInput);
                         
                         const emmaResponse = {
                             id: Date.now() + 1,
                             type: 'emma',
-                            content: generateEmmaResponse(emmaInput),
+                            content: response,
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
                         
                         setEmmaMessages(prev => [...prev, emmaResponse]);
                     } catch (error) {
+                        console.error('Erreur Gemini:', error);
                         const errorMessage = {
                             id: Date.now() + 1,
                             type: 'error',
-                            content: 'Désolé, Emma n\'est pas disponible pour le moment.',
+                            content: 'Désolé, je ne peux pas répondre pour le moment. Vérifiez votre configuration Gemini.',
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
                         setEmmaMessages(prev => [...prev, errorMessage]);
@@ -2081,38 +2154,106 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     }
                 };
 
-                const generateEmmaResponse = (input) => {
-                    const lowerInput = input.toLowerCase();
-                    
-                    if (lowerInput.includes('bonjour') || lowerInput.includes('salut') || lowerInput.includes('hello')) {
-                        return 'Bonjour ! Je suis Emma, votre assistante financière. Comment puis-je vous aider aujourd\'hui ?';
+                const generateGeminiResponse = async (userMessage) => {
+                    try {
+                        // Récupérer la clé API
+                        let apiKey = '';
+                        try {
+                            const response = await fetch('/api/gemini-key');
+                            if (response.ok) {
+                                const data = await response.json();
+                                apiKey = data.apiKey;
+                            }
+                        } catch (error) {
+                            // Fallback vers localStorage
+                            apiKey = localStorage.getItem('gemini-api-key') || '';
+                        }
+
+                        if (!apiKey) {
+                            throw new Error('Clé API Gemini non configurée');
+                        }
+
+                        // Construire le prompt complet
+                        const fullPrompt = `${emmaPrompt}\n\nQuestion de l'utilisateur: ${userMessage}`;
+
+                        // Appeler l'API Gemini
+                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{
+                                        text: fullPrompt
+                                    }]
+                                }],
+                                generationConfig: {
+                                    temperature: 0.7,
+                                    topK: 40,
+                                    topP: 0.95,
+                                    maxOutputTokens: 1024,
+                                }
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`Erreur API: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        
+                        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                            return data.candidates[0].content.parts[0].text;
+                        } else {
+                            throw new Error('Réponse invalide de l\'API');
+                        }
+                    } catch (error) {
+                        console.error('Erreur Gemini:', error);
+                        throw error;
                     }
-                    
-                    if (lowerInput.includes('prix') || lowerInput.includes('cours') || lowerInput.includes('action')) {
-                        return 'Je peux vous aider à analyser les cours des actions. Voulez-vous des informations sur un titre spécifique ?';
-                    }
-                    
-                    if (lowerInput.includes('analyse') || lowerInput.includes('recommandation')) {
-                        return 'Pour une analyse approfondie, je recommande de consulter l\'onglet "Analyses Seeking Alpha" qui contient des analyses détaillées.';
-                    }
-                    
-                    if (lowerInput.includes('actualité') || lowerInput.includes('news') || lowerInput.includes('nouvelle')) {
-                        return 'Les dernières actualités financières sont disponibles dans l\'onglet "Stocks & News". Je peux vous aider à les interpréter.';
-                    }
-                    
-                    if (lowerInput.includes('scraping') || lowerInput.includes('données')) {
-                        return 'Pour le scraping de données, utilisez l\'onglet "Scrapping SA" qui contient tous les outils nécessaires.';
-                    }
-                    
-                    if (lowerInput.includes('aide') || lowerInput.includes('help')) {
-                        return 'Je peux vous aider avec :\n• Analyse des cours d\'actions\n• Interprétation des actualités\n• Navigation dans l\'interface\n• Recommandations d\'utilisation\n\nQue souhaitez-vous savoir ?';
-                    }
-                    
-                    return 'C\'est une excellente question ! Je peux vous aider à naviguer dans l\'interface et à interpréter les données financières. Pouvez-vous être plus spécifique ?';
                 };
 
                 const clearChat = () => {
                     setEmmaMessages([]);
+                };
+
+                const savePrompt = () => {
+                    localStorage.setItem('emma-financial-prompt', emmaPrompt);
+                    setShowPromptEditor(false);
+                };
+
+                const resetPrompt = () => {
+                    const defaultPrompt = `Tu es Emma, une assistante virtuelle spécialisée en analyse financière. Tu es professionnelle, experte et bienveillante.
+
+**Ton rôle :**
+- Aider les utilisateurs avec l'analyse et l'évaluation financière
+- Fournir des conseils basés sur des données fiables
+- Expliquer les concepts financiers de manière claire
+- Guider dans l'interprétation des données du dashboard
+
+**Ton style de communication :**
+- Professionnelle mais accessible
+- Précise et factuelle
+- Encourageante et rassurante
+- Adaptée au niveau intermédiaire
+
+**Règles importantes :**
+- Toujours rappeler que pour des conseils personnalisés, il faut consulter un expert qualifié
+- Baser tes réponses sur les données disponibles dans le dashboard
+- Être transparent sur les limites de tes conseils
+- Proposer des sources fiables quand possible
+
+**Contexte du dashboard :**
+L'utilisateur utilise un dashboard financier avec :
+- Cours d'actions en temps réel
+- Analyses Seeking Alpha
+- Actualités financières
+- Outils de scraping de données
+- Graphiques et métriques
+
+Réponds toujours en français et adapte ton niveau d'expertise à la question posée.`;
+                    setEmmaPrompt(defaultPrompt);
                 };
 
                 return (
@@ -2134,6 +2275,17 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 >
                                     💡 Exemple
                                 </button>
+                                <button
+                                    onClick={() => setShowPromptEditor(!showPromptEditor)}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                                >
+                                    📝 Prompt
+                                </button>
+                                <div className={`px-3 py-2 rounded text-sm font-medium ${
+                                    emmaConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }`}>
+                                    {emmaConnected ? '✅ Gemini Connecté' : '❌ Gemini Non Connecté'}
+                                </div>
                             </div>
                         </div>
 
@@ -2254,6 +2406,57 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 </button>
                             </div>
                         </div>
+
+                        {/* Éditeur de prompt */}
+                        {showPromptEditor && (
+                            <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                                isDarkMode 
+                                    ? 'bg-gray-900 border-gray-700' 
+                                    : 'bg-gray-50 border-gray-200'
+                            }`}>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>📝 Éditeur de Prompt Emma</h3>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={resetPrompt}
+                                            className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors"
+                                        >
+                                            🔄 Réinitialiser
+                                        </button>
+                                        <button
+                                            onClick={savePrompt}
+                                            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
+                                        >
+                                            💾 Sauvegarder
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <textarea
+                                    value={emmaPrompt}
+                                    onChange={(e) => setEmmaPrompt(e.target.value)}
+                                    className={`w-full h-64 p-3 rounded-lg border transition-colors duration-300 font-mono text-sm ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                    placeholder="Saisissez votre prompt personnalisé pour Emma..."
+                                />
+                                
+                                <div className={`mt-3 p-3 rounded-lg text-sm ${
+                                    isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'
+                                }`}>
+                                    <p className="font-medium mb-2">Variables disponibles :</p>
+                                    <ul className="space-y-1 text-xs">
+                                        <li><code className="bg-gray-200 text-gray-800 px-1 rounded">{"{userMessage}"}</code> - Message de l'utilisateur</li>
+                                        <li><code className="bg-gray-200 text-gray-800 px-1 rounded">{"{dashboardData}"}</code> - Données du dashboard</li>
+                                        <li><code className="bg-gray-200 text-gray-800 px-1 rounded">{"{currentTime}"}</code> - Heure actuelle</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Suggestions rapides */}
                         <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
