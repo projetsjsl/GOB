@@ -1898,6 +1898,236 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         </div>
                     </div>
 
+                    {/* Section Données Financières & Actualités (Finnhub uniquement) */}
+                    <div className="mt-8">
+                        <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-gray-800/50 border-gray-600' 
+                                : 'bg-white/80 border-gray-300'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📊 Données Financières & Actualités (Finnhub)</h3>
+                            <div className="overflow-x-auto max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 relative">
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr className={`border-b transition-colors duration-300 ${
+                                            isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                                        }`}>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>Ticker</th>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>Prix</th>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>Change</th>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>P/E</th>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>Dividende</th>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>Secteur</th>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>Rating</th>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>Sentiment</th>
+                                            <th className={`text-left py-2 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {tickers.map(ticker => {
+                                            // Données de Finnhub uniquement
+                                            const finnhubData = stockData[ticker];
+                                            const price = finnhubData?.c ? `$${finnhubData.c.toFixed(2)}` : 'N/A';
+                                            const change = finnhubData?.d ? `${finnhubData.d > 0 ? '+' : ''}${finnhubData.d.toFixed(2)}` : 'N/A';
+                                            const changePercent = finnhubData?.dp ? `${finnhubData.dp > 0 ? '+' : ''}${finnhubData.dp.toFixed(2)}%` : 'N/A';
+                                            const changeColor = finnhubData?.d > 0 ? 'text-green-400' : finnhubData?.d < 0 ? 'text-red-400' : 'text-gray-400';
+                                            
+                                            // Données de profil Finnhub
+                                            const profile = finnhubData?.profile;
+                                            const peRatio = profile?.pe ? profile.pe.toFixed(2) : 'N/A';
+                                            const dividendYield = profile?.dividend ? `${(profile.dividend * 100).toFixed(2)}%` : 'N/A';
+                                            const sector = profile?.industry || 'N/A';
+                                            
+                                            // Données de recommandation Finnhub
+                                            const recommendation = finnhubData?.recommendation;
+                                            const rating = recommendation?.length > 0 ? 
+                                                (recommendation[0].buy + recommendation[0].strongBuy > recommendation[0].sell + recommendation[0].strongSell ? 'Achat' : 
+                                                 recommendation[0].sell + recommendation[0].strongSell > recommendation[0].buy + recommendation[0].strongBuy ? 'Vente' : 'Neutre') : 'N/A';
+                                            
+                                            // 3 actualités les plus récentes pour ce ticker
+                                            const tickerNews = newsData.filter(article => {
+                                                const text = (article.title + ' ' + article.description).toLowerCase();
+                                                return text.includes(ticker.toLowerCase());
+                                            }).slice(0, 3);
+                                            
+                                            // Analyse du sentiment
+                                            const analyzeSentiment = (title, description) => {
+                                                const text = (title + ' ' + description).toLowerCase();
+                                                const positiveWords = ['hausse', 'croissance', 'gain', 'profit', 'positif', 'amélioration', 'succès', 'fort', 'solide'];
+                                                const negativeWords = ['baisse', 'chute', 'perte', 'négatif', 'déclin', 'faible', 'problème', 'risque', 'inquiétude'];
+                                                
+                                                const positiveCount = positiveWords.filter(word => text.includes(word)).length;
+                                                const negativeCount = negativeWords.filter(word => text.includes(word)).length;
+                                                
+                                                if (positiveCount > negativeCount) return { sentiment: 'Positif', color: 'text-green-400' };
+                                                if (negativeCount > positiveCount) return { sentiment: 'Négatif', color: 'text-red-400' };
+                                                return { sentiment: 'Neutre', color: 'text-gray-400' };
+                                            };
+                                            
+                                            const sentiment = tickerNews.length > 0 ? analyzeSentiment(tickerNews[0].title, tickerNews[0].description) : { sentiment: 'N/A', color: 'text-gray-400' };
+                                            
+                                            return (
+                                                <React.Fragment key={ticker}>
+                                                    {/* Ligne principale */}
+                                                    <tr className={`border-b transition-colors duration-300 ${
+                                                        isDarkMode ? 'border-gray-700 hover:bg-gray-800/50' : 'border-gray-200 hover:bg-gray-50'
+                                                    }`}>
+                                                        <td className="py-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <img 
+                                                                    src={getCompanyLogo(ticker)} 
+                                                                    alt={`${ticker} logo`}
+                                                                    className="w-5 h-5 rounded"
+                                                                    onError={(e) => {
+                                                                        e.target.style.display = 'none';
+                                                                    }}
+                                                                />
+                                                                <span className={`font-mono font-bold transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                }`}>{ticker}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className={`py-2 font-medium transition-colors duration-300 ${
+                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}>{price}</td>
+                                                        <td className={`py-2 transition-colors duration-300 ${changeColor}`}>
+                                                            {change} ({changePercent})
+                                                        </td>
+                                                        <td className={`py-2 transition-colors duration-300 ${
+                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                        }`}>{peRatio}</td>
+                                                        <td className={`py-2 transition-colors duration-300 ${
+                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                        }`}>{dividendYield}</td>
+                                                        <td className={`py-2 transition-colors duration-300 ${
+                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                        }`}>{cleanText(sector)}</td>
+                                                        <td className={`py-2 transition-colors duration-300 ${
+                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                        }`}>{rating}</td>
+                                                        <td className={`py-2 transition-colors duration-300 ${sentiment.color}`}>
+                                                            {sentiment.sentiment}
+                                                        </td>
+                                                        <td className="py-2">
+                            <button
+                                                                onClick={() => setSelectedStock(ticker)}
+                                                                className={`px-3 py-1 text-xs rounded transition-colors duration-300 ${
+                                    isDarkMode 
+                                                                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                                                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                }`}
+                            >
+                                                                Voir détail
+                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    
+                                                    {/* Lignes d'actualités (3 maximum) */}
+                                                    {tickerNews.map((news, newsIndex) => (
+                                                        <tr key={`${ticker}-news-${newsIndex}`} className={`border-b transition-colors duration-300 ${
+                                                            isDarkMode ? 'border-gray-700 bg-gray-800/30' : 'border-gray-200 bg-gray-50/50'
+                                                        }`}>
+                                                            <td colSpan="9" className="py-3">
+                                                                <div className={`text-sm transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                                }`}>
+                                                                    <div className="flex items-start gap-2">
+                                                                        <span className="text-blue-400">📰</span>
+                                                                        <div className="flex-1">
+                                                                            <h5 className={`font-medium mb-1 transition-colors duration-300 ${
+                                                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                            }`}>
+                                                                                {news.url ? (
+                                                                                    <a 
+                                                                                        href={news.url} 
+                                                                                        target="_blank" 
+                                                                                        rel="noopener noreferrer"
+                                                                                        className={`hover:underline transition-colors duration-300 ${
+                                                                                            isDarkMode 
+                                                                                                ? 'text-blue-400 hover:text-blue-300' 
+                                                                                                : 'text-blue-600 hover:text-blue-700'
+                                                                                        }`}
+                                                                                    >
+                                                                                        {cleanText(news.title)}
+                                                                                    </a>
+                                                                                ) : (
+                                                                                    cleanText(news.title)
+                                                                                )}
+                                                                            </h5>
+                                                                            <p className={`text-xs mb-2 transition-colors duration-300 ${
+                                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                            }`}>
+                                                                                {cleanText(news.description)}
+                                                                            </p>
+                                                                            <div className={`flex items-center gap-2 text-xs transition-colors duration-300 ${
+                                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                            }`}>
+                                                                                <span>{news.source?.name || 'Source inconnue'}</span>
+                                                                                <span>•</span>
+                                                                                <span>
+                                                                                    {news.publishedAt ? 
+                                                                                        new Date(news.publishedAt).toLocaleString('fr-FR') : 
+                                                                                        'Date inconnue'
+                                                                                    }
+                                                                                </span>
+                                                                                {news.url && (
+                                                                                    <>
+                                                                                        <span>•</span>
+                                                                                        <a 
+                                                                                            href={news.url} 
+                                                                                            target="_blank" 
+                                                                                            rel="noopener noreferrer"
+                                                                                            className={`hover:underline transition-colors duration-300 ${
+                                                                                                isDarkMode 
+                                                                                                    ? 'text-blue-400 hover:text-blue-300' 
+                                                                                                    : 'text-blue-600 hover:text-blue-700'
+                                                                                            }`}
+                                                                                        >
+                                                                                            Lire l'article →
+                                                                                        </a>
+                                                                                    </>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className={`text-xs text-center mt-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>
+                                📜 Faites défiler pour voir toutes les données (Source: Finnhub uniquement)
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Vue en liste compacte */}
                     {viewMode === 'list' && tickers.length > 0 && (
                         <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-600">
@@ -2504,235 +2734,6 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         </div>
                     </div>
 
-                    {/* Section Données Financières & Actualités (Finnhub uniquement) */}
-                    <div className="mt-8">
-                        <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
-                            isDarkMode 
-                                ? 'bg-gray-800/50 border-gray-600' 
-                                : 'bg-white/80 border-gray-300'
-                        }`}>
-                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📊 Données Financières & Actualités (Finnhub)</h3>
-                            <div className="overflow-x-auto max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 relative">
-                                <table className="w-full text-sm">
-                                    <thead>
-                                        <tr className={`border-b transition-colors duration-300 ${
-                                            isDarkMode ? 'border-gray-600' : 'border-gray-300'
-                                        }`}>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>Ticker</th>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>Prix</th>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>Change</th>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>P/E</th>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>Dividende</th>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>Secteur</th>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>Rating</th>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>Sentiment</th>
-                                            <th className={`text-left py-2 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {tickers.map(ticker => {
-                                            // Données de Finnhub uniquement
-                                            const finnhubData = stockData[ticker];
-                                            const price = finnhubData?.c ? `$${finnhubData.c.toFixed(2)}` : 'N/A';
-                                            const change = finnhubData?.d ? `${finnhubData.d > 0 ? '+' : ''}${finnhubData.d.toFixed(2)}` : 'N/A';
-                                            const changePercent = finnhubData?.dp ? `${finnhubData.dp > 0 ? '+' : ''}${finnhubData.dp.toFixed(2)}%` : 'N/A';
-                                            const changeColor = finnhubData?.d > 0 ? 'text-green-400' : finnhubData?.d < 0 ? 'text-red-400' : 'text-gray-400';
-                                            
-                                            // Données de profil Finnhub
-                                            const profile = finnhubData?.profile;
-                                            const peRatio = profile?.pe ? profile.pe.toFixed(2) : 'N/A';
-                                            const dividendYield = profile?.dividend ? `${(profile.dividend * 100).toFixed(2)}%` : 'N/A';
-                                            const sector = profile?.industry || 'N/A';
-                                            
-                                            // Données de recommandation Finnhub
-                                            const recommendation = finnhubData?.recommendation;
-                                            const rating = recommendation?.length > 0 ? 
-                                                (recommendation[0].buy + recommendation[0].strongBuy > recommendation[0].sell + recommendation[0].strongSell ? 'Achat' : 
-                                                 recommendation[0].sell + recommendation[0].strongSell > recommendation[0].buy + recommendation[0].strongBuy ? 'Vente' : 'Neutre') : 'N/A';
-                                            
-                                            // 3 actualités les plus récentes pour ce ticker
-                                            const tickerNews = newsData.filter(article => {
-                                                const text = (article.title + ' ' + article.description).toLowerCase();
-                                                return text.includes(ticker.toLowerCase());
-                                            }).slice(0, 3);
-                                            
-                                            // Analyse du sentiment
-                                            const analyzeSentiment = (title, description) => {
-                                                const text = (title + ' ' + description).toLowerCase();
-                                                const positiveWords = ['hausse', 'croissance', 'gain', 'profit', 'positif', 'amélioration', 'succès', 'fort', 'solide'];
-                                                const negativeWords = ['baisse', 'chute', 'perte', 'négatif', 'déclin', 'faible', 'problème', 'risque', 'inquiétude'];
-                                                
-                                                const positiveCount = positiveWords.filter(word => text.includes(word)).length;
-                                                const negativeCount = negativeWords.filter(word => text.includes(word)).length;
-                                                
-                                                if (positiveCount > negativeCount) return { sentiment: 'Positif', color: 'text-green-400' };
-                                                if (negativeCount > positiveCount) return { sentiment: 'Négatif', color: 'text-red-400' };
-                                                return { sentiment: 'Neutre', color: 'text-gray-400' };
-                                            };
-                                            
-                                            const sentiment = tickerNews.length > 0 ? analyzeSentiment(tickerNews[0].title, tickerNews[0].description) : { sentiment: 'N/A', color: 'text-gray-400' };
-                                            
-                                            return (
-                                                <React.Fragment key={ticker}>
-                                                    {/* Ligne principale */}
-                                                    <tr className={`border-b transition-colors duration-300 ${
-                                                        isDarkMode ? 'border-gray-700 hover:bg-gray-800/50' : 'border-gray-200 hover:bg-gray-50'
-                                                    }`}>
-                                                        <td className="py-2">
-                                                            <div className="flex items-center gap-2">
-                                                                <img 
-                                                                    src={getCompanyLogo(ticker)} 
-                                                                    alt={`${ticker} logo`}
-                                                                    className="w-5 h-5 rounded"
-                                                                    onError={(e) => {
-                                                                        e.target.style.display = 'none';
-                                                                    }}
-                                                                />
-                                                                <span className={`font-mono font-bold transition-colors duration-300 ${
-                                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                                }`}>{ticker}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className={`py-2 font-medium transition-colors duration-300 ${
-                                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                                        }`}>{price}</td>
-                                                        <td className={`py-2 transition-colors duration-300 ${changeColor}`}>
-                                                            {change} ({changePercent})
-                                                        </td>
-                                                        <td className={`py-2 transition-colors duration-300 ${
-                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                        }`}>{peRatio}</td>
-                                                        <td className={`py-2 transition-colors duration-300 ${
-                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                        }`}>{dividendYield}</td>
-                                                        <td className={`py-2 transition-colors duration-300 ${
-                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                        }`}>{cleanText(sector)}</td>
-                                                        <td className={`py-2 transition-colors duration-300 ${
-                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                        }`}>{rating}</td>
-                                                        <td className={`py-2 transition-colors duration-300 ${sentiment.color}`}>
-                                                            {sentiment.sentiment}
-                                                        </td>
-                                                        <td className="py-2">
-                                                            <button
-                                                                onClick={() => setSelectedStock(ticker)}
-                                                                className={`px-3 py-1 text-xs rounded transition-colors duration-300 ${
-                                                                    isDarkMode 
-                                                                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                                                }`}
-                                                            >
-                                                                Voir détail
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    
-                                                    {/* Lignes d'actualités (3 maximum) */}
-                                                    {tickerNews.map((news, newsIndex) => (
-                                                        <tr key={`${ticker}-news-${newsIndex}`} className={`border-b transition-colors duration-300 ${
-                                                            isDarkMode ? 'border-gray-700 bg-gray-800/30' : 'border-gray-200 bg-gray-50/50'
-                                                        }`}>
-                                                            <td colSpan="9" className="py-3">
-                                                                <div className={`text-sm transition-colors duration-300 ${
-                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                                }`}>
-                                                                    <div className="flex items-start gap-2">
-                                                                        <span className="text-blue-400">📰</span>
-                                                                        <div className="flex-1">
-                                                                            <h5 className={`font-medium mb-1 transition-colors duration-300 ${
-                                                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                                                            }`}>
-                                                                                {news.url ? (
-                                                                                    <a 
-                                                                                        href={news.url} 
-                                                                                        target="_blank" 
-                                                                                        rel="noopener noreferrer"
-                                                                                        className={`hover:underline transition-colors duration-300 ${
-                                                                                            isDarkMode 
-                                                                                                ? 'text-blue-400 hover:text-blue-300' 
-                                                                                                : 'text-blue-600 hover:text-blue-700'
-                                                                                        }`}
-                                                                                    >
-                                                                                        {cleanText(news.title)}
-                                                                                    </a>
-                                                                                ) : (
-                                                                                    cleanText(news.title)
-                                                                                )}
-                                                                            </h5>
-                                                                            <p className={`text-xs mb-2 transition-colors duration-300 ${
-                                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                                            }`}>
-                                                                                {cleanText(news.description)}
-                                                                            </p>
-                                                                            <div className={`flex items-center gap-2 text-xs transition-colors duration-300 ${
-                                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                                            }`}>
-                                                                                <span>{news.source?.name || 'Source inconnue'}</span>
-                                                                                <span>•</span>
-                                                                                <span>
-                                                                                    {news.publishedAt ? 
-                                                                                        new Date(news.publishedAt).toLocaleString('fr-FR') : 
-                                                                                        'Date inconnue'
-                                                                                    }
-                                                                                </span>
-                                                                                {news.url && (
-                                                                                    <>
-                                                                                        <span>•</span>
-                                                                                        <a 
-                                                                                            href={news.url} 
-                                                                                            target="_blank" 
-                                                                                            rel="noopener noreferrer"
-                                                                                            className={`hover:underline transition-colors duration-300 ${
-                                                                                                isDarkMode 
-                                                                                                    ? 'text-blue-400 hover:text-blue-300' 
-                                                                                                    : 'text-blue-600 hover:text-blue-700'
-                                                                                            }`}
-                                                                                        >
-                                                                                            Lire l'article →
-                                                                                        </a>
-                                                                                    </>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </React.Fragment>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className={`text-xs text-center mt-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                            }`}>
-                                📜 Faites défiler pour voir toutes les données (Source: Finnhub uniquement)
-                            </div>
-                        </div>
-                    </div>
                 </div>
             );
 
