@@ -5091,12 +5091,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="flex space-x-1">
                                 {[
+                                    { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
                                     { id: 'ask-emma', label: '🤖 Emma IA', component: AskEmmaTab },
                                     { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
                                     { id: 'dans-watchlist', label: '👀 Dan\'s Watchlist', component: DansWatchlistTab },
                                     { id: 'scrapping-sa', label: '🔧 Scrapping SA', component: ScrappingSATab },
-                                    { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab },
-                                    { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab }
+                                    { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab }
                                 ].map(tab => (
                                     <button
                                         key={tab.id}
