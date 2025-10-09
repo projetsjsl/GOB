@@ -3042,7 +3042,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                     temperature: 0.7,
                                     topK: 40,
                                     topP: 0.95,
-                                    maxOutputTokens: 1024,
+                                    maxOutputTokens: 4096, // Augmenté pour des réponses plus longues
+                                    candidateCount: 1,
+                                    stopSequences: []
                                 }
                             })
                         });
@@ -3057,17 +3059,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         console.log('🔍 Réponse Gemini complète:', data);
                         
                         // Vérifier différentes structures de réponse possibles
+                        let responseText = '';
                         if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                            return data.candidates[0].content.parts[0].text;
+                            responseText = data.candidates[0].content.parts[0].text;
                         } else if (data.candidates && data.candidates[0] && data.candidates[0].text) {
                             // Structure alternative possible
-                            return data.candidates[0].text;
+                            responseText = data.candidates[0].text;
                         } else if (data.text) {
                             // Structure directe
-                            return data.text;
+                            responseText = data.text;
                         } else if (data.content && data.content.parts && data.content.parts[0]) {
                             // Structure alternative
-                            return data.content.parts[0].text;
+                            responseText = data.content.parts[0].text;
                         } else {
                             console.error('❌ Structure de réponse inattendue:', {
                                 hasCandidates: !!data.candidates,
@@ -3079,6 +3082,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             });
                             throw new Error(`Réponse invalide de l'API Gemini. Structure: ${JSON.stringify(data, null, 2)}`);
                         }
+                        
+                        // Log de la réponse pour diagnostic
+                        console.log(`📝 Réponse Emma (${responseText.length} caractères):`, responseText);
+                        
+                        // Vérifier si la réponse semble tronquée
+                        if (responseText.length < 50) {
+                            console.warn('⚠️ Réponse très courte, possible troncature');
+                        }
+                        
+                        return responseText;
                     } catch (error) {
                         console.error('Erreur Gemini:', error);
                         throw error;
