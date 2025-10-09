@@ -3,7 +3,7 @@ name: Parse Stock Data with Claude
 on:
   push:
     paths:
-      - 'public/seeking-alpha/stock_analysis.json'
+      - 'stock_analysis.json'
   workflow_dispatch:
 
 jobs:
@@ -139,8 +139,8 @@ jobs:
           }
 
           async function main() {
-            console.log("Lecture public/seeking-alpha/stock_analysis.json...");
-            const stockAnalysis = JSON.parse(fs.readFileSync('public/seeking-alpha/stock_analysis.json', 'utf8'));
+            console.log("Lecture stock_analysis.json...");
+            const stockAnalysis = JSON.parse(fs.readFileSync('stock_analysis.json', 'utf8'));
             const parsedStocks = {};
 
             for (const stock of stockAnalysis.stocks) {
@@ -162,7 +162,7 @@ jobs:
               }
             }
 
-            fs.writeFileSync('public/seeking-alpha/stock_data.json', JSON.stringify({
+            fs.writeFileSync('stock_data.json', JSON.stringify({
               lastUpdate: new Date().toISOString(),
               stocks: parsedStocks
             }, null, 2), 'utf8');
@@ -179,6 +179,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/seeking-alpha/stock_data.json
+          git add stock_data.json
           git diff --quiet && git diff --staged --quiet || git commit -m "Rapport auto-généré par Claude"
           git push
