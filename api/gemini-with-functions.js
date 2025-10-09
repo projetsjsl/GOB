@@ -30,6 +30,10 @@ export default async function handler(req, res) {
     }
 
     try {
+        console.log('🔧 Début de la requête Gemini avec Function Calling');
+        console.log('📝 Message:', message);
+        console.log('🌡️ Température:', temperature);
+        
         // Définir les fonctions disponibles pour Gemini
         const functionDeclarations = [
             {
@@ -103,9 +107,18 @@ export default async function handler(req, res) {
         // Fonction pour obtenir le prix d'une action
         const getStockPrice = async (symbol) => {
             try {
+                console.log(`🔍 Récupération du prix pour ${symbol}`);
+                
                 // Utiliser notre API marketdata existante
-                const response = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/marketdata?endpoint=quote&symbol=${symbol}&source=yahoo`);
+                const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+                const url = `${baseUrl}/api/marketdata?endpoint=quote&symbol=${symbol}&source=yahoo`;
+                
+                console.log(`📡 URL: ${url}`);
+                
+                const response = await fetch(url);
                 const data = await response.json();
+                
+                console.log(`📊 Données reçues:`, data);
                 
                 if (data.error) {
                     return { error: data.error };
@@ -113,13 +126,14 @@ export default async function handler(req, res) {
                 
                 return {
                     symbol: symbol,
-                    price: data.c,
-                    change: data.d,
-                    changePercent: data.dp,
+                    price: data.c || 0,
+                    change: data.d || 0,
+                    changePercent: data.dp || 0,
                     currency: "USD",
                     timestamp: new Date().toISOString()
                 };
             } catch (error) {
+                console.error(`❌ Erreur getStockPrice:`, error);
                 return { error: error.message };
             }
         };
