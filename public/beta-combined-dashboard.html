@@ -2930,6 +2930,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 4. Redéployez l'application
 
 **Diagnostic :** ${error.message}`;
+                        } else if (error.message.includes('Réponse invalide de l\'API Gemini')) {
+                            errorContent = `🔧 Problème de structure de réponse Gemini !
+
+**Problème détecté :** La réponse de l'API Gemini a une structure inattendue.
+
+**Solutions :**
+1. Vérifiez que votre clé API Gemini est valide
+2. Consultez la console pour voir la structure complète de la réponse
+3. Essayez de redémarrer la conversation
+
+**Diagnostic :** ${error.message}`;
                         } else {
                             errorContent = `❌ Erreur de connexion à l'API Gemini.
 
@@ -3042,10 +3053,31 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                         const data = await response.json();
                         
+                        // Log de debug pour diagnostiquer la structure de la réponse
+                        console.log('🔍 Réponse Gemini complète:', data);
+                        
+                        // Vérifier différentes structures de réponse possibles
                         if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                             return data.candidates[0].content.parts[0].text;
+                        } else if (data.candidates && data.candidates[0] && data.candidates[0].text) {
+                            // Structure alternative possible
+                            return data.candidates[0].text;
+                        } else if (data.text) {
+                            // Structure directe
+                            return data.text;
+                        } else if (data.content && data.content.parts && data.content.parts[0]) {
+                            // Structure alternative
+                            return data.content.parts[0].text;
                         } else {
-                            throw new Error('Réponse invalide de l\'API');
+                            console.error('❌ Structure de réponse inattendue:', {
+                                hasCandidates: !!data.candidates,
+                                candidatesLength: data.candidates?.length,
+                                firstCandidate: data.candidates?.[0],
+                                hasText: !!data.text,
+                                hasContent: !!data.content,
+                                fullResponse: data
+                            });
+                            throw new Error(`Réponse invalide de l'API Gemini. Structure: ${JSON.stringify(data, null, 2)}`);
                         }
                     } catch (error) {
                         console.error('Erreur Gemini:', error);
