@@ -109,29 +109,31 @@ export default async function handler(req, res) {
             try {
                 console.log(`🔍 Récupération du prix pour ${symbol}`);
                 
-                // Utiliser notre API marketdata existante
-                const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
-                const url = `${baseUrl}/api/marketdata?endpoint=quote&symbol=${symbol}&source=yahoo`;
+                // Utiliser directement Yahoo Finance (gratuit et fiable)
+                const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
                 
-                console.log(`📡 URL: ${url}`);
+                console.log(`📡 URL Yahoo Finance: ${url}`);
                 
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                console.log(`📊 Données reçues:`, data);
+                console.log(`📊 Données Yahoo Finance reçues:`, data);
                 
-                if (data.error) {
-                    return { error: data.error };
+                if (data.quoteResponse && data.quoteResponse.result && data.quoteResponse.result[0]) {
+                    const quote = data.quoteResponse.result[0];
+                    return {
+                        symbol: symbol,
+                        price: quote.regularMarketPrice || 0,
+                        change: quote.regularMarketChange || 0,
+                        changePercent: quote.regularMarketChangePercent || 0,
+                        currency: quote.currency || "USD",
+                        timestamp: new Date().toISOString(),
+                        marketCap: quote.marketCap,
+                        volume: quote.regularMarketVolume
+                    };
+                } else {
+                    return { error: `Aucune donnée trouvée pour ${symbol}` };
                 }
-                
-                return {
-                    symbol: symbol,
-                    price: data.c || 0,
-                    change: data.d || 0,
-                    changePercent: data.dp || 0,
-                    currency: "USD",
-                    timestamp: new Date().toISOString()
-                };
             } catch (error) {
                 console.error(`❌ Erreur getStockPrice:`, error);
                 return { error: error.message };
@@ -141,25 +143,34 @@ export default async function handler(req, res) {
         // Fonction pour obtenir les actualités financières
         const getFinancialNews = async (query, limit) => {
             try {
-                // Utiliser notre API news existante
-                const response = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/news?q=${encodeURIComponent(query)}&limit=${limit}`);
+                console.log(`🔍 Récupération des actualités pour ${query}`);
+                
+                // Utiliser directement Yahoo Finance News (gratuit)
+                const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=1&newsCount=${limit || 5}`;
+                
+                console.log(`📡 URL Yahoo News: ${url}`);
+                
+                const response = await fetch(url);
                 const data = await response.json();
                 
-                if (data.error) {
-                    return { error: data.error };
-                }
+                console.log(`📊 Actualités Yahoo reçues:`, data);
                 
-                return {
-                    query: query,
-                    articles: data.articles.map(article => ({
-                        title: article.title,
-                        description: article.description,
-                        url: article.url,
-                        publishedAt: article.publishedAt,
-                        source: article.source?.name || 'Unknown'
-                    }))
-                };
+                if (data.news && data.news.length > 0) {
+                    return {
+                        query: query,
+                        articles: data.news.map(article => ({
+                            title: article.title,
+                            summary: article.summary,
+                            url: article.link,
+                            publishedAt: new Date(article.providerPublishTime * 1000).toISOString(),
+                            source: article.publisher
+                        }))
+                    };
+                } else {
+                    return { error: `Aucune actualité trouvée pour ${query}` };
+                }
             } catch (error) {
+                console.error(`❌ Erreur getFinancialNews:`, error);
                 return { error: error.message };
             }
         };
