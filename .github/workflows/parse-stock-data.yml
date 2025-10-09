@@ -116,8 +116,14 @@ jobs:
             const data = await response.json();
             let text = data.content[0].text;
             
-            // Forcer le décodage UTF-8
-            text = decodeURIComponent(escape(text));
+            // Gestion robuste de l'encodage UTF-8
+            try {
+              // Essayer d'abord la méthode standard
+              text = decodeURIComponent(escape(text));
+            } catch (e) {
+              // Si ça échoue, utiliser le texte tel quel (déjà en UTF-8)
+              console.log("Décodage URI échoué, utilisation du texte brut");
+            }
             
             // Nettoyage agressif
             text = text.replace(/```json\n?/g, "");
