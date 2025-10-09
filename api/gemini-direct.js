@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Méthode non autorisée' });
     }
 
-    const { message, temperature = 0.3 } = req.body;
+    const { message, temperature = 0.3, maxTokens = 4096 } = req.body;
     
     if (!message) {
         return res.status(400).json({ error: 'Message requis' });
@@ -140,7 +140,7 @@ Note: Erreur lors de la récupération des données financières. Réponds quand
                     temperature: temperature,
                     topK: 20,
                     topP: 0.8,
-                    maxOutputTokens: 2048, // Réduit pour des réponses plus concises
+                    maxOutputTokens: maxTokens,
                     candidateCount: 1
                 }
             })

@@ -2589,7 +2589,9 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [emmaConnected, setEmmaConnected] = useState(false);
                 const [showPromptEditor, setShowPromptEditor] = useState(false);
                 const [showTemperatureEditor, setShowTemperatureEditor] = useState(false);
+                const [showLengthEditor, setShowLengthEditor] = useState(false);
                 const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
+                const [emmaMaxTokens, setEmmaMaxTokens] = useState(4096); // Longueur de réponse par défaut
                 const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
                 const [emmaPrompt, setEmmaPrompt] = useState(`Identité et Mission
 Tu es Emma — Exploratrice Multi-Métiers Autonome, actuellement configurée en mode Analyste Financière et Gestionnaire de Portefeuille.
@@ -2853,6 +2855,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const initializeEmma = async () => {
                     try {
+                        // Charger les messages depuis localStorage (persistance)
+                        const savedMessages = localStorage.getItem('emma-messages');
+                        if (savedMessages) {
+                            setEmmaMessages(JSON.parse(savedMessages));
+                        } else {
+                            // Message de bienvenue initial seulement si pas de messages sauvegardés
+                            setEmmaMessages([{
+                                type: 'emma',
+                                content: 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l\'analyse et l\'évaluation financière. Quel est votre défi financier ?',
+                                timestamp: new Date().toISOString()
+                            }]);
+                        }
+                        
                         // Charger le prompt depuis localStorage
                         const savedPrompt = localStorage.getItem('emma-financial-prompt');
                         if (savedPrompt) {
@@ -2861,6 +2876,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         // Charger la température depuis localStorage
                         loadTemperature();
+                        
+                        // Charger la longueur de réponse depuis localStorage
+                        loadMaxTokens();
                         
                         // Charger le paramètre function calling depuis localStorage
                         loadFunctionCalling();
@@ -2916,7 +2934,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
                         
-                        setEmmaMessages(prev => [...prev, emmaResponse]);
+                        setEmmaMessages(prev => {
+                            const newMessages = [...prev, emmaResponse];
+                            // Sauvegarder les messages dans localStorage
+                            localStorage.setItem('emma-messages', JSON.stringify(newMessages));
+                            return newMessages;
+                        });
                     } catch (error) {
                         console.error('Erreur Gemini:', error);
                         // Analyser le type d'erreur pour un message plus précis
@@ -2971,7 +2994,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         setEmmaMessages(prev => [...prev, errorMessage]);
                     } finally {
                         setEmmaLoading(false);
-                        setEmmaInput('');
+                        // Ne pas vider l'input automatiquement
                     }
                 };
 
@@ -3048,7 +3071,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                 },
                                 body: JSON.stringify({
                                     message: userMessage, // Utiliser directement le message utilisateur
-                                    temperature: emmaTemperature
+                                    temperature: emmaTemperature,
+                                    maxTokens: emmaMaxTokens
                                 })
                             });
                         } else {
@@ -3134,6 +3158,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const clearChat = () => {
                     setEmmaMessages([]);
+                    localStorage.removeItem('emma-messages');
                 };
 
                 const savePrompt = () => {
@@ -3160,6 +3185,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     const saved = localStorage.getItem('emma-function-calling');
                     if (saved !== null) {
                         setUseFunctionCalling(saved === 'true');
+                    }
+                };
+
+                const saveMaxTokens = () => {
+                    localStorage.setItem('emma-max-tokens', emmaMaxTokens.toString());
+                };
+
+                const loadMaxTokens = () => {
+                    const saved = localStorage.getItem('emma-max-tokens');
+                    if (saved) {
+                        setEmmaMaxTokens(parseInt(saved));
                     }
                 };
 
@@ -3435,12 +3471,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     🗑️ Effacer
                                 </button>
                                 <button
-                                    onClick={() => setEmmaInput('Bonjour Emma, peux-tu m\'aider ?')}
-                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                                >
-                                    💡 Exemple
-                                </button>
-                                <button
                                     onClick={() => setShowPromptEditor(!showPromptEditor)}
                                     className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
                                 >
@@ -3451,6 +3481,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                                 >
                                     🌡️ Température
+                                </button>
+                                <button
+                                    onClick={() => setShowLengthEditor(!showLengthEditor)}
+                                    className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
+                                >
+                                    📏 Longueur
                                 </button>
                                 <div className={`px-3 py-2 rounded text-sm font-medium ${
                                     emmaConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -3467,7 +3503,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 : 'bg-gray-50 border-gray-200'
                         }`}>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                                <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
                                     <img 
                                         src={isDarkMode ? 'emma-avatar-gob-dark.jpg' : 'emma-avatar-gob-light.jpg'} 
                                         alt="Emma" 
@@ -3477,10 +3513,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <div>
                                     <h3 className={`text-lg font-semibold transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>Emma - Consultations Gratuites</h3>
+                                    }`}>Emma IA</h3>
                                     <p className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                    }`}>Analyse Financière</p>
+                                    }`}>Analyste financière virtuelle</p>
                                 </div>
                             </div>
 
@@ -3602,6 +3638,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 >
                                     {emmaLoading ? '⏳' : '📤'}
                                 </button>
+                                {emmaInput.trim() && (
+                                    <button
+                                        onClick={() => setEmmaInput('')}
+                                        className="px-3 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600 transition-colors"
+                                        title="Vider l'input"
+                                    >
+                                        ✕
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -3773,6 +3818,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 <div className="text-xs opacity-75">Analyses professionnelles</div>
                                             </button>
                                             <button
+                                                onClick={() => setEmmaTemperature(0.5)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${
+                                                    emmaTemperature === 0.5 
+                                                        ? 'bg-blue-600 text-white' 
+                                                        : isDarkMode 
+                                                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                }`}
+                                            >
+                                                <div className="font-medium">🎯 Modéré</div>
+                                                <div className="text-xs opacity-75">Équilibré et factuel</div>
+                                            </button>
+                                            <button
                                                 onClick={() => setEmmaTemperature(0.7)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${
                                                     emmaTemperature === 0.7 
@@ -3811,11 +3869,109 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 <strong>Température 0.1:</strong> "Apple présente un P/E de 28.5, une croissance des revenus de 8.2% YoY, et une position de trésorerie de $29.4B. Recommandation: ACHAT."
                                             </div>
                                             <div>
+                                                <strong>Température 0.5:</strong> "Apple montre une performance financière robuste avec des métriques clés positives. Le P/E de 28.5 est raisonnable pour la croissance, et la trésorerie de $29.4B renforce la position. Recommandation: ACHAT."
+                                            </div>
+                                            <div>
                                                 <strong>Température 0.7:</strong> "Apple semble intéressant avec de bonnes perspectives de croissance, mais il faut surveiller les défis du marché chinois..."
                                             </div>
                                             <div>
                                                 <strong>Température 0.9:</strong> "Apple, c'est comme un phénix qui renaît de ses cendres ! Avec leur écosystème intégré, ils pourraient révolutionner..."
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Éditeur de longueur de réponse */}
+                        {showLengthEditor && (
+                            <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>📏 Contrôle de Longueur Emma</h3>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setEmmaMaxTokens(4096)}
+                                            className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors"
+                                        >
+                                            🔄 Réinitialiser
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                saveMaxTokens();
+                                            }}
+                                            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
+                                        >
+                                            💾 Sauvegarder
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    {/* Slider de longueur */}
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                            Longueur de réponse: {emmaMaxTokens} tokens
+                                        </label>
+                                        <input
+                                            type="range"
+                                            min="1024"
+                                            max="8192"
+                                            step="1024"
+                                            value={emmaMaxTokens}
+                                            onChange={(e) => setEmmaMaxTokens(parseInt(e.target.value))}
+                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                                        />
+                                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>1024 (Court)</span>
+                                            <span>8192 (Long)</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Presets de longueur */}
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                            Presets Recommandés:
+                                        </label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                onClick={() => setEmmaMaxTokens(1024)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 1024 ? 'bg-orange-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                                            >
+                                                <div className="font-medium">📝 Court</div>
+                                                <div className="text-xs opacity-75">2-3 paragraphes</div>
+                                            </button>
+                                            <button
+                                                onClick={() => setEmmaMaxTokens(2048)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 2048 ? 'bg-orange-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                                            >
+                                                <div className="font-medium">📊 Moyen</div>
+                                                <div className="text-xs opacity-75">Analyses courtes à moyenne</div>
+                                            </button>
+                                            <button
+                                                onClick={() => setEmmaMaxTokens(4096)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 4096 ? 'bg-orange-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                                            >
+                                                <div className="font-medium">📈 Complet</div>
+                                                <div className="text-xs opacity-75">Analyses moyennes (Par défaut)</div>
+                                            </button>
+                                            <button
+                                                onClick={() => setEmmaMaxTokens(8192)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 8192 ? 'bg-orange-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                                            >
+                                                <div className="font-medium">📋 Rapport</div>
+                                                <div className="text-xs opacity-75">Rapports complets</div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Exemples de longueur */}
+                                    <div className={`p-3 rounded-lg text-sm ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                                        <p className="font-medium mb-2">Exemples d'ajustements possibles de maxOutputTokens :</p>
+                                        <div className="space-y-2 text-xs">
+                                            <div><strong>1024 →</strong> réponses courtes (2-3 paragraphes)</div>
+                                            <div><strong>2048 →</strong> analyses courtes à moyenne</div>
+                                            <div><strong>Par Défaut : 4096</strong> analyses moyennes</div>
+                                            <div><strong>8192 →</strong> rapports complets (si modèle supporte)</div>
                                         </div>
                                     </div>
                                 </div>
@@ -4905,7 +5061,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <p className={`font-['Inter'] transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                         }`}>
-                                            Plateforme financière • Seeking Alpha + Stocks & News • Propulsée par JSL AI
+                                            Plateforme financière • Propulsée par JSL AI
                                         </p>
                                     </div>
                                 </div>
