@@ -67,7 +67,7 @@ class EmmaDashboardIntegration {
         
         <!-- Boutons de contrôle -->
         <div class="emma-control-buttons">
-          <button class="emma-btn emma-btn-secondary" id="emma-toggle-prompt-editor" disabled style="opacity: 0.5; cursor: not-allowed;">
+          <button class="emma-btn emma-btn-secondary" id="emma-toggle-prompt-editor">
             📝 Éditer le prompt
           </button>
           <button class="emma-btn emma-btn-secondary" id="emma-toggle-gemini-config">
