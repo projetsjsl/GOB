@@ -2587,6 +2587,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [emmaApiKey, setEmmaApiKey] = useState('');
                 const [emmaConnected, setEmmaConnected] = useState(false);
                 const [showPromptEditor, setShowPromptEditor] = useState(false);
+                const [showTemperatureEditor, setShowTemperatureEditor] = useState(false);
+                const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
                 const [emmaPrompt, setEmmaPrompt] = useState(`Identité et Mission
 Tu es Emma — Exploratrice Multi-Métiers Autonome, actuellement configurée en mode Analyste Financière et Gestionnaire de Portefeuille.
 
@@ -2855,6 +2857,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             setEmmaPrompt(savedPrompt);
                         }
                         
+                        // Charger la température depuis localStorage
+                        loadTemperature();
+                        
                         // Vérifier la connexion Gemini
                         await checkGeminiConnection();
                     } catch (error) {
@@ -3039,7 +3044,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                     }]
                                 }],
                                 generationConfig: {
-                                    temperature: 0.3, // Réduit pour analyses financières plus précises et cohérentes
+                                    temperature: emmaTemperature, // Température dynamique configurée par l'utilisateur
                                     topK: 20, // Réduit pour plus de précision dans le vocabulaire financier
                                     topP: 0.8, // Réduit pour plus de cohérence dans les analyses
                                     maxOutputTokens: 4096, // Maintenu pour analyses détaillées
@@ -3105,6 +3110,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 const savePrompt = () => {
                     localStorage.setItem('emma-financial-prompt', emmaPrompt);
                     setShowPromptEditor(false);
+                };
+
+                const saveTemperature = () => {
+                    localStorage.setItem('emma-temperature', emmaTemperature.toString());
+                };
+
+                const loadTemperature = () => {
+                    const saved = localStorage.getItem('emma-temperature');
+                    if (saved) {
+                        setEmmaTemperature(parseFloat(saved));
+                    }
                 };
 
                 const resetPrompt = () => {
@@ -3390,6 +3406,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 >
                                     📝 Prompt
                                 </button>
+                                <button
+                                    onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    🌡️ Température
+                                </button>
                                 <div className={`px-3 py-2 rounded text-sm font-medium ${
                                     emmaConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                                 }`}>
@@ -3590,6 +3612,140 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <li><code className="bg-gray-200 text-gray-800 px-1 rounded">{"{dashboardData}"}</code> - Données du dashboard</li>
                                         <li><code className="bg-gray-200 text-gray-800 px-1 rounded">{"{currentTime}"}</code> - Heure actuelle</li>
                                     </ul>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Éditeur de Température */}
+                        {showTemperatureEditor && (
+                            <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
+                                isDarkMode 
+                                    ? 'bg-gray-900 border-gray-700' 
+                                    : 'bg-gray-50 border-gray-200'
+                            }`}>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>🌡️ Contrôle de Température Emma</h3>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setEmmaTemperature(0.3)}
+                                            className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors"
+                                        >
+                                            🔄 Réinitialiser
+                                        </button>
+                                        <button
+                                            onClick={saveTemperature}
+                                            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
+                                        >
+                                            💾 Sauvegarder
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    {/* Slider de température */}
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Température: {emmaTemperature}
+                                        </label>
+                                        <input
+                                            type="range"
+                                            min="0.1"
+                                            max="1.0"
+                                            step="0.1"
+                                            value={emmaTemperature}
+                                            onChange={(e) => setEmmaTemperature(parseFloat(e.target.value))}
+                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                                        />
+                                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>0.1 (Précis)</span>
+                                            <span>1.0 (Créatif)</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Presets de température */}
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Presets Recommandés:
+                                        </label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                onClick={() => setEmmaTemperature(0.1)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${
+                                                    emmaTemperature === 0.1 
+                                                        ? 'bg-blue-600 text-white' 
+                                                        : isDarkMode 
+                                                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                }`}
+                                            >
+                                                <div className="font-medium">📊 Très Précis</div>
+                                                <div className="text-xs opacity-75">Analyses factuelles</div>
+                                            </button>
+                                            <button
+                                                onClick={() => setEmmaTemperature(0.3)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${
+                                                    emmaTemperature === 0.3 
+                                                        ? 'bg-blue-600 text-white' 
+                                                        : isDarkMode 
+                                                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                }`}
+                                            >
+                                                <div className="font-medium">📈 Financier</div>
+                                                <div className="text-xs opacity-75">Analyses professionnelles</div>
+                                            </button>
+                                            <button
+                                                onClick={() => setEmmaTemperature(0.7)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${
+                                                    emmaTemperature === 0.7 
+                                                        ? 'bg-blue-600 text-white' 
+                                                        : isDarkMode 
+                                                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                }`}
+                                            >
+                                                <div className="font-medium">⚖️ Équilibré</div>
+                                                <div className="text-xs opacity-75">Professionnel et naturel</div>
+                                            </button>
+                                            <button
+                                                onClick={() => setEmmaTemperature(0.9)}
+                                                className={`p-3 rounded-lg text-sm transition-colors ${
+                                                    emmaTemperature === 0.9 
+                                                        ? 'bg-blue-600 text-white' 
+                                                        : isDarkMode 
+                                                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                }`}
+                                            >
+                                                <div className="font-medium">🎨 Créatif</div>
+                                                <div className="text-xs opacity-75">Idées innovantes</div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Exemples de réponses */}
+                                    <div className={`p-3 rounded-lg text-sm ${
+                                        isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'
+                                    }`}>
+                                        <p className="font-medium mb-2">Exemples de réponses selon la température :</p>
+                                        <div className="space-y-2 text-xs">
+                                            <div>
+                                                <strong>Température 0.1:</strong> "Apple présente un P/E de 28.5, une croissance des revenus de 8.2% YoY, et une position de trésorerie de $29.4B. Recommandation: ACHAT."
+                                            </div>
+                                            <div>
+                                                <strong>Température 0.7:</strong> "Apple semble intéressant avec de bonnes perspectives de croissance, mais il faut surveiller les défis du marché chinois..."
+                                            </div>
+                                            <div>
+                                                <strong>Température 0.9:</strong> "Apple, c'est comme un phénix qui renaît de ses cendres ! Avec leur écosystème intégré, ils pourraient révolutionner..."
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}
