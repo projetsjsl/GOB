@@ -113,10 +113,10 @@ class EmmaGeminiService {
             }]
           }],
           generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 4096, // Augmenté pour des réponses plus longues
+            temperature: 0.3, // Réduit pour analyses financières plus précises et cohérentes
+            topK: 20, // Réduit pour plus de précision dans le vocabulaire financier
+            topP: 0.8, // Réduit pour plus de cohérence dans les analyses
+            maxOutputTokens: 4096, // Maintenu pour analyses détaillées
             candidateCount: 1,
             stopSequences: []
           }
