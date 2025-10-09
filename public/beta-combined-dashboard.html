@@ -216,7 +216,7 @@
             // Fonction pour extraire le logo depuis les données de scraping
             const getCompanyLogo = (ticker) => {
                 try {
-                    // Chercher dans les données de scraping
+                    // Chercher dans les  données de scraping
                     const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
                     if (seekingAlphaItem?.raw_text) {
                         // Extraire le logo depuis le JSON dans raw_text
