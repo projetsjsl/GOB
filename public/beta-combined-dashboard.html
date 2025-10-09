@@ -104,6 +104,17 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
+        /* Animation intro Emma */
+        @keyframes emma-intro-fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes emma-zoom-in {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .emma-intro-overlay { animation: emma-intro-fade 300ms ease-out; }
+        .emma-intro-image { animation: emma-zoom-in 800ms ease-out; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -145,6 +156,7 @@
             
             // État pour le thème
             const [isDarkMode, setIsDarkMode] = useState(true);
+            const [showEmmaIntro, setShowEmmaIntro] = useState(false);
 
             // Configuration API
             const API_BASE_URL = window.location.origin;
@@ -565,6 +577,13 @@
                 };
                 
                 loadAllData();
+
+                // Intro Emma: première visite de session
+                if (activeTab === 'ask-emma' && !sessionStorage.getItem('emma-intro-shown')) {
+                    setShowEmmaIntro(true);
+                    sessionStorage.setItem('emma-intro-shown', '1');
+                    setTimeout(() => setShowEmmaIntro(false), 3000);
+                }
                 
                 const interval = setInterval(() => {
                     console.log('🔄 Auto-refresh des données...');
@@ -576,6 +595,15 @@
                 
                 return () => clearInterval(interval);
             }, []);
+
+            // Afficher l'intro quand on ouvre Emma IA pour la 1ère fois pendant la session
+            useEffect(() => {
+                if (activeTab === 'ask-emma' && !sessionStorage.getItem('emma-intro-shown')) {
+                    setShowEmmaIntro(true);
+                    sessionStorage.setItem('emma-intro-shown', '1');
+                    setTimeout(() => setShowEmmaIntro(false), 3000);
+                }
+            }, [activeTab]);
 
             // Mettre à jour les actualités filtrées quand les actualités changent
             useEffect(() => {
@@ -5032,6 +5060,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         ? 'bg-black' 
                         : 'bg-white'
                 }`}>
+                    {/* Intro Emma IA - première visite de session */}
+                    {showEmmaIntro && activeTab === 'ask-emma' && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 emma-intro-overlay">
+                            <div className="text-center">
+                                <div className="mb-6">
+                                    <img 
+                                        src={'EMMA-JSLAI-GOB-dark.jpg'}
+                                        alt="Emma IA"
+                                        className="emma-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-emerald-500"
+                                    />
+                                </div>
+                                <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">Emma IA</h2>
+                                <p className="text-emerald-300 text-lg">Analyste financière virtuelle • JSL AI</p>
+                            </div>
+                        </div>
+                    )}
                     {/* Header */}
                     <header className={`p-6 border-b transition-colors duration-300 ${
                         isDarkMode 
