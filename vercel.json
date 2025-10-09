@@ -1,1 +1,34 @@
-{"redirects":[{"source":"/","destination":"https://gobapps.com/beta-combined-dashboard.html","permanent":false}]}
+{
+  "functions": {
+    "api/gemini/chat.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "api/marketdata.js": {
+      "memory": 512,
+      "maxDuration": 10
+    },
+    "api/news.js": {
+      "memory": 512,
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
+  ]
+,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://gobapps.com/beta-combined-dashboard.html",
+      "permanent": false
+    }
+  ]
+}

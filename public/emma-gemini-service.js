@@ -140,6 +140,33 @@ class EmmaGeminiService {
     }
   }
 
+  // Générer une réponse via backend Function Calling
+  async generateResponseViaBackend(userMessage, history = [], customPrompt = null, cfg = {}) {
+    const { temperature = 0.3, maxTokens = 4096 } = cfg;
+    const systemPrompt = customPrompt || localStorage.getItem('emma-financial-prompt') ||
+      `Tu es Emma, une assistante virtuelle spécialisée en analyse financière. Réponds de manière professionnelle et utile.`;
+
+    const payload = {
+      messages: [
+        ...history.map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.content })),
+        { role: 'user', content: userMessage }
+      ],
+      temperature,
+      maxTokens,
+      systemPrompt
+    };
+
+    const r = await fetch('/api/gemini/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error(`Erreur API backend: ${r.status}`);
+    const d = await r.json();
+    if (d?.response) return d.response;
+    throw new Error('Réponse backend invalide');
+  }
+
   // Obtenir le statut de connexion
   getConnectionStatus() {
     return {

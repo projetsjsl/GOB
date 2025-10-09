@@ -3242,16 +3242,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         // Utiliser l'API avec function calling si activé
                         if (useFunctionCalling) {
-                            console.log('🔧 Utilisation de Gemini Direct (v2)');
-                            response = await fetch('/api/gemini-direct', {
+                            console.log('🔧 Utilisation de Gemini Function Calling (chat)');
+                            response = await fetch('/api/gemini/chat', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({
-                                    message: userMessage, // Utiliser directement le message utilisateur
+                                    messages: [
+                                        // Historique minimal (multi-tours), on peut l’étendre si besoin
+                                        ...emmaMessages.map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.content })),
+                                        { role: 'user', content: userMessage }
+                                    ],
                                     temperature: emmaTemperature,
-                                    maxTokens: emmaMaxTokens
+                                    maxTokens: emmaMaxTokens,
+                                    systemPrompt: emmaPrompt
                                 })
                             });
                         } else {
