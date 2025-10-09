@@ -423,7 +423,7 @@
             // Données   Seeking Alpha
             const fetchSeekingAlphaData = async () => {
                 try {
-                    const response = await fetch('/seeking-alpha/stock_analysis.json');
+                    const response = await fetch('/stock_analysis.json');
                     if (response.ok) {
                         const data = await response.json();
                         setSeekingAlphaData(data);
@@ -435,7 +435,7 @@
 
             const fetchSeekingAlphaStockData = async () => {
                 try {
-                    const response = await fetch('/seeking-alpha/stock_data.json');
+                    const response = await fetch('/stock_data.json');
                     if (response.ok) {
                         const data = await response.json();
                         setSeekingAlphaStockData(data);
@@ -1103,7 +1103,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            file: 'public/seeking-alpha/stock_data.json',
+                            file: 'stock_data.json',
                             ticker: ticker,
                             data: analysisData,
                             action: 'update_stock'
@@ -1121,7 +1121,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            file: 'public/seeking-alpha/stock_analysis.json',
+                            file: 'stock_analysis.json',
                             ticker: ticker,
                             data: {
                                 ticker: ticker,
