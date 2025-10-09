@@ -3039,14 +3039,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         // Utiliser l'API avec function calling si activé
                         if (useFunctionCalling) {
-                            console.log('🔧 Utilisation de Gemini Fixed');
-                            response = await fetch('/api/gemini-fixed', {
+                            console.log('🔧 Utilisation de Gemini Direct');
+                            response = await fetch('/api/gemini-direct', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({
-                                    message: fullPrompt,
+                                    message: userMessage, // Utiliser directement le message utilisateur
                                     temperature: emmaTemperature
                                 })
                             });

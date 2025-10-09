@@ -1,6 +1,6 @@
 // ========================================
-// GEMINI FIXED - Version simplifiée qui fonctionne
-// API Route pour Gemini avec function calling simplifié
+// GEMINI DIRECT - Version ultra-simplifiée
+// API Route pour Gemini avec données financières directes
 // ========================================
 
 export default async function handler(req, res) {
@@ -31,21 +31,20 @@ export default async function handler(req, res) {
     }
 
     try {
-        console.log('🔧 Gemini Fixed - Début');
+        console.log('🔧 Gemini Direct - Début');
         console.log('📝 Message:', message.substring(0, 100) + '...');
-        console.log('🌡️ Température:', temperature);
 
-        // Détecter si la question nécessite des données financières
-        const needsStockData = /prix|price|action|stock|AAPL|TSLA|MSFT|GOOGL|AMZN|META|NVDA/i.test(message);
-        const needsNews = /actualité|news|nouvelle|récent/i.test(message);
+        // Détecter les questions sur les prix d'actions
+        const priceKeywords = /prix|price|valeur|value|action|stock|AAPL|TSLA|MSFT|GOOGL|AMZN|META|NVDA|Apple|Tesla|Microsoft|Google|Amazon|Meta|NVIDIA/i;
+        const isPriceQuestion = priceKeywords.test(message);
 
-        let enhancedMessage = message;
+        let finalMessage = message;
 
-        // Si la question concerne des données financières, ajouter des données réelles
-        if (needsStockData) {
-            console.log('📊 Détection: Données financières nécessaires');
+        // Si c'est une question sur les prix, récupérer les données réelles
+        if (isPriceQuestion) {
+            console.log('💰 Question sur les prix détectée');
             
-            // Extraire le symbole de la question
+            // Extraire le symbole
             const symbolMatch = message.match(/(AAPL|TSLA|MSFT|GOOGL|AMZN|META|NVDA|Apple|Tesla|Microsoft|Google|Amazon|Meta|NVIDIA)/i);
             const symbol = symbolMatch ? symbolMatch[1] : 'AAPL';
             
@@ -63,9 +62,9 @@ export default async function handler(req, res) {
             const finalSymbol = symbolMap[symbol] || symbol.toUpperCase();
             
             try {
-                console.log(`🔍 Récupération des données pour ${finalSymbol}`);
+                console.log(`📊 Récupération du prix pour ${finalSymbol}`);
                 
-                // Récupérer les données depuis Yahoo Finance
+                // Yahoo Finance API
                 const yahooUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${finalSymbol}`;
                 const yahooResponse = await fetch(yahooUrl);
                 const yahooData = await yahooResponse.json();
@@ -73,7 +72,7 @@ export default async function handler(req, res) {
                 if (yahooData.quoteResponse && yahooData.quoteResponse.result && yahooData.quoteResponse.result[0]) {
                     const quote = yahooData.quoteResponse.result[0];
                     
-                    const stockData = {
+                    const stockInfo = {
                         symbol: finalSymbol,
                         price: quote.regularMarketPrice,
                         change: quote.regularMarketChange,
@@ -81,61 +80,47 @@ export default async function handler(req, res) {
                         currency: quote.currency || 'USD',
                         marketCap: quote.marketCap,
                         volume: quote.regularMarketVolume,
-                        timestamp: new Date().toISOString()
+                        high: quote.regularMarketDayHigh,
+                        low: quote.regularMarketDayLow,
+                        open: quote.regularMarketOpen,
+                        previousClose: quote.regularMarketPreviousClose
                     };
                     
-                    console.log('✅ Données récupérées:', stockData);
+                    console.log('✅ Données récupérées:', stockInfo);
                     
-                    // Enrichir le message avec les données réelles
-                    enhancedMessage = `${message}
+                    // Créer un message enrichi avec les données réelles
+                    finalMessage = `Tu es Emma, Analyste Financière. Réponds de manière directe et concise.
+
+Question: ${message}
 
 DONNÉES FINANCIÈRES ACTUELLES (${new Date().toLocaleDateString('fr-CA')}):
-- Symbole: ${stockData.symbol}
-- Prix actuel: $${stockData.price} ${stockData.currency}
-- Changement: ${stockData.change > 0 ? '+' : ''}${stockData.change} (${stockData.changePercent > 0 ? '+' : ''}${stockData.changePercent}%)
-- Capitalisation: $${(stockData.marketCap / 1000000000).toFixed(1)}B
-- Volume: ${stockData.volume ? (stockData.volume / 1000000).toFixed(1) + 'M' : 'N/A'}
+- Symbole: ${stockInfo.symbol}
+- Prix actuel: $${stockInfo.price} ${stockInfo.currency}
+- Changement: ${stockInfo.change > 0 ? '+' : ''}${stockInfo.change} (${stockInfo.changePercent > 0 ? '+' : ''}${stockInfo.changePercent}%)
+- Capitalisation: $${(stockInfo.marketCap / 1000000000).toFixed(1)}B
+- Volume: ${stockInfo.volume ? (stockInfo.volume / 1000000).toFixed(1) + 'M' : 'N/A'}
 
-Utilise ces données réelles pour répondre à la question.`;
+Règles importantes :
+- Commence par donner le prix actuel
+- Ajoute un bref commentaire sur la performance
+- Ne mentionne JAMAIS d'actualités non fournies
+- Reste factuel et professionnel
+- Réponds en français québécois`;
                 } else {
                     console.log('⚠️ Aucune donnée trouvée pour', finalSymbol);
+                    finalMessage = `${message}
+
+Note: Je n'ai pas pu récupérer les données financières actuelles pour ${finalSymbol}. Réponds quand même à la question de manière générale.`;
                 }
             } catch (error) {
                 console.error('❌ Erreur récupération données:', error);
+                finalMessage = `${message}
+
+Note: Erreur lors de la récupération des données financières. Réponds quand même à la question.`;
             }
         }
 
-        // Si la question concerne des actualités, ajouter des actualités récentes
-        if (needsNews) {
-            console.log('📰 Détection: Actualités nécessaires');
-            
-            try {
-                const newsUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=AAPL&newsCount=3`;
-                const newsResponse = await fetch(newsUrl);
-                const newsData = await newsResponse.json();
-                
-                if (newsData.news && newsData.news.length > 0) {
-                    const recentNews = newsData.news.slice(0, 3).map(article => ({
-                        title: article.title,
-                        summary: article.summary,
-                        published: new Date(article.providerPublishTime * 1000).toLocaleDateString('fr-CA')
-                    }));
-                    
-                    console.log('✅ Actualités récupérées:', recentNews.length);
-                    
-                    enhancedMessage += `
-
-ACTUALITÉS RÉCENTES:
-${recentNews.map(news => `- ${news.title} (${news.published})`).join('\n')}
-
-Utilise ces actualités récentes dans ta réponse.`;
-                }
-            } catch (error) {
-                console.error('❌ Erreur récupération actualités:', error);
-            }
-        }
-
-        // Appel à Gemini avec le message enrichi
+        // Appel à Gemini
         console.log('🤖 Appel à Gemini...');
         
         const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
@@ -146,14 +131,14 @@ Utilise ces actualités récentes dans ta réponse.`;
             body: JSON.stringify({
                 contents: [{
                     parts: [{
-                        text: enhancedMessage
+                        text: finalMessage
                     }]
                 }],
                 generationConfig: {
                     temperature: temperature,
                     topK: 20,
                     topP: 0.8,
-                    maxOutputTokens: 4096,
+                    maxOutputTokens: 2048, // Réduit pour des réponses plus concises
                     candidateCount: 1
                 }
             })
@@ -185,12 +170,12 @@ Utilise ces actualités récentes dans ta réponse.`;
             response: responseText,
             temperature: temperature,
             timestamp: new Date().toISOString(),
-            source: 'gemini-fixed',
-            dataUsed: needsStockData || needsNews
+            source: 'gemini-direct',
+            hasRealData: isPriceQuestion
         });
         
     } catch (error) {
-        console.error('❌ Erreur dans gemini-fixed:', error);
+        console.error('❌ Erreur dans gemini-direct:', error);
         return res.status(500).json({ 
             error: 'Erreur lors de la génération de la réponse',
             details: error.message,
