@@ -3039,8 +3039,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         // Utiliser l'API avec function calling si activé
                         if (useFunctionCalling) {
-                            console.log('🔧 Utilisation de Gemini avec Function Calling');
-                            response = await fetch('/api/gemini-with-functions', {
+                            console.log('🔧 Utilisation de Gemini Fixed');
+                            response = await fetch('/api/gemini-fixed', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
