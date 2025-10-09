@@ -492,7 +492,7 @@
                 // Test Seeking Alpha
                 try {
                     const startTime = Date.now();
-                    const response = await fetch('/seeking-alpha/stock_analysis.json');
+                    const response = await fetch('/stock_analysis.json');
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {
