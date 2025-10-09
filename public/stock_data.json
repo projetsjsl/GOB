@@ -1,128 +1,1354 @@
 {
-  "lastUpdate": "2025-10-02T06:24:09.757Z",
+  "lastUpdate": "2025-10-09T16:50:29.808Z",
   "stocks": {
+    "GOOGL": {
+      "ticker": "GOOGL",
+      "companyName": "Alphabet Inc. (Google)",
+      "lastUpdate": "2025-10-09T16:46:33.966Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Technology",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "En attente d'analyse",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": [],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "T": {
+      "ticker": "T",
+      "companyName": "AT&T Inc.",
+      "lastUpdate": "2025-10-09T16:49:19.978Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Telecommunications",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Verizon", "T-Mobile"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "BNS": {
+      "ticker": "BNS",
+      "companyName": "Bank of Nova Scotia",
+      "lastUpdate": "2025-10-09T16:46:49.306Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Financial Services",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["TD", "RBC", "BMO"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "TD": {
+      "ticker": "TD",
+      "companyName": "Toronto-Dominion Bank",
+      "lastUpdate": "2025-10-09T16:46:56.896Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Financial Services",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["BNS", "RBC", "BMO"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "BCE": {
+      "ticker": "BCE",
+      "companyName": "BCE Inc.",
+      "lastUpdate": "2025-10-09T16:47:04.806Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Telecommunications",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Rogers", "Telus"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "CNR": {
+      "ticker": "CNR",
+      "companyName": "Canadian National Railway",
+      "lastUpdate": "2025-10-09T16:47:12.967Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Transportation",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["CP Rail"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "CSCO": {
+      "ticker": "CSCO",
+      "companyName": "Cisco Systems Inc.",
+      "lastUpdate": "2025-10-09T16:47:20.903Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Technology",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Juniper", "Arista"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
     "CVS": {
       "ticker": "CVS",
       "companyName": "CVS Health Corporation",
-      "lastUpdate": "2025-10-02T06:22:47.593Z",
+      "lastUpdate": "2025-10-09T16:47:28.675Z",
       "metrics": {
-        "marketCap": "$95.62B",
-        "bpaGrowth": "-6.45%",
-        "peRatio": "11.84",
-        "sector": "Health Care Services",
-        "dividendYield": "3.53%",
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Healthcare",
+        "dividendYield": "En attente d'analyse",
         "dividendFrequency": "Quarterly",
-        "exDivDate": "10/23/2025",
-        "annualPayout": "$2.66",
-        "price": "$76.87",
-        "priceChange": "+1.96%"
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
       },
       "companyProfile": {
-        "description": "CVS Health Corporation est un leader diversifié des solutions de santé aux États-Unis, opérant à travers trois segments principaux : Health Care Benefits (assurance santé), Health Services (gestion des avantages pharmaceutiques), et Pharmacy & Consumer Wellness (pharmacie de détail). Basée à Woonsocket, Rhode Island, l'entreprise sert plus de 100 millions de membres et exploite plus de 9 000 magasins de détail.",
-        "employees": "Non spécifié dans le rapport",
-        "innovation": "CVS investit massivement dans les soins basés sur la valeur à travers des acquisitions stratégiques comme Aetna (2018) et Oak Street Health (2023), développant un modèle intégré de soins de santé combinant assurance, pharmacie et services de santé de proximité avec des solutions technologiques avancées."
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": [
-          "UnitedHealth Group",
-          "Cigna Corporation",
-          "Walgreens Boots Alliance"
-        ],
-        "valueProposition": "CVS se différencie par son modèle de soins de santé intégré unique qui combine assurance, services pharmaceutiques et santé de détail en un écosystème cohérent, offrant une accessibilité nationale grâce à son vaste réseau de points de vente et cliniques.",
-        "advantages": "Réseau de plus de 9 000 magasins offrant un accès pratique aux services de santé, intégration verticale complète de la chaîne de valeur santé, et positionnement stratégique dans les soins basés sur la valeur pour améliorer les résultats patients tout en gérant efficacement les coûts."
+        "competitors": ["Walgreens", "UnitedHealth"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
       },
       "quantRating": {
-        "valuation": "A-",
-        "growth": "D-",
-        "profitability": "A+",
-        "momentum": "B+",
-        "revisions": "B+"
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
       "sectorAnalysis": {
-        "valuation": "CVS affiche un P/E de 12, significativement inférieur à la médiane sectorielle de 18, indiquant une valorisation attractive. Le PEG forward de 0.62 représente une décote de 65% par rapport au secteur, suggérant une sous-évaluation marquée.",
-        "growth": "Défis de croissance avec un déclin du BPA de 36% en glissement annuel, bien en deçà de la croissance sectorielle de 16%. La croissance de l'EBITDA forward est projetée en baisse de 3%, comparé à une hausse sectorielle de 8%.",
-        "profitability": "Rentabilité exceptionnelle avec une marge nette de 1.18% surpassant largement la médiane sectorielle. Le ratio de rotation des actifs de 1.50 est substantiellement supérieur aux 0.45 du secteur, démontrant une utilisation efficace des actifs.",
-        "momentum": "Performance boursière remarquable avec un gain de 33% sur un an, largement supérieur à la médiane sectorielle de -12%, reflétant une forte confiance des investisseurs.",
-        "revisions": "26 révisions à la hausse du BPA contre seulement 1 à la baisse sur les trois derniers mois, suggérant un optimisme croissant des analystes concernant les perspectives futures."
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
       },
-      "intermediateConclusion": "CVS Health présente un profil d'investissement contrasté avec des forces notables en rentabilité et momentum boursier, mais des défis significatifs en croissance. La valorisation attractive et les révisions positives des analystes offrent un potentiel de redressement, justifiant une recommandation Hold pour un investissement prudent.",
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
       "strengths": [
-        "Valorisation attractive avec un P/E de 11.84 bien inférieur à la moyenne sectorielle, suggérant un potentiel de revalorisation significatif selon les calculs de valeur intrinsèque des analystes",
-        "Performance remarquable du segment pharmacie de détail malgré les défis sectoriels, démontrant la résilience opérationnelle et la capacité d'adaptation aux conditions changeantes du marché",
-        "Positionnement stratégique dans les soins basés sur la valeur grâce aux acquisitions ciblées, offrant des opportunités de croissance future dans un secteur en transformation vers l'amélioration des résultats patients"
+        "Données en cours de traitement"
       ],
       "concerns": [
-        "Risques réglementaires et politiques significatifs, particulièrement dans les segments Medicare Advantage et Pharmacy Benefit Management, pouvant impacter la rentabilité et la stabilité opérationnelle",
-        "Niveau d'endettement élevé résultant des acquisitions récentes, limitant potentiellement la capacité d'investissement dans de nouvelles opportunités de croissance ou la résistance aux ralentissements économiques",
-        "Stagnation relative du cours de bourse sur la dernière décennie, indiquant des difficultés persistantes à convaincre les investisseurs du potentiel de croissance à long terme et de la direction stratégique"
+        "Analyse en attente"
       ],
       "finalConclusion": {
-        "strengths": "CVS Health démontre une rentabilité exceptionnelle (A+), un momentum boursier positif (B+) et une valorisation attractive (A-) avec un modèle d'affaires intégré unique dans le secteur de la santé.",
-        "weaknesses": "Les défis de croissance significatifs (D-) avec un déclin du BPA de 36%, l'endettement élevé et les risques réglementaires persistent, freinant le potentiel de croissance à court terme.",
-        "recommendation": "Recommandation Hold basée sur un profil risque-rendement équilibré. La valorisation attractive et les révisions positives des analystes offrent un potentiel de revalorisation, mais les défis de croissance nécessitent une approche prudente. Adapté aux investisseurs recherchant un dividende stable (3.53%) avec un potentiel de redressement à moyen terme.",
-        "rating": "Hold"
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
       }
     },
-    "MSFT": {
-      "ticker": "MSFT",
-      "companyName": "Microsoft Corporation",
-      "lastUpdate": "2025-10-02T06:23:25.306Z",
+    "DEO": {
+      "ticker": "DEO",
+      "companyName": "Diageo plc",
+      "lastUpdate": "2025-10-09T16:47:37.202Z",
       "metrics": {
-        "marketCap": "$3.85T",
-        "bpaGrowth": "15.64%",
-        "peRatio": "33.30",
-        "sector": "Information Technology - Systems Software",
-        "dividendYield": "0.70%",
-        "dividendFrequency": "Quarterly",
-        "exDivDate": "11/20/2025",
-        "annualPayout": "$3.64",
-        "price": "$519.71",
-        "priceChange": "+1.76 (+0.34%)"
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Consumer Goods",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Semi-Annual",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
       },
       "companyProfile": {
-        "description": "Microsoft Corporation, fondée en 1975, est un leader mondial dans le développement et le support d'une large gamme de logiciels, services, appareils et solutions. Basée à Redmond, Washington, l'entreprise opère à travers trois segments clés : Productivity and Business Processes (Microsoft 365, Dynamics 365, LinkedIn, Copilot), Intelligent Cloud (Azure, GitHub, Nuance Healthcare, services serveur), et Personal Computing (Windows, Xbox, Bing). Microsoft intègre activement l'IA dans tous ses produits et services.",
-        "employees": "Non spécifié",
-        "innovation": "Microsoft investit massivement dans l'infrastructure cloud et IA avec $7.3 milliards engagés dans le Wisconsin. L'entreprise opère plus de 400 centres de données dans 70 régions mondiales et maintient un partenariat stratégique avec OpenAI. L'intégration de l'IA est évidente dans Microsoft 365 Copilot et les services Azure AI, positionnant l'entreprise à l'avant-garde de la transformation numérique."
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": [
-          "Amazon Web Services (AWS)",
-          "Google Cloud (Alphabet)",
-          "Oracle Corporation"
-        ],
-        "valueProposition": "Microsoft se distingue par son intégration extensive de l'IA à travers toute sa suite de produits, son écosystème robuste de services Microsoft 365 et Azure, et ses solutions d'entreprise complètes.",
-        "advantages": "Partenariats stratégiques avec OpenAI, infrastructure cloud mondiale de premier plan, intégration verticale des services, position dominante dans la productivité d'entreprise, et croissance accélérée d'Azure à 39%."
+        "competitors": ["Pernod Ricard", "Brown-Forman"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
       },
       "quantRating": {
-        "valuation": "F",
-        "growth": "C-",
-        "profitability": "A+",
-        "momentum": "B-",
-        "revisions": "B"
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
       "sectorAnalysis": {
-        "valuation": "Ratio Price/Sales de 14 vs médiane sectorielle de 4, indiquant une valorisation premium significative qui suggère une possible surévaluation par rapport aux pairs.",
-        "growth": "Croissance exceptionnelle avec 15% de croissance annuelle des revenus vs 7% pour le secteur, démontrant une expansion réussie sur le marché.",
-        "profitability": "Rentabilité exceptionnelle avec une marge de bénéfice net de 36% vs 4% pour le secteur, indiquant des opérations très efficaces et une forte conversion des ventes en profits.",
-        "momentum": "Performance mitigée avec +20% sur 1 an vs +10% secteur, mais sous-performance sur 3 mois récents par rapport au secteur.",
-        "revisions": "Optimisme des analystes avec 41 révisions à la hausse du BPA et seulement 3 à la baisse sur 90 jours, suggérant une confiance dans le potentiel de bénéfices."
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
       },
-      "intermediateConclusion": "MSFT présente une rentabilité et une croissance solides qui génèrent un sentiment positif chez les analystes. Cependant, sa valorisation élevée et son momentum mitigé conduisent à une notation Hold. L'entreprise bénéficie d'une position dominante dans le cloud et l'IA, mais les attentes du marché semblent déjà très élevées.",
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
       "strengths": [
-        "Investissements massifs dans l'infrastructure IA et centres de données ($7.3B dans le Wisconsin) soutenant la croissance long terme du cloud et de l'IA",
-        "Croissance accélérée d'Azure à 39%, consolidant le leadership de Microsoft dans l'infrastructure IA avec un potentiel de hausse de 26% sur 1-2 ans",
-        "Position de marché dominante dans le cloud Azure avec un partenariat stratégique avec OpenAI, projetant une croissance continue à un rythme soutenu"
+        "Données en cours de traitement"
       ],
       "concerns": [
-        "Actions considérées comme surachetées avec des attentes trop élevées, la concurrence intensifiée d'Amazon et Google menaçant la croissance future",
-        "Le prix actuel de l'action reflète des attentes élevées de rendements anormaux soutenus, rendant le profil risque-rendement moins attractif",
-        "Le marché de l'IA, crucial pour la croissance de Microsoft, est perçu comme potentiellement en bulle, sans nouveaux catalyseurs clairs à l'horizon pour justifier la valorisation élevée"
+        "Analyse en attente"
       ],
       "finalConclusion": {
-        "strengths": "Microsoft démontre une rentabilité exceptionnelle (marge nette 36%), une croissance robuste (15% revenus), et un leadership technologique dans le cloud et l'IA avec des investissements stratégiques massifs.",
-        "weaknesses": "Valorisation très élevée (P/E 33.3, P/S 14 vs secteur 4), momentum récent mitigé, et risque de bulles sur le marché de l'IA avec une concurrence accrue d'AWS et Google Cloud.",
-        "recommendation": "Position Hold recommandée. Bien que les fondamentaux soient solides et la position concurrentielle forte, la valorisation actuelle incorpore déjà des attentes très optimistes, limitant le potentiel de hausse à court terme.",
-        "rating": "Hold"
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "MDT": {
+      "ticker": "MDT",
+      "companyName": "Medtronic plc",
+      "lastUpdate": "2025-10-09T16:47:45.032Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Healthcare",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Abbott", "Boston Scientific"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "JNJ": {
+      "ticker": "JNJ",
+      "companyName": "Johnson & Johnson",
+      "lastUpdate": "2025-10-09T16:47:53.724Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Healthcare",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Pfizer", "Merck"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "JPM": {
+      "ticker": "JPM",
+      "companyName": "JPMorgan Chase & Co.",
+      "lastUpdate": "2025-10-09T16:48:01.718Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Financial Services",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Bank of America", "Wells Fargo", "Citigroup"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "LVMHF": {
+      "ticker": "LVMHF",
+      "companyName": "LVMH Moët Hennessy Louis Vuitton",
+      "lastUpdate": "2025-10-09T16:48:09.627Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Consumer Goods - Luxury",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Annual",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Kering", "Richemont"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "MG": {
+      "ticker": "MG",
+      "companyName": "Mistras Group Inc.",
+      "lastUpdate": "2025-10-09T16:48:17.267Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Industrial Services",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "N/A",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": [],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "MFC": {
+      "ticker": "MFC",
+      "companyName": "Manulife Financial Corporation",
+      "lastUpdate": "2025-10-09T16:48:24.797Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Financial Services - Insurance",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Sun Life", "Great-West Lifeco"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "MU": {
+      "ticker": "MU",
+      "companyName": "Micron Technology Inc.",
+      "lastUpdate": "2025-10-09T16:48:32.693Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Technology - Semiconductors",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Samsung", "SK Hynix"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "NSRGY": {
+      "ticker": "NSRGY",
+      "companyName": "Nestlé S.A.",
+      "lastUpdate": "2025-10-09T16:48:40.711Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Consumer Goods - Food",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Annual",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Unilever", "Procter & Gamble"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "NKE": {
+      "ticker": "NKE",
+      "companyName": "Nike Inc.",
+      "lastUpdate": "2025-10-09T16:48:48.372Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Consumer Goods - Apparel",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Adidas", "Under Armour"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "NTR": {
+      "ticker": "NTR",
+      "companyName": "Nutrien Ltd.",
+      "lastUpdate": "2025-10-09T16:48:56.289Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Materials - Fertilizers",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Mosaic", "CF Industries"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "PFE": {
+      "ticker": "PFE",
+      "companyName": "Pfizer Inc.",
+      "lastUpdate": "2025-10-09T16:49:04.344Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Healthcare - Pharmaceuticals",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Johnson & Johnson", "Merck"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "TRP": {
+      "ticker": "TRP",
+      "companyName": "TC Energy Corporation",
+      "lastUpdate": "2025-10-09T16:49:12.145Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Energy - Pipelines",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Enbridge", "Kinder Morgan"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "UNH": {
+      "ticker": "UNH",
+      "companyName": "UnitedHealth Group Inc.",
+      "lastUpdate": "2025-10-09T16:49:28.782Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Healthcare - Insurance",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["CVS Health", "Anthem"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "UL": {
+      "ticker": "UL",
+      "companyName": "Unilever PLC",
+      "lastUpdate": "2025-10-09T16:50:09.100Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Consumer Goods",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["Procter & Gamble", "Nestlé"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "VZ": {
+      "ticker": "VZ",
+      "companyName": "Verizon Communications Inc.",
+      "lastUpdate": "2025-10-09T16:50:17.099Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Telecommunications",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["AT&T", "T-Mobile"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
+      }
+    },
+    "WFC": {
+      "ticker": "WFC",
+      "companyName": "Wells Fargo & Company",
+      "lastUpdate": "2025-10-09T16:50:26.893Z",
+      "metrics": {
+        "marketCap": "En attente d'analyse",
+        "bpaGrowth": "En attente d'analyse",
+        "peRatio": "En attente d'analyse",
+        "sector": "Financial Services",
+        "dividendYield": "En attente d'analyse",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "En attente d'analyse",
+        "annualPayout": "En attente d'analyse",
+        "price": "En attente d'analyse",
+        "priceChange": "En attente d'analyse"
+      },
+      "companyProfile": {
+        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
+        "employees": "En attente d'analyse",
+        "innovation": "En attente d'analyse"
+      },
+      "competition": {
+        "competitors": ["JPMorgan Chase", "Bank of America"],
+        "valueProposition": "En attente d'analyse",
+        "advantages": "En attente d'analyse"
+      },
+      "quantRating": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "En attente d'analyse",
+        "growth": "En attente d'analyse",
+        "profitability": "En attente d'analyse",
+        "momentum": "En attente d'analyse",
+        "revisions": "En attente d'analyse"
+      },
+      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
+      "strengths": [
+        "Données en cours de traitement"
+      ],
+      "concerns": [
+        "Analyse en attente"
+      ],
+      "finalConclusion": {
+        "strengths": "En attente d'analyse",
+        "weaknesses": "En attente d'analyse",
+        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
+        "rating": "Pending"
       }
     }
   }
