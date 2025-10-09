@@ -64,26 +64,28 @@ export default async function handler(req, res) {
             try {
                 console.log(`📊 Récupération du prix pour ${finalSymbol}`);
                 
-                // Yahoo Finance API
-                const yahooUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${finalSymbol}`;
-                const yahooResponse = await fetch(yahooUrl);
+                // Utiliser l'API marketdata existante
+                const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+                const marketdataUrl = `${baseUrl}/api/marketdata?endpoint=quote&symbol=${finalSymbol}&source=yahoo`;
+                
+                console.log(`📡 URL Marketdata: ${marketdataUrl}`);
+                
+                const yahooResponse = await fetch(marketdataUrl);
                 const yahooData = await yahooResponse.json();
                 
-                if (yahooData.quoteResponse && yahooData.quoteResponse.result && yahooData.quoteResponse.result[0]) {
-                    const quote = yahooData.quoteResponse.result[0];
-                    
+                if (yahooData && !yahooData.error) {
                     const stockInfo = {
                         symbol: finalSymbol,
-                        price: quote.regularMarketPrice,
-                        change: quote.regularMarketChange,
-                        changePercent: quote.regularMarketChangePercent,
-                        currency: quote.currency || 'USD',
-                        marketCap: quote.marketCap,
-                        volume: quote.regularMarketVolume,
-                        high: quote.regularMarketDayHigh,
-                        low: quote.regularMarketDayLow,
-                        open: quote.regularMarketOpen,
-                        previousClose: quote.regularMarketPreviousClose
+                        price: yahooData.c || 0,
+                        change: yahooData.d || 0,
+                        changePercent: yahooData.dp || 0,
+                        currency: 'USD',
+                        marketCap: yahooData.marketCap || 0,
+                        volume: yahooData.volume || 0,
+                        high: yahooData.h || 0,
+                        low: yahooData.l || 0,
+                        open: yahooData.o || 0,
+                        previousClose: yahooData.pc || 0
                     };
                     
                     console.log('✅ Données récupérées:', stockInfo);
