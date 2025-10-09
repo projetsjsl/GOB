@@ -104,6 +104,19 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
+        /* Effets visuels - ripple sur boutons */
+        .btn-ripple { position: relative; overflow: hidden; }
+        .ripple-circle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            background: rgba(16, 185, 129, 0.35); /* emerald */
+            transform: scale(0);
+            animation: ripple 600ms ease-out;
+        }
+        @keyframes ripple {
+            to { transform: scale(3); opacity: 0; }
+        }
         /* Animation intro Emma */
         @keyframes emma-intro-fade {
             from { opacity: 0; }
@@ -157,6 +170,8 @@
             // État pour le thème
             const [isDarkMode, setIsDarkMode] = useState(true);
             const [showEmmaIntro, setShowEmmaIntro] = useState(false);
+            const clickSoundRef = useRef(null);
+            const tabSoundRef = useRef(null);
 
             // Configuration API
             const API_BASE_URL = window.location.origin;
@@ -277,7 +292,7 @@
                         return await response.json();
                     } catch (fallbackError) {
                         console.error('Erreur fetch stock data (finnhub fallback):', fallbackError);
-                        return null;
+                    return null;
                     }
                 }
             };
@@ -603,7 +618,25 @@
                     sessionStorage.setItem('emma-intro-shown', '1');
                     setTimeout(() => setShowEmmaIntro(false), 3000);
                 }
+                // Son doux lors du changement d'onglet
+                try { tabSoundRef.current?.play().catch(() => {}); } catch(e) {}
             }, [activeTab]);
+
+            // Effet ripple générique pour les boutons
+            const withRipple = (e) => {
+                const target = e.currentTarget;
+                const circle = document.createElement('span');
+                const diameter = Math.max(target.clientWidth, target.clientHeight);
+                const radius = diameter / 2;
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${e.clientX - target.getBoundingClientRect().left - radius}px`;
+                circle.style.top = `${e.clientY - target.getBoundingClientRect().top - radius}px`;
+                circle.classList.add('ripple-circle');
+                const old = target.getElementsByClassName('ripple-circle')[0];
+                if (old) old.remove();
+                target.appendChild(circle);
+                try { clickSoundRef.current?.play().catch(() => {}); } catch(err) {}
+            };
 
             // Mettre à jour les actualités filtrées quand les actualités changent
             useEffect(() => {
@@ -5143,8 +5176,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ].map(tab => (
                                     <button
                                         key={tab.id}
+                                        onMouseDown={withRipple}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`tab-button px-6 py-3 rounded-t-lg font-medium transition-all ${
+                                        className={`tab-button btn-ripple px-6 py-3 rounded-t-lg font-medium transition-all ${
                                             activeTab === tab.id 
                                                 ? (isDarkMode 
                                                     ? 'bg-gray-900 text-white border-b-2 border-green-500' 
@@ -5160,6 +5194,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
                         </div>
                     </nav>
+                    {/* Audio UI feedback (désactivé par défaut jusqu'au premier geste utilisateur) */}
+                    <audio ref={tabSoundRef} preload="auto" className="hidden">
+                        <source src="https://cdn.jsdelivr.net/gh/naptha/tinyfiles@main/sounds/ui-pop.mp3" type="audio/mpeg" />
+                    </audio>
+                    <audio ref={clickSoundRef} preload="auto" className="hidden">
+                        <source src="https://cdn.jsdelivr.net/gh/naptha/tinyfiles@main/sounds/click-soft.mp3" type="audio/mpeg" />
+                    </audio>
 
                     {/* Contenu principal */}
                     <main className="max-w-7xl mx-auto p-6">
