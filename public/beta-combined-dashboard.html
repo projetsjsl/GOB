@@ -248,15 +248,24 @@
                 setIsDarkMode(!isDarkMode);
             };
 
-            // Données Finnhub
+            // Données Market Data (Finnhub + Alpha Vantage + Yahoo Finance)
             const fetchStockData = async (ticker) => {
                 try {
-                    const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
+                    // Essayer d'abord la nouvelle API unifiée avec Yahoo Finance (gratuit)
+                    const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`);
                     if (!response.ok) throw new Error(`API error: ${response.status}`);
                     return await response.json();
                 } catch (error) {
-                    console.error('Erreur fetch stock data:', error);
-                    return null;
+                    console.error('Erreur fetch stock data (marketdata):', error);
+                    // Fallback vers l'ancienne API Finnhub
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
+                        if (!response.ok) throw new Error(`API error: ${response.status}`);
+                        return await response.json();
+                    } catch (fallbackError) {
+                        console.error('Erreur fetch stock data (finnhub fallback):', fallbackError);
+                        return null;
+                    }
                 }
             };
 
@@ -397,10 +406,10 @@
                     seekingAlpha: { status: 'checking', responseTime: 0, error: null }
                 };
 
-                // Test Finnhub API
+                // Test Market Data API (nouvelle API unifiée)
                 try {
                     const startTime = Date.now();
-                    const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=AAPL`);
+                    const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=AAPL&source=auto`);
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {
@@ -408,7 +417,8 @@
                         status.finnhub = {
                             status: data.message ? 'warning' : 'success',
                             responseTime,
-                            error: data.message || null
+                            error: data.message || null,
+                            source: data.source || 'unknown'
                         };
                     } else {
                         status.finnhub = { status: 'error', responseTime, error: `HTTP ${response.status}` };

@@ -43,10 +43,16 @@ async function runTests() {
     // Test API News
     await testAPI('/api/news?q=CVS OR MSFT&limit=5', 'API News multi-sources');
     
-    // Test API Finnhub
-    await testAPI('/api/finnhub?endpoint=quote&symbol=AAPL', 'API Finnhub - Quote');
-    await testAPI('/api/finnhub?endpoint=profile&symbol=MSFT', 'API Finnhub - Profile');
-    await testAPI('/api/finnhub?endpoint=news&symbol=CVS', 'API Finnhub - News');
+    // Test API Market Data (nouvelle API unifiée)
+    await testAPI('/api/marketdata?endpoint=quote&symbol=AAPL&source=yahoo', 'API Market Data - Yahoo Finance Quote');
+    await testAPI('/api/marketdata?endpoint=quote&symbol=MSFT&source=auto', 'API Market Data - Auto Source Quote');
+    await testAPI('/api/marketdata?endpoint=profile&symbol=CVS&source=alpha', 'API Market Data - Alpha Vantage Profile');
+    await testAPI('/api/marketdata?endpoint=news&symbol=AAPL&source=finnhub', 'API Market Data - Finnhub News');
+    
+    // Test API Finnhub (ancienne - pour compatibilité)
+    await testAPI('/api/finnhub?endpoint=quote&symbol=AAPL', 'API Finnhub - Quote (legacy)');
+    await testAPI('/api/finnhub?endpoint=profile&symbol=MSFT', 'API Finnhub - Profile (legacy)');
+    await testAPI('/api/finnhub?endpoint=news&symbol=CVS', 'API Finnhub - News (legacy)');
     
     // Test API Fallback
     await testAPI('/api/fallback?type=stock&symbol=AAPL', 'API Fallback - Stock');
@@ -56,11 +62,13 @@ async function runTests() {
     
     console.log('\n🎉 Tests terminés !');
     console.log('\n📋 Résumé des améliorations:');
+    console.log('✅ API Market Data: Finnhub + Alpha Vantage + Yahoo Finance unifiés');
     console.log('✅ API News: Multi-sources avec déduplication');
-    console.log('✅ API Finnhub: 10+ endpoints avec données démo');
+    console.log('✅ API Finnhub: 10+ endpoints avec données démo (legacy)');
     console.log('✅ API Fallback: Données de secours robustes');
     console.log('✅ API Status: Vérification des APIs');
     console.log('✅ Gestion d\'erreurs: Fallbacks automatiques');
+    console.log('✅ Sources multiples: Auto-sélection de la meilleure source');
 }
 
 // Exécuter les tests si le script est appelé directement
