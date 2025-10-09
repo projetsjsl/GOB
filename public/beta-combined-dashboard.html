@@ -619,8 +619,6 @@
                     sessionStorage.setItem('emma-intro-shown', '1');
                     setTimeout(() => setShowEmmaIntro(false), 3000);
                 }
-                // Son doux lors du changement d'onglet
-                try { tabSoundRef.current?.play().catch(() => {}); } catch(e) {}
             }, [activeTab]);
 
             // Effet ripple générique pour les boutons
@@ -655,8 +653,8 @@
             // Volume: baisser le son général et couper le son du ripple/clic
             useEffect(() => {
                 try {
-                    if (tabSoundRef.current) tabSoundRef.current.volume = 0.2; // 20%
-                    if (clickSoundRef.current) clickSoundRef.current.volume = 0.0; // muet
+                    if (tabSoundRef.current) tabSoundRef.current.volume = 0.0; // aucun son d'onglet
+                    if (clickSoundRef.current) clickSoundRef.current.volume = 0.08; // clic/ripple doux
                 } catch(_) {}
             }, []);
 
