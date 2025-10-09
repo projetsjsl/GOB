@@ -36,7 +36,7 @@ export default function handler(req, res) {
   // Test de connectivité avec l'API Gemini
   const testPrompt = "Répondez simplement 'Test réussi' si vous recevez ce message.";
   
-  fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
+  fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ class EmmaGeminiService {
   constructor() {
     // Priorité : Variable d'environnement Vercel > localStorage
     this.apiKey = '';
-    this.baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+    this.baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
     this.isConnected = false;
     this.initializeApiKey();
   }
