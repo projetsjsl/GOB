@@ -650,8 +650,15 @@
                 if (old) old.remove();
                 target.appendChild(circle);
                 ensureAudioReady();
-                try { clickSoundRef.current?.play().catch(() => {}); } catch(err) {}
             };
+
+            // Volume: baisser le son général et couper le son du ripple/clic
+            useEffect(() => {
+                try {
+                    if (tabSoundRef.current) tabSoundRef.current.volume = 0.2; // 20%
+                    if (clickSoundRef.current) clickSoundRef.current.volume = 0.0; // muet
+                } catch(_) {}
+            }, []);
 
             // Mettre à jour les actualités filtrées quand les actualités changent
             useEffect(() => {
