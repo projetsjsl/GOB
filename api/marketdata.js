@@ -127,6 +127,9 @@ export default async function handler(req, res) {
                 case 'profile':
                     url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
                     break;
+                case 'fundamentals':
+                    url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+                    break;
                 default:
                     throw new Error(`Endpoint ${endpoint} non supporté par Alpha Vantage`);
             }
@@ -158,6 +161,28 @@ export default async function handler(req, res) {
                     marketCapitalization: parseFloat(data.MarketCapitalization) || 0,
                     shareOutstanding: parseFloat(data.SharesOutstanding) || 0,
                     ticker: data.Symbol
+                };
+            } else if (endpoint === 'fundamentals') {
+                const parse = (v) => {
+                    if (v === undefined || v === null || v === '') return null;
+                    const n = parseFloat(String(v).replace('%', ''));
+                    return Number.isFinite(n) ? n : null;
+                };
+                return {
+                    symbol: data.Symbol,
+                    peRatio: parse(data.PERatio),
+                    pegRatio: parse(data.PEGRatio),
+                    evToEbitda: parse(data.EVToEBITDA),
+                    roeTTM: parse(data.ReturnOnEquityTTM),
+                    profitMargin: parse(data.ProfitMargin),
+                    operatingMarginTTM: parse(data.OperatingMarginTTM),
+                    epsTTM: parse(data.EPSTTM),
+                    dividendYield: parse(data.DividendYield),
+                    revenueTTM: parse(data.RevenueTTM),
+                    grossMarginTTM: parse(data.GrossProfitTTM),
+                    marketCapitalization: parse(data.MarketCapitalization),
+                    sector: data.Sector || null,
+                    industry: data.Industry || null
                 };
             }
         } catch (error) {

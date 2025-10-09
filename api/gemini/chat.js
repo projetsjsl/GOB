@@ -30,6 +30,15 @@ export default async function handler(req, res) {
 
     // Convertir messages UI -> contents Gemini
     const contents = [];
+    // Instruction système forte (outil d'abord, pas d'exemples)
+    const toolSystemPrompt = [
+      'Règles d\'analyse financière (prioritaires) :',
+      '- Utilise TOUJOURS les fonctions disponibles pour extraire des données réelles (prix, news, etc.).',
+      "- N\'utilise PAS de chiffres \"à titre d\'exemple\" ou fictifs.",
+      '- Si une donnée est indisponible, explique-le clairement et propose une alternative (ex.: demander le ticker exact).',
+      '- Réponds en français, concis, avec chiffres réels quand disponibles.'
+    ].join('\n');
+    contents.push({ role: 'user', parts: [{ text: toolSystemPrompt }] });
     if (systemPrompt) {
       contents.push({ role: 'user', parts: [{ text: systemPrompt }] });
     }

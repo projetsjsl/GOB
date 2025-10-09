@@ -36,6 +36,17 @@ export const functionDeclarations = [
       },
       required: ['symbols']
     }
+  },
+  {
+    name: 'getFundamentals',
+    description: 'Récupérer des fondamentaux (P/E, EV/EBITDA, ROE, marges, dividende, etc.).',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        symbol: { type: 'STRING', description: 'Symbole boursier, ex: AAPL, MSFT, GOOGL' }
+      },
+      required: ['symbol']
+    }
   }
 ];
 
@@ -86,6 +97,15 @@ export async function executeFunction(name, args = {}) {
         }
       }
       return { results };
+    }
+    case 'getFundamentals': {
+      const symbol = String(args.symbol || '').trim().toUpperCase();
+      if (!symbol) throw new Error('Paramètre symbol requis');
+      const url = `${getBaseUrl()}/api/marketdata?endpoint=fundamentals&symbol=${encodeURIComponent(symbol)}&source=auto`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`marketdata fundamentals error: ${r.status}`);
+      const d = await r.json();
+      return d;
     }
     default:
       throw new Error(`Fonction inconnue: ${name}`);
