@@ -317,12 +317,21 @@
                 for (const ticker of tickers) {
                     console.log(`📊 Récupération des données pour ${ticker}...`);
                     try {
-                    const data = await fetchStockData(ticker);
+                        const data = await fetchStockData(ticker);
+                        // Charger les fondamentaux pour alimenter P/E/Dividende/Secteur
+                        let fundamentals = null;
+                        try {
+                            const fundamentalsResp = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${ticker}&source=auto`);
+                            if (fundamentalsResp.ok) fundamentals = await fundamentalsResp.json();
+                        } catch (e) {
+                            console.warn(`⚠️ Fundamentals non disponibles pour ${ticker}`, e?.message || e);
+                        }
                         if (data && !data.message) {
-                        newStockData[ticker] = {
-                            ...data,
-                            timestamp: new Date().toISOString()
-                        };
+                            newStockData[ticker] = {
+                                ...data,
+                                fundamentals,
+                                timestamp: new Date().toISOString()
+                            };
                             successCount++;
                             console.log(`✅ ${ticker}: Données récupérées`, data);
                         } else {
@@ -4564,9 +4573,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             
                                             // Données de profil Finnhub
                                             const profile = finnhubData?.profile;
-                                            const peRatio = profile?.pe ? profile.pe.toFixed(2) : 'N/A';
-                                            const dividendYield = profile?.dividend ? `${(profile.dividend * 100).toFixed(2)}%` : 'N/A';
-                                            const sector = profile?.industry || 'N/A';
+                                            const fundamentals = finnhubData?.fundamentals;
+                                            const peRatio = fundamentals?.peRatio
+                                                ? (Number.isFinite(fundamentals.peRatio) ? fundamentals.peRatio.toFixed(2) : fundamentals.peRatio)
+                                                : (profile?.pe ? profile.pe.toFixed(2) : 'N/A');
+                                            const dividendYield = fundamentals?.dividendYield
+                                                ? `${(Number(fundamentals.dividendYield) * 100).toFixed(2)}%`
+                                                : (profile?.dividend ? `${(profile.dividend * 100).toFixed(2)}%` : 'N/A');
+                                            const sector = fundamentals?.sector || profile?.industry || 'N/A';
                                             
                                             // Données de recommandation Finnhub
                                             const recommendation = finnhubData?.recommendation;
@@ -5016,8 +5030,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     {tickers.map(ticker => {
                                         // Filtrer les actualités pour ce ticker
                                         const tickerNews = newsData.filter(article => {
-                                            const text = (article.title + ' ' + article.description).toLowerCase();
-                                            return text.includes(ticker.toLowerCase());
+                                            const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                                            const tagged = (article.ticker || '').toLowerCase();
+                                            return tagged === ticker.toLowerCase() || text.includes(ticker.toLowerCase());
                                         });
                                         
                                         if (tickerNews.length === 0) return null;

@@ -9,6 +9,7 @@ export default async function handler(req, res) {
     // Clés API multiples (à configurer dans les variables d'environnement Vercel)
     const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || 'YOUR_FINNHUB_API_KEY';
     const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY || 'YOUR_ALPHA_VANTAGE_API_KEY';
+    const TWELVE_DATA_API_KEY = process.env.TWELVE_DATA_API_KEY || 'YOUR_TWELVE_DATA_API_KEY';
     
     // Données de démonstration étendues si pas de clé API
     const demoData = {
@@ -107,6 +108,45 @@ export default async function handler(req, res) {
             }
         } catch (error) {
             console.error('Erreur Yahoo Finance:', error);
+            throw error;
+        }
+    };
+
+    // Fonction pour récupérer depuis Twelve Data
+    const fetchTwelveData = async (symbol, endpoint) => {
+        if (!TWELVE_DATA_API_KEY || TWELVE_DATA_API_KEY === 'YOUR_TWELVE_DATA_API_KEY') {
+            throw new Error('Clé API Twelve Data non configurée');
+        }
+        try {
+            switch (endpoint) {
+                case 'quote': {
+                    const url = `https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${TWELVE_DATA_API_KEY}`;
+                    const r = await fetch(url);
+                    if (!r.ok) throw new Error(`Twelve Data error: ${r.status}`);
+                    const d = await r.json();
+                    if (d && d.price) {
+                        const price = parseFloat(d.price);
+                        const prev = parseFloat(d.previous_close);
+                        const change = parseFloat(d.change);
+                        const percent = parseFloat(d.percent_change);
+                        return {
+                            c: price,
+                            d: Number.isFinite(change) ? change : (Number.isFinite(price) && Number.isFinite(prev) ? price - prev : null),
+                            dp: Number.isFinite(percent) ? percent : (Number.isFinite(price) && Number.isFinite(prev) ? ((price - prev) / prev) * 100 : null),
+                            h: parseFloat(d.high),
+                            l: parseFloat(d.low),
+                            o: parseFloat(d.open),
+                            pc: prev,
+                            t: Date.now()
+                        };
+                    }
+                    throw new Error('Réponse Twelve Data invalide');
+                }
+                default:
+                    throw new Error(`Endpoint ${endpoint} non supporté par Twelve Data`);
+            }
+        } catch (error) {
+            console.error('Erreur Twelve Data:', error);
             throw error;
         }
     };
@@ -256,14 +296,23 @@ export default async function handler(req, res) {
         // Priorité selon l'endpoint
         switch (endpoint) {
             case 'quote':
-                // Yahoo Finance gratuit et fiable pour les prix
+                // Ordre: Yahoo (gratuit) > Twelve Data > Finnhub > Alpha
                 sources.push('yahoo');
+                if (TWELVE_DATA_API_KEY && TWELVE_DATA_API_KEY !== 'YOUR_TWELVE_DATA_API_KEY') sources.push('twelve');
                 if (FINNHUB_API_KEY && FINNHUB_API_KEY !== 'YOUR_FINNHUB_API_KEY') sources.push('finnhub');
                 if (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY') sources.push('alpha');
                 break;
             case 'profile':
                 // Alpha Vantage excellent pour les profils d'entreprise
                 if (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY') sources.push('alpha');
+                if (FINNHUB_API_KEY && FINNHUB_API_KEY !== 'YOUR_FINNHUB_API_KEY') sources.push('finnhub');
+                sources.push('yahoo');
+                break;
+            case 'fundamentals':
+                // Fundamentals via Alpha Vantage en priorité
+                if (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY') sources.push('alpha');
+                // Fallback quote providers (pour éviter vide)
+                if (TWELVE_DATA_API_KEY && TWELVE_DATA_API_KEY !== 'YOUR_TWELVE_DATA_API_KEY') sources.push('twelve');
                 if (FINNHUB_API_KEY && FINNHUB_API_KEY !== 'YOUR_FINNHUB_API_KEY') sources.push('finnhub');
                 sources.push('yahoo');
                 break;
@@ -279,7 +328,8 @@ export default async function handler(req, res) {
     
     // Vérifier si on a au moins une source configurée
     const hasApiKey = (FINNHUB_API_KEY && FINNHUB_API_KEY !== 'YOUR_FINNHUB_API_KEY') || 
-                     (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY');
+                     (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY') ||
+                     (TWELVE_DATA_API_KEY && TWELVE_DATA_API_KEY !== 'YOUR_TWELVE_DATA_API_KEY');
     
     if (!hasApiKey && source === 'auto') {
         // Retourner des données de démonstration selon l'endpoint
@@ -377,6 +427,9 @@ export default async function handler(req, res) {
                 case 'finnhub':
                     result = await fetchFinnhub(symbol, endpoint);
                     break;
+                case 'twelve':
+                    result = await fetchTwelveData(symbol, endpoint);
+                    break;
                 default:
                     throw new Error(`Source ${usedSource} non supportée`);
             }
@@ -402,6 +455,11 @@ export default async function handler(req, res) {
                             case 'finnhub':
                                 result = await fetchFinnhub(symbol, endpoint);
                                 usedSource = 'finnhub';
+                                fallbackSuccess = true;
+                                break;
+                            case 'twelve':
+                                result = await fetchTwelveData(symbol, endpoint);
+                                usedSource = 'twelve';
                                 fallbackSuccess = true;
                                 break;
                         }

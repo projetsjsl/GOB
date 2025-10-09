@@ -284,17 +284,25 @@ export default async function handler(req, res) {
 
             const data = await response.json();
             
-            const articles = data.articles?.results?.map(article => ({
-                title: article.title,
-                description: article.body?.substring(0, 200) + '...' || article.title,
-                url: article.url,
-                publishedAt: article.datePublished,
-                source: {
-                    name: article.source?.title || 'Source inconnue'
-                },
-                urlToImage: article.image,
-                content: article.body
-            })) || [];
+            const articles = data.articles?.results?.map(article => {
+                const title = article.title || '';
+                const desc = article.body || '';
+                const lower = (title + ' ' + desc).toLowerCase();
+                // Tagger un ticker si détecté dans le titre/description
+                const matched = tickers.find(t => lower.includes(t.toLowerCase()));
+                return {
+                    title,
+                    description: desc ? (desc.substring(0, 200) + '...') : title,
+                    url: article.url,
+                    publishedAt: article.datePublished,
+                    source: {
+                        name: article.source?.title || 'Source inconnue'
+                    },
+                    urlToImage: article.image,
+                    content: article.body,
+                    ticker: matched || undefined
+                };
+            }) || [];
 
             return articles;
         } catch (error) {
@@ -393,7 +401,24 @@ export default async function handler(req, res) {
         uniqueNews.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
         
         // Limiter au nombre demandé
-        const finalArticles = uniqueNews.slice(0, limit);
+        let finalArticles = uniqueNews.slice(0, limit);
+
+        // Garantir au moins une actualité par ticker demandé (fallback synthétique)
+        const hasForTicker = (t) => finalArticles.some(a => (a.ticker || '').toUpperCase() === t.toUpperCase() || ((a.title + ' ' + a.description).toUpperCase().includes(t.toUpperCase())));
+        for (const t of tickers) {
+            if (!hasForTicker(t)) {
+                finalArticles.push({
+                    title: `${t}: aucune actualité spécifique trouvée aujourd'hui` ,
+                    description: `Aucune actualité directe trouvée pour ${t}. Voici une note automatique pour indiquer l'absence d'article dédié.`,
+                    url: '#',
+                    publishedAt: new Date().toISOString(),
+                    source: { name: 'Système' },
+                    urlToImage: null,
+                    content: '',
+                    ticker: t
+                });
+            }
+        }
         
         return res.status(200).json({
             articles: finalArticles,
