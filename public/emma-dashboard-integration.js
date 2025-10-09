@@ -225,19 +225,89 @@ class EmmaDashboardIntegration {
     return messageDiv;
   }
 
-  // Formater le contenu du message
+  // Formater le contenu du message (rendu enrichi, fond inchangé)
   formatMessageContent(content) {
-    // Échapper le HTML
-    let formatted = this.escapeHtml(content);
-    
-    // Convertir les retours à la ligne en <br>
-    formatted = formatted.replace(/\n/g, '<br>');
-    
-    // Mettre en forme les listes
-    formatted = formatted.replace(/\n• /g, '<br>• ');
-    formatted = formatted.replace(/\n- /g, '<br>- ');
-    
-    return formatted;
+    const escapeHtml = (s) => {
+      const div = document.createElement('div');
+      div.textContent = s ?? '';
+      return div.innerHTML;
+    };
+
+    // Protéger les blocs de code ``` ```
+    const codeBlocks = [];
+    let t = escapeHtml(content || '');
+    t = t.replace(/```([\w-]*)\n([\s\S]*?)\n```/g, (_m, lang, code) => {
+      const idx = codeBlocks.length;
+      codeBlocks.push({ lang: (lang || '').trim(), code });
+      return `@@CODE_BLOCK_${idx}@@`;
+    });
+
+    // Gras / italique basiques
+    t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+    // Code inline `code`
+    t = t.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-gray-800/10 text-[0.95em]">$1</code>');
+
+    // Titres de section avec emoji
+    t = t.replace(/^(🔍|📌|💡|⚠️|✅|🔑|📊|💬|📈|📉|✉️|🔗)\s*(?:\*\*(.+?)\*\*|([^\n]+))$/gm, (_m, emj, boldTitle, plainTitle) => {
+      const title = boldTitle || plainTitle || '';
+      return `<div class="mt-2 mb-1 font-semibold flex items-center gap-2">${emj} <span>${title}</span></div>`;
+    });
+
+    // Titres Markdown
+    t = t.replace(/^###\s+(.+)$/gm, '<div class="mt-2 mb-1 font-semibold">$1</div>');
+    t = t.replace(/^##\s+(.+)$/gm, '<div class="mt-2 mb-1 font-semibold text-base">$1</div>');
+    t = t.replace(/^#\s+(.+)$/gm, '<div class="mt-3 mb-1 font-bold text-lg">$1</div>');
+
+    // Listes à puces groupées
+    t = t.replace(/(?:^|\n)((?:[-•*]\s+.+(?:\n|$))+)/gm, (block) => {
+      const items = block.trim().split(/\n/)
+        .filter(l => /^[-•*]\s+/.test(l))
+        .map(l => l.replace(/^[-•*]\s+/, ''))
+        .map(x => `<li>${x}</li>`)
+        .join('');
+      return `\n<ul class="list-disc pl-5 space-y-1">${items}</ul>\n`;
+    });
+
+    // Listes numérotées groupées
+    t = t.replace(/(?:^|\n)((?:\d+\.\s+.+(?:\n|$))+)/gm, (block) => {
+      const items = block.trim().split(/\n/)
+        .filter(l => /^\d+\.\s+/.test(l))
+        .map(l => l.replace(/^\d+\.\s+/, ''))
+        .map(x => `<li>${x}</li>`)
+        .join('');
+      return `\n<ol class="list-decimal pl-5 space-y-1">${items}</ol>\n`;
+    });
+
+    // Citations et séparateurs
+    t = t.replace(/^(>+)\s*(.+)$/gm, (_m, _arrows, quote) => `<blockquote class="border-l-4 pl-3 italic opacity-90">${quote}</blockquote>`);
+    t = t.replace(/^\s*(?:---|___)\s*$/gm, '<hr class="my-3 opacity-50">');
+
+    // Section Sources
+    t = t.replace(/^\s*(?:🔗\s*)?Sources?\s*:\s*$/gim, '<div class="mt-2 mb-1 font-semibold">🔗 Sources</div>');
+
+    // Paragraphes et sauts de ligne
+    t = t.replace(/\n\n/g, '</p><p class="mb-2">');
+    t = t.replace(/\n/g, '<br>');
+
+    // Linkification d'URLs
+    t = t.replace(/((https?:\/\/|www\.)[\w.-]+(?:\/[\w\-._~:\/?#[\]@!$&'()*+,;=%]*)?)/g, (url) => {
+      const href = url.startsWith('http') ? url : `http://${url}`;
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`;
+    });
+
+    // Réinsertion blocs de code
+    t = t.replace(/@@CODE_BLOCK_(\d+)@@/g, (_m, idxStr) => {
+      const idx = parseInt(idxStr, 10);
+      const block = codeBlocks[idx];
+      if (!block) return '';
+      const langLabel = block.lang ? `<div class="text-xs opacity-70 mb-1">${block.lang}</div>` : '';
+      const codeSafe = block.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<div class="my-2"><div class="rounded-md border border-gray-200 bg-gray-50 p-3 overflow-auto">${langLabel}<pre class="m-0"><code>${codeSafe}</code></pre></div></div>`;
+    });
+
+    return `<div class="leading-relaxed text-sm">${t}</div>`;
   }
 
   // Échapper le HTML
