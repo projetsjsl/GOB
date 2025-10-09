@@ -110,7 +110,7 @@
             position: absolute;
             border-radius: 50%;
             pointer-events: none;
-            background: rgba(16, 185, 129, 0.35); /* emerald */
+            background: rgba(59, 130, 246, 0.45); /* blue */
             transform: scale(0);
             animation: ripple 600ms ease-out;
         }
@@ -172,6 +172,7 @@
             const [showEmmaIntro, setShowEmmaIntro] = useState(false);
             const clickSoundRef = useRef(null);
             const tabSoundRef = useRef(null);
+            const audioCtxRef = useRef(null);
 
             // Configuration API
             const API_BASE_URL = window.location.origin;
@@ -623,6 +624,19 @@
             }, [activeTab]);
 
             // Effet ripple générique pour les boutons
+            const ensureAudioReady = () => {
+                // Débloquer audio sur premier geste utilisateur
+                if (!audioCtxRef.current) {
+                    try {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (AudioCtx) {
+                            audioCtxRef.current = new AudioCtx();
+                        }
+                    } catch (_) {}
+                }
+                try { tabSoundRef.current?.load(); clickSoundRef.current?.load(); } catch(_){}
+            };
+
             const withRipple = (e) => {
                 const target = e.currentTarget;
                 const circle = document.createElement('span');
@@ -635,6 +649,7 @@
                 const old = target.getElementsByClassName('ripple-circle')[0];
                 if (old) old.remove();
                 target.appendChild(circle);
+                ensureAudioReady();
                 try { clickSoundRef.current?.play().catch(() => {}); } catch(err) {}
             };
 
@@ -5196,10 +5211,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </nav>
                     {/* Audio UI feedback (désactivé par défaut jusqu'au premier geste utilisateur) */}
                     <audio ref={tabSoundRef} preload="auto" className="hidden">
-                        <source src="https://cdn.jsdelivr.net/gh/naptha/tinyfiles@main/sounds/ui-pop.mp3" type="audio/mpeg" />
+                        <source src="https://assets.mixkit.co/active_storage/sfx/2005/2005-preview.mp3" type="audio/mpeg" />
                     </audio>
                     <audio ref={clickSoundRef} preload="auto" className="hidden">
-                        <source src="https://cdn.jsdelivr.net/gh/naptha/tinyfiles@main/sounds/click-soft.mp3" type="audio/mpeg" />
+                        <source src="https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3" type="audio/mpeg" />
                     </audio>
 
                     {/* Contenu principal */}
