@@ -2589,6 +2589,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [showPromptEditor, setShowPromptEditor] = useState(false);
                 const [showTemperatureEditor, setShowTemperatureEditor] = useState(false);
                 const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
+                const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
                 const [emmaPrompt, setEmmaPrompt] = useState(`Identité et Mission
 Tu es Emma — Exploratrice Multi-Métiers Autonome, actuellement configurée en mode Analyste Financière et Gestionnaire de Portefeuille.
 
@@ -2860,6 +2861,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Charger la température depuis localStorage
                         loadTemperature();
                         
+                        // Charger le paramètre function calling depuis localStorage
+                        loadFunctionCalling();
+                        
                         // Vérifier la connexion Gemini
                         await checkGeminiConnection();
                     } catch (error) {
@@ -3031,28 +3035,46 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Construire le prompt complet
                         const fullPrompt = `${emmaPrompt}\n\nQuestion de l'utilisateur: ${userMessage}`;
 
-                        // Appeler l'API Gemini
-                        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                        let response;
+                        
+                        // Utiliser l'API avec function calling si activé
+                        if (useFunctionCalling) {
+                            console.log('🔧 Utilisation de Gemini avec Function Calling');
+                            response = await fetch('/api/gemini-with-functions', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    message: fullPrompt,
+                                    temperature: emmaTemperature
+                                })
+                            });
+                        } else {
+                            // Utiliser l'API Gemini directe
+                            console.log('🔧 Utilisation de Gemini direct');
+                            response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({
-                                contents: [{
-                                    parts: [{
-                                        text: fullPrompt
-                                    }]
-                                }],
-                                generationConfig: {
-                                    temperature: emmaTemperature, // Température dynamique configurée par l'utilisateur
-                                    topK: 20, // Réduit pour plus de précision dans le vocabulaire financier
-                                    topP: 0.8, // Réduit pour plus de cohérence dans les analyses
-                                    maxOutputTokens: 4096, // Maintenu pour analyses détaillées
-                                    candidateCount: 1,
-                                    stopSequences: []
-                                }
-                            })
-                        });
+                                body: JSON.stringify({
+                                    contents: [{
+                                        parts: [{
+                                            text: fullPrompt
+                                        }]
+                                    }],
+                                    generationConfig: {
+                                        temperature: emmaTemperature, // Température dynamique configurée par l'utilisateur
+                                        topK: 20, // Réduit pour plus de précision dans le vocabulaire financier
+                                        topP: 0.8, // Réduit pour plus de cohérence dans les analyses
+                                        maxOutputTokens: 4096, // Maintenu pour analyses détaillées
+                                        candidateCount: 1,
+                                        stopSequences: []
+                                    }
+                                })
+                            });
+                        }
 
                         if (!response.ok) {
                             throw new Error(`Erreur API: ${response.status}`);
@@ -3063,9 +3085,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Log de debug pour diagnostiquer la structure de la réponse
                         console.log('🔍 Réponse Gemini complète:', data);
                         
-                        // Vérifier différentes structures de réponse possibles
+                        // Gérer les deux types de réponses (avec et sans function calling)
                         let responseText = '';
-                        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        
+                        if (useFunctionCalling && data.response) {
+                            // Réponse de l'API avec function calling
+                            responseText = data.response;
+                            console.log('✅ Réponse avec Function Calling reçue');
+                        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                            // Structure standard Gemini
                             responseText = data.candidates[0].content.parts[0].text;
                         } else if (data.candidates && data.candidates[0] && data.candidates[0].text) {
                             // Structure alternative possible
@@ -3120,6 +3148,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     const saved = localStorage.getItem('emma-temperature');
                     if (saved) {
                         setEmmaTemperature(parseFloat(saved));
+                    }
+                };
+
+                const saveFunctionCalling = () => {
+                    localStorage.setItem('emma-function-calling', useFunctionCalling.toString());
+                };
+
+                const loadFunctionCalling = () => {
+                    const saved = localStorage.getItem('emma-function-calling');
+                    if (saved !== null) {
+                        setUseFunctionCalling(saved === 'true');
                     }
                 };
 
@@ -3635,7 +3674,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             🔄 Réinitialiser
                                         </button>
                                         <button
-                                            onClick={saveTemperature}
+                                            onClick={() => {
+                                                saveTemperature();
+                                                saveFunctionCalling();
+                                            }}
                                             className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                                         >
                                             💾 Sauvegarder
@@ -3644,6 +3686,35 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                                 
                                 <div className="space-y-4">
+                                    {/* Contrôle Function Calling */}
+                                    <div className={`p-3 rounded-lg border ${
+                                        isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-gray-100 border-gray-300'
+                                    }`}>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className={`text-sm font-medium transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>
+                                                    🔧 Function Calling (Données Temps Réel)
+                                                </label>
+                                                <p className={`text-xs mt-1 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}>
+                                                    Emma peut accéder aux données financières actuelles via nos APIs
+                                                </p>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={useFunctionCalling}
+                                                    onChange={(e) => setUseFunctionCalling(e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     {/* Slider de température */}
                                     <div>
                                         <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
