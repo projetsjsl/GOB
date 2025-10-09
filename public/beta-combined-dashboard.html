@@ -3540,6 +3540,57 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     setEmmaPrompt(defaultPrompt);
                 };
 
+                // --------- Amélioration rendu: formatage HTML sécurisé ---------
+                const formatMessageText = (raw) => {
+                    if (!raw || typeof raw !== 'string') return '';
+                    const escapeHtml = (s) => s
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                    let t = escapeHtml(raw);
+                    // Gras/italique basiques
+                    t = t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    t = t.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    // Titres d’emoji en section
+                    t = t.replace(/^(🔍|📌|💡|⚠️|✅|🔑|📊|💬|📈|📉)\s*\*\*(.*?)\*\*/gm,
+                        '<div class="mt-3 mb-2 font-bold">$1 $2</div>');
+                    // Listes
+                    t = t.replace(/^(\d+)\.\s+(.+)$/gm, '<div class="ml-4">$1. $2</div>');
+                    t = t.replace(/^[-•]\s+(.+)$/gm, '<div class="ml-4">• $1</div>');
+                    // Paragraphes
+                    t = t.replace(/\n\n/g, '</p><p class="mb-2">');
+                    t = t.replace(/\n/g, '<br>');
+                    return `<p class="mb-2 leading-relaxed">${t}</p>`;
+                };
+
+                // --------- Email: exporter la conversation ---------
+                const [showEmailModal, setShowEmailModal] = useState(false);
+                const [emailTo, setEmailTo] = useState('');
+                const [emailSubject, setEmailSubject] = useState("Conversation avec Emma IA");
+
+                const buildEmailBody = () => {
+                    const lines = [];
+                    lines.push('Résumé de la conversation avec Emma IA');
+                    lines.push('-------------------------------------');
+                    emmaMessages.forEach(m => {
+                        const who = m.type === 'user' ? 'Vous' : (m.type === 'error' ? 'Erreur' : 'Emma');
+                        lines.push(`${who}: ${m.content}`);
+                        lines.push('');
+                    });
+                    lines.push('— Envoyé depuis le Dashboard GOB');
+                    return lines.join('\n');
+                };
+
+                const sendEmailTranscript = () => {
+                    const body = encodeURIComponent(buildEmailBody());
+                    const subj = encodeURIComponent(emailSubject || 'Conversation avec Emma IA');
+                    const to = encodeURIComponent(emailTo || '');
+                    window.location.href = `mailto:${to}?subject=${subj}&body=${body}`;
+                    setShowEmailModal(false);
+                };
+
                 return (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
@@ -3552,6 +3603,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
                                 >
                                     🗑️ Effacer
+                                </button>
+                                <button
+                                    onClick={() => setShowEmailModal(true)}
+                                    className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition-colors"
+                                    title="Envoyer la discussion par courriel"
+                                >
+                                    ✉️ Envoyer par courriel
                                 </button>
                                 <button
                                     onClick={() => setShowPromptEditor(!showPromptEditor)}
@@ -3654,16 +3712,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         />
                                                     </div>
                                                 )}
-                                                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                                                <div className={`max-w-xl px-4 py-3 rounded-lg shadow ${
                                                     message.type === 'user' 
-                                                        ? 'bg-blue-600 text-white' 
+                                                        ? 'bg-blue-600 text-white shadow-blue-500/20' 
                                                         : message.type === 'error'
-                                                        ? 'bg-red-600 text-white'
+                                                        ? 'bg-red-600 text-white shadow-red-500/20'
                                                         : isDarkMode 
-                                                            ? 'bg-gray-700 text-white' 
-                                                            : 'bg-gray-200 text-gray-900'
+                                                            ? 'bg-gray-800 text-white border border-gray-700' 
+                                                            : 'bg-white text-gray-900 border border-gray-200'
                                                 }`}>
-                                                    <div className="whitespace-pre-wrap">{message.content}</div>
+                                                    <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formatMessageText(message.content) }} />
                                                     <div className={`text-xs mt-1 ${
                                                         message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
                                                     }`}>
@@ -3780,6 +3838,39 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <li><code className="bg-gray-200 text-gray-800 px-1 rounded">{"{dashboardData}"}</code> - Données du dashboard</li>
                                         <li><code className="bg-gray-200 text-gray-800 px-1 rounded">{"{currentTime}"}</code> - Heure actuelle</li>
                                     </ul>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Modal d'envoi par courriel */}
+                        {showEmailModal && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                                <div className={`w-full max-w-md rounded-lg p-6 shadow-xl ${isDarkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+                                    <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>✉️ Envoyer par courriel</h3>
+                                    <div className="space-y-3">
+                                        <input
+                                            type="email"
+                                            value={emailTo}
+                                            onChange={(e) => setEmailTo(e.target.value)}
+                                            placeholder="Destinataire (optionnel)"
+                                            className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={emailSubject}
+                                            onChange={(e) => setEmailSubject(e.target.value)}
+                                            className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                        />
+                                        <textarea
+                                            className={`w-full h-32 px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-300 text-gray-800'}`}
+                                            readOnly
+                                            value={buildEmailBody()}
+                                        />
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-4">
+                                        <button onClick={() => setShowEmailModal(false)} className={`px-4 py-2 rounded ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>Annuler</button>
+                                        <button onClick={sendEmailTranscript} className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700">Envoyer</button>
+                                    </div>
                                 </div>
                             </div>
                         )}
