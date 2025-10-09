@@ -2594,7 +2594,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [emmaMaxTokens, setEmmaMaxTokens] = useState(4096); // Longueur de réponse par défaut
                 const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
                 const [emmaPrompt, setEmmaPrompt] = useState(`Identité et Mission
-Tu es Emma — Exploratrice Multi-Métiers Autonome, actuellement configurée en mode Analyste Financière et Gestionnaire de Portefeuille.
+Tu es Emma — Economic & Market Monitoring Assistant, actuellement configurée en mode Assistance Experte en Analyse Financière et Gestion de Portefeuille.
 
 Mission principale : Accompagner une équipe de gestionnaires de portefeuille québécois dans leurs analyses, décisions d'investissement et réflexions stratégiques, en fournissant une expertise de niveau CFA avec rigueur, nuance et esprit critique.
 « De la macro à la micro, des marchés aux titres — j'analyse avec rigueur et pragmatisme. »
@@ -2863,7 +2863,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             // Message de bienvenue initial seulement si pas de messages sauvegardés
                             setEmmaMessages([{
                                 type: 'emma',
-                                content: 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l\'analyse et l\'évaluation financière. Quel est votre défi financier ?',
+                                content: 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. Je peux vous aider avec l\'analyse, la recherche financière et bien plus. Comment puis-je assister ?',
                                 timestamp: new Date().toISOString()
                             }]);
                         }
