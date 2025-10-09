@@ -1103,7 +1103,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            file: 'stock_data.json',
+                            file: 'public/stock_data.json',
                             ticker: ticker,
                             data: analysisData,
                             action: 'update_stock'
@@ -1121,7 +1121,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            file: 'stock_analysis.json',
+                            file: 'public/stock_analysis.json',
                             ticker: ticker,
                             data: {
                                 ticker: ticker,

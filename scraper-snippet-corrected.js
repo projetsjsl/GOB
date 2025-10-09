@@ -99,7 +99,7 @@ async function main() {
     console.log('=== SEEKING ALPHA SCRAPER ===');
     
     console.log('Lecture des tickers...');
-    const tickersConfig = await fetchFromGitHub('tickers.json');
+    const tickersConfig = await fetchFromGitHub('public/tickers.json');
     const tickers = tickersConfig.tickers;
     console.log(`Tickers: ${tickers.join(', ')}`);
     
@@ -122,7 +122,7 @@ async function main() {
     };
     
     console.log('Push vers GitHub...');
-    const success = await pushToGitHub('stock_analysis.json', output, `Update - ${new Date().toISOString()}`);
+    const success = await pushToGitHub('public/stock_analysis.json', output, `Update - ${new Date().toISOString()}`);
     
     if (success) {
         console.log('TERMINE - Donnees sur GitHub');
