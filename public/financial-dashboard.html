@@ -36,6 +36,10 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
+        /* Réduction globale pour mobile: police et espacements à 50% */
+        @media (max-width: 768px) {
+            html { font-size: 50%; }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
@@ -376,6 +380,11 @@
                 </div>
             );
 
+            const tabs = [
+                { id: 'stocks', label: '📊 Données Financières', component: StocksTab },
+                { id: 'news', label: '📰 Actualités', component: NewsTab },
+                { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab }
+            ];
             return (
                 <div className="min-h-screen">
                     {/* Header */}
@@ -404,12 +413,8 @@
                     {/* Navigation par onglets */}
                     <nav className="bg-white/10 backdrop-blur-sm border-b border-white/20">
                         <div className="max-w-7xl mx-auto px-6">
-                            <div className="flex space-x-1">
-                                {[
-                                    { id: 'stocks', label: '📊 Données Financières', component: StocksTab },
-                                    { id: 'news', label: '📰 Actualités', component: NewsTab },
-                                    { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab }
-                                ].map(tab => (
+                            <div className="hidden md:flex space-x-1">
+                                {tabs.map(tab => (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
@@ -422,6 +427,17 @@
                                         {tab.label}
                                     </button>
                                 ))}
+                            </div>
+                            <div className="md:hidden py-3">
+                                <select
+                                    value={activeTab}
+                                    onChange={(e) => setActiveTab(e.target.value)}
+                                    className="w-full bg-white/10 text-white border border-white/20 rounded p-2"
+                                >
+                                    {tabs.map(tab => (
+                                        <option key={tab.id} value={tab.id}>{tab.label}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                     </nav>

@@ -41,6 +41,10 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
+        /* Réduction globale pour mobile: police et espacements à 50% */
+        @media (max-width: 768px) {
+            html { font-size: 50%; }
+        }
         .seeking-alpha-card {
             background: linear-gradient(135deg, #1f1f1f 0%, #2d2d2d 100%);
         }
@@ -5408,6 +5412,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             );
 
 
+            const tabs = [
+                { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
+                { id: 'ask-emma', label: '🤖 Emma IA', component: AskEmmaTab },
+                { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
+                { id: 'dans-watchlist', label: "👀 Dan's Watchlist", component: DansWatchlistTab },
+                { id: 'scrapping-sa', label: '📈 Seeking Alpha', component: ScrappingSATab }
+            ];
             return (
                 <div className={`min-h-screen transition-colors duration-300 ${
                     isDarkMode 
@@ -5487,14 +5498,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             : 'bg-white border-gray-300'
                     }`}>
                         <div className="max-w-7xl mx-auto px-6">
-                            <div className="flex space-x-1">
-                                {[
-                                    { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
-                                    { id: 'ask-emma', label: '🤖 Emma IA', component: AskEmmaTab },
-                                    { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
-                                    { id: 'dans-watchlist', label: '👀 Dan\'s Watchlist', component: DansWatchlistTab },
-                                    { id: 'scrapping-sa', label: '📈 Seeking Alpha', component: ScrappingSATab }
-                                ].map(tab => (
+                            <div className="hidden md:flex space-x-1">
+                                {tabs.map(tab => (
                                     <button
                                         key={tab.id}
                                         onMouseDown={withRipple}
@@ -5512,6 +5517,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         {tab.label}
                                     </button>
                                 ))}
+                            </div>
+                            <div className="md:hidden p-3">
+                                <select
+                                    value={activeTab}
+                                    onChange={(e) => setActiveTab(e.target.value)}
+                                    className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-900 text-white border border-gray-700' : 'bg-white text-gray-900 border border-gray-300'}`}
+                                >
+                                    {tabs.map(tab => (
+                                        <option key={tab.id} value={tab.id}>{tab.label}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                     </nav>
