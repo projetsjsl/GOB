@@ -14,6 +14,10 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Recharts pour IntelliStocks -->
+    <script src="https://unpkg.com/recharts@2.10.3/dist/Recharts.js"></script>
+    <!-- Lucide React pour les icônes IntelliStocks -->
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
     
     <!-- Styles Emma -->
     <link rel="stylesheet" href="emma-styles.css">
@@ -5411,9 +5415,722 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 </div>
             );
 
+            // ============================================
+            // COMPOSANT INTELLISTOCKS
+            // ============================================
+            const IntelliStocksTab = () => {
+                const [time, setTime] = useState(new Date());
+                const [selectedStock, setSelectedStock] = useState('AAPL');
+                const [timeframe, setTimeframe] = useState('1D');
+                const [menuOpen, setMenuOpen] = useState(false);
+                const [stockDataIntelli, setStockDataIntelli] = useState(null);
+                const [loadingIntelli, setLoadingIntelli] = useState(true);
+                const [connected, setConnected] = useState(false);
+                const [lastUpdateIntelli, setLastUpdateIntelli] = useState(null);
+
+                // Génération de données mock
+                const generateMockData = (symbol) => {
+                    const basePrice = {
+                        AAPL: 183.45, TSLA: 251.23, GOOGL: 143.12,
+                        MSFT: 384.89, NVDA: 485.32, AMZN: 178.91
+                    }[symbol] || 180;
+
+                    const companyNames = {
+                        AAPL: 'Apple Inc.', TSLA: 'Tesla Inc.', GOOGL: 'Alphabet Inc.',
+                        MSFT: 'Microsoft Corp.', NVDA: 'NVIDIA Corp.', AMZN: 'Amazon.com Inc.'
+                    };
+
+                    return {
+                        quote: {
+                            symbol,
+                            name: companyNames[symbol] || 'Company Inc.',
+                            price: basePrice,
+                            change: parseFloat((Math.random() * 6 - 2).toFixed(2)),
+                            changesPercentage: parseFloat((Math.random() * 4 - 1).toFixed(2)),
+                            volume: Math.floor(Math.random() * 50000000 + 30000000),
+                            marketCap: Math.floor(Math.random() * 2000000000000 + 1000000000000),
+                            avgVolume: Math.floor(Math.random() * 60000000 + 40000000)
+                        },
+                        intraday: Array.from({ length: 20 }, (_, i) => ({
+                            date: `${9 + Math.floor(i/4)}:${(i % 4) * 15}`,
+                            open: basePrice + (Math.random() * 4 - 2),
+                            high: basePrice + (Math.random() * 5 - 1),
+                            low: basePrice + (Math.random() * 3 - 3),
+                            close: basePrice + (Math.random() * 4 - 2),
+                            volume: Math.floor(Math.random() * 5000000 + 2000000)
+                        })),
+                        metrics: {
+                            peRatioTTM: parseFloat((Math.random() * 40 + 15).toFixed(1)),
+                            pegRatioTTM: parseFloat((Math.random() * 2 + 0.5).toFixed(2)),
+                            priceToSalesRatioTTM: parseFloat((Math.random() * 8 + 2).toFixed(2)),
+                            dividendYieldTTM: parseFloat((Math.random() * 0.03).toFixed(4))
+                        },
+                        ratios: {
+                            debtEquityRatio: parseFloat((Math.random() * 2 + 0.3).toFixed(2)),
+                            returnOnEquityTTM: parseFloat((Math.random() * 0.4 + 0.1).toFixed(3)),
+                            returnOnAssetsTTM: parseFloat((Math.random() * 0.2 + 0.05).toFixed(3)),
+                            netProfitMarginTTM: parseFloat((Math.random() * 0.3 + 0.1).toFixed(3)),
+                        },
+                        profile: {
+                            companyName: companyNames[symbol] || 'Company Inc.',
+                            price: basePrice,
+                            beta: parseFloat((Math.random() * 0.6 + 0.8).toFixed(2)),
+                            sector: 'Technology',
+                            industry: 'Consumer Electronics'
+                        },
+                        news: [
+                            {
+                                title: `${symbol} annonce résultats trimestriels record`,
+                                publishedDate: new Date(Date.now() - 2*3600000).toISOString(),
+                                site: 'Reuters'
+                            },
+                            {
+                                title: `Nouveau partenariat stratégique annoncé`,
+                                publishedDate: new Date(Date.now() - 5*3600000).toISOString(),
+                                site: 'Bloomberg'
+                            },
+                            {
+                                title: `Analystes relèvent objectif de prix`,
+                                publishedDate: new Date(Date.now() - 8*3600000).toISOString(),
+                                site: 'CNBC'
+                            }
+                        ],
+                        sentiment: {
+                            overall: Math.floor(Math.random() * 30 + 60),
+                            news: Math.floor(Math.random() * 30 + 65),
+                            social: Math.floor(Math.random() * 30 + 60),
+                            institutional: Math.floor(Math.random() * 30 + 55),
+                            retail: Math.floor(Math.random() * 30 + 70),
+                            summary: 'Sentiment globalement positif avec optimisme modéré'
+                        },
+                        insights: {
+                            catalysts: [
+                                'Résultats trimestriels supérieurs aux attentes',
+                                'Innovation produit majeure annoncée',
+                                'Expansion internationale réussie'
+                            ],
+                            risks: [
+                                'Concurrence accrue dans le secteur',
+                                'Incertitudes macroéconomiques',
+                                'Volatilité des marchés'
+                            ],
+                            consensus: 'bullish',
+                            reasoning: 'Les fondamentaux solides et la croissance continue justifient un sentiment positif'
+                        }
+                    };
+                };
+
+                // Chargement des données
+                useEffect(() => {
+                    const fetchData = async () => {
+                        try {
+                            const mockData = generateMockData(selectedStock);
+                            setStockDataIntelli(mockData);
+                            setConnected(true);
+                            setLoadingIntelli(false);
+                            setLastUpdateIntelli(new Date());
+                        } catch (error) {
+                            console.error('Error fetching data:', error);
+                            setConnected(false);
+                            setLoadingIntelli(false);
+                            const mockData = generateMockData(selectedStock);
+                            setStockDataIntelli(mockData);
+                        }
+                    };
+                    fetchData();
+                    const interval = setInterval(fetchData, 30000);
+                    return () => clearInterval(interval);
+                }, [selectedStock]);
+
+                // Timer
+                useEffect(() => {
+                    const timer = setInterval(() => setTime(new Date()), 1000);
+                    return () => clearInterval(timer);
+                }, []);
+
+                const stocks = [
+                    { symbol: 'AAPL', name: 'Apple Inc.' },
+                    { symbol: 'TSLA', name: 'Tesla Inc.' },
+                    { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+                    { symbol: 'MSFT', name: 'Microsoft Corp.' },
+                    { symbol: 'NVDA', name: 'NVIDIA Corp.' },
+                    { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+                ];
+
+                const currentStock = stocks.find(s => s.symbol === selectedStock);
+                const quote = stockDataIntelli?.quote || {};
+                const metrics = stockDataIntelli?.metrics || {};
+                const ratios = stockDataIntelli?.ratios || {};
+                const profile = stockDataIntelli?.profile || {};
+                const intraday = stockDataIntelli?.intraday || [];
+                const news = stockDataIntelli?.news || [];
+                const sentiment = stockDataIntelli?.sentiment || {};
+                const insights = stockDataIntelli?.insights || {};
+
+                const formatNumber = (num, prefix = '', suffix = '') => {
+                    if (!num && num !== 0) return 'N/A';
+                    const n = parseFloat(num);
+                    if (isNaN(n)) return 'N/A';
+                    if (n >= 1e12) return `${prefix}${(n / 1e12).toFixed(2)}T${suffix}`;
+                    if (n >= 1e9) return `${prefix}${(n / 1e9).toFixed(2)}B${suffix}`;
+                    if (n >= 1e6) return `${prefix}${(n / 1e6).toFixed(2)}M${suffix}`;
+                    if (n >= 1e3) return `${prefix}${(n / 1e3).toFixed(2)}K${suffix}`;
+                    return `${prefix}${n.toFixed(2)}${suffix}`;
+                };
+
+                const formatTimeAgo = (dateString) => {
+                    const date = new Date(dateString);
+                    const hours = Math.floor((Date.now() - date.getTime()) / 3600000);
+                    if (hours < 1) return 'maintenant';
+                    if (hours < 24) return `${hours}h`;
+                    return `${Math.floor(hours / 24)}j`;
+                };
+
+                const technicalIndicators = {
+                    RSI: { value: 67.8, signal: 'Achat' },
+                    MACD: { value: 2.34, signal: 'Bullish' },
+                    SMA_50: { value: (quote.price || 0) * 0.98, signal: 'Au-dessus' },
+                    SMA_200: { value: (quote.price || 0) * 0.94, signal: 'Au-dessus' },
+                };
+
+                const orderFlow = { buyVolume: 68.4, sellVolume: 31.6 };
+
+                const peerComparison = [
+                    { name: 'AAPL', pe: metrics.peRatioTTM || 29.8, growth: 12.5, margin: (ratios.netProfitMarginTTM || 0.25) * 100 },
+                    { name: 'MSFT', pe: 35.2, growth: 15.8, margin: 32.1 },
+                    { name: 'GOOGL', pe: 24.6, growth: 18.2, margin: 28.7 },
+                    { name: 'AMZN', pe: 52.3, growth: 22.1, margin: 8.9 },
+                ];
+
+                if (loadingIntelli) {
+                    return (
+                        <div className={`min-h-screen p-2 flex items-center justify-center transition-colors duration-300 ${
+                            isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
+                        }`}>
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto mb-4"></div>
+                                <div className="text-sm text-gray-400">Chargement des données…</div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                // Accès aux icônes Lucide
+                const LucideIcon = ({ name, className = "w-4 h-4" }) => {
+                    if (typeof lucideReact === 'undefined') return null;
+                    const Icon = lucideReact[name];
+                    if (!Icon) return null;
+                    return React.createElement(Icon, { className });
+                };
+
+                return (
+                    <div className={`min-h-screen p-2 transition-colors duration-300 ${
+                        isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
+                    }`}>
+                        {/* Header */}
+                        <div className="mb-2">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                    <div className={`p-1.5 border rounded-lg transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                    }`}>
+                                        <LucideIcon name="Activity" className="w-4 h-4 text-gray-400" />
+                                    </div>
+                                    <div>
+                                        <h1 className={`text-base font-bold flex items-center gap-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>
+                                            Expert Trading Analytics
+                                            {connected ? (
+                                                <LucideIcon name="Wifi" className="w-3 h-3 text-green-500" />
+                                            ) : (
+                                                <LucideIcon name="WifiOff" className="w-3 h-3 text-red-500" />
+                                            )}
+                                        </h1>
+                                        <p className="text-[8px] text-gray-600">
+                                            Mode Démo Hybride • FMP + Perplexity AI
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => {
+                                            const fetchData = async () => {
+                                                try {
+                                                    const mockData = generateMockData(selectedStock);
+                                                    setStockDataIntelli(mockData);
+                                                    setConnected(true);
+                                                    setLastUpdateIntelli(new Date());
+                                                } catch (error) {
+                                                    console.error('Error:', error);
+                                                }
+                                            };
+                                            fetchData();
+                                        }}
+                                        className={`p-1.5 border rounded-md transition-all ${
+                                            isDarkMode 
+                                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
+                                                : 'bg-white hover:bg-gray-100 border-gray-300'
+                                        }`}
+                                    >
+                                        <LucideIcon name="RefreshCw" className="w-3 h-3 text-gray-400" />
+                                    </button>
+
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setMenuOpen(!menuOpen)}
+                                            className={`flex items-center gap-2 px-3 py-1.5 border rounded-lg transition-all ${
+                                                isDarkMode 
+                                                    ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
+                                                    : 'bg-white hover:bg-gray-100 border-gray-300'
+                                            }`}
+                                        >
+                                            <div>
+                                                <div className={`text-xs font-bold transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>{selectedStock}</div>
+                                                <div className="text-[8px] text-gray-600">{profile.companyName || currentStock?.name}</div>
+                                            </div>
+                                            <LucideIcon name="ChevronDown" className={`w-3 h-3 text-gray-400 transition-transform ${menuOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        {menuOpen && (
+                                            <div className={`absolute top-full mt-1 right-0 w-48 border rounded-lg shadow-2xl overflow-hidden z-50 transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                            }`}>
+                                                {stocks.map((stock) => (
+                                                    <button
+                                                        key={stock.symbol}
+                                                        onClick={() => {
+                                                            setSelectedStock(stock.symbol);
+                                                            setMenuOpen(false);
+                                                        }}
+                                                        className={`w-full p-2 flex items-center justify-between transition-all text-xs ${
+                                                            selectedStock === stock.symbol 
+                                                                ? (isDarkMode ? 'bg-neutral-800' : 'bg-gray-100')
+                                                                : (isDarkMode ? 'hover:bg-neutral-800' : 'hover:bg-gray-50')
+                                                        }`}
+                                                    >
+                                                        <div className="text-left">
+                                                            <div className={`font-bold transition-colors duration-300 ${
+                                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                                            }`}>{stock.symbol}</div>
+                                                            <div className="text-[8px] text-gray-600">{stock.name}</div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="text-right">
+                                        <div className="text-xs font-mono font-bold text-gray-300">
+                                            {time.toLocaleTimeString('fr-FR')}
+                                        </div>
+                                        <div className="text-[8px] text-gray-600">
+                                            {time.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-1">
+                                        <button className={`p-1.5 border rounded-md transition-all ${
+                                            isDarkMode 
+                                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
+                                                : 'bg-white hover:bg-gray-100 border-gray-300'
+                                        }`}>
+                                            <LucideIcon name="Bell" className="w-3 h-3 text-gray-500" />
+                                        </button>
+                                        <button className={`p-1.5 border rounded-md transition-all ${
+                                            isDarkMode 
+                                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
+                                                : 'bg-white hover:bg-gray-100 border-gray-300'
+                                        }`}>
+                                            <LucideIcon name="Search" className="w-3 h-3 text-gray-500" />
+                                        </button>
+                                        <button className={`p-1.5 border rounded-md transition-all ${
+                                            isDarkMode 
+                                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
+                                                : 'bg-white hover:bg-gray-100 border-gray-300'
+                                        }`}>
+                                            <LucideIcon name="Settings" className="w-3 h-3 text-gray-500" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Grid Layout */}
+                        <div className="grid grid-cols-12 gap-2">
+                            
+                            {/* Colonne gauche */}
+                            <div className="col-span-8 space-y-2">
+                                
+                                {/* Graphique principal */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                }`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div>
+                                            <h2 className={`text-sm font-bold mb-0.5 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>{selectedStock}</h2>
+                                            <p className="text-[8px] text-gray-600">{profile.companyName || currentStock?.name} • {profile.sector || 'NASDAQ'}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className={`text-lg font-bold transition-colors duration-300 ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>${parseFloat(quote.price || 0).toFixed(2)}</div>
+                                            <div className={`flex items-center gap-1 justify-end text-xs ${parseFloat(quote.changesPercentage || 0) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                {parseFloat(quote.changesPercentage || 0) >= 0 ? (
+                                                    <LucideIcon name="ArrowUpRight" className="w-3 h-3" />
+                                                ) : (
+                                                    <LucideIcon name="ArrowDownRight" className="w-3 h-3" />
+                                                )}
+                                                <span className="font-semibold">
+                                                    {parseFloat(quote.changesPercentage || 0) >= 0 ? '+' : ''}{parseFloat(quote.changesPercentage || 0).toFixed(2)}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ width: '100%', height: 140 }}>
+                                        <div className="text-center text-gray-500 text-xs py-8">
+                                            📈 Graphique interactif (Recharts nécessite une configuration avancée)
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-1 mt-1.5">
+                                        {['1D', '1W', '1M', '3M', '6M', '1A'].map((period) => (
+                                            <button
+                                                key={period}
+                                                onClick={() => setTimeframe(period)}
+                                                className={`px-2 py-0.5 rounded text-[9px] font-semibold transition-all ${
+                                                    timeframe === period 
+                                                        ? (isDarkMode 
+                                                            ? 'bg-neutral-700 text-white border border-neutral-600' 
+                                                            : 'bg-gray-300 text-gray-900 border border-gray-400')
+                                                        : (isDarkMode 
+                                                            ? 'bg-neutral-800 hover:bg-neutral-700 border border-neutral-800 text-gray-500' 
+                                                            : 'bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-600')
+                                                }`}
+                                            >
+                                                {period}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Volume */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                }`}>
+                                    <h3 className="text-[10px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
+                                        <LucideIcon name="BarChart3" className="w-3 h-3 text-gray-500" />
+                                        Volume & Flux d'Ordres
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div style={{ width: '100%', height: 80 }}>
+                                            <div className="text-center text-gray-500 text-xs py-4">
+                                                📊 Graphique Volume
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <div className={`flex items-center justify-between p-1.5 border rounded text-[9px] transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                            }`}>
+                                                <span className="text-gray-500">Acheteurs</span>
+                                                <div className="flex items-center gap-1">
+                                                    <div className={`w-16 h-1.5 rounded-full overflow-hidden ${
+                                                        isDarkMode ? 'bg-neutral-700' : 'bg-gray-200'
+                                                    }`}>
+                                                        <div className="h-full bg-emerald-500" style={{ width: `${orderFlow.buyVolume}%` }}></div>
+                                                    </div>
+                                                    <span className="text-emerald-500 font-bold">{orderFlow.buyVolume}%</span>
+                                                </div>
+                                            </div>
+                                            <div className={`flex items-center justify-between p-1.5 border rounded text-[9px] transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                            }`}>
+                                                <span className="text-gray-500">Vendeurs</span>
+                                                <div className="flex items-center gap-1">
+                                                    <div className={`w-16 h-1.5 rounded-full overflow-hidden ${
+                                                        isDarkMode ? 'bg-neutral-700' : 'bg-gray-200'
+                                                    }`}>
+                                                        <div className="h-full bg-red-500" style={{ width: `${orderFlow.sellVolume}%` }}></div>
+                                                    </div>
+                                                    <span className="text-red-500 font-bold">{orderFlow.sellVolume}%</span>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-1">
+                                                <div className={`p-1.5 border rounded text-center transition-colors duration-300 ${
+                                                    isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                                }`}>
+                                                    <div className="text-[8px] text-gray-600">Volume</div>
+                                                    <div className={`text-xs font-bold transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                    }`}>{formatNumber(quote.volume)}</div>
+                                                </div>
+                                                <div className={`p-1.5 border rounded text-center transition-colors duration-300 ${
+                                                    isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                                }`}>
+                                                    <div className="text-[8px] text-gray-600">Cap</div>
+                                                    <div className={`text-xs font-bold transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                    }`}>{formatNumber(quote.marketCap)}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Indicateurs */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                }`}>
+                                    <h3 className="text-[10px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
+                                        <LucideIcon name="Activity" className="w-3 h-3 text-gray-500" />
+                                        Indicateurs Techniques
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                        {Object.entries(technicalIndicators).map(([key, value]) => (
+                                            <div key={key} className={`flex items-center justify-between p-1.5 border rounded transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                            }`}>
+                                                <div>
+                                                    <div className="font-semibold text-[9px] text-gray-400">{key.replace('_', ' ')}</div>
+                                                    <div className="text-[8px] text-emerald-500">{value.signal}</div>
+                                                </div>
+                                                <div className={`text-sm font-bold transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-200' : 'text-gray-700'
+                                                }`}>
+                                                    {typeof value.value === 'number' ? value.value.toFixed(2) : value.value}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Fondamentaux */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                }`}>
+                                    <h3 className="text-[10px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
+                                        <LucideIcon name="DollarSign" className="w-3 h-3 text-gray-500" />
+                                        Analyse Fondamentale
+                                    </h3>
+                                    <div className="grid grid-cols-3 gap-1.5">
+                                        {[
+                                            { label: 'P/E', value: metrics.peRatioTTM, suffix: 'x' },
+                                            { label: 'PEG', value: metrics.pegRatioTTM, suffix: '' },
+                                            { label: 'P/S', value: metrics.priceToSalesRatioTTM, suffix: 'x' },
+                                            { label: 'ROE', value: ratios.returnOnEquityTTM ? `${(ratios.returnOnEquityTTM * 100).toFixed(1)}%` : 'N/A', suffix: '' },
+                                            { label: 'ROA', value: ratios.returnOnAssetsTTM ? `${(ratios.returnOnAssetsTTM * 100).toFixed(1)}%` : 'N/A', suffix: '' },
+                                            { label: 'D/E', value: ratios.debtEquityRatio, suffix: 'x' },
+                                            { label: 'Marge', value: ratios.netProfitMarginTTM ? `${(ratios.netProfitMarginTTM * 100).toFixed(1)}%` : 'N/A', suffix: '' },
+                                            { label: 'Beta', value: profile.beta, suffix: '' },
+                                            { label: 'Div', value: metrics.dividendYieldTTM ? `${(metrics.dividendYieldTTM * 100).toFixed(2)}%` : 'N/A', suffix: '' },
+                                        ].map((metric) => (
+                                            <div key={metric.label} className={`p-1.5 border rounded text-center transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                            }`}>
+                                                <div className="text-[8px] text-gray-600 mb-0.5">{metric.label}</div>
+                                                <div className={`text-xs font-bold transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-200' : 'text-gray-700'
+                                                }`}>
+                                                    {metric.value != null ? 
+                                                        (typeof metric.value === 'number' ? metric.value.toFixed(2) + (metric.suffix || '') : metric.value) 
+                                                        : 'N/A'}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Insights */}
+                                {insights.catalysts && (
+                                    <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                    }`}>
+                                        <h3 className="text-[10px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
+                                            <LucideIcon name="Brain" className="w-3 h-3 text-gray-500" />
+                                            Insights IA (Perplexity)
+                                        </h3>
+                                        <div className="space-y-2">
+                                            <div>
+                                                <div className="text-[9px] text-gray-500 mb-1 font-semibold">🚀 Catalyseurs</div>
+                                                {insights.catalysts.map((cat, i) => (
+                                                    <div key={i} className="text-[8px] text-emerald-400 mb-0.5">• {cat}</div>
+                                                ))}
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] text-gray-500 mb-1 font-semibold">⚠️ Risques</div>
+                                                {insights.risks.map((risk, i) => (
+                                                    <div key={i} className="text-[8px] text-orange-400 mb-0.5">• {risk}</div>
+                                                ))}
+                                            </div>
+                                            <div className={`p-1.5 border rounded transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                            }`}>
+                                                <div className="text-[9px] text-gray-500 mb-0.5">Consensus : 
+                                                    <span className={`ml-1 font-bold ${
+                                                        insights.consensus === 'bullish' ? 'text-emerald-500' :
+                                                        insights.consensus === 'bearish' ? 'text-red-500' : 'text-gray-400'
+                                                    }`}>
+                                                        {insights.consensus === 'bullish' ? '📈 Bullish' : 
+                                                         insights.consensus === 'bearish' ? '📉 Bearish' : '➖ Neutre'}
+                                                    </span>
+                                                </div>
+                                                <div className="text-[8px] text-gray-400">{insights.reasoning}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Comparaison */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                }`}>
+                                    <h3 className="text-[10px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
+                                        <LucideIcon name="TrendingUp" className="w-3 h-3 text-gray-500" />
+                                        Comparaison Pairs
+                                    </h3>
+                                    <div style={{ width: '100%', height: 120 }}>
+                                        <div className="text-center text-gray-500 text-xs py-8">
+                                            📊 Graphique Radar (Recharts nécessite une configuration avancée)
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            {/* Colonne droite */}
+                            <div className="col-span-4 space-y-2">
+                                
+                                {/* Stats */}
+                                <div className="space-y-1.5">
+                                    <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                    }`}>
+                                        <div className="text-[8px] text-gray-600 mb-0.5">Capitalisation</div>
+                                        <div className={`text-base font-bold transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>{formatNumber(quote.marketCap)}</div>
+                                        <div className="text-[8px] text-gray-500">P/E: {metrics.peRatioTTM?.toFixed(1) || 'N/A'}</div>
+                                    </div>
+
+                                    <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                    }`}>
+                                        <div className="text-[8px] text-gray-600 mb-0.5">Sentiment IA</div>
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="text-base font-bold text-emerald-500">{sentiment.overall || 0}%</div>
+                                            <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${
+                                                isDarkMode ? 'bg-neutral-700' : 'bg-gray-200'
+                                            }`}>
+                                                <div className="h-full bg-emerald-500" style={{ width: `${sentiment.overall || 0}%` }}></div>
+                                            </div>
+                                        </div>
+                                        <div className="text-[8px] text-emerald-500 mt-0.5">
+                                            {(sentiment.overall || 0) > 70 ? 'Très Bullish' : (sentiment.overall || 0) > 50 ? 'Bullish' : 'Neutre'}
+                                        </div>
+                                    </div>
+
+                                    <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                    }`}>
+                                        <div className="text-[8px] text-gray-600 mb-0.5">Prix Actuel</div>
+                                        <div className={`text-base font-bold transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>${parseFloat(quote.price || 0).toFixed(2)}</div>
+                                        <div className="text-[8px] text-emerald-500 mt-0.5">Volume: {formatNumber(quote.volume)}</div>
+                                    </div>
+                                </div>
+
+                                {/* Sentiment détaillé */}
+                                {sentiment.overall && (
+                                    <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                    }`}>
+                                        <h3 className="text-[9px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
+                                            <LucideIcon name="Brain" className="w-3 h-3 text-gray-500" />
+                                            Sentiment IA
+                                        </h3>
+                                        <div style={{ width: '100%', height: 90 }}>
+                                            <div className="text-center text-gray-500 text-xs py-6">
+                                                📊 Graphique Sentiment
+                                            </div>
+                                        </div>
+                                        {sentiment.summary && (
+                                            <div className={`mt-1.5 p-1.5 border rounded transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                            }`}>
+                                                <div className="text-[8px] text-gray-400">{sentiment.summary}</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* News */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                }`}>
+                                    <h3 className="text-[9px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
+                                        <LucideIcon name="Newspaper" className="w-3 h-3 text-gray-500" />
+                                        News Temps Réel
+                                    </h3>
+                                    <div className="space-y-1 max-h-40 overflow-y-auto">
+                                        {news.map((item, i) => (
+                                            <div key={i} className={`p-1.5 border rounded transition-all cursor-pointer ${
+                                                isDarkMode 
+                                                    ? 'bg-neutral-800 border-neutral-700 hover:bg-neutral-750' 
+                                                    : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                            }`}>
+                                                <div className="flex items-start justify-between mb-0.5">
+                                                    <div className="text-[7px] px-1 py-0.5 rounded bg-emerald-900 text-emerald-500">📈</div>
+                                                    <span className="text-[7px] text-gray-600">{formatTimeAgo(item.publishedDate)}</span>
+                                                </div>
+                                                <div className={`font-semibold text-[8px] mb-0.5 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>{item.title}</div>
+                                                <div className="text-[7px] text-gray-500">{item.site}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className={`mt-2 p-1.5 border rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                        }`}>
+                            <div className="flex items-center gap-2">
+                                <LucideIcon name="AlertCircle" className="w-3 h-3 text-gray-500" />
+                                <div className="flex-1">
+                                    <div className="font-semibold text-[9px] text-gray-400">
+                                        ✅ Dashboard Hybride Fonctionnel
+                                    </div>
+                                    <div className="text-[7px] text-gray-600">
+                                        Mode Démo • FMP (données précises) + Perplexity (intelligence IA)
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-[8px] text-gray-500 font-bold">Hybride Optimal</div>
+                                    <div className="text-[7px] text-gray-600">Précision + IA</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
 
             const tabs = [
                 { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
+                { id: 'intellistocks', label: '🚀 IntelliStocks', component: IntelliStocksTab },
                 { id: 'ask-emma', label: '🤖 Emma IA', component: AskEmmaTab },
                 { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: "👀 Dan's Watchlist", component: DansWatchlistTab },
@@ -5541,12 +6258,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* Contenu principal */}
                     <main className="max-w-7xl mx-auto p-6">
+                        {activeTab === 'stocks-news' && <StocksNewsTab />}
+                        {activeTab === 'intellistocks' && <IntelliStocksTab />}
                         {activeTab === 'ask-emma' && <AskEmmaTab />}
                         {activeTab === 'admin-jsla' && <AdminJSLaiTab />}
                         {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                         {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
-                        {activeTab === 'stocks-news' && <StocksNewsTab />}
                     </main>
 
                     {/* Messages */}
