@@ -627,15 +627,8 @@
                     setTimeout(() => setShowEmmaIntro(false), 3000);
                 }
                 
-                const interval = setInterval(() => {
-                    console.log('🔄 Auto-refresh des données...');
-                    refreshAllStocks();
-                    fetchNews();
-                    fetchSeekingAlphaData();
-                    fetchSeekingAlphaStockData();
-                }, 300000);
-                
-                return () => clearInterval(interval);
+                // Pas d'auto-rafraîchissement — l'utilisateur déclenche manuellement si besoin
+                return () => {};
             }, []);
 
             // Afficher l'intro quand on ouvre Emma IA pour la 1ère fois pendant la session
@@ -5606,8 +5599,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }
                     };
                     fetchData();
-                    const interval = setInterval(fetchData, 300000); // 5 min
-                    return () => clearInterval(interval);
+                    // Pas d'intervalle d'auto-rafraîchissement
+                    return () => {};
                 }, [selectedStock]);
 
                 // Timer
