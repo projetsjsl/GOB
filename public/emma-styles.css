@@ -741,3 +741,10 @@
     font-size: 14px;
   }
 }
+
+/* Réduction globale pour mobile: police et espacements à 50% */
+@media (max-width: 768px) {
+  html {
+    font-size: 50%;
+  }
+}
