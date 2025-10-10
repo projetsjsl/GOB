@@ -296,7 +296,7 @@ const GOB = () => {
     return names[symbol] || symbol;
   };
 
-  // Update time every minute and check market status
+  // Update time when arriving and on manual actions only (no interval)
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -323,17 +323,12 @@ const GOB = () => {
     };
     
     updateTime();
-    const interval = setInterval(updateTime, 60000); // Update every minute
-    
-    return () => clearInterval(interval);
+    // Auto-update time interval removed to avoid background refresh
   }, []);
 
-  // Fetch market data on component mount and every 30 seconds
+  // Fetch market data on component mount only (no auto-refresh)
   useEffect(() => {
     fetchMarketData();
-    const marketInterval = setInterval(fetchMarketData, 30000); // Update every 30 seconds
-    
-    return () => clearInterval(marketInterval);
   }, []);
 
   // Load apps from localStorage

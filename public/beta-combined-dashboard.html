@@ -623,15 +623,7 @@
                     setTimeout(() => setShowEmmaIntro(false), 3000);
                 }
                 
-                const interval = setInterval(() => {
-                    console.log('🔄 Auto-refresh des données...');
-                    refreshAllStocks();
-                    fetchNews();
-                    fetchSeekingAlphaData();
-                    fetchSeekingAlphaStockData();
-                }, 300000);
-                
-                return () => clearInterval(interval);
+                // Auto-refresh supprimé: mises à jour uniquement au chargement initial ou via actions utilisateur
             }, []);
 
             // Afficher l'intro quand on ouvre Emma IA pour la 1ère fois pendant la session
