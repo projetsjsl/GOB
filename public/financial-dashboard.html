@@ -182,14 +182,7 @@
                 refreshAllStocks();
                 fetchNews();
                 fetchSeekingAlphaData();
-                
-                // Auto-refresh toutes les 5 minutes
-                const interval = setInterval(() => {
-                    refreshAllStocks();
-                    fetchNews();
-                }, 300000);
-                
-                return () => clearInterval(interval);
+                // Suppression de l'auto-refresh: on ne met à jour que sur arrivée ou clic bouton
             }, []);
 
             // Composant de gestion des titres
