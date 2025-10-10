@@ -11,6 +11,10 @@
     "api/news.js": {
       "memory": 512,
       "maxDuration": 10
+    },
+    "api/finnhub.js": {
+      "memory": 512,
+      "maxDuration": 10
     }
   },
   "headers": [
@@ -22,8 +26,7 @@
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
     }
-  ]
-,
+  ],
   "redirects": [
     {
       "source": "/",

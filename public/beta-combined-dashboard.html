@@ -5520,17 +5520,85 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     };
                 };
 
-                // Chargement des données
+                // Chargement des données (branché sur /api/marketdata avec fallback mock)
                 useEffect(() => {
                     const fetchData = async () => {
                         try {
-                            const mockData = generateMockData(selectedStock);
-                            setStockDataIntelli(mockData);
-                            setConnected(true);
+                            const qs = (ep) => `${API_BASE_URL}/api/marketdata?endpoint=${ep}&symbol=${selectedStock}&source=auto`;
+                            const [qRes, fRes, pRes] = await Promise.all([
+                                fetch(qs('quote')),
+                                fetch(qs('fundamentals')),
+                                fetch(qs('profile'))
+                            ]);
+
+                            const quoteJson = qRes.ok ? await qRes.json() : {};
+                            const fundamentalsJson = fRes.ok ? await fRes.json() : null;
+                            const profileJson = pRes.ok ? await pRes.json() : {};
+
+                            let candles = null;
+                            try {
+                                const cRes = await fetch(qs('candles'));
+                                if (cRes.ok) candles = await cRes.json();
+                            } catch (_) {}
+
+                            const currentPrice = (typeof quoteJson.c === 'number' ? quoteJson.c : undefined) || profileJson.price || 0;
+
+                            // Construire la série intraday à partir des bougies Finnhub si disponibles
+                            let intradaySeries = [];
+                            if (candles && Array.isArray(candles.c) && Array.isArray(candles.t) && candles.c.length === candles.t.length) {
+                                intradaySeries = candles.t.map((ts, i) => ({
+                                    time: new Date((ts || 0) * 1000).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+                                    price: candles.c[i]
+                                }));
+                            }
+
+                            // Fallback série synthétique si rien
+                            if (intradaySeries.length === 0) {
+                                const mock = generateMockData(selectedStock);
+                                intradaySeries = (mock.intraday || []).map(p => ({ time: p.date, price: p.close }));
+                            }
+
+                            const metricsMapped = fundamentalsJson ? {
+                                peRatioTTM: typeof fundamentalsJson.peRatio === 'number' ? fundamentalsJson.peRatio : undefined,
+                                pegRatioTTM: typeof fundamentalsJson.pegRatio === 'number' ? fundamentalsJson.pegRatio : undefined,
+                                priceToSalesRatioTTM: typeof fundamentalsJson.priceToSalesRatioTTM === 'number' ? fundamentalsJson.priceToSalesRatioTTM : undefined,
+                                dividendYieldTTM: typeof fundamentalsJson.dividendYield === 'number' ? fundamentalsJson.dividendYield : undefined
+                            } : {};
+
+                            const data = {
+                                quote: {
+                                    symbol: selectedStock,
+                                    name: profileJson.name || profileJson.companyName || selectedStock,
+                                    price: currentPrice,
+                                    change: quoteJson.d,
+                                    changesPercentage: quoteJson.dp,
+                                    volume: quoteJson.volume,
+                                    marketCap: fundamentalsJson?.marketCapitalization || profileJson.marketCapitalization,
+                                    avgVolume: undefined
+                                },
+                                intraday: intradaySeries,
+                                metrics: metricsMapped,
+                                ratios: {
+                                    returnOnEquityTTM: fundamentalsJson?.roeTTM ? fundamentalsJson.roeTTM / 100 : undefined,
+                                    returnOnAssetsTTM: fundamentalsJson?.roaTTM ? fundamentalsJson.roaTTM / 100 : undefined,
+                                    netProfitMarginTTM: fundamentalsJson?.profitMargin ? fundamentalsJson.profitMargin / 100 : undefined
+                                },
+                                profile: {
+                                    companyName: profileJson.name || profileJson.companyName || selectedStock,
+                                    sector: fundamentalsJson?.sector || profileJson.sector || '—',
+                                    industry: fundamentalsJson?.industry || profileJson.industry || '—'
+                                },
+                                news: [],
+                                sentiment: { overall: 70 },
+                                insights: { catalysts: [], risks: [], consensus: 'neutral', reasoning: '' }
+                            };
+
+                            setStockDataIntelli(data);
+                            setConnected(quoteJson?.source && quoteJson.source !== 'demo');
                             setLoadingIntelli(false);
                             setLastUpdateIntelli(new Date());
                         } catch (error) {
-                            console.error('Error fetching data:', error);
+                            console.error('Error fetching IntelliStocks data:', error);
                             setConnected(false);
                             setLoadingIntelli(false);
                             const mockData = generateMockData(selectedStock);
@@ -5538,7 +5606,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }
                     };
                     fetchData();
-                    const interval = setInterval(fetchData, 30000);
+                    const interval = setInterval(fetchData, 300000); // 5 min
                     return () => clearInterval(interval);
                 }, [selectedStock]);
 
@@ -5795,9 +5863,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
 
                                     <div style={{ width: '100%', height: 140 }}>
-                                        <div className="text-center text-gray-500 text-xs py-8">
-                                            📈 Graphique interactif (Recharts nécessite une configuration avancée)
-                                        </div>
+                                        {typeof window !== 'undefined' && window.Recharts && intraday.length > 0 ? (
+                                            (() => {
+                                                const { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } = window.Recharts;
+                                                const chartData = intraday.map(p => ({ time: p.time || p.date, price: Number(p.price || p.close || 0) }));
+                                                return (
+                                                    <ResponsiveContainer width="100%" height={140}>
+                                                        <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                                                            <defs>
+                                                                <linearGradient id="priceFill" x1="0" y1="0" x2="0" y2="1">
+                                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                                                </linearGradient>
+                                                            </defs>
+                                                            <CartesianGrid stroke={isDarkMode ? '#262626' : '#e5e7eb'} strokeDasharray="3 3" />
+                                                            <XAxis dataKey="time" hide />
+                                                            <YAxis hide domain={[ 'auto', 'auto' ]} />
+                                                            <Tooltip formatter={(v) => `$${Number(v).toFixed(2)}`} labelFormatter={() => ''} />
+                                                            <Area type="monotone" dataKey="price" stroke="#10b981" fill="url(#priceFill)" strokeWidth={2} />
+                                                        </AreaChart>
+                                                    </ResponsiveContainer>
+                                                );
+                                            })()
+                                        ) : (
+                                            <div className="text-center text-gray-500 text-xs py-8">
+                                                📈 Graphique en attente de données
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="flex gap-1 mt-1.5">
