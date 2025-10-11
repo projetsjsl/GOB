@@ -303,15 +303,8 @@
                     return await response.json();
                 } catch (error) {
                     console.error('Erreur fetch stock data (marketdata):', error);
-                    // Fallback vers l'ancienne API Finnhub
-                    try {
-                        const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
-                        if (!response.ok) throw new Error(`API error: ${response.status}`);
-                        return await response.json();
-                    } catch (fallbackError) {
-                        console.error('Erreur fetch stock data (finnhub fallback):', fallbackError);
+                    // Rester sur marketdata; l’API gère déjà ses fallbacks internes
                     return null;
-                    }
                 }
             };
 

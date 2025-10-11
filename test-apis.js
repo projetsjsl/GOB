@@ -49,10 +49,10 @@ async function runTests() {
     await testAPI('/api/marketdata?endpoint=profile&symbol=CVS&source=alpha', 'API Market Data - Alpha Vantage Profile');
     await testAPI('/api/marketdata?endpoint=news&symbol=AAPL&source=finnhub', 'API Market Data - Finnhub News');
     
-    // Test API Finnhub (ancienne - pour compatibilité)
-    await testAPI('/api/finnhub?endpoint=quote&symbol=AAPL', 'API Finnhub - Quote (legacy)');
-    await testAPI('/api/finnhub?endpoint=profile&symbol=MSFT', 'API Finnhub - Profile (legacy)');
-    await testAPI('/api/finnhub?endpoint=news&symbol=CVS', 'API Finnhub - News (legacy)');
+    // Test API Marketdata (migration depuis Finnhub)
+    await testAPI('/api/marketdata?endpoint=quote&symbol=AAPL&source=auto', 'API Marketdata - Quote');
+    await testAPI('/api/marketdata?endpoint=profile&symbol=MSFT&source=auto', 'API Marketdata - Profile');
+    await testAPI('/api/marketdata?endpoint=news&symbol=CVS&source=auto', 'API Marketdata - News');
     
     // Test API Fallback
     await testAPI('/api/fallback?type=stock&symbol=AAPL', 'API Fallback - Stock');

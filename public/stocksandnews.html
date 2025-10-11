@@ -338,7 +338,7 @@
         async function callFinnhubAPI(endpoint, params = {}) {
             try {
                 const queryString = new URLSearchParams(params).toString();
-                const url = `/api/finnhub?endpoint=${encodeURIComponent(endpoint)}&${queryString}`;
+                const url = `/api/marketdata?endpoint=${encodeURIComponent(endpoint)}&${queryString}`;
                 const res = await fetch(url);
                 
                 if (!res.ok) {
