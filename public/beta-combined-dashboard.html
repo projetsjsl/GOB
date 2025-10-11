@@ -5513,93 +5513,95 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     };
                 };
 
-                // Chargement des données (branché sur /api/marketdata avec fallback mock)
-                useEffect(() => {
-                    const fetchData = async () => {
+                // Fonction de rechargement des données IntelliStocks (appelable par bouton)
+                const reloadIntelli = async () => {
+                    try {
+                        setLoadingIntelli(true);
+                        const qs = (ep) => `${API_BASE_URL}/api/marketdata?endpoint=${ep}&symbol=${selectedStock}&source=auto`;
+                        const [qRes, fRes, pRes] = await Promise.all([
+                            fetch(qs('quote')),
+                            fetch(qs('fundamentals')),
+                            fetch(qs('profile'))
+                        ]);
+
+                        const quoteJson = qRes.ok ? await qRes.json() : {};
+                        const fundamentalsJson = fRes.ok ? await fRes.json() : null;
+                        const profileJson = pRes.ok ? await pRes.json() : {};
+
+                        let candles = null;
                         try {
-                            const qs = (ep) => `${API_BASE_URL}/api/marketdata?endpoint=${ep}&symbol=${selectedStock}&source=auto`;
-                            const [qRes, fRes, pRes] = await Promise.all([
-                                fetch(qs('quote')),
-                                fetch(qs('fundamentals')),
-                                fetch(qs('profile'))
-                            ]);
+                            const cRes = await fetch(qs('candles'));
+                            if (cRes.ok) candles = await cRes.json();
+                        } catch (_) {}
 
-                            const quoteJson = qRes.ok ? await qRes.json() : {};
-                            const fundamentalsJson = fRes.ok ? await fRes.json() : null;
-                            const profileJson = pRes.ok ? await pRes.json() : {};
+                        const currentPrice = (typeof quoteJson.c === 'number' ? quoteJson.c : undefined) || profileJson.price || 0;
 
-                            let candles = null;
-                            try {
-                                const cRes = await fetch(qs('candles'));
-                                if (cRes.ok) candles = await cRes.json();
-                            } catch (_) {}
-
-                            const currentPrice = (typeof quoteJson.c === 'number' ? quoteJson.c : undefined) || profileJson.price || 0;
-
-                            // Construire la série intraday à partir des bougies Finnhub si disponibles
-                            let intradaySeries = [];
-                            if (candles && Array.isArray(candles.c) && Array.isArray(candles.t) && candles.c.length === candles.t.length) {
-                                intradaySeries = candles.t.map((ts, i) => ({
-                                    time: new Date((ts || 0) * 1000).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
-                                    price: candles.c[i]
-                                }));
-                            }
-
-                            // Fallback série synthétique si rien
-                            if (intradaySeries.length === 0) {
-                                const mock = generateMockData(selectedStock);
-                                intradaySeries = (mock.intraday || []).map(p => ({ time: p.date, price: p.close }));
-                            }
-
-                            const metricsMapped = fundamentalsJson ? {
-                                peRatioTTM: typeof fundamentalsJson.peRatio === 'number' ? fundamentalsJson.peRatio : undefined,
-                                pegRatioTTM: typeof fundamentalsJson.pegRatio === 'number' ? fundamentalsJson.pegRatio : undefined,
-                                priceToSalesRatioTTM: typeof fundamentalsJson.priceToSalesRatioTTM === 'number' ? fundamentalsJson.priceToSalesRatioTTM : undefined,
-                                dividendYieldTTM: typeof fundamentalsJson.dividendYield === 'number' ? fundamentalsJson.dividendYield : undefined
-                            } : {};
-
-                            const data = {
-                                quote: {
-                                    symbol: selectedStock,
-                                    name: profileJson.name || profileJson.companyName || selectedStock,
-                                    price: currentPrice,
-                                    change: quoteJson.d,
-                                    changesPercentage: quoteJson.dp,
-                                    volume: quoteJson.volume,
-                                    marketCap: fundamentalsJson?.marketCapitalization || profileJson.marketCapitalization,
-                                    avgVolume: undefined
-                                },
-                                intraday: intradaySeries,
-                                metrics: metricsMapped,
-                                ratios: {
-                                    returnOnEquityTTM: fundamentalsJson?.roeTTM ? fundamentalsJson.roeTTM / 100 : undefined,
-                                    returnOnAssetsTTM: fundamentalsJson?.roaTTM ? fundamentalsJson.roaTTM / 100 : undefined,
-                                    netProfitMarginTTM: fundamentalsJson?.profitMargin ? fundamentalsJson.profitMargin / 100 : undefined
-                                },
-                                profile: {
-                                    companyName: profileJson.name || profileJson.companyName || selectedStock,
-                                    sector: fundamentalsJson?.sector || profileJson.sector || '—',
-                                    industry: fundamentalsJson?.industry || profileJson.industry || '—'
-                                },
-                                news: [],
-                                sentiment: { overall: 70 },
-                                insights: { catalysts: [], risks: [], consensus: 'neutral', reasoning: '' }
-                            };
-
-                            setStockDataIntelli(data);
-                            setConnected(quoteJson?.source && quoteJson.source !== 'demo');
-                            setLoadingIntelli(false);
-                            setLastUpdateIntelli(new Date());
-                        } catch (error) {
-                            console.error('Error fetching IntelliStocks data:', error);
-                            setConnected(false);
-                            setLoadingIntelli(false);
-                            const mockData = generateMockData(selectedStock);
-                            setStockDataIntelli(mockData);
+                        // Construire la série intraday à partir des bougies si disponibles
+                        let intradaySeries = [];
+                        if (candles && Array.isArray(candles.c) && Array.isArray(candles.t) && candles.c.length === candles.t.length) {
+                            intradaySeries = candles.t.map((ts, i) => ({
+                                time: new Date((ts || 0) * 1000).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+                                price: candles.c[i]
+                            }));
                         }
-                    };
-                    fetchData();
-                    // Pas d'intervalle d'auto-rafraîchissement
+
+                        // Fallback série synthétique si rien
+                        if (intradaySeries.length === 0) {
+                            const mock = generateMockData(selectedStock);
+                            intradaySeries = (mock.intraday || []).map(p => ({ time: p.date, price: p.close }));
+                        }
+
+                        const metricsMapped = fundamentalsJson ? {
+                            peRatioTTM: typeof fundamentalsJson.peRatio === 'number' ? fundamentalsJson.peRatio : undefined,
+                            pegRatioTTM: typeof fundamentalsJson.pegRatio === 'number' ? fundamentalsJson.pegRatio : undefined,
+                            priceToSalesRatioTTM: typeof fundamentalsJson.priceToSalesRatioTTM === 'number' ? fundamentalsJson.priceToSalesRatioTTM : undefined,
+                            dividendYieldTTM: typeof fundamentalsJson.dividendYield === 'number' ? fundamentalsJson.dividendYield : undefined
+                        } : {};
+
+                        const data = {
+                            quote: {
+                                symbol: selectedStock,
+                                name: profileJson.name || profileJson.companyName || selectedStock,
+                                price: currentPrice,
+                                change: quoteJson.d,
+                                changesPercentage: quoteJson.dp,
+                                volume: quoteJson.volume,
+                                marketCap: fundamentalsJson?.marketCapitalization || profileJson.marketCapitalization,
+                                avgVolume: undefined
+                            },
+                            intraday: intradaySeries,
+                            metrics: metricsMapped,
+                            ratios: {
+                                returnOnEquityTTM: fundamentalsJson?.roeTTM ? fundamentalsJson.roeTTM / 100 : undefined,
+                                returnOnAssetsTTM: fundamentalsJson?.roaTTM ? fundamentalsJson.roaTTM / 100 : undefined,
+                                netProfitMarginTTM: fundamentalsJson?.profitMargin ? fundamentalsJson.profitMargin / 100 : undefined
+                            },
+                            profile: {
+                                companyName: profileJson.name || profileJson.companyName || selectedStock,
+                                sector: fundamentalsJson?.sector || profileJson.sector || '—',
+                                industry: fundamentalsJson?.industry || profileJson.industry || '—'
+                            },
+                            news: [],
+                            sentiment: { overall: 70 },
+                            insights: { catalysts: [], risks: [], consensus: 'neutral', reasoning: '' }
+                        };
+
+                        setStockDataIntelli(data);
+                        setConnected(quoteJson?.source && quoteJson.source !== 'demo');
+                        setLastUpdateIntelli(new Date());
+                    } catch (error) {
+                        console.error('Error fetching IntelliStocks data:', error);
+                        setConnected(false);
+                        const mockData = generateMockData(selectedStock);
+                        setStockDataIntelli(mockData);
+                    } finally {
+                        setLoadingIntelli(false);
+                    }
+                };
+
+                // Chargement initial sans intervalle
+                useEffect(() => {
+                    reloadIntelli();
                     return () => {};
                 }, [selectedStock]);
 
