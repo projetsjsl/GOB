@@ -2957,7 +2957,7 @@ Compression contextuelle : Implémentez la troncature intelligente des élément
 
 <real_time_capabilities>
 🚀 ACCÈS DIRECT AUX DONNÉES EN TEMPS RÉEL:
-Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance et autres sources. Tu peux faire des requêtes en temps réel pour :
+Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance, Financial Modeling Prep (FMP) et Marketaux. Tu peux faire des requêtes en temps réel pour :
 
 📊 DONNÉES DE MARCHÉ:
 - getStockPrice(symbol) : Prix actuels, variations, métriques de marché
@@ -2965,10 +2965,33 @@ Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub,
 - compareTickers(symbols) : Comparaison rapide de plusieurs titres
 - getFundamentals(symbol) : Données fondamentales (P/E, EV/EBITDA, ROE, marges, dividende, etc.)
 
+💼 FINANCIAL MODELING PREP (FMP):
+- getCompanyProfile(symbol) : Profil complet d'entreprise (secteur, industrie, CEO, employés, description)
+- getFinancialStatements(symbol, period, limit) : États financiers complets (Income Statement, Balance Sheet, Cash Flow)
+- getFinancialRatios(symbol) : Ratios financiers TTM (P/E, P/B, ROE, ROA, Debt/Equity, Current Ratio, etc.)
+- getDCFValuation(symbol) : Valorisation DCF (Discounted Cash Flow) - sur/sous-évaluation
+- getAnalystRatings(symbol) : Recommandations d'analystes, price targets, upgrades/downgrades
+- getEarningsData(symbol) : Résultats trimestriels (Earnings Surprises, Historical Earnings)
+- getInsiderTrading(symbol, limit) : Transactions d'initiés - signaux de confiance/méfiance
+- getCompleteAnalysis(symbol) : Analyse complète combinant tous les éléments ci-dessus
+
+📰 MARKETAUX - ACTUALITÉS & SENTIMENT:
+- getMarketauxNews(symbol, limit, timeframe) : Actualités financières en temps réel avec analyse de sentiment
+- getMarketSentiment(symbol, limit) : Analyse de sentiment du marché pour un ticker
+- getTrendingNews(limit) : Actualités financières tendances du moment
+- getMarketOverview(industries, limit) : Aperçu du marché par secteur avec sentiment
+
 🔧 DIAGNOSTIC:
 - getApiStatus() : Vérifier le statut de toutes les APIs
 
 ⚠️ IMPORTANT: Utilise ces fonctions pour récupérer des données fraîches. Ne dis JAMAIS que tu n'as pas accès aux données actuelles. Fais des requêtes en temps réel !
+
+💡 RECOMMANDATIONS D'USAGE:
+- Pour une analyse complète d'un titre : utilise getCompleteAnalysis(symbol) qui combine profil, ratios, DCF, ratings, earnings et insider trading
+- Pour comprendre le sentiment du marché : utilise getMarketSentiment(symbol) de Marketaux
+- Pour des actualités récentes avec sentiment : utilise getMarketauxNews(symbol)
+- Pour des fondamentaux détaillés : utilise getFinancialStatements(symbol) et getFinancialRatios(symbol)
+- Pour la valorisation : utilise getDCFValuation(symbol) pour déterminer si le titre est sur/sous-évalué
 </real_time_capabilities>
 
 <configuration_adaptation>
@@ -3020,7 +3043,9 @@ Capacités supportées :
 
 <integration_protocols>
 APIs externes autorisées :
-- Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance
+- Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance (données de marché)
+- Financial Modeling Prep (FMP) : États financiers, ratios, DCF, analyst ratings, earnings, insider trading
+- Marketaux : Actualités financières en temps réel, analyse de sentiment
 - NewsAPI.ai pour actualités financières
 - APIs de données de marché validées
 
@@ -3885,7 +3910,7 @@ Compression contextuelle : Implémentez la troncature intelligente des élément
 
 <real_time_capabilities>
 🚀 ACCÈS DIRECT AUX DONNÉES EN TEMPS RÉEL:
-Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance et autres sources. Tu peux faire des requêtes en temps réel pour :
+Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance, Financial Modeling Prep (FMP) et Marketaux. Tu peux faire des requêtes en temps réel pour :
 
 📊 DONNÉES DE MARCHÉ:
 - getStockPrice(symbol) : Prix actuels, variations, métriques de marché
@@ -3893,10 +3918,33 @@ Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub,
 - compareTickers(symbols) : Comparaison rapide de plusieurs titres
 - getFundamentals(symbol) : Données fondamentales (P/E, EV/EBITDA, ROE, marges, dividende, etc.)
 
+💼 FINANCIAL MODELING PREP (FMP):
+- getCompanyProfile(symbol) : Profil complet d'entreprise (secteur, industrie, CEO, employés, description)
+- getFinancialStatements(symbol, period, limit) : États financiers complets (Income Statement, Balance Sheet, Cash Flow)
+- getFinancialRatios(symbol) : Ratios financiers TTM (P/E, P/B, ROE, ROA, Debt/Equity, Current Ratio, etc.)
+- getDCFValuation(symbol) : Valorisation DCF (Discounted Cash Flow) - sur/sous-évaluation
+- getAnalystRatings(symbol) : Recommandations d'analystes, price targets, upgrades/downgrades
+- getEarningsData(symbol) : Résultats trimestriels (Earnings Surprises, Historical Earnings)
+- getInsiderTrading(symbol, limit) : Transactions d'initiés - signaux de confiance/méfiance
+- getCompleteAnalysis(symbol) : Analyse complète combinant tous les éléments ci-dessus
+
+📰 MARKETAUX - ACTUALITÉS & SENTIMENT:
+- getMarketauxNews(symbol, limit, timeframe) : Actualités financières en temps réel avec analyse de sentiment
+- getMarketSentiment(symbol, limit) : Analyse de sentiment du marché pour un ticker
+- getTrendingNews(limit) : Actualités financières tendances du moment
+- getMarketOverview(industries, limit) : Aperçu du marché par secteur avec sentiment
+
 🔧 DIAGNOSTIC:
 - getApiStatus() : Vérifier le statut de toutes les APIs
 
 ⚠️ IMPORTANT: Utilise ces fonctions pour récupérer des données fraîches. Ne dis JAMAIS que tu n'as pas accès aux données actuelles. Fais des requêtes en temps réel !
+
+💡 RECOMMANDATIONS D'USAGE:
+- Pour une analyse complète d'un titre : utilise getCompleteAnalysis(symbol) qui combine profil, ratios, DCF, ratings, earnings et insider trading
+- Pour comprendre le sentiment du marché : utilise getMarketSentiment(symbol) de Marketaux
+- Pour des actualités récentes avec sentiment : utilise getMarketauxNews(symbol)
+- Pour des fondamentaux détaillés : utilise getFinancialStatements(symbol) et getFinancialRatios(symbol)
+- Pour la valorisation : utilise getDCFValuation(symbol) pour déterminer si le titre est sur/sous-évalué
 </real_time_capabilities>
 
 <configuration_adaptation>
@@ -3948,7 +3996,9 @@ Capacités supportées :
 
 <integration_protocols>
 APIs externes autorisées :
-- Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance
+- Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance (données de marché)
+- Financial Modeling Prep (FMP) : États financiers, ratios, DCF, analyst ratings, earnings, insider trading
+- Marketaux : Actualités financières en temps réel, analyse de sentiment
 - NewsAPI.ai pour actualités financières
 - APIs de données de marché validées
 
@@ -6288,15 +6338,108 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     };
                 };
 
+                // Fonction pour récupérer les données réelles d'un stock
+                const fetchRealStockData = async (symbol) => {
+                    try {
+                        // Appels parallèles aux APIs
+                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse] = await Promise.allSettled([
+                            fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
+                            fetch(`/api/fmp?endpoint=profile&symbol=${symbol}`),
+                            fetch(`/api/fmp?endpoint=ratios&symbol=${symbol}`),
+                            fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`)
+                        ]);
+
+                        // Parser les résultats
+                        const quote = quoteResponse.status === 'fulfilled' && quoteResponse.value.ok 
+                            ? await quoteResponse.value.json() 
+                            : null;
+                        
+                        const profile = profileResponse.status === 'fulfilled' && profileResponse.value.ok 
+                            ? await profileResponse.value.json() 
+                            : null;
+                        
+                        const ratios = ratiosResponse.status === 'fulfilled' && ratiosResponse.value.ok 
+                            ? await ratiosResponse.value.json() 
+                            : null;
+                        
+                        const news = newsResponse.status === 'fulfilled' && newsResponse.value.ok 
+                            ? await newsResponse.value.json() 
+                            : null;
+
+                        // Construire l'objet de données structuré
+                        return {
+                            quote: {
+                                symbol: symbol,
+                                name: profile?.data?.[0]?.companyName || profile?.companyName || `${symbol} Inc.`,
+                                price: quote?.c || 0,
+                                change: quote?.d || 0,
+                                changesPercentage: quote?.dp || 0,
+                                volume: quote?.volume || 0,
+                                marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0,
+                                avgVolume: quote?.avgVolume || 0
+                            },
+                            intraday: generateMockData(symbol).intraday, // Utiliser mock pour intraday en attendant API candles
+                            metrics: {
+                                peRatioTTM: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
+                                pegRatioTTM: ratios?.data?.[0]?.pegRatioTTM || ratios?.pegRatioTTM || null,
+                                priceToSalesRatioTTM: ratios?.data?.[0]?.priceToSalesRatioTTM || ratios?.priceToSalesRatioTTM || null,
+                                dividendYieldTTM: ratios?.data?.[0]?.dividendYieldTTM || ratios?.dividendYieldTTM || null
+                            },
+                            ratios: {
+                                debtEquityRatio: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
+                                returnOnEquityTTM: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
+                                returnOnAssetsTTM: ratios?.data?.[0]?.returnOnAssetsTTM || ratios?.returnOnAssetsTTM || null,
+                                netProfitMarginTTM: ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null,
+                            },
+                            profile: {
+                                companyName: profile?.data?.[0]?.companyName || profile?.companyName || `${symbol} Inc.`,
+                                price: quote?.c || 0,
+                                beta: profile?.data?.[0]?.beta || profile?.beta || null,
+                                sector: profile?.data?.[0]?.sector || profile?.sector || 'Unknown',
+                                industry: profile?.data?.[0]?.industry || profile?.industry || 'Unknown'
+                            },
+                            news: news?.news?.slice(0, 5)?.map(article => ({
+                                title: article.title,
+                                source: article.source?.name || 'Marketaux',
+                                time: article.publishedAt,
+                                url: article.url || '#',
+                                sentiment: article.sentiment || 'neutral'
+                            })) || [],
+                            sentiment: {
+                                overall: news?.sentimentAnalysis?.positivePercent || 60,
+                                news: news?.sentimentAnalysis?.positivePercent || 65,
+                                social: 60,
+                                institutional: 55,
+                                retail: 70,
+                                summary: news?.sentimentAnalysis?.overallSentiment === 'positive' 
+                                    ? 'Sentiment globalement positif' 
+                                    : news?.sentimentAnalysis?.overallSentiment === 'negative'
+                                    ? 'Sentiment globalement négatif'
+                                    : 'Sentiment neutre'
+                            },
+                            insights: generateMockData(symbol).insights // Utiliser mock pour insights en attendant
+                        };
+
+                    } catch (error) {
+                        console.error(`Error fetching real data for ${symbol}:`, error);
+                        return null;
+                    }
+                };
+
                 // Chargement des données
                 useEffect(() => {
                     const fetchData = async () => {
                         try {
-                            const mockData = generateMockData(selectedStock);
-                            setStockDataIntelli(mockData);
-                            setConnected(true);
-                            setLoadingIntelli(false);
-                            setLastUpdateIntelli(new Date());
+                            // Essayer d'abord avec les vraies APIs
+                            const realData = await fetchRealStockData(selectedStock);
+                            if (realData) {
+                                setStockDataIntelli(realData);
+                                setConnected(true);
+                                setLoadingIntelli(false);
+                                setLastUpdateIntelli(new Date());
+                            } else {
+                                throw new Error('Real API failed, using mock data');
+                            }
                         } catch (error) {
                             console.error('Error fetching data:', error?.message || String(error));
                             setConnected(false);
