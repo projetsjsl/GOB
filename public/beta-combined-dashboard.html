@@ -847,15 +847,8 @@
                     setTimeout(() => setShowEmmaIntro(false), 3000);
                 }
                 
-                const interval = setInterval(() => {
-                    console.log('🔄 Auto-refresh des données...');
-                    refreshAllStocks();
-                    fetchNews();
-                    fetchSeekingAlphaData();
-                    fetchSeekingAlphaStockData();
-                }, 300000);
-                
-                return () => clearInterval(interval);
+                // Pas d'auto-rafraîchissement — l'utilisateur déclenche manuellement si besoin
+                return () => {};
             }, []);
 
             // Afficher l'intro quand on ouvre Emma IA pour la 1ère fois pendant la session
@@ -6898,185 +6891,96 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     };
                 };
 
-                // Fonction pour récupérer les données réelles d'un stock
-                const fetchRealStockData = async (symbol) => {
+                // Fonction de rechargement des données IntelliStocks (appelable par bouton)
+                const reloadIntelli = async () => {
                     try {
-                        console.log(`🔍 Récupération des données réelles pour ${symbol}...`);
-                        
-                        // Appels parallèles aux APIs
-                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, historicalRatiosResponse, smaResponse] = await Promise.allSettled([
-                            fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
-                            fetch(`/api/fmp?endpoint=profile&symbol=${symbol}`),
-                            fetch(`/api/fmp?endpoint=ratios&symbol=${symbol}`),
-                            fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`),
-                            fetch(`/api/fmp?endpoint=historical-chart&symbol=${symbol}&timeframe=15min&limit=20`),
-                            fetch(`/api/fmp?endpoint=ratios-ttm&symbol=${symbol}&limit=8`),
-                            fetch(`/api/fmp?endpoint=technical-indicators&symbol=${symbol}&period=daily&type=sma`)
+                        setLoadingIntelli(true);
+                        const qs = (ep) => `${API_BASE_URL}/api/marketdata?endpoint=${ep}&symbol=${selectedStock}&source=auto`;
+                        const [qRes, fRes, pRes] = await Promise.all([
+                            fetch(qs('quote')),
+                            fetch(qs('fundamentals')),
+                            fetch(qs('profile'))
                         ]);
 
-                        // Parser les résultats
-                        const quote = quoteResponse.status === 'fulfilled' && quoteResponse.value.ok 
-                            ? await quoteResponse.value.json() 
-                            : null;
-                        
-                        const profile = profileResponse.status === 'fulfilled' && profileResponse.value.ok 
-                            ? await profileResponse.value.json() 
-                            : null;
-                        
-                        const ratios = ratiosResponse.status === 'fulfilled' && ratiosResponse.value.ok 
-                            ? await ratiosResponse.value.json() 
-                            : null;
-                        
-                        const news = newsResponse.status === 'fulfilled' && newsResponse.value.ok 
-                            ? await newsResponse.value.json() 
-                            : null;
-                        
-                        const intradayData = intradayResponse.status === 'fulfilled' && intradayResponse.value.ok 
-                            ? await intradayResponse.value.json() 
-                            : null;
-                        
-                        console.log('✅ Données récupérées:', { 
-                            hasQuote: !!quote, 
-                            hasProfile: !!profile, 
-                            hasRatios: !!ratios, 
-                            hasNews: !!news,
-                            hasIntraday: !!intradayData
-                        });
+                        const quoteJson = qRes.ok ? await qRes.json() : {};
+                        const fundamentalsJson = fRes.ok ? await fRes.json() : null;
+                        const profileJson = pRes.ok ? await pRes.json() : {};
 
-                        // Construire l'objet de données structuré
-                        return {
+                        let candles = null;
+                        try {
+                            const cRes = await fetch(qs('candles'));
+                            if (cRes.ok) candles = await cRes.json();
+                        } catch (_) {}
+
+                        const currentPrice = (typeof quoteJson.c === 'number' ? quoteJson.c : undefined) || profileJson.price || 0;
+
+                        // Construire la série intraday à partir des bougies si disponibles
+                        let intradaySeries = [];
+                        if (candles && Array.isArray(candles.c) && Array.isArray(candles.t) && candles.c.length === candles.t.length) {
+                            intradaySeries = candles.t.map((ts, i) => ({
+                                time: new Date((ts || 0) * 1000).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+                                price: candles.c[i]
+                            }));
+                        }
+
+                        // Fallback série synthétique si rien
+                        if (intradaySeries.length === 0) {
+                            const mock = generateMockData(selectedStock);
+                            intradaySeries = (mock.intraday || []).map(p => ({ time: p.date, price: p.close }));
+                        }
+
+                        const metricsMapped = fundamentalsJson ? {
+                            peRatioTTM: typeof fundamentalsJson.peRatio === 'number' ? fundamentalsJson.peRatio : undefined,
+                            pegRatioTTM: typeof fundamentalsJson.pegRatio === 'number' ? fundamentalsJson.pegRatio : undefined,
+                            priceToSalesRatioTTM: typeof fundamentalsJson.priceToSalesRatioTTM === 'number' ? fundamentalsJson.priceToSalesRatioTTM : undefined,
+                            dividendYieldTTM: typeof fundamentalsJson.dividendYield === 'number' ? fundamentalsJson.dividendYield : undefined
+                        } : {};
+
+                        const data = {
                             quote: {
-                                symbol: symbol,
-                                name: profile?.data?.[0]?.companyName || profile?.companyName || `${symbol} Inc.`,
-                                price: quote?.c || 0,
-                                change: quote?.d || 0,
-                                changesPercentage: quote?.dp || 0,
-                                volume: quote?.volume || 0,
-                                marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0,
-                                avgVolume: quote?.avgVolume || 0
+                                symbol: selectedStock,
+                                name: profileJson.name || profileJson.companyName || selectedStock,
+                                price: currentPrice,
+                                change: quoteJson.d,
+                                changesPercentage: quoteJson.dp,
+                                volume: quoteJson.volume,
+                                marketCap: fundamentalsJson?.marketCapitalization || profileJson.marketCapitalization,
+                                avgVolume: undefined
                             },
-                            intraday: intradayData?.data?.map((candle, i) => ({
-                                date: candle.date || `${9 + Math.floor(i/4)}:${(i % 4) * 15}`,
-                                open: candle.open || quote?.o || 0,
-                                high: candle.high || quote?.h || 0,
-                                low: candle.low || quote?.l || 0,
-                                close: candle.close || quote?.c || 0,
-                                volume: candle.volume || 0
-                            })) || [],
-                            metrics: {
-                                peRatioTTM: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
-                                pegRatioTTM: ratios?.data?.[0]?.pegRatioTTM || ratios?.pegRatioTTM || null,
-                                priceToSalesRatioTTM: ratios?.data?.[0]?.priceToSalesRatioTTM || ratios?.priceToSalesRatioTTM || null,
-                                dividendYieldTTM: ratios?.data?.[0]?.dividendYieldTTM || ratios?.dividendYieldTTM || null
-                            },
+                            intraday: intradaySeries,
+                            metrics: metricsMapped,
                             ratios: {
-                                debtEquityRatio: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
-                                returnOnEquityTTM: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
-                                returnOnAssetsTTM: ratios?.data?.[0]?.returnOnAssetsTTM || ratios?.returnOnAssetsTTM || null,
-                                netProfitMarginTTM: ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null,
+                                returnOnEquityTTM: fundamentalsJson?.roeTTM ? fundamentalsJson.roeTTM / 100 : undefined,
+                                returnOnAssetsTTM: fundamentalsJson?.roaTTM ? fundamentalsJson.roaTTM / 100 : undefined,
+                                netProfitMarginTTM: fundamentalsJson?.profitMargin ? fundamentalsJson.profitMargin / 100 : undefined
                             },
                             profile: {
-                                companyName: profile?.data?.[0]?.companyName || profile?.companyName || `${symbol} Inc.`,
-                                price: quote?.c || 0,
-                                beta: profile?.data?.[0]?.beta || profile?.beta || null,
-                                sector: profile?.data?.[0]?.sector || profile?.sector || 'Unknown',
-                                industry: profile?.data?.[0]?.industry || profile?.industry || 'Unknown'
+                                companyName: profileJson.name || profileJson.companyName || selectedStock,
+                                sector: fundamentalsJson?.sector || profileJson.sector || '—',
+                                industry: fundamentalsJson?.industry || profileJson.industry || '—'
                             },
-                            news: news?.news?.slice(0, 5)?.map(article => ({
-                                title: article.title,
-                                source: article.source?.name || 'Marketaux',
-                                time: article.publishedAt,
-                                url: article.url || '#',
-                                sentiment: article.sentiment || 'neutral'
-                            })) || [],
-                            sentiment: {
-                                overall: news?.sentimentAnalysis?.positivePercent || 60,
-                                news: news?.sentimentAnalysis?.positivePercent || 65,
-                                social: 60,
-                                institutional: 55,
-                                retail: 70,
-                                summary: news?.sentimentAnalysis?.overallSentiment === 'positive' 
-                                    ? 'Sentiment globalement positif' 
-                                    : news?.sentimentAnalysis?.overallSentiment === 'negative'
-                                    ? 'Sentiment globalement négatif'
-                                    : 'Sentiment neutre'
-                            },
-                            insights: {
-                                catalysts: news?.news?.slice(0, 3)?.map(article => article.title) || [
-                                    'Analyse en cours des catalyseurs de marché',
-                                    'Surveillance des annonces d\'entreprise',
-                                    'Suivi des tendances du secteur'
-                                ],
-                                risks: [
-                                    'Volatilité du marché',
-                                    'Conditions macroéconomiques',
-                                    'Concurrence sectorielle'
-                                ],
-                                consensus: news?.sentimentAnalysis?.overallSentiment === 'positive' ? 'bullish' : 
-                                          news?.sentimentAnalysis?.overallSentiment === 'negative' ? 'bearish' : 'neutral',
-                                reasoning: news?.sentimentAnalysis?.summary || 'Analyse basée sur les données de marché actuelles'
-                            }
+                            news: [],
+                            sentiment: { overall: 70 },
+                            insights: { catalysts: [], risks: [], consensus: 'neutral', reasoning: '' }
                         };
 
+                        setStockDataIntelli(data);
+                        setConnected(quoteJson?.source && quoteJson.source !== 'demo');
+                        setLastUpdateIntelli(new Date());
                     } catch (error) {
-                        console.error(`Error fetching real data for ${symbol}:`, error);
-                        return null;
+                        console.error('Error fetching IntelliStocks data:', error);
+                        setConnected(false);
+                        const mockData = generateMockData(selectedStock);
+                        setStockDataIntelli(mockData);
+                    } finally {
+                        setLoadingIntelli(false);
                     }
                 };
 
-                // Chargement des données
+                // Chargement initial sans intervalle
                 useEffect(() => {
-                    const fetchData = async () => {
-                        try {
-                            setLoadingIntelli(true);
-                            console.log(`📊 Chargement des données pour ${selectedStock}...`);
-                            
-                            // Essayer d'abord avec les vraies APIs
-                            const realData = await fetchRealStockData(selectedStock);
-                            if (realData && realData.quote && realData.quote.price > 0) {
-                                setStockDataIntelli(realData);
-                                setConnected(true);
-                                setLastUpdateIntelli(new Date());
-                                console.log('✅ Données chargées avec succès');
-                                
-                                // Vérifier si les données intraday sont disponibles
-                                if (!realData.intraday || realData.intraday.length === 0) {
-                                    setViolations(prev => {
-                                        // Éviter les doublons
-                                        if (prev.find(v => v.code === 'intraday_missing')) return prev;
-                                        return [
-                                            ...prev,
-                                            { code: 'intraday_missing', severity: 'low', message: 'Données intraday non disponibles - utilisation des données quote uniquement.' }
-                                        ];
-                                    });
-                                }
-                            } else {
-                                throw new Error('Données invalides reçues de l\'API');
-                            }
-                        } catch (error) {
-                            console.error('❌ Erreur lors du chargement:', error?.message || String(error));
-                            setConnected(false);
-                            
-                            // Utiliser mock data en dernier recours
-                            const mockData = generateMockData(selectedStock);
-                            setStockDataIntelli(mockData);
-                            
-                            // Enregistrer une violation visible dans l'helppop
-                            setViolations(prev => {
-                                if (prev.find(v => v.code === 'data_fetch_error')) return prev;
-                                return [
-                                    ...prev,
-                                    { code: 'data_fetch_error', severity: 'high', message: 'Échec de récupération API. Vérifiez votre connexion et les clés API.' }
-                                ];
-                            });
-                            setShowHelp(true);
-                        } finally {
-                            setLoadingIntelli(false);
-                        }
-                    };
-                    fetchData();
-                    const interval = setInterval(fetchData, 60000); // Rafraîchir toutes les minutes
-                    return () => clearInterval(interval);
+                    reloadIntelli();
+                    return () => {};
                 }, [selectedStock]);
 
                 // Timer
@@ -7424,6 +7328,79 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     );
                 };
 
+                // Action: rafraîchir manuellement les données IntelliStocks
+                const refreshIntelliStocks = async () => {
+                    try {
+                        const qs = (ep) => `${API_BASE_URL}/api/marketdata?endpoint=${ep}&symbol=${selectedStock}&source=auto`;
+                        const [qRes, fRes, pRes] = await Promise.all([
+                            fetch(qs('quote')),
+                            fetch(qs('fundamentals')),
+                            fetch(qs('profile'))
+                        ]);
+                        const quoteJson = qRes.ok ? await qRes.json() : {};
+                        const fundamentalsJson = fRes.ok ? await fRes.json() : null;
+                        const profileJson = pRes.ok ? await pRes.json() : {};
+                        let candles = null;
+                        try {
+                            const cRes = await fetch(qs('candles'));
+                            if (cRes.ok) candles = await cRes.json();
+                        } catch (_) {}
+
+                        const currentPrice = (typeof quoteJson.c === 'number' ? quoteJson.c : undefined) || profileJson.price || 0;
+                        let intradaySeries = [];
+                        if (candles && Array.isArray(candles.c) && Array.isArray(candles.t) && candles.c.length === candles.t.length) {
+                            intradaySeries = candles.t.map((ts, i) => ({
+                                time: new Date((ts || 0) * 1000).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+                                price: candles.c[i]
+                            }));
+                        }
+                        if (intradaySeries.length === 0) {
+                            const mock = generateMockData(selectedStock);
+                            intradaySeries = (mock.intraday || []).map(p => ({ time: p.date, price: p.close }));
+                        }
+
+                        const metricsMapped = fundamentalsJson ? {
+                            peRatioTTM: typeof fundamentalsJson.peRatio === 'number' ? fundamentalsJson.peRatio : undefined,
+                            pegRatioTTM: typeof fundamentalsJson.pegRatio === 'number' ? fundamentalsJson.pegRatio : undefined,
+                            priceToSalesRatioTTM: typeof fundamentalsJson.priceToSalesRatioTTM === 'number' ? fundamentalsJson.priceToSalesRatioTTM : undefined,
+                            dividendYieldTTM: typeof fundamentalsJson.dividendYield === 'number' ? fundamentalsJson.dividendYield : undefined
+                        } : {};
+
+                        const data = {
+                            quote: {
+                                symbol: selectedStock,
+                                name: profileJson.name || profileJson.companyName || selectedStock,
+                                price: currentPrice,
+                                change: quoteJson.d,
+                                changesPercentage: quoteJson.dp,
+                                volume: quoteJson.volume,
+                                marketCap: fundamentalsJson?.marketCapitalization || profileJson.marketCapitalization,
+                                avgVolume: undefined
+                            },
+                            intraday: intradaySeries,
+                            metrics: metricsMapped,
+                            ratios: {
+                                returnOnEquityTTM: fundamentalsJson?.roeTTM ? fundamentalsJson.roeTTM / 100 : undefined,
+                                returnOnAssetsTTM: fundamentalsJson?.roaTTM ? fundamentalsJson.roaTTM / 100 : undefined,
+                                netProfitMarginTTM: fundamentalsJson?.profitMargin ? fundamentalsJson.profitMargin / 100 : undefined
+                            },
+                            profile: {
+                                companyName: profileJson.name || profileJson.companyName || selectedStock,
+                                sector: fundamentalsJson?.sector || profileJson.sector || '—',
+                                industry: fundamentalsJson?.industry || profileJson.industry || '—'
+                            },
+                            news: [],
+                            sentiment: { overall: 70 },
+                            insights: { catalysts: [], risks: [], consensus: 'neutral', reasoning: '' }
+                        };
+
+                        setStockDataIntelli(data);
+                        setConnected(quoteJson?.source && quoteJson.source !== 'demo');
+                        setLastUpdateIntelli(new Date());
+                    } catch (error) {
+                        console.error('Manual refresh error:', error);
+                    }
+                };
                 // Référence locale pour utiliser le composant global
                 const LucideIcon = window.LucideIcon;
 
@@ -7642,33 +7619,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                                 <div className="flex items-center gap-2">
                                     <button
-                                        onClick={async () => {
-                                            try {
-                                                setLoadingIntelli(true);
-                                                console.log('🔄 Actualisation des données...');
-                                                const realData = await fetchRealStockData(selectedStock);
-                                                if (realData && realData.quote && realData.quote.price > 0) {
-                                                    setStockDataIntelli(realData);
-                                                    setConnected(true);
-                                                    setLastUpdateIntelli(new Date());
-                                                    console.log('✅ Données actualisées avec succès');
-                                                } else {
-                                                    throw new Error('Données invalides reçues de l\'API');
-                                                }
-                                            } catch (error) {
-                                                console.error('❌ Erreur lors de l\'actualisation:', error);
-                                                setConnected(false);
-                                            } finally {
-                                                setLoadingIntelli(false);
-                                            }
-                                        }}
-                                        className={`p-1.5 border rounded-md transition-all ${
+                                        onClick={refreshIntelliStocks}
+                                        className={`flex items-center gap-1 px-2 py-1 border rounded-md text-[10px] font-semibold ${
                                             isDarkMode 
-                                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
-                                                : 'bg-white hover:bg-gray-100 border-gray-300'
+                                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-gray-300' 
+                                                : 'bg-white hover:bg-gray-100 border-gray-300 text-gray-700'
                                         }`}
+                                        title="Rafraîchir les données"
                                     >
-                                        <LucideIcon name="RefreshCw" className="w-3 h-3 text-gray-400" />
+                                        <LucideIcon name="RefreshCw" className="w-3 h-3" />
+                                        Rafraîchir
                                     </button>
 
                                     <div className="relative">
@@ -7916,61 +7876,31 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
 
                                     <div style={{ width: '100%', height: 140 }}>
-                                        {typeof Chart !== 'undefined' && intraday.length > 0 ? (
-                                            <canvas ref={(canvas) => {
-                                                if (canvas && !canvas.chart) {
-                                                    const ctx = canvas.getContext('2d');
-                                                    canvas.chart = new Chart(ctx, {
-                                                        type: 'line',
-                                                        data: {
-                                                            labels: intraday.map(d => d.date),
-                                                            datasets: [{
-                                                                label: 'Prix',
-                                                                data: intraday.map(d => d.close),
-                                                                borderColor: parseFloat(quote.changesPercentage || 0) >= 0 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
-                                                                backgroundColor: parseFloat(quote.changesPercentage || 0) >= 0 ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                                                                tension: 0.4,
-                                                                fill: true,
-                                                                borderWidth: 2
-                                                            }]
-                                                        },
-                                                        options: {
-                                                            responsive: true,
-                                                            maintainAspectRatio: false,
-                                                            plugins: {
-                                                                legend: { display: false },
-                                                                tooltip: {
-                                                                    mode: 'index',
-                                                                    intersect: false,
-                                                                    backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                                                                    titleColor: isDarkMode ? '#fff' : '#000',
-                                                                    bodyColor: isDarkMode ? '#fff' : '#000',
-                                                                    borderColor: isDarkMode ? '#444' : '#ddd',
-                                                                    borderWidth: 1
-                                                                }
-                                                            },
-                                                            scales: {
-                                                                x: {
-                                                                    display: false,
-                                                                    grid: { display: false }
-                                                                },
-                                                                y: {
-                                                                    display: true,
-                                                                    position: 'right',
-                                                                    grid: { color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
-                                                                    ticks: {
-                                                                        color: isDarkMode ? '#888' : '#666',
-                                                                        font: { size: 10 }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    });
-                                                }
-                                            }} width="100%" height="140"></canvas>
+                                        {typeof window !== 'undefined' && window.Recharts && intraday.length > 0 ? (
+                                            (() => {
+                                                const { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } = window.Recharts;
+                                                const chartData = intraday.map(p => ({ time: p.time || p.date, price: Number(p.price || p.close || 0) }));
+                                                return (
+                                                    <ResponsiveContainer width="100%" height={140}>
+                                                        <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                                                            <defs>
+                                                                <linearGradient id="priceFill" x1="0" y1="0" x2="0" y2="1">
+                                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                                                </linearGradient>
+                                                            </defs>
+                                                            <CartesianGrid stroke={isDarkMode ? '#262626' : '#e5e7eb'} strokeDasharray="3 3" />
+                                                            <XAxis dataKey="time" hide />
+                                                            <YAxis hide domain={[ 'auto', 'auto' ]} />
+                                                            <Tooltip formatter={(v) => `$${Number(v).toFixed(2)}`} labelFormatter={() => ''} />
+                                                            <Area type="monotone" dataKey="price" stroke="#10b981" fill="url(#priceFill)" strokeWidth={2} />
+                                                        </AreaChart>
+                                                    </ResponsiveContainer>
+                                                );
+                                            })()
                                         ) : (
                                             <div className="text-center text-gray-500 text-xs py-8">
-                                                📈 Chargement des données du graphique...
+                                                📈 Graphique en attente de données
                                             </div>
                                         )}
                                     </div>
