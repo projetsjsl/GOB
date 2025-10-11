@@ -8,7 +8,6 @@ const octokit = new Octokit({
 const REPO_OWNER = 'projetsjsl';
 const REPO_NAME = 'GOB';
 const BRANCH = 'main';
-const TICKERS_FILE = 'public/tickers.json';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -16,7 +15,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { tickers } = req.body;
+        const { tickers, filename } = req.body;
+        
+        // Déterminer le fichier cible (par défaut tickers.json, sinon dans-watchlist.json)
+        const TICKERS_FILE = filename ? `public/${filename}` : 'public/tickers.json';
         
         if (!Array.isArray(tickers)) {
             return res.status(400).json({ error: 'Les tickers doivent être un tableau' });
@@ -76,12 +78,13 @@ export default async function handler(req, res) {
 
                 return res.status(200).json({
                     success: true,
-                    message: `Tickers sauvegardés avec succès sur GitHub`,
+                    message: `Tickers sauvegardés avec succès sur GitHub (${TICKERS_FILE})`,
                     data: tickerData,
                     github: {
                         commit: updateResponse.data.commit.sha,
                         url: updateResponse.data.content.html_url
-                    }
+                    },
+                    file: TICKERS_FILE
                 });
             } catch (githubError) {
                 console.error('Erreur GitHub:', githubError);
@@ -94,9 +97,10 @@ export default async function handler(req, res) {
         
         return res.status(200).json({
             success: true,
-            message: 'Tickers sauvegardés avec succès (local)',
+            message: `Tickers sauvegardés avec succès (local - ${TICKERS_FILE})`,
             data: tickerData,
-            warning: 'GitHub token non configuré - sauvegarde locale uniquement'
+            warning: 'GitHub token non configuré - sauvegarde locale uniquement',
+            file: TICKERS_FILE
         });
         
     } catch (error) {
