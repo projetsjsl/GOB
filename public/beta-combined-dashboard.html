@@ -503,13 +503,106 @@
                 return 'bg-gray-100 text-gray-600';
             };
 
+            // Parser les données brutes de Seeking Alpha
+            const parseSeekingAlphaRawText = (rawText) => {
+                if (!rawText) return null;
+                
+                try {
+                    // Extraire les données du texte brut
+                    const data = {};
+                    
+                    // Prix actuel
+                    const priceMatch = rawText.match(/\$(\d+\.\d+)/);
+                    if (priceMatch) data.price = priceMatch[1];
+                    
+                    // Variation
+                    const changeMatch = rawText.match(/([+-]\d+\.\d+)\s*\(([+-]\d+\.\d+)%\)/);
+                    if (changeMatch) {
+                        data.priceChange = changeMatch[1];
+                        data.priceChangePercent = changeMatch[2];
+                    }
+                    
+                    // Market Cap
+                    const marketCapMatch = rawText.match(/Market Cap\$?([\d.]+[KMBT])/i);
+                    if (marketCapMatch) data.marketCap = marketCapMatch[1];
+                    
+                    // P/E Ratio
+                    const peMatch = rawText.match(/P\/E (?:Non-GAAP )?\((?:FWD|TTM)\)([\d.]+)/i);
+                    if (peMatch) data.peRatio = peMatch[1];
+                    
+                    // Dividend Yield
+                    const divYieldMatch = rawText.match(/(?:Dividend )?Yield(?: \(FWD\))?([\d.]+)%/i);
+                    if (divYieldMatch) data.dividendYield = divYieldMatch[1] + '%';
+                    
+                    // Annual Payout
+                    const payoutMatch = rawText.match(/Annual Payout(?: \(FWD\))?\$?([\d.]+)/i);
+                    if (payoutMatch) data.annualPayout = '$' + payoutMatch[1];
+                    
+                    // Ex-Dividend Date
+                    const exDivMatch = rawText.match(/Ex-Dividend Date(\d{1,2}\/\d{1,2}\/\d{4})/i);
+                    if (exDivMatch) data.exDivDate = exDivMatch[1];
+                    
+                    // Frequency
+                    const freqMatch = rawText.match(/Frequency(Quarterly|Monthly|Annual)/i);
+                    if (freqMatch) data.dividendFrequency = freqMatch[1];
+                    
+                    // Sector
+                    const sectorMatch = rawText.match(/Sector([A-Za-z\s]+)Industry/i);
+                    if (sectorMatch) data.sector = sectorMatch[1].trim();
+                    
+                    // Quant Ratings
+                    const valuationMatch = rawText.match(/Valuation([A-F][+-]?)/i);
+                    if (valuationMatch) data.valuationGrade = valuationMatch[1];
+                    
+                    const growthMatch = rawText.match(/Growth([A-F][+-]?)/i);
+                    if (growthMatch) data.growthGrade = growthMatch[1];
+                    
+                    const profitMatch = rawText.match(/Profitability([A-F][+-]?)/i);
+                    if (profitMatch) data.profitabilityGrade = profitMatch[1];
+                    
+                    const momentumMatch = rawText.match(/Momentum([A-F][+-]?)/i);
+                    if (momentumMatch) data.momentumGrade = momentumMatch[1];
+                    
+                    // Company Description
+                    const descMatch = rawText.match(/Company Profile([^]+?)(?:More\.\.\.|Revenue|Earnings)/i);
+                    if (descMatch) data.description = descMatch[1].trim().substring(0, 500);
+                    
+                    // ROE
+                    const roeMatch = rawText.match(/Return on Equity([\d.]+)%/i);
+                    if (roeMatch) data.roe = roeMatch[1] + '%';
+                    
+                    // Profit Margin
+                    const marginMatch = rawText.match(/Net Income Margin([\d.]+)%/i);
+                    if (marginMatch) data.netMargin = marginMatch[1] + '%';
+                    
+                    // Debt to Equity
+                    const debtMatch = rawText.match(/Total Debt \/ Equity[^]+([\d.]+)%/i);
+                    if (debtMatch) data.debtToEquity = debtMatch[1] + '%';
+                    
+                    return data;
+                } catch (error) {
+                    console.error('Erreur parsing Seeking Alpha:', error);
+                    return null;
+                }
+            };
+            
             // Données   Seeking Alpha
             const fetchSeekingAlphaData = async () => {
                 try {
                     const response = await fetch('/stock_analysis.json');
                     if (response.ok) {
                         const data = await response.json();
+                        
+                        // Parser les données brutes pour chaque stock
+                        if (data.stocks && Array.isArray(data.stocks)) {
+                            data.stocks = data.stocks.map(stock => ({
+                                ...stock,
+                                parsedData: parseSeekingAlphaRawText(stock.raw_text)
+                            }));
+                        }
+                        
                         setSeekingAlphaData(data);
+                        console.log('✅ Seeking Alpha data chargée et parsée:', data.stocks?.length || 0, 'stocks');
                     } else if (response.status === 404) {
                         console.warn('⚠️ Fichier stock_analysis.json non trouvé (404). Données Seeking Alpha non disponibles.');
                     } else {
@@ -2963,7 +3056,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 )}
 
                                                 {/* Préoccupations */}
-                                                {claudeData?.concerns && (
+                                                {claudeData?.concerns && claudeData.concerns[0] !== "Analyse en attente" && (
                                                     <div className="bg-red-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-red-800 mb-4 flex items-center">
                                                             <span className="mr-2">⚠️</span>
@@ -2980,14 +3073,42 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                 )}
 
                                                 {/* Recommandation */}
-                                                {claudeData?.recommendation && (
+                                                {(claudeData?.recommendation || claudeData?.finalConclusion?.recommendation) && 
+                                                 !claudeData?.recommendation?.includes('En attente') && 
+                                                 !claudeData?.finalConclusion?.recommendation?.includes('En attente') && (
                                                     <div className="bg-blue-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
                                                             <span className="mr-2">💡</span>
                                                             Recommandation
                                                         </h4>
                                                         <div className="text-blue-700 leading-relaxed">
-                                                            {cleanText(claudeData.recommendation)}
+                                                            {cleanText(claudeData?.recommendation || claudeData?.finalConclusion?.recommendation)}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                
+                                                {/* Message si données en attente */}
+                                                {(!parsedData || Object.keys(parsedData).length < 5) && 
+                                                 claudeData?.metrics?.marketCap === 'En attente d\'analyse' && (
+                                                    <div className="bg-yellow-50 rounded-lg p-6 border-2 border-yellow-200">
+                                                        <h4 className="text-lg font-bold text-yellow-800 mb-3 flex items-center">
+                                                            <span className="mr-2">⏳</span>
+                                                            Données en cours de traitement
+                                                        </h4>
+                                                        <div className="text-yellow-700 leading-relaxed space-y-2">
+                                                            <p>Les données brutes ont été collectées avec succès, mais l'analyse détaillée n'est pas encore disponible.</p>
+                                                            <p className="font-semibold">Pour obtenir l'analyse complète :</p>
+                                                            <ol className="list-decimal pl-5 space-y-1">
+                                                                <li>Configurez la clé API Claude dans l'onglet Admin-JSLAI</li>
+                                                                <li>Cliquez sur "🤖 Analyser avec Claude" pour traiter les données</li>
+                                                                <li>Les métriques détaillées seront extraites et affichées ici</li>
+                                                            </ol>
+                                                            <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+                                                                <p className="text-sm text-blue-800">
+                                                                    💡 <strong>Astuce :</strong> Les données parsées automatiquement sont affichées ci-dessus. 
+                                                                    Pour une analyse plus approfondie avec insights IA, utilisez l'API Claude.
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 )}
@@ -3014,6 +3135,29 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         </div>
                     )}
 
+                    {/* Message si aucune donnée */}
+                    {(!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && (
+                        <div className={`backdrop-blur-sm rounded-lg p-8 border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-300'
+                        }`}>
+                            <div className="text-center">
+                                <div className="text-5xl mb-4">📊</div>
+                                <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-yellow-200' : 'text-yellow-800'}`}>
+                                    Aucune donnée Seeking Alpha disponible
+                                </h3>
+                                <p className={`mb-4 ${isDarkMode ? 'text-yellow-300' : 'text-yellow-700'}`}>
+                                    Utilisez les outils de scraping dans l'onglet Admin-JSLAI pour collecter les données.
+                                </p>
+                                <button
+                                    onClick={() => setActiveTab('admin-jsla')}
+                                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Aller à Admin-JSLAI →
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                    
                     {/* Affichage des analyses en cartes */}
                     {seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -7808,6 +7952,174 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                {/* Moyennes Mobiles - Analyse des Croisements */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                }`}>
+                                    <h3 className="text-[10px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
+                                        <LucideIcon name="TrendingUp" className="w-3 h-3 text-gray-500" />
+                                        Moyennes Mobiles & Croisements
+                                    </h3>
+                                    
+                                    {/* Indicateur de tendance global */}
+                                    <div className={`mb-2 p-2 border rounded text-center ${
+                                        movingAverages.interpretation?.trend?.includes('Haussier fort') 
+                                            ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-800' : 'bg-emerald-50 border-emerald-200')
+                                            : movingAverages.interpretation?.trend?.includes('Haussier') 
+                                            ? (isDarkMode ? 'bg-blue-900/30 border-blue-800' : 'bg-blue-50 border-blue-200')
+                                            : movingAverages.interpretation?.trend?.includes('Baissier fort')
+                                            ? (isDarkMode ? 'bg-red-900/30 border-red-800' : 'bg-red-50 border-red-200')
+                                            : movingAverages.interpretation?.trend?.includes('Baissier')
+                                            ? (isDarkMode ? 'bg-orange-900/30 border-orange-800' : 'bg-orange-50 border-orange-200')
+                                            : (isDarkMode ? 'bg-gray-900/30 border-gray-800' : 'bg-gray-50 border-gray-200')
+                                    }`}>
+                                        <div className="text-[8px] text-gray-500 mb-0.5">Tendance Globale</div>
+                                        <div className={`text-xs font-bold ${
+                                            movingAverages.interpretation?.trend?.includes('Haussier') ? 'text-emerald-500' :
+                                            movingAverages.interpretation?.trend?.includes('Baissier') ? 'text-red-500' :
+                                            'text-gray-400'
+                                        }`}>
+                                            {movingAverages.interpretation?.trend === 'Haussier fort' && '📈 '}
+                                            {movingAverages.interpretation?.trend === 'Baissier fort' && '📉 '}
+                                            {movingAverages.interpretation?.trend || 'Calcul en cours...'}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="space-y-1.5">
+                                        {/* SMA 20 */}
+                                        <div className={`p-1.5 border rounded transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                        }`}>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <div className="text-[9px] font-semibold text-gray-400">SMA 20 jours</div>
+                                                <div className="text-[9px] text-gray-500">
+                                                    ${movingAverages.sma20?.value?.toFixed(2) || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <div className={`text-[8px] font-semibold ${
+                                                    movingAverages.sma20?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
+                                                }`}>
+                                                    {movingAverages.interpretation?.sma20}
+                                                    {movingAverages.sma20?.diff > 0 ? ' ↑' : ' ↓'}
+                                                </div>
+                                                <div className={`text-xs font-bold ${
+                                                    Math.abs(movingAverages.sma20?.diff || 0) > 5 
+                                                        ? (movingAverages.sma20?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
+                                                        : 'text-blue-500'
+                                                }`}>
+                                                    {movingAverages.sma20?.diff > 0 ? '+' : ''}{movingAverages.sma20?.diff?.toFixed(2) || 0}%
+                                                </div>
+                                            </div>
+                                            <div className="text-[7px] text-gray-500 mt-1 italic">
+                                                {Math.abs(movingAverages.sma20?.diff || 0) < 2 
+                                                    ? '💡 Proche de la moyenne - Zone de consolidation'
+                                                    : movingAverages.sma20?.diff > 5 
+                                                    ? '🚀 Fort au-dessus - Momentum haussier'
+                                                    : movingAverages.sma20?.diff < -5
+                                                    ? '⚠️ Fort en-dessous - Pression baissière'
+                                                    : movingAverages.sma20?.diff > 0
+                                                    ? '✅ Au-dessus - Signal positif'
+                                                    : '⚠️ En-dessous - Signal négatif'}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* SMA 50 */}
+                                        <div className={`p-1.5 border rounded transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                        }`}>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <div className="text-[9px] font-semibold text-gray-400">SMA 50 jours</div>
+                                                <div className="text-[9px] text-gray-500">
+                                                    ${movingAverages.sma50?.value?.toFixed(2) || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <div className={`text-[8px] font-semibold ${
+                                                    movingAverages.sma50?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
+                                                }`}>
+                                                    {movingAverages.interpretation?.sma50}
+                                                    {movingAverages.sma50?.diff > 0 ? ' ↑' : ' ↓'}
+                                                </div>
+                                                <div className={`text-xs font-bold ${
+                                                    Math.abs(movingAverages.sma50?.diff || 0) > 5 
+                                                        ? (movingAverages.sma50?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
+                                                        : 'text-blue-500'
+                                                }`}>
+                                                    {movingAverages.sma50?.diff > 0 ? '+' : ''}{movingAverages.sma50?.diff?.toFixed(2) || 0}%
+                                                </div>
+                                            </div>
+                                            <div className="text-[7px] text-gray-500 mt-1 italic">
+                                                {movingAverages.sma50?.diff > 0 && movingAverages.sma20?.diff > 0
+                                                    ? '📊 Tendance moyen terme positive'
+                                                    : movingAverages.sma50?.diff < 0 && movingAverages.sma20?.diff < 0
+                                                    ? '📉 Tendance moyen terme négative'
+                                                    : movingAverages.sma50?.diff > 0
+                                                    ? '⚡ Support potentiel - Test en cours'
+                                                    : '⚠️ Résistance - Vigilance recommandée'}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* SMA 200 */}
+                                        <div className={`p-1.5 border rounded transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
+                                        }`}>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <div className="text-[9px] font-semibold text-gray-400">SMA 200 jours</div>
+                                                <div className="text-[9px] text-gray-500">
+                                                    ${movingAverages.sma200?.value?.toFixed(2) || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <div className={`text-[8px] font-semibold ${
+                                                    movingAverages.sma200?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
+                                                }`}>
+                                                    {movingAverages.interpretation?.sma200}
+                                                    {movingAverages.sma200?.diff > 0 ? ' ↑' : ' ↓'}
+                                                </div>
+                                                <div className={`text-xs font-bold ${
+                                                    Math.abs(movingAverages.sma200?.diff || 0) > 10 
+                                                        ? (movingAverages.sma200?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
+                                                        : 'text-blue-500'
+                                                }`}>
+                                                    {movingAverages.sma200?.diff > 0 ? '+' : ''}{movingAverages.sma200?.diff?.toFixed(2) || 0}%
+                                                </div>
+                                            </div>
+                                            <div className="text-[7px] text-gray-500 mt-1 italic">
+                                                {movingAverages.sma200?.diff > 10
+                                                    ? '🎯 Bull Market confirmé - Tendance long terme haussière'
+                                                    : movingAverages.sma200?.diff > 0
+                                                    ? '✅ Au-dessus SMA200 - Marché haussier'
+                                                    : movingAverages.sma200?.diff < -10
+                                                    ? '🐻 Bear Market - Tendance long terme baissière'
+                                                    : '⚠️ En-dessous SMA200 - Marché baissier'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Interprétation des croisements */}
+                                    {(movingAverages.sma20 && movingAverages.sma50) && (
+                                        <div className={`mt-2 p-2 border rounded text-[8px] ${
+                                            movingAverages.sma20.value > movingAverages.sma50.value && movingAverages.sma50.value > movingAverages.sma200.value
+                                                ? (isDarkMode ? 'bg-emerald-900/20 border-emerald-800 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700')
+                                                : movingAverages.sma20.value < movingAverages.sma50.value && movingAverages.sma50.value < movingAverages.sma200.value
+                                                ? (isDarkMode ? 'bg-red-900/20 border-red-800 text-red-300' : 'bg-red-50 border-red-200 text-red-700')
+                                                : (isDarkMode ? 'bg-yellow-900/20 border-yellow-800 text-yellow-300' : 'bg-yellow-50 border-yellow-200 text-yellow-700')
+                                        }`}>
+                                            <div className="font-semibold mb-1">📊 Analyse des Croisements</div>
+                                            {movingAverages.sma20.value > movingAverages.sma50.value && movingAverages.sma50.value > movingAverages.sma200.value ? (
+                                                <div>✅ Configuration idéale : SMA20 &gt; SMA50 &gt; SMA200. Tendance haussière confirmée sur tous les horizons temporels.</div>
+                                            ) : movingAverages.sma20.value < movingAverages.sma50.value && movingAverages.sma50.value < movingAverages.sma200.value ? (
+                                                <div>⚠️ Configuration baissière : SMA20 &lt; SMA50 &lt; SMA200. Pression vendeuse sur tous les horizons. Prudence recommandée.</div>
+                                            ) : movingAverages.sma20.value > movingAverages.sma50.value ? (
+                                                <div>⚡ Croisement récent possible : SMA20 au-dessus de SMA50. Signal de retournement haussier à confirmer.</div>
+                                            ) : (
+                                                <div>📉 Moyennes désalignées : Configuration mixte. Attendre confirmation de tendance avant prise de position.</div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Indicateurs */}
