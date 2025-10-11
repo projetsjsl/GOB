@@ -1,6 +1,7 @@
 // API News multi-sources pour les actualités financières
 export default async function handler(req, res) {
-    const { q, limit = 20, language = 'fr' } = req.query;
+    const { q, limit = 20, language = 'fr', strict = 'false' } = req.query;
+    const isStrict = String(strict).toLowerCase() === 'true';
     
     // Clés API multiples (à configurer dans les variables d'environnement Vercel)
     const NEWSAPI_KEY = process.env.NEWSAPI_KEY || 'YOUR_NEWSAPI_KEY';
@@ -169,25 +170,25 @@ export default async function handler(req, res) {
             const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             const to = new Date().toISOString().split('T')[0];
 
-            for (const ticker of tickers.slice(0, 3)) { // Limiter à 3 tickers pour éviter les limites
+            const workTickers = isStrict ? tickers : tickers.slice(0, 3);
+            const tasks = workTickers.map(async (ticker) => {
                 const url = `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`;
                 const response = await fetch(url);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    const tickerNews = data.slice(0, 3).map(article => ({
-                        title: article.headline,
-                        description: article.summary || article.headline,
-                        url: article.url,
-                        publishedAt: new Date(article.datetime * 1000).toISOString(),
-                        source: { name: 'Finnhub' },
-                        urlToImage: article.image,
-                        content: article.summary,
-                        ticker: ticker
-                    }));
-                    allNews.push(...tickerNews);
-                }
-            }
+                if (!response.ok) return;
+                const data = await response.json();
+                const tickerNews = data.slice(0, 3).map(article => ({
+                    title: article.headline,
+                    description: article.summary || article.headline,
+                    url: article.url,
+                    publishedAt: new Date(article.datetime * 1000).toISOString(),
+                    source: { name: 'Finnhub' },
+                    urlToImage: article.image,
+                    content: article.summary,
+                    ticker: ticker
+                }));
+                allNews.push(...tickerNews);
+            });
+            await Promise.allSettled(tasks);
             return allNews;
         } catch (error) {
             console.error('Erreur Finnhub News:', error);
@@ -203,28 +204,28 @@ export default async function handler(req, res) {
 
         try {
             const allNews = [];
-            for (const ticker of tickers.slice(0, 2)) { // Limiter à 2 tickers
+            const workTickers = isStrict ? tickers : tickers.slice(0, 2);
+            const tasks = workTickers.map(async (ticker) => {
                 const url = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}&limit=5`;
                 const response = await fetch(url);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.feed) {
-                        const tickerNews = data.feed.map(article => ({
-                            title: article.title,
-                            description: article.summary,
-                            url: article.url,
-                            publishedAt: article.time_published,
-                            source: { name: article.source },
-                            urlToImage: article.banner_image,
-                            content: article.summary,
-                            ticker: ticker,
-                            sentiment: article.overall_sentiment_label
-                        }));
-                        allNews.push(...tickerNews);
-                    }
+                if (!response.ok) return;
+                const data = await response.json();
+                if (data.feed) {
+                    const tickerNews = data.feed.map(article => ({
+                        title: article.title,
+                        description: article.summary,
+                        url: article.url,
+                        publishedAt: article.time_published,
+                        source: { name: article.source },
+                        urlToImage: article.banner_image,
+                        content: article.summary,
+                        ticker: ticker,
+                        sentiment: article.overall_sentiment_label
+                    }));
+                    allNews.push(...tickerNews);
                 }
-            }
+            });
+            await Promise.allSettled(tasks);
             return allNews;
         } catch (error) {
             console.error('Erreur Alpha Vantage News:', error);
@@ -284,7 +285,7 @@ export default async function handler(req, res) {
 
             const data = await response.json();
             
-            const articles = data.articles?.results?.map(article => {
+            let articles = data.articles?.results?.map(article => {
                 const title = article.title || '';
                 const desc = article.body || '';
                 const lower = (title + ' ' + desc).toLowerCase();
@@ -303,6 +304,15 @@ export default async function handler(req, res) {
                     ticker: matched || undefined
                 };
             }) || [];
+
+            if (isStrict) {
+                // Filtrer strictement sur tickers (mot entier, insensible à la casse)
+                const patterns = tickers.map(t => new RegExp(`(^|[^A-Z0-9])${t}([^A-Z0-9]|$)`, 'i'));
+                articles = articles.filter(a => {
+                    const text = `${a.title || ''} ${a.description || ''}`;
+                    return patterns.some(rx => rx.test(text));
+                });
+            }
 
             return articles;
         } catch (error) {
@@ -326,7 +336,8 @@ export default async function handler(req, res) {
             query: q || 'finance',
             timestamp: new Date().toISOString(),
             source: 'demo',
-            message: 'Données de démonstration - Configurez au moins une clé API (NEWSAPI_KEY, FINNHUB_API_KEY, ou ALPHA_VANTAGE_API_KEY) pour des actualités réelles'
+            message: 'Données de démonstration - Configurez au moins une clé API (NEWSAPI_KEY, FINNHUB_API_KEY, ou ALPHA_VANTAGE_API_KEY) pour des actualités réelles',
+            strict: isStrict
         });
     }
 
@@ -336,42 +347,27 @@ export default async function handler(req, res) {
         const defaultTickers = ['CVS', 'MSFT', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META'];
         const tickers = requestedTickers.length > 0 ? requestedTickers : defaultTickers;
         
-        // Récupérer les actualités depuis toutes les sources disponibles
+        // Récupérer les actualités depuis toutes les sources disponibles (en parallèle)
         const allNews = [];
         const sources = [];
-        
-        // 1. Essayer NewsAPI.ai
+
+        const tasks = [];
         if (NEWSAPI_KEY && NEWSAPI_KEY !== 'YOUR_NEWSAPI_KEY') {
-            try {
-                const newsApiNews = await fetchNewsApiNews(tickers, limit);
-                allNews.push(...newsApiNews);
-                sources.push('NewsAPI.ai');
-            } catch (error) {
-                console.error('Erreur NewsAPI.ai:', error);
-            }
+            tasks.push(
+                fetchNewsApiNews(tickers, limit).then(items => { allNews.push(...items); sources.push('NewsAPI.ai'); }).catch(e => console.error('Erreur NewsAPI.ai:', e))
+            );
         }
-        
-        // 2. Essayer Finnhub News
         if (FINNHUB_API_KEY && FINNHUB_API_KEY !== 'YOUR_FINNHUB_API_KEY') {
-            try {
-                const finnhubNews = await fetchFinnhubNews(tickers);
-                allNews.push(...finnhubNews);
-                sources.push('Finnhub');
-            } catch (error) {
-                console.error('Erreur Finnhub News:', error);
-            }
+            tasks.push(
+                fetchFinnhubNews(tickers).then(items => { allNews.push(...items); sources.push('Finnhub'); }).catch(e => console.error('Erreur Finnhub News:', e))
+            );
         }
-        
-        // 3. Essayer Alpha Vantage News
         if (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY') {
-            try {
-                const alphaVantageNews = await fetchAlphaVantageNews(tickers);
-                allNews.push(...alphaVantageNews);
-                sources.push('Alpha Vantage');
-            } catch (error) {
-                console.error('Erreur Alpha Vantage News:', error);
-            }
+            tasks.push(
+                fetchAlphaVantageNews(tickers).then(items => { allNews.push(...items); sources.push('Alpha Vantage'); }).catch(e => console.error('Erreur Alpha Vantage News:', e))
+            );
         }
+        await Promise.allSettled(tasks);
         
         // Si aucune source n'a fonctionné, utiliser les données de démonstration
         if (allNews.length === 0) {
@@ -382,7 +378,8 @@ export default async function handler(req, res) {
                 query: q || 'finance',
                 timestamp: new Date().toISOString(),
                 source: 'demo',
-                message: 'Aucune source API disponible - Données de démonstration'
+                message: 'Aucune source API disponible - Données de démonstration',
+                strict: isStrict
             });
         }
         
@@ -400,8 +397,11 @@ export default async function handler(req, res) {
         // Trier par date de publication (plus récent en premier)
         uniqueNews.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
         
-        // Limiter au nombre demandé
-        let finalArticles = uniqueNews.slice(0, limit);
+        // Limiter au nombre demandé (mais en mode strict, viser au moins 1/article par ticker avant coupe)
+        let finalArticles = uniqueNews;
+        if (!isStrict) {
+            finalArticles = uniqueNews.slice(0, limit);
+        }
 
         // Garantir au moins une actualité par ticker demandé (fallback synthétique)
         const hasForTicker = (t) => finalArticles.some(a => (a.ticker || '').toUpperCase() === t.toUpperCase() || ((a.title + ' ' + a.description).toUpperCase().includes(t.toUpperCase())));
@@ -427,7 +427,8 @@ export default async function handler(req, res) {
             timestamp: new Date().toISOString(),
             source: sources.join(', '),
             sources: sources,
-            message: `Actualités récupérées depuis ${sources.join(', ')}`
+            message: `Actualités récupérées depuis ${sources.join(', ')}`,
+            strict: isStrict
         });
         
     } catch (error) {
@@ -441,7 +442,8 @@ export default async function handler(req, res) {
             query: q || 'finance',
             timestamp: new Date().toISOString(),
             source: 'demo (fallback)',
-            message: 'Erreur API - Données de démonstration utilisées'
+            message: 'Erreur API - Données de démonstration utilisées',
+            strict: isStrict
         });
     }
 }

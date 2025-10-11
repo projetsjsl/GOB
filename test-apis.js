@@ -40,8 +40,8 @@ async function runTests() {
     await testAPI('/api/status', 'Statut des APIs (sans test)');
     await testAPI('/api/status?test=true', 'Statut des APIs (avec test)');
     
-    // Test API News
-    await testAPI('/api/news?q=CVS OR MSFT&limit=5', 'API News multi-sources');
+    // Test API News (mode strict)
+    await testAPI('/api/news?q=CVS OR MSFT&limit=5&strict=true', 'API News multi-sources (strict)');
     
     // Test API Market Data (nouvelle API unifiée)
     await testAPI('/api/marketdata?endpoint=quote&symbol=AAPL&source=yahoo', 'API Market Data - Yahoo Finance Quote');
