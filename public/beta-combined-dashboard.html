@@ -3243,7 +3243,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 };
 
                 const sendMessageToEmma = async () => {
-                    if (!emmaInput.trim()) return;
+                    console.log('🔍 sendMessageToEmma appelée avec:', emmaInput);
+                    if (!emmaInput.trim()) {
+                        console.log('❌ Input vide, sortie de la fonction');
+                        return;
+                    }
                     
                     const userMessage = {
                         id: Date.now(),
@@ -3252,7 +3256,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         timestamp: new Date().toLocaleTimeString('fr-FR')
                     };
                     
-                    setEmmaMessages(prev => [...prev, userMessage]);
+                    setEmmaMessages(prev => {
+                        console.log('📝 Ajout du message utilisateur:', userMessage);
+                        return [...prev, userMessage];
+                    });
                     setEmmaLoading(true);
                     
                     // Feedback visuel immédiat
@@ -3265,7 +3272,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         content: '📤 Message envoyé...',
                         timestamp: new Date().toLocaleTimeString('fr-FR')
                     };
-                    setEmmaMessages(prev => [...prev, confirmMessage]);
+                    setEmmaMessages(prev => {
+                        console.log('📤 Ajout du message de confirmation:', confirmMessage);
+                        return [...prev, confirmMessage];
+                    });
                     
                     try {
                         // Rafraîchir les données en temps réel avant de répondre
@@ -4076,6 +4086,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     📰 Test News
                                 </button>
                                 <button
+                                    onClick={() => {
+                                        console.log('🧪 Test direct - ajout message manuel');
+                                        const testMessage = {
+                                            id: Date.now(),
+                                            type: 'user',
+                                            content: 'Test message manuel',
+                                            timestamp: new Date().toLocaleTimeString('fr-FR')
+                                        };
+                                        setEmmaMessages(prev => {
+                                            console.log('🧪 Ajout message test:', testMessage);
+                                            return [...prev, testMessage];
+                                        });
+                                    }}
+                                    className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
+                                >
+                                    🧪 Test Direct
+                                </button>
+                                <button
                                     onClick={clearChat}
                                     className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
                                 >
@@ -4184,6 +4212,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
+                                        {console.log('📋 Messages à afficher:', emmaMessages.length, emmaMessages)}
                                         {emmaMessages.map((message) => (
                                             <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                                                 {message.type !== 'user' && (
@@ -4254,7 +4283,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     disabled={emmaLoading}
                                 />
                                 <button
-                                    onClick={sendMessageToEmma}
+                                    onClick={() => {
+                                        console.log('🔘 Bouton Envoyer cliqué !');
+                                        console.log('📝 Contenu de emmaInput:', emmaInput);
+                                        console.log('📊 État de emmaLoading:', emmaLoading);
+                                        sendMessageToEmma();
+                                    }}
                                     disabled={emmaLoading || !emmaInput.trim()}
                                     className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${
                                         emmaLoading || !emmaInput.trim()
