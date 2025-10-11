@@ -6603,13 +6603,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         console.log(`🔍 Récupération des données réelles pour ${symbol}...`);
                         
                         // Appels parallèles aux APIs
-                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, historicalRatiosResponse] = await Promise.allSettled([
+                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, historicalRatiosResponse, smaResponse] = await Promise.allSettled([
                             fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
                             fetch(`/api/fmp?endpoint=profile&symbol=${symbol}`),
                             fetch(`/api/fmp?endpoint=ratios&symbol=${symbol}`),
                             fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`),
                             fetch(`/api/fmp?endpoint=historical-chart&symbol=${symbol}&timeframe=15min&limit=20`),
-                            fetch(`/api/fmp?endpoint=ratios-ttm&symbol=${symbol}&limit=8`)
+                            fetch(`/api/fmp?endpoint=ratios-ttm&symbol=${symbol}&limit=8`),
+                            fetch(`/api/fmp?endpoint=technical-indicators&symbol=${symbol}&period=daily&type=sma`)
                         ]);
 
                         // Parser les résultats
@@ -7042,6 +7043,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 const sentiment = stockDataIntelli?.sentiment || {};
                 const insights = stockDataIntelli?.insights || {};
                 const historicalRatios = stockDataIntelli?.historicalRatios || [];
+                const movingAverages = stockDataIntelli?.movingAverages || {};
 
                 const formatNumber = (num, prefix = '', suffix = '') => {
                     if (!num && num !== 0) return 'N/A';
