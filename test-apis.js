@@ -72,8 +72,4 @@ async function runTests() {
 }
 
 // Exécuter les tests si le script est appelé directement
-if (typeof window === 'undefined') {
-    runTests().catch(console.error);
-}
-
-module.exports = { testAPI, runTests };
+runTests().catch(console.error);

@@ -30,18 +30,36 @@ export default async function handler(req, res) {
 
     // Convertir messages UI -> contents Gemini
     const contents = [];
-    // Instruction système forte (outil d'abord, pas d'exemples)
-    const toolSystemPrompt = [
-      'Règles d\'analyse financière (prioritaires) :',
-      '- Utilise TOUJOURS les fonctions disponibles pour extraire des données réelles (prix, news, etc.).',
-      "- N\'utilise PAS de chiffres \"à titre d\'exemple\" ou fictifs.",
-      '- Si une donnée est indisponible, explique-le clairement et propose une alternative (ex.: demander le ticker exact).',
-      '- Réponds en français, concis, avec chiffres réels quand disponibles.'
-    ].join('\n');
-    contents.push({ role: 'user', parts: [{ text: toolSystemPrompt }] });
-    if (systemPrompt) {
-      contents.push({ role: 'user', parts: [{ text: systemPrompt }] });
-    }
+    // Charger le prompt personnalisé d'Emma depuis le profil financier
+    const emmaPrompt = systemPrompt || `Tu es Emma, une assistante virtuelle spécialisée en analyse financière. Tu es professionnelle, experte et bienveillante.
+
+**Ton rôle :**
+- Aider les utilisateurs avec l'analyse et l'évaluation financière
+- Fournir des conseils basés sur des données fiables
+- Expliquer les concepts financiers de manière claire
+- Guider dans l'interprétation des données du dashboard
+
+**Règles IMPORTANTES :**
+- Utilise TOUJOURS les fonctions disponibles pour extraire des données réelles (prix, news, etc.)
+- N'utilise JAMAIS de chiffres "à titre d'exemple" ou fictifs
+- Si une donnée est indisponible, explique-le clairement et propose une alternative
+- Toujours rappeler que pour des conseils personnalisés, il faut consulter un expert qualifié
+- Baser tes réponses sur les données disponibles dans le dashboard
+- Être transparent sur les limites de tes conseils
+
+**Ton style de communication :**
+- Professionnelle mais accessible
+- Précise et factuelle
+- Encourageante et rassurante
+- Réponds toujours en français
+
+**Contexte du dashboard :**
+L'utilisateur utilise un dashboard financier avec :
+- Cours d'actions en temps réel
+- Analyses Seeking Alpha
+- Actualités financières
+- Graphiques et métriques`;
+    contents.push({ role: 'user', parts: [{ text: emmaPrompt }] });
     for (const m of messages) {
       const role = m.role === 'assistant' ? 'model' : 'user';
       contents.push({ role, parts: [{ text: String(m.content || '') }] });
