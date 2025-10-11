@@ -291,24 +291,71 @@ export async function searchNews(query, options = {}) {
   }
 }
 
-export default {
-  // News
-  getNews,
-  getTickerNews,
-  getEntityNews,
-  getIndustryNews,
-  getCountryNews,
-  
-  // Sentiment
-  getNewsWithSentiment,
-  getTickerSentiment,
-  
-  // Trending
-  getTrendingNews,
-  getPopularNews,
-  
-  // Combined
-  getCompleteTickerNews,
-  getMarketOverview,
-  searchNews
-};
+// Serverless function handler pour Vercel
+export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  try {
+    const { endpoint, symbol, entity, industry, country, limit, timeframe, query, industries } = req.query;
+
+    if (!endpoint) {
+      return res.status(400).json({ error: 'Parameter "endpoint" is required' });
+    }
+
+    let result;
+    const parsedLimit = parseInt(limit) || 50;
+    const parsedTimeframe = parseInt(timeframe) || 7;
+
+    switch (endpoint) {
+      case 'ticker-news':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getTickerNews(symbol, { limit: parsedLimit });
+        break;
+      case 'ticker-sentiment':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getTickerSentiment(symbol, { limit: parsedLimit });
+        break;
+      case 'complete':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getCompleteTickerNews(symbol, { limit: parsedLimit, timeframe: parsedTimeframe });
+        break;
+      case 'trending':
+        result = await getTrendingNews({ limit: parsedLimit });
+        break;
+      case 'market-overview':
+        const industryList = industries ? industries.split(',') : ['Technology', 'Finance', 'Healthcare', 'Energy'];
+        result = await getMarketOverview({ industries: industryList, limit: parsedLimit });
+        break;
+      case 'search':
+        if (!query) return res.status(400).json({ error: 'Parameter "query" is required' });
+        result = await searchNews(query, { limit: parsedLimit });
+        break;
+      default:
+        return res.status(404).json({ error: `Endpoint "${endpoint}" not found` });
+    }
+
+    res.status(200).json(result);
+
+  } catch (error) {
+    console.error('Marketaux API error:', error);
+    
+    if (error.message.includes('not configured')) {
+      return res.status(503).json({
+        error: 'Service unavailable',
+        message: 'MARKETAUX_API_KEY not configured'
+      });
+    }
+
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+}

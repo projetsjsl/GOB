@@ -6344,9 +6344,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         // Appels parallèles aux APIs
                         const [quoteResponse, profileResponse, ratiosResponse, newsResponse] = await Promise.allSettled([
                             fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
-                            fetch(`/api/fmp/profile?symbol=${symbol}`),
-                            fetch(`/api/fmp/ratios?symbol=${symbol}`),
-                            fetch(`/api/marketaux/ticker-sentiment?symbol=${symbol}&limit=50`)
+                            fetch(`/api/fmp?endpoint=profile&symbol=${symbol}`),
+                            fetch(`/api/fmp?endpoint=ratios&symbol=${symbol}`),
+                            fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`)
                         ]);
 
                         // Parser les résultats

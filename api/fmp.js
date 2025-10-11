@@ -371,69 +371,79 @@ export async function getFundamentalsForEmma(symbol) {
   }
 }
 
-export default {
-  // Company data
-  getCompanyProfile,
-  getIncomeStatement,
-  getBalanceSheet,
-  getCashFlowStatement,
-  getFinancialStatements,
-  getFinancialRatiosTTM,
-  getKeyMetricsTTM,
-  getFinancialGrowth,
-  
-  // Valuations
-  getDCFValuation,
-  getCompanyRating,
-  getPriceTargetConsensus,
-  getUpgradesDowngrades,
-  getAnalystEstimates,
-  
-  // Market data
-  getQuote,
-  getQuotes,
-  getHistoricalPrices,
-  getPrePostMarketQuote,
-  
-  // News
-  getCompanyNews,
-  getGeneralNews,
-  getPressReleases,
-  
-  // Earnings
-  getEarningsCalendar,
-  getEarningsSurprises,
-  getHistoricalEarnings,
-  getEarningsTranscript,
-  getAvailableTranscripts,
-  
-  // Insider & Institutional
-  getInsiderTrading,
-  getInstitutionalHolders,
-  getCongressionalTrading,
-  get13FFilings,
-  
-  // SEC
-  getSECFilings,
-  get10KFilings,
-  get10QFilings,
-  
-  // Market
-  getStockPeers,
-  getSectorPerformance,
-  getMarketMovers,
-  
-  // ESG
-  getESGScore,
-  getESGRatings,
-  
-  // Search
-  searchCompanies,
-  searchByName,
-  screenStocks,
-  
-  // Combined
-  getCompleteAnalysis,
-  getFundamentalsForEmma
-};
+// Serverless function handler pour Vercel
+export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  try {
+    const { endpoint, symbol, period, limit, from, to, quarter, year, cik, date, type } = req.query;
+
+    if (!endpoint) {
+      return res.status(400).json({ error: 'Parameter "endpoint" is required' });
+    }
+
+    let result;
+
+    switch (endpoint) {
+      case 'profile':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getCompanyProfile(symbol);
+        break;
+      case 'ratios':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getFinancialRatiosTTM(symbol);
+        break;
+      case 'financials':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getFinancialStatements(symbol, period || 'quarter', parseInt(limit) || 4);
+        break;
+      case 'dcf':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getDCFValuation(symbol);
+        break;
+      case 'analyst':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getPriceTargetConsensus(symbol);
+        break;
+      case 'earnings':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getEarningsSurprises(symbol);
+        break;
+      case 'insider':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getInsiderTrading(symbol, parseInt(limit) || 100);
+        break;
+      case 'complete':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getCompleteAnalysis(symbol);
+        break;
+      default:
+        return res.status(404).json({ error: `Endpoint "${endpoint}" not found` });
+    }
+
+    res.status(200).json({ data: Array.isArray(result) ? result : [result] });
+
+  } catch (error) {
+    console.error('FMP API error:', error);
+    
+    if (error.message.includes('not configured')) {
+      return res.status(503).json({
+        error: 'Service unavailable',
+        message: 'FMP_API_KEY not configured'
+      });
+    }
+
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+}
 
