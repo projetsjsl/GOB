@@ -5790,26 +5790,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                                 <div className="flex items-center gap-2">
                                     <button
-                                        onClick={() => {
-                                            const fetchData = async () => {
-                                                try {
-                                                    const mockData = generateMockData(selectedStock);
-                                                    setStockDataIntelli(mockData);
-                                                    setConnected(true);
-                                                    setLastUpdateIntelli(new Date());
-                                                } catch (error) {
-                                                    console.error('Error:', error);
-                                                }
-                                            };
-                                            fetchData();
-                                        }}
-                                        className={`p-1.5 border rounded-md transition-all ${
+                                        onClick={refreshIntelliStocks}
+                                        className={`flex items-center gap-1 px-2 py-1 border rounded-md text-[10px] font-semibold ${
                                             isDarkMode 
-                                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
-                                                : 'bg-white hover:bg-gray-100 border-gray-300'
+                                                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-gray-300' 
+                                                : 'bg-white hover:bg-gray-100 border-gray-300 text-gray-700'
                                         }`}
+                                        title="Rafraîchir les données"
                                     >
-                                        <LucideIcon name="RefreshCw" className="w-3 h-3 text-gray-400" />
+                                        <LucideIcon name="RefreshCw" className="w-3 h-3" />
+                                        Rafraîchir
                                     </button>
 
                                     <div className="relative">
