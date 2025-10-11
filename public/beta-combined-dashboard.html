@@ -2915,6 +2915,9 @@ Tu es Emma — Economic & Market Monitoring Assistant, actuellement configurée 
 Mission principale : Accompagner une équipe de gestionnaires de portefeuille québécois dans leurs analyses, décisions d'investissement et réflexions stratégiques, en fournissant une expertise de niveau CFA avec rigueur, nuance et esprit critique.
 « De la macro à la micro, des marchés aux titres — j'analyse avec rigueur et pragmatisme. »
 
+🚀 CAPACITÉS EN TEMPS RÉEL:
+Tu as accès aux données de marché en temps réel via les APIs Finnhub, Alpha Vantage et autres sources. Tu peux analyser les prix actuels, volumes, variations et actualités financières. Utilise toujours ces données pour tes analyses et ne dis jamais que tu n'as pas accès aux données actuelles.
+
 🏢 Contexte Organisationnel
 L'équipe que tu assistes :
 
@@ -3240,7 +3243,26 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     setEmmaLoading(true);
                     
                     try {
-                        // Utiliser l'API Gemini
+                        // Rafraîchir les données en temps réel avant de répondre
+                        console.log('🔄 Rafraîchissement des données pour Emma...');
+                        
+                        // Ajouter un message de mise à jour des données
+                        const updateMessage = {
+                            id: Date.now() + 0.5,
+                            type: 'system',
+                            content: '🔄 Mise à jour des données en temps réel...',
+                            timestamp: new Date().toLocaleTimeString('fr-FR')
+                        };
+                        setEmmaMessages(prev => [...prev, updateMessage]);
+                        
+                        await Promise.all([
+                            refreshAllStocks(),
+                            fetchNews(),
+                            checkApiStatus()
+                        ]);
+                        console.log('✅ Données mises à jour pour Emma');
+                        
+                        // Utiliser l'API Gemini avec les données fraîches
                         const response = await generateGeminiResponse(emmaInput);
                         
                         const emmaResponse = {
@@ -3372,8 +3394,35 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             throw new Error(errorMsg);
                         }
 
-                        // Construire le prompt complet
-                        const fullPrompt = `${emmaPrompt}\n\nQuestion de l'utilisateur: ${userMessage}`;
+                        // Récupérer les données en temps réel du dashboard
+                        const currentStockData = stockData || {};
+                        const currentNewsData = newsData || [];
+                        const currentApiStatus = apiStatus || {};
+                        
+                        // Construire le contexte avec les données actuelles
+                        const realTimeContext = `
+DONNÉES EN TEMPS RÉEL DISPONIBLES:
+
+📊 DONNÉES DE MARCHÉ ACTUELLES:
+${Object.entries(currentStockData).map(([ticker, data]) => 
+    `${ticker}: Prix=${data.c}, Variation=${data.d} (${data.dp}%), Haut=${data.h}, Bas=${data.l}, Volume=${data.v || 'N/A'}`
+).join('\n')}
+
+📰 ACTUALITÉS RÉCENTES:
+${currentNewsData.slice(0, 5).map(article => 
+    `- ${article.title} (${article.source?.name || 'Source'})`
+).join('\n')}
+
+🔧 STATUT DES APIs:
+${Object.entries(currentApiStatus).map(([api, status]) => 
+    `${api}: ${status.status} (${status.responseTime}ms)${status.error ? ` - ${status.error}` : ''}`
+).join('\n')}
+
+⚠️ IMPORTANT: Utilisez ces données en temps réel pour vos analyses. Ne dites pas que vous n'avez pas accès aux données actuelles.
+`;
+
+                        // Construire le prompt complet avec les données en temps réel
+                        const fullPrompt = `${emmaPrompt}\n\n${realTimeContext}\n\nQuestion de l'utilisateur: ${userMessage}`;
 
                         let response;
                         
@@ -3911,9 +3960,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 return (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🤖 Ask Emma</h2>
+                            <div>
+                                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>🤖 Ask Emma</h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    🚀 Accès aux données en temps réel (Finnhub, Alpha Vantage, News)
+                                </p>
+                            </div>
                             <div className="flex gap-2">
                                 <button
                                     onClick={clearChat}
@@ -4040,6 +4096,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? 'bg-blue-600 text-white shadow-blue-500/20' 
                                                         : message.type === 'error'
                                                         ? 'bg-red-600 text-white shadow-red-500/20'
+                                                        : message.type === 'system'
+                                                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
                                                         : isDarkMode 
                                                             ? 'bg-gray-800 text-white border border-gray-700' 
                                                             : 'bg-white text-gray-900 border border-gray-200'
