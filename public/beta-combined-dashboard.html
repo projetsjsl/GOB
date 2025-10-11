@@ -2909,6 +2909,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
                 const [emmaMaxTokens, setEmmaMaxTokens] = useState(4096); // Longueur de réponse par défaut
                 const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
+                const [useValidatedMode, setUseValidatedMode] = useState(false); // Mode validation en 3 étapes
                 const [emmaPrompt, setEmmaPrompt] = useState(`Identité et Mission
 Tu es Emma — Economic & Market Monitoring Assistant, actuellement configurée en mode Assistance Experte en Analyse Financière et Gestion de Portefeuille.
 
@@ -3223,6 +3224,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Charger le paramètre function calling depuis localStorage
                         loadFunctionCalling();
                         
+                        // Charger le paramètre mode validé depuis localStorage
+                        loadValidatedMode();
+                        
                         // Vérifier la connexion Gemini
                         await checkGeminiConnection();
                     } catch (error) {
@@ -3474,8 +3478,9 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         
                         // Utiliser l'API avec function calling si activé
                         if (useFunctionCalling) {
-                            console.log('🔧 Utilisation de Gemini Function Calling (chat) avec accès aux APIs');
-                            response = await fetch('/api/gemini/chat', {
+                            const apiEndpoint = useValidatedMode ? '/api/gemini/chat-validated' : '/api/gemini/chat';
+                            console.log(`🔧 Utilisation de Gemini Function Calling (${useValidatedMode ? 'validé' : 'standard'}) avec accès aux APIs`);
+                            response = await fetch(apiEndpoint, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -3653,6 +3658,17 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                     const saved = localStorage.getItem('emma-function-calling');
                     if (saved !== null) {
                         setUseFunctionCalling(saved === 'true');
+                    }
+                };
+
+                const saveValidatedMode = () => {
+                    localStorage.setItem('emma-validated-mode', useValidatedMode.toString());
+                };
+
+                const loadValidatedMode = () => {
+                    const saved = localStorage.getItem('emma-validated-mode');
+                    if (saved !== null) {
+                        setUseValidatedMode(saved === 'true');
                     }
                 };
 
@@ -4075,7 +4091,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <p className={`text-xs transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                 }`}>
-                                    ⚙️ Température: {emmaTemperature} • Longueur: {emmaMaxTokens} tokens • Function Calling: {useFunctionCalling ? 'ON' : 'OFF'}
+                                    ⚙️ Température: {emmaTemperature} • Longueur: {emmaMaxTokens} tokens • Function Calling: {useFunctionCalling ? 'ON' : 'OFF'}{useValidatedMode ? ' • Mode Validé: ON' : ''}
                                 </p>
                             </div>
                             <div className="flex gap-2">
@@ -4274,6 +4290,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 }`}>
                                                                     API: {useFunctionCalling ? 'ON' : 'OFF'}
                                                                 </span>
+                                                                {useValidatedMode && (
+                                                                    <span className="px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700">
+                                                                        Validé: ON
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     )}
@@ -4322,6 +4343,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             }`}>
                                                                 API: {useFunctionCalling ? 'ON' : 'OFF'}
                                                             </span>
+                                                            {useValidatedMode && (
+                                                                <span className="px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700">
+                                                                    Validé: ON
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -4552,13 +4578,50 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 <input
                                                     type="checkbox"
                                                     checked={useFunctionCalling}
-                                                    onChange={(e) => setUseFunctionCalling(e.target.checked)}
+                                                    onChange={(e) => {
+                                                        setUseFunctionCalling(e.target.checked);
+                                                        saveFunctionCalling();
+                                                    }}
                                                     className="sr-only peer"
                                                 />
                                                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                             </label>
                                         </div>
                                     </div>
+
+                                    {/* Contrôle Mode Validé */}
+                                    {useFunctionCalling && (
+                                        <div className={`p-3 rounded-lg border ${
+                                            isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-gray-100 border-gray-300'
+                                        }`}>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <label className={`text-sm font-medium transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                    }`}>
+                                                        🔍 Mode Validé (3 Étapes)
+                                                    </label>
+                                                    <p className={`text-xs mt-1 transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    }`}>
+                                                        Emma valide les données API et bonifie ses réponses
+                                                    </p>
+                                                </div>
+                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={useValidatedMode}
+                                                        onChange={(e) => {
+                                                            setUseValidatedMode(e.target.checked);
+                                                            saveValidatedMode();
+                                                        }}
+                                                        className="sr-only peer"
+                                                    />
+                                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* Slider de température */}
                                     <div>
