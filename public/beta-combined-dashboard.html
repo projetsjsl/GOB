@@ -2901,6 +2901,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [emmaMessages, setEmmaMessages] = useState([]);
                 const [emmaInput, setEmmaInput] = useState('');
                 const [emmaLoading, setEmmaLoading] = useState(false);
+                const chatContainerRef = useRef(null);
                 const [emmaApiKey, setEmmaApiKey] = useState('');
                 const [emmaConnected, setEmmaConnected] = useState(false);
                 const [showPromptEditor, setShowPromptEditor] = useState(false);
@@ -2910,6 +2911,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [emmaMaxTokens, setEmmaMaxTokens] = useState(4096); // Longueur de réponse par défaut
                 const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
                 const [useValidatedMode, setUseValidatedMode] = useState(false); // Mode validation en 3 étapes
+                const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Bouton scroll vers le bas
                 const [emmaPrompt, setEmmaPrompt] = useState(`Identité et Mission
 Tu es Emma — Economic & Market Monitoring Assistant, actuellement configurée en mode Assistance Experte en Analyse Financière et Gestion de Portefeuille.
 
@@ -3640,6 +3642,43 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                     }]);
                 };
 
+                // Fonction d'auto-scroll vers le bas du chat avec animation fluide
+                const scrollToBottom = () => {
+                    if (chatContainerRef.current) {
+                        chatContainerRef.current.scrollTo({
+                            top: chatContainerRef.current.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }
+                };
+
+                // Auto-scroll quand les messages changent
+                useEffect(() => {
+                    scrollToBottom();
+                }, [emmaMessages]);
+
+                // Auto-scroll aussi quand Emma commence à répondre
+                useEffect(() => {
+                    if (emmaLoading) {
+                        scrollToBottom();
+                    }
+                }, [emmaLoading]);
+
+                // Détecter le scroll pour afficher/masquer le bouton "Aller en bas"
+                useEffect(() => {
+                    const chatContainer = chatContainerRef.current;
+                    if (!chatContainer) return;
+
+                    const handleScroll = () => {
+                        const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+                        const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+                        setShowScrollToBottom(!isNearBottom);
+                    };
+
+                    chatContainer.addEventListener('scroll', handleScroll);
+                    return () => chatContainer.removeEventListener('scroll', handleScroll);
+                }, []);
+
                 const savePrompt = () => {
                     localStorage.setItem('emma-financial-prompt', emmaPrompt);
                     setShowPromptEditor(false);
@@ -4201,9 +4240,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
 
                             {/* Messages */}
-                            <div className={`h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 ${
+                            <div className="relative">
+                                <div 
+                                    ref={chatContainerRef}
+                                    className={`h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
-                            }`}>
+                                    }`}
+                                >
                                 {emmaMessages.length === 0 ? (
                                     <div className="flex gap-3 mb-4">
                                         <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
@@ -4360,6 +4403,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             </div>
                                         )}
                                     </div>
+                                )}
+                                </div>
+                                
+                                {/* Bouton "Aller en bas" */}
+                                {showScrollToBottom && (
+                                    <button
+                                        onClick={scrollToBottom}
+                                        className={`absolute bottom-6 right-6 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
+                                            isDarkMode 
+                                                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                                                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                        }`}
+                                        title="Aller en bas"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                        </svg>
+                                    </button>
                                 )}
                             </div>
 
