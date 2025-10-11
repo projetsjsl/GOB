@@ -166,8 +166,8 @@
 <body class="min-h-screen">
     <div id="root"></div>
     
-        <script type="text/babel">
-            const { useState, useEffect, useRef } = React;
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
             // Composant d'icônes SVG inline (remplace Lucide) - Défini globalement
             window.LucideIcon = ({ name, className = "w-4 h-4" }) => {
@@ -3205,18 +3205,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const initializeEmma = async () => {
                     try {
-                        // Charger les messages depuis localStorage (persistance)
-                        const savedMessages = localStorage.getItem('emma-messages');
-                        if (savedMessages) {
-                            setEmmaMessages(JSON.parse(savedMessages));
-                        } else {
-                            // Message de bienvenue initial seulement si pas de messages sauvegardés
+                        // Initialiser avec le message de bienvenue (session uniquement - pas de persistance)
                             setEmmaMessages([{
                                 type: 'emma',
-                                content: 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**NOUVELLES CAPACITÉS :**\n- Accès DIRECT aux APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance\n- Requêtes en temps réel pour n\'importe quel symbole\n- Données de marché, actualités, profils d\'entreprise, recommandations d\'analystes\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?',
+                            content: 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**NOUVELLES CAPACITÉS :**\n- Accès DIRECT aux APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance\n- Requêtes en temps réel pour n\'importe quel symbole\n- Données de marché, actualités, profils d\'entreprise, recommandations d\'analystes\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?',
                                 timestamp: new Date().toISOString()
                             }]);
-                        }
                         
                         // Charger le prompt depuis localStorage
                         const savedPrompt = localStorage.getItem('emma-financial-prompt');
@@ -3320,8 +3314,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             // Supprimer le message de confirmation temporaire
                             const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
                             const newMessages = [...filteredMessages, emmaResponse];
-                            // Sauvegarder les messages dans localStorage
-                            localStorage.setItem('emma-messages', JSON.stringify(newMessages));
+                            // Pas de sauvegarde - session uniquement
                             return newMessages;
                         });
                         
@@ -3639,8 +3632,12 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                 };
 
                 const clearChat = () => {
-                    setEmmaMessages([]);
-                    localStorage.removeItem('emma-messages');
+                    // Vider l'historique de la session uniquement (pas de persistance)
+                    setEmmaMessages([{
+                        type: 'emma',
+                        content: 'Chat vidé ! Comment puis-je vous assister ?',
+                        timestamp: new Date().toISOString()
+                    }]);
                 };
 
                 const savePrompt = () => {
@@ -4084,9 +4081,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
                             <div>
-                                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>🤖 Ask Emma</h2>
+                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🤖 Ask Emma</h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
@@ -6454,9 +6451,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     height={80}
                                                 />
                                             ) : (
-                                                <div className="text-center text-gray-500 text-xs py-4">
-                                                    📊 Graphique Volume
-                                                </div>
+                                            <div className="text-center text-gray-500 text-xs py-4">
+                                                📊 Graphique Volume
+                                            </div>
                                             )}
                                         </div>
 
@@ -6745,12 +6742,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <div className="text-[8px] text-gray-500 font-bold">Hybride Optimal</div>
                                     <div className="text-[7px] text-gray-600">Précision + IA</div>
                                 </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            );
-        };
+                );
+            };
 
             return (
                 <div className={`min-h-screen transition-colors duration-300 ${
