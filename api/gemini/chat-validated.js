@@ -40,7 +40,10 @@ export default async function handler(req, res) {
 
     // Utiliser le SDK officiel pour robustesse long terme
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp', tools: { functionDeclarations } });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash-exp',
+      tools: [ { functionDeclarations } ]
+    });
     
     // ÉTAPE 1: Analyse initiale et décision d'appel de fonction
     const initialResult = await model.generateContent({
