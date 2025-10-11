@@ -74,8 +74,9 @@ export default async function handler(req, res) {
       });
     }
 
+    const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model,
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }]
     });
