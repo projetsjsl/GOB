@@ -3255,6 +3255,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     setEmmaMessages(prev => [...prev, userMessage]);
                     setEmmaLoading(true);
                     
+                    // Feedback visuel immédiat
+                    console.log('📤 Message envoyé à Emma:', emmaInput);
+                    
+                    // Ajouter un message temporaire de confirmation
+                    const confirmMessage = {
+                        id: Date.now() + 0.1,
+                        type: 'system',
+                        content: '📤 Message envoyé...',
+                        timestamp: new Date().toLocaleTimeString('fr-FR')
+                    };
+                    setEmmaMessages(prev => [...prev, confirmMessage]);
+                    
                     try {
                         // Rafraîchir les données en temps réel avant de répondre
                         console.log('🔄 Rafraîchissement des données pour Emma...');
@@ -3286,11 +3298,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         };
                         
                         setEmmaMessages(prev => {
-                            const newMessages = [...prev, emmaResponse];
+                            // Supprimer le message de confirmation temporaire
+                            const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
+                            const newMessages = [...filteredMessages, emmaResponse];
                             // Sauvegarder les messages dans localStorage
                             localStorage.setItem('emma-messages', JSON.stringify(newMessages));
                             return newMessages;
                         });
+                        
+                        // Confirmation de réception
+                        console.log('✅ Réponse d\'Emma reçue:', response.length, 'caractères');
                     } catch (error) {
                         console.error('Erreur Gemini:', error?.message || String(error));
                         // Analyser le type d'erreur pour un message plus précis
@@ -3342,10 +3359,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             content: errorContent,
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
-                        setEmmaMessages(prev => [...prev, errorMessage]);
+                        setEmmaMessages(prev => {
+                            // Supprimer le message de confirmation temporaire
+                            const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
+                            return [...filteredMessages, errorMessage];
+                        });
                     } finally {
                         setEmmaLoading(false);
-                        // Ne pas vider l'input automatiquement
+                        // Vider l'input après envoi
+                        setEmmaInput('');
                     }
                 };
 
