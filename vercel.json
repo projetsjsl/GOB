@@ -23,13 +23,9 @@
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
     }
-<<<<<<< HEAD
-=======
-  ]
-,
+  ],
   "rewrites": [
     { "source": "/api/finnhub", "destination": "/api/marketdata" }
->>>>>>> origin/main
   ],
   "redirects": [
     {
