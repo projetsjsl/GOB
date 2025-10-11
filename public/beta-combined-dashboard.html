@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
     <!-- Cache bust: 2024-10-08 23:12 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -190,7 +192,7 @@
             const audioCtxRef = useRef(null);
 
             // Configuration API
-            const API_BASE_URL = window.location.origin;
+            const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
             
             // Configuration GitHub
             const GITHUB_REPO = 'projetsjsl/GOB';
