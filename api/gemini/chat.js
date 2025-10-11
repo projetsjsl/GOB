@@ -2,7 +2,7 @@
 // /api/gemini/chat - Function Calling (boucle minimale)
 // ========================================
 
-import { functionDeclarations, executeFunction } from './functions.js';
+import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default async function handler(req, res) {
