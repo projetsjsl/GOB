@@ -165,7 +165,7 @@ console.log(`Actualités: ${data.length} articles`);
 fetch('/api/finnhub?endpoint=quote&symbol=AAPL')
 ```
 
-### Après
+### Après (recommandé)
 ```javascript
 fetch('/api/marketdata?endpoint=quote&symbol=AAPL&source=auto')
 ```

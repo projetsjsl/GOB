@@ -252,7 +252,7 @@ const GOB = () => {
       
       for (const symbol of symbols) {
         try {
-          const response = await fetch(`/api/finnhub?endpoint=quote&symbol=${symbol}`);
+          const response = await fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`);
           const data = await response.json();
           
           if (data.c && data.d !== undefined && data.dp !== undefined && data.source === 'finnhub') {

@@ -303,15 +303,8 @@
                     return await response.json();
                 } catch (error) {
                     console.error('Erreur fetch stock data (marketdata):', error);
-                    // Fallback vers l'ancienne API Finnhub
-                    try {
-                        const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
-                        if (!response.ok) throw new Error(`API error: ${response.status}`);
-                        return await response.json();
-                    } catch (fallbackError) {
-                        console.error('Erreur fetch stock data (finnhub fallback):', fallbackError);
+                    // Rester sur marketdata; l’API gère déjà ses fallbacks internes
                     return null;
-                    }
                 }
             };
 
@@ -368,7 +361,7 @@
                     const tickersQuery = tickers.join(' OR ');
                     console.log(`🔍 Recherche pour: ${tickersQuery}`);
                     
-                    const response = await fetch(`${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=20`);
+                    const response = await fetch(`${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=20&strict=true`);
                     console.log(`📡 Réponse API News: ${response.status}`);
                     
                     if (!response.ok) throw new Error(`News API error: ${response.status}`);
@@ -485,7 +478,7 @@
                 // Test NewsAPI
                 try {
                     const startTime = Date.now();
-                    const response = await fetch(`${API_BASE_URL}/api/news?q=finance&limit=5`);
+                    const response = await fetch(`${API_BASE_URL}/api/news?q=finance&limit=5&strict=true`);
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {

@@ -50,7 +50,7 @@
 
           const fetchStockData = async (ticker) => {
             try {
-              const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
+              const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`);
               if (!response.ok) throw new Error(`API error: ${response.status}`);
               return await response.json();
             } catch (error) {
@@ -100,7 +100,7 @@
             // Test Finnhub API
             try {
               const startTime = Date.now();
-              const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=AAPL`);
+              const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=AAPL&source=auto`);
               const responseTime = Date.now() - startTime;
               
               if (response.ok) {
@@ -128,7 +128,7 @@
             // Test Vercel API
             try {
               const startTime = Date.now();
-              const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=TEST`);
+              const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=TEST&source=auto`);
               const responseTime = Date.now() - startTime;
               
               status.vercel = {
