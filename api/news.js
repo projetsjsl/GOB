@@ -327,17 +327,11 @@ export default async function handler(req, res) {
                      (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY');
 
     if (!hasApiKey) {
-        // Générer des actualités de démonstration basées sur les tickers demandés
-        const demoNews = generateDemoNews(q);
-        
-        return res.status(200).json({
-            articles: demoNews,
-            totalResults: demoNews.length,
-            query: q || 'finance',
-            timestamp: new Date().toISOString(),
-            source: 'demo',
-            message: 'Données de démonstration - Configurez au moins une clé API (NEWSAPI_KEY, FINNHUB_API_KEY, ou ALPHA_VANTAGE_API_KEY) pour des actualités réelles',
-            strict: isStrict
+        return res.status(503).json({
+            error: 'Service indisponible',
+            message: 'Aucune clé API configurée. Veuillez configurer au moins une des variables d\'environnement suivantes : NEWSAPI_KEY, FINNHUB_API_KEY, ou ALPHA_VANTAGE_API_KEY',
+            requiredKeys: ['NEWSAPI_KEY', 'FINNHUB_API_KEY', 'ALPHA_VANTAGE_API_KEY'],
+            query: q || 'finance'
         });
     }
 
@@ -369,17 +363,14 @@ export default async function handler(req, res) {
         }
         await Promise.allSettled(tasks);
         
-        // Si aucune source n'a fonctionné, utiliser les données de démonstration
+        // Si aucune source n'a fonctionné, retourner une erreur
         if (allNews.length === 0) {
-            const demoNews = generateDemoNews(q);
-            return res.status(200).json({
-                articles: demoNews,
-                totalResults: demoNews.length,
+            return res.status(503).json({
+                error: 'Aucune actualité disponible',
+                message: 'Toutes les sources d\'actualités ont échoué. Veuillez réessayer dans quelques instants.',
+                sources: sources,
                 query: q || 'finance',
-                timestamp: new Date().toISOString(),
-                source: 'demo',
-                message: 'Aucune source API disponible - Données de démonstration',
-                strict: isStrict
+                timestamp: new Date().toISOString()
             });
         }
         
@@ -433,17 +424,11 @@ export default async function handler(req, res) {
         
     } catch (error) {
         console.error('Erreur générale API News:', error);
-        
-        // Fallback vers les données de démonstration
-        const demoNews = generateDemoNews(q);
-        return res.status(200).json({
-            articles: demoNews,
-            totalResults: demoNews.length,
+        return res.status(500).json({
+            error: 'Erreur lors de la récupération des actualités',
+            message: error.message,
             query: q || 'finance',
-            timestamp: new Date().toISOString(),
-            source: 'demo (fallback)',
-            message: 'Erreur API - Données de démonstration utilisées',
-            strict: isStrict
+            timestamp: new Date().toISOString()
         });
     }
 }

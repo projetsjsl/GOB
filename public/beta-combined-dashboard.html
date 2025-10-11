@@ -1444,7 +1444,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 };
 
                 // Ajouter un ticker à la watchlist
-                const addTickerToWatchlist = () => {
+                const addTickerToWatchlist = async () => {
                     if (!newTicker.trim()) return;
                     
                     const ticker = newTicker.trim().toUpperCase();
@@ -1461,10 +1461,13 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     // Charger les données pour le nouveau ticker
                     loadWatchlistData([ticker]);
                     showMessage(`${ticker} ajouté à la watchlist`, 'success');
+                    
+                    // Sauvegarder automatiquement sur GitHub
+                    await saveWatchlistToGitHubAuto(updatedTickers);
                 };
 
                 // Supprimer un ticker de la watchlist
-                const removeTickerFromWatchlist = (ticker) => {
+                const removeTickerFromWatchlist = async (ticker) => {
                     const updatedTickers = watchlistTickers.filter(t => t !== ticker);
                     setWatchlistTickers(updatedTickers);
                     localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
@@ -1477,6 +1480,9 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     });
                     
                     showMessage(`${ticker} supprimé de la watchlist`, 'success');
+                    
+                    // Sauvegarder automatiquement sur GitHub
+                    await saveWatchlistToGitHubAuto(updatedTickers);
                 };
 
                 // Actualiser les données de la watchlist
@@ -1485,19 +1491,39 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     showMessage('Watchlist actualisée', 'success');
                 };
 
-                // Sauvegarder la watchlist dans GitHub via l'API serveur
-                const saveWatchlistToGitHub = async () => {
+                // Sauvegarder automatiquement la watchlist sur GitHub (silencieux)
+                const saveWatchlistToGitHubAuto = async (tickers) => {
                     try {
-                        const response = await fetch(`${API_BASE_URL}/api/github-update`, {
+                        const watchlistData = {
+                            tickers: tickers,
+                            lastUpdated: new Date().toISOString(),
+                            count: tickers.length
+                        };
+                        
+                        const response = await fetch(`${API_BASE_URL}/api/save-tickers`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                file: 'public/dans-watchlist.json',
-                                action: 'update_watchlist',
-                                data: { tickers: watchlistTickers, timestamp: new Date().toISOString() }
+                                tickers: tickers,
+                                filename: 'dans-watchlist.json'
                             })
                         });
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        
+                        console.log('✅ Watchlist sauvegardée automatiquement sur GitHub');
+                    } catch (e) {
+                        console.error('⚠️ Erreur sauvegarde automatique GitHub watchlist:', e);
+                        // Ne pas afficher d'erreur à l'utilisateur pour ne pas perturber l'expérience
+                    }
+                };
+
+                // Sauvegarder manuellement la watchlist dans GitHub (avec confirmation)
+                const saveWatchlistToGitHub = async () => {
+                    try {
+                        await saveWatchlistToGitHubAuto(watchlistTickers);
                         showMessage('Watchlist sauvegardée sur GitHub', 'success');
                     } catch (e) {
                         console.error('Erreur sauvegarde GitHub watchlist:', e);

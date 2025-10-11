@@ -331,77 +331,13 @@ export default async function handler(req, res) {
                      (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY') ||
                      (TWELVE_DATA_API_KEY && TWELVE_DATA_API_KEY !== 'YOUR_TWELVE_DATA_API_KEY');
     
-    if (!hasApiKey && source === 'auto') {
-        // Retourner des données de démonstration selon l'endpoint
-        let demoResult;
-        
-        switch (endpoint) {
-            case 'profile':
-                demoResult = demoData[symbol]?.profile || {
-                    name: `${symbol} Corporation`,
-                    country: 'US',
-                    industry: 'Technology',
-                    weburl: `https://www.${symbol.toLowerCase()}.com`,
-                    logo: `https://logo.clearbit.com/${symbol.toLowerCase()}.com`,
-                    marketCapitalization: 100000000000,
-                    shareOutstanding: 1000000000,
-                    ticker: symbol
-                };
-                break;
-            case 'news':
-                demoResult = [
-                    {
-                        category: 'general',
-                        datetime: Date.now() - 3600000,
-                        headline: `${symbol} Reports Strong Quarterly Results`,
-                        id: 1,
-                        image: '',
-                        related: symbol,
-                        source: 'Demo News',
-                        summary: `Demo news article for ${symbol} showing strong performance in the latest quarter.`,
-                        url: `https://example.com/${symbol.toLowerCase()}-news-1`
-                    },
-                    {
-                        category: 'general',
-                        datetime: Date.now() - 7200000,
-                        headline: `${symbol} Announces New Strategic Initiative`,
-                        id: 2,
-                        image: '',
-                        related: symbol,
-                        source: 'Demo News',
-                        summary: `Demo news article for ${symbol} announcing new strategic initiatives.`,
-                        url: `https://example.com/${symbol.toLowerCase()}-news-2`
-                    }
-                ];
-                break;
-            case 'recommendation':
-                demoResult = [
-                    {
-                        symbol: symbol,
-                        date: new Date().toISOString().split('T')[0],
-                        period: '0m',
-                        strongBuy: 5,
-                        buy: 8,
-                        hold: 3,
-                        sell: 1,
-                        strongSell: 0
-                    }
-                ];
-                break;
-            default:
-                demoResult = demoData[symbol] || {
-                    c: 100.00, d: 0.50, dp: 0.50, h: 101.00, l: 99.50, o: 100.50, pc: 99.50, t: Date.now()
-                };
-        }
-        
-        return res.status(200).json({
-            ...(Array.isArray(demoResult) ? {} : demoResult),
-            data: Array.isArray(demoResult) ? demoResult : undefined,
+    if (!hasApiKey) {
+        return res.status(503).json({
+            error: 'Service indisponible',
+            message: 'Aucune clé API configurée. Veuillez configurer au moins une des variables d\'environnement suivantes : FINNHUB_API_KEY, ALPHA_VANTAGE_API_KEY, ou TWELVE_DATA_API_KEY',
+            requiredKeys: ['FINNHUB_API_KEY', 'ALPHA_VANTAGE_API_KEY', 'TWELVE_DATA_API_KEY'],
             symbol,
-            endpoint,
-            source: 'demo',
-            timestamp: new Date().toISOString(),
-            message: 'Données de démonstration - Configurez au moins une clé API (FINNHUB_API_KEY ou ALPHA_VANTAGE_API_KEY) pour des données réelles'
+            endpoint
         });
     }
 
