@@ -43,7 +43,7 @@ class EmmaDashboardIntegration {
   createEmmaInterface() {
     const askEmmaTab = document.querySelector('#ask-emma-tab');
     if (!askEmmaTab) {
-      console.error('Onglet Ask Emma non trouvé');
+      // Silencieux si l'onglet n'existe pas dans ce contexte (ex: dashboard React)
       return;
     }
 

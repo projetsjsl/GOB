@@ -120,7 +120,7 @@
             // Données Finnhub
             const fetchStockData = async (ticker) => {
                 try {
-                    const response = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=quote&symbol=${ticker}`);
+                    const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`);
                     if (!response.ok) throw new Error(`API error: ${response.status}`);
                     return await response.json();
                 } catch (error) {
@@ -153,7 +153,7 @@
             const fetchNews = async () => {
                 try {
                     const tickersQuery = tickers.join(' OR ');
-                    const response = await fetch(`${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=20`);
+                    const response = await fetch(`${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=20&strict=true`);
                     if (!response.ok) throw new Error(`News API error: ${response.status}`);
                     const data = await response.json();
                     setNewsData(data.articles || []);

@@ -40,8 +40,8 @@ async function runTests() {
     await testAPI('/api/status', 'Statut des APIs (sans test)');
     await testAPI('/api/status?test=true', 'Statut des APIs (avec test)');
     
-    // Test API News
-    await testAPI('/api/news?q=CVS OR MSFT&limit=5', 'API News multi-sources');
+    // Test API News (mode strict)
+    await testAPI('/api/news?q=CVS OR MSFT&limit=5&strict=true', 'API News multi-sources (strict)');
     
     // Test API Market Data (nouvelle API unifiée)
     await testAPI('/api/marketdata?endpoint=quote&symbol=AAPL&source=yahoo', 'API Market Data - Yahoo Finance Quote');
@@ -49,10 +49,10 @@ async function runTests() {
     await testAPI('/api/marketdata?endpoint=profile&symbol=CVS&source=alpha', 'API Market Data - Alpha Vantage Profile');
     await testAPI('/api/marketdata?endpoint=news&symbol=AAPL&source=finnhub', 'API Market Data - Finnhub News');
     
-    // Test API Finnhub (ancienne - pour compatibilité)
-    await testAPI('/api/finnhub?endpoint=quote&symbol=AAPL', 'API Finnhub - Quote (legacy)');
-    await testAPI('/api/finnhub?endpoint=profile&symbol=MSFT', 'API Finnhub - Profile (legacy)');
-    await testAPI('/api/finnhub?endpoint=news&symbol=CVS', 'API Finnhub - News (legacy)');
+    // Test API Marketdata (migration depuis Finnhub)
+    await testAPI('/api/marketdata?endpoint=quote&symbol=AAPL&source=auto', 'API Marketdata - Quote');
+    await testAPI('/api/marketdata?endpoint=profile&symbol=MSFT&source=auto', 'API Marketdata - Profile');
+    await testAPI('/api/marketdata?endpoint=news&symbol=CVS&source=auto', 'API Marketdata - News');
     
     // Test API Fallback
     await testAPI('/api/fallback?type=stock&symbol=AAPL', 'API Fallback - Stock');
@@ -72,8 +72,4 @@ async function runTests() {
 }
 
 // Exécuter les tests si le script est appelé directement
-if (typeof window === 'undefined') {
-    runTests().catch(console.error);
-}
-
-module.exports = { testAPI, runTests };
+runTests().catch(console.error);
