@@ -192,15 +192,15 @@ const GOB = () => {
   const [currentTime, setCurrentTime] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMarketOpen, setIsMarketOpen] = useState(false);
-  const [marketData, setMarketData] = useState({
-    'SPX': { symbol: 'S&P 500', price: 4567.89, change: 0.85, changePercent: 0.85 },
-    'IXIC': { symbol: 'NASDAQ', price: 14234.56, change: 1.23, changePercent: 1.23 },
-    'DJI': { symbol: 'DOW JONES', price: 34567.89, change: -0.45, changePercent: -0.45 },
-    'TSX': { symbol: 'TSX', price: 20123.45, change: 0.67, changePercent: 0.67 },
-    'EURUSD': { symbol: 'EUR/USD', price: 1.0845, change: 0.12, changePercent: 0.12 },
-    'GOLD': { symbol: 'GOLD', price: 2034.50, change: -0.34, changePercent: -0.34 },
-    'OIL': { symbol: 'OIL', price: 78.45, change: 1.56, changePercent: 1.56 },
-    'BTCUSD': { symbol: 'BITCOIN', price: 43567.89, change: 2.34, changePercent: 2.34 }
+  const [marketData, setMarketData] = useState<Record<string, { symbol: string; price: number | null; change: number | null; changePercent: number | null }>>({
+    'SPX': { symbol: 'S&P 500', price: null, change: null, changePercent: null },
+    'IXIC': { symbol: 'NASDAQ', price: null, change: null, changePercent: null },
+    'DJI': { symbol: 'DOW JONES', price: null, change: null, changePercent: null },
+    'TSX': { symbol: 'TSX', price: null, change: null, changePercent: null },
+    'EURUSD': { symbol: 'EUR/USD', price: null, change: null, changePercent: null },
+    'GOLD': { symbol: 'GOLD', price: null, change: null, changePercent: null },
+    'OIL': { symbol: 'OIL', price: null, change: null, changePercent: null },
+    'BTCUSD': { symbol: 'BITCOIN', price: null, change: null, changePercent: null }
   });
   const [showWelcome, setShowWelcome] = useState(false);
 
@@ -211,37 +211,7 @@ const GOB = () => {
   const [useEmoji, setUseEmoji] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState('🌐');
 
-  // Fonction pour générer des données de marché réalistes
-  const generateRealisticMarketData = () => {
-    const baseData = {
-      'SPX': { basePrice: 4567.89, volatility: 0.02 },
-      'IXIC': { basePrice: 14234.56, volatility: 0.025 },
-      'DJI': { basePrice: 34567.89, volatility: 0.015 },
-      'TSX': { basePrice: 20123.45, volatility: 0.018 },
-      'EURUSD': { basePrice: 1.0845, volatility: 0.001 },
-      'GOLD': { basePrice: 2034.50, volatility: 0.01 },
-      'OIL': { basePrice: 78.45, volatility: 0.02 },
-      'BTCUSD': { basePrice: 43567.89, volatility: 0.03 }
-    };
-
-    const newMarketData: any = {};
-    
-    Object.entries(baseData).forEach(([symbol, config]) => {
-      const randomChange = (Math.random() - 0.5) * 2 * config.volatility;
-      const newPrice = config.basePrice * (1 + randomChange);
-      const change = newPrice - config.basePrice;
-      const changePercent = (change / config.basePrice) * 100;
-      
-      newMarketData[symbol] = {
-        symbol: getSymbolName(symbol),
-        price: newPrice,
-        change: change,
-        changePercent: changePercent
-      };
-    });
-    
-    setMarketData(newMarketData);
-  };
+  // Suppression de toute génération de données simulées: afficher vide si indisponible
 
   // Fonction pour récupérer les données des indices boursiers
   const fetchMarketData = async () => {
@@ -271,13 +241,9 @@ const GOB = () => {
       
       if (hasRealData && Object.keys(newMarketData).length > 0) {
         setMarketData(prev => ({ ...prev, ...newMarketData }));
-      } else {
-        // Utiliser des données réalistes générées si l'API ne fonctionne pas
-        generateRealisticMarketData();
       }
     } catch (error) {
       console.log('Erreur lors de la récupération des données de marché:', error);
-      generateRealisticMarketData();
     }
   };
 
@@ -664,13 +630,13 @@ const GOB = () => {
             {Object.entries(marketData).map(([key, data]) => (
               <div key={key} className="flex items-center space-x-2 whitespace-nowrap">
                 <span className="text-xs font-semibold">{data.symbol}</span>
-                <span className={`font-bold ${data.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {data.changePercent >= 0 ? '+' : ''}{data.changePercent.toFixed(2)}%
+                <span className={`font-bold ${((data.changePercent ?? 0) >= 0) ? 'text-green-400' : 'text-red-400'}`}>
+                  {(data.changePercent ?? 0) >= 0 ? '+' : ''}{(data.changePercent ?? 0).toFixed(2)}%
                 </span>
                 <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  {key === 'EURUSD' ? data.price.toFixed(4) : 
-                   key === 'GOLD' || key === 'OIL' || key === 'BTCUSD' ? `$${data.price.toLocaleString()}` :
-                   data.price.toLocaleString()}
+                  {key === 'EURUSD' ? (data.price ?? 0).toFixed(4) : 
+                   key === 'GOLD' || key === 'OIL' || key === 'BTCUSD' ? `$${(data.price ?? 0).toLocaleString()}` :
+                   (data.price ?? 0).toLocaleString()}
                 </span>
               </div>
             ))}

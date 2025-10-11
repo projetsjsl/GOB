@@ -11,56 +11,7 @@ export default async function handler(req, res) {
     const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY || 'YOUR_ALPHA_VANTAGE_API_KEY';
     const TWELVE_DATA_API_KEY = process.env.TWELVE_DATA_API_KEY || 'YOUR_TWELVE_DATA_API_KEY';
     
-    // Données de démonstration étendues si pas de clé API
-    const demoData = {
-        'SPX': { c: 4567.89, d: 38.75, dp: 0.85, h: 4580.12, l: 4550.23, o: 4560.45, pc: 4529.14, t: Date.now() },
-        'IXIC': { c: 14234.56, d: 175.23, dp: 1.23, h: 14280.45, l: 14150.67, o: 14200.12, pc: 14059.33, t: Date.now() },
-        'DJI': { c: 34567.89, d: -156.78, dp: -0.45, h: 34750.12, l: 34500.45, o: 34650.67, pc: 34724.67, t: Date.now() },
-        'TSX': { c: 20123.45, d: 134.56, dp: 0.67, h: 20180.23, l: 20050.12, o: 20100.34, pc: 19988.89, t: Date.now() },
-        'EURUSD': { c: 1.0845, d: 0.0013, dp: 0.12, h: 1.0856, l: 1.0823, o: 1.0834, pc: 1.0832, t: Date.now() },
-        'GOLD': { c: 2034.50, d: -6.89, dp: -0.34, h: 2045.67, l: 2025.34, o: 2038.45, pc: 2041.39, t: Date.now() },
-        'OIL': { c: 78.45, d: 1.23, dp: 1.56, h: 79.12, l: 77.89, o: 78.12, pc: 77.22, t: Date.now() },
-        'BTCUSD': { c: 43567.89, d: 998.45, dp: 2.34, h: 44123.45, l: 42890.12, o: 43234.56, pc: 42569.44, t: Date.now() },
-        'CVS': { 
-            c: 78.45, d: 1.23, dp: 1.59, h: 79.12, l: 77.89, o: 78.12, pc: 77.22, t: Date.now(),
-            profile: {
-                name: 'CVS Health Corporation',
-                country: 'US',
-                industry: 'Healthcare Services',
-                weburl: 'https://www.cvshealth.com',
-                logo: 'https://logo.clearbit.com/cvshealth.com',
-                marketCapitalization: 100000000000,
-                shareOutstanding: 1300000000,
-                ticker: 'CVS'
-            }
-        },
-        'MSFT': { 
-            c: 378.85, d: -2.15, dp: -0.56, h: 381.20, l: 377.45, o: 380.00, pc: 381.00, t: Date.now(),
-            profile: {
-                name: 'Microsoft Corporation',
-                country: 'US',
-                industry: 'Software',
-                weburl: 'https://www.microsoft.com',
-                logo: 'https://logo.clearbit.com/microsoft.com',
-                marketCapitalization: 2800000000000,
-                shareOutstanding: 7400000000,
-                ticker: 'MSFT'
-            }
-        },
-        'AAPL': { 
-            c: 175.43, d: 0.87, dp: 0.50, h: 176.20, l: 174.89, o: 175.10, pc: 174.56, t: Date.now(),
-            profile: {
-                name: 'Apple Inc.',
-                country: 'US',
-                industry: 'Technology Hardware',
-                weburl: 'https://www.apple.com',
-                logo: 'https://logo.clearbit.com/apple.com',
-                marketCapitalization: 2700000000000,
-                shareOutstanding: 15500000000,
-                ticker: 'AAPL'
-            }
-        }
-    };
+    // Suppression de toute donnée de démonstration: pas de valeurs synthétiques
     
     // Fonction pour récupérer les données depuis Yahoo Finance (yfinance)
     const fetchYahooFinance = async (symbol, endpoint) => {
@@ -90,18 +41,8 @@ export default async function handler(req, res) {
                     };
                     
                 case 'profile':
-                    // Yahoo Finance ne fournit pas de profil détaillé via cette API
-                    // Retourner des données basiques
-                    return {
-                        name: `${symbol} Corporation`,
-                        country: 'US',
-                        industry: 'Technology',
-                        weburl: `https://finance.yahoo.com/quote/${symbol}`,
-                        logo: `https://logo.clearbit.com/${symbol.toLowerCase()}.com`,
-                        marketCapitalization: 100000000000,
-                        shareOutstanding: 1000000000,
-                        ticker: symbol
-                    };
+                    // Yahoo Finance n'expose pas un profil fiable ici: lever une erreur pour éviter du faux contenu
+                    throw new Error('Profil non disponible via Yahoo Finance');
                     
                 default:
                     throw new Error(`Endpoint ${endpoint} non supporté par Yahoo Finance`);
@@ -247,11 +188,18 @@ export default async function handler(req, res) {
                 case 'profile':
                     url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
                     break;
-                case 'news':
+                case 'news': {
+                    // News générales (category=general)
+                    const category = params?.category || 'general';
+                    url = `https://finnhub.io/api/v1/news?category=${encodeURIComponent(category)}&token=${FINNHUB_API_KEY}`;
+                    break;
+                }
+                case 'company-news': {
                     const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                     const to = new Date().toISOString().split('T')[0];
                     url = `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`;
                     break;
+                }
                 case 'recommendation':
                     url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
                     break;
@@ -275,6 +223,16 @@ export default async function handler(req, res) {
                 case 'search':
                     url = `https://finnhub.io/api/v1/search?q=${symbol}&token=${FINNHUB_API_KEY}`;
                     break;
+                case 'calendar/economic': {
+                    const from = params?.from;
+                    const to = params?.to;
+                    const search = new URLSearchParams();
+                    if (from) search.append('from', from);
+                    if (to) search.append('to', to);
+                    search.append('token', FINNHUB_API_KEY);
+                    url = `https://finnhub.io/api/v1/calendar/economic?${search.toString()}`;
+                    break;
+                }
                 default:
                     throw new Error(`Endpoint ${endpoint} non supporté par Finnhub`);
             }
