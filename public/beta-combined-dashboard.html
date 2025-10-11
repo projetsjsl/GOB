@@ -5420,6 +5420,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 const [loadingIntelli, setLoadingIntelli] = useState(true);
                 const [connected, setConnected] = useState(false);
                 const [lastUpdateIntelli, setLastUpdateIntelli] = useState(null);
+                // Helppop: visibilité et liste des violations détectées
+                const [showHelp, setShowHelp] = useState(false);
+                const [violations, setViolations] = useState([]);
 
                 // Génération de données mock
                 const generateMockData = (symbol) => {
@@ -5528,6 +5531,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             setLoadingIntelli(false);
                             const mockData = generateMockData(selectedStock);
                             setStockDataIntelli(mockData);
+                            // Enregistrer une violation visible dans l'helppop
+                            setViolations(prev => [
+                                ...prev,
+                                { code: 'data_fetch_error', severity: 'medium', message: 'Échec de récupération API. Données mock utilisées.' }
+                            ]);
+                            setShowHelp(true);
                         }
                     };
                     fetchData();
@@ -5539,6 +5548,39 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 useEffect(() => {
                     const timer = setInterval(() => setTime(new Date()), 1000);
                     return () => clearInterval(timer);
+                }, []);
+
+                // Diagnostics environnementaux (violations) + ouverture auto du HelpPop
+                useEffect(() => {
+                    const newViolations = [];
+                    try {
+                        if (typeof Recharts === 'undefined') {
+                            newViolations.push({
+                                code: 'recharts_missing',
+                                severity: 'high',
+                                message: 'Recharts non chargé — graphiques désactivés.'
+                            });
+                        }
+                    } catch (_) {
+                        newViolations.push({ code: 'recharts_missing', severity: 'high', message: 'Recharts non chargé — graphiques désactivés.' });
+                    }
+
+                    try {
+                        if (typeof lucideReact === 'undefined') {
+                            newViolations.push({
+                                code: 'lucide_missing',
+                                severity: 'medium',
+                                message: 'Bibliothèque des icônes (lucide-react UMD) indisponible.'
+                            });
+                        }
+                    } catch (_) {
+                        newViolations.push({ code: 'lucide_missing', severity: 'medium', message: 'Bibliothèque des icônes (lucide-react UMD) indisponible.' });
+                    }
+
+                    setViolations(newViolations);
+                    if (newViolations.length > 0) {
+                        setShowHelp(true);
+                    }
                 }, []);
 
                 const stocks = [
@@ -5726,7 +5768,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-1">
+                                <div className="flex gap-1">
                                         <button className={`p-1.5 border rounded-md transition-all ${
                                             isDarkMode 
                                                 ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
@@ -5748,6 +5790,77 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         }`}>
                                             <LucideIcon name="Settings" className="w-3 h-3 text-gray-500" />
                                         </button>
+                                    {/* HelpPop / Violations */}
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setShowHelp(!showHelp)}
+                                            className={`p-1.5 border rounded-md transition-all ${
+                                                isDarkMode 
+                                                    ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
+                                                    : 'bg-white hover:bg-gray-100 border-gray-300'
+                                            }`}
+                                            title={violations.length ? 'Diagnostics: problèmes détectés' : 'Aide IntelliStocks'}
+                                        >
+                                            <div className="relative">
+                                                <LucideIcon name={violations.length ? 'AlertTriangle' : 'HelpCircle'} className={`w-3 h-3 ${violations.length ? 'text-yellow-500' : 'text-gray-500'}`} />
+                                                {violations.length > 0 && (
+                                                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                                                )}
+                                            </div>
+                                        </button>
+
+                                        {showHelp && (
+                                            <div className={`absolute right-0 mt-2 w-80 border rounded-xl shadow-2xl z-50 ${
+                                                isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                            }`}>
+                                                <div className={`p-3 border-b flex items-center justify-between gap-2 ${isDarkMode ? 'border-neutral-800' : 'border-gray-200'}`}>
+                                                    <div className="flex items-center gap-2">
+                                                        <LucideIcon name="LifeBuoy" className="w-4 h-4 text-blue-500" />
+                                                        <div>
+                                                            <div className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Aide & diagnostics IntelliStocks</div>
+                                                            <div className="text-[10px] text-gray-500">Mode Démo Hybride • FMP + Perplexity</div>
+                                                        </div>
+                                                    </div>
+                                                    <button onClick={() => setShowHelp(false)} className={`p-1 rounded ${isDarkMode ? 'hover:bg-neutral-800' : 'hover:bg-gray-100'}`}>
+                                                        <LucideIcon name="X" className="w-3 h-3 text-gray-500" />
+                                                    </button>
+                                                </div>
+                                                <div className="p-3 space-y-2 text-[11px]">
+                                                    {violations.length > 0 ? (
+                                                        <div>
+                                                            <div className={`mb-1 font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Problèmes détectés</div>
+                                                            <ul className="space-y-1">
+                                                                {violations.map((v, i) => (
+                                                                    <li key={i} className={`p-2 rounded border ${
+                                                                        v.severity === 'high' ? (isDarkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800') :
+                                                                        v.severity === 'medium' ? (isDarkMode ? 'bg-yellow-900/30 border-yellow-800 text-yellow-200' : 'bg-yellow-50 border-yellow-200 text-yellow-800') :
+                                                                        (isDarkMode ? 'bg-gray-900/30 border-gray-800 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-800')
+                                                                    }`}>
+                                                                        {v.message}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    ) : (
+                                                        <div className={`p-2 rounded border ${isDarkMode ? 'bg-emerald-900/20 border-emerald-800 text-emerald-200' : 'bg-emerald-50 border-emerald-200 text-emerald-800'}`}>
+                                                            Aucun problème détecté.
+                                                        </div>
+                                                    )}
+
+                                                    <div className={`pt-1 border-t ${isDarkMode ? 'border-neutral-800' : 'border-gray-200'}`} />
+                                                    <div className="space-y-1">
+                                                        <div className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Conseils rapides</div>
+                                                        <ul className="list-disc pl-4 space-y-1 text-gray-500">
+                                                            <li>Si Recharts est manquant, vérifiez le script UMD chargé en haut de la page.</li>
+                                                            <li>Les graphiques sont désactivés en mode démo; les données sont simulées.</li>
+                                                            <li>Actualisez avec le bouton rafraîchir pour recharger les données mock.</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                                     </div>
                                 </div>
                             </div>
@@ -5794,7 +5907,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
 
                                     <div className="flex gap-1 mt-1.5">
-                                        {['1D', '1W', '1M', '3M', '6M', '1A'].map((period) => (
+                                    {['1D', '1W', '1M', '3M', '6M', '1A'].map((period) => (
                                             <button
                                                 key={period}
                                                 onClick={() => setTimeframe(period)}
