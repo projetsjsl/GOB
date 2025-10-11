@@ -2916,7 +2916,20 @@ Mission principale : Accompagner une équipe de gestionnaires de portefeuille qu
 « De la macro à la micro, des marchés aux titres — j'analyse avec rigueur et pragmatisme. »
 
 🚀 CAPACITÉS EN TEMPS RÉEL:
-Tu as accès aux données de marché en temps réel via les APIs Finnhub, Alpha Vantage et autres sources. Tu peux analyser les prix actuels, volumes, variations et actualités financières. Utilise toujours ces données pour tes analyses et ne dis jamais que tu n'as pas accès aux données actuelles.
+Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance et autres sources. Tu peux faire des requêtes en temps réel pour :
+
+📊 DONNÉES DE MARCHÉ:
+- getMarketData(symbol, endpoint, source) : Prix, profils, actualités, recommandations, données financières
+- Sources disponibles : yahoo (gratuit), alpha (Alpha Vantage), finnhub (Finnhub), auto (sélection automatique)
+- Endpoints : quote (prix), profile (entreprise), news (actualités), recommendation (analystes), financials (états financiers)
+
+📰 ACTUALITÉS:
+- getNewsData(query, limit) : Actualités financières récentes de toutes sources
+
+🔧 DIAGNOSTIC:
+- getApiStatus() : Vérifier le statut de toutes les APIs
+
+⚠️ IMPORTANT: Utilise ces fonctions pour récupérer des données fraîches. Ne dis JAMAIS que tu n'as pas accès aux données actuelles. Fais des requêtes en temps réel !
 
 🏢 Contexte Organisationnel
 L'équipe que tu assistes :
@@ -3182,7 +3195,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             // Message de bienvenue initial seulement si pas de messages sauvegardés
                             setEmmaMessages([{
                                 type: 'emma',
-                                content: 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. Je peux vous aider avec l\'analyse, la recherche financière et bien plus. Comment puis-je assister ?',
+                                content: 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**NOUVELLES CAPACITÉS :**\n- Accès DIRECT aux APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance\n- Requêtes en temps réel pour n\'importe quel symbole\n- Données de marché, actualités, profils d\'entreprise, recommandations d\'analystes\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?',
                                 timestamp: new Date().toISOString()
                             }]);
                         }
@@ -3428,7 +3441,7 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         
                         // Utiliser l'API avec function calling si activé
                         if (useFunctionCalling) {
-                            console.log('🔧 Utilisation de Gemini Function Calling (chat)');
+                            console.log('🔧 Utilisation de Gemini Function Calling (chat) avec accès aux APIs');
                             response = await fetch('/api/gemini/chat', {
                                 method: 'POST',
                                 headers: {
@@ -3436,13 +3449,65 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                                 },
                                 body: JSON.stringify({
                                     messages: [
-                                        // Historique minimal (multi-tours), on peut l’étendre si besoin
+                                        // Historique minimal (multi-tours), on peut l'étendre si besoin
                                         ...emmaMessages.map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.content })),
                                         { role: 'user', content: userMessage }
                                     ],
                                     temperature: emmaTemperature,
                                     maxTokens: emmaMaxTokens,
-                                    systemPrompt: emmaPrompt
+                                    systemPrompt: emmaPrompt,
+                                    functions: [
+                                        {
+                                            name: 'getMarketData',
+                                            description: 'Récupère les données de marché en temps réel pour un symbole donné',
+                                            parameters: {
+                                                type: 'object',
+                                                properties: {
+                                                    symbol: {
+                                                        type: 'string',
+                                                        description: 'Symbole du titre (ex: AAPL, MSFT, GOOGL)'
+                                                    },
+                                                    endpoint: {
+                                                        type: 'string',
+                                                        enum: ['quote', 'profile', 'news', 'recommendation', 'peers', 'earnings', 'financials'],
+                                                        description: 'Type de données à récupérer'
+                                                    },
+                                                    source: {
+                                                        type: 'string',
+                                                        enum: ['auto', 'yahoo', 'alpha', 'finnhub'],
+                                                        description: 'Source de données (auto = sélection automatique)'
+                                                    }
+                                                },
+                                                required: ['symbol', 'endpoint']
+                                            }
+                                        },
+                                        {
+                                            name: 'getNewsData',
+                                            description: 'Récupère les actualités financières récentes',
+                                            parameters: {
+                                                type: 'object',
+                                                properties: {
+                                                    query: {
+                                                        type: 'string',
+                                                        description: 'Termes de recherche pour les actualités'
+                                                    },
+                                                    limit: {
+                                                        type: 'number',
+                                                        description: 'Nombre maximum d\'articles à récupérer (défaut: 10)'
+                                                    }
+                                                },
+                                                required: ['query']
+                                            }
+                                        },
+                                        {
+                                            name: 'getApiStatus',
+                                            description: 'Vérifie le statut de toutes les APIs disponibles',
+                                            parameters: {
+                                                type: 'object',
+                                                properties: {}
+                                            }
+                                        }
+                                    ]
                                 })
                             });
                         } else {
@@ -3967,10 +4032,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    🚀 Accès aux données en temps réel (Finnhub, Alpha Vantage, News)
+                                    🚀 Accès DIRECT aux APIs : Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance
+                                </p>
+                                <p className={`text-xs transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                                }`}>
+                                    💡 Emma peut faire des requêtes en temps réel pour n'importe quel symbole
                                 </p>
                             </div>
                             <div className="flex gap-2">
+                                <button
+                                    onClick={() => setEmmaInput("Quel est le prix actuel d'AAPL ?")}
+                                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm"
+                                >
+                                    📊 Test AAPL
+                                </button>
+                                <button
+                                    onClick={() => setEmmaInput("Récupère les actualités récentes sur Tesla")}
+                                    className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
+                                >
+                                    📰 Test News
+                                </button>
                                 <button
                                     onClick={clearChat}
                                     className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
