@@ -6222,17 +6222,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // Helppop: visibilité et liste des violations détectées
                 const [showHelp, setShowHelp] = useState(false);
                 const [violations, setViolations] = useState([]);
-                // Screener
-                const [showScreener, setShowScreener] = useState(false);
-                const [screenerResults, setScreenerResults] = useState([]);
-                const [screenerFilters, setScreenerFilters] = useState({
-                    minMarketCap: 0,
-                    maxPE: 50,
-                    minROE: 0,
-                    maxDebtEquity: 2,
-                    sector: 'all'
-                });
-                const [loadingScreener, setLoadingScreener] = useState(false);
 
                 // Génération de données mock
                 const generateMockData = (symbol) => {
@@ -6705,14 +6694,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     }
                 };
                 
-                // Fonction pour exécuter le screener
-                const runScreener = async () => {
+                // Fonction pour exécuter le screener (utilise la liste de stocks fournie)
+                const runScreenerForStocks = async (stocksList) => {
                     setLoadingScreener(true);
                     try {
                         const results = [];
                         
-                        // Parcourir tous les stocks et récupérer leurs données
-                        for (const stock of stocks) {
+                        // Parcourir les stocks fournis et récupérer leurs données
+                        for (const stock of stocksList) {
                             try {
                                 const [quoteRes, profileRes, ratiosRes] = await Promise.allSettled([
                                     fetch(`/api/marketdata?endpoint=quote&symbol=${stock.symbol}&source=auto`),
@@ -6753,7 +6742,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }
                         
                         setScreenerResults(results);
-                        console.log(`✅ Screener: ${results.length} résultats trouvés`);
+                        console.log(`✅ Screener: ${results.length} résultats trouvés sur ${stocksList.length} titres`);
                     } catch (error) {
                         console.error('Erreur screener:', error);
                     } finally {
@@ -6953,7 +6942,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                                 
                                 <button
-                                    onClick={runScreener}
+                                    onClick={() => runScreenerForStocks(stocks)}
                                     disabled={loadingScreener}
                                     className={`w-full py-2 rounded text-sm font-semibold transition-colors ${
                                         loadingScreener
