@@ -6222,6 +6222,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // Helppop: visibilité et liste des violations détectées
                 const [showHelp, setShowHelp] = useState(false);
                 const [violations, setViolations] = useState([]);
+                // Screener
+                const [showScreener, setShowScreener] = useState(false);
+                const [screenerResults, setScreenerResults] = useState([]);
+                const [screenerFilters, setScreenerFilters] = useState({
+                    minMarketCap: 0,
+                    maxPE: 50,
+                    minROE: 0,
+                    maxDebtEquity: 2,
+                    sector: 'all'
+                });
+                const [loadingScreener, setLoadingScreener] = useState(false);
 
                 // Génération de données mock
                 const generateMockData = (symbol) => {
@@ -6559,7 +6570,114 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     { symbol: 'MSFT', name: 'Microsoft Corp.' },
                     { symbol: 'NVDA', name: 'NVIDIA Corp.' },
                     { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+                    { symbol: 'META', name: 'Meta Platforms Inc.' },
+                    { symbol: 'NFLX', name: 'Netflix Inc.' },
+                    { symbol: 'AMD', name: 'Advanced Micro Devices' },
+                    { symbol: 'INTC', name: 'Intel Corporation' },
                 ];
+                
+                // Fonction pour déterminer la couleur d'un indicateur
+                const getMetricColor = (metric, value) => {
+                    if (value == null || value === 'N/A') return 'text-gray-400';
+                    
+                    const v = typeof value === 'string' ? parseFloat(value) : value;
+                    
+                    switch(metric) {
+                        case 'PE':
+                            // P/E: <15 excellent, 15-25 bon, >25 élevé
+                            if (v < 15) return 'text-emerald-500';
+                            if (v < 25) return 'text-blue-500';
+                            return 'text-orange-500';
+                        case 'PEG':
+                            // PEG: <1 excellent, 1-2 bon, >2 élevé
+                            if (v < 1) return 'text-emerald-500';
+                            if (v < 2) return 'text-blue-500';
+                            return 'text-orange-500';
+                        case 'ROE':
+                            // ROE: >20% excellent, 10-20% bon, <10% faible
+                            if (v > 20) return 'text-emerald-500';
+                            if (v > 10) return 'text-blue-500';
+                            return 'text-orange-500';
+                        case 'ROA':
+                            // ROA: >10% excellent, 5-10% bon, <5% faible
+                            if (v > 10) return 'text-emerald-500';
+                            if (v > 5) return 'text-blue-500';
+                            return 'text-orange-500';
+                        case 'DE':
+                            // D/E: <0.5 excellent, 0.5-1 bon, >1 élevé
+                            if (v < 0.5) return 'text-emerald-500';
+                            if (v < 1) return 'text-blue-500';
+                            return 'text-red-500';
+                        case 'Margin':
+                            // Marge: >20% excellent, 10-20% bon, <10% faible
+                            if (v > 20) return 'text-emerald-500';
+                            if (v > 10) return 'text-blue-500';
+                            return 'text-orange-500';
+                        case 'Beta':
+                            // Beta: <1 moins volatil, 1-1.5 modéré, >1.5 volatil
+                            if (v < 1) return 'text-emerald-500';
+                            if (v < 1.5) return 'text-blue-500';
+                            return 'text-orange-500';
+                        default:
+                            return 'text-gray-400';
+                    }
+                };
+                
+                // Fonction pour exécuter le screener
+                const runScreener = async () => {
+                    setLoadingScreener(true);
+                    try {
+                        const results = [];
+                        
+                        // Parcourir tous les stocks et récupérer leurs données
+                        for (const stock of stocks) {
+                            try {
+                                const [quoteRes, profileRes, ratiosRes] = await Promise.allSettled([
+                                    fetch(`/api/marketdata?endpoint=quote&symbol=${stock.symbol}&source=auto`),
+                                    fetch(`/api/fmp?endpoint=profile&symbol=${stock.symbol}`),
+                                    fetch(`/api/fmp?endpoint=ratios&symbol=${stock.symbol}`)
+                                ]);
+                                
+                                const quote = quoteRes.status === 'fulfilled' && quoteRes.value.ok 
+                                    ? await quoteRes.value.json() : null;
+                                const profile = profileRes.status === 'fulfilled' && profileRes.value.ok 
+                                    ? await profileRes.value.json() : null;
+                                const ratios = ratiosRes.status === 'fulfilled' && ratiosRes.value.ok 
+                                    ? await ratiosRes.value.json() : null;
+                                
+                                const stockData = {
+                                    symbol: stock.symbol,
+                                    name: stock.name,
+                                    price: quote?.c || 0,
+                                    change: quote?.dp || 0,
+                                    marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0,
+                                    pe: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
+                                    roe: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
+                                    debtEquity: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
+                                    sector: profile?.data?.[0]?.sector || profile?.sector || 'Unknown'
+                                };
+                                
+                                // Appliquer les filtres
+                                if (stockData.marketCap >= screenerFilters.minMarketCap &&
+                                    (!stockData.pe || stockData.pe <= screenerFilters.maxPE) &&
+                                    (!stockData.roe || (stockData.roe * 100) >= screenerFilters.minROE) &&
+                                    (!stockData.debtEquity || stockData.debtEquity <= screenerFilters.maxDebtEquity) &&
+                                    (screenerFilters.sector === 'all' || stockData.sector === screenerFilters.sector)) {
+                                    results.push(stockData);
+                                }
+                            } catch (error) {
+                                console.error(`Erreur pour ${stock.symbol}:`, error);
+                            }
+                        }
+                        
+                        setScreenerResults(results);
+                        console.log(`✅ Screener: ${results.length} résultats trouvés`);
+                    } catch (error) {
+                        console.error('Erreur screener:', error);
+                    } finally {
+                        setLoadingScreener(false);
+                    }
+                };
 
                 const currentStock = stocks.find(s => s.symbol === selectedStock);
                 const quote = stockDataIntelli?.quote || {};
