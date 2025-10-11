@@ -5,6 +5,7 @@
 
 export default async function handler(req, res) {
     const { endpoint, symbol, limit = 10, source = 'auto' } = req.query;
+    const params = req.query;
     
     // Clés API multiples (à configurer dans les variables d'environnement Vercel)
     const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || 'YOUR_FINNHUB_API_KEY';
@@ -18,10 +19,25 @@ export default async function handler(req, res) {
         try {
             // Utiliser l'API Yahoo Finance non-officielle
             const baseUrl = 'https://query1.finance.yahoo.com/v8/finance/chart';
+            // Normaliser quelques symboles courants
+            const mapToYahooSymbol = (s) => {
+                const mapping = {
+                    'SPX': '^GSPC',
+                    'IXIC': '^IXIC',
+                    'DJI': '^DJI',
+                    'TSX': '^GSPTSE',
+                    'EURUSD': 'EURUSD=X',
+                    'GOLD': 'GC=F',
+                    'OIL': 'CL=F',
+                    'BTCUSD': 'BTC-USD'
+                };
+                return mapping[s] || s;
+            };
+            const yahooSymbol = mapToYahooSymbol(symbol);
             
             switch (endpoint) {
                 case 'quote':
-                    const response = await fetch(`${baseUrl}/${symbol}`);
+                    const response = await fetch(`${baseUrl}/${encodeURIComponent(yahooSymbol)}`);
                     if (!response.ok) throw new Error(`Yahoo Finance error: ${response.status}`);
                     
                     const data = await response.json();
@@ -288,8 +304,11 @@ export default async function handler(req, res) {
     const hasApiKey = (FINNHUB_API_KEY && FINNHUB_API_KEY !== 'YOUR_FINNHUB_API_KEY') || 
                      (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY') ||
                      (TWELVE_DATA_API_KEY && TWELVE_DATA_API_KEY !== 'YOUR_TWELVE_DATA_API_KEY');
-    
-    if (!hasApiKey) {
+
+    // Permettre l'accès anonyme via Yahoo Finance pour l'endpoint 'quote' (pas besoin de clé)
+    const allowAnonymousYahoo = endpoint === 'quote';
+
+    if (!hasApiKey && !allowAnonymousYahoo) {
         return res.status(503).json({
             error: 'Service indisponible',
             message: 'Aucune clé API configurée. Veuillez configurer au moins une des variables d\'environnement suivantes : FINNHUB_API_KEY, ALPHA_VANTAGE_API_KEY, ou TWELVE_DATA_API_KEY',
@@ -364,8 +383,18 @@ export default async function handler(req, res) {
                     }
                 }
                 
+                // Si aucun fallback n'a fonctionné, renvoyer un format unifié vide pour éviter du contenu fictif
                 if (!fallbackSuccess) {
-                    throw error; // Re-lancer l'erreur originale si tous les fallbacks échouent
+                    return res.status(200).json({
+                        c: null,
+                        d: null,
+                        dp: null,
+                        symbol,
+                        endpoint,
+                        source: 'none',
+                        timestamp: new Date().toISOString(),
+                        availableSources: ['yahoo', 'alpha', 'finnhub']
+                    });
                 }
             } else {
                 throw error; // Re-lancer l'erreur si source spécifique demandée

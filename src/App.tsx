@@ -225,7 +225,12 @@ const GOB = () => {
           const response = await fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`);
           const data = await response.json();
           
-          if (data.c && data.d !== undefined && data.dp !== undefined && data.source === 'finnhub') {
+          // Accepter toute source si les champs unifiés sont présents
+          if (
+            typeof data.c === 'number' &&
+            data.d !== undefined &&
+            data.dp !== undefined
+          ) {
             newMarketData[symbol] = {
               symbol: getSymbolName(symbol),
               price: data.c,
