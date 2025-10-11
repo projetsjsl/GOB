@@ -1647,6 +1647,16 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [newTicker, setNewTicker] = useState('');
                 const [watchlistStockData, setWatchlistStockData] = useState({});
                 const [watchlistLoading, setWatchlistLoading] = useState(false);
+                const [showScreener, setShowScreener] = useState(false);
+                const [screenerFilters, setScreenerFilters] = useState({
+                    minMarketCap: 0,
+                    maxPE: 50,
+                    minROE: 0,
+                    maxDebtEquity: 2,
+                    sector: 'all'
+                });
+                const [loadingScreener, setLoadingScreener] = useState(false);
+                const [screenerResults, setScreenerResults] = useState([]);
                 const WATCHLIST_FILE = '/dans-watchlist.json'; // servi depuis /public
                 
                 // Fonction pour exécuter le screener sur la watchlist
@@ -6771,6 +6781,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // Helppop: visibilité et liste des violations détectées
                 const [showHelp, setShowHelp] = useState(false);
                 const [violations, setViolations] = useState([]);
+                const [showScreener, setShowScreener] = useState(false);
+                const [screenerFilters, setScreenerFilters] = useState({
+                    minMarketCap: 0,
+                    maxPE: 50,
+                    minROE: 0,
+                    maxDebtEquity: 2,
+                    sector: 'all'
+                });
+                const [loadingScreener, setLoadingScreener] = useState(false);
+                const [screenerResults, setScreenerResults] = useState([]);
 
                 // Génération de données mock
                 const generateMockData = (symbol) => {
