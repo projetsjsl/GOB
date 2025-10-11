@@ -327,20 +327,11 @@ export default async function handler(req, res) {
                      (ALPHA_VANTAGE_API_KEY && ALPHA_VANTAGE_API_KEY !== 'YOUR_ALPHA_VANTAGE_API_KEY');
 
     if (!hasApiKey) {
-        // Mode démo sans clés: générer des actualités synthétiques à partir des tickers
-        const requestedTickers = q ? q.split(' OR ').map(t => t.trim().toUpperCase()) : [];
-        const defaultTickers = ['CVS', 'MSFT', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META'];
-        const tickers = requestedTickers.length > 0 ? requestedTickers : defaultTickers;
-        const demo = generateDemoNews(tickers).slice(0, limit);
-        return res.status(200).json({
-            articles: demo,
-            totalResults: demo.length,
-            query: q || 'finance',
-            timestamp: new Date().toISOString(),
-            source: 'demo',
-            sources: ['demo'],
-            message: 'Mode démo activé: aucune clé API configurée',
-            strict: isStrict
+        return res.status(503).json({
+            error: 'Service indisponible',
+            message: 'Aucune clé API configurée. Veuillez configurer au moins une des variables d\'environnement suivantes : NEWSAPI_KEY, FINNHUB_API_KEY, ou ALPHA_VANTAGE_API_KEY',
+            requiredKeys: ['NEWSAPI_KEY', 'FINNHUB_API_KEY', 'ALPHA_VANTAGE_API_KEY'],
+            query: q || 'finance'
         });
     }
 
