@@ -2929,6 +2929,14 @@ Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub,
 🔧 DIAGNOSTIC:
 - getApiStatus() : Vérifier le statut de toutes les APIs
 
+⚙️ PARAMÈTRES DE CONFIGURATION:
+Tu reçois à chaque requête tes paramètres de configuration actuels (température, longueur max, function calling). Adapte ton style de réponse selon ces paramètres :
+- Température basse (0.1-0.3) : Réponses factuelles, précises, techniques
+- Température moyenne (0.4-0.6) : Équilibré entre factuel et professionnel  
+- Température élevée (0.7-1.0) : Plus créatif, expressif, mais toujours professionnel
+- Longueur courte : Réponses concises et directes
+- Longueur longue : Analyses détaillées et complètes
+
 ⚠️ IMPORTANT: Utilise ces fonctions pour récupérer des données fraîches. Ne dis JAMAIS que tu n'as pas accès aux données actuelles. Fais des requêtes en temps réel !
 
 🏢 Contexte Organisationnel
@@ -3450,6 +3458,11 @@ ${currentNewsData.slice(0, 5).map(article =>
 ${Object.entries(currentApiStatus).map(([api, status]) => 
     `${api}: ${status.status} (${status.responseTime}ms)${status.error ? ` - ${status.error}` : ''}`
 ).join('\n')}
+
+⚙️ PARAMÈTRES DE CONFIGURATION ACTUELS:
+• Température: ${emmaTemperature} (${emmaTemperature <= 0.3 ? 'Analyses factuelles et précises' : emmaTemperature <= 0.5 ? 'Équilibré et professionnel' : emmaTemperature <= 0.7 ? 'Professionnel et naturel' : 'Créatif et expressif'})
+• Longueur max: ${emmaMaxTokens} tokens (${emmaMaxTokens <= 2048 ? 'Réponses concises' : emmaMaxTokens <= 4096 ? 'Réponses détaillées' : 'Réponses très détaillées'})
+• Function Calling: ${useFunctionCalling ? 'Activé' : 'Désactivé'}
 
 ⚠️ IMPORTANT: Utilisez ces données en temps réel pour vos analyses. Ne dites pas que vous n'avez pas accès aux données actuelles.
 `;
@@ -4058,6 +4071,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     isDarkMode ? 'text-gray-500' : 'text-gray-500'
                                 }`}>
                                     💡 Emma peut faire des requêtes en temps réel pour n'importe quel symbole
+                                </p>
+                                <p className={`text-xs transition-colors duration-300 ${
+                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                }`}>
+                                    ⚙️ Température: {emmaTemperature} • Longueur: {emmaMaxTokens} tokens • Function Calling: {useFunctionCalling ? 'ON' : 'OFF'}
                                 </p>
                             </div>
                             <div className="flex gap-2">
