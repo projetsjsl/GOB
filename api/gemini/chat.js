@@ -86,9 +86,22 @@ L'utilisateur utilise un dashboard financier avec :
     const fc = candidateParts.find(p => p?.functionCall && p.functionCall.name);
 
     if (!fc) {
-      // Pas de function call: renvoyer simplement le texte
+      // Pas de function call: renvoyer le texte avec sources génériques
       const text = candidateParts?.[0]?.text || initialData.text || '';
-      return res.status(200).json({ response: text, source: 'gemini', functionCalled: false });
+      
+      // Ajouter des sources génériques pour les réponses sans API
+      const sourcesAddition = `
+
+---
+**Sources:**
+• [Gemini AI](https://ai.google.dev/) - Analyse et réponse générée par l'IA
+• [Connaissances d'entraînement](https://ai.google.dev/gemini-api/docs) - Données d'entraînement jusqu'en 2024`;
+
+      return res.status(200).json({ 
+        response: text + sourcesAddition, 
+        source: 'gemini', 
+        functionCalled: false 
+      });
     }
 
     // Exécuter la fonction demandée
@@ -101,12 +114,26 @@ L'utilisateur utilise un dashboard financier avec :
       fnResult = { error: String(e?.message || e) };
     }
 
-    // Envoyer le résultat de fonction à Gemini pour finaliser la réponse
+    // Envoyer le résultat de fonction à Gemini pour finaliser la réponse avec sources
+    const sourcesPrompt = `IMPORTANT: À la fin de ta réponse, ajoute toujours une section "Sources:" avec des liens cliquables vers les sources utilisées.
+
+DONNÉES REÇUES AVEC SOURCES:
+${JSON.stringify(fnResult, null, 2)}
+
+FORMAT DES SOURCES (à ajouter à la fin):
+---
+**Sources:**
+• [Nom de la source](URL) - Description de ce qui a été récupéré
+• [Autre source](URL) - Description
+
+Utilise les sources fournies dans les données reçues pour créer des liens appropriés. Si des sources sont fournies dans les données, utilise-les. Sinon, suggère des sources génériques appropriées.`;
+
     const followUpResult = await model.generateContent({
       contents: [
         ...contents,
         { role: 'model', parts: [fc] },
-        { role: 'user', parts: [{ functionResponse: { name: fnName, response: fnResult } }] }
+        { role: 'user', parts: [{ functionResponse: { name: fnName, response: fnResult } }] },
+        { role: 'user', parts: [{ text: sourcesPrompt }] }
       ],
       generationConfig: {
         temperature,

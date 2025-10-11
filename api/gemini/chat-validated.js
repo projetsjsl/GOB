@@ -60,10 +60,19 @@ export default async function handler(req, res) {
     const fc = candidateParts.find(p => p?.functionCall && p.functionCall.name);
 
     if (!fc) {
-      // Pas de function call: renvoyer simplement le texte
+      // Pas de function call: renvoyer le texte avec sources génériques
       const text = candidateParts?.[0]?.text || initialData.text || '';
+      
+      // Ajouter des sources génériques pour les réponses sans API
+      const sourcesAddition = `
+
+---
+**Sources:**
+• [Gemini AI](https://ai.google.dev/) - Analyse et réponse générée par l'IA
+• [Connaissances d'entraînement](https://ai.google.dev/gemini-api/docs) - Données d'entraînement jusqu'en 2024`;
+
       return res.status(200).json({ 
-        response: text, 
+        response: text + sourcesAddition, 
         source: 'gemini', 
         functionCalled: false,
         validationSteps: ['Étape 1: Analyse directe - Pas d\'appel API nécessaire']
@@ -102,7 +111,7 @@ export default async function handler(req, res) {
       validationSteps.push(`Étape 2: Erreur API - ${e.message}`);
     }
 
-    // ÉTAPE 4: Génération de la réponse finale avec validation
+    // ÉTAPE 4: Génération de la réponse finale avec validation et sources
     const finalPrompt = `Tu es Emma, assistante financière experte. Tu viens de recevoir des données d'API. 
 
 DONNÉES REÇUES:
@@ -117,6 +126,13 @@ INSTRUCTIONS:
 3. Fournis une analyse professionnelle basée sur ces données
 4. Si des données manquent, suggère des sources alternatives
 5. Adapte ton style selon la température configurée (${temperature})
+6. IMPORTANT: À la fin de ta réponse, ajoute toujours une section "Sources:" avec des liens cliquables vers les sources utilisées
+
+FORMAT DES SOURCES (à ajouter à la fin):
+---
+**Sources:**
+• [Nom de la source](URL) - Description de ce qui a été récupéré
+• [Autre source](URL) - Description
 
 Question originale: ${messages[messages.length - 1]?.content || 'N/A'}`;
 
