@@ -3715,10 +3715,17 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         }
 
                         if (!response.ok) {
-                            throw new Error(`Erreur API: ${response.status}`);
+                            const errorData = await response.json().catch(() => ({}));
+                            console.error('❌ Erreur HTTP Gemini:', {
+                                status: response.status,
+                                statusText: response.statusText,
+                                error: errorData
+                            });
+                            throw new Error(`Erreur API: ${response.status} - ${errorData.details || errorData.error || response.statusText}`);
                         }
 
                         const data = await response.json();
+                        console.log('✅ Réponse Gemini reçue avec succès');
                         
                         // Log de debug pour diagnostiquer la structure de la réponse
                         console.log('🔍 Réponse Gemini complète:', data);
@@ -4445,36 +4452,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </p>
                             </div>
                             <div className="flex gap-2">
-                                <button
-                                    onClick={() => setEmmaInput("Quel est le prix actuel d'AAPL ?")}
-                                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm"
-                                >
-                                    📊 Test AAPL
-                                </button>
-                                <button
-                                    onClick={() => setEmmaInput("Récupère les actualités récentes sur Tesla")}
-                                    className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
-                                >
-                                    📰 Test News
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        console.log('🧪 Test direct - ajout message manuel');
-                                        const testMessage = {
-                                            id: Date.now(),
-                                            type: 'user',
-                                            content: 'Test message manuel',
-                                            timestamp: new Date().toLocaleTimeString('fr-FR')
-                                        };
-                                        setEmmaMessages(prev => {
-                                            console.log('🧪 Ajout message test:', testMessage);
-                                            return [...prev, testMessage];
-                                        });
-                                    }}
-                                    className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
-                                >
-                                    🧪 Test Direct
-                                </button>
                                 <button
                                     onClick={clearChat}
                                     className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
@@ -6341,12 +6318,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // Fonction pour récupérer les données réelles d'un stock
                 const fetchRealStockData = async (symbol) => {
                     try {
+                        console.log(`🔍 Récupération des données réelles pour ${symbol}...`);
+                        
                         // Appels parallèles aux APIs
-                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse] = await Promise.allSettled([
+                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse] = await Promise.allSettled([
                             fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
                             fetch(`/api/fmp?endpoint=profile&symbol=${symbol}`),
                             fetch(`/api/fmp?endpoint=ratios&symbol=${symbol}`),
-                            fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`)
+                            fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`),
+                            fetch(`/api/fmp?endpoint=historical-chart&symbol=${symbol}&timeframe=15min&limit=20`)
                         ]);
 
                         // Parser les résultats
@@ -6365,6 +6345,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         const news = newsResponse.status === 'fulfilled' && newsResponse.value.ok 
                             ? await newsResponse.value.json() 
                             : null;
+                        
+                        const intradayData = intradayResponse.status === 'fulfilled' && intradayResponse.value.ok 
+                            ? await intradayResponse.value.json() 
+                            : null;
+                        
+                        console.log('✅ Données récupérées:', { 
+                            hasQuote: !!quote, 
+                            hasProfile: !!profile, 
+                            hasRatios: !!ratios, 
+                            hasNews: !!news,
+                            hasIntraday: !!intradayData
+                        });
 
                         // Construire l'objet de données structuré
                         return {
@@ -6378,7 +6370,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0,
                                 avgVolume: quote?.avgVolume || 0
                             },
-                            intraday: generateMockData(symbol).intraday, // Utiliser mock pour intraday en attendant API candles
+                            intraday: intradayData?.data?.map((candle, i) => ({
+                                date: candle.date || `${9 + Math.floor(i/4)}:${(i % 4) * 15}`,
+                                open: candle.open || quote?.o || 0,
+                                high: candle.high || quote?.h || 0,
+                                low: candle.low || quote?.l || 0,
+                                close: candle.close || quote?.c || 0,
+                                volume: candle.volume || 0
+                            })) || [],
                             metrics: {
                                 peRatioTTM: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
                                 pegRatioTTM: ratios?.data?.[0]?.pegRatioTTM || ratios?.pegRatioTTM || null,
@@ -6417,7 +6416,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     ? 'Sentiment globalement négatif'
                                     : 'Sentiment neutre'
                             },
-                            insights: generateMockData(symbol).insights // Utiliser mock pour insights en attendant
+                            insights: {
+                                catalysts: news?.news?.slice(0, 3)?.map(article => article.title) || [
+                                    'Analyse en cours des catalyseurs de marché',
+                                    'Surveillance des annonces d\'entreprise',
+                                    'Suivi des tendances du secteur'
+                                ],
+                                risks: [
+                                    'Volatilité du marché',
+                                    'Conditions macroéconomiques',
+                                    'Concurrence sectorielle'
+                                ],
+                                consensus: news?.sentimentAnalysis?.overallSentiment === 'positive' ? 'bullish' : 
+                                          news?.sentimentAnalysis?.overallSentiment === 'negative' ? 'bearish' : 'neutral',
+                                reasoning: news?.sentimentAnalysis?.summary || 'Analyse basée sur les données de marché actuelles'
+                            }
                         };
 
                     } catch (error) {
@@ -6430,32 +6443,54 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 useEffect(() => {
                     const fetchData = async () => {
                         try {
+                            setLoadingIntelli(true);
+                            console.log(`📊 Chargement des données pour ${selectedStock}...`);
+                            
                             // Essayer d'abord avec les vraies APIs
                             const realData = await fetchRealStockData(selectedStock);
-                            if (realData) {
+                            if (realData && realData.quote && realData.quote.price > 0) {
                                 setStockDataIntelli(realData);
                                 setConnected(true);
-                                setLoadingIntelli(false);
                                 setLastUpdateIntelli(new Date());
+                                console.log('✅ Données chargées avec succès');
+                                
+                                // Vérifier si les données intraday sont disponibles
+                                if (!realData.intraday || realData.intraday.length === 0) {
+                                    setViolations(prev => {
+                                        // Éviter les doublons
+                                        if (prev.find(v => v.code === 'intraday_missing')) return prev;
+                                        return [
+                                            ...prev,
+                                            { code: 'intraday_missing', severity: 'low', message: 'Données intraday non disponibles - utilisation des données quote uniquement.' }
+                                        ];
+                                    });
+                                }
                             } else {
-                                throw new Error('Real API failed, using mock data');
+                                throw new Error('Données invalides reçues de l\'API');
                             }
                         } catch (error) {
-                            console.error('Error fetching data:', error?.message || String(error));
+                            console.error('❌ Erreur lors du chargement:', error?.message || String(error));
                             setConnected(false);
-                            setLoadingIntelli(false);
+                            
+                            // Utiliser mock data en dernier recours
                             const mockData = generateMockData(selectedStock);
                             setStockDataIntelli(mockData);
+                            
                             // Enregistrer une violation visible dans l'helppop
-                            setViolations(prev => [
-                                ...prev,
-                                { code: 'data_fetch_error', severity: 'medium', message: 'Échec de récupération API. Données mock utilisées.' }
-                            ]);
+                            setViolations(prev => {
+                                if (prev.find(v => v.code === 'data_fetch_error')) return prev;
+                                return [
+                                    ...prev,
+                                    { code: 'data_fetch_error', severity: 'high', message: 'Échec de récupération API. Vérifiez votre connexion et les clés API.' }
+                                ];
+                            });
                             setShowHelp(true);
+                        } finally {
+                            setLoadingIntelli(false);
                         }
                     };
                     fetchData();
-                    const interval = setInterval(fetchData, 30000);
+                    const interval = setInterval(fetchData, 60000); // Rafraîchir toutes les minutes
                     return () => clearInterval(interval);
                 }, [selectedStock]);
 
@@ -6648,18 +6683,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                                 <div className="flex items-center gap-2">
                                     <button
-                                        onClick={() => {
-                                            const fetchData = async () => {
-                                                try {
-                                                    const mockData = generateMockData(selectedStock);
-                                                    setStockDataIntelli(mockData);
+                                        onClick={async () => {
+                                            try {
+                                                setLoadingIntelli(true);
+                                                console.log('🔄 Actualisation des données...');
+                                                const realData = await fetchRealStockData(selectedStock);
+                                                if (realData && realData.quote && realData.quote.price > 0) {
+                                                    setStockDataIntelli(realData);
                                                     setConnected(true);
                                                     setLastUpdateIntelli(new Date());
-                                                } catch (error) {
-                                                    console.error('Error:', error);
+                                                    console.log('✅ Données actualisées avec succès');
+                                                } else {
+                                                    throw new Error('Données invalides reçues de l\'API');
                                                 }
-                                            };
-                                            fetchData();
+                                            } catch (error) {
+                                                console.error('❌ Erreur lors de l\'actualisation:', error);
+                                                setConnected(false);
+                                            } finally {
+                                                setLoadingIntelli(false);
+                                            }
                                         }}
                                         className={`p-1.5 border rounded-md transition-all ${
                                             isDarkMode 
@@ -6809,9 +6851,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     <div className="space-y-1">
                                                         <div className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Conseils rapides</div>
                                                         <ul className="list-disc pl-4 space-y-1 text-gray-500">
-                                                            <li>Si Recharts est manquant, vérifiez le script UMD chargé en haut de la page.</li>
-                                                            <li>Les graphiques sont désactivés en mode démo; les données sont simulées.</li>
-                                                            <li>Actualisez avec le bouton rafraîchir pour recharger les données mock.</li>
+                                                            <li>Les graphiques utilisent Chart.js pour afficher les données en temps réel.</li>
+                                                            <li>Les données proviennent de FMP et Marketaux via les APIs configurées.</li>
+                                                            <li>Actualisez avec le bouton rafraîchir pour recharger les dernières données du marché.</li>
+                                                            <li>Les graphiques s'adaptent au thème sombre/clair automatiquement.</li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -6857,9 +6900,63 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
 
                                     <div style={{ width: '100%', height: 140 }}>
-                                        <div className="text-center text-gray-500 text-xs py-8">
-                                            📈 Graphique interactif (Recharts nécessite une configuration avancée)
-                                        </div>
+                                        {typeof Chart !== 'undefined' && intraday.length > 0 ? (
+                                            <canvas ref={(canvas) => {
+                                                if (canvas && !canvas.chart) {
+                                                    const ctx = canvas.getContext('2d');
+                                                    canvas.chart = new Chart(ctx, {
+                                                        type: 'line',
+                                                        data: {
+                                                            labels: intraday.map(d => d.date),
+                                                            datasets: [{
+                                                                label: 'Prix',
+                                                                data: intraday.map(d => d.close),
+                                                                borderColor: parseFloat(quote.changesPercentage || 0) >= 0 ? 'rgb(34, 197, 94)' : 'rgb(239, 68, 68)',
+                                                                backgroundColor: parseFloat(quote.changesPercentage || 0) >= 0 ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                                tension: 0.4,
+                                                                fill: true,
+                                                                borderWidth: 2
+                                                            }]
+                                                        },
+                                                        options: {
+                                                            responsive: true,
+                                                            maintainAspectRatio: false,
+                                                            plugins: {
+                                                                legend: { display: false },
+                                                                tooltip: {
+                                                                    mode: 'index',
+                                                                    intersect: false,
+                                                                    backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                                                                    titleColor: isDarkMode ? '#fff' : '#000',
+                                                                    bodyColor: isDarkMode ? '#fff' : '#000',
+                                                                    borderColor: isDarkMode ? '#444' : '#ddd',
+                                                                    borderWidth: 1
+                                                                }
+                                                            },
+                                                            scales: {
+                                                                x: {
+                                                                    display: false,
+                                                                    grid: { display: false }
+                                                                },
+                                                                y: {
+                                                                    display: true,
+                                                                    position: 'right',
+                                                                    grid: { color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
+                                                                    ticks: {
+                                                                        color: isDarkMode ? '#888' : '#666',
+                                                                        font: { size: 10 }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }} width="100%" height="140"></canvas>
+                                        ) : (
+                                            <div className="text-center text-gray-500 text-xs py-8">
+                                                📈 Chargement des données du graphique...
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="flex gap-1 mt-1.5">
@@ -6893,26 +6990,63 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </h3>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div style={{ width: '100%', height: 80 }}>
-                                            {typeof Chart !== 'undefined' ? (
-                                                <SimpleChart 
-                                                    data={{
-                                                        labels: ['9h', '10h', '11h', '12h', '13h', '14h', '15h'],
-                                                        datasets: [{
-                                                            label: 'Volume',
-                                                            data: [1200, 1900, 3000, 5000, 2000, 3000, 4500],
-                                                            borderColor: 'rgb(34, 197, 94)',
-                                                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                                                            tension: 0.1
-                                                        }]
-                                                    }}
-                                                    type="line"
-                                                    width={150}
-                                                    height={80}
-                                                />
+                                            {typeof Chart !== 'undefined' && intraday.length > 0 ? (
+                                                <canvas ref={(canvas) => {
+                                                    if (canvas && !canvas.chart) {
+                                                        const ctx = canvas.getContext('2d');
+                                                        canvas.chart = new Chart(ctx, {
+                                                            type: 'bar',
+                                                            data: {
+                                                                labels: intraday.map(d => d.date),
+                                                                datasets: [{
+                                                                    label: 'Volume',
+                                                                    data: intraday.map(d => d.volume),
+                                                                    backgroundColor: intraday.map((d, i) => {
+                                                                        if (i === 0) return 'rgba(34, 197, 94, 0.6)';
+                                                                        return d.close >= intraday[i-1].close 
+                                                                            ? 'rgba(34, 197, 94, 0.6)' 
+                                                                            : 'rgba(239, 68, 68, 0.6)';
+                                                                    }),
+                                                                    borderColor: intraday.map((d, i) => {
+                                                                        if (i === 0) return 'rgb(34, 197, 94)';
+                                                                        return d.close >= intraday[i-1].close 
+                                                                            ? 'rgb(34, 197, 94)' 
+                                                                            : 'rgb(239, 68, 68)';
+                                                                    }),
+                                                                    borderWidth: 1
+                                                                }]
+                                                            },
+                                                            options: {
+                                                                responsive: true,
+                                                                maintainAspectRatio: false,
+                                                                plugins: {
+                                                                    legend: { display: false },
+                                                                    tooltip: {
+                                                                        backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                                                                        titleColor: isDarkMode ? '#fff' : '#000',
+                                                                        bodyColor: isDarkMode ? '#fff' : '#000'
+                                                                    }
+                                                                },
+                                                                scales: {
+                                                                    x: { display: false },
+                                                                    y: { 
+                                                                        display: true,
+                                                                        position: 'right',
+                                                                        grid: { color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
+                                                                        ticks: {
+                                                                            color: isDarkMode ? '#888' : '#666',
+                                                                            font: { size: 9 }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }} width="100%" height="80"></canvas>
                                             ) : (
-                                            <div className="text-center text-gray-500 text-xs py-4">
-                                                📊 Graphique Volume
-                                            </div>
+                                                <div className="text-center text-gray-500 text-xs py-4">
+                                                    📊 Chargement du volume...
+                                                </div>
                                             )}
                                         </div>
 

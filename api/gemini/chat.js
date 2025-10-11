@@ -25,8 +25,11 @@ export default async function handler(req, res) {
     }
 
     if (!Array.isArray(messages) || messages.length === 0) {
+      console.error('❌ Messages invalides:', { messages, message });
       return res.status(400).json({ error: 'messages requis (array) ou message (string)' });
     }
+
+    console.log('✅ Messages valides reçus:', messages.length, 'messages');
 
     // Convertir messages UI -> contents Gemini
     const contents = [];
@@ -66,8 +69,11 @@ L'utilisateur utilise un dashboard financier avec :
     }
 
     // Utiliser le SDK officiel pour robustesse long terme
+    console.log('🔧 Initialisation Gemini avec model: gemini-2.0-flash-exp');
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp', tools: { functionDeclarations } });
+    
+    console.log('📤 Envoi de la requête à Gemini avec', contents.length, 'messages');
     const initialResult = await model.generateContent({
       contents,
       generationConfig: {
@@ -77,8 +83,13 @@ L'utilisateur utilise un dashboard financier avec :
         maxOutputTokens: maxTokens,
         candidateCount: 1
       }
+    }).catch(err => {
+      console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message || err);
+      throw new Error(`Erreur Gemini API: ${err?.message || err}`);
     });
+    
     const initialData = initialResult.response;
+    console.log('✅ Réponse reçue de Gemini');
 
     // Détecter un éventuel function call
     // Le SDK renvoie un objet response; on récupère les parts et potentiels functionCall
@@ -147,7 +158,13 @@ Utilise les sources fournies dans les données reçues pour créer des liens app
 
     return res.status(200).json({ response: text, functionCalled: true, functionName: fnName, functionResult: fnResult, source: 'gemini+fc' });
   } catch (e) {
-    return res.status(500).json({ error: 'Erreur serveur', details: String(e?.message || e) });
+    console.error('❌ Erreur dans le handler Gemini:', e);
+    console.error('Stack trace:', e?.stack);
+    return res.status(500).json({ 
+      error: 'Erreur serveur Gemini', 
+      details: String(e?.message || e),
+      timestamp: new Date().toISOString()
+    });
   }
 }
 
