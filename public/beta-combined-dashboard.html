@@ -3278,24 +3278,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     });
                     
                     try {
-                        // Rafraîchir les données en temps réel avant de répondre
-                        console.log('🔄 Rafraîchissement des données pour Emma...');
+                        // Utiliser les données existantes du dashboard
+                        console.log('🚀 Envoi de la requête à Emma avec les données actuelles...');
                         
-                        // Ajouter un message de mise à jour des données
-                        const updateMessage = {
-                            id: Date.now() + 0.5,
-                            type: 'system',
-                            content: '🔄 Mise à jour des données en temps réel...',
-                            timestamp: new Date().toLocaleTimeString('fr-FR')
-                        };
-                        setEmmaMessages(prev => [...prev, updateMessage]);
-                        
-                        await Promise.all([
-                            refreshAllStocks(),
-                            fetchNews(),
-                            checkApiStatus()
-                        ]);
-                        console.log('✅ Données mises à jour pour Emma');
+                        // Les fonctions refreshAllStocks, fetchNews, checkApiStatus ne sont pas accessibles ici
+                        // Les données sont déjà incluses dans realTimeContext via stockData, newsData, apiStatus
+                        console.log('✅ Utilisation des données existantes du dashboard');
                         
                         // Utiliser l'API Gemini avec les données fraîches
                         const response = await generateGeminiResponse(emmaInput);
