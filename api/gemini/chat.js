@@ -71,22 +71,35 @@ L'utilisateur utilise un dashboard financier avec :
     // Utiliser le SDK officiel pour robustesse long terme
     console.log('🔧 Initialisation Gemini avec model: gemini-2.0-flash-exp');
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp', tools: { functionDeclarations } });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash-exp',
+      // Format attendu par le SDK: tableau d'outils
+      tools: [ { functionDeclarations } ]
+    });
     
     console.log('📤 Envoi de la requête à Gemini avec', contents.length, 'messages');
-    const initialResult = await model.generateContent({
-      contents,
-      generationConfig: {
-        temperature,
-        topK: 20,
-        topP: 0.8,
-        maxOutputTokens: maxTokens,
-        candidateCount: 1
-      }
-    }).catch(err => {
-      console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message || err);
-      throw new Error(`Erreur Gemini API: ${err?.message || err}`);
-    });
+    let initialResult;
+    try {
+      initialResult = await model.generateContent({
+        contents,
+        generationConfig: {
+          temperature,
+          topK: 20,
+          topP: 0.8,
+          maxOutputTokens: maxTokens,
+          candidateCount: 1
+        }
+      });
+    } catch (err) {
+      const msg = String(err?.message || err);
+      console.error('❌ Erreur lors de l\'appel à Gemini:', msg);
+      const lower = msg.toLowerCase();
+      let status = 502;
+      if (lower.includes('api key') && lower.includes('not valid')) status = 401;
+      else if (lower.includes('permission') || lower.includes('forbidden')) status = 403;
+      else if (lower.includes('quota') || lower.includes('rate limit')) status = 429;
+      return res.status(status).json({ error: 'Erreur Gemini API', details: msg });
+    }
     
     const initialData = initialResult.response;
     console.log('✅ Réponse reçue de Gemini');
@@ -139,21 +152,33 @@ FORMAT DES SOURCES (à ajouter à la fin):
 
 Utilise les sources fournies dans les données reçues pour créer des liens appropriés. Si des sources sont fournies dans les données, utilise-les. Sinon, suggère des sources génériques appropriées.`;
 
-    const followUpResult = await model.generateContent({
-      contents: [
-        ...contents,
-        { role: 'model', parts: [fc] },
-        { role: 'user', parts: [{ functionResponse: { name: fnName, response: fnResult } }] },
-        { role: 'user', parts: [{ text: sourcesPrompt }] }
-      ],
-      generationConfig: {
-        temperature,
-        topK: 20,
-        topP: 0.8,
-        maxOutputTokens: maxTokens,
-        candidateCount: 1
-      }
-    });
+    let followUpResult;
+    try {
+      followUpResult = await model.generateContent({
+        contents: [
+          ...contents,
+          { role: 'model', parts: [fc] },
+          { role: 'user', parts: [{ functionResponse: { name: fnName, response: fnResult } }] },
+          { role: 'user', parts: [{ text: sourcesPrompt }] }
+        ],
+        generationConfig: {
+          temperature,
+          topK: 20,
+          topP: 0.8,
+          maxOutputTokens: maxTokens,
+          candidateCount: 1
+        }
+      });
+    } catch (err) {
+      const msg = String(err?.message || err);
+      console.error('❌ Erreur lors du follow-up Gemini:', msg);
+      const lower = msg.toLowerCase();
+      let status = 502;
+      if (lower.includes('api key') && lower.includes('not valid')) status = 401;
+      else if (lower.includes('permission') || lower.includes('forbidden')) status = 403;
+      else if (lower.includes('quota') || lower.includes('rate limit')) status = 429;
+      return res.status(status).json({ error: 'Erreur Gemini API', details: msg });
+    }
     const text = followUpResult?.response?.candidates?.[0]?.content?.parts?.[0]?.text || followUpResult?.response?.text || '';
 
     return res.status(200).json({ response: text, functionCalled: true, functionName: fnName, functionResult: fnResult, source: 'gemini+fc' });

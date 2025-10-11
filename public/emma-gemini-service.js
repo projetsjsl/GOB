@@ -6,7 +6,8 @@ class EmmaGeminiService {
   constructor() {
     // Priorité : Variable d'environnement Vercel > localStorage
     this.apiKey = '';
-    this.baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
+    // Aligner le modèle front avec celui du backend pour réduire les erreurs 5xx
+    this.baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-exp:generateContent';
     this.isConnected = false;
     this.initializeApiKey();
   }
@@ -51,6 +52,42 @@ class EmmaGeminiService {
 
   // Tester la connexion
   async testConnection() {
+    // 1) Essayer d'abord le backend (si clé côté serveur configurée)
+    try {
+      const r = await fetch('/api/gemini/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: 'ping' }],
+          temperature: 0.1,
+          maxTokens: 64,
+          systemPrompt: 'Réponds uniquement par "OK".'
+        })
+      });
+      if (r.ok) {
+        this.isConnected = true;
+        return { success: true, mode: 'backend' };
+      }
+      // Si 500 avec clé manquante, on tentera le direct
+      try {
+        const d = await r.json();
+        if (d?.error && String(d.error).toLowerCase().includes('clé api gemini manquante')) {
+          // pass -> on bascule sur le test direct
+        } else {
+          throw new Error(`Erreur API backend: ${r.status}`);
+        }
+      } catch (_) {
+        // Réponse non JSON -> considérer comme erreur backend générique
+        throw new Error(`Erreur API backend: ${r.status}`);
+      }
+    } catch (backendErr) {
+      // Continuer vers le test direct si possible
+    }
+
+    // 2) Repli: test direct côté client (nécessite une clé locale)
+    if (!this.apiKey) {
+      this.apiKey = await this.getApiKey();
+    }
     if (!this.apiKey) {
       throw new Error('Clé API Gemini non configurée');
     }
@@ -58,25 +95,15 @@ class EmmaGeminiService {
     try {
       const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: 'Test de connexion - réponds simplement "OK"'
-            }]
-          }]
+          contents: [{ parts: [{ text: 'Test de connexion - réponds simplement "OK"' }] }]
         })
       });
-
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
       const data = await response.json();
       this.isConnected = true;
-      return { success: true, data };
+      return { success: true, data, mode: 'direct' };
     } catch (error) {
       this.isConnected = false;
       throw error;
@@ -85,58 +112,50 @@ class EmmaGeminiService {
 
   // Générer une réponse avec le prompt personnalisé
   async generateResponse(userMessage, customPrompt = null) {
-    // S'assurer que la clé API est chargée
-    if (!this.apiKey) {
-      this.apiKey = await this.getApiKey();
-    }
-    
-    if (!this.apiKey) {
-      throw new Error('Clé API Gemini non configurée');
-    }
-
-    // Charger le prompt personnalisé ou utiliser celui par défaut
-    const prompt = customPrompt || localStorage.getItem('emma-financial-prompt') || 
-      `Tu es Emma, une assistante virtuelle spécialisée en analyse financière. Réponds de manière professionnelle et utile.`;
-
-    const fullPrompt = `${prompt}\n\nQuestion de l'utilisateur: ${userMessage}`;
-
+    // 1) Essayer d'abord via le backend (plus robuste et sécurisé)
     try {
-      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: fullPrompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.3, // Réduit pour analyses financières plus précises et cohérentes
-            topK: 20, // Réduit pour plus de précision dans le vocabulaire financier
-            topP: 0.8, // Réduit pour plus de cohérence dans les analyses
-            maxOutputTokens: 4096, // Maintenu pour analyses détaillées
-            candidateCount: 1,
-            stopSequences: []
-          }
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
+      return await this.generateResponseViaBackend(userMessage, [], customPrompt);
+    } catch (backendError) {
+      // 2) Repli: appel direct à l'API Gemini si une clé locale est disponible
+      // S'assurer que la clé API est chargée
+      if (!this.apiKey) {
+        this.apiKey = await this.getApiKey();
+      }
+      if (!this.apiKey) {
+        throw backendError; // Pas de clé locale -> remonter l'erreur backend
       }
 
-      const data = await response.json();
-      
-      if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-        return data.candidates[0].content.parts[0].text;
-      } else {
+      // Charger le prompt personnalisé ou utiliser celui par défaut
+      const prompt = customPrompt || localStorage.getItem('emma-financial-prompt') || 
+        `Tu es Emma, une assistante virtuelle spécialisée en analyse financière. Réponds de manière professionnelle et utile.`;
+      const fullPrompt = `${prompt}\n\nQuestion de l'utilisateur: ${userMessage}`;
+
+      try {
+        const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: fullPrompt }] }],
+            generationConfig: {
+              temperature: 0.3,
+              topK: 20,
+              topP: 0.8,
+              maxOutputTokens: 4096,
+              candidateCount: 1,
+              stopSequences: []
+            }
+          })
+        });
+        if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+        const data = await response.json();
+        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          return data.candidates[0].content.parts[0].text;
+        }
         throw new Error('Réponse invalide de l\'API');
+      } catch (directError) {
+        console.error('Erreur Gemini (direct):', directError);
+        throw directError;
       }
-    } catch (error) {
-      console.error('Erreur Gemini:', error);
-      throw error;
     }
   }
 
