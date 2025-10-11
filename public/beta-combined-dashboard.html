@@ -276,7 +276,7 @@
                     
                     return defaultLogos[ticker] || `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
                 } catch (error) {
-                    console.error(`Erreur extraction logo pour ${ticker}:`, error);
+                    console.error(`Erreur extraction logo pour ${ticker}:`, error?.message || String(error));
                     return `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
                 }
             };
@@ -302,7 +302,7 @@
                     if (!response.ok) throw new Error(`API error: ${response.status}`);
                     return await response.json();
                 } catch (error) {
-                    console.error('Erreur fetch stock data (marketdata):', error);
+                    console.error('Erreur fetch stock data (marketdata):', error?.message || String(error));
                     // Rester sur marketdata; l’API gère déjà ses fallbacks internes
                     return null;
                 }
@@ -340,7 +340,7 @@
                             errorCount++;
                         }
                     } catch (error) {
-                        console.error(`❌ ${ticker}: Erreur`, error);
+                        console.error(`❌ ${ticker}: Erreur`, error?.message || String(error));
                         errorCount++;
                     }
                 }
@@ -378,7 +378,7 @@
                         showMessage(`${data.articles?.length || 0} actualités chargées`, 'success');
                     }
                 } catch (error) {
-                    console.error('❌ Erreur fetch news:', error);
+                    console.error('❌ Erreur fetch news:', error?.message || String(error));
                     showMessage('Erreur chargement actualités', 'error');
                     
                     const fallbackNews = [
@@ -428,9 +428,13 @@
                     if (response.ok) {
                         const data = await response.json();
                         setSeekingAlphaData(data);
+                    } else if (response.status === 404) {
+                        console.warn('⚠️ Fichier stock_analysis.json non trouvé (404). Données Seeking Alpha non disponibles.');
+                    } else {
+                        console.warn(`⚠️ Erreur ${response.status} lors du chargement de stock_analysis.json`);
                     }
                 } catch (error) {
-                    console.error('Erreur fetch Seeking Alpha:', error);
+                    console.error('Erreur fetch Seeking Alpha:', error?.message || String(error));
                 }
             };
 
@@ -440,9 +444,13 @@
                     if (response.ok) {
                         const data = await response.json();
                         setSeekingAlphaStockData(data);
+                    } else if (response.status === 404) {
+                        console.warn('⚠️ Fichier stock_data.json non trouvé (404). Données Seeking Alpha stock non disponibles.');
+                    } else {
+                        console.warn(`⚠️ Erreur ${response.status} lors du chargement de stock_data.json`);
                     }
                 } catch (error) {
-                    console.error('Erreur fetch Seeking Alpha stock data:', error);
+                    console.error('Erreur fetch Seeking Alpha stock data:', error?.message || String(error));
                 }
             };
 
@@ -607,7 +615,7 @@
                         ]);
                         console.log('✅ Toutes les données chargées');
                     } catch (error) {
-                        console.error('❌ Erreur lors du chargement:', error);
+                        console.error('❌ Erreur lors du chargement:', error?.message || String(error));
                     }
                 };
                 
@@ -984,7 +992,7 @@
             console.table(pageData.content);
             
         } catch (error) {
-            console.error('❌ Erreur lors de l\'extraction:', error);
+            console.error('❌ Erreur lors de l\'extraction:', error?.message || String(error));
         }
     }, 3000);
 })();
@@ -1435,7 +1443,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 };
                             }
                         } catch (error) {
-                            console.error(`Erreur pour ${ticker}:`, error);
+                            console.error(`Erreur pour ${ticker}:`, error?.message || String(error));
                         }
                     }
                     
@@ -3101,7 +3109,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Vérifier la connexion Gemini
                         await checkGeminiConnection();
                     } catch (error) {
-                        console.error('Erreur initialisation Emma:', error);
+                        console.error('Erreur initialisation Emma:', error?.message || String(error));
                     }
                 };
 
@@ -3156,7 +3164,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             return newMessages;
                         });
                     } catch (error) {
-                        console.error('Erreur Gemini:', error);
+                        console.error('Erreur Gemini:', error?.message || String(error));
                         // Analyser le type d'erreur pour un message plus précis
                         let errorContent = '';
                         if (error.message.includes('404')) {
@@ -3371,7 +3379,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         return responseText;
                     } catch (error) {
-                        console.error('Erreur Gemini:', error);
+                        console.error('Erreur Gemini:', error?.message || String(error));
                         throw error;
                     }
                 };
@@ -5552,7 +5560,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             setLoadingIntelli(false);
                             setLastUpdateIntelli(new Date());
                         } catch (error) {
-                            console.error('Error fetching data:', error);
+                            console.error('Error fetching data:', error?.message || String(error));
                             setConnected(false);
                             setLoadingIntelli(false);
                             const mockData = generateMockData(selectedStock);
