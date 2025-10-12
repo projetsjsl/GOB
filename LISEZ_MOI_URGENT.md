@@ -29,7 +29,7 @@ Emma crashe toujours avec : `FUNCTION_INVOCATION_FAILED`
 ### **1️⃣ Teste ta clé Gemini manuellement :**
 
 ```bash
-curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=AIzaSyAOq1TDYpJmDgKfN7j_Mym4y2tUjgevNIU" \
+curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=KEY" \
   -H 'Content-Type: application/json' \
   -d '{"contents":[{"parts":[{"text":"Hello"}]}]}'
 ```
