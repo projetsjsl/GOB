@@ -71,8 +71,8 @@ export default async function handler(req, res) {
 - Réponds toujours en français
 
 **Contexte du dashboard :**
-L'utilisateur utilise un dashboard financier avec :
-- Cours d'actions en temps réel
+L\'utilisateur utilise un dashboard financier avec :
+- Cours d\'actions en temps réel
 - Analyses Seeking Alpha
 - Actualités financières
 - Graphiques et métriques`;
