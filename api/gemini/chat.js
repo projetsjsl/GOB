@@ -83,9 +83,9 @@ L'utilisateur utilise un dashboard financier avec :
     }
 
     // Utiliser le SDK officiel pour robustesse long terme
-    console.log('🔧 Initialisation Gemini avec model: gemini-2.0-flash-exp');
+    console.log('🔧 Initialisation Gemini avec model: gemini-1.5-flash');
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp', tools: { functionDeclarations } });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', tools: { functionDeclarations } });
     
     console.log('📤 Envoi de la requête à Gemini avec', contents.length, 'messages');
     const initialResult = await model.generateContent({
