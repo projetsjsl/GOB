@@ -119,38 +119,7 @@ console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message);
 
 ---
 
-## 🔍 PHASE 4 : Screener Multi-fonctions
-
-### 4.1 Filtres Disponibles (10 filtres)
-
-**Filtres de base**:
-1. ✅ Market Cap Min (en milliards $)
-2. ✅ P/E Max
-3. ✅ ROE Min (%)
-4. ✅ D/E Max (Debt/Equity)
-5. ✅ Secteur (Technology, Finance, Healthcare, etc.)
-
-**Filtres avancés**:
-6. ✅ Dividende Min (%)
-7. ✅ Financial Strength Min (0-100)
-8. ✅ RSI Min (0-100)
-9. ✅ RSI Max (0-100)
-10. ✅ Marge Nette Min (%)
-
-### 4.2 Intégration Screener
-**Disponible dans**:
-- 📊 JStocks™ (10 titres majeurs: AAPL, MSFT, GOOGL, AMZN, META, TSLA, NVDA, NFLX, AMD, INTC)
-- ⭐ Dan's Watchlist (titres de la watchlist uniquement)
-
-**Fonctionnalités**:
-- États partagés entre les deux onglets
-- Filtrage en temps réel
-- Tableau de résultats avec métriques colorées
-- Bouton "Voir" pour analyser directement le titre
-
----
-
-## 📊 PHASE 5 : Moyennes Mobiles & Analyse Technique
+## 📊 PHASE 4 : Moyennes Mobiles & Analyse Technique
 
 ### 5.1 Trois Moyennes Mobiles
 **Calculées et affichées**:
@@ -187,7 +156,7 @@ console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message);
 
 ---
 
-## 💰 PHASE 6 : Métriques Financières Avancées
+## 💰 PHASE 5 : Métriques Financières Avancées
 
 ### 6.1 Financial Strength Score (0-100)
 **Calcul basé sur 4 piliers** (25 points chacun):
@@ -261,7 +230,7 @@ console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message);
 
 ---
 
-## 🎯 PHASE 7 : Score JSLAI™ Global (Propriétaire)
+## 🎯 PHASE 6 : Score JSLAI™ Global (Propriétaire)
 
 ### 7.1 Méthodologie du Score JSLAI™
 **Score composite 0-100** basé sur 7 dimensions:
@@ -326,7 +295,7 @@ jslaiConfig = {
 
 ---
 
-## 🔧 PHASE 8 : Parser Automatique Seeking Alpha
+## 🔧 PHASE 7 : Parser Automatique Seeking Alpha
 
 ### 8.1 Extraction de Données
 **Fichier source**: `stock_analysis.json` (raw scraping data)
@@ -482,7 +451,6 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
 - Onglet de navigation
 - Titres des sections
 - Aide & diagnostics
-- Screener
 - Commentaires dans le code
 
 **Score JSLAI™**:

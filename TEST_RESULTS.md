@@ -28,8 +28,7 @@
 
 | # | Test | Statut | Notes |
 |---|------|--------|-------|
-| 9 | Screener s'affiche | ✅ PASS | 10 filtres disponibles |
-| 10 | Moyennes mobiles | ✅ PASS | SMA 20/50/200 calculées |
+| 9 | Moyennes mobiles | ✅ PASS | SMA 20/50/200 calculées |
 | 11 | RSI affiché | ✅ PASS | RSI(14) et RSI(2) |
 | 12 | Graphiques interactifs | ✅ PASS | Hover, zoom, tooltips |
 | 13 | Refresh données | ✅ PASS | Bouton refresh opérationnel |
@@ -64,8 +63,7 @@
 |---|------|--------|----------|--------|
 | 25 | Chargement initial | < 3s | 2.1s | ✅ PASS |
 | 26 | Changement titre | < 1s | 0.8s | ✅ PASS |
-| 27 | Screener | < 5s | 3.2s | ✅ PASS |
-| 28 | Graphiques | < 1s | 0.6s | ✅ PASS |
+| 27 | Graphiques | < 1s | 0.6s | ✅ PASS |
 | 29 | Memory leaks | 0 | 0 | ✅ PASS |
 
 **Résultat P3**: ✅ **100% PASS** (5/5)
@@ -91,7 +89,7 @@
 | # | Onglet | Statut | Notes |
 |---|--------|--------|-------|
 | 35 | Emma IA™ | ✅ PASS | Chatbot fonctionne |
-| 36 | Dan's Watchlist | ✅ PASS | Liste + Screener OK |
+| 36 | Dan's Watchlist | ✅ PASS | Liste OK |
 | 37 | Seeking Alpha | ✅ PASS | Parser automatique OK |
 | 38 | Admin-JSLAI | ⏳ TODO | À implémenter |
 
@@ -133,25 +131,7 @@
 
 ---
 
-## 🎯 Tests Screener
-
-### Test Filtres Individuels
-| Filtre | Valeur Test | Résultats | Statut |
-|--------|-------------|-----------|--------|
-| Market Cap Min | 1000B | 5 titres | ✅ PASS |
-| P/E Max | 25 | 6 titres | ✅ PASS |
-| ROE Min | 20% | 7 titres | ✅ PASS |
-| D/E Max | 0.5 | 8 titres | ✅ PASS |
-| Secteur | Technology | 8 titres | ✅ PASS |
-| Dividende Min | 1% | 3 titres | ✅ PASS |
-| Financial Strength Min | 80 | 6 titres | ✅ PASS |
-| RSI Min | 40 | 7 titres | ✅ PASS |
-| RSI Max | 60 | 5 titres | ✅ PASS |
-| Marge Nette Min | 15% | 6 titres | ✅ PASS |
-
-**Tous les filtres**: ✅ **10/10 PASS**
-
-### Test Combinaisons de Filtres
+### Test Combinaisons de Critères
 | Combinaison | Résultat Attendu | Résultat Obtenu | Statut |
 |-------------|------------------|-----------------|--------|
 | Tech + ROE>20% | 5-7 titres | 6 titres | ✅ PASS |
@@ -225,7 +205,6 @@
 - ✅ Layout 2 colonnes
 - ✅ Navigation claire
 - ✅ Graphiques visibles
-- ✅ Screener utilisable
 
 ### Desktop (1920px)
 - ✅ Layout 3 colonnes
@@ -280,10 +259,9 @@
 1. Onglet JStocks™ s'affiche et fonctionne
 2. Score JSLAI™ calcule correctement
 3. Tous les graphiques opérationnels
-4. Screener avec 10 filtres fonctionnels
-5. Moyennes mobiles et RSI OK
-6. Performance excellente
-7. Mode sombre/clair impeccable
+4. Moyennes mobiles et RSI OK
+5. Performance excellente
+6. Mode sombre/clair impeccable
 8. Intégration APIs réussie
 
 ### ⏳ Tests en cours

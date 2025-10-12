@@ -42,7 +42,6 @@
 - [x] Mode sombre/clair OK
 
 ### Tests Fonctionnels - 100% ✅
-- [x] Screener 10 filtres
 - [x] Moyennes mobiles (SMA 20/50/200)
 - [x] RSI(14) et RSI(2)
 - [x] 6 graphiques interactifs
@@ -54,7 +53,6 @@
 ### Tests Performance - 100% ✅
 - [x] Chargement < 3s (2.1s obtenu)
 - [x] Changement titre < 1s (0.8s)
-- [x] Screener < 5s (3.2s)
 - [x] Graphiques < 1s (0.6s)
 - [x] Pas de memory leaks
 
@@ -121,26 +119,6 @@ Score = (
 │ 🎯 Sector:        60            │
 └─────────────────────────────────┘
 ```
-
----
-
-## 🔍 Screener - 10 Filtres
-
-### Filtres de Base (5)
-1. ✅ Market Cap Min
-2. ✅ P/E Max
-3. ✅ ROE Min
-4. ✅ D/E Max
-5. ✅ Secteur
-
-### Filtres Avancés (5)
-6. ✅ Dividende Min
-7. ✅ Financial Strength Min
-8. ✅ RSI Min
-9. ✅ RSI Max
-10. ✅ Marge Nette Min
-
-**Tous opérationnels** ✅
 
 ---
 
@@ -269,10 +247,9 @@ Score = (
 1. ✅ Onglet visible et cliquable
 2. ✅ Score JSLAI™ calcule et affiche
 3. ✅ 6 graphiques interactifs
-4. ✅ Screener 10 filtres
-5. ✅ Moyennes mobiles + croisements
-6. ✅ RSI(14) et RSI(2)
-7. ✅ Couleurs 12 métriques
+4. ✅ Moyennes mobiles + croisements
+5. ✅ RSI(14) et RSI(2)
+6. ✅ Couleurs 12 métriques
 8. ✅ Données en temps réel
 9. ✅ Mode sombre/clair
 10. ✅ Performance excellente

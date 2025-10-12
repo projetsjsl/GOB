@@ -109,8 +109,7 @@ const IntelliStocksTab = () => { ... }
 8. [ ] Mode sombre/clair fonctionne
 
 ### Tests Fonctionnels (P1)
-9. [ ] Screener s'affiche et filtre
-10. [ ] Moyennes mobiles calculées
+9. [ ] Moyennes mobiles calculées
 11. [ ] RSI s'affiche
 12. [ ] Graphiques Chart.js interactifs
 13. [ ] Refresh des données fonctionne
@@ -129,8 +128,7 @@ const IntelliStocksTab = () => { ... }
 ### Tests de Performance (P3)
 23. [ ] Chargement initial < 3s
 24. [ ] Changement de titre < 1s
-25. [ ] Screener < 5s
-26. [ ] Graphiques < 1s
+25. [ ] Graphiques < 1s
 27. [ ] Pas de memory leaks
 
 ### Tests d'Intégration (P4)
@@ -182,8 +180,7 @@ npm run build
 2. Cliquer sur JStocks™
 3. Sélectionner AAPL
 4. Vérifier le Score JSLAI™
-5. Tester le screener
-6. Changer de titre
+5. Changer de titre
 7. Tester le refresh
 8. Basculer mode sombre
 9. Tester sur mobile
@@ -207,7 +204,6 @@ Contenu JStocks™:
 │ 📈 Graphique du cours           │
 │ 📊 Métriques financières        │
 │ 🎯 Moyennes mobiles             │
-│ 🔍 Screener                     │
 └─────────────────────────────────┘
 ```
 

@@ -287,7 +287,6 @@ Une plateforme financière **complète et professionnelle** avec :
 ✅ **3 scores propriétaires** (JSLAI, Financial Strength, Earning Predictability)
 ✅ **6 graphiques interactifs Chart.js**
 ✅ **1 système d'analyse IA automatique**
-✅ **1 screener 10 filtres**
 ✅ **1 calendrier earnings complet**
 ✅ **1 module de backtesting avancé**
 ✅ **Documentation exhaustive**

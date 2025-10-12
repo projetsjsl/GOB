@@ -1,17 +1,229 @@
-<!doctype html>
-<!-- GOB Apps v1.0.0 - Plateforme financière JSL AI -->
+<!DOCTYPE html>
+<!-- GOB Apps - Page d'accueil -->
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GOB Apps - Plateforme financière • Propulsée par JSL AI</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOB Apps - Plateforme Financière • JSL AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1e3a 50%, #2a1e3a 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .logo-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .app-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+        
+        .app-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .app-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .app-description {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+                <img src="logojslaidark.jpg" alt="JSL AI" class="logo" onerror="this.style.display='none'">
+            </div>
+            <h1>GOB Apps</h1>
+            <p class="subtitle">Plateforme Financière Professionnelle</p>
+            <div class="status">
+                <span class="status-dot"></span>
+                <span>Système opérationnel</span>
+            </div>
+        </div>
+        
+        <div class="apps-grid">
+            <a href="financial-dashboard.html" class="app-card">
+                <div class="app-icon">📊</div>
+                <div class="app-title">Dashboard Financier</div>
+                <div class="app-description">
+                    Dashboard complet avec JStocks™, Score JSLAI™, graphiques interactifs et moyennes mobiles
+                </div>
+            </a>
+            
+            <a href="stocksandnews.html" class="app-card">
+                <div class="app-icon">📈</div>
+                <div class="app-title">Stocks & News</div>
+                <div class="app-description">
+                    Suivi en temps réel de votre watchlist, actualités financières et calendrier économique
+                </div>
+            </a>
+            
+            <a href="seeking-alpha/index.html" class="app-card">
+                <div class="app-icon">🔍</div>
+                <div class="app-title">Seeking Alpha</div>
+                <div class="app-description">
+                    Analyses Seeking Alpha avec parser automatique et notes Quant ratings
+                </div>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>Propulsé par JSL AI • Version 1.0.0</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">© 2025 GOB Apps - Tous droits réservés</p>
+        </div>
+    </div>
+    
+    <script>
+        console.log('🚀 GOB Apps - Loaded successfully');
+        console.log('📍 Location:', window.location.href);
+        
+        // Test de connectivité API (optionnel, ne bloque pas l'affichage)
+        setTimeout(() => {
+            fetch('/api/marketdata?endpoint=quote&symbol=AAPL&source=auto')
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ API is accessible and responding');
+                    } else {
+                        console.warn('⚠️ API returned status:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.warn('⚠️ API test failed (normal if running locally):', error.message);
+                });
+        }, 1000);
+    </script>
+</body>
 </html>
