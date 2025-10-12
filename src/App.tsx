@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon } from 'lucide-react';
 
 // Les logos seront chargés dynamiquement via les chemins publics
@@ -214,10 +214,10 @@ const GOB = () => {
   // Suppression de toute génération de données simulées: afficher vide si indisponible
 
   // Fonction pour récupérer les données des indices boursiers
-  const fetchMarketData = async () => {
+  const fetchMarketData = useCallback(async () => {
     try {
       const symbols = ['SPX', 'IXIC', 'DJI', 'TSX', 'EURUSD', 'GOLD', 'OIL', 'BTCUSD'];
-      const newMarketData: any = {};
+      const newMarketData: Record<string, { symbol: string; price: number; change: number; changePercent: number }> = {};
       let hasRealData = false;
       
       for (const symbol of symbols) {
@@ -250,7 +250,7 @@ const GOB = () => {
     } catch (error) {
       console.log('Erreur lors de la récupération des données de marché:', error);
     }
-  };
+  }, []);
 
   // Fonction pour obtenir le nom affiché du symbole
   const getSymbolName = (symbol: string) => {
@@ -305,7 +305,7 @@ const GOB = () => {
     const marketInterval = setInterval(fetchMarketData, 30000); // Update every 30 seconds
     
     return () => clearInterval(marketInterval);
-  }, []);
+  }, [fetchMarketData]);
 
   // Load apps from localStorage
   useEffect(() => {
