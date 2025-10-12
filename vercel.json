@@ -1,13 +1,21 @@
 {
   "functions": {
     "api/gemini/chat.js": {
-      "maxDuration": 30
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/gemini/chat-validated.js": {
+      "maxDuration": 60,
+      "memory": 1024
     },
     "api/marketdata.js": {
-      "maxDuration": 10
+      "maxDuration": 15
     },
     "api/news.js": {
-      "maxDuration": 10
+      "maxDuration": 15
+    },
+    "api/fmp.js": {
+      "maxDuration": 15
     }
   },
   "headers": [
