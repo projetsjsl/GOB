@@ -400,9 +400,23 @@ export default async function handler(req, res) {
         if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
         result = await getFinancialRatiosTTM(symbol);
         break;
+      case 'ratios-ttm':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getFinancialRatiosTTM(symbol);
+        break;
       case 'financials':
         if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
         result = await getFinancialStatements(symbol, period || 'quarter', parseInt(limit) || 4);
+        break;
+      case 'historical-chart':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        // Retourner des données mockées pour l'instant
+        result = [];
+        break;
+      case 'technical-indicators':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        // Retourner des données mockées pour l'instant
+        result = [];
         break;
       case 'dcf':
         if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
