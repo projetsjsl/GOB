@@ -17,16 +17,9 @@ export default async function handler(req, res) {
   if (!GEMINI_API_KEY) {
     console.error('❌ GEMINI_API_KEY manquante');
     return res.status(503).json({ 
-      error: 'Clé API Gemini non configurée',
-      message: '⚠️ Emma IA nécessite une clé API Gemini. Configurez GEMINI_API_KEY dans les variables d\'environnement Vercel.',
-      helpUrl: 'https://vercel.com/projetsjsl/gob/settings/environment-variables',
-      steps: [
-        '1. Obtenez une clé gratuite sur https://ai.google.dev/',
-        '2. Ajoutez GEMINI_API_KEY dans Vercel',
-        '3. Redéployez l\'application'
-      ],
-      technical: 'GEMINI_API_KEY not configured',
-      timestamp: new Date().toISOString()
+      error: 'Service temporairement indisponible',
+      message: 'Configuration Gemini AI en cours. Veuillez réessayer dans quelques instants.',
+      technical: 'GEMINI_API_KEY not configured'
     });
   }
 
@@ -71,8 +64,8 @@ export default async function handler(req, res) {
 - Réponds toujours en français
 
 **Contexte du dashboard :**
-L\'utilisateur utilise un dashboard financier avec :
-- Cours d\'actions en temps réel
+L'utilisateur utilise un dashboard financier avec :
+- Cours d'actions en temps réel
 - Analyses Seeking Alpha
 - Actualités financières
 - Graphiques et métriques`;
@@ -82,7 +75,7 @@ L\'utilisateur utilise un dashboard financier avec :
       contents.push({ role, parts: [{ text: String(m.content || '') }] });
     }
 
-    // Utiliser le SDK officiel avec Gemini 2.0 Flash Exp (modèle qui fonctionnait avant)
+    // Utiliser le SDK officiel pour robustesse long terme
     console.log('🔧 Initialisation Gemini avec model: gemini-2.0-flash-exp');
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp', tools: { functionDeclarations } });
