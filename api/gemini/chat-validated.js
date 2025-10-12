@@ -5,6 +5,24 @@
 import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// ========================================
+// CONSTANTES DE CONFIGURATION
+// ========================================
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
+const REQUEST_TIMEOUT_MS = 25000;
+
+// Sleep helper
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Wrapper avec timeout
+async function fetchWithTimeout(promise, timeoutMs) {
+  const timeoutPromise = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Timeout dépassé')), timeoutMs)
+  );
+  return Promise.race([promise, timeoutPromise]);
+}
+
 export default async function handler(req, res) {
   // CORS basique
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,7 +32,14 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  if (!GEMINI_API_KEY) return res.status(500).json({ error: 'Clé API Gemini manquante' });
+  if (!GEMINI_API_KEY) {
+    console.error('❌ Clé API Gemini manquante');
+    return res.status(500).json({ 
+      error: 'Clé API Gemini manquante',
+      details: 'Configurez GEMINI_API_KEY',
+      timestamp: new Date().toISOString()
+    });
+  }
 
   try {
     let { messages = [], temperature = 0.3, maxTokens = 4096, systemPrompt, message } = req.body || {};
@@ -38,24 +63,63 @@ export default async function handler(req, res) {
       contents.push({ role, parts: [{ text: String(m.content || '') }] });
     }
 
-    // Utiliser le SDK officiel pour robustesse long terme
+    // Utiliser le SDK officiel avec modèle stable
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-1.5-flash', // Modèle stable
       tools: [ { functionDeclarations } ]
     });
     
-    // ÉTAPE 1: Analyse initiale et décision d'appel de fonction
-    const initialResult = await model.generateContent({
-      contents,
-      generationConfig: {
-        temperature,
-        topK: 20,
-        topP: 0.8,
-        maxOutputTokens: maxTokens,
-        candidateCount: 1
+    // ÉTAPE 1: Analyse initiale et décision d'appel de fonction avec retry
+    let initialResult;
+    let lastError = null;
+    
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        console.log(`🔄 Tentative ${attempt}/${MAX_RETRIES}`);
+        
+        initialResult = await fetchWithTimeout(
+          model.generateContent({
+            contents,
+            generationConfig: {
+              temperature,
+              topK: 20,
+              topP: 0.8,
+              maxOutputTokens: maxTokens,
+              candidateCount: 1
+            }
+          }),
+          REQUEST_TIMEOUT_MS
+        );
+        
+        console.log('✅ Appel initial réussi');
+        break;
+        
+      } catch (err) {
+        lastError = err;
+        console.error(`❌ Erreur tentative ${attempt}/${MAX_RETRIES}:`, err.message);
+        
+        if (attempt < MAX_RETRIES) {
+          const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+          await sleep(delay);
+        } else {
+          return res.status(502).json({ 
+            error: 'Erreur Gemini API',
+            details: err.message,
+            attempts: MAX_RETRIES,
+            timestamp: new Date().toISOString()
+          });
+        }
       }
-    });
+    }
+    
+    if (!initialResult) {
+      return res.status(502).json({ 
+        error: 'Impossible de contacter Gemini',
+        details: String(lastError?.message || 'Erreur inconnue'),
+        timestamp: new Date().toISOString()
+      });
+    }
     const initialData = initialResult.response;
 
     // Détecter un éventuel function call
@@ -139,21 +203,61 @@ FORMAT DES SOURCES (à ajouter à la fin):
 
 Question originale: ${messages[messages.length - 1]?.content || 'N/A'}`;
 
-    const followUpResult = await model.generateContent({
-      contents: [
-        ...contents,
-        { role: 'model', parts: [fc] },
-        { role: 'user', parts: [{ functionResponse: { name: fnName, response: fnResult } }] },
-        { role: 'user', parts: [{ text: finalPrompt }] }
-      ],
-      generationConfig: {
-        temperature,
-        topK: 20,
-        topP: 0.8,
-        maxOutputTokens: maxTokens,
-        candidateCount: 1
+    // Follow-up avec retry
+    let followUpResult;
+    let followUpError = null;
+    
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        console.log(`🔄 Follow-up tentative ${attempt}/${MAX_RETRIES}`);
+        
+        followUpResult = await fetchWithTimeout(
+          model.generateContent({
+            contents: [
+              ...contents,
+              { role: 'model', parts: [fc] },
+              { role: 'user', parts: [{ functionResponse: { name: fnName, response: fnResult } }] },
+              { role: 'user', parts: [{ text: finalPrompt }] }
+            ],
+            generationConfig: {
+              temperature,
+              topK: 20,
+              topP: 0.8,
+              maxOutputTokens: maxTokens,
+              candidateCount: 1
+            }
+          }),
+          REQUEST_TIMEOUT_MS
+        );
+        
+        console.log('✅ Follow-up réussi');
+        break;
+        
+      } catch (err) {
+        followUpError = err;
+        console.error(`❌ Erreur follow-up tentative ${attempt}/${MAX_RETRIES}:`, err.message);
+        
+        if (attempt < MAX_RETRIES) {
+          const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+          await sleep(delay);
+        } else {
+          return res.status(502).json({ 
+            error: 'Erreur lors du follow-up',
+            details: err.message,
+            attempts: MAX_RETRIES,
+            timestamp: new Date().toISOString()
+          });
+        }
       }
-    });
+    }
+    
+    if (!followUpResult) {
+      return res.status(502).json({ 
+        error: 'Impossible de compléter le follow-up',
+        details: String(followUpError?.message || 'Erreur inconnue'),
+        timestamp: new Date().toISOString()
+      });
+    }
     
     const text = followUpResult?.response?.candidates?.[0]?.content?.parts?.[0]?.text || followUpResult?.response?.text || '';
     
