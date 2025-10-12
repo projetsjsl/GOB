@@ -38,10 +38,9 @@ export default async function handler(req, res) {
       contents.push({ role, parts: [{ text: String(m.content || '') }] });
     }
 
-    // Utiliser le SDK officiel avec Gemini 1.5 Flash (modèle stable)
-    // Note: gemini-2.5-flash causait des erreurs FUNCTION_INVOCATION_FAILED
+    // Utiliser le SDK officiel avec Gemini 2.0 Flash Exp (modèle qui fonctionnait avant)
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', tools: { functionDeclarations } });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp', tools: { functionDeclarations } });
     
     // ÉTAPE 1: Analyse initiale et décision d'appel de fonction
     const initialResult = await model.generateContent({
