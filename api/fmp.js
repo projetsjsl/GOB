@@ -449,9 +449,16 @@ export default async function handler(req, res) {
     
     if (error.message.includes('not configured')) {
       return res.status(503).json({
-        error: 'Service unavailable',
-        message: 'FMP_API_KEY not configured',
-        data: []
+        error: 'Clé API FMP non configurée',
+        message: '⚠️ Les données financières nécessitent une clé API FMP. Configurez FMP_API_KEY dans les variables d\'environnement Vercel.',
+        helpUrl: 'https://vercel.com/projetsjsl/gob/settings/environment-variables',
+        steps: [
+          '1. Obtenez une clé gratuite (250 req/jour) sur https://site.financialmodelingprep.com/',
+          '2. Ajoutez FMP_API_KEY dans Vercel',
+          '3. Redéployez l\'application'
+        ],
+        data: [],
+        timestamp: new Date().toISOString()
       });
     }
 
