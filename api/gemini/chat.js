@@ -82,10 +82,10 @@ L'utilisateur utilise un dashboard financier avec :
       contents.push({ role, parts: [{ text: String(m.content || '') }] });
     }
 
-    // Utiliser le SDK officiel pour robustesse long terme
-    console.log('🔧 Initialisation Gemini avec model: gemini-1.5-flash');
+    // Utiliser le SDK officiel avec Gemini 2.5 Flash (modèle "workhorse" optimisé)
+    console.log('🔧 Initialisation Gemini avec model: gemini-2.5-flash');
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', tools: { functionDeclarations } });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', tools: { functionDeclarations } });
     
     console.log('📤 Envoi de la requête à Gemini avec', contents.length, 'messages');
     const initialResult = await model.generateContent({
