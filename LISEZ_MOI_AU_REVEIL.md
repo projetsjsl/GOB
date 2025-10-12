@@ -30,11 +30,6 @@
 - Price/FCF vs Historique
 - Performance depuis plus bas 5 ans
 
-### ✅ **4. Screener 10 Filtres**
-- Market Cap, P/E, ROE, D/E, Secteur
-- Dividende, Financial Strength, RSI, Marge
-- Partagé JStocks™/Watchlist
-- Résultats avec couleurs
 
 ### ✅ **5. Moyennes Mobiles**
 - SMA 20, 50, 200 jours
@@ -94,12 +89,6 @@
 - **Excellent** = Interprétation
 - **Achat Fort** = Recommandation
 
-### Screener
-1. Cliquez sur l'icône **🔍 Filter**
-2. Configurez vos critères (10 filtres)
-3. Cliquez **"Lancer le Screener"**
-4. Cliquez **"Voir"** pour analyser un titre
-
 ### Moyennes Mobiles
 **Section dédiée** dans JStocks™ :
 - Valeurs SMA 20/50/200 en $
@@ -114,7 +103,6 @@
 ### 📈 JStocks™
 - Score JSLAI™ 0-100
 - 6 graphiques interactifs
-- Screener 10 filtres
 - Moyennes mobiles SMA
 - RSI(14) et RSI(2)
 - 12 métriques colorées
@@ -130,7 +118,6 @@
 
 ### ⭐ Dan's Watchlist
 - Titres personnalisés
-- Screener intégré
 - Sauvegarde GitHub
 - Gestion facile
 
@@ -217,7 +204,6 @@
 ### Performance Mesurée
 - Chargement: 2.1s (target 3s) ✅
 - Refresh: 1.5s (target 2s) ✅
-- Screener: 3.2s (target 5s) ✅
 - Graphiques: 0.6s (target 1s) ✅
 
 **Toutes les métriques en vert !** 🎉
@@ -271,8 +257,7 @@
 ### Immédiat (Aujourd'hui)
 1. Tester le dashboard complet
 2. Vérifier tous les onglets
-3. Essayer le screener
-4. Observer le Score JSLAI™
+3. Observer le Score JSLAI™
 
 ### Cette Semaine
 1. Activer l'Interface Admin
@@ -296,20 +281,10 @@
 3. Examiner les 7 composantes
 4. Vérifier moyennes mobiles
 5. Consulter graphiques historiques
-6. Utiliser screener pour comparer
-
-### Pour Trouver Opportunités
-1. Ouvrir Screener (icône Filter)
-2. Configurer filtres (ex: ROE > 15%, P/E < 25)
-3. Lancer screening
-4. Trier par Score JSLAI™
-5. Cliquer "Voir" pour analyser
 
 ### Pour Suivre vos Titres
 1. Dan's Watchlist → Ajouter titres
-2. Activer screener
-3. Filtrer selon critères
-4. Sauvegarder sur GitHub
+2. Sauvegarder sur GitHub
 
 ---
 
@@ -369,7 +344,6 @@ Vous avez maintenant un dashboard financier **professionnel** avec :
 🎯 **Score propriétaire JSLAI™**  
 📊 **10+ métriques avancées**  
 📈 **6 graphiques interactifs**  
-🔍 **Screener puissant 10 filtres**  
 💹 **Analyse moyennes mobiles**  
 🎨 **Système couleurs intelligent**  
 📚 **Documentation exhaustive**  

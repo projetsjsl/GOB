@@ -13,7 +13,6 @@
 - [ ] Identifier les modifications appliquées
 - [ ] Tester le Score JSLAI™
 - [ ] Vérifier les graphiques Chart.js
-- [ ] Tester le screener
 - [ ] Valider les appels API
 
 ### Phase 2: Analyse IA Gemini ⏳
@@ -59,7 +58,6 @@
 - [ ] Test Admin Config
 - [ ] Test Calendrier Earnings
 - [ ] Test Backtesting
-- [ ] Test Screener
 - [ ] Test Graphiques
 - [ ] Test Mode sombre/clair
 - [ ] Test Responsive

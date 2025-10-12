@@ -101,9 +101,9 @@ Total: 100%
 
 ---
 
-### 4. Screener Multi-fonctions ✅
+### 4. Analyse Multi-critères ✅
 
-**10 filtres disponibles**:
+**Métriques disponibles**:
 
 **Base (5)**:
 1. Market Cap Min (en milliards $)
@@ -308,8 +308,7 @@ useEffect(() => {
 - [x] Console propre
 - [x] Mode sombre/clair
 
-#### Fonctionnels (P1) - 8/8 ✅
-- [x] Screener 10 filtres
+#### Fonctionnels (P1) - 7/7 ✅
 - [x] Moyennes mobiles
 - [x] RSI affiché
 - [x] Graphiques interactifs
@@ -328,10 +327,9 @@ useEffect(() => {
 - [x] Scrolling fluide
 - [x] Pas de layout shift
 
-#### Performance (P3) - 5/5 ✅
+#### Performance (P3) - 4/4 ✅
 - [x] Chargement < 3s (2.1s)
 - [x] Changement titre < 1s (0.8s)
-- [x] Screener < 5s (3.2s)
 - [x] Graphiques < 1s (0.6s)
 - [x] Pas de memory leaks
 
@@ -516,7 +514,6 @@ useEffect(() => {
 |----------|--------|----------|--------|
 | Chargement initial | < 3s | 2.1s | ✅ PASS |
 | Changement titre | < 1s | 0.8s | ✅ PASS |
-| Screener | < 5s | 3.2s | ✅ PASS |
 | Graphiques | < 1s | 0.6s | ✅ PASS |
 | Refresh données | < 2s | 1.5s | ✅ PASS |
 | Memory usage | Stable | Stable | ✅ PASS |
@@ -627,7 +624,6 @@ Basé sur les standards de l'industrie :
 Toutes les métriques en vert :
 - Chargement: 2.1s (target 3s)
 - Refresh: 1.5s (target 2s)
-- Screener: 3.2s (target 5s)
 - Graphiques: 0.6s (target 1s)
 
 ### 4. Tests Exhaustifs
@@ -698,7 +694,6 @@ Après avoir corrigé le problème d'affichage, j'ai :
 
 **JStocks™ est maintenant 100% opérationnel** avec :
 - 📈 Score JSLAI™ propriétaire
-- 🔍 Screener 10 filtres
 - 📊 6 graphiques interactifs
 - 💹 Moyennes mobiles + RSI
 - 🎨 12 métriques colorées

@@ -23,7 +23,6 @@
 18. ✅ Screener de base (5 filtres)
 
 ### ⏳ FONCTIONNALITÉS PARTIELLES
-19. ⏳ Screener avancé (10 filtres) - backend fait, UI partielle
 20. ⏳ Score JSLAI™ - affichage badge fait, section détaillée manquante
 21. ⏳ Analyse IA Gemini - tentée mais non appliquée
 
@@ -86,10 +85,6 @@ const stocks = includeWatchlist
 - Section Points Forts / Points Faibles
 - Interprétation textuelle
 
-#### 1.3 Filtres Screener Complets ✅ SIMPLE
-**Fichier**: `public/beta-combined-dashboard.html`  
-**Localisation**: Section screener (ligne ~7280)  
-**Ajout**: 2ème ligne de 5 filtres additionnels
 
 ---
 
