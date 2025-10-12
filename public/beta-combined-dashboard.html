@@ -6659,6 +6659,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 const [violations, setViolations] = useState([]);
                 // Screener visibility
                 const [showScreener, setShowScreener] = useState(false);
+                
+                // 🎯 Configuration du Score JSLAI™ (pondérations)
+                const [jslaiConfig, setJslaiConfig] = useState(() => {
+                    const saved = localStorage.getItem('jslaiConfig');
+                    return saved ? JSON.parse(saved) : {
+                        valuation: 20,        // Multiples de valorisation
+                        profitability: 20,    // Marges, ROE, ROA
+                        growth: 15,           // Croissance revenus & EPS
+                        financialHealth: 20,  // Bilan, dette, liquidité
+                        momentum: 10,         // RSI, tendances, moyennes mobiles
+                        moat: 10,             // Avantage concurrentiel
+                        sectorPosition: 5     // Position dans le secteur
+                    };
+                });
+
+                // Sauvegarder la config JSLAI
+                useEffect(() => {
+                    localStorage.setItem('jslaiConfig', JSON.stringify(jslaiConfig));
+                }, [jslaiConfig]);
 
                 // Génération de données mock
                 const generateMockData = (symbol) => {
@@ -6797,8 +6816,88 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             hasIntraday: !!intradayData
                         });
 
+                        // 🎯 Calcul du Score JSLAI™ Global (0-100)
+                        const calculateJSLAIScore = () => {
+                            let totalScore = 0;
+                            let scores = {};
+                            
+                            // 1. VALUATION (basé sur P/E ratio)
+                            const pe = ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null;
+                            let valuationScore = 50;
+                            if (pe) {
+                                if (pe < 10) valuationScore = 100;
+                                else if (pe < 15) valuationScore = 85;
+                                else if (pe < 20) valuationScore = 70;
+                                else if (pe < 25) valuationScore = 55;
+                                else if (pe < 30) valuationScore = 40;
+                                else valuationScore = 25;
+                            }
+                            scores.valuation = valuationScore;
+                            totalScore += (valuationScore * jslaiConfig.valuation) / 100;
+                            
+                            // 2. PROFITABILITY (basé sur ROE)
+                            const roe = ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null;
+                            let profitabilityScore = 50;
+                            if (roe) {
+                                const roePercent = roe * 100;
+                                if (roePercent > 25) profitabilityScore = 100;
+                                else if (roePercent > 20) profitabilityScore = 85;
+                                else if (roePercent > 15) profitabilityScore = 70;
+                                else if (roePercent > 10) profitabilityScore = 55;
+                                else if (roePercent > 5) profitabilityScore = 40;
+                                else profitabilityScore = 25;
+                            }
+                            scores.profitability = profitabilityScore;
+                            totalScore += (profitabilityScore * jslaiConfig.profitability) / 100;
+                            
+                            // 3. GROWTH (score neutre pour l'instant)
+                            scores.growth = 60;
+                            totalScore += (60 * jslaiConfig.growth) / 100;
+                            
+                            // 4. FINANCIAL HEALTH (basé sur debt/equity)
+                            const de = ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null;
+                            let healthScore = 50;
+                            if (de !== null) {
+                                if (de < 0.3) healthScore = 100;
+                                else if (de < 0.5) healthScore = 85;
+                                else if (de < 1.0) healthScore = 70;
+                                else if (de < 1.5) healthScore = 55;
+                                else if (de < 2.0) healthScore = 40;
+                                else healthScore = 25;
+                            }
+                            scores.financialHealth = healthScore;
+                            totalScore += (healthScore * jslaiConfig.financialHealth) / 100;
+                            
+                            // 5-7. MOMENTUM, MOAT, SECTOR (scores neutres pour l'instant)
+                            scores.momentum = 55;
+                            scores.moat = 60;
+                            scores.sectorPosition = 60;
+                            totalScore += (55 * jslaiConfig.momentum) / 100;
+                            totalScore += (60 * jslaiConfig.moat) / 100;
+                            totalScore += (60 * jslaiConfig.sectorPosition) / 100;
+                            
+                            const finalScore = Math.round(totalScore);
+                            
+                            return {
+                                total: finalScore,
+                                breakdown: scores,
+                                interpretation: finalScore >= 85 ? 'Excellent' :
+                                               finalScore >= 75 ? 'Très Bon' :
+                                               finalScore >= 65 ? 'Bon' :
+                                               finalScore >= 50 ? 'Moyen' :
+                                               finalScore >= 35 ? 'Faible' : 'Mauvais',
+                                recommendation: finalScore >= 75 ? 'Achat Fort' :
+                                               finalScore >= 65 ? 'Achat' :
+                                               finalScore >= 50 ? 'Conserver' :
+                                               finalScore >= 35 ? 'Surveiller' : 'Éviter'
+                            };
+                        };
+
+                        const jslaiScore = calculateJSLAIScore();
+                        
                         // Construire l'objet de données structuré
                         return {
+                            jslaiScore: jslaiScore,  // 🎯 Score JSLAI™ ajouté
                             quote: {
                                 symbol: symbol,
                                 name: profile?.data?.[0]?.companyName || profile?.companyName || `${symbol} Inc.`,
@@ -7483,9 +7582,23 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             ) : (
                                                 <LucideIcon name="WifiOff" className="w-3 h-3 text-red-500" />
                                             )}
+                                            {/* 🎯 Badge Score JSLAI™ */}
+                                            {stockDataIntelli?.jslaiScore && (
+                                                <div className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
+                                                    stockDataIntelli.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600' :
+                                                    stockDataIntelli.jslaiScore.total >= 65 ? 'bg-blue-900/30 text-blue-400 border-blue-600' :
+                                                    stockDataIntelli.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
+                                                    'bg-red-900/30 text-red-400 border-red-600'
+                                                }`}>
+                                                    🎯 JSLAI™ {stockDataIntelli.jslaiScore.total}/100
+                                                </div>
+                                            )}
                                         </h1>
                                         <p className="text-[8px] text-gray-600">
-                                            Mode Démo Hybride • FMP + Perplexity AI
+                                            Mode Démo Hybride • FMP + Perplexity AI 
+                                            {stockDataIntelli?.jslaiScore && (
+                                                <span className="ml-2">• {stockDataIntelli.jslaiScore.interpretation} ({stockDataIntelli.jslaiScore.recommendation})</span>
+                                            )}
                                         </p>
                                     </div>
                                 </div>
