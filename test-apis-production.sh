@@ -43,8 +43,8 @@ test_api() {
         response=$(curl -s -w "\n%{http_code}" "$url" 2>&1)
     fi
     
-    status_code=$(echo "$response" | tail -n1)
-    body=$(echo "$response" | head -n-1)
+    status_code=$(echo "$response" | tail -n 1)
+    body=$(echo "$response" | sed '$d')
     
     echo "Status Code: $status_code"
     echo "Response preview:"
