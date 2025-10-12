@@ -1,8 +1,6 @@
 // ========================================
-// /api/gemini/chat - Version simplifiée SANS function calling
+// /api/gemini/chat - Version REST API directe (SANS SDK)
 // ========================================
-
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default async function handler(req, res) {
   // CORS basique
@@ -64,55 +62,59 @@ L'utilisateur utilise un dashboard financier avec :
 - Actualités financières
 - Graphiques et métriques`;
 
-    // Construire le contenu pour Gemini
-    const contents = [];
+    // Construire le texte complet pour Gemini
+    let fullText = emmaPrompt + '\n\n';
     
-    // Ajouter le system prompt
-    contents.push({ 
-      role: 'user', 
-      parts: [{ text: emmaPrompt }] 
-    });
-    
-    // Ajouter les messages de conversation
     for (const m of messages) {
-      const role = m.role === 'assistant' ? 'model' : 'user';
-      contents.push({ 
-        role, 
-        parts: [{ text: String(m.content || '') }] 
-      });
+      fullText += `\nUtilisateur: ${m.content}\n`;
     }
 
-    // Initialiser Gemini SANS function calling
-    console.log('🔧 Initialisation Gemini (version simplifiée sans function calling)');
+    // Appeler l'API Gemini REST directement (sans SDK)
+    console.log('🔧 Appel API Gemini REST directe (sans SDK)');
     console.log('📦 Modèle: gemini-2.0-flash-exp');
+    console.log('📤 Envoi de la requête...');
     
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp'
-      // PAS de tools pour l'instant
-    });
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
     
-    console.log('📤 Envoi de la requête à Gemini...');
-    
-    const result = await model.generateContent({
-      contents,
-      generationConfig: {
-        temperature,
-        topK: 20,
-        topP: 0.8,
-        maxOutputTokens: maxTokens,
-        candidateCount: 1
-      }
-    }).catch(err => {
-      console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message || err);
-      console.error('Stack:', err?.stack);
-      throw new Error(`Erreur Gemini API: ${err?.message || err}`);
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: fullText }]
+        }],
+        generationConfig: {
+          temperature,
+          topK: 20,
+          topP: 0.8,
+          maxOutputTokens: maxTokens,
+          candidateCount: 1
+        }
+      })
     });
 
-    console.log('✅ Réponse reçue de Gemini');
+    console.log('📡 Réponse reçue, status:', response.status);
 
-    const response = result.response;
-    const text = response.text();
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Erreur API Gemini:', response.status, errorText);
+      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Données parsées avec succès');
+
+    // Extraire le texte de la réponse
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    if (!text) {
+      console.error('❌ Pas de texte dans la réponse:', JSON.stringify(data));
+      throw new Error('Aucune réponse générée par Gemini');
+    }
+
+    console.log('✅ Texte extrait, longueur:', text.length);
     
     // Ajouter des sources génériques
     const sourcesAddition = `
