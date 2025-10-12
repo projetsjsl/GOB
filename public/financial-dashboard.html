@@ -22,6 +22,15 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
+        .sub-tab-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .sub-tab-button.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
         .pulse-animation {
             animation: pulse 2s infinite;
         }
@@ -35,6 +44,19 @@
         .stock-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .earnings-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .earnings-card.upcoming {
+            border-left-color: #3b82f6;
+        }
+        .earnings-card.beat {
+            border-left-color: #10b981;
+        }
+        .earnings-card.miss {
+            border-left-color: #ef4444;
         }
         /* Réduction globale pour mobile: police et espacements à 50% */
         @media (max-width: 768px) {
@@ -50,17 +72,21 @@
 
         const FinancialDashboard = () => {
             // États principaux
-            const [activeTab, setActiveTab] = useState('stocks');
-            const [tickers, setTickers] = useState(['CVS', 'MSFT']);
+            const [activeTab, setActiveTab] = useState('jstocks');
+            const [activeJStocksTab, setActiveJStocksTab] = useState('overview');
+            const [tickers, setTickers] = useState(['CVS', 'MSFT', 'AAPL', 'GOOGL', 'TSLA']);
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
             const [seekingAlphaData, setSeekingAlphaData] = useState({});
+            const [earningsData, setEarningsData] = useState([]);
             const [loading, setLoading] = useState(false);
+            const [earningsLoading, setEarningsLoading] = useState(false);
             const [message, setMessage] = useState(null);
             const [selectedStock, setSelectedStock] = useState(null);
             const [newTicker, setNewTicker] = useState('');
             const [showTickerManager, setShowTickerManager] = useState(false);
             const [lastUpdate, setLastUpdate] = useState(null);
+            const [earningsFilter, setEarningsFilter] = useState('all'); // 'all', 'upcoming', 'past'
 
             // Configuration API
             const API_BASE_URL = window.location.origin;
@@ -176,14 +202,60 @@
                 }
             };
 
+            // Fonction pour charger les données du calendrier des résultats
+            const fetchEarningsCalendar = async () => {
+                setEarningsLoading(true);
+                try {
+                    console.log('📅 Chargement du calendrier des résultats...');
+                    
+                    // Générer des données simulées pour démonstration
+                    // En production, utiliser l'API FMP: /api/fmp?endpoint=calendar-earnings&symbol=AAPL
+                    const mockEarnings = tickers.map((ticker, index) => {
+                        const today = new Date();
+                        const daysOffset = (index - 2) * 7; // Étaler sur plusieurs semaines
+                        const date = new Date(today.getTime() + daysOffset * 24 * 60 * 60 * 1000);
+                        
+                        return {
+                            symbol: ticker,
+                            date: date.toISOString().split('T')[0],
+                            time: 'AMC', // After Market Close
+                            epsEstimate: (Math.random() * 2 + 0.5).toFixed(2),
+                            epsActual: daysOffset < 0 ? (Math.random() * 2 + 0.5).toFixed(2) : null,
+                            revenueEstimate: (Math.random() * 50 + 20).toFixed(2) + 'B',
+                            revenueActual: daysOffset < 0 ? (Math.random() * 50 + 20).toFixed(2) + 'B' : null,
+                            fiscalDateEnding: date.toISOString().split('T')[0],
+                            isPast: daysOffset < 0
+                        };
+                    });
+
+                    // Trier par date
+                    mockEarnings.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    setEarningsData(mockEarnings);
+                    
+                    console.log(`✅ ${mockEarnings.length} événements de résultats chargés`);
+                } catch (error) {
+                    console.error('❌ Erreur chargement calendrier des résultats:', error);
+                    showMessage('Erreur chargement calendrier', 'error');
+                } finally {
+                    setEarningsLoading(false);
+                }
+            };
+
             // Initialisation
             useEffect(() => {
                 loadTickers();
                 refreshAllStocks();
                 fetchNews();
                 fetchSeekingAlphaData();
-                // Suppression de l'auto-refresh: on ne met à jour que sur arrivée ou clic bouton
+                fetchEarningsCalendar();
             }, []);
+
+            // Recharger les earnings quand les tickers changent
+            useEffect(() => {
+                if (tickers.length > 0 && activeTab === 'jstocks' && activeJStocksTab === 'car') {
+                    fetchEarningsCalendar();
+                }
+            }, [tickers, activeTab, activeJStocksTab]);
 
             // Composant de gestion des titres
             const TickerManager = () => (
@@ -236,7 +308,385 @@
                 </div>
             );
 
-            // Composant onglet Stocks
+            // ======================================
+            // COMPOSANTS DE L'ONGLET JSTOCKS
+            // ======================================
+
+            // Vue d'ensemble JStocks
+            const JStocksOverview = () => (
+                <div className="space-y-6">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                        <h3 className="text-xl font-bold text-white mb-4">📊 Vue d'ensemble JStocks™</h3>
+                        <p className="text-gray-300 mb-4">
+                            Bienvenue dans JStocks™, votre plateforme d'analyse financière complète. 
+                            Utilisez les sous-onglets ci-dessus pour naviguer entre les différentes sections.
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                            <div className="bg-green-900/30 rounded-lg p-4 border border-green-500/30">
+                                <h4 className="text-lg font-semibold text-green-400 mb-2">📈 Analyses</h4>
+                                <p className="text-gray-300 text-sm">Analyses approfondies de vos actions avec métriques clés</p>
+                            </div>
+                            
+                            <div className="bg-blue-900/30 rounded-lg p-4 border border-blue-500/30">
+                                <h4 className="text-lg font-semibold text-blue-400 mb-2">📅 Calendrier CAR</h4>
+                                <p className="text-gray-300 text-sm">Calendrier des Annonces de Résultats en temps réel</p>
+                            </div>
+                            
+                            <div className="bg-purple-900/30 rounded-lg p-4 border border-purple-500/30">
+                                <h4 className="text-lg font-semibold text-purple-400 mb-2">📰 Actualités</h4>
+                                <p className="text-gray-300 text-sm">Dernières nouvelles financières pour vos titres</p>
+                            </div>
+                            
+                            <div className="bg-yellow-900/30 rounded-lg p-4 border border-yellow-500/30">
+                                <h4 className="text-lg font-semibold text-yellow-400 mb-2">💡 Insights IA</h4>
+                                <p className="text-gray-300 text-sm">Analyses générées par intelligence artificielle</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                        <h3 className="text-xl font-bold text-white mb-4">🎯 Titres suivis ({tickers.length})</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {tickers.map(ticker => (
+                                <div key={ticker} className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-mono">
+                                    {ticker}
+                                </div>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => setShowTickerManager(true)}
+                            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                        >
+                            Gérer les titres
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Onglet CAR - Calendrier des Annonces de Résultats
+            const JStocksCARTab = () => {
+                const filteredEarnings = earningsData.filter(item => {
+                    if (earningsFilter === 'upcoming') return !item.isPast;
+                    if (earningsFilter === 'past') return item.isPast;
+                    return true;
+                });
+
+                const getEarningsStatus = (item) => {
+                    if (!item.isPast) return 'upcoming';
+                    if (!item.epsActual || !item.epsEstimate) return 'upcoming';
+                    return parseFloat(item.epsActual) >= parseFloat(item.epsEstimate) ? 'beat' : 'miss';
+                };
+
+                return (
+                    <div className="space-y-6">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h3 className="text-2xl font-bold text-white mb-2">
+                                    📅 Calendrier des Annonces de Résultats (CAR)
+                                </h3>
+                                <p className="text-gray-300 text-sm">
+                                    Suivez les dates et résultats des annonces financières
+                                </p>
+                            </div>
+                            <button
+                                onClick={fetchEarningsCalendar}
+                                disabled={earningsLoading}
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                            >
+                                {earningsLoading ? 'Actualisation...' : '🔄 Actualiser'}
+                            </button>
+                        </div>
+
+                        {/* Filtres */}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setEarningsFilter('all')}
+                                className={`sub-tab-button ${earningsFilter === 'all' ? 'active' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
+                            >
+                                Tous ({earningsData.length})
+                            </button>
+                            <button
+                                onClick={() => setEarningsFilter('upcoming')}
+                                className={`sub-tab-button ${earningsFilter === 'upcoming' ? 'active' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
+                            >
+                                À venir ({earningsData.filter(e => !e.isPast).length})
+                            </button>
+                            <button
+                                onClick={() => setEarningsFilter('past')}
+                                className={`sub-tab-button ${earningsFilter === 'past' ? 'active' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}
+                            >
+                                Passés ({earningsData.filter(e => e.isPast).length})
+                            </button>
+                        </div>
+
+                        {/* Indicateurs */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-blue-900/30 rounded-lg p-4 border border-blue-500/30">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-blue-400">À venir</span>
+                                    <span className="text-2xl font-bold text-white">
+                                        {earningsData.filter(e => !e.isPast).length}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="bg-green-900/30 rounded-lg p-4 border border-green-500/30">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-green-400">Surperformance</span>
+                                    <span className="text-2xl font-bold text-white">
+                                        {earningsData.filter(e => e.isPast && e.epsActual && parseFloat(e.epsActual) >= parseFloat(e.epsEstimate)).length}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="bg-red-900/30 rounded-lg p-4 border border-red-500/30">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-red-400">Sous-performance</span>
+                                    <span className="text-2xl font-bold text-white">
+                                        {earningsData.filter(e => e.isPast && e.epsActual && parseFloat(e.epsActual) < parseFloat(e.epsEstimate)).length}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Liste des événements */}
+                        {earningsLoading ? (
+                            <div className="text-center py-12">
+                                <div className="text-white text-xl mb-2">Chargement du calendrier...</div>
+                                <div className="text-gray-400">Récupération des données d'annonces de résultats</div>
+                            </div>
+                        ) : filteredEarnings.length === 0 ? (
+                            <div className="text-center py-12">
+                                <div className="text-gray-400 text-lg">
+                                    Aucune annonce de résultats trouvée
+                                </div>
+                                <p className="text-gray-500 text-sm mt-2">
+                                    Ajoutez des titres à votre liste pour voir leur calendrier
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {filteredEarnings.map((item, index) => {
+                                    const status = getEarningsStatus(item);
+                                    const date = new Date(item.date);
+                                    const isToday = date.toDateString() === new Date().toDateString();
+                                    
+                                    return (
+                                        <div key={index} className={`earnings-card ${status} bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20`}>
+                                            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <h4 className="text-xl font-bold text-white">{item.symbol}</h4>
+                                                        {isToday && (
+                                                            <span className="px-2 py-1 bg-yellow-500 text-black text-xs rounded-full font-semibold">
+                                                                AUJOURD'HUI
+                                                            </span>
+                                                        )}
+                                                        {!item.isPast && (
+                                                            <span className="px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
+                                                                À venir
+                                                            </span>
+                                                        )}
+                                                        {status === 'beat' && (
+                                                            <span className="px-2 py-1 bg-green-500 text-white text-xs rounded-full">
+                                                                ✓ Beat
+                                                            </span>
+                                                        )}
+                                                        {status === 'miss' && (
+                                                            <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-full">
+                                                                ✗ Miss
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="text-gray-300 text-sm mb-3">
+                                                        📅 {date.toLocaleDateString('fr-FR', { 
+                                                            weekday: 'long', 
+                                                            year: 'numeric', 
+                                                            month: 'long', 
+                                                            day: 'numeric' 
+                                                        })}
+                                                        {' • '}
+                                                        {item.time === 'BMO' ? '🌅 Avant ouverture' : '🌙 Après fermeture'}
+                                                    </div>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div className="bg-black/20 rounded p-3">
+                                                            <div className="text-gray-400 text-xs mb-1">EPS (Bénéfice par action)</div>
+                                                            <div className="flex items-baseline gap-2">
+                                                                <span className="text-white text-lg font-semibold">
+                                                                    ${item.epsActual || item.epsEstimate}
+                                                                </span>
+                                                                {item.epsActual && (
+                                                                    <span className="text-gray-400 text-sm">
+                                                                        (prévu: ${item.epsEstimate})
+                                                                    </span>
+                                                                )}
+                                                                {!item.epsActual && (
+                                                                    <span className="text-gray-400 text-sm">
+                                                                        (estimé)
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="bg-black/20 rounded p-3">
+                                                            <div className="text-gray-400 text-xs mb-1">Revenus</div>
+                                                            <div className="flex items-baseline gap-2">
+                                                                <span className="text-white text-lg font-semibold">
+                                                                    {item.revenueActual || item.revenueEstimate}
+                                                                </span>
+                                                                {item.revenueActual && (
+                                                                    <span className="text-gray-400 text-sm">
+                                                                        (prévu: {item.revenueEstimate})
+                                                                    </span>
+                                                                )}
+                                                                {!item.revenueActual && (
+                                                                    <span className="text-gray-400 text-sm">
+                                                                        (estimé)
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex md:flex-col gap-2">
+                                                    <button 
+                                                        onClick={() => setSelectedStock(item.symbol)}
+                                                        className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm whitespace-nowrap"
+                                                    >
+                                                        📊 Analyser
+                                                    </button>
+                                                    <button 
+                                                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm whitespace-nowrap"
+                                                    >
+                                                        📰 News
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {/* Note informative */}
+                        <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                                <span className="text-2xl">💡</span>
+                                <div>
+                                    <h4 className="text-yellow-400 font-semibold mb-1">Note importante</h4>
+                                    <p className="text-gray-300 text-sm">
+                                        Les données affichées sont actuellement simulées à des fins de démonstration.
+                                        Pour obtenir des données réelles en temps réel, configurez une clé API FMP 
+                                        (Financial Modeling Prep) dans les paramètres administrateur.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            // Onglet Analyses JStocks
+            const JStocksAnalysis = () => (
+                <div className="space-y-6">
+                    <h3 className="text-2xl font-bold text-white">📈 Analyses Détaillées</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {tickers.map(ticker => {
+                            const data = stockData[ticker];
+                            if (!data) return null;
+
+                            const change = data.dp || 0;
+                            const changeColor = change >= 0 ? 'text-green-400' : 'text-red-400';
+                            const bgColor = change >= 0 ? 'bg-green-900/20' : 'bg-red-900/20';
+
+                            return (
+                                <div key={ticker} className={`stock-card p-4 rounded-lg border ${bgColor}`}>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="text-xl font-bold text-white">{ticker}</h3>
+                                        <span className={`text-sm ${changeColor}`}>
+                                            {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="text-2xl font-bold text-white mb-2">
+                                        ${data.c?.toFixed(2) || 'N/A'}
+                                    </div>
+                                    
+                                    <div className="text-sm text-gray-400 space-y-1">
+                                        <div>Ouverture: ${data.o?.toFixed(2) || 'N/A'}</div>
+                                        <div>Plus haut: ${data.h?.toFixed(2) || 'N/A'}</div>
+                                        <div>Plus bas: ${data.l?.toFixed(2) || 'N/A'}</div>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => setSelectedStock(ticker)}
+                                        className="mt-3 w-full px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+                                    >
+                                        Voir détails
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+
+            // Composant principal JStocks avec sous-onglets
+            const JStocksTab = () => {
+                const jstocksTabs = [
+                    { id: 'overview', label: '📊 Vue d\'ensemble' },
+                    { id: 'car', label: '📅 Calendrier CAR' },
+                    { id: 'analysis', label: '📈 Analyses' }
+                ];
+
+                return (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-2xl font-bold text-white">JStocks™ - Plateforme d'Analyse</h2>
+                            <button
+                                onClick={refreshAllStocks}
+                                disabled={loading}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                            >
+                                {loading ? 'Actualisation...' : '🔄 Actualiser'}
+                            </button>
+                        </div>
+
+                        {/* Sous-navigation JStocks */}
+                        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
+                            <div className="flex flex-wrap gap-2">
+                                {jstocksTabs.map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveJStocksTab(tab.id)}
+                                        className={`sub-tab-button ${
+                                            activeJStocksTab === tab.id 
+                                                ? 'active' 
+                                                : 'text-gray-300 hover:text-white hover:bg-white/10'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Contenu des sous-onglets */}
+                        {activeJStocksTab === 'overview' && <JStocksOverview />}
+                        {activeJStocksTab === 'car' && <JStocksCARTab />}
+                        {activeJStocksTab === 'analysis' && <JStocksAnalysis />}
+                    </div>
+                );
+            };
+
+            // ======================================
+            // AUTRES COMPOSANTS D'ONGLETS
+            // ======================================
+
+            // Composant onglet Stocks (classique)
             const StocksTab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
@@ -374,10 +824,12 @@
             );
 
             const tabs = [
+                { id: 'jstocks', label: '📈 JStocks™', component: JStocksTab },
                 { id: 'stocks', label: '📊 Données Financières', component: StocksTab },
                 { id: 'news', label: '📰 Actualités', component: NewsTab },
-                { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab }
+                { id: 'seeking-alpha', label: '🔍 Seeking Alpha', component: SeekingAlphaTab }
             ];
+
             return (
                 <div className="min-h-screen">
                     {/* Header */}
@@ -437,6 +889,7 @@
 
                     {/* Contenu principal */}
                     <main className="max-w-7xl mx-auto p-6">
+                        {activeTab === 'jstocks' && <JStocksTab />}
                         {activeTab === 'stocks' && <StocksTab />}
                         {activeTab === 'news' && <NewsTab />}
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
