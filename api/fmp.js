@@ -450,13 +450,16 @@ export default async function handler(req, res) {
     if (error.message.includes('not configured')) {
       return res.status(503).json({
         error: 'Service unavailable',
-        message: 'FMP_API_KEY not configured'
+        message: 'FMP_API_KEY not configured',
+        data: []
       });
     }
 
-    res.status(500).json({
-      error: 'Internal server error',
-      message: error.message
+    // Retourner un tableau vide au lieu d'une erreur 500 pour ne pas casser l'UI
+    res.status(200).json({
+      error: error.message,
+      data: [],
+      warning: 'API call failed but returning empty data to prevent UI crash'
     });
   }
 }

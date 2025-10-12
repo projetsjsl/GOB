@@ -14,7 +14,14 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  if (!GEMINI_API_KEY) return res.status(500).json({ error: 'Clé API Gemini manquante' });
+  if (!GEMINI_API_KEY) {
+    console.error('❌ GEMINI_API_KEY manquante');
+    return res.status(503).json({ 
+      error: 'Service temporairement indisponible',
+      message: 'Configuration Gemini AI en cours. Veuillez réessayer dans quelques instants.',
+      technical: 'GEMINI_API_KEY not configured'
+    });
+  }
 
   try {
     let { messages = [], temperature = 0.3, maxTokens = 4096, systemPrompt, message } = req.body || {};

@@ -1600,6 +1600,15 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [newTicker, setNewTicker] = useState('');
                 const [watchlistStockData, setWatchlistStockData] = useState({});
                 const [watchlistLoading, setWatchlistLoading] = useState(false);
+                const [showScreener, setShowScreener] = useState(false);
+                const [loadingScreener, setLoadingScreener] = useState(false);
+                const [screenerResults, setScreenerResults] = useState([]);
+                const [screenerFilters, setScreenerFilters] = useState({
+                    minMarketCap: 0,
+                    maxPE: 50,
+                    minROE: 0,
+                    sector: 'all'
+                });
                 const WATCHLIST_FILE = '/dans-watchlist.json'; // servi depuis /public
                 
                 // Fonction pour exécuter le screener sur la watchlist
