@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - GOB Apps</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            font-size: 3em;
+            margin: 0 0 20px 0;
+        }
+        p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .status {
+            display: inline-block;
+            background: #10b981;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .links {
+            margin-top: 30px;
+        }
+        .links a {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .links a:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ GOB Apps Fonctionne!</h1>
+        <p>La plateforme financière est opérationnelle</p>
+        <div class="status">🟢 Système actif</div>
+        <div class="links">
+            <a href="/financial-dashboard.html">📊 Dashboard Financier</a>
+            <a href="/stocksandnews.html">📈 Stocks & News</a>
+            <a href="/seeking-alpha/index.html">🔍 Seeking Alpha</a>
+        </div>
+        <p style="margin-top: 40px; font-size: 0.9em; opacity: 0.7;">
+            Propulsé par JSL AI
+        </p>
+    </div>
+
+    <script>
+        console.log('✅ GOB Apps - Test page loaded successfully');
+        console.log('📍 Current location:', window.location.href);
+        console.log('🌐 Base URL:', window.location.origin);
+        
+        // Test if we can access the API
+        fetch('/api/marketdata?endpoint=quote&symbol=AAPL&source=auto')
+            .then(response => {
+                console.log('✅ API is accessible:', response.ok);
+                return response.json();
+            })
+            .then(data => {
+                console.log('📊 API data:', data);
+            })
+            .catch(error => {
+                console.warn('⚠️ API test failed (this is normal if not deployed):', error.message);
+            });
+    </script>
+</body>
+</html>

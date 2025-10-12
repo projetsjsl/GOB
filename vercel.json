@@ -29,11 +29,5 @@
     }
   ],
   "rewrites": [],
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/financial-dashboard.html",
-      "permanent": false
-    }
-  ]
+  "redirects": []
 }
