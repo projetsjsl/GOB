@@ -71,7 +71,13 @@ export async function getFinancialStatements(symbol, period = 'quarter', limit =
 
 // Get financial ratios (TTM - Trailing Twelve Months)
 export async function getFinancialRatiosTTM(symbol) {
-  return await fmpRequest(`/ratios-ttm/${symbol}`);
+  try {
+    return await fmpRequest(`/ratios-ttm/${symbol}`);
+  } catch (error) {
+    // Fallback to profile data if ratios endpoint not available
+    console.log('Ratios endpoint not available, using profile data');
+    return await fmpRequest(`/profile?symbol=${symbol}`);
+  }
 }
 
 // Get key metrics (TTM)
@@ -117,9 +123,9 @@ export async function getAnalystEstimates(symbol, period = 'quarter', limit = 12
  * MARKET DATA
  */
 
-// Get real-time quote
+// Get real-time quote (using profile endpoint as quote returns empty)
 export async function getQuote(symbol) {
-  return await fmpRequest(`/quote/${symbol}`);
+  return await fmpRequest(`/profile?symbol=${symbol}`);
 }
 
 // Get multiple quotes
