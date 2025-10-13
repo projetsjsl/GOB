@@ -1,6 +1,8 @@
 // ========================================
-// /api/gemini/chat - Version REST API directe (SANS SDK)
+// /api/gemini/chat - Version avec Function Calling
 // ========================================
+
+import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
 
 export default async function handler(req, res) {
   // CORS basique
@@ -69,9 +71,10 @@ L'utilisateur utilise un dashboard financier avec :
       fullText += `\nUtilisateur: ${m.content}\n`;
     }
 
-    // Appeler l'API Gemini REST directement (sans SDK)
-    console.log('🔧 Appel API Gemini REST directe (sans SDK)');
+    // Appeler l'API Gemini avec Function Calling
+    console.log('🔧 Appel API Gemini avec Function Calling');
     console.log('📦 Modèle: gemini-2.0-flash-exp');
+    console.log('🛠️ Fonctions disponibles:', functionDeclarations.length);
     console.log('📤 Envoi de la requête...');
     
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
@@ -84,6 +87,9 @@ L'utilisateur utilise un dashboard financier avec :
       body: JSON.stringify({
         contents: [{
           parts: [{ text: fullText }]
+        }],
+        tools: [{
+          functionDeclarations: functionDeclarations
         }],
         generationConfig: {
           temperature,
@@ -106,7 +112,94 @@ L'utilisateur utilise un dashboard financier avec :
     const data = await response.json();
     console.log('✅ Données parsées avec succès');
 
-    // Extraire le texte de la réponse
+    // Vérifier s'il y a des function calls à exécuter
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+      const parts = data.candidates[0].content.parts;
+      
+      // Chercher les function calls
+      const functionCalls = parts.filter(part => part.functionCall);
+      
+      if (functionCalls.length > 0) {
+        console.log('🛠️ Function calls détectés:', functionCalls.length);
+        
+        // Exécuter les function calls
+        const functionResults = [];
+        for (const functionCall of functionCalls) {
+          try {
+            console.log(`🔧 Exécution de ${functionCall.functionCall.name} avec args:`, functionCall.functionCall.args);
+            const result = await executeFunction(functionCall.functionCall.name, functionCall.functionCall.args);
+            functionResults.push({
+              name: functionCall.functionCall.name,
+              response: result
+            });
+            console.log(`✅ ${functionCall.functionCall.name} exécuté avec succès`);
+          } catch (error) {
+            console.error(`❌ Erreur lors de l'exécution de ${functionCall.functionCall.name}:`, error);
+            functionResults.push({
+              name: functionCall.functionCall.name,
+              response: { error: error.message }
+            });
+          }
+        }
+
+        // Construire le message avec les résultats des fonctions
+        const functionResultsText = functionResults.map(fr => 
+          `Résultat de ${fr.name}: ${JSON.stringify(fr.response, null, 2)}`
+        ).join('\n\n');
+
+        // Faire un deuxième appel à Gemini avec les résultats des fonctions
+        const followUpPayload = {
+          contents: [
+            {
+              parts: [
+                {
+                  text: `${emmaPrompt}\n\n${messages.map(m => `Utilisateur: ${m.content}`).join('\n')}`
+                }
+              ]
+            },
+            {
+              parts: [
+                {
+                  text: `Voici les résultats des fonctions exécutées:\n\n${functionResultsText}\n\nMaintenant, fournis une réponse complète en intégrant ces données réelles dans ton analyse. Ne mentionne pas que tu as utilisé des fonctions - présente directement les données récupérées.`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature,
+            topK: 20,
+            topP: 0.8,
+            maxOutputTokens: maxTokens,
+            candidateCount: 1
+          }
+        };
+
+        const followUpResponse = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(followUpPayload)
+        });
+
+        if (followUpResponse.ok) {
+          const followUpData = await followUpResponse.json();
+          if (followUpData.candidates && followUpData.candidates[0] && followUpData.candidates[0].content) {
+            const finalResponse = followUpData.candidates[0].content.parts[0].text;
+            console.log('✅ Réponse finale avec données intégrées générée');
+            
+            return res.status(200).json({
+              response: finalResponse,
+              source: 'gemini-with-functions',
+              functionsExecuted: functionResults.map(fr => fr.name),
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+      }
+    }
+
+    // Si pas de function calls, retourner la réponse normale
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
     if (!text) {
@@ -127,7 +220,7 @@ L'utilisateur utilise un dashboard financier avec :
     return res.status(200).json({ 
       response: text + sourcesAddition, 
       source: 'gemini', 
-      functionCalled: false 
+      functionsExecuted: []
     });
 
   } catch (e) {
