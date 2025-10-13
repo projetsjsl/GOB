@@ -167,6 +167,72 @@
     <div id="root"></div>
     
     <script type="text/babel">
+
+// Version simplifiée de l'API hybride qui fonctionne sans Supabase
+const fetchHybridData = async (symbol, dataType) => {
+  try {
+    console.log(`🔄 Récupération ${dataType} pour ${symbol}`);
+    
+    // Utiliser directement les APIs externes
+    let apiUrl = '';
+    switch (dataType) {
+      case 'quote':
+        apiUrl = `/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`;
+        break;
+      case 'profile':
+        apiUrl = `/api/fmp?endpoint=profile&symbol=${symbol}`;
+        break;
+      case 'ratios':
+        apiUrl = `/api/fmp?endpoint=ratios&symbol=${symbol}`;
+        break;
+      case 'news':
+        apiUrl = `/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=20`;
+        break;
+      case 'prices':
+        apiUrl = `/api/fmp?endpoint=historical-chart&symbol=${symbol}&timeframe=1day&limit=30`;
+        break;
+      case 'analyst':
+        apiUrl = `/api/fmp?endpoint=rating&symbol=${symbol}`;
+        break;
+      case 'earnings':
+        apiUrl = `/api/fmp?endpoint=earnings&symbol=${symbol}&limit=5`;
+        break;
+      default:
+        throw new Error(`Type de données non supporté: ${dataType}`);
+    }
+    
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error(`API ${dataType} échouée: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log(`✅ ${dataType} récupéré pour ${symbol}`);
+    
+    return {
+      success: true,
+      symbol,
+      dataType,
+      data: data,
+      source: 'external',
+      metadata: {
+        confidence: 0.9,
+        freshness: 'fresh',
+        lastUpdated: new Date().toISOString()
+      }
+    };
+    
+  } catch (error) {
+    console.error(`❌ Erreur ${dataType} pour ${symbol}:`, error);
+    return {
+      success: false,
+      symbol,
+      dataType,
+      error: error.message,
+      source: 'error'
+    };
+  }
+};
         const { useState, useEffect, useRef } = React;
 
             // Composant d'icônes SVG inline (remplace Lucide) - Défini globalement
@@ -7059,44 +7125,28 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }
 
                         // Appels parallèles aux APIs hybrides (Base locale + APIs externes)
-                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, analystResponse, earningsResponse] = await Promise.allSettled([
-                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=quote&syncIfNeeded=true`),
-                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=profile&syncIfNeeded=true`),
-                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=ratios&syncIfNeeded=true`),
-                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=news&syncIfNeeded=true`),
-                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=prices&syncIfNeeded=true`),
-                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=analyst&syncIfNeeded=true`),
-                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=earnings&syncIfNeeded=true`)
-                        ]);
+                        
+// Appels parallèles aux APIs avec gestion d'erreur améliorée
+const [quoteResult, profileResult, ratiosResult, newsResult, intradayResult, analystResult, earningsResult] = await Promise.allSettled([
+  fetchHybridData(symbol, 'quote'),
+  fetchHybridData(symbol, 'profile'),
+  fetchHybridData(symbol, 'ratios'),
+  fetchHybridData(symbol, 'news'),
+  fetchHybridData(symbol, 'prices'),
+  fetchHybridData(symbol, 'analyst'),
+  fetchHybridData(symbol, 'earnings')
+]);
 
                         // Parser les résultats hybrides
-                        const quoteData = quoteResponse.status === 'fulfilled' && quoteResponse.value.ok 
-                            ? await quoteResponse.value.json() 
-                            : null;
                         
-                        const profileData = profileResponse.status === 'fulfilled' && profileResponse.value.ok 
-                            ? await profileResponse.value.json() 
-                            : null;
-                        
-                        const ratiosData = ratiosResponse.status === 'fulfilled' && ratiosResponse.value.ok 
-                            ? await ratiosResponse.value.json() 
-                            : null;
-                        
-                        const newsData = newsResponse.status === 'fulfilled' && newsResponse.value.ok 
-                            ? await newsResponse.value.json() 
-                            : null;
-                        
-                        const intradayData = intradayResponse.status === 'fulfilled' && intradayResponse.value.ok 
-                            ? await intradayResponse.value.json() 
-                            : null;
-
-                        const analystData = analystResponse.status === 'fulfilled' && analystResponse.value.ok 
-                            ? await analystResponse.value.json() 
-                            : null;
-
-                        const earningsData = earningsResponse.status === 'fulfilled' && earningsResponse.value.ok 
-                            ? await earningsResponse.value.json() 
-                            : null;
+// Parser les résultats simplifiés
+const quote = quoteResult.status === 'fulfilled' && quoteResult.value.success ? quoteResult.value.data : null;
+const profile = profileResult.status === 'fulfilled' && profileResult.value.success ? profileResult.value.data : null;
+const ratios = ratiosResult.status === 'fulfilled' && ratiosResult.value.success ? ratiosResult.value.data : null;
+const news = newsResult.status === 'fulfilled' && newsResult.value.success ? newsResult.value.data : null;
+const intradayData = intradayResult.status === 'fulfilled' && intradayResult.value.success ? intradayResult.value.data : null;
+const analystData = analystResult.status === 'fulfilled' && analystResult.value.success ? analystResult.value.data : null;
+const earningsData = earningsResult.status === 'fulfilled' && earningsResult.value.success ? earningsResult.value.data : null;
 
                         // Extraire les données hybrides
                         const quote = quoteData?.data || null;
@@ -7104,7 +7154,34 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         const ratios = ratiosData?.data?.ratios || null;
                         const news = newsData?.data || null;
                         
-                        console.log('✅ Données hybrides récupérées:', { 
+                        
+// Log des données récupérées avec gestion d'erreur
+console.log('✅ Données récupérées:', { 
+  hasQuote: !!quote, 
+  hasProfile: !!profile, 
+  hasRatios: !!ratios,
+  hasNews: !!news,
+  hasIntraday: !!intradayData,
+  hasAnalyst: !!analystData,
+  hasEarnings: !!earningsData
+});
+
+// Gestion des erreurs
+const errors = [];
+if (!quote) errors.push('Quote manquant');
+if (!profile) errors.push('Profile manquant');
+if (!ratios) errors.push('Ratios manquant');
+if (!news) errors.push('News manquant');
+
+if (errors.length > 0) {
+  console.warn('⚠️ Données manquantes:', errors);
+  setMessage({
+    text: `Données partielles pour ${symbol}: ${errors.join(', ')}`,
+    type: 'warning'
+  });
+}
+
+console.log('✅ Données hybrides récupérées:', { 
                             hasQuote: !!quote, 
                             hasProfile: !!profile, 
                             hasRatios: !!ratios, 
