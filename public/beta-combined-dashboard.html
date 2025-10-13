@@ -3932,11 +3932,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             ? 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières en temps réel\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n- Accès direct aux APIs financières (Finnhub, Alpha Vantage, etc.)\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?'
                             : 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n\n**Exemples de questions :**\n- "Analyse le profil de Microsoft"\n- "Quelles sont les tendances du marché ?"\n- "Explique-moi le ratio P/E"\n- "Comment naviguer dans le dashboard ?"\n\nComment puis-je vous assister aujourd\'hui ?';
                         
-                        setEmmaMessages([{
-                            type: 'emma',
+                            setEmmaMessages([{
+                                type: 'emma',
                             content: welcomeMessage,
-                            timestamp: new Date().toISOString()
-                        }]);
+                                timestamp: new Date().toISOString()
+                            }]);
                         
                         // Charger le prompt depuis localStorage
                         const savedPrompt = localStorage.getItem('emma-financial-prompt');
@@ -7181,15 +7181,15 @@ console.log('✅ Données hybrides récupérées:', {
                             hasIntraday: !!intradayData,
                             hasAnalyst: !!analystData,
                             hasEarnings: !!earningsData,
-                            quoteSource: quoteData?.source || 'unknown',
-                            profileSource: profileData?.source || 'unknown',
-                            ratiosSource: ratiosData?.source || 'unknown',
-                            quoteConfidence: quoteData?.metadata?.confidence || 0,
-                            profileConfidence: profileData?.metadata?.confidence || 0,
-                            ratiosConfidence: ratiosData?.metadata?.confidence || 0,
-                            quoteFreshness: quoteData?.metadata?.freshness || 'unknown',
-                            profileFreshness: profileData?.metadata?.freshness || 'unknown',
-                            ratiosFreshness: ratiosData?.metadata?.freshness || 'unknown'
+                            quoteSource: quote?.source || 'unknown',
+                            profileSource: profile?.source || 'unknown',
+                            ratiosSource: ratios?.source || 'unknown',
+                            quoteConfidence: quote?.metadata?.confidence || 0,
+                            profileConfidence: profile?.metadata?.confidence || 0,
+                            ratiosConfidence: ratios?.metadata?.confidence || 0,
+                            quoteFreshness: quote?.metadata?.freshness || 'unknown',
+                            profileFreshness: profile?.metadata?.freshness || 'unknown',
+                            ratiosFreshness: ratios?.metadata?.freshness || 'unknown'
                         });
 
                         // 🎯 Calcul du Score JSLAI™ Global (0-100)
@@ -7294,7 +7294,7 @@ console.log('✅ Données hybrides récupérées:', {
                                         high: candle.high || 0,
                                         low: candle.low || 0,
                                         close: candle.close || 0,
-                                        volume: candle.volume || 0
+                                volume: candle.volume || 0
                                     }));
                                 }
                                 
@@ -7544,22 +7544,22 @@ console.log('✅ Données hybrides récupérées:', {
                             } : null,
                             dataValidation: {
                                 quote: {
-                                    confidence: quoteData?.metadata?.confidence || 0,
-                                    status: quoteData?.metadata?.freshness || 'unknown',
-                                    source: quoteData?.source || 'unknown',
-                                    lastUpdated: quoteData?.metadata?.lastUpdated || null
+                                    confidence: quote?.metadata?.confidence || 0,
+                                    status: quote?.metadata?.freshness || 'unknown',
+                                    source: quote?.source || 'unknown',
+                                    lastUpdated: quote?.metadata?.lastUpdated || null
                                 },
                                 profile: {
-                                    confidence: profileData?.metadata?.confidence || 0,
-                                    status: profileData?.metadata?.freshness || 'unknown',
-                                    source: profileData?.source || 'unknown',
-                                    lastUpdated: profileData?.metadata?.lastUpdated || null
+                                    confidence: profile?.metadata?.confidence || 0,
+                                    status: profile?.metadata?.freshness || 'unknown',
+                                    source: profile?.source || 'unknown',
+                                    lastUpdated: profile?.metadata?.lastUpdated || null
                                 },
                                 ratios: {
-                                    confidence: ratiosData?.metadata?.confidence || 0,
-                                    quality: ratiosData?.metadata?.dataQuality || 'Unknown',
-                                    source: ratiosData?.source || 'unknown',
-                                    lastUpdated: ratiosData?.metadata?.lastUpdated || null
+                                    confidence: ratios?.metadata?.confidence || 0,
+                                    quality: ratios?.metadata?.dataQuality || 'Unknown',
+                                    source: ratios?.source || 'unknown',
+                                    lastUpdated: ratios?.metadata?.lastUpdated || null
                                 }
                             },
                             insights: {

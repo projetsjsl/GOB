@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       error: 'Paramètre endpoint requis',
       availableEndpoints: [
         'fmp', 'marketdata', 'marketaux', 'news', 'hybrid-data',
-        'claude', 'gemini-chat', 'github-update', 'unified-data'
+        'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini'
       ]
     });
   }
@@ -59,12 +59,15 @@ export default async function handler(req, res) {
       case 'test-env':
         return await handleTestEnv(req, res);
       
+      case 'test-gemini':
+        return await handleTestGemini(req, res);
+      
       default:
         return res.status(400).json({ 
           error: `Endpoint '${endpoint}' non supporté`,
           availableEndpoints: [
             'fmp', 'marketdata', 'marketaux', 'news', 'hybrid-data',
-            'claude', 'gemini-chat', 'github-update', 'unified-data'
+            'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini'
           ]
         });
     }
@@ -145,21 +148,28 @@ async function handleMarketaux(req, res, symbol, limit) {
   }
 
   try {
-    // Simulation des données Marketaux
-    const result = {
-      symbol,
-      news: [],
-      sentimentAnalysis: {
-        positive: 0,
-        neutral: 0,
-        negative: 0,
-        total: 0,
-        overallSentiment: 'neutral'
-      },
-      timestamp: new Date().toISOString()
-    };
-    
-    return res.status(200).json(result);
+    // Vérifier si l'API key est configurée
+    if (!process.env.MARKETAUX_API_KEY) {
+      console.warn('⚠️ MARKETAUX_API_KEY non configurée, retour de données simulées');
+      const result = {
+        symbol,
+        news: [],
+        sentimentAnalysis: {
+          positive: 0,
+          neutral: 0,
+          negative: 0,
+          total: 0,
+          overallSentiment: 'neutral'
+        },
+        timestamp: new Date().toISOString(),
+        source: 'simulated'
+      };
+      return res.status(200).json(result);
+    }
+
+    // Utiliser l'API Marketaux réelle
+    const { default: marketauxHandler } = await import('./marketaux.js');
+    return await marketauxHandler(req, res);
   } catch (error) {
     console.error('❌ Erreur Marketaux:', error);
     return res.status(500).json({ error: 'Erreur Marketaux', details: error.message });
@@ -241,6 +251,16 @@ async function handleHybridData(req, res, symbol, dataType) {
 // Claude Handler
 async function handleClaude(req, res, params) {
   try {
+    // Vérifier si l'API key est configurée
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.warn('⚠️ ANTHROPIC_API_KEY non configurée, retour de réponse simulée');
+      return res.status(200).json({
+        response: 'Claude AI non configuré - API key manquante',
+        source: 'simulated',
+        timestamp: new Date().toISOString()
+      });
+    }
+
     const { default: claudeHandler } = await import('./claude.js');
     return await claudeHandler(req, res);
   } catch (error) {
@@ -332,6 +352,31 @@ async function handleTestEnv(req, res) {
     return res.status(500).json({
       error: 'Erreur test env',
       details: error.message
+    });
+  }
+}
+
+// Test Gemini Handler
+async function handleTestGemini(req, res) {
+  try {
+    // Vérifier si l'API key est configurée
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(200).json({
+        status: 'warning',
+        message: 'GEMINI_API_KEY non configurée',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Test simple de l'API Gemini
+    const { default: geminiHandler } = await import('./test-gemini.js');
+    return await geminiHandler(req, res);
+  } catch (error) {
+    console.error('❌ Erreur Test Gemini:', error);
+    return res.status(500).json({ 
+      status: 'error',
+      error: 'Erreur Test Gemini', 
+      details: error.message 
     });
   }
 }
