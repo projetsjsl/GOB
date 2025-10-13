@@ -7010,13 +7010,61 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     try {
                         console.log(`🔍 Récupération des données réelles pour ${symbol}...`);
                         
+                        // Déterminer le timeframe et les paramètres pour les données historiques
+                        let historicalTimeframe, historicalLimit;
+                        switch (currentTimeframe) {
+                            case '1D':
+                                historicalTimeframe = '15min';
+                                historicalLimit = 20;
+                                break;
+                            case '1W':
+                                historicalTimeframe = '1hour';
+                                historicalLimit = 24;
+                                break;
+                            case '1M':
+                                historicalTimeframe = '1day';
+                                historicalLimit = 30;
+                                break;
+                            case '3M':
+                                historicalTimeframe = '1day';
+                                historicalLimit = 90;
+                                break;
+                            case '6M':
+                                historicalTimeframe = '1day';
+                                historicalLimit = 180;
+                                break;
+                            case '1A':
+                                historicalTimeframe = '1day';
+                                historicalLimit = 365;
+                                break;
+                            case '5A':
+                                historicalTimeframe = '1week';
+                                historicalLimit = 260;
+                                break;
+                            case 'MAX':
+                                historicalTimeframe = '1month';
+                                historicalLimit = 120;
+                                break;
+                            case 'YTD':
+                                historicalTimeframe = '1day';
+                                // Calculer le nombre de jours depuis le début de l'année
+                                const now = new Date();
+                                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                                const daysSinceStart = Math.ceil((now - startOfYear) / (1000 * 60 * 60 * 24));
+                                historicalLimit = Math.min(daysSinceStart, 365);
+                                break;
+                            default:
+                                historicalTimeframe = '1day';
+                                historicalLimit = 30;
+                        }
+
                         // Appels parallèles aux APIs
                         const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, historicalRatiosResponse, smaResponse] = await Promise.allSettled([
                             fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
                             fetch(`/api/fmp?endpoint=profile&symbol=${symbol}`),
                             fetch(`/api/fmp?endpoint=ratios&symbol=${symbol}`),
                             fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`),
-                            fetch(`/api/fmp?endpoint=historical-chart&symbol=${symbol}&timeframe=15min&limit=20`),
+                            fetch(`/api/fmp?endpoint=historical-chart&symbol=${symbol}&timeframe=${historicalTimeframe}&limit=${historicalLimit}`),
                             fetch(`/api/fmp?endpoint=ratios-ttm&symbol=${symbol}&limit=8`),
                             fetch(`/api/fmp?endpoint=technical-indicators&symbol=${symbol}&period=daily&type=sma`)
                         ]);
@@ -7143,14 +7191,41 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 avgVolume: quote?.avgVolume || 0
                             },
                             intraday: (() => {
-                                // Si on a des données intraday réelles, les utiliser
-                                if (intradayData?.data && intradayData.data.length > 0) {
-                                    return intradayData.data.map((candle, i) => ({
-                                        date: candle.date || `${9 + Math.floor(i/4)}:${(i % 4) * 15}`,
-                                        open: candle.open || quote?.o || 0,
-                                        high: candle.high || quote?.h || 0,
-                                        low: candle.low || quote?.l || 0,
-                                        close: candle.close || quote?.c || 0,
+                                // Si on a des données historiques réelles, les utiliser
+                                if (intradayData && Array.isArray(intradayData) && intradayData.length > 0) {
+                                    console.log(`📊 Données historiques réelles récupérées: ${intradayData.length} points`);
+                                    return intradayData.map((candle, i) => ({
+                                        date: candle.date || new Date(candle.timestamp || Date.now() - i * 60000).toLocaleString('fr-FR'),
+                                        open: candle.open || 0,
+                                        high: candle.high || 0,
+                                        low: candle.low || 0,
+                                        close: candle.close || 0,
+                                        volume: candle.volume || 0
+                                    }));
+                                }
+                                
+                                // Si on a des données dans le format FMP
+                                if (intradayData?.historical && Array.isArray(intradayData.historical) && intradayData.historical.length > 0) {
+                                    console.log(`📊 Données FMP historiques récupérées: ${intradayData.historical.length} points`);
+                                    
+                                    let filteredData = intradayData.historical;
+                                    
+                                    // Pour YTD, filtrer les données depuis le début de l'année
+                                    if (currentTimeframe === 'YTD') {
+                                        const currentYear = new Date().getFullYear();
+                                        filteredData = intradayData.historical.filter(candle => {
+                                            const candleDate = new Date(candle.date);
+                                            return candleDate.getFullYear() === currentYear;
+                                        });
+                                        console.log(`📊 Données YTD filtrées: ${filteredData.length} points`);
+                                    }
+                                    
+                                    return filteredData.map((candle, i) => ({
+                                        date: candle.date || new Date(candle.timestamp || Date.now() - i * 60000).toLocaleString('fr-FR'),
+                                        open: candle.open || 0,
+                                        high: candle.high || 0,
+                                        low: candle.low || 0,
+                                        close: candle.close || 0,
                                         volume: candle.volume || 0
                                     }));
                                 }

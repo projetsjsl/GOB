@@ -137,6 +137,18 @@ export async function getHistoricalPrices(symbol, from, to) {
   return await fmpRequest(endpoint);
 }
 
+// Get historical chart data (intraday, daily, weekly, monthly)
+export async function getHistoricalChart(symbol, timeframe = '1day', limit = 100) {
+  const endpoint = `/historical-chart/${timeframe}/${symbol}?limit=${limit}`;
+  return await fmpRequest(endpoint);
+}
+
+// Get intraday data (1min, 5min, 15min, 30min, 1hour)
+export async function getIntradayData(symbol, timeframe = '1min', limit = 100) {
+  const endpoint = `/historical-chart/${timeframe}/${symbol}?limit=${limit}`;
+  return await fmpRequest(endpoint);
+}
+
 // Get pre/post market quote
 export async function getPrePostMarketQuote(symbol) {
   return await fmpRequest(`/pre-post-market/${symbol}`, 'v4');
@@ -410,8 +422,9 @@ export default async function handler(req, res) {
         break;
       case 'historical-chart':
         if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
-        // Retourner des données mockées pour l'instant
-        result = [];
+        const timeframe = req.query.timeframe || '1day';
+        const chartLimit = parseInt(req.query.limit) || 100;
+        result = await getHistoricalChart(symbol, timeframe, chartLimit);
         break;
       case 'technical-indicators':
         if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
