@@ -13,16 +13,10 @@
     "api/marketdata.js": {
       "maxDuration": 10
     },
-    "api/marketaux.js": {
-      "maxDuration": 10
-    },
     "api/supabase-watchlist.js": {
       "maxDuration": 15
     },
     "api/test-gemini.js": {
-      "maxDuration": 10
-    },
-    "api/news/cached.js": {
       "maxDuration": 10
     },
     "api/cron/refresh-news.js": {
