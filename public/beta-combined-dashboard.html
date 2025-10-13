@@ -1779,27 +1779,42 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         return;
                     }
                     
+                    // 1. AFFICHAGE IMMÉDIAT : Ajouter le ticker à la liste TOUT DE SUITE
                     const updatedTickers = [...watchlistTickers, ticker];
                     setWatchlistTickers(updatedTickers);
                     localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
                     setNewTicker('');
-                    
                     showMessage(`${ticker} ajouté à la watchlist`, 'success');
                     
-                    // Charger les données pour le nouveau ticker (mode append pour garder les autres)
-                    await loadWatchlistData([ticker], true);
+                    // 2. Ajouter un placeholder avec état "loading" pour affichage immédiat
+                    setWatchlistStockData(prev => ({
+                        ...prev,
+                        [ticker]: {
+                            symbol: ticker,
+                            loading: true,
+                            timestamp: new Date().toISOString()
+                        }
+                    }));
                     
-                    // Sauvegarder automatiquement sur GitHub
-                    await saveWatchlistToGitHubAuto(updatedTickers);
+                    // 3. ARRIÈRE-PLAN : Charger les vraies données (sans bloquer l'UI)
+                    loadWatchlistData([ticker], true).catch(err => {
+                        console.error('Erreur chargement:', err);
+                    });
+                    
+                    // 4. ARRIÈRE-PLAN : Sauvegarder sur GitHub (sans bloquer l'UI)
+                    saveWatchlistToGitHubAuto(updatedTickers).catch(err => {
+                        console.error('Erreur sauvegarde GitHub:', err);
+                    });
                 };
 
                 // Supprimer un ticker de la watchlist
                 const removeTickerFromWatchlist = async (ticker) => {
+                    // 1. SUPPRESSION IMMÉDIATE : Retirer de la liste TOUT DE SUITE
                     const updatedTickers = watchlistTickers.filter(t => t !== ticker);
                     setWatchlistTickers(updatedTickers);
                     localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
                     
-                    // Supprimer les données du ticker
+                    // 2. Supprimer les données du ticker immédiatement
                     setWatchlistStockData(prev => {
                         const newData = { ...prev };
                         delete newData[ticker];
@@ -1808,8 +1823,10 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     
                     showMessage(`${ticker} supprimé de la watchlist`, 'success');
                     
-                    // Sauvegarder automatiquement sur GitHub
-                    await saveWatchlistToGitHubAuto(updatedTickers);
+                    // 3. ARRIÈRE-PLAN : Sauvegarder sur GitHub (sans bloquer l'UI)
+                    saveWatchlistToGitHubAuto(updatedTickers).catch(err => {
+                        console.error('Erreur sauvegarde GitHub:', err);
+                    });
                 };
 
                 // Actualiser les données de la watchlist
@@ -1818,33 +1835,41 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     showMessage('Watchlist actualisée', 'success');
                 };
 
-                // Sauvegarder automatiquement la watchlist sur GitHub (silencieux)
+                // Timer pour debounce de la sauvegarde GitHub
+                let saveGitHubTimer = null;
+                
+                // Sauvegarder automatiquement la watchlist sur GitHub (silencieux avec debounce)
                 const saveWatchlistToGitHubAuto = async (tickers) => {
-                    try {
-                        const watchlistData = {
-                            tickers: tickers,
-                            lastUpdated: new Date().toISOString(),
-                            count: tickers.length
-                        };
-                        
-                        const response = await fetch(`${API_BASE_URL}/api/save-tickers`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                tickers: tickers,
-                                filename: 'dans-watchlist.json'
-                            })
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}`);
-                        }
-                        
-                        console.log('✅ Watchlist sauvegardée automatiquement sur GitHub');
-                    } catch (e) {
-                        console.error('⚠️ Erreur sauvegarde automatique GitHub watchlist:', e);
-                        // Ne pas afficher d'erreur à l'utilisateur pour ne pas perturber l'expérience
+                    // Annuler la sauvegarde précédente si elle est en attente
+                    if (saveGitHubTimer) {
+                        clearTimeout(saveGitHubTimer);
                     }
+                    
+                    // Sauvegarder dans localStorage immédiatement (déjà fait ailleurs)
+                    
+                    // Attendre 1 seconde avant de sauvegarder sur GitHub (debounce)
+                    // Si l'utilisateur ajoute plusieurs tickers, on ne sauvegarde qu'une fois
+                    saveGitHubTimer = setTimeout(async () => {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/save-tickers`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    tickers: tickers,
+                                    filename: 'dans-watchlist.json'
+                                })
+                            });
+                            
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}`);
+                            }
+                            
+                            console.log('✅ Watchlist sauvegardée sur GitHub');
+                        } catch (e) {
+                            console.error('⚠️ Erreur sauvegarde GitHub:', e);
+                            // Silencieux pour ne pas perturber l'UX
+                        }
+                    }, 1000); // Debounce de 1 seconde
                 };
 
                 // Sauvegarder manuellement la watchlist dans GitHub (avec confirmation)
