@@ -8,8 +8,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Clés publiques (non sensibles)
-const SUPABASE_URL = 'https://gob-watchlist.supabase.co'; // Remplacez par votre URL
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvYi13YXRjaGxpc3QiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczOTM0NzQwMCwiZXhwIjoyMDU0OTIzNDAwfQ.example'; // Remplacez par votre anon key
+const SUPABASE_URL = 'https://boyuxgdplbpkknplxbxp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkzNDc0MDAsImV4cCI6MjA1NDkyMzQwMH0.example'; // Remplacez par votre anon key
 
 async function testDirectConnection() {
   console.log('🔍 Test de connexion directe à Supabase\n');

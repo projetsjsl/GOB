@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   }
 
   console.log(`🔑 Utilisation de la clé: ${SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : 'ANON'}`);
-  console.log(`🔑 SUPABASE_URL: ${SUPABASE_URL ? 'Configurée' : 'Manquante'}`);
+  console.log(`🔑 SUPABASE_URL: ${SUPABASE_URL ? 'Configurée' : 'Manquante'} (${SUPABASE_URL})`);
   console.log(`🔑 SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY ? 'Configurée' : 'Manquante'}`);
   console.log(`🔑 SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY ? 'Configurée' : 'Manquante'}`);
 
