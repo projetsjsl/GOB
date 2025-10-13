@@ -53,9 +53,14 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('❌ Erreur Supabase Watchlist:', error);
+    console.error('❌ Stack trace:', error.stack);
+    console.error('❌ Error type:', typeof error);
+    console.error('❌ Error constructor:', error.constructor.name);
+    
     return res.status(500).json({
       error: 'Erreur serveur Supabase',
       details: String(error?.message || error),
+      errorType: error.constructor.name,
       timestamp: new Date().toISOString()
     });
   }
@@ -64,17 +69,25 @@ export default async function handler(req, res) {
 // Récupérer la watchlist
 async function handleGet(supabase, userId, res) {
   try {
+    console.log(`🔍 handleGet - userId: ${userId}`);
+    console.log(`🔍 handleGet - supabase client:`, typeof supabase);
+    
     const { data, error } = await supabase
       .from('watchlists')
       .select('*')
       .eq('user_id', userId)
       .single();
 
+    console.log(`🔍 handleGet - data:`, data);
+    console.log(`🔍 handleGet - error:`, error);
+
     if (error && error.code !== 'PGRST116') { // PGRST116 = pas de ligne trouvée
+      console.log(`🔍 handleGet - throwing error:`, error);
       throw error;
     }
 
     const tickers = data?.tickers || [];
+    console.log(`🔍 handleGet - tickers:`, tickers);
     
     return res.status(200).json({
       success: true,
@@ -85,10 +98,18 @@ async function handleGet(supabase, userId, res) {
     });
 
   } catch (error) {
-    console.error('Erreur GET Supabase:', error);
+    console.error('❌ Erreur GET Supabase:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    });
     return res.status(500).json({
       error: 'Erreur récupération watchlist',
-      details: String(error?.message || error)
+      details: String(error?.message || error),
+      errorCode: error.code,
+      errorDetails: error.details
     });
   }
 }
