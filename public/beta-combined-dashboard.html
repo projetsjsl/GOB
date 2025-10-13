@@ -911,8 +911,9 @@ const fetchHybridData = async (symbol, dataType) => {
 
             // État de chargement initial pour éviter les réactualisations
             const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+            const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
-            // Chargement initial UNE SEULE FOIS au démarrage
+            // Chargement initial UNE SEULE FOIS au démarrage avec écran de chargement
             useEffect(() => {
                 if (initialLoadComplete) return; // Éviter les rechargements
                 
@@ -930,19 +931,23 @@ const fetchHybridData = async (symbol, dataType) => {
                             checkApiStatus()
                         ]).then(() => {
                             console.log('✅ Toutes les données chargées en arrière-plan');
-                            setInitialLoadComplete(true); // Marquer comme terminé
                         }).catch(error => {
                             console.error('❌ Erreur lors du chargement des données:', error?.message || String(error));
-                            setInitialLoadComplete(true); // Marquer comme terminé même en cas d'erreur
                         });
                     } catch (error) {
                         console.error('❌ Erreur lors du chargement:', error?.message || String(error));
-                        setInitialLoadComplete(true); // Marquer comme terminé même en cas d'erreur
                     }
                 };
                 
                 // Chargement initial silencieux
                 loadAllData();
+                
+                // Écran de chargement de 3 secondes pour masquer les actualisations
+                setTimeout(() => {
+                    setShowLoadingScreen(false);
+                    setInitialLoadComplete(true);
+                    console.log('🎉 Écran de chargement terminé - Dashboard prêt !');
+                }, 3000);
                 
                 // ⚡ OPTIMISATION API: Pas d'auto-refresh
                 // Les données se chargent une seule fois au démarrage
@@ -9557,7 +9562,7 @@ console.log('✅ Données hybrides récupérées:', {
                         isDarkMode 
                             ? 'bg-black border-gray-700' 
                             : 'bg-white border-gray-300'
-                    }`}>
+                    } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                         <div className="max-w-7xl mx-auto px-6">
                             <div className="hidden md:flex space-x-1">
                                 {tabs.map(tab => (
@@ -9600,8 +9605,40 @@ console.log('✅ Données hybrides récupérées:', {
                         <source src="https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3" type="audio/mpeg" />
                     </audio>
 
+                    {/* Écran de chargement initial */}
+                    {showLoadingScreen && (
+                        <div className={`fixed inset-0 z-50 flex items-center justify-center ${
+                            isDarkMode ? 'bg-gray-900' : 'bg-white'
+                        }`}>
+                            <div className="text-center">
+                                <div className="mb-8">
+                                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full border-4 ${
+                                        isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                                    } border-t-blue-600 animate-spin`}></div>
+                                    <h2 className={`text-2xl font-bold mb-2 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        GOB Dashboard
+                                    </h2>
+                                    <p className={`text-lg ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        Chargement des données...
+                                    </p>
+                                </div>
+                                <div className={`text-sm ${
+                                    isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                                }`}>
+                                    ⏳ Initialisation en cours (3 secondes)
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Contenu principal */}
-                    <main className="max-w-7xl mx-auto p-6">
+                    <main className={`max-w-7xl mx-auto p-6 transition-opacity duration-500 ${
+                        showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                    }`}>
                         {activeTab === 'stocks-news' && <StocksNewsTab />}
                         {activeTab === 'intellistocks' && <IntelliStocksTab />}
                         {activeTab === 'ask-emma' && <AskEmmaTab />}
