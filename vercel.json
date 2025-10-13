@@ -6,6 +6,15 @@
     },
     "api/unified-serverless.js": {
       "maxDuration": 30
+    },
+    "api/marketdata.js": {
+      "maxDuration": 10
+    },
+    "api/marketaux.js": {
+      "maxDuration": 10
+    },
+    "api/supabase-watchlist.js": {
+      "maxDuration": 15
     }
   },
   "headers": [
