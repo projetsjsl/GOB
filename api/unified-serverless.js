@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       error: 'Paramètre endpoint requis',
       availableEndpoints: [
         'fmp', 'marketdata', 'marketaux', 'news', 'news/cached', 'hybrid-data',
-        'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini'
+        'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini', 'refresh-news'
       ]
     });
   }
@@ -65,12 +65,15 @@ export default async function handler(req, res) {
       case 'test-gemini':
         return await handleTestGemini(req, res);
       
+      case 'refresh-news':
+        return await handleRefreshNews(req, res);
+      
       default:
         return res.status(400).json({ 
           error: `Endpoint '${endpoint}' non supporté`,
           availableEndpoints: [
             'fmp', 'marketdata', 'marketaux', 'news', 'news/cached', 'hybrid-data',
-            'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini'
+            'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini', 'refresh-news'
           ]
         });
     }
@@ -456,6 +459,45 @@ async function handleTestGemini(req, res) {
       status: 'error',
       error: 'Erreur Test Gemini', 
       details: error.message 
+    });
+  }
+}
+
+// Refresh News Handler (déclenchement manuel)
+async function handleRefreshNews(req, res) {
+  try {
+    console.log('🔄 Déclenchement manuel du refresh des nouvelles...');
+    
+    // Vérifier si Supabase est configuré
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      return res.status(200).json({
+        success: false,
+        message: 'Supabase non configuré - refresh impossible',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Appeler le cron job directement
+    const { default: cronHandler } = await import('./cron/refresh-news.js');
+    
+    // Simuler l'en-tête d'autorisation pour le cron
+    const mockReq = {
+      ...req,
+      headers: {
+        ...req.headers,
+        authorization: `Bearer ${process.env.CRON_SECRET || 'manual-trigger'}`
+      }
+    };
+    
+    return await cronHandler(mockReq, res);
+    
+  } catch (error) {
+    console.error('❌ Erreur Refresh News:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Erreur Refresh News',
+      details: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 }

@@ -32,7 +32,7 @@
   "crons": [
     {
       "path": "/api/cron/refresh-news",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 9 * * *"
     }
   ],
   "headers": [
