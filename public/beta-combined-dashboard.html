@@ -3862,11 +3862,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 const initializeEmma = async () => {
                     try {
                         // Initialiser avec le message de bienvenue (session uniquement - pas de persistance)
-                            setEmmaMessages([{
-                                type: 'emma',
-                            content: 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**NOUVELLES CAPACITÉS :**\n- Accès DIRECT aux APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance\n- Requêtes en temps réel pour n\'importe quel symbole\n- Données de marché, actualités, profils d\'entreprise, recommandations d\'analystes\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?',
-                                timestamp: new Date().toISOString()
-                            }]);
+                        const welcomeMessage = useFunctionCalling 
+                            ? 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières en temps réel\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n- Accès direct aux APIs financières (Finnhub, Alpha Vantage, etc.)\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?'
+                            : 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n\n**Exemples de questions :**\n- "Analyse le profil de Microsoft"\n- "Quelles sont les tendances du marché ?"\n- "Explique-moi le ratio P/E"\n- "Comment naviguer dans le dashboard ?"\n\nComment puis-je vous assister aujourd\'hui ?';
+                        
+                        setEmmaMessages([{
+                            type: 'emma',
+                            content: welcomeMessage,
+                            timestamp: new Date().toISOString()
+                        }]);
                         
                         // Charger le prompt depuis localStorage
                         const savedPrompt = localStorage.getItem('emma-financial-prompt');
@@ -4358,6 +4362,19 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
 
                 const saveFunctionCalling = () => {
                     localStorage.setItem('emma-function-calling', useFunctionCalling.toString());
+                    
+                    // Mettre à jour le message de bienvenue si c'est le premier message
+                    if (emmaMessages.length === 1 && emmaMessages[0].type === 'emma') {
+                        const welcomeMessage = useFunctionCalling 
+                            ? 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières en temps réel\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n- Accès direct aux APIs financières (Finnhub, Alpha Vantage, etc.)\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?'
+                            : 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n\n**Exemples de questions :**\n- "Analyse le profil de Microsoft"\n- "Quelles sont les tendances du marché ?"\n- "Explique-moi le ratio P/E"\n- "Comment naviguer dans le dashboard ?"\n\nComment puis-je vous assister aujourd\'hui ?';
+                        
+                        setEmmaMessages([{
+                            type: 'emma',
+                            content: welcomeMessage,
+                            timestamp: new Date().toISOString()
+                        }]);
+                    }
                 };
 
                 const loadFunctionCalling = () => {
@@ -5054,6 +5071,123 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                             </div>
 
+                            {/* Slide de Sélection de Mode */}
+                            <div className={`mb-4 p-4 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                            }`}>
+                                <h4 className={`text-sm font-medium mb-3 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    🚀 Mode d'Interaction avec Emma
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {/* Version Directe */}
+                                    <div 
+                                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                            !useFunctionCalling 
+                                                ? isDarkMode 
+                                                    ? 'border-green-500 bg-green-900/20' 
+                                                    : 'border-green-500 bg-green-50'
+                                                : isDarkMode 
+                                                    ? 'border-gray-600 bg-gray-700 hover:border-gray-500' 
+                                                    : 'border-gray-300 bg-gray-50 hover:border-gray-400'
+                                        }`}
+                                        onClick={() => {
+                                            setUseFunctionCalling(false);
+                                            saveFunctionCalling();
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-lg">💬</span>
+                                            <span className={`font-medium ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                Version Directe
+                                            </span>
+                                        </div>
+                                        <p className={`text-xs ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>
+                                            Conversation standard avec Emma. Réponses rapides et fiables.
+                                        </p>
+                                        <div className={`text-xs mt-2 px-2 py-1 rounded ${
+                                            !useFunctionCalling 
+                                                ? 'bg-green-100 text-green-700' 
+                                                : isDarkMode 
+                                                    ? 'bg-gray-600 text-gray-300' 
+                                                    : 'bg-gray-200 text-gray-600'
+                                        }`}>
+                                            {!useFunctionCalling ? '✅ Actif' : 'Inactif'}
+                                        </div>
+                                    </div>
+
+                                    {/* Version Function Calling */}
+                                    <div 
+                                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                            useFunctionCalling 
+                                                ? isDarkMode 
+                                                    ? 'border-blue-500 bg-blue-900/20' 
+                                                    : 'border-blue-500 bg-blue-50'
+                                                : isDarkMode 
+                                                    ? 'border-gray-600 bg-gray-700 hover:border-gray-500' 
+                                                    : 'border-gray-300 bg-gray-50 hover:border-gray-400'
+                                        }`}
+                                        onClick={() => {
+                                            setUseFunctionCalling(true);
+                                            saveFunctionCalling();
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-lg">🔧</span>
+                                            <span className={`font-medium ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                Version Function Calling
+                                            </span>
+                                        </div>
+                                        <p className={`text-xs ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>
+                                            Emma peut exécuter des fonctions pour récupérer des données en temps réel.
+                                        </p>
+                                        <div className={`text-xs mt-2 px-2 py-1 rounded ${
+                                            useFunctionCalling 
+                                                ? 'bg-blue-100 text-blue-700' 
+                                                : isDarkMode 
+                                                    ? 'bg-gray-600 text-gray-300' 
+                                                    : 'bg-gray-200 text-gray-600'
+                                        }`}>
+                                            {useFunctionCalling ? '✅ Actif' : 'Inactif'}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {/* Indicateur de Statut */}
+                                <div className={`mt-3 p-2 rounded text-xs ${
+                                    useFunctionCalling 
+                                        ? isDarkMode 
+                                            ? 'bg-blue-900/30 text-blue-300' 
+                                            : 'bg-blue-100 text-blue-700'
+                                        : isDarkMode 
+                                            ? 'bg-green-900/30 text-green-300' 
+                                            : 'bg-green-100 text-green-700'
+                                }`}>
+                                    <span className="font-medium">
+                                        {useFunctionCalling ? '🔧 Mode Function Calling' : '💬 Mode Direct'}
+                                    </span>
+                                    {useFunctionCalling && (
+                                        <span className="ml-2">
+                                            • Emma peut exécuter des fonctions pour récupérer des données en temps réel
+                                        </span>
+                                    )}
+                                    {!useFunctionCalling && (
+                                        <span className="ml-2">
+                                            • Conversation standard avec Emma
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
                             {/* Messages */}
                             <div className="relative">
                                 <div 
@@ -5077,7 +5211,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             <p className={`text-sm leading-relaxed mb-3 ${
                                                 isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                             }`}>
-                                                Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière. Quel est votre défi financier ?
+                                                Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière. 
+                                                {useFunctionCalling ? ' Je peux également récupérer des données en temps réel via les APIs financières.' : ' Je vous fournis des analyses basées sur mes connaissances.'}
+                                                Quel est votre défi financier ?
                                             </p>
                                             <div className={`flex items-start gap-2 p-3 rounded-lg mb-3 ${
                                                 isDarkMode ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'
