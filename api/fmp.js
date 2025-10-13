@@ -404,6 +404,10 @@ export default async function handler(req, res) {
     let result;
 
     switch (endpoint) {
+      case 'quote':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getQuote(symbol);
+        break;
       case 'profile':
         if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
         result = await getCompanyProfile(symbol);
@@ -434,6 +438,10 @@ export default async function handler(req, res) {
       case 'dcf':
         if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
         result = await getDCFValuation(symbol);
+        break;
+      case 'rating':
+        if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
+        result = await getCompanyRating(symbol);
         break;
       case 'analyst':
         if (!symbol) return res.status(400).json({ error: 'Parameter "symbol" is required' });
