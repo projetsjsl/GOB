@@ -21,8 +21,20 @@
     },
     "api/test-gemini.js": {
       "maxDuration": 10
+    },
+    "api/news/cached.js": {
+      "maxDuration": 10
+    },
+    "api/cron/refresh-news.js": {
+      "maxDuration": 60
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/refresh-news",
+      "schedule": "*/15 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
