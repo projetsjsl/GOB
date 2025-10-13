@@ -778,9 +778,14 @@
                 setApiStatus(status);
             };
 
-            // Initialisation
+            // État de chargement initial pour éviter les réactualisations
+            const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+            // Chargement initial UNE SEULE FOIS au démarrage
             useEffect(() => {
-                console.log('🚀 Initialisation du dashboard...');
+                if (initialLoadComplete) return; // Éviter les rechargements
+                
+                console.log('🚀 Initialisation du dashboard (une seule fois)...');
                 
                 const loadAllData = async () => {
                     console.log('📊 Chargement des données en arrière-plan...');
@@ -794,37 +799,35 @@
                             checkApiStatus()
                         ]).then(() => {
                             console.log('✅ Toutes les données chargées en arrière-plan');
+                            setInitialLoadComplete(true); // Marquer comme terminé
                         }).catch(error => {
                             console.error('❌ Erreur lors du chargement des données:', error?.message || String(error));
+                            setInitialLoadComplete(true); // Marquer comme terminé même en cas d'erreur
                         });
                     } catch (error) {
                         console.error('❌ Erreur lors du chargement:', error?.message || String(error));
+                        setInitialLoadComplete(true); // Marquer comme terminé même en cas d'erreur
                     }
                 };
                 
                 // Chargement initial silencieux
                 loadAllData();
-
-                // Intro Emma: première visite de session
-                if (activeTab === 'ask-emma' && !sessionStorage.getItem('emma-intro-shown')) {
-                    setShowEmmaIntro(true);
-                    sessionStorage.setItem('emma-intro-shown', '1');
-                    setTimeout(() => setShowEmmaIntro(false), 3000);
-                }
                 
                 // ⚡ OPTIMISATION API: Pas d'auto-refresh
-                // Les données se chargent une fois à l'ouverture
+                // Les données se chargent une seule fois au démarrage
                 // Rafraîchissement manuel uniquement via les boutons
-            }, []);
+            }, []); // Dépendance vide = une seule fois au montage
 
-            // Afficher l'intro quand on ouvre Emma IA pour la 1ère fois pendant la session
+            // Intro Emma: première visite de session (séparé du chargement)
             useEffect(() => {
                 if (activeTab === 'ask-emma' && !sessionStorage.getItem('emma-intro-shown')) {
                     setShowEmmaIntro(true);
                     sessionStorage.setItem('emma-intro-shown', '1');
                     setTimeout(() => setShowEmmaIntro(false), 3000);
                 }
-            }, [activeTab]);
+            }, [activeTab]); // Se déclenche seulement au changement d'onglet
+
+            // (Code Emma supprimé - déjà géré plus haut)
 
             // Effet ripple générique pour les boutons
             const ensureAudioReady = () => {
@@ -1714,8 +1717,13 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     return `${prefix}${n.toFixed(2)}${suffix}`;
                 };
 
-                // Charger la watchlist depuis Supabase au démarrage (puis localStorage en fallback)
+                // État pour éviter le rechargement de la watchlist
+                const [watchlistLoaded, setWatchlistLoaded] = useState(false);
+
+                // Charger la watchlist UNE SEULE FOIS au démarrage
                 useEffect(() => {
+                    if (watchlistLoaded) return; // Éviter les rechargements
+                    
                     const loadInitialWatchlist = async () => {
                         try {
                             // Essayer de charger depuis Supabase d'abord
@@ -1727,6 +1735,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 setWatchlistTickers(tickers);
                                 localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
                                 loadWatchlistData(tickers);
+                                setWatchlistLoaded(true);
                                 return;
                             }
                         } catch (e) {
@@ -1741,10 +1750,11 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             setWatchlistTickers(tickers);
                             loadWatchlistData(tickers);
                         }
+                        setWatchlistLoaded(true);
                     };
                     
                     loadInitialWatchlist();
-                }, []);
+                }, []); // Dépendance vide = une seule fois au montage
 
                 // Charger les données pour les tickers de la watchlist
                 const loadWatchlistData = async (tickers, appendMode = false) => {
@@ -2115,7 +2125,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 <div className={`text-sm px-4 py-2 rounded ${
                                     isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                                 }`}>
-                                    🚀 Supabase + Arrière-plan silencieux
+                                    {!initialLoadComplete ? '⏳ Chargement initial...' : '🚀 Supabase + Arrière-plan silencieux'}
                                 </div>
                             </div>
                         </div>
