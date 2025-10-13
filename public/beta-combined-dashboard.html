@@ -7138,21 +7138,13 @@ const [quoteResult, profileResult, ratiosResult, newsResult, intradayResult, ana
 ]);
 
                         // Parser les résultats hybrides
-                        
-// Parser les résultats simplifiés
-const quote = quoteResult.status === 'fulfilled' && quoteResult.value.success ? quoteResult.value.data : null;
-const profile = profileResult.status === 'fulfilled' && profileResult.value.success ? profileResult.value.data : null;
-const ratios = ratiosResult.status === 'fulfilled' && ratiosResult.value.success ? ratiosResult.value.data : null;
-const news = newsResult.status === 'fulfilled' && newsResult.value.success ? newsResult.value.data : null;
-const intradayData = intradayResult.status === 'fulfilled' && intradayResult.value.success ? intradayResult.value.data : null;
-const analystData = analystResult.status === 'fulfilled' && analystResult.value.success ? analystResult.value.data : null;
-const earningsData = earningsResult.status === 'fulfilled' && earningsResult.value.success ? earningsResult.value.data : null;
-
-                        // Extraire les données hybrides
-                        const quote = quoteData?.data || null;
-                        const profile = profileData?.data || null;
-                        const ratios = ratiosData?.data?.ratios || null;
-                        const news = newsData?.data || null;
+                        const quote = quoteResult.status === 'fulfilled' && quoteResult.value.success ? quoteResult.value.data : null;
+                        const profile = profileResult.status === 'fulfilled' && profileResult.value.success ? profileResult.value.data : null;
+                        const ratios = ratiosResult.status === 'fulfilled' && ratiosResult.value.success ? ratiosResult.value.data : null;
+                        const news = newsResult.status === 'fulfilled' && newsResult.value.success ? newsResult.value.data : null;
+                        const intradayData = intradayResult.status === 'fulfilled' && intradayResult.value.success ? intradayResult.value.data : null;
+                        const analystData = analystResult.status === 'fulfilled' && analystResult.value.success ? analystResult.value.data : null;
+                        const earningsData = earningsResult.status === 'fulfilled' && earningsResult.value.success ? earningsResult.value.data : null;
                         
                         
 // Log des données récupérées avec gestion d'erreur
