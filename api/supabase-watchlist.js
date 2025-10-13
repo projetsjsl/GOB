@@ -14,15 +14,30 @@ export default async function handler(req, res) {
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    console.error('❌ Variables Supabase manquantes');
+  if (!SUPABASE_URL) {
+    console.error('❌ SUPABASE_URL manquante');
     return res.status(503).json({
       error: 'Configuration Supabase manquante',
-      message: 'Configurez SUPABASE_URL et SUPABASE_ANON_KEY dans Vercel',
+      message: 'Configurez SUPABASE_URL dans Vercel',
       helpUrl: 'https://vercel.com/projetsjsl/gob/settings/environment-variables'
     });
   }
+
+  // Utiliser la service role key si disponible, sinon l'anon key
+  const supabaseKey = SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
+  
+  if (!supabaseKey) {
+    console.error('❌ Aucune clé Supabase configurée');
+    return res.status(503).json({
+      error: 'Configuration Supabase manquante',
+      message: 'Configurez SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_ANON_KEY dans Vercel',
+      helpUrl: 'https://vercel.com/projetsjsl/gob/settings/environment-variables'
+    });
+  }
+
+  console.log(`🔑 Utilisation de la clé: ${SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : 'ANON'}`);
 
   try {
     const { method } = req;
@@ -30,8 +45,8 @@ export default async function handler(req, res) {
 
     console.log(`🔧 Supabase Watchlist - ${method} ${action || 'GET'}`);
 
-    // Créer le client Supabase
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Créer le client Supabase avec la clé appropriée
+    const supabase = createClient(SUPABASE_URL, supabaseKey);
 
     switch (method) {
       case 'GET':
