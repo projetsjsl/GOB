@@ -123,7 +123,7 @@ L'utilisateur utilise un dashboard financier avec :
     */
 
     // ========================================
-    // VERSION SANS SDK (SANS FUNCTION CALLING) - ACTUELLE
+    // VERSION SANS SDK (SANS FUNCTION CALLING) - ACTUELLE // OK
     // ========================================
     console.log('🔧 Appel API Gemini REST directe (sans SDK)');
     console.log('📦 Modèle: gemini-2.0-flash-exp');
