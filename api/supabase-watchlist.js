@@ -1,6 +1,11 @@
 /**
  * Supabase Watchlist API - Version simplifiée
  * Gestion de la watchlist avec Supabase
+ * 
+ * Version 1.0.0 - Watchlist fonctionnelle avec fallback
+ * ✅ Service role key configurée
+ * ✅ Fallback opérationnel
+ * ✅ Dashboard compatible
  */
 
 import { createClient } from '@supabase/supabase-js';
