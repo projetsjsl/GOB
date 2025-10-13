@@ -13,7 +13,7 @@
 // 📚 Référence : https://ai.google.dev/gemini-api/docs/function-calling
 // ========================================
 
-import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
+// import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
 
 export default async function handler(req, res) {
   // CORS basique
@@ -89,8 +89,9 @@ L'utilisateur utilise un dashboard financier avec :
     }
 
     // ========================================
-    // VERSION AVEC FUNCTION CALLING (ACTUELLE)
+    // VERSION AVEC FUNCTION CALLING - EN COMMENTAIRE (PROBLÈME DE DÉPLOIEMENT)
     // ========================================
+    /*
     console.log('🔧 Appel API Gemini avec Function Calling');
     console.log('📦 Modèle: gemini-2.0-flash-exp');
     console.log('🛠️ Fonctions disponibles:', functionDeclarations.length);
@@ -119,11 +120,11 @@ L'utilisateur utilise un dashboard financier avec :
         }
       })
     });
+    */
 
     // ========================================
-    // VERSION SANS SDK (SANS FUNCTION CALLING) - EN COMMENTAIRE POUR RÉFÉRENCE
+    // VERSION SANS SDK (SANS FUNCTION CALLING) - ACTUELLE
     // ========================================
-    /*
     console.log('🔧 Appel API Gemini REST directe (sans SDK)');
     console.log('📦 Modèle: gemini-2.0-flash-exp');
     console.log('📤 Envoi de la requête...');
@@ -148,7 +149,6 @@ L'utilisateur utilise un dashboard financier avec :
         }
       })
     });
-    */
 
     console.log('📡 Réponse reçue, status:', response.status);
 
@@ -162,8 +162,9 @@ L'utilisateur utilise un dashboard financier avec :
     console.log('✅ Données parsées avec succès');
 
     // ========================================
-    // TRAITEMENT DES FUNCTION CALLS (VERSION ACTUELLE)
+    // TRAITEMENT DES FUNCTION CALLS - EN COMMENTAIRE (PROBLÈME DE DÉPLOIEMENT)
     // ========================================
+    /*
     // Vérifier s'il y a des function calls à exécuter (selon doc officielle Google)
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
       const parts = data.candidates[0].content.parts;
@@ -270,6 +271,7 @@ L'utilisateur utilise un dashboard financier avec :
         }
       }
     }
+    */
 
     // ========================================
     // VERSION SIMPLE SANS FUNCTION CALLS (FALLBACK)
