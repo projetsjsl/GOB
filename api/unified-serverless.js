@@ -56,6 +56,9 @@ export default async function handler(req, res) {
       case 'unified-data':
         return await handleUnifiedData(req, res, symbol, action);
       
+      case 'test-env':
+        return await handleTestEnv(req, res);
+      
       default:
         return res.status(400).json({ 
           error: `Endpoint '${endpoint}' non supporté`,
@@ -302,6 +305,32 @@ async function handleUnifiedData(req, res, symbol, action) {
     console.error('❌ Erreur unified data:', error);
     return res.status(500).json({
       error: 'Erreur unified data',
+      details: error.message
+    });
+  }
+}
+
+// Test Environment Variables Handler
+async function handleTestEnv(req, res) {
+  try {
+    const envVars = {
+      FMP_API_KEY: process.env.FMP_API_KEY ? '✅ Configurée' : '❌ Manquante',
+      MARKETAUX_API_KEY: process.env.MARKETAUX_API_KEY ? '✅ Configurée' : '❌ Manquante',
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY ? '✅ Configurée' : '❌ Manquante',
+      SUPABASE_URL: process.env.SUPABASE_URL ? '✅ Configurée' : '❌ Manquante',
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✅ Configurée' : '❌ Manquante'
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: 'Variables d\'environnement vérifiées',
+      environment: envVars,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Erreur test env:', error);
+    return res.status(500).json({
+      error: 'Erreur test env',
       details: error.message
     });
   }

@@ -3,7 +3,7 @@
  * Documentation: https://site.financialmodelingprep.com/developer/docs
  */
 
-const FMP_BASE_URL = 'https://financialmodelingprep.com/api/v3';
+const FMP_BASE_URL = 'https://financialmodelingprep.com/stable';
 const FMP_V4_BASE_URL = 'https://financialmodelingprep.com/api/v4';
 
 /**
