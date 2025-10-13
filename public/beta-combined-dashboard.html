@@ -1707,14 +1707,36 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     return `${prefix}${n.toFixed(2)}${suffix}`;
                 };
 
-                // Charger la watchlist depuis localStorage
+                // Charger la watchlist depuis GitHub au démarrage (puis localStorage en fallback)
                 useEffect(() => {
-                    const savedWatchlist = localStorage.getItem('dans-watchlist');
-                    if (savedWatchlist) {
-                        const tickers = JSON.parse(savedWatchlist);
-                        setWatchlistTickers(tickers);
-                        loadWatchlistData(tickers);
-                    }
+                    const loadInitialWatchlist = async () => {
+                        try {
+                            // Essayer de charger depuis GitHub d'abord
+                            const res = await fetch(WATCHLIST_FILE + `?t=${Date.now()}`);
+                            if (res.ok) {
+                                const json = await res.json();
+                                const tickers = Array.isArray(json.tickers) ? json.tickers : [];
+                                console.log('✅ Watchlist chargée depuis GitHub:', tickers);
+                                setWatchlistTickers(tickers);
+                                localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
+                                loadWatchlistData(tickers);
+                                return;
+                            }
+                        } catch (e) {
+                            console.log('⚠️ GitHub non disponible, utilisation du localStorage');
+                        }
+                        
+                        // Fallback: charger depuis localStorage
+                        const savedWatchlist = localStorage.getItem('dans-watchlist');
+                        if (savedWatchlist) {
+                            const tickers = JSON.parse(savedWatchlist);
+                            console.log('📦 Watchlist chargée depuis localStorage:', tickers);
+                            setWatchlistTickers(tickers);
+                            loadWatchlistData(tickers);
+                        }
+                    };
+                    
+                    loadInitialWatchlist();
                 }, []);
 
                 // Charger les données pour les tickers de la watchlist
