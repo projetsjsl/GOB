@@ -426,7 +426,9 @@ async function handleTestEnv(req, res) {
       GEMINI_API_KEY: process.env.GEMINI_API_KEY ? '✅ Configurée' : '❌ Manquante',
       SUPABASE_URL: process.env.SUPABASE_URL ? '✅ Configurée' : '❌ Manquante',
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✅ Configurée' : '❌ Manquante',
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Configurée' : '❌ Manquante'
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Configurée' : '❌ Manquante',
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Configurée' : '❌ Manquante',
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ? '✅ Configurée' : '❌ Manquante'
     };
 
     return res.status(200).json({
