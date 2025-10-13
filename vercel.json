@@ -4,6 +4,9 @@
     "api/gemini/chat.js": {
       "maxDuration": 30
     },
+    "api/gemini/chat-validated.js": {
+      "maxDuration": 30
+    },
     "api/unified-serverless.js": {
       "maxDuration": 30
     },
@@ -15,6 +18,9 @@
     },
     "api/supabase-watchlist.js": {
       "maxDuration": 15
+    },
+    "api/test-gemini.js": {
+      "maxDuration": 10
     }
   },
   "headers": [
