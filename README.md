@@ -1,6 +1,24 @@
-﻿# Seeking Alpha Dashboard
+﻿# GOB - JLab™ Dashboard
 
-Dashboard automatisé pour tracker les analyses Seeking Alpha.
+Dashboard financier complet avec JLab™ (ex-JStocks™) pour le Groupe Ouellet Bolduc.
+
+## 📚 Documentation
+
+**👉 [Consultez la documentation complète](./docs/README.md)**
+
+### 🚀 Démarrage Rapide
+- **[Guide principal](./docs/user-guides/LISEZ_MOI_AU_REVEIL.md)** - Tout ce qu'il faut savoir
+- **[Démarrage rapide](./docs/user-guides/DEMARRAGE_RAPIDE.md)** - Mise en route
+- **[Vue d'ensemble](./docs/user-guides/TOUT_EN_UN_COUP_D_OEIL.md)** - Fonctionnalités
+
+### 🔧 Pour les développeurs
+- **[Plan d'implémentation](./docs/technical/COMPLETE_IMPLEMENTATION_PLAN.md)**
+- **[Résultats des tests](./docs/technical/TEST_RESULTS.md)**
+- **[Configuration APIs](./docs/api/CONFIGURATION_CLES_API.md)**
+
+---
+
+## Ancien projet Seeking Alpha
 
 ## Installation
 
