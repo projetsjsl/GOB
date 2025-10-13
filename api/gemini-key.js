@@ -3,7 +3,7 @@
 // ========================================
 
 export default function handler(req, res) {
-  // Ajouter des  headers CORS pour éviter les problèmes de cross-origin
+  // Ajouter des headers CORS pour éviter les problèmes de cross-origin
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
