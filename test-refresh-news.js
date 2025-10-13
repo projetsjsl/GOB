@@ -81,7 +81,7 @@ async function runTests() {
   console.log('✅ Alternative au cron job toutes les 15 minutes');
   console.log('✅ Compatible avec le plan Hobby Vercel');
   console.log('\n💡 Utilisation:');
-  console.log('   - Cron automatique: 1x par jour à 9h00');
+  console.log('   - Cron automatique: 1x par jour à 6h00 Montréal (11h UTC)');
   console.log('   - Refresh manuel: /api/unified-serverless?endpoint=refresh-news');
   console.log('   - Cache: /api/unified-serverless?endpoint=news/cached');
 }

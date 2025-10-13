@@ -14,7 +14,7 @@ Le plan Hobby de Vercel limite les cron jobs à **une fois par jour maximum**, m
 "schedule": "*/15 * * * *"  // Toutes les 15 minutes ❌
 
 // vercel.json - APRÈS  
-"schedule": "0 9 * * *"     // Une fois par jour à 9h00 ✅
+"schedule": "0 11 * * *"    // Une fois par jour à 6h00 Montréal (11h UTC) ✅
 ```
 
 **Avantages :**
@@ -46,7 +46,7 @@ Le dashboard utilise maintenant un système de cache avec fallback :
 ## 🚀 Architecture Finale
 
 ### Cron Job Automatique
-- **Fréquence :** 1x par jour à 9h00 UTC
+- **Fréquence :** 1x par jour à 6h00 Montréal (11h UTC)
 - **Fonction :** `api/cron/refresh-news.js`
 - **Action :** Récupère et met en cache les nouvelles depuis 3 sources
 
@@ -146,7 +146,7 @@ CREATE TABLE symbol_news_cache (
 - **Fiable** : Fallbacks automatiques en cas de problème
 
 ### Pour l'Administrateur
-- **Cron automatique** : Nouvelles actualisées chaque matin
+- **Cron automatique** : Nouvelles actualisées chaque matin à 6h00 Montréal
 - **Refresh manuel** : Actualisation immédiate si nécessaire
 - **Monitoring** : Logs détaillés des opérations
 
