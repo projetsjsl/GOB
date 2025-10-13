@@ -2041,18 +2041,11 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 >
                                     {watchlistLoading ? 'Actualisation...' : '🔄 Actualiser'}
                                 </button>
-                                <button
-                                    onClick={saveWatchlistToGitHub}
-                                    className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition-colors"
-                                >
-                                    💾 Sauvegarder GitHub
-                                </button>
-                                <button
-                                    onClick={loadWatchlistFromGitHub}
-                                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-                                >
-                                    ⬇️ Charger GitHub
-                                </button>
+                                <div className={`text-sm px-4 py-2 rounded ${
+                                    isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                                }`}>
+                                    💾 Sauvegarde automatique activée
+                                </div>
                             </div>
                         </div>
 
