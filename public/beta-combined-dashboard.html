@@ -346,7 +346,9 @@
             // Messages
             const showMessage = (text, type = 'info') => {
                 setMessage({ text, type });
-                setTimeout(() => setMessage(null), 5000);
+                // Messages plus courts pour éviter les interruptions
+                const duration = type === 'success' ? 2000 : 3000;
+                setTimeout(() => setMessage(null), duration);
             };
 
             // Fonction pour basculer le thème
@@ -781,21 +783,26 @@
                 console.log('🚀 Initialisation du dashboard...');
                 
                 const loadAllData = async () => {
-                    console.log('📊 Chargement des données...');
+                    console.log('📊 Chargement des données en arrière-plan...');
                     try {
-                        await Promise.all([
+                        // Chargement silencieux en arrière-plan (pas de await pour ne pas bloquer)
+                        Promise.all([
                             fetchSeekingAlphaData(),
                             fetchSeekingAlphaStockData(),
                             refreshAllStocks(),
                             fetchNews(),
                             checkApiStatus()
-                        ]);
-                        console.log('✅ Toutes les données chargées');
+                        ]).then(() => {
+                            console.log('✅ Toutes les données chargées en arrière-plan');
+                        }).catch(error => {
+                            console.error('❌ Erreur lors du chargement des données:', error?.message || String(error));
+                        });
                     } catch (error) {
                         console.error('❌ Erreur lors du chargement:', error?.message || String(error));
                     }
                 };
                 
+                // Chargement initial silencieux
                 loadAllData();
 
                 // Intro Emma: première visite de session
@@ -1784,7 +1791,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     setWatchlistTickers(updatedTickers);
                     localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
                     setNewTicker('');
-                    showMessage(`${ticker} ajouté à la watchlist`, 'success');
+                    // Message discret pour l'ajout
+                    console.log(`✅ ${ticker} ajouté à la watchlist`);
                     
                     // 2. Ajouter un placeholder avec état "loading" pour affichage immédiat
                     setWatchlistStockData(prev => ({
@@ -1821,7 +1829,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         return newData;
                     });
                     
-                    showMessage(`${ticker} supprimé de la watchlist`, 'success');
+                    // Message discret pour la suppression
+                    console.log(`✅ ${ticker} supprimé de la watchlist`);
                     
                     // 3. ARRIÈRE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
                     saveWatchlistToSupabaseAuto(ticker, 'remove').catch(err => {
@@ -1829,10 +1838,10 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     });
                 };
 
-                // Actualiser les données de la watchlist
+                // Actualiser les données de la watchlist (silencieux)
                 const refreshWatchlist = async () => {
                     await loadWatchlistData(watchlistTickers);
-                    showMessage('Watchlist actualisée', 'success');
+                    console.log('✅ Watchlist actualisée silencieusement');
                 };
 
                 // Timer pour debounce de la sauvegarde Supabase
@@ -1885,7 +1894,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         if (!response.ok) throw new Error(`HTTP ${response.status}`);
                         
                         const result = await response.json();
-                        showMessage('Watchlist sauvegardée sur Supabase', 'success');
+                        console.log('✅ Watchlist sauvegardée sur Supabase');
                     } catch (e) {
                         console.error('Erreur sauvegarde Supabase watchlist:', e);
                         showMessage('Erreur sauvegarde Supabase', 'error');
@@ -1902,7 +1911,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         setWatchlistTickers(tickers);
                         localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
                         await loadWatchlistData(tickers);
-                        showMessage('Watchlist chargée depuis Supabase', 'success');
+                        console.log('✅ Watchlist chargée depuis Supabase');
                     } catch (e) {
                         console.error('Erreur chargement Supabase watchlist:', e);
                         showMessage('Erreur chargement Supabase', 'error');
@@ -2106,7 +2115,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 <div className={`text-sm px-4 py-2 rounded ${
                                     isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                                 }`}>
-                                    🚀 Supabase + Sauvegarde automatique
+                                    🚀 Supabase + Arrière-plan silencieux
                                 </div>
                             </div>
                         </div>
@@ -7081,11 +7090,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     // Chargement uniquement au changement de stock ou manuel
                 }, [selectedStock]);
 
-                // Timer
-                useEffect(() => {
-                    const timer = setInterval(() => setTime(new Date()), 1000);
-                    return () => clearInterval(timer);
-                }, []);
+                // Timer (désactivé pour éviter les actualisations inutiles)
+                // useEffect(() => {
+                //     const timer = setInterval(() => setTime(new Date()), 1000);
+                //     return () => clearInterval(timer);
+                // }, []);
 
                 // Diagnostics environnementaux (violations) + ouverture auto du HelpPop
                 useEffect(() => {
