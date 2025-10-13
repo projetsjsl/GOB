@@ -7058,27 +7058,28 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 historicalLimit = 30;
                         }
 
-                        // Appels parallèles aux APIs
-                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, historicalRatiosResponse, smaResponse] = await Promise.allSettled([
-                            fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
-                            fetch(`/api/fmp?endpoint=profile&symbol=${symbol}`),
-                            fetch(`/api/fmp?endpoint=ratios&symbol=${symbol}`),
+                        // Appels parallèles aux APIs avec validation croisée
+                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, analystResponse, earningsResponse, validationResponse] = await Promise.allSettled([
+                            fetch(`/api/data-validation?symbol=${symbol}&dataType=quote`),
+                            fetch(`/api/data-validation?symbol=${symbol}&dataType=profile`),
+                            fetch(`/api/financial-ratios?symbol=${symbol}`),
                             fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`),
                             fetch(`/api/fmp?endpoint=historical-chart&symbol=${symbol}&timeframe=${historicalTimeframe}&limit=${historicalLimit}`),
-                            fetch(`/api/fmp?endpoint=ratios-ttm&symbol=${symbol}&limit=8`),
-                            fetch(`/api/fmp?endpoint=technical-indicators&symbol=${symbol}&period=daily&type=sma`)
+                            fetch(`/api/analyst-recommendations?symbol=${symbol}`),
+                            fetch(`/api/earnings-calendar?symbol=${symbol}&limit=5`),
+                            fetch(`/api/data-validation?symbol=${symbol}&dataType=ratios`)
                         ]);
 
-                        // Parser les résultats
-                        const quote = quoteResponse.status === 'fulfilled' && quoteResponse.value.ok 
+                        // Parser les résultats avec validation croisée
+                        const quoteValidation = quoteResponse.status === 'fulfilled' && quoteResponse.value.ok 
                             ? await quoteResponse.value.json() 
                             : null;
                         
-                        const profile = profileResponse.status === 'fulfilled' && profileResponse.value.ok 
+                        const profileValidation = profileResponse.status === 'fulfilled' && profileResponse.value.ok 
                             ? await profileResponse.value.json() 
                             : null;
                         
-                        const ratios = ratiosResponse.status === 'fulfilled' && ratiosResponse.value.ok 
+                        const ratiosData = ratiosResponse.status === 'fulfilled' && ratiosResponse.value.ok 
                             ? await ratiosResponse.value.json() 
                             : null;
                         
@@ -7089,13 +7090,31 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         const intradayData = intradayResponse.status === 'fulfilled' && intradayResponse.value.ok 
                             ? await intradayResponse.value.json() 
                             : null;
+
+                        const analystData = analystResponse.status === 'fulfilled' && analystResponse.value.ok 
+                            ? await analystResponse.value.json() 
+                            : null;
+
+                        const earningsData = earningsResponse.status === 'fulfilled' && earningsResponse.value.ok 
+                            ? await earningsResponse.value.json() 
+                            : null;
+
+                        // Extraire les données validées
+                        const quote = quoteValidation?.finalData || null;
+                        const profile = profileValidation?.finalData || null;
+                        const ratios = ratiosData?.ratios || null;
                         
-                        console.log('✅ Données récupérées:', { 
+                        console.log('✅ Données récupérées avec validation croisée:', { 
                             hasQuote: !!quote, 
                             hasProfile: !!profile, 
                             hasRatios: !!ratios, 
                             hasNews: !!news,
-                            hasIntraday: !!intradayData
+                            hasIntraday: !!intradayData,
+                            hasAnalyst: !!analystData,
+                            hasEarnings: !!earningsData,
+                            quoteConfidence: quoteValidation?.validation?.confidence || 0,
+                            profileConfidence: profileValidation?.validation?.confidence || 0,
+                            ratiosConfidence: ratiosData?.validation?.confidence || 0
                         });
 
                         // 🎯 Calcul du Score JSLAI™ Global (0-100)
@@ -7388,16 +7407,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 return [];
                             })(),
                             metrics: {
-                                peRatioTTM: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
-                                pegRatioTTM: ratios?.data?.[0]?.pegRatioTTM || ratios?.pegRatioTTM || null,
-                                priceToSalesRatioTTM: ratios?.data?.[0]?.priceToSalesRatioTTM || ratios?.priceToSalesRatioTTM || null,
-                                dividendYieldTTM: ratios?.data?.[0]?.dividendYieldTTM || ratios?.dividendYieldTTM || null
+                                peRatioTTM: ratios?.valuation?.peRatio || null,
+                                pegRatioTTM: ratios?.valuation?.pegRatio || null,
+                                priceToSalesRatioTTM: ratios?.valuation?.psRatio || null,
+                                dividendYieldTTM: ratios?.debt?.dividendYield || null
                             },
                             ratios: {
-                                debtEquityRatio: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
-                                returnOnEquityTTM: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
-                                returnOnAssetsTTM: ratios?.data?.[0]?.returnOnAssetsTTM || ratios?.returnOnAssetsTTM || null,
-                                netProfitMarginTTM: ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null,
+                                debtEquityRatio: ratios?.debt?.debtEquityRatio || null,
+                                returnOnEquityTTM: ratios?.profitability?.returnOnEquity || null,
+                                returnOnAssetsTTM: ratios?.profitability?.returnOnAssets || null,
+                                netProfitMarginTTM: ratios?.profitability?.netProfitMargin || null,
+                                currentRatio: ratios?.liquidity?.currentRatio || null,
+                                quickRatio: ratios?.liquidity?.quickRatio || null,
+                                grossProfitMargin: ratios?.profitability?.grossProfitMargin || null,
+                                operatingProfitMargin: ratios?.profitability?.operatingIncomeMargin || null
                             },
                             profile: {
                                 companyName: profile?.data?.[0]?.companyName || profile?.companyName || `${symbol} Inc.`,
@@ -7424,6 +7447,41 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     : news?.sentimentAnalysis?.overallSentiment === 'negative'
                                     ? 'Sentiment globalement négatif'
                                     : 'Sentiment neutre'
+                            },
+                            // 🎯 Nouvelles données avec validation croisée
+                            analystRecommendations: analystData ? {
+                                consensus: analystData.consensus?.rating || 'N/A',
+                                targetPrice: analystData.consensus?.targetPrice || null,
+                                upside: analystData.consensus?.upside || null,
+                                analystCount: analystData.consensus?.analystCount || 0,
+                                breakdown: analystData.breakdown || {},
+                                confidence: analystData.validation?.confidence || 0,
+                                sources: analystData.validation?.sources || []
+                            } : null,
+                            earningsCalendar: earningsData ? {
+                                nextEarningsDate: earningsData.consensus?.nextEarningsDate || null,
+                                estimatedEPS: earningsData.consensus?.estimatedEPS || null,
+                                estimatedRevenue: earningsData.consensus?.estimatedRevenue || null,
+                                upcoming: earningsData.upcoming || [],
+                                historical: earningsData.historical?.slice(0, 4) || [],
+                                statistics: earningsData.statistics || null,
+                                confidence: earningsData.validation?.confidence || 0
+                            } : null,
+                            dataValidation: {
+                                quote: {
+                                    confidence: quoteValidation?.validation?.confidence || 0,
+                                    status: quoteValidation?.validation?.status || 'unknown',
+                                    sources: quoteValidation?.validation?.sources || []
+                                },
+                                profile: {
+                                    confidence: profileValidation?.validation?.confidence || 0,
+                                    status: profileValidation?.validation?.status || 'unknown',
+                                    sources: profileValidation?.validation?.sources || []
+                                },
+                                ratios: {
+                                    confidence: ratiosData?.validation?.confidence || 0,
+                                    quality: ratiosData?.metadata?.dataQuality || 'Unknown'
+                                }
                             },
                             insights: {
                                 catalysts: news?.news?.slice(0, 3)?.map(article => article.title) || [
