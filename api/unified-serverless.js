@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ 
       error: 'Paramètre endpoint requis',
       availableEndpoints: [
-        'fmp', 'marketdata', 'marketaux', 'news', 'hybrid-data',
+        'fmp', 'marketdata', 'marketaux', 'news', 'news/cached', 'hybrid-data',
         'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini'
       ]
     });
@@ -40,6 +40,9 @@ export default async function handler(req, res) {
       
       case 'news':
         return await handleNews(req, res, symbol, limit);
+      
+      case 'news/cached':
+        return await handleNewsCached(req, res, otherParams);
       
       case 'hybrid-data':
         return await handleHybridData(req, res, symbol, dataType);
@@ -66,7 +69,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ 
           error: `Endpoint '${endpoint}' non supporté`,
           availableEndpoints: [
-            'fmp', 'marketdata', 'marketaux', 'news', 'hybrid-data',
+            'fmp', 'marketdata', 'marketaux', 'news', 'news/cached', 'hybrid-data',
             'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini'
           ]
         });
@@ -195,6 +198,82 @@ async function handleNews(req, res, symbol, limit) {
   } catch (error) {
     console.error('❌ Erreur News:', error);
     return res.status(500).json({ error: 'Erreur News', details: error.message });
+  }
+}
+
+// News Cached Handler
+async function handleNewsCached(req, res, params) {
+  try {
+    const { type = 'general', symbol, limit = 20 } = req.query;
+    
+    console.log(`📰 Cache News - Type: ${type}, Symbol: ${symbol}, Limit: ${limit}`);
+    
+    // Vérifier si Supabase est configuré
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      console.warn('⚠️ Supabase non configuré, retour de données simulées');
+      return res.status(200).json({
+        cached: false,
+        data: [],
+        sources: ['Simulation'],
+        message: 'Supabase non configuré - données simulées',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Import dynamique de Supabase
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+
+    let query = supabase.from('news_cache').select('*');
+    
+    if (type === 'symbol' && symbol) {
+      query = query.or(`symbols.cs.{${symbol}},title.ilike.%${symbol}%,description.ilike.%${symbol}%`);
+    }
+    
+    query = query.order('published_at', { ascending: false }).limit(parseInt(limit));
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('❌ Erreur Supabase News Cache:', error);
+      return res.status(500).json({
+        cached: false,
+        error: 'Erreur base de données',
+        details: error.message
+      });
+    }
+
+    if (!data || data.length === 0) {
+      console.log('📭 Cache vide pour les critères donnés');
+      return res.status(200).json({
+        cached: false,
+        data: [],
+        sources: [],
+        message: 'Cache vide',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Extraire les sources uniques
+    const sources = [...new Set(data.map(item => item.source))];
+
+    console.log(`✅ ${data.length} articles récupérés du cache (${sources.join(', ')})`);
+
+    return res.status(200).json({
+      cached: true,
+      data: data,
+      sources: sources,
+      count: data.length,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur News Cached:', error);
+    return res.status(500).json({
+      cached: false,
+      error: 'Erreur News Cached',
+      details: error.message
+    });
   }
 }
 
