@@ -41,6 +41,7 @@ export default async function handler(req, res) {
   console.log(`🔑 SUPABASE_URL: ${SUPABASE_URL ? 'Configurée' : 'Manquante'} (${SUPABASE_URL})`);
   console.log(`🔑 SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY ? 'Configurée' : 'Manquante'}`);
   console.log(`🔑 SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY ? 'Configurée' : 'Manquante'}`);
+  console.log(`🔑 FORCE REDEPLOY: ${new Date().toISOString()}`);
 
   try {
     const { method } = req;
