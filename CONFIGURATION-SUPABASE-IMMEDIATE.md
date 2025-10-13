@@ -1,8 +1,8 @@
-# 🚀 ACTION IMMÉDIATE - Configuration Supabase
+# 🚀 CONFIGURATION SUPABASE IMMÉDIATE
 
 ## ⚡ **ÉTAPES RAPIDES (5 minutes)**
 
-### **1. 🆕 Créer un Projet Supabase**
+### **1. 🆕 Créer le Projet Supabase**
 
 1. **Aller sur [supabase.com](https://supabase.com)**
 2. **Cliquer "Start your project"**
@@ -30,7 +30,7 @@
 
 ### **4. ⚙️ Configurer Vercel (2 minutes)**
 
-#### **Option A : Via Vercel Dashboard (Recommandé)**
+#### **Via Vercel Dashboard (Recommandé)**
 1. **Aller sur [vercel.com/dashboard](https://vercel.com/dashboard)**
 2. **Sélectionner le projet GOB**
 3. **Settings → Environment Variables**
@@ -40,15 +40,6 @@
    SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    ```
 5. **Cliquer "Save"**
-
-#### **Option B : Via CLI (Si connecté)**
-```bash
-vercel env add SUPABASE_URL
-# Coller: https://votre-projet.supabase.co
-
-vercel env add SUPABASE_ANON_KEY  
-# Coller: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 ### **5. 🚀 Redéployer (1 minute)**
 
@@ -72,10 +63,11 @@ AND table_name LIKE '%stock%' OR table_name LIKE '%financial%';
 curl "https://VOTRE_SITE.vercel.app/api/hybrid-data?symbol=AAPL&dataType=quote&syncIfNeeded=true"
 ```
 
-### **Test 3 : Vérifier le Dashboard**
-1. **Aller sur votre site**
-2. **Onglet JLab™**
-3. **Vérifier que les données s'affichent**
+### **Test 3 : Vérifier les Données en Cache**
+```sql
+-- Dans Supabase SQL Editor
+SELECT symbol, last_updated FROM stock_quotes ORDER BY last_updated DESC LIMIT 5;
+```
 
 ## 🎯 **RÉSULTAT ATTENDU**
 
@@ -83,8 +75,8 @@ Après ces étapes, vous devriez voir :
 
 ### **Dans Supabase :**
 - ✅ 7 tables créées (stock_quotes, stock_profiles, etc.)
+- ✅ Données en cache après utilisation
 - ✅ Index et triggers configurés
-- ✅ Politiques RLS actives
 
 ### **Dans les Logs Vercel :**
 ```
@@ -95,9 +87,8 @@ Après ces étapes, vous devriez voir :
 
 ### **Dans le Dashboard :**
 - ✅ Données réelles dans JLab™
-- ✅ Graphiques fonctionnels
-- ✅ Métriques financières exactes
-- ✅ Chargement rapide (cache local)
+- ✅ Chargement plus rapide (cache local)
+- ✅ Données disponibles même si APIs externes échouent
 
 ## 🚨 **EN CAS DE PROBLÈME**
 
@@ -113,24 +104,11 @@ Après ces étapes, vous devriez voir :
 - ✅ Vérifier SUPABASE_URL et SUPABASE_ANON_KEY
 - ✅ Redéployer après modification des variables
 
-### **Dashboard ne charge pas**
-- ✅ Vérifier les logs Vercel
-- ✅ Tester l'API hybride directement
-- ✅ Vérifier la console du navigateur
-
-## 📞 **SUPPORT RAPIDE**
-
-Si vous bloquez :
-1. **Copier l'erreur exacte**
-2. **Vérifier les logs Vercel**
-3. **Tester l'API directement**
-4. **Vérifier la configuration Supabase**
-
 ---
 
-## 🎉 **FÉLICITATIONS !**
+## 🎉 **APRÈS CONFIGURATION**
 
-Une fois terminé, votre système JLab™ aura :
+Une fois Supabase configuré, votre système aura :
 - 🚀 **Performance optimale** (cache local)
 - 📊 **Données exactes** (APIs fiables)
 - 🔄 **Synchronisation automatique**

@@ -1,5 +1,6 @@
 -- ============================================
 -- SCRIPT DE CRÉATION DES TABLES HISTORIQUES
+-- Projet: gob-watchlist
 -- ============================================
 
 -- Extension pour UUID

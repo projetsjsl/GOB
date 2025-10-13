@@ -32,7 +32,7 @@ const setupSupabaseProject = async () => {
     console.log('SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? '✅ Configuré' : '❌ Manquant');
     
     console.log('\n💡 Pour configurer:');
-    console.log('1. Créer un projet sur https://supabase.com');
+    console.log('1. Créer un projet sur https://supabase.com (nom: gob-watchlist)');
     console.log('2. Aller dans Settings > API');
     console.log('3. Copier Project URL et anon public key');
     console.log('4. Les ajouter dans Vercel Environment Variables');
