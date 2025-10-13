@@ -135,9 +135,29 @@ L'utilisateur utilise un dashboard financier avec :
             console.log(`✅ ${functionCall.functionCall.name} exécuté avec succès`);
           } catch (error) {
             console.error(`❌ Erreur lors de l'exécution de ${functionCall.functionCall.name}:`, error);
+            
+            // Messages d'erreur plus informatifs pour les function calls
+            let functionErrorMessage = `Erreur lors de l'exécution de ${functionCall.functionCall.name}`;
+            let functionErrorDetails = error.message;
+            
+            if (functionErrorDetails.includes('404') || functionErrorDetails.includes('Not Found')) {
+              functionErrorMessage = `Service ${functionCall.functionCall.name} temporairement indisponible`;
+              functionErrorDetails = 'Le service de données financières rencontre des difficultés temporaires';
+            } else if (functionErrorDetails.includes('timeout')) {
+              functionErrorMessage = `Délai d'attente dépassé pour ${functionCall.functionCall.name}`;
+              functionErrorDetails = 'La requête a pris trop de temps à traiter';
+            } else if (functionErrorDetails.includes('network') || functionErrorDetails.includes('fetch')) {
+              functionErrorMessage = `Problème de connexion pour ${functionCall.functionCall.name}`;
+              functionErrorDetails = 'Impossible de récupérer les données en temps réel';
+            }
+            
             functionResults.push({
               name: functionCall.functionCall.name,
-              response: { error: error.message }
+              response: { 
+                error: functionErrorMessage,
+                details: functionErrorDetails,
+                suggestion: 'Les données peuvent être temporairement indisponibles. Réessayez dans quelques instants.'
+              }
             });
           }
         }
@@ -226,10 +246,76 @@ L'utilisateur utilise un dashboard financier avec :
   } catch (e) {
     console.error('❌ Erreur dans le handler Gemini:', e);
     console.error('Stack trace:', e?.stack);
+    
+    // Messages d'erreur améliorés et plus informatifs
+    let errorMessage = 'Erreur de connexion à l\'API Gemini.';
+    let suggestions = [];
+    let technicalDetails = String(e?.message || e);
+    
+    // Analyser le type d'erreur pour donner des suggestions pertinentes
+    if (technicalDetails.includes('GEMINI_API_KEY')) {
+      errorMessage = 'Configuration de la clé API Gemini manquante.';
+      suggestions = [
+        'Vérifiez que la clé API Gemini est configurée dans Vercel',
+        'Contactez l\'administrateur pour configurer la clé API'
+      ];
+    } else if (technicalDetails.includes('quota') || technicalDetails.includes('limit')) {
+      errorMessage = 'Limite de quota API Gemini atteinte.';
+      suggestions = [
+        'Attendez quelques minutes avant de réessayer',
+        'Le quota se renouvelle automatiquement'
+      ];
+    } else if (technicalDetails.includes('network') || technicalDetails.includes('fetch')) {
+      errorMessage = 'Problème de connexion réseau.';
+      suggestions = [
+        'Vérifiez votre connexion internet',
+        'Réessayez dans quelques instants'
+      ];
+    } else if (technicalDetails.includes('timeout')) {
+      errorMessage = 'Délai d\'attente dépassé.';
+      suggestions = [
+        'La requête a pris trop de temps à traiter',
+        'Réessayez avec une question plus simple'
+      ];
+    } else if (technicalDetails.includes('400') || technicalDetails.includes('Bad Request')) {
+      errorMessage = 'Requête invalide envoyée à l\'API.';
+      suggestions = [
+        'Vérifiez le format de votre message',
+        'Évitez les caractères spéciaux ou les messages trop longs'
+      ];
+    } else if (technicalDetails.includes('401') || technicalDetails.includes('Unauthorized')) {
+      errorMessage = 'Clé API Gemini invalide ou expirée.';
+      suggestions = [
+        'Vérifiez la configuration de la clé API',
+        'Contactez l\'administrateur système'
+      ];
+    } else if (technicalDetails.includes('429') || technicalDetails.includes('Too Many Requests')) {
+      errorMessage = 'Trop de requêtes simultanées.';
+      suggestions = [
+        'Attendez quelques secondes avant de réessayer',
+        'Évitez de poser plusieurs questions en même temps'
+      ];
+    } else if (technicalDetails.includes('500') || technicalDetails.includes('Internal Server Error')) {
+      errorMessage = 'Erreur interne du serveur Gemini.';
+      suggestions = [
+        'Le service Gemini rencontre des difficultés temporaires',
+        'Réessayez dans quelques minutes'
+      ];
+    } else {
+      // Erreur générique avec suggestions générales
+      suggestions = [
+        'Vérifiez votre connexion internet',
+        'Réessayez dans quelques instants',
+        'Si le problème persiste, contactez le support'
+      ];
+    }
+    
     return res.status(500).json({ 
-      error: 'Erreur serveur Gemini', 
-      details: String(e?.message || e),
-      timestamp: new Date().toISOString()
+      error: errorMessage,
+      suggestions: suggestions,
+      technical: technicalDetails,
+      timestamp: new Date().toISOString(),
+      support: 'Pour plus d\'aide, consultez la console du navigateur (F12)'
     });
   }
 }
