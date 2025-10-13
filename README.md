@@ -43,3 +43,4 @@ Le scraper va automatiquement extraire toutes les données et les sauvegarder su
 - `scraper-snippet.js` - Script de scraping Chrome
 - `tickers.json` - Liste des tickers à suivre
 - `stock_data.json` - Données scrapées
+# Test deployment Mon Oct 13 15:42:10 EDT 2025
