@@ -7223,6 +7223,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 return date.toLocaleDateString('fr-FR', { month: 'short' });
                                             };
                                             break;
+                                        case '5A':
+                                            pointCount = 20;
+                                            timeInterval = 90; // 3 mois
+                                            timeFormat = (i) => {
+                                                const date = new Date();
+                                                date.setMonth(date.getMonth() - (19 - i) * 3);
+                                                return date.toLocaleDateString('fr-FR', { year: '2-digit', month: 'short' });
+                                            };
+                                            break;
+                                        case 'MAX':
+                                            pointCount = 30;
+                                            timeInterval = 120; // 4 mois
+                                            timeFormat = (i) => {
+                                                const date = new Date();
+                                                date.setMonth(date.getMonth() - (29 - i) * 4);
+                                                return date.toLocaleDateString('fr-FR', { year: '2-digit', month: 'short' });
+                                            };
+                                            break;
+                                        case 'YTD':
+                                            pointCount = 12;
+                                            timeInterval = 30; // 1 mois depuis début d'année
+                                            timeFormat = (i) => {
+                                                const date = new Date();
+                                                date.setMonth(i); // Janvier = 0, Décembre = 11
+                                                return date.toLocaleDateString('fr-FR', { month: 'short' });
+                                            };
+                                            break;
                                         default:
                                             pointCount = 20;
                                             timeInterval = 3;
@@ -7233,22 +7260,49 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             };
                                     }
                                     
+                                    // Générer des données historiques plus réalistes
                                     for (let i = 0; i < pointCount; i++) {
-                                        // Simulation de variation de prix avec une tendance
                                         const progress = i / (pointCount - 1); // 0 à 1
-                                        const trend = changePercent > 0 ? 1 : -1;
-                                        const volatility = Math.random() * 0.02 - 0.01; // ±1% de volatilité
-                                        const priceVariation = (progress * change) + (volatility * basePrice);
                                         
-                                        const price = Math.max(0.01, basePrice + priceVariation);
+                                        // Calculer le prix historique basé sur la tendance et la volatilité
+                                        let historicalPrice;
+                                        
+                                        if (timeframe === 'YTD') {
+                                            // Pour YTD, commencer au prix d'ouverture de l'année
+                                            const yearStartPrice = basePrice * (1 - changePercent / 100 * 0.8); // Prix approximatif début d'année
+                                            const yearProgress = i / (pointCount - 1);
+                                            historicalPrice = yearStartPrice + (yearProgress * (currentPrice - yearStartPrice));
+                                        } else if (timeframe === '5A' || timeframe === 'MAX') {
+                                            // Pour les périodes longues, simuler une croissance/évolution historique
+                                            const yearsBack = timeframe === '5A' ? 5 : 10;
+                                            const historicalMultiplier = 1 - (changePercent / 100) * (yearsBack * 0.2); // Évolution sur plusieurs années
+                                            const startPrice = currentPrice * historicalMultiplier;
+                                            historicalPrice = startPrice + (progress * (currentPrice - startPrice));
+                                        } else {
+                                            // Pour les périodes courtes, utiliser la logique existante
+                                            const trend = changePercent > 0 ? 1 : -1;
+                                            const volatility = Math.random() * 0.02 - 0.01; // ±1% de volatilité
+                                            const priceVariation = (progress * change) + (volatility * basePrice);
+                                            historicalPrice = Math.max(0.01, basePrice + priceVariation);
+                                        }
+                                        
+                                        // Ajouter de la volatilité réaliste
+                                        const volatility = Math.random() * 0.015 - 0.0075; // ±0.75% de volatilité
+                                        const finalPrice = historicalPrice * (1 + volatility);
+                                        
+                                        // Calculer OHLC réalistes
+                                        const open = i === 0 ? (timeframe === 'YTD' ? basePrice * 0.9 : basePrice) : dataPoints[i-1]?.close || finalPrice;
+                                        const close = Math.max(0.01, finalPrice);
+                                        const high = Math.max(open, close) * (1 + Math.random() * 0.01);
+                                        const low = Math.min(open, close) * (1 - Math.random() * 0.01);
                                         
                                         dataPoints.push({
                                             date: timeFormat(i),
-                                            open: i === 0 ? basePrice : dataPoints[i-1]?.close || basePrice,
-                                            high: price * (1 + Math.random() * 0.01),
-                                            low: price * (1 - Math.random() * 0.01),
-                                            close: price,
-                                            volume: Math.floor(Math.random() * 1000000) + 100000
+                                            open: open,
+                                            high: high,
+                                            low: low,
+                                            close: close,
+                                            volume: Math.floor(Math.random() * 2000000) + 500000 // Volume plus réaliste
                                         });
                                     }
                                     
@@ -8223,7 +8277,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <div style={{ width: '100%', height: 140 }}>
                                         {typeof Chart !== 'undefined' && intraday && intraday.length > 0 ? (
                                             <canvas key={`chart-${selectedStock}-${timeframe}`} ref={(canvas) => {
-                                                if (canvas && !canvas.chart) {
+                                                if (canvas) {
+                                                    // Détruire l'ancien graphique s'il existe
+                                                    if (canvas.chart) {
+                                                        canvas.chart.destroy();
+                                                        canvas.chart = null;
+                                                    }
+                                                    
                                                     const ctx = canvas.getContext('2d');
                                                     canvas.chart = new Chart(ctx, {
                                                         type: 'line',
@@ -8256,8 +8316,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             },
                                                             scales: {
                                                                 x: {
-                                                                    display: false,
-                                                                    grid: { display: false }
+                                                                    display: timeframe === '1D' ? false : true, // Afficher les dates pour les périodes longues
+                                                                    grid: { display: false },
+                                                                    ticks: {
+                                                                        color: isDarkMode ? '#888' : '#666',
+                                                                        font: { size: 8 },
+                                                                        maxTicksLimit: 6
+                                                                    }
                                                                 },
                                                                 y: {
                                                                     display: true,
@@ -8265,7 +8330,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                     grid: { color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' },
                                                                     ticks: {
                                                                         color: isDarkMode ? '#888' : '#666',
-                                                                        font: { size: 10 }
+                                                                        font: { size: 10 },
+                                                                        callback: function(value) {
+                                                                            return '$' + value.toFixed(2);
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -8281,7 +8349,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
 
                                     <div className="flex gap-1 mt-1.5">
-                                    {['1D', '1W', '1M', '3M', '6M', '1A'].map((period) => (
+                                    {['1D', '1W', '1M', '3M', '6M', '1A', '5A', 'MAX', 'YTD'].map((period) => (
                                             <button
                                                 key={period}
                                                 onClick={async () => {
