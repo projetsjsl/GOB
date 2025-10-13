@@ -1740,7 +1740,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 }, []);
 
                 // Charger les données pour les tickers de la watchlist
-                const loadWatchlistData = async (tickers) => {
+                const loadWatchlistData = async (tickers, appendMode = false) => {
                     if (tickers.length === 0) return;
                     
                     setWatchlistLoading(true);
@@ -1760,7 +1760,12 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         }
                     }
                     
-                    setWatchlistStockData(newData);
+                    // Si appendMode, ajouter aux données existantes au lieu de remplacer
+                    if (appendMode) {
+                        setWatchlistStockData(prev => ({ ...prev, ...newData }));
+                    } else {
+                        setWatchlistStockData(newData);
+                    }
                     setWatchlistLoading(false);
                 };
 
@@ -1779,9 +1784,10 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
                     setNewTicker('');
                     
-                    // Charger les données pour le nouveau ticker
-                    loadWatchlistData([ticker]);
                     showMessage(`${ticker} ajouté à la watchlist`, 'success');
+                    
+                    // Charger les données pour le nouveau ticker (mode append pour garder les autres)
+                    await loadWatchlistData([ticker], true);
                     
                     // Sauvegarder automatiquement sur GitHub
                     await saveWatchlistToGitHubAuto(updatedTickers);
