@@ -48,6 +48,7 @@ export default async function handler(req, res) {
         shouldSync = true;
       }
     } else {
+      console.warn('⚠️ Supabase non configuré, utilisation directe des APIs externes');
       shouldSync = true;
     }
 
@@ -56,12 +57,17 @@ export default async function handler(req, res) {
       console.log(`📡 Synchronisation avec APIs externes pour ${symbol} (${dataType})`);
       const externalData = await fetchExternalData(symbol, dataType);
       
+      if (!externalData) {
+        throw new Error(`Aucune donnée disponible pour ${symbol} (${dataType})`);
+      }
+      
       // Sauvegarder en local si possible
       if (SUPABASE_URL && SUPABASE_ANON_KEY && externalData) {
         try {
           const { createClient } = await import('@supabase/supabase-js');
           const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
           await saveLocalData(supabase, symbol, dataType, externalData);
+          console.log(`💾 Données sauvegardées en local pour ${symbol} (${dataType})`);
         } catch (error) {
           console.warn('⚠️ Erreur sauvegarde locale:', error.message);
         }
@@ -202,11 +208,13 @@ async function fetchExternalData(symbol, dataType) {
       return pricesResponse.ok ? await pricesResponse.json() : null;
 
     case 'analyst':
-      const analystResponse = await fetch(`${baseUrl}/api/unified-data?endpoint=analyst-recommendations&symbol=${symbol}`);
+      // Utiliser l'API FMP pour les recommandations d'analystes
+      const analystResponse = await fetch(`${baseUrl}/api/fmp?endpoint=rating&symbol=${symbol}`);
       return analystResponse.ok ? await analystResponse.json() : null;
 
     case 'earnings':
-      const earningsResponse = await fetch(`${baseUrl}/api/unified-data?endpoint=earnings-calendar&symbol=${symbol}&limit=5`);
+      // Utiliser l'API FMP pour le calendrier des résultats
+      const earningsResponse = await fetch(`${baseUrl}/api/fmp?endpoint=earnings&symbol=${symbol}&limit=5`);
       return earningsResponse.ok ? await earningsResponse.json() : null;
 
     default:
