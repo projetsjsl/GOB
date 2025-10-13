@@ -7058,24 +7058,23 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 historicalLimit = 30;
                         }
 
-                        // Appels parallèles aux APIs avec validation croisée
-                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, analystResponse, earningsResponse, validationResponse] = await Promise.allSettled([
-                            fetch(`/api/data-validation?symbol=${symbol}&dataType=quote`),
-                            fetch(`/api/data-validation?symbol=${symbol}&dataType=profile`),
-                            fetch(`/api/financial-ratios?symbol=${symbol}`),
-                            fetch(`/api/marketaux?endpoint=ticker-sentiment&symbol=${symbol}&limit=50`),
-                            fetch(`/api/fmp?endpoint=historical-chart&symbol=${symbol}&timeframe=${historicalTimeframe}&limit=${historicalLimit}`),
-                            fetch(`/api/analyst-recommendations?symbol=${symbol}`),
-                            fetch(`/api/earnings-calendar?symbol=${symbol}&limit=5`),
-                            fetch(`/api/data-validation?symbol=${symbol}&dataType=ratios`)
+                        // Appels parallèles aux APIs hybrides (Base locale + APIs externes)
+                        const [quoteResponse, profileResponse, ratiosResponse, newsResponse, intradayResponse, analystResponse, earningsResponse] = await Promise.allSettled([
+                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=quote&syncIfNeeded=true`),
+                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=profile&syncIfNeeded=true`),
+                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=ratios&syncIfNeeded=true`),
+                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=news&syncIfNeeded=true`),
+                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=prices&syncIfNeeded=true`),
+                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=analyst&syncIfNeeded=true`),
+                            fetch(`/api/hybrid-data?symbol=${symbol}&dataType=earnings&syncIfNeeded=true`)
                         ]);
 
-                        // Parser les résultats avec validation croisée
-                        const quoteValidation = quoteResponse.status === 'fulfilled' && quoteResponse.value.ok 
+                        // Parser les résultats hybrides
+                        const quoteData = quoteResponse.status === 'fulfilled' && quoteResponse.value.ok 
                             ? await quoteResponse.value.json() 
                             : null;
                         
-                        const profileValidation = profileResponse.status === 'fulfilled' && profileResponse.value.ok 
+                        const profileData = profileResponse.status === 'fulfilled' && profileResponse.value.ok 
                             ? await profileResponse.value.json() 
                             : null;
                         
@@ -7083,7 +7082,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             ? await ratiosResponse.value.json() 
                             : null;
                         
-                        const news = newsResponse.status === 'fulfilled' && newsResponse.value.ok 
+                        const newsData = newsResponse.status === 'fulfilled' && newsResponse.value.ok 
                             ? await newsResponse.value.json() 
                             : null;
                         
@@ -7099,12 +7098,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             ? await earningsResponse.value.json() 
                             : null;
 
-                        // Extraire les données validées
-                        const quote = quoteValidation?.finalData || null;
-                        const profile = profileValidation?.finalData || null;
-                        const ratios = ratiosData?.ratios || null;
+                        // Extraire les données hybrides
+                        const quote = quoteData?.data || null;
+                        const profile = profileData?.data || null;
+                        const ratios = ratiosData?.data?.ratios || null;
+                        const news = newsData?.data || null;
                         
-                        console.log('✅ Données récupérées avec validation croisée:', { 
+                        console.log('✅ Données hybrides récupérées:', { 
                             hasQuote: !!quote, 
                             hasProfile: !!profile, 
                             hasRatios: !!ratios, 
@@ -7112,9 +7112,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             hasIntraday: !!intradayData,
                             hasAnalyst: !!analystData,
                             hasEarnings: !!earningsData,
-                            quoteConfidence: quoteValidation?.validation?.confidence || 0,
-                            profileConfidence: profileValidation?.validation?.confidence || 0,
-                            ratiosConfidence: ratiosData?.validation?.confidence || 0
+                            quoteSource: quoteData?.source || 'unknown',
+                            profileSource: profileData?.source || 'unknown',
+                            ratiosSource: ratiosData?.source || 'unknown',
+                            quoteConfidence: quoteData?.metadata?.confidence || 0,
+                            profileConfidence: profileData?.metadata?.confidence || 0,
+                            ratiosConfidence: ratiosData?.metadata?.confidence || 0,
+                            quoteFreshness: quoteData?.metadata?.freshness || 'unknown',
+                            profileFreshness: profileData?.metadata?.freshness || 'unknown',
+                            ratiosFreshness: ratiosData?.metadata?.freshness || 'unknown'
                         });
 
                         // 🎯 Calcul du Score JSLAI™ Global (0-100)
@@ -7469,18 +7475,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             } : null,
                             dataValidation: {
                                 quote: {
-                                    confidence: quoteValidation?.validation?.confidence || 0,
-                                    status: quoteValidation?.validation?.status || 'unknown',
-                                    sources: quoteValidation?.validation?.sources || []
+                                    confidence: quoteData?.metadata?.confidence || 0,
+                                    status: quoteData?.metadata?.freshness || 'unknown',
+                                    source: quoteData?.source || 'unknown',
+                                    lastUpdated: quoteData?.metadata?.lastUpdated || null
                                 },
                                 profile: {
-                                    confidence: profileValidation?.validation?.confidence || 0,
-                                    status: profileValidation?.validation?.status || 'unknown',
-                                    sources: profileValidation?.validation?.sources || []
+                                    confidence: profileData?.metadata?.confidence || 0,
+                                    status: profileData?.metadata?.freshness || 'unknown',
+                                    source: profileData?.source || 'unknown',
+                                    lastUpdated: profileData?.metadata?.lastUpdated || null
                                 },
                                 ratios: {
-                                    confidence: ratiosData?.validation?.confidence || 0,
-                                    quality: ratiosData?.metadata?.dataQuality || 'Unknown'
+                                    confidence: ratiosData?.metadata?.confidence || 0,
+                                    quality: ratiosData?.metadata?.dataQuality || 'Unknown',
+                                    source: ratiosData?.source || 'unknown',
+                                    lastUpdated: ratiosData?.metadata?.lastUpdated || null
                                 }
                             },
                             insights: {
