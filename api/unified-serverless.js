@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       error: 'Paramètre endpoint requis',
       availableEndpoints: [
         'fmp', 'marketdata', 'marketaux', 'news', 'news/cached', 'hybrid-data',
-        'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-gemini', 'refresh-news'
+        'claude', 'gemini-chat', 'github-update', 'unified-data', 'test-env', 'test-supabase-keys', 'test-gemini', 'refresh-news'
       ]
     });
   }
@@ -59,8 +59,11 @@ export default async function handler(req, res) {
       case 'unified-data':
         return await handleUnifiedData(req, res, symbol, action);
       
-      case 'test-env':
-        return await handleTestEnv(req, res);
+        case 'test-env':
+            return await handleTestEnv(req, res);
+        
+        case 'test-supabase-keys':
+            return await handleTestSupabaseKeys(req, res);
       
       case 'test-gemini':
         return await handleTestGemini(req, res);
@@ -227,10 +230,12 @@ async function handleNewsCached(req, res, params) {
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-    let query = supabase.from('news_cache').select('*');
+    let query;
     
     if (type === 'symbol' && symbol) {
-      query = query.or(`symbols.cs.{${symbol}},title.ilike.%${symbol}%,description.ilike.%${symbol}%`);
+      query = supabase.from('symbol_news_cache').select('*').eq('symbol', symbol);
+    } else {
+      query = supabase.from('market_news_cache').select('*');
     }
     
     query = query.order('published_at', { ascending: false }).limit(parseInt(limit));
@@ -420,7 +425,8 @@ async function handleTestEnv(req, res) {
       MARKETAUX_API_KEY: process.env.MARKETAUX_API_KEY ? '✅ Configurée' : '❌ Manquante',
       GEMINI_API_KEY: process.env.GEMINI_API_KEY ? '✅ Configurée' : '❌ Manquante',
       SUPABASE_URL: process.env.SUPABASE_URL ? '✅ Configurée' : '❌ Manquante',
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✅ Configurée' : '❌ Manquante'
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✅ Configurée' : '❌ Manquante',
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Configurée' : '❌ Manquante'
     };
 
     return res.status(200).json({
@@ -433,6 +439,68 @@ async function handleTestEnv(req, res) {
     console.error('❌ Erreur test env:', error);
     return res.status(500).json({
       error: 'Erreur test env',
+      details: error.message
+    });
+  }
+}
+
+// Test Supabase Keys Handler
+async function handleTestSupabaseKeys(req, res) {
+  try {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+    const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    const keys = {
+      SUPABASE_URL: SUPABASE_URL ? '✅ Configurée' : '❌ Manquante',
+      SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '✅ Configurée' : '❌ Manquante',
+      SUPABASE_SERVICE_ROLE_KEY: SUPABASE_SERVICE_ROLE_KEY ? '✅ Configurée' : '❌ Manquante'
+    };
+
+    // Test de connexion si les clés sont disponibles
+    let connectionTest = null;
+    if (SUPABASE_URL && (SUPABASE_ANON_KEY || SUPABASE_SERVICE_ROLE_KEY)) {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabaseKey = SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
+        const supabase = createClient(SUPABASE_URL, supabaseKey);
+        
+        // Test simple de connexion
+        const { data, error } = await supabase
+          .from('watchlists')
+          .select('count')
+          .limit(1);
+        
+        if (error) {
+          connectionTest = {
+            status: '❌ Erreur de connexion',
+            error: error.message,
+            code: error.code
+          };
+        } else {
+          connectionTest = {
+            status: '✅ Connexion réussie',
+            keyUsed: SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : 'ANON'
+          };
+        }
+      } catch (err) {
+        connectionTest = {
+          status: '❌ Erreur de test',
+          error: err.message
+        };
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      keys,
+      connectionTest,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Erreur test Supabase keys:', error);
+    return res.status(500).json({
+      error: 'Erreur test Supabase keys',
       details: error.message
     });
   }
