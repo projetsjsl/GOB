@@ -16,9 +16,15 @@ export default async function handler(req, res) {
   if (!GEMINI_API_KEY) {
     console.error('❌ GEMINI_API_KEY manquante');
     return res.status(503).json({ 
-      error: 'Service temporairement indisponible',
-      message: 'Configuration Gemini AI en cours. Veuillez réessayer dans quelques instants.',
-      technical: 'GEMINI_API_KEY not configured'
+      error: 'Configuration de la clé API Gemini manquante',
+      suggestions: [
+        'Vérifiez que la clé API Gemini est configurée dans Vercel',
+        'Contactez l\'administrateur pour configurer la clé API',
+        'Consultez la documentation de configuration'
+      ],
+      technical: 'GEMINI_API_KEY not configured',
+      timestamp: new Date().toISOString(),
+      support: 'Pour plus d\'aide, consultez la console du navigateur (F12)'
     });
   }
 
