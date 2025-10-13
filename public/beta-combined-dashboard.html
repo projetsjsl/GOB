@@ -4136,8 +4136,8 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         
                         // Utiliser l'API avec function calling si activé
                         if (useFunctionCalling) {
-                            const apiEndpoint = '/api/gemini/chat-with-functions';
-                            console.log(`🔧 Utilisation de Gemini Function Calling avec accès aux APIs`);
+                            const apiEndpoint = useValidatedMode ? '/api/gemini/chat-validated' : '/api/gemini/chat';
+                            console.log(`🔧 Utilisation de Gemini Function Calling (${useValidatedMode ? 'validé' : 'standard'}) avec accès aux APIs`);
                             response = await fetch(apiEndpoint, {
                                 method: 'POST',
                                 headers: {
