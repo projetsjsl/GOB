@@ -68,7 +68,7 @@ Le problème venait du **frontend** (fichier HTML) qui affichait des messages d'
 • Vérifiez votre connexion internet
 • Si le problème persiste, contactez le support
 
-💡 **Astuce :** Pendant ce temps, vous pouvez utiliser les autres fonctionnalités du dashboard (JStocks™, Screener, etc.)`;
+💡 **Astuce :** Pendant ce temps, vous pouvez utiliser les autres fonctionnalités du dashboard (JLab™, Screener, etc.)`;
     } else if (error?.message?.includes('Failed to fetch') || error?.message?.includes('NetworkError')) {
         errorContent = `Je ne parviens pas à me connecter au serveur. 🌐
 
@@ -180,7 +180,7 @@ Désolée, je rencontre un problème technique temporaire. 😔
 • Si le problème persiste, contactez le support
 
 💡 **Astuce :** Pendant ce temps, vous pouvez utiliser les autres 
-fonctionnalités du dashboard (JStocks™, Screener, etc.)
+fonctionnalités du dashboard (JLab™, Screener, etc.)
 ```
 **Impact**: Utilisateur rassuré, sait quoi faire 😊
 

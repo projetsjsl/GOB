@@ -131,7 +131,7 @@ const [economyMode, setEconomyMode] = useState(() => {
 
 | Action | Requêtes | Fréquence | Total/jour |
 |--------|----------|-----------|------------|
-| Chargement JStocks | 7 | 1x/min | 10 080 ❌ |
+| Chargement JLab | 7 | 1x/min | 10 080 ❌ |
 | Actualisation auto | 7 | 1x/60s | 672 ❌ |
 | Changer d'action | 7 | 10x | 70 |
 | Emma IA | 1 | 5x | 5 |
@@ -145,7 +145,7 @@ const [economyMode, setEconomyMode] = useState(() => {
 
 | Action | Requêtes | Cache | Total/jour |
 |--------|----------|-------|------------|
-| Chargement JStocks | 4 | 2 min | 80 ✅ |
+| Chargement JLab | 4 | 2 min | 80 ✅ |
 | Actualisation manuelle | 4 | 2 min | 40 ✅ |
 | Changer d'action | 4 | Cache hit | 20 ✅ |
 | Emma IA | 1 | N/A | 5 ✅ |

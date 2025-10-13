@@ -31,11 +31,11 @@ const EARNINGS_CALENDAR_COMPONENT = `
 const EarningsCalendarTab = () => {
     const [earningsData, setEarningsData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [filterSource, setFilterSource] = useState('all'); // 'all', 'jstocks', 'watchlist'
+    const [filterSource, setFilterSource] = useState('all'); // 'all', 'jlab', 'watchlist'
     const [sortBy, setSortBy] = useState('date'); // 'date', 'symbol', 'beat'
     
-    // Liste des symboles JStocks
-    const jstocksSymbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA', 'NFLX', 'AMD', 'INTC'];
+    // Liste des symboles JLab
+    const jlabSymbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA', 'NFLX', 'AMD', 'INTC'];
     
     // Fonction pour récupérer le calendrier des earnings
     const fetchEarningsCalendar = async () => {
@@ -44,8 +44,8 @@ const EarningsCalendarTab = () => {
             let symbols = [];
             
             // Déterminer quels symboles charger
-            if (filterSource === 'all' || filterSource === 'jstocks') {
-                symbols.push(...jstocksSymbols);
+            if (filterSource === 'all' || filterSource === 'jlab') {
+                symbols.push(...jlabSymbols);
             }
             if (filterSource === 'all' || filterSource === 'watchlist') {
                 symbols.push(...watchlistTickers);
@@ -169,7 +169,7 @@ const EarningsCalendarTab = () => {
                     <div className="flex gap-2">
                         {[
                             { id: 'all', label: 'Tous les titres', icon: '🌐' },
-                            { id: 'jstocks', label: 'JStocks™ uniquement', icon: '📈' },
+                            { id: 'jlab', label: 'JLab™ uniquement', icon: '📈' },
                             { id: 'watchlist', label: 'Watchlist uniquement', icon: '⭐' }
                         ].map(filter => (
                             <button

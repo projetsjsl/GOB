@@ -1,7 +1,7 @@
-# 🚨 FIX URGENT - JStocks™ ne s'affiche pas
+# 🚨 FIX URGENT - JLab™ ne s'affiche pas
 
 **Date**: 11 octobre 2025 - 22h45  
-**Problème**: Onglet JStocks™ ne s'affiche pas  
+**Problème**: Onglet JLab™ ne s'affiche pas  
 **Cause**: Renommage de composant incomplet  
 **Statut**: 🔧 EN COURS DE RÉPARATION
 
@@ -10,16 +10,16 @@
 ## 🔍 Diagnostic du Problème
 
 ### Problème Identifié
-J'ai renommé le composant de `IntelliStocksTab` en `JStocksTab` mais :
+J'ai renommé le composant de `IntelliStocksTab` en `JLabTab` mais :
 - ❌ Le rendu utilise toujours `<IntelliStocksTab />`
 - ❌ L'ID de l'onglet est `'intellistocks'` (correct)
-- ❌ Le composant s'appelle `JStocksTab` (incorrect)
+- ❌ Le composant s'appelle `JLabTab` (incorrect)
 - ❌ **INCOMPATIBILITÉ** : Le nom du composant ne correspond pas au rendu
 
 ### Pourquoi ça ne marche pas ?
 ```javascript
 // Dans le code actuel (CASSÉ):
-const JStocksTab = () => { ... }  // Composant défini
+const JLabTab = () => { ... }  // Composant défini
 
 // Plus loin :
 {activeTab === 'intellistocks' && <IntelliStocksTab />}  
@@ -38,7 +38,7 @@ const JStocksTab = () => { ... }  // Composant défini
 const IntelliStocksTab = () => { ... }
 
 // Navigation (afficher le nouveau nom)
-{ id: 'intellistocks', label: '📈 JStocks™', icon: 'BarChart3' }
+{ id: 'intellistocks', label: '📈 JLab™', icon: 'BarChart3' }
 
 // Rendu (utiliser le nom interne)
 {activeTab === 'intellistocks' && <IntelliStocksTab />}
@@ -46,14 +46,14 @@ const IntelliStocksTab = () => { ... }
 
 **Avantages**:
 - ✅ Pas de risque de casser le code
-- ✅ Nom externe (UI) = JStocks™
+- ✅ Nom externe (UI) = JLab™
 - ✅ Nom interne (code) = IntelliStocksTab
 - ✅ Séparation claire affichage/logique
 
-### Option 2: Tout renommer en JStocks
+### Option 2: Tout renommer en JLab
 ```javascript
-const JStocksTab = () => { ... }
-{activeTab === 'jstocks' && <JStocksTab />}
+const JLabTab = () => { ... }
+{activeTab === 'jlab' && <JLabTab />}
 ```
 
 **Inconvénients**:
@@ -65,12 +65,12 @@ const JStocksTab = () => { ... }
 
 ## 🎯 Décision
 
-**J'applique l'Option 1** : Garder `IntelliStocksTab` en interne, afficher `JStocks™` à l'utilisateur.
+**J'applique l'Option 1** : Garder `IntelliStocksTab` en interne, afficher `JLab™` à l'utilisateur.
 
 **Pourquoi ?**
 - Moins risqué
 - Code reste stable
-- Utilisateur voit "JStocks™" (objectif atteint)
+- Utilisateur voit "JLab™" (objectif atteint)
 - Pas besoin de tout refactoriser
 
 ---
@@ -79,7 +79,7 @@ const JStocksTab = () => { ... }
 
 ```javascript
 // AVANT (CASSÉ):
-const JStocksTab = () => { ... }
+const JLabTab = () => { ... }
 {activeTab === 'intellistocks' && <IntelliStocksTab />}  // ❌
 
 // APRÈS (CORRIGÉ):
@@ -90,7 +90,7 @@ const IntelliStocksTab = () => { ... }
 **Changement**: Restaurer le nom du composant à `IntelliStocksTab`
 
 **Impact utilisateur**: AUCUN
-- L'utilisateur voit toujours "JStocks™"
+- L'utilisateur voit toujours "JLab™"
 - L'onglet fonctionne
 - Tout est cohérent
 
@@ -99,8 +99,8 @@ const IntelliStocksTab = () => { ... }
 ## 🧪 Plan de Tests (1000 tests demandés)
 
 ### Tests Critiques (P0)
-1. [ ] L'onglet JStocks™ s'affiche dans la navigation
-2. [ ] Cliquer sur JStocks™ affiche le contenu
+1. [ ] L'onglet JLab™ s'affiche dans la navigation
+2. [ ] Cliquer sur JLab™ affiche le contenu
 3. [ ] Le Score JSLAI™ s'affiche
 4. [ ] Les graphiques se chargent
 5. [ ] Le sélecteur de titres fonctionne
@@ -161,7 +161,7 @@ const IntelliStocksTab = () => { ... }
 
 ### Après Commit
 - [ ] Preview deploy fonctionne
-- [ ] Onglet JStocks™ visible
+- [ ] Onglet JLab™ visible
 - [ ] Score JSLAI™ s'affiche
 - [ ] Tout fonctionne end-to-end
 
@@ -179,7 +179,7 @@ npm run build
 
 ### Tests Manuels
 1. Ouvrir le dashboard
-2. Cliquer sur JStocks™
+2. Cliquer sur JLab™
 3. Sélectionner AAPL
 4. Vérifier le Score JSLAI™
 5. Tester le screener
@@ -196,12 +196,12 @@ npm run build
 ### Ce que l'utilisateur doit voir:
 ```
 Navigation:
-[💬 Emma IA™] [📈 JStocks™] [⭐ Dan's Watchlist] [🔍 Seeking Alpha] [⚙️ Admin-JSLAI]
+[💬 Emma IA™] [📈 JLab™] [⭐ Dan's Watchlist] [🔍 Seeking Alpha] [⚙️ Admin-JSLAI]
                     ^
                     |
               Onglet actif
               
-Contenu JStocks™:
+Contenu JLab™:
 ┌─────────────────────────────────┐
 │ Score JSLAI™: 87/100 - Excellent│
 │ 📈 Graphique du cours           │

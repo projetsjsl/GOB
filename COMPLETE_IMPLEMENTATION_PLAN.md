@@ -5,7 +5,7 @@
 ### ✅ FONCTIONNALITÉS CONFIRMÉES
 1. ✅ Correction API Gemini chatbot
 2. ✅ Suppression boutons de test
-3. ✅ Rebranding IntelliStocks → JStocks™
+3. ✅ Rebranding IntelliStocks → JLab™
 4. ✅ Rebranding Ask Emma → Emma IA™
 5. ✅ Symboles ™ ajoutés
 6. ✅ Données réelles FMP
@@ -28,7 +28,7 @@
 21. ⏳ Analyse IA Gemini - tentée mais non appliquée
 
 ### ❌ FONCTIONNALITÉS MANQUANTES
-22. ❌ Checkbox "Inclure Watchlist" dans JStocks™
+22. ❌ Checkbox "Inclure Watchlist" dans JLab™
 23. ❌ Section détaillée Score JSLAI™ avec décomposition
 24. ❌ Interface Admin configuration Score JSLAI™
 25. ❌ Presets Score JSLAI™ (Value, Growth, Balanced, Dividend)
@@ -60,7 +60,7 @@ Au lieu d'essayer de tout faire en un seul coup (ce qui cause des erreurs StrRep
 **Localisation**: Ligne ~7660 (dropdown sélection de titres)  
 **Code à ajouter**:
 ```javascript
-// Dans JStocksTab, après le state selectedStock
+// Dans JLabTab, après le state selectedStock
 const [includeWatchlist, setIncludeWatchlist] = useState(false);
 
 // Modifier la const stocks
@@ -186,7 +186,7 @@ const presets = {
 **Design**: Ligne temporelle verticale  
 **Cartes d'événements**:
 - Date + Heure
-- Symbole (cliquable → JStocks)
+- Symbole (cliquable → JLab)
 - Estimations
 - Résultats réels si disponibles
 - Badge Beat/Miss
@@ -194,7 +194,7 @@ const presets = {
 #### 4.4 Filtres ✅ SIMPLE
 **3 boutons radio**:
 - Tous les titres
-- JStocks™ uniquement
+- JLab™ uniquement
 - Watchlist uniquement
 
 ---

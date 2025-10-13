@@ -7,7 +7,7 @@
 **Cause** : `GEMINI_API_KEY` non configurée  
 **Impact** : Emma ne peut pas générer d'analyses
 
-### 2. Données manquantes dans JStocks™
+### 2. Données manquantes dans JLab™
 **Cause** : `FMP_API_KEY` non configurée  
 **Impact** : 
 - Ratios financiers (P/E, ROE, D/E) manquants
@@ -98,7 +98,7 @@ Après le redéploiement, testez :
 - ❌ Ne devrait plus afficher "Erreur API: 500"
 
 ### 2. **Score JSLAI™** (FMP)
-- Allez dans l'onglet "📈 JStocks™"
+- Allez dans l'onglet "📈 JLab™"
 - Sélectionnez une action (ex: AAPL)
 - ✅ Le score devrait être entre 0-100 (pas 50-60 neutre)
 - ✅ Les ratios P/E, ROE, D/E devraient s'afficher

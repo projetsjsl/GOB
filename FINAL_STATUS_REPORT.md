@@ -145,7 +145,7 @@ Statuts:
 - [x] Nouvel onglet complet
 - [x] API FMP integration
 - [x] Timeline chronologique
-- [x] 3 filtres (Tous/JStocks/Watchlist)
+- [x] 3 filtres (Tous/JLab/Watchlist)
 - [x] Statistiques en temps réel
 - [x] Beat/Miss indicators
 - [x] Bouton "Analyser"

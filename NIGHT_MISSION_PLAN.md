@@ -11,12 +11,12 @@
 
 ### Demandes Utilisateur
 1. ✅ Guide Utilisateur avec overlay + export PDF/Email
-2. ✅ Export Fiche JStocks™ en PDF/Email
+2. ✅ Export Fiche JLab™ en PDF/Email
 3. ✅ Interface Admin Score JSLAI™
 4. ✅ Calendrier des Résultats (nouvel onglet)
 5. ✅ Module Backtesting
 6. ✅ Analyse IA Gemini automatique
-7. ✅ Option Watchlist dans JStocks
+7. ✅ Option Watchlist dans JLab
 8. ✅ Tests exhaustifs (1000 tests)
 9. ✅ Commit + Push final
 
@@ -31,8 +31,8 @@
 - [ ] Fonction email
 - [ ] Tests
 
-### 00h30 - 01h15 : Export Fiche JStocks™
-- [ ] Bouton export dans JStocks
+### 00h30 - 01h15 : Export Fiche JLab™
+- [ ] Bouton export dans JLab
 - [ ] Capture de toutes les données
 - [ ] Format PDF professionnel
 - [ ] Option email
@@ -49,7 +49,7 @@
 ### 02h00 - 02h30 : Calendrier Résultats
 - [ ] Nouvel onglet
 - [ ] API earnings FMP
-- [ ] 3 filtres (Tous/JStocks/Watchlist)
+- [ ] 3 filtres (Tous/JLab/Watchlist)
 - [ ] Timeline UI
 - [ ] Tests
 
@@ -79,7 +79,7 @@
 ## 🎯 LIVRABLE AU RÉVEIL
 
 Un dashboard **100% fonctionnel** avec :
-- ✅ JStocks™ opérationnel
+- ✅ JLab™ opérationnel
 - ✅ Score JSLAI™ avec config
 - ✅ Guide utilisateur interactif
 - ✅ Export PDF/Email partout

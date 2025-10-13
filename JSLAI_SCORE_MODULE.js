@@ -182,7 +182,7 @@ jslaiScore: jslaiScore
 
 /**
  * ÉTAPE 4: UI - Badge Score JSLAI™
- * À placer dans JStocksTab, au début des métriques (remplacer grid-cols-3 par grid-cols-4)
+ * À placer dans JLabTab, au début des métriques (remplacer grid-cols-3 par grid-cols-4)
  */
 const BADGE_JSLAI = `
 <div className="grid grid-cols-4 gap-1.5">

@@ -66,7 +66,7 @@
 - ✅ Affichage Markdown formaté
 - ✅ Bouton régénérer
 - ✅ Gestion des erreurs élégante
-- ✅ Integration de TOUS les titres (JStocks + Watchlist)
+- ✅ Integration de TOUS les titres (JLab + Watchlist)
 
 #### 3. ADMIN_CONFIG_MODULE.js (211 lignes) ✅
 **Ce qui est inclus:**
@@ -88,7 +88,7 @@
 - Nouvel onglet complet
 - API FMP earnings calendar
 - Timeline des événements
-- 3 filtres (Tous/JStocks/Watchlist)
+- 3 filtres (Tous/JLab/Watchlist)
 - Statistiques en temps réel
 - Beat/Miss indicators
 
@@ -270,7 +270,7 @@ Si vous avez des questions ou besoin d'aide:
 ## 🎨 CAPTURES D'ÉCRAN (À venir)
 
 Une fois intégré, vous aurez :
-- 📊 Un magnifique badge Score JSLAI™ en haut de JStocks™
+- 📊 Un magnifique badge Score JSLAI™ en haut de JLab™
 - 🤖 Une section Analyse IA Gemini™ avec dégradé violet
 - ⚙️ Une interface Admin avec sliders et presets
 - 📅 Un calendrier earnings chronologique

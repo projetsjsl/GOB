@@ -39,7 +39,7 @@
 - [ ] API endpoint earnings
 - [ ] Fonction fetchEarningsCalendar()
 - [ ] Composant EarningsCalendarTab
-- [ ] 3 filtres (Tous/JStocks/Watchlist)
+- [ ] 3 filtres (Tous/JLab/Watchlist)
 - [ ] Timeline/Calendrier visuel
 - [ ] Beat/Miss indicators
 - [ ] Statistiques

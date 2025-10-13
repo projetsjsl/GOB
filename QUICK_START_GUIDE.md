@@ -31,7 +31,7 @@ cp public/beta-combined-dashboard.html public/beta-combined-dashboard.backup.htm
 
 ### Étape 3: Score JSLAI™ - Badge UI (3 min)
 
-1. Cherchez `<div className="grid grid-cols-3 gap-1.5">` dans JStocksTab
+1. Cherchez `<div className="grid grid-cols-3 gap-1.5">` dans JLabTab
 
 2. Remplacez `grid-cols-3` par `grid-cols-4`
 
@@ -49,7 +49,7 @@ cp public/beta-combined-dashboard.html public/beta-combined-dashboard.backup.htm
 
 2. Rafraîchissez votre navigateur
 
-3. Allez dans JStocks™
+3. Allez dans JLab™
 
 4. Vous devriez voir le badge Score JSLAI™ ! 🎉
 

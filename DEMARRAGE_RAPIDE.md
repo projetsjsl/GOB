@@ -75,7 +75,7 @@ Votre dashboard est déployé mais **2 clés API sont manquantes** pour un fonct
    - ✅ Devrait générer une analyse complète
 
 2. **Test Score JSLAI™** :
-   - Allez dans "📈 JStocks™"
+   - Allez dans "📈 JLab™"
    - ✅ Le score devrait être calculé (pas juste 50-60)
    - ✅ Les ratios P/E, ROE, D/E devraient s'afficher
 

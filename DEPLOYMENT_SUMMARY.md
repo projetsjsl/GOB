@@ -41,11 +41,11 @@ console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message);
 
 ---
 
-## 📈 PHASE 2 : Refonte Complète IntelliStocks → JStocks™
+## 📈 PHASE 2 : Refonte Complète IntelliStocks → JLab™
 
 ### 2.1 Rebranding
 **Changements de marque**:
-- 🔄 "IntelliStocks" → "JStocks™" (avec symbole ™)
+- 🔄 "IntelliStocks" → "JLab™" (avec symbole ™)
 - 🔄 "Ask Emma" → "Emma IA™" (avec symbole ™)
 - 📈 Nouvelle icône: BarChart3 (graphique boursier)
 
@@ -139,7 +139,7 @@ console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message);
 
 ### 4.2 Intégration Screener
 **Disponible dans**:
-- 📊 JStocks™ (10 titres majeurs: AAPL, MSFT, GOOGL, AMZN, META, TSLA, NVDA, NFLX, AMD, INTC)
+- 📊 JLab™ (10 titres majeurs: AAPL, MSFT, GOOGL, AMZN, META, TSLA, NVDA, NFLX, AMD, INTC)
 - ⭐ Dan's Watchlist (titres de la watchlist uniquement)
 
 **Fonctionnalités**:
@@ -290,7 +290,7 @@ console.error('❌ Erreur lors de l\'appel à Gemini:', err?.message);
 | 0-34 | ⛔ | Mauvais | **Éviter** |
 
 ### 7.3 Affichage du Score JSLAI™
-**Localisation**: En haut de JStocks™ (4ème colonne de métriques)
+**Localisation**: En haut de JLab™ (4ème colonne de métriques)
 
 **Contenu affiché**:
 - Score global (ex: 87/100)
@@ -398,8 +398,8 @@ Pour obtenir l'analyse complète:
 
 ### 9.2 Fonctionnalités Prévues
 **Filtres**:
-- ✅ Tous les titres (JStocks™ + Watchlist)
-- 📊 JStocks™ uniquement
+- ✅ Tous les titres (JLab™ + Watchlist)
+- 📊 JLab™ uniquement
 - ⭐ Watchlist uniquement
 
 **Affichage**:
@@ -478,7 +478,7 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
 - Messages du chatbot
 - Titres des sections
 
-**JStocks™**:
+**JLab™**:
 - Onglet de navigation
 - Titres des sections
 - Aide & diagnostics
@@ -520,7 +520,7 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
 ### ✅ Complètement Implémenté
 1. ✅ Correction erreur API Gemini
 2. ✅ Suppression boutons de test
-3. ✅ Rebranding IntelliStocks → JStocks™
+3. ✅ Rebranding IntelliStocks → JLab™
 4. ✅ Rebranding Ask Emma → Emma IA™
 5. ✅ Symboles ™ ajoutés
 6. ✅ Données en temps réel (FMP + Marketaux)
@@ -548,7 +548,7 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
 26. ⏳ Module de backtesting
 27. ⏳ Calendrier des résultats (nouvel onglet)
 28. ⏳ API Earnings Calendar
-29. ⏳ Filtres Calendrier (Tous/JStocks/Watchlist)
+29. ⏳ Filtres Calendrier (Tous/JLab/Watchlist)
 30. ⏳ Notifications earnings proches
 
 ---
@@ -597,7 +597,7 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
    npm run dev
    # Tester tous les onglets:
    # - Emma IA™
-   # - JStocks™
+   # - JLab™
    # - Dan's Watchlist
    # - Seeking Alpha
    # - Admin-JSLAI
@@ -613,10 +613,10 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
 4. ✅ Commit et Push
    ```bash
    git add .
-   git commit -m "feat: Complete JStocks™ revamp with JSLAI™ Score
+   git commit -m "feat: Complete JLab™ revamp with JSLAI™ Score
    
    - Fix Gemini API errors
-   - Rebrand IntelliStocks to JStocks™
+   - Rebrand IntelliStocks to JLab™
    - Add Emma IA™ trademark
    - Implement JSLAI™ Score (0-100)
    - Add 10-filter screener
@@ -632,7 +632,7 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
    ```
 
 5. ✅ Créer une Pull Request
-   - Titre: "Complete JStocks™ Platform with JSLAI™ Score"
+   - Titre: "Complete JLab™ Platform with JSLAI™ Score"
    - Description: Référencer ce fichier DEPLOYMENT_SUMMARY.md
 
 ---
@@ -641,7 +641,7 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
 
 ### Tests Fonctionnels
 - [ ] Emma IA™ répond correctement
-- [ ] JStocks™ charge les données réelles
+- [ ] JLab™ charge les données réelles
 - [ ] Graphiques s'affichent correctement
 - [ ] Score JSLAI™ se calcule sans erreur
 - [ ] Screener filtre correctement
@@ -672,7 +672,7 @@ GOOGL  | 79          | +8.5%       | 0.72        | 78%
 
 **Highlights**:
 - 🎯 Introduction du Score JSLAI™ propriétaire
-- 📈 Rebranding complet vers JStocks™
+- 📈 Rebranding complet vers JLab™
 - 🤖 Emma IA™ avec marque déposée
 - 🔍 Screener avancé 10 filtres
 - 📊 6 graphiques interactifs en temps réel
@@ -762,7 +762,7 @@ Pour toute question ou problème:
 ## 📜 Licence
 
 **Propriétaire**: JSL AI / Groupe Ouellet Bolduc  
-**Marques déposées**: Emma IA™, JStocks™, Score JSLAI™  
+**Marques déposées**: Emma IA™, JLab™, Score JSLAI™  
 **Date de création**: 11 octobre 2025
 
 ---

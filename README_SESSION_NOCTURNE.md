@@ -156,13 +156,13 @@
 ### Comment savoir si tout fonctionne ?
 
 **Score JSLAI™** ✅
-- Badge visible en haut de JStocks™
+- Badge visible en haut de JLab™
 - Score affiché (ex: 87/100)
 - Interprétation visible (ex: "Excellent")
 - Couleur dynamique selon le score
 
 **Analyse IA Gemini™** ✅
-- Section violet/bleu en bas de JStocks™
+- Section violet/bleu en bas de JLab™
 - Analyse se génère automatiquement
 - Texte formaté avec titres et listes
 - Bouton "Régénérer" fonctionnel
