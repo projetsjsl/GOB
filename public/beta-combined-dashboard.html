@@ -1707,23 +1707,23 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     return `${prefix}${n.toFixed(2)}${suffix}`;
                 };
 
-                // Charger la watchlist depuis GitHub au démarrage (puis localStorage en fallback)
+                // Charger la watchlist depuis Supabase au démarrage (puis localStorage en fallback)
                 useEffect(() => {
                     const loadInitialWatchlist = async () => {
                         try {
-                            // Essayer de charger depuis GitHub d'abord
-                            const res = await fetch(WATCHLIST_FILE + `?t=${Date.now()}`);
+                            // Essayer de charger depuis Supabase d'abord
+                            const res = await fetch('/api/supabase-watchlist');
                             if (res.ok) {
                                 const json = await res.json();
                                 const tickers = Array.isArray(json.tickers) ? json.tickers : [];
-                                console.log('✅ Watchlist chargée depuis GitHub:', tickers);
+                                console.log('✅ Watchlist chargée depuis Supabase:', tickers);
                                 setWatchlistTickers(tickers);
                                 localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
                                 loadWatchlistData(tickers);
                                 return;
                             }
                         } catch (e) {
-                            console.log('⚠️ GitHub non disponible, utilisation du localStorage');
+                            console.log('⚠️ Supabase non disponible, utilisation du localStorage');
                         }
                         
                         // Fallback: charger depuis localStorage
@@ -1801,9 +1801,9 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         console.error('Erreur chargement:', err);
                     });
                     
-                    // 4. ARRIÈRE-PLAN : Sauvegarder sur GitHub (sans bloquer l'UI)
-                    saveWatchlistToGitHubAuto(updatedTickers).catch(err => {
-                        console.error('Erreur sauvegarde GitHub:', err);
+                    // 4. ARRIÈRE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
+                    saveWatchlistToSupabaseAuto(ticker, 'add').catch(err => {
+                        console.error('Erreur sauvegarde Supabase:', err);
                     });
                 };
 
@@ -1823,9 +1823,9 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     
                     showMessage(`${ticker} supprimé de la watchlist`, 'success');
                     
-                    // 3. ARRIÈRE-PLAN : Sauvegarder sur GitHub (sans bloquer l'UI)
-                    saveWatchlistToGitHubAuto(updatedTickers).catch(err => {
-                        console.error('Erreur sauvegarde GitHub:', err);
+                    // 3. ARRIÈRE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
+                    saveWatchlistToSupabaseAuto(ticker, 'remove').catch(err => {
+                        console.error('Erreur sauvegarde Supabase:', err);
                     });
                 };
 
@@ -1835,28 +1835,25 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     showMessage('Watchlist actualisée', 'success');
                 };
 
-                // Timer pour debounce de la sauvegarde GitHub
-                let saveGitHubTimer = null;
+                // Timer pour debounce de la sauvegarde Supabase
+                let saveSupabaseTimer = null;
                 
-                // Sauvegarder automatiquement la watchlist sur GitHub (silencieux avec debounce)
-                const saveWatchlistToGitHubAuto = async (tickers) => {
+                // Sauvegarder automatiquement la watchlist sur Supabase (silencieux avec debounce)
+                const saveWatchlistToSupabaseAuto = async (ticker, action) => {
                     // Annuler la sauvegarde précédente si elle est en attente
-                    if (saveGitHubTimer) {
-                        clearTimeout(saveGitHubTimer);
+                    if (saveSupabaseTimer) {
+                        clearTimeout(saveSupabaseTimer);
                     }
                     
-                    // Sauvegarder dans localStorage immédiatement (déjà fait ailleurs)
-                    
-                    // Attendre 1 seconde avant de sauvegarder sur GitHub (debounce)
-                    // Si l'utilisateur ajoute plusieurs tickers, on ne sauvegarde qu'une fois
-                    saveGitHubTimer = setTimeout(async () => {
+                    // Attendre 500ms avant de sauvegarder sur Supabase (debounce plus court)
+                    saveSupabaseTimer = setTimeout(async () => {
                         try {
-                            const response = await fetch(`${API_BASE_URL}/api/save-tickers`, {
+                            const response = await fetch('/api/supabase-watchlist', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                    tickers: tickers,
-                                    filename: 'dans-watchlist.json'
+                                    action: action,
+                                    ticker: ticker
                                 })
                             });
                             
@@ -1864,39 +1861,51 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 throw new Error(`HTTP ${response.status}`);
                             }
                             
-                            console.log('✅ Watchlist sauvegardée sur GitHub');
+                            const result = await response.json();
+                            console.log(`✅ Supabase: ${result.message}`);
                         } catch (e) {
-                            console.error('⚠️ Erreur sauvegarde GitHub:', e);
+                            console.error('⚠️ Erreur sauvegarde Supabase:', e);
                             // Silencieux pour ne pas perturber l'UX
                         }
-                    }, 1000); // Debounce de 1 seconde
+                    }, 500); // Debounce de 500ms (plus rapide que GitHub)
                 };
 
-                // Sauvegarder manuellement la watchlist dans GitHub (avec confirmation)
-                const saveWatchlistToGitHub = async () => {
+                // Sauvegarder manuellement la watchlist dans Supabase (avec confirmation)
+                const saveWatchlistToSupabase = async () => {
                     try {
-                        await saveWatchlistToGitHubAuto(watchlistTickers);
-                        showMessage('Watchlist sauvegardée sur GitHub', 'success');
+                        const response = await fetch('/api/supabase-watchlist', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'save',
+                                tickers: watchlistTickers
+                            })
+                        });
+                        
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        
+                        const result = await response.json();
+                        showMessage('Watchlist sauvegardée sur Supabase', 'success');
                     } catch (e) {
-                        console.error('Erreur sauvegarde GitHub watchlist:', e);
-                        showMessage('Erreur sauvegarde GitHub', 'error');
+                        console.error('Erreur sauvegarde Supabase watchlist:', e);
+                        showMessage('Erreur sauvegarde Supabase', 'error');
                     }
                 };
 
-                // Charger la watchlist depuis GitHub (fichier statique public)
-                const loadWatchlistFromGitHub = async () => {
+                // Charger la watchlist depuis Supabase
+                const loadWatchlistFromSupabase = async () => {
                     try {
-                        const res = await fetch(WATCHLIST_FILE + `?t=${Date.now()}`);
+                        const res = await fetch('/api/supabase-watchlist');
                         if (!res.ok) throw new Error(`HTTP ${res.status}`);
                         const json = await res.json();
                         const tickers = Array.isArray(json.tickers) ? json.tickers : [];
                         setWatchlistTickers(tickers);
                         localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
                         await loadWatchlistData(tickers);
-                        showMessage('Watchlist chargée depuis GitHub', 'success');
+                        showMessage('Watchlist chargée depuis Supabase', 'success');
                     } catch (e) {
-                        console.error('Erreur chargement GitHub watchlist:', e);
-                        showMessage('Erreur chargement GitHub', 'error');
+                        console.error('Erreur chargement Supabase watchlist:', e);
+                        showMessage('Erreur chargement Supabase', 'error');
                     }
                 };
 
@@ -2097,7 +2106,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                 <div className={`text-sm px-4 py-2 rounded ${
                                     isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                                 }`}>
-                                    💾 Sauvegarde automatique activée
+                                    🚀 Supabase + Sauvegarde automatique
                                 </div>
                             </div>
                         </div>
