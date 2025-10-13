@@ -3,6 +3,8 @@
  * Gestion de la watchlist avec Supabase
  */
 
+import { createClient } from '@supabase/supabase-js';
+
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,8 +30,7 @@ export default async function handler(req, res) {
 
     console.log(`🔧 Supabase Watchlist - ${method} ${action || 'GET'}`);
 
-    // Import dynamique de Supabase
-    const { createClient } = await import('@supabase/supabase-js');
+    // Créer le client Supabase
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     switch (method) {
