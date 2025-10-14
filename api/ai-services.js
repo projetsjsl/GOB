@@ -68,7 +68,12 @@ async function handlePerplexity(req, res, { prompt, recency = 'day' }) {
       return res.status(400).json({ error: 'Le prompt est requis' });
     }
 
-    if (!process.env.PERPLEXITY_API_KEY) {
+    // Vérifier les clés API disponibles pour les actualités
+    const perplexityKey = process.env.PERPLEXITY_API_KEY;
+    const marketauxKey = process.env.MARKETAUX_API_KEY;
+    const twelveDataKey = process.env.TWELVE_DATA_API_KEY;
+    
+    if (!perplexityKey && !marketauxKey && !twelveDataKey) {
       return res.status(200).json({
         success: true,
         content: getFallbackNews(),
@@ -77,33 +82,66 @@ async function handlePerplexity(req, res, { prompt, recency = 'day' }) {
       });
     }
 
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'sonar-pro',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 1500,
-        temperature: 0.1,
-        search_recency_filter: recency
-      })
-    });
+    let response;
+    let model;
+
+    if (perplexityKey) {
+      // Utiliser Perplexity (priorité)
+      response = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${perplexityKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'sonar-pro',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 1500,
+          temperature: 0.1,
+          search_recency_filter: recency
+        })
+      });
+      model = 'sonar-pro';
+    } else if (marketauxKey) {
+      // Utiliser Marketaux pour les actualités
+      response = await fetch(`https://api.marketaux.com/v1/news/all?api_token=${marketauxKey}&limit=10&language=fr`);
+      model = 'marketaux';
+    } else if (twelveDataKey) {
+      // Utiliser Twelve Data pour les actualités
+      response = await fetch(`https://api.twelvedata.com/news?apikey=${twelveDataKey}&limit=10`);
+      model = 'twelve-data';
+    }
 
     if (!response.ok) {
       throw new Error(`Erreur Perplexity: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices[0]?.message?.content || '';
+    let content;
+    let tokens = 0;
+
+    if (perplexityKey) {
+      content = data.choices[0]?.message?.content || '';
+      tokens = data.usage?.total_tokens || 0;
+    } else if (marketauxKey) {
+      // Formater les actualités Marketaux
+      const articles = data.data || [];
+      content = articles.map(article => 
+        `📰 ${article.title}\n${article.description}\nSource: ${article.source}\n`
+      ).join('\n');
+    } else if (twelveDataKey) {
+      // Formater les actualités Twelve Data
+      const articles = data.data || [];
+      content = articles.map(article => 
+        `📰 ${article.title}\n${article.summary}\nSource: ${article.source}\n`
+      ).join('\n');
+    }
 
     return res.status(200).json({
       success: true,
       content,
-      model: 'sonar-pro',
-      tokens: data.usage?.total_tokens || 0
+      model,
+      tokens
     });
 
   } catch (error) {
@@ -126,7 +164,11 @@ async function handleOpenAI(req, res, { prompt, marketData, news }) {
       return res.status(400).json({ error: 'Le prompt est requis' });
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    // Vérifier les clés API disponibles (OpenAI ou Anthropic)
+    const openaiKey = process.env.OPENAI_API_KEY;
+    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    
+    if (!openaiKey && !anthropicKey) {
       return res.status(200).json({
         success: true,
         content: getFallbackAnalysis(),
@@ -149,32 +191,64 @@ ${news || 'Aucune actualité disponible'}
 Rédige maintenant le briefing selon la structure demandée.
 `;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [{ role: 'user', content: contextualPrompt }],
-        max_tokens: 2500,
-        temperature: 0.7
-      })
-    });
+    let response;
+    let model;
+
+    if (openaiKey) {
+      // Utiliser OpenAI
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [{ role: 'user', content: contextualPrompt }],
+          max_tokens: 2500,
+          temperature: 0.7
+        })
+      });
+      model = 'gpt-4';
+    } else if (anthropicKey) {
+      // Utiliser Anthropic Claude
+      response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicKey,
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-sonnet-20240229',
+          max_tokens: 2500,
+          messages: [{ role: 'user', content: contextualPrompt }]
+        })
+      });
+      model = 'claude-3-sonnet';
+    }
 
     if (!response.ok) {
       throw new Error(`Erreur OpenAI: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices[0]?.message?.content || '';
+    let content;
+    let tokens = 0;
+
+    if (openaiKey) {
+      content = data.choices[0]?.message?.content || '';
+      tokens = data.usage?.total_tokens || 0;
+    } else if (anthropicKey) {
+      content = data.content[0]?.text || '';
+      tokens = data.usage?.input_tokens + data.usage?.output_tokens || 0;
+    }
 
     return res.status(200).json({
       success: true,
       content,
-      model: 'gpt-4',
-      tokens: data.usage?.total_tokens || 0
+      model,
+      tokens
     });
 
   } catch (error) {
