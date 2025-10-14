@@ -6,19 +6,35 @@
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST' && req.method !== 'GET' && req.method !== 'DELETE') {
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }
 
   try {
+    // Pour les requêtes GET et DELETE, utiliser les query parameters
+    if (req.method === 'GET' || req.method === 'DELETE') {
+      const { service, ...params } = req.query;
+      
+      if (service === 'supabase-briefings') {
+        return await handleSupabaseBriefings(req, res, params);
+      } else {
+        return res.status(400).json({ error: 'Service non reconnu pour GET/DELETE. Utilisez: supabase-briefings' });
+      }
+    }
+
+    // Pour les requêtes POST, utiliser le body
     const { service, ...params } = req.body;
+
+    if (!service) {
+      return res.status(400).json({ error: 'Paramètre "service" requis' });
+    }
 
     switch (service) {
       case 'perplexity':

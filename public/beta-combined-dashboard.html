@@ -3674,10 +3674,10 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
           ${data.asian_markets.map((market) => `
             <div class="metric-card">
               <div class="metric-label">${market.name}</div>
-              <div class="metric-value">${market.price.toFixed(2)}</div>
+              <div class="metric-value">${market.price ? market.price.toFixed(2) : 'N/A'}</div>
               <div class="metric-change ${market.change >= 0 ? 'positive' : 'negative'}">
-                ${market.change >= 0 ? '+' : ''}${market.change.toFixed(2)} 
-                (${market.changePct >= 0 ? '+' : ''}${market.changePct.toFixed(2)}%)
+                ${market.change >= 0 ? '+' : ''}${market.change ? market.change.toFixed(2) : 'N/A'} 
+                (${market.changePct >= 0 ? '+' : ''}${market.changePct ? market.changePct.toFixed(2) : 'N/A'}%)
               </div>
             </div>
           `).join('')}
@@ -3692,10 +3692,10 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
           ${data.futures.map((future) => `
             <div class="metric-card">
               <div class="metric-label">${future.name}</div>
-              <div class="metric-value">${future.price.toFixed(2)}</div>
+              <div class="metric-value">${future.price ? future.price.toFixed(2) : 'N/A'}</div>
               <div class="metric-change ${future.change >= 0 ? 'positive' : 'negative'}">
-                ${future.change >= 0 ? '+' : ''}${future.change.toFixed(2)} 
-                (${future.changePct >= 0 ? '+' : ''}${future.changePct.toFixed(2)}%)
+                ${future.change >= 0 ? '+' : ''}${future.change ? future.change.toFixed(2) : 'N/A'} 
+                (${future.changePct >= 0 ? '+' : ''}${future.changePct ? future.changePct.toFixed(2) : 'N/A'}%)
               </div>
             </div>
           `).join('')}
@@ -3869,10 +3869,10 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
           ${data.us_markets.map((market) => `
             <div class="metric-card">
               <div class="metric-label">${market.name}</div>
-              <div class="metric-value">${market.price.toFixed(2)}</div>
+              <div class="metric-value">${market.price ? market.price.toFixed(2) : 'N/A'}</div>
               <div class="metric-change ${market.change >= 0 ? 'positive' : 'negative'}">
-                ${market.change >= 0 ? '+' : ''}${market.change.toFixed(2)} 
-                (${market.changePct >= 0 ? '+' : ''}${market.changePct.toFixed(2)}%)
+                ${market.change >= 0 ? '+' : ''}${market.change ? market.change.toFixed(2) : 'N/A'} 
+                (${market.changePct >= 0 ? '+' : ''}${market.changePct ? market.changePct.toFixed(2) : 'N/A'}%)
               </div>
             </div>
           `).join('')}
@@ -3890,7 +3890,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
               ${data.top_movers.gainers?.map((stock) => `
                 <li class="mover-item">
                   <strong>${stock.symbol}</strong>
-                  <span class="positive">+${stock.change.toFixed(2)}%</span>
+                  <span class="positive">+${stock.change ? stock.change.toFixed(2) : 'N/A'}%</span>
                 </li>
               `).join('') || ''}
             </ul>
@@ -3901,7 +3901,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
               ${data.top_movers.losers?.map((stock) => `
                 <li class="mover-item">
                   <strong>${stock.symbol}</strong>
-                  <span class="negative">${stock.change.toFixed(2)}%</span>
+                  <span class="negative">${stock.change ? stock.change.toFixed(2) : 'N/A'}%</span>
                 </li>
               `).join('') || ''}
             </ul>
@@ -4070,10 +4070,10 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
           ${data.us_markets.map((market) => `
             <div class="metric-card">
               <div class="metric-label">${market.name}</div>
-              <div class="metric-value">${market.price.toFixed(2)}</div>
+              <div class="metric-value">${market.price ? market.price.toFixed(2) : 'N/A'}</div>
               <div class="metric-change ${market.change >= 0 ? 'positive' : 'negative'}">
-                ${market.change >= 0 ? '+' : ''}${market.change.toFixed(2)} 
-                (${market.changePct >= 0 ? '+' : ''}${market.changePct.toFixed(2)}%)
+                ${market.change >= 0 ? '+' : ''}${market.change ? market.change.toFixed(2) : 'N/A'} 
+                (${market.changePct >= 0 ? '+' : ''}${market.changePct ? market.changePct.toFixed(2) : 'N/A'}%)
               </div>
             </div>
           `).join('')}
@@ -4417,14 +4417,7 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                 // Fonction pour charger l'historique
                 const loadBriefingHistory = async () => {
                     try {
-                        const response = await fetch('/api/ai-services', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                service: 'supabase-briefings',
-                                limit: 20
-                            })
-                        });
+                        const response = await fetch('/api/ai-services?service=supabase-briefings&limit=20');
                         const result = await response.json();
                         
                         if (result.success) {
