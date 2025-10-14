@@ -4121,6 +4121,17 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [recipients, setRecipients] = useState('');
                 const [selectedType, setSelectedType] = useState('morning');
                 const [dataSource, setDataSource] = useState('apis'); // 'apis' ou 'yahoo'
+                const [apiSources, setApiSources] = useState({
+                    marketData: 'apis', // 'apis' ou 'yahoo'
+                    news: 'perplexity', // 'perplexity', 'marketaux', 'twelve-data'
+                    analysis: 'anthropic' // 'anthropic', 'openai'
+                });
+                const [debugData, setDebugData] = useState({
+                    marketData: { request: null, response: null, error: null },
+                    news: { request: null, response: null, error: null },
+                    analysis: { request: null, response: null, error: null }
+                });
+                const [showDebug, setShowDebug] = useState(false);
 
                 // Prompts pour chaque type de briefing
                 const prompts = {
@@ -4259,46 +4270,103 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                     setPreviewHtml('');
 
                     try {
+                        // Reset debug data
+                        setDebugData({
+                            marketData: { request: null, response: null, error: null },
+                            news: { request: null, response: null, error: null },
+                            analysis: { request: null, response: null, error: null }
+                        });
+
                         // 1. Collecter les données marché
+                        const marketDataRequest = {
+                            service: 'briefing-data',
+                            type: type,
+                            source: apiSources.marketData
+                        };
+                        
+                        setDebugData(prev => ({
+                            ...prev,
+                            marketData: { ...prev.marketData, request: marketDataRequest }
+                        }));
+
                         const dataResponse = await fetch('/api/ai-services', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                service: 'briefing-data',
-                                type: type,
-                                source: dataSource
-                            })
+                            body: JSON.stringify(marketDataRequest)
                         });
                         const dataResult = await dataResponse.json();
+                        
+                        setDebugData(prev => ({
+                            ...prev,
+                            marketData: { 
+                                ...prev.marketData, 
+                                response: dataResult,
+                                error: dataResult.success ? null : dataResult.error
+                            }
+                        }));
                         
                         if (!dataResult.success) {
                             throw new Error('Erreur lors de la collecte des données');
                         }
 
                         // 2. Rechercher les actualités
+                        const newsRequest = {
+                            service: 'perplexity',
+                            prompt: prompts[type].perplexity,
+                            recency: 'day',
+                            source: apiSources.news
+                        };
+                        
+                        setDebugData(prev => ({
+                            ...prev,
+                            news: { ...prev.news, request: newsRequest }
+                        }));
+
                         const newsResponse = await fetch('/api/ai-services', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                service: 'perplexity',
-                                prompt: prompts[type].perplexity,
-                                recency: 'day'
-                            })
+                            body: JSON.stringify(newsRequest)
                         });
                         const newsResult = await newsResponse.json();
+                        
+                        setDebugData(prev => ({
+                            ...prev,
+                            news: { 
+                                ...prev.news, 
+                                response: newsResult,
+                                error: newsResult.success ? null : newsResult.error
+                            }
+                        }));
 
                         // 3. Générer l'analyse
+                        const analysisRequest = {
+                            service: 'openai',
+                            prompt: prompts[type].openai,
+                            marketData: dataResult.data,
+                            news: newsResult.content || 'Aucune actualité disponible',
+                            source: apiSources.analysis
+                        };
+                        
+                        setDebugData(prev => ({
+                            ...prev,
+                            analysis: { ...prev.analysis, request: analysisRequest }
+                        }));
+
                         const analysisResponse = await fetch('/api/ai-services', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                service: 'openai',
-                                prompt: prompts[type].openai,
-                                marketData: dataResult.data,
-                                news: newsResult.content || 'Aucune actualité disponible'
-                            })
+                            body: JSON.stringify(analysisRequest)
                         });
                         const analysisResult = await analysisResponse.json();
+                        
+                        setDebugData(prev => ({
+                            ...prev,
+                            analysis: { 
+                                ...prev.analysis, 
+                                response: analysisResult,
+                                error: analysisResult.success ? null : analysisResult.error
+                            }
+                        }));
 
                         // 4. Créer le HTML
                         let html = '';
@@ -4443,70 +4511,328 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                             }`}>📧 Briefings Email Automatisés</h2>
                         </div>
 
-                        {/* Sélecteur de source de données */}
+                        {/* Sélecteur détaillé des sources API */}
                         <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📊 Source des Données</h3>
+                            }`}>⚙️ Configuration des Sources API</h3>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                <div 
-                                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                        dataSource === 'apis' 
-                                            ? (isDarkMode ? 'border-green-500 bg-green-900/20' : 'border-green-500 bg-green-50')
-                                            : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
-                                    }`}
-                                    onClick={() => setDataSource('apis')}
-                                >
-                                    <div className="flex items-center space-x-3">
-                                        <div className={`w-4 h-4 rounded-full border-2 ${
-                                            dataSource === 'apis' 
-                                                ? 'border-green-500 bg-green-500' 
-                                                : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                        }`}></div>
-                                        <div>
-                                            <h4 className={`font-semibold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>APIs Professionnelles</h4>
-                                            <p className={`text-sm transition-colors duration-300 ${
+                            <div className="space-y-6">
+                                {/* Données de Marché */}
+                                <div>
+                                    <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>📊 Données de Marché</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div 
+                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                                apiSources.marketData === 'apis' 
+                                                    ? (isDarkMode ? 'border-green-500 bg-green-900/20' : 'border-green-500 bg-green-50')
+                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            }`}
+                                            onClick={() => setApiSources({...apiSources, marketData: 'apis'})}
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <div className={`w-3 h-3 rounded-full border-2 ${
+                                                    apiSources.marketData === 'apis' 
+                                                        ? 'border-green-500 bg-green-500' 
+                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
+                                                }`}></div>
+                                                <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>APIs Professionnelles</span>
+                                            </div>
+                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                                FMP, Alpha Vantage, Marketaux (plus fiable)
-                                            </p>
+                                            }`}>FMP, Alpha Vantage, Marketaux</p>
+                                        </div>
+
+                                        <div 
+                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                                apiSources.marketData === 'yahoo' 
+                                                    ? (isDarkMode ? 'border-blue-500 bg-blue-900/20' : 'border-blue-500 bg-blue-50')
+                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            }`}
+                                            onClick={() => setApiSources({...apiSources, marketData: 'yahoo'})}
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <div className={`w-3 h-3 rounded-full border-2 ${
+                                                    apiSources.marketData === 'yahoo' 
+                                                        ? 'border-blue-500 bg-blue-500' 
+                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
+                                                }`}></div>
+                                                <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>Yahoo Finance</span>
+                                            </div>
+                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>Données directes</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div 
-                                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                        dataSource === 'yahoo' 
-                                            ? (isDarkMode ? 'border-blue-500 bg-blue-900/20' : 'border-blue-500 bg-blue-50')
-                                            : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
-                                    }`}
-                                    onClick={() => setDataSource('yahoo')}
-                                >
-                                    <div className="flex items-center space-x-3">
-                                        <div className={`w-4 h-4 rounded-full border-2 ${
-                                            dataSource === 'yahoo' 
-                                                ? 'border-blue-500 bg-blue-500' 
-                                                : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                        }`}></div>
-                                        <div>
-                                            <h4 className={`font-semibold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>Yahoo Finance</h4>
-                                            <p className={`text-sm transition-colors duration-300 ${
+                                {/* Actualités */}
+                                <div>
+                                    <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>📰 Actualités</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <div 
+                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                                apiSources.news === 'perplexity' 
+                                                    ? (isDarkMode ? 'border-purple-500 bg-purple-900/20' : 'border-purple-500 bg-purple-50')
+                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            }`}
+                                            onClick={() => setApiSources({...apiSources, news: 'perplexity'})}
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <div className={`w-3 h-3 rounded-full border-2 ${
+                                                    apiSources.news === 'perplexity' 
+                                                        ? 'border-purple-500 bg-purple-500' 
+                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
+                                                }`}></div>
+                                                <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>Perplexity</span>
+                                            </div>
+                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                                Données directes (peut être limité)
-                                            </p>
+                                            }`}>IA de recherche</p>
+                                        </div>
+
+                                        <div 
+                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                                apiSources.news === 'marketaux' 
+                                                    ? (isDarkMode ? 'border-orange-500 bg-orange-900/20' : 'border-orange-500 bg-orange-50')
+                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            }`}
+                                            onClick={() => setApiSources({...apiSources, news: 'marketaux'})}
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <div className={`w-3 h-3 rounded-full border-2 ${
+                                                    apiSources.news === 'marketaux' 
+                                                        ? 'border-orange-500 bg-orange-500' 
+                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
+                                                }`}></div>
+                                                <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>Marketaux</span>
+                                            </div>
+                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>Actualités financières</p>
+                                        </div>
+
+                                        <div 
+                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                                apiSources.news === 'twelve-data' 
+                                                    ? (isDarkMode ? 'border-cyan-500 bg-cyan-900/20' : 'border-cyan-500 bg-cyan-50')
+                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            }`}
+                                            onClick={() => setApiSources({...apiSources, news: 'twelve-data'})}
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <div className={`w-3 h-3 rounded-full border-2 ${
+                                                    apiSources.news === 'twelve-data' 
+                                                        ? 'border-cyan-500 bg-cyan-500' 
+                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
+                                                }`}></div>
+                                                <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>Twelve Data</span>
+                                            </div>
+                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>Actualités alternatives</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Analyse IA */}
+                                <div>
+                                    <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>🤖 Analyse IA</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div 
+                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                                apiSources.analysis === 'anthropic' 
+                                                    ? (isDarkMode ? 'border-indigo-500 bg-indigo-900/20' : 'border-indigo-500 bg-indigo-50')
+                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            }`}
+                                            onClick={() => setApiSources({...apiSources, analysis: 'anthropic'})}
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <div className={`w-3 h-3 rounded-full border-2 ${
+                                                    apiSources.analysis === 'anthropic' 
+                                                        ? 'border-indigo-500 bg-indigo-500' 
+                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
+                                                }`}></div>
+                                                <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>Claude (Anthropic)</span>
+                                            </div>
+                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>Claude-3-Sonnet</p>
+                                        </div>
+
+                                        <div 
+                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
+                                                apiSources.analysis === 'openai' 
+                                                    ? (isDarkMode ? 'border-emerald-500 bg-emerald-900/20' : 'border-emerald-500 bg-emerald-50')
+                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            }`}
+                                            onClick={() => setApiSources({...apiSources, analysis: 'openai'})}
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                <div className={`w-3 h-3 rounded-full border-2 ${
+                                                    apiSources.analysis === 'openai' 
+                                                        ? 'border-emerald-500 bg-emerald-500' 
+                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
+                                                }`}></div>
+                                                <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>GPT-4 (OpenAI)</span>
+                                            </div>
+                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>GPT-4 Turbo</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Bouton Debug */}
+                        <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        }`}>
+                            <div className="flex items-center justify-between">
+                                <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>🔍 Debug API</h3>
+                                <button
+                                    onClick={() => setShowDebug(!showDebug)}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
+                                        showDebug 
+                                            ? (isDarkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white')
+                                            : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                    }`}
+                                >
+                                    {showDebug ? 'Masquer Debug' : 'Afficher Debug'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Panneau Debug */}
+                        {showDebug && (
+                            <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>📊 Données API en Temps Réel</h3>
+                                
+                                <div className="space-y-4">
+                                    {/* Données de Marché */}
+                                    <div>
+                                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>📊 Données de Marché ({apiSources.marketData})</h4>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                            <div>
+                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>Requête :</h5>
+                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
+                                                }`}>
+                                                    {debugData.marketData.request ? JSON.stringify(debugData.marketData.request, null, 2) : 'Aucune requête'}
+                                                </pre>
+                                            </div>
+                                            <div>
+                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>Réponse :</h5>
+                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                                    debugData.marketData.error 
+                                                        ? (isDarkMode ? 'bg-red-900/20 text-red-300 border-red-600' : 'bg-red-50 text-red-800 border-red-300')
+                                                        : (isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300')
+                                                }`}>
+                                                    {debugData.marketData.response ? JSON.stringify(debugData.marketData.response, null, 2) : 'Aucune réponse'}
+                                                </pre>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Actualités */}
+                                    <div>
+                                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>📰 Actualités ({apiSources.news})</h4>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                            <div>
+                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>Requête :</h5>
+                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
+                                                }`}>
+                                                    {debugData.news.request ? JSON.stringify(debugData.news.request, null, 2) : 'Aucune requête'}
+                                                </pre>
+                                            </div>
+                                            <div>
+                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>Réponse :</h5>
+                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                                    debugData.news.error 
+                                                        ? (isDarkMode ? 'bg-red-900/20 text-red-300 border-red-600' : 'bg-red-50 text-red-800 border-red-300')
+                                                        : (isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300')
+                                                }`}>
+                                                    {debugData.news.response ? JSON.stringify(debugData.news.response, null, 2) : 'Aucune réponse'}
+                                                </pre>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Analyse IA */}
+                                    <div>
+                                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>🤖 Analyse IA ({apiSources.analysis})</h4>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                            <div>
+                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>Requête :</h5>
+                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
+                                                }`}>
+                                                    {debugData.analysis.request ? JSON.stringify(debugData.analysis.request, null, 2) : 'Aucune requête'}
+                                                </pre>
+                                            </div>
+                                            <div>
+                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>Réponse :</h5>
+                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                                    debugData.analysis.error 
+                                                        ? (isDarkMode ? 'bg-red-900/20 text-red-300 border-red-600' : 'bg-red-50 text-red-800 border-red-300')
+                                                        : (isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300')
+                                                }`}>
+                                                    {debugData.analysis.response ? JSON.stringify(debugData.analysis.response, null, 2) : 'Aucune réponse'}
+                                                </pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Boutons de génération */}
                         <div className={`p-6 rounded-lg border transition-colors duration-300 ${
