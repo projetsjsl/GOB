@@ -4259,7 +4259,14 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
 
                     try {
                         // 1. Collecter les données marché
-                        const dataResponse = await fetch(`/api/briefing-data?type=${type}`);
+                        const dataResponse = await fetch('/api/ai-services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                service: 'briefing-data',
+                                type: type
+                            })
+                        });
                         const dataResult = await dataResponse.json();
                         
                         if (!dataResult.success) {
@@ -4346,10 +4353,11 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                     if (!currentBriefing) return;
 
                     try {
-                        const response = await fetch('/api/supabase-briefings', {
+                        const response = await fetch('/api/ai-services', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
+                                service: 'supabase-briefings',
                                 type: currentBriefing.type,
                                 subject: currentBriefing.subject,
                                 html_content: currentBriefing.html,
@@ -4409,7 +4417,14 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                 // Fonction pour charger l'historique
                 const loadBriefingHistory = async () => {
                     try {
-                        const response = await fetch('/api/supabase-briefings?limit=20');
+                        const response = await fetch('/api/ai-services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                service: 'supabase-briefings',
+                                limit: 20
+                            })
+                        });
                         const result = await response.json();
                         
                         if (result.success) {
