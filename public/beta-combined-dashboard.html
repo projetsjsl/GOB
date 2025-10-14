@@ -4133,134 +4133,358 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 });
                 const [showDebug, setShowDebug] = useState(false);
 
-                // Prompts pour chaque type de briefing
+                // Tickers de la watchlist (même que Seeking Alpha et Titres & Nouvelles)
+                const watchlistTickers = [
+                    'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT', 
+                    'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE', 
+                    'TRP', 'UNH', 'UL', 'VZ', 'WFC'
+                ];
+
+                // Prompts pour chaque type de briefing - Niveau Expert
                 const prompts = {
                     morning: {
-                        perplexity: `Tu es un analyste financier institutionnel préparant le briefing matinal.
+                        perplexity: `Tu es Emma, assistante virtuelle spécialisée en analyse financière, préparant le briefing matinal pour vos clients institutionnels. Tu es professionnelle, experte et bienveillante.
 
 RECHERCHE LES INFORMATIONS SUIVANTES (dernières 12 heures) :
 
 📰 ACTUALITÉS MAJEURES :
-- Annonces économiques importantes (Fed, BCE, BOJ)
-- Résultats d'entreprises publiés overnight
+- Annonces économiques importantes (Fed, BCE, BOJ, PBOC)
+- Résultats d'entreprises publiés overnight (focus sur les grandes caps)
 - Événements géopolitiques impactant les marchés
-- Nouvelles réglementaires significatives
+- Nouvelles réglementaires significatives (SEC, ESMA, etc.)
 
 📊 DONNÉES ÉCONOMIQUES :
-- Publications de données macro en Asie
-- Agenda économique US/Europe du jour
-- Décisions de taux d'intérêt
-- Indicateurs PMI, emploi, inflation
+- Publications de données macro en Asie (Chine, Japon, Corée)
+- Agenda économique US/Europe du jour (PIB, inflation, emploi)
+- Décisions de taux d'intérêt et communications des banques centrales
+- Indicateurs PMI, emploi, inflation, consommation
 
 🏢 MOUVEMENTS CORPORATIFS :
-- Fusions & acquisitions annoncées
-- Guidances révisées
-- Changements de direction
+- Fusions & acquisitions annoncées (valeur > $1B)
+- Guidances révisées et changements de direction
+- Activisme actionnarial et proxy fights
+- Restructurations et spin-offs
 
 ⚡ CATALYSEURS DU JOUR :
-- Événements à surveiller aujourd'hui
-- Publications de résultats attendues
-- Interventions de banquiers centraux
+- Événements à surveiller aujourd'hui (conférences, analyst meetings)
+- Publications de résultats attendues (earnings calendar)
+- Interventions de banquiers centraux et témoignages
+- Données économiques clés (NFP, CPI, PMI)
 
-FORMAT : Données factuelles avec chiffres précis, sources citées.
+🎯 FOCUS SECTEUR - VOTRE WATCHLIST :
+- Technologie (GOOGL, CSCO, MU) - actualités tech, earnings, régulation
+- Santé (JNJ, MDT, PFE, UNH) - FDA, résultats, innovation
+- Finance (JPM, BNS, TD, WFC) - taux, stress tests, provisions
+- Consommation (NKE, DEO, UL) - retail, consumer sentiment, ESG
+- Énergie/Matériaux (NTR, TRP) - commodities, transition énergétique
+- Télécoms (T, BCE, VZ) - 5G, infrastructure, consolidation
+
+FORMAT : Données factuelles avec chiffres précis, sources citées, impact sur vos secteurs.
 PÉRIODE : Dernières 12 heures + agenda du jour`,
-                        openai: `Tu es un gestionnaire de portefeuille senior rédigeant le briefing matinal pour clients institutionnels.
+                        openai: `Tu es Emma, assistante virtuelle spécialisée en analyse financière, rédigeant le briefing matinal pour vos clients institutionnels. Tu es professionnelle, experte et bienveillante.
 
-STRUCTURE OBLIGATOIRE :
+**Ton style Emma :**
+- Professionnelle mais accessible, comme une consultante senior
+- Précise et factuelle, avec une approche rassurante
+- Encourageante dans l'analyse, même en période d'incertitude
+- Toujours transparente sur les limites de tes conseils
 
-🌏 RÉSUMÉ EXÉCUTIF (3-4 phrases)
-→ Synthèse des mouvements overnight
-→ Thème dominant des marchés
-→ Sentiment général (risk-on/risk-off)
+**Structure OBLIGATOIRE - Voix Emma :**
 
-📊 PERFORMANCE DES MARCHÉS
-→ Asie : analyse des variations par région
-→ Futures : implications pour l'ouverture US/EU
-→ Secteurs moteurs identifiés
+🌏 RÉSUMÉ EXÉCUTIF (4-5 phrases)
+→ Bonjour ! Voici votre briefing matinal avec les mouvements overnight
+→ Thème dominant des marchés et rotation sectorielle observée
+→ Sentiment général (risk-on/risk-off) et flux institutionnels
+→ Implications pour vos stratégies tactiques
+
+📊 PERFORMANCE DES MARCHÉS APPROFONDIE
+→ Asie : analyse détaillée par région avec contexte économique
+→ Futures : implications pour l'ouverture US/EU avec niveaux clés
+→ Secteurs moteurs et sous-performants avec drivers explicatifs
+→ Corrélations inter-marchés et devises
 
 💡 CATALYSEURS & ACTUALITÉS CLÉS
-→ Top 3 événements impactants
-→ Analyse de leur signification
+→ Top 5 événements impactants avec analyse quantitative
+→ Signification pour vos secteurs et titres de la watchlist
+→ Réactions des marchés et ajustements de positionnement
 
-📈 DONNÉES TECHNIQUES
-→ Niveaux S&P 500
-→ Indicateurs de sentiment (VIX)
+📈 DONNÉES TECHNIQUES & SENTIMENT
+→ Niveaux S&P 500, support/résistance, volumes
+→ Indicateurs de sentiment (VIX, put/call ratio, flows)
+→ Positionnement institutionnel et retail
 
-🎯 FOCUS DU JOUR
-→ Publications économiques à surveiller
-→ Résultats d'entreprises attendus
+🎯 FOCUS DU JOUR - VOTRE WATCHLIST
+→ Publications économiques à surveiller (impact sur vos secteurs)
+→ Résultats d'entreprises attendus (earnings calendar)
+→ Dividendes à venir et ex-dates
+→ Événements corporate (analyst days, conférences)
 
-⚠️ RISQUES & OPPORTUNITÉS
-→ 2 risques majeurs
-→ 2 opportunités tactiques
+⚠️ RISQUES & OPPORTUNITÉS TACTIQUES
+→ 3 risques majeurs avec probabilité et impact
+→ 3 opportunités tactiques avec entry/exit levels
+→ Recommandations de positionnement par secteur
 
-STYLE : Professionnel, 800 mots max, français`
+**Important :** Rappelez toujours que pour des conseils personnalisés, il faut consulter un expert qualifié.
+
+STYLE : Voix Emma - Niveau expert, 1200-1500 mots, français, avec chiffres précis et références sectorielles`
                     },
                     noon: {
-                        perplexity: `Analyste financier - Update mi-journée
+                        perplexity: `Tu es Emma, assistante virtuelle spécialisée en analyse financière, préparant l'update mi-journée pour vos clients institutionnels. Tu es professionnelle, experte et bienveillante.
 
 RECHERCHE (dernières 4 heures) :
 
-📢 BREAKING NEWS :
-- Annonces corporate majeures depuis l'ouverture
-- Réactions aux résultats
-- Upgrades/downgrades d'analystes
+📢 BREAKING NEWS CORPORATE :
+- Annonces corporate majeures depuis l'ouverture (M&A, guidances, restructurations)
+- Réactions aux résultats publiés ce matin
+- Upgrades/downgrades d'analystes (focus sur votre watchlist)
+- Activisme actionnarial et proxy fights
 
-📊 DONNÉES ÉCONOMIQUES :
-- Chiffres US du matin
-- Déclarations Fed/BCE
+📊 DONNÉES ÉCONOMIQUES US/EU :
+- Chiffres US du matin (retail sales, PPI, consumer sentiment)
+- Déclarations Fed/BCE et témoignages
+- Réactions des marchés aux données macro
+- Corrélations devises/obligations/actions
 
-🔥 MOUVEMENTS ANORMAUX :
-- Actions avec volume exceptionnel
-- Gaps significatifs
+🔥 MOUVEMENTS ANORMAUX - VOTRE WATCHLIST :
+- Actions avec volume exceptionnel (>200% de la moyenne)
+- Gaps significatifs (>5%) sur les titres suivis
+- Rotation sectorielle intraday
+- Flux institutionnels et retail
 
-FORMAT : Factuel, chiffres précis, timeframe exact`,
-                        openai: `Gestionnaire de portefeuille - Briefing mi-journée
+🎯 FOCUS SECTEUR INTRADAY :
+- Technologie (GOOGL, CSCO, MU) - réactions aux données tech
+- Santé (JNJ, MDT, PFE, UNH) - actualités réglementaires
+- Finance (JPM, BNS, TD, WFC) - réactions aux taux
+- Consommation (NKE, DEO, UL) - données retail
+- Énergie/Matériaux (NTR, TRP) - commodities
+- Télécoms (T, BCE, VZ) - 5G et infrastructure
 
-ANALYSE REQUISE :
+FORMAT : Factuel, chiffres précis, timeframe exact, impact quantifié sur vos secteurs`,
+                        openai: `Tu es Emma, assistante virtuelle spécialisée en analyse financière, rédigeant l'update mi-journée pour vos clients institutionnels. Tu es professionnelle, experte et bienveillante.
 
-⚡ FLASH EXÉCUTIF (2-3 phrases)
-→ Thème dominant de la séance
+**Ton style Emma :**
+- Professionnelle mais accessible, comme une consultante senior
+- Précise et factuelle, avec une approche rassurante
+- Encourageante dans l'analyse, même en période d'incertitude
+- Toujours transparente sur les limites de tes conseils
 
-📈 ANALYSE DE MARCHÉ
-→ Europe : cohérence/divergences
-→ US : réaction à l'ouverture
+**ANALYSE REQUISE - Voix Emma :**
 
-🔍 DEEP DIVE TOP MOVERS
-→ Catalyseur précis
-→ Implications secteur
+⚡ FLASH EXÉCUTIF (3-4 phrases)
+→ Voici votre update mi-journée avec le thème dominant de la séance
+→ Rotation sectorielle et flux institutionnels observés
+→ Sentiment et positionnement des marchés à mi-parcours
 
-🎯 AJUSTEMENTS TACTIQUES
-→ Opportunités intraday
-→ Actions à surveiller
+📈 ANALYSE DE MARCHÉ APPROFONDIE
+→ Europe : cohérence/divergences par secteur avec drivers explicatifs
+→ US : réaction à l'ouverture et niveaux techniques clés
+→ Corrélations inter-marchés et devises
+→ Volumes et liquidité par secteur
 
-STYLE : Concis, 600 mots max, français`
+🔍 DEEP DIVE TOP MOVERS - VOTRE WATCHLIST
+→ Catalyseur précis pour chaque titre significatif
+→ Implications sectorielles et peer group
+→ Révisions d'estimations et changements de consensus
+→ Positionnement technique et niveaux clés
+
+🎯 AJUSTEMENTS TACTIQUES INTRADAY
+→ Opportunités intraday avec entry/exit levels
+→ Actions à surveiller pour l'après-midi
+→ Événements corporate restants (earnings, conférences)
+→ Risques de volatilité et hedging
+
+📊 CALENDRIER APRÈS-MIDI
+→ Publications économiques restantes
+→ Résultats d'entreprises après clôture
+→ Interventions de banquiers centraux
+→ Événements corporate (analyst days, roadshows)
+
+**Important :** Rappelez toujours que pour des conseils personnalisés, il faut consulter un expert qualifié.
+
+STYLE : Voix Emma - Niveau expert, 800-1000 mots, français, avec chiffres précis et recommandations tactiques`
                     },
                     evening: {
-                        perplexity: `Analyste senior - Récapitulatif de clôture
+                        perplexity: `Tu es Emma, assistante virtuelle spécialisée en analyse financière, préparant le récapitulatif de clôture pour vos clients institutionnels. Tu es professionnelle, experte et bienveillante.
 
 SYNTHÈSE COMPLÈTE DU JOUR :
 
-📊 PERFORMANCE GLOBALE
-🏆 GAGNANTS & PERDANTS
-📢 ÉVÉNEMENTS MARQUANTS
-🔮 APRÈS CLÔTURE
-📅 AGENDA DEMAIN
+📊 PERFORMANCE GLOBALE APPROFONDIE
+- Indices majeurs avec variations précises et volumes
+- Secteurs gagnants/perdants avec drivers sectoriels
+- Corrélations inter-marchés et devises
+- Flux institutionnels et retail
 
-FOCUS : Bilan factuel + setup pour demain`,
-                        openai: `Gestionnaire de portefeuille senior - Rapport de clôture
+🏆 GAGNANTS & PERDANTS - VOTRE WATCHLIST
+- Top 10 mouvements sur les titres suivis
+- Catalyseurs précis pour chaque mouvement significatif
+- Révisions d'estimations et changements de consensus
+- Activisme actionnarial et événements corporate
 
-RAPPORT STRUCTURÉ :
+📢 ÉVÉNEMENTS MARQUANTS DU JOUR
+- Résultats d'entreprises publiés (beat/miss, guidances)
+- Annonces macro importantes (Fed, BCE, données économiques)
+- M&A et restructurations annoncées
+- Nouvelles réglementaires et politiques
 
-🎯 SYNTHÈSE EXÉCUTIVE (4-5 phrases)
+🔮 APRÈS CLÔTURE & PRÉ-MARCHÉ
+- Résultats après clôture (earnings calendar)
+- Guidances et communications corporate
+- Futures et pré-ouverture asiatique
+- Événements corporate de demain
+
+📅 AGENDA DEMAIN - ÉCONOMIQUE & CORPORATE
+- Publications économiques clés (NFP, CPI, PMI, etc.)
+- Résultats d'entreprises attendus (earnings calendar)
+- Dividendes à venir et ex-dates
+- Événements corporate (analyst days, conférences)
+- Interventions de banquiers centraux
+
+🎯 FOCUS SECTEUR - SETUP DEMAIN
+- Technologie (GOOGL, CSCO, MU) - actualités tech et earnings
+- Santé (JNJ, MDT, PFE, UNH) - réglementation et résultats
+- Finance (JPM, BNS, TD, WFC) - taux et stress tests
+- Consommation (NKE, DEO, UL) - retail et consumer sentiment
+- Énergie/Matériaux (NTR, TRP) - commodities et ESG
+- Télécoms (T, BCE, VZ) - 5G et infrastructure
+
+FOCUS : Bilan factuel complet + setup tactique pour demain avec niveaux clés`,
+                        openai: `Tu es Emma, assistante virtuelle spécialisée en analyse financière, rédigeant le rapport de clôture pour vos clients institutionnels. Tu es professionnelle, experte et bienveillante.
+
+**Ton style Emma :**
+- Professionnelle mais accessible, comme une consultante senior
+- Précise et factuelle, avec une approche rassurante
+- Encourageante dans l'analyse, même en période d'incertitude
+- Toujours transparente sur les limites de tes conseils
+
+**RAPPORT STRUCTURÉ - Voix Emma :**
+
+🎯 SYNTHÈSE EXÉCUTIVE (5-6 phrases)
+→ Bonsoir ! Voici votre rapport de clôture avec la performance globale
+→ Thème dominant et rotation sectorielle observée
+→ Sentiment et positionnement institutionnel
+→ Implications pour vos stratégies tactiques
+→ Setup pour la séance de demain
+
 📊 ANALYSE DE MARCHÉ APPROFONDIE
-💡 DEEP DIVE ÉVÉNEMENTS
-🔬 ANALYSE SECTORIELLE
-📈 ANALYSE TECHNIQUE
-🔮 PERSPECTIVES & POSITIONNEMENT
+→ Indices majeurs : variations, volumes, corrélations
+→ Secteurs : performance relative et drivers explicatifs
+→ Devises et obligations : impact sur les actions
+→ Flux institutionnels et retail par secteur
+→ Volatilité et liquidité par asset class
 
-STYLE : Analyse institutionnelle, 1200-1500 mots, français`
+💡 DEEP DIVE ÉVÉNEMENTS CORPORATE
+→ Résultats d'entreprises : beat/miss, guidances, révisions
+→ M&A et restructurations : impact sectoriel
+→ Activisme actionnarial et proxy fights
+→ Événements corporate (analyst days, roadshows)
+→ Révisions d'estimations et changements de consensus
+
+🔬 ANALYSE SECTORIELLE - VOTRE WATCHLIST
+→ Technologie (GOOGL, CSCO, MU) : actualités tech, earnings, régulation
+→ Santé (JNJ, MDT, PFE, UNH) : FDA, résultats, innovation
+→ Finance (JPM, BNS, TD, WFC) : taux, stress tests, provisions
+→ Consommation (NKE, DEO, UL) : retail, consumer sentiment, ESG
+→ Énergie/Matériaux (NTR, TRP) : commodities, transition énergétique
+→ Télécoms (T, BCE, VZ) : 5G, infrastructure, consolidation
+
+📈 ANALYSE TECHNIQUE & SENTIMENT
+→ Niveaux clés : support/résistance, volumes, momentum
+→ Indicateurs de sentiment : VIX, put/call, flows
+→ Positionnement institutionnel et retail
+→ Corrélations et divergences techniques
+
+🔮 PERSPECTIVES & POSITIONNEMENT
+→ Calendrier économique de demain (impact sectoriel)
+→ Résultats d'entreprises attendus (earnings calendar)
+→ Dividendes à venir et ex-dates
+→ Événements corporate et analyst days
+→ Recommandations tactiques par secteur
+
+**Important :** Rappelez toujours que pour des conseils personnalisés, il faut consulter un expert qualifié.
+
+STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, français, avec chiffres précis et recommandations tactiques`
                     }
+                };
+
+                // Fonction pour enrichir les données avec les informations de la watchlist
+                const enrichWatchlistData = async (marketData, type) => {
+                    try {
+                        // Ajouter les informations spécifiques à la watchlist
+                        const enrichedData = {
+                            ...marketData,
+                            watchlist: {
+                                tickers: watchlistTickers,
+                                earnings_calendar: await getEarningsCalendar(),
+                                dividends_calendar: await getDividendsCalendar(),
+                                sector_analysis: getSectorAnalysis(),
+                                economic_events: getEconomicEvents(type)
+                            }
+                        };
+                        return enrichedData;
+                    } catch (error) {
+                        console.error('Erreur enrichissement watchlist:', error);
+                        return marketData;
+                    }
+                };
+
+                // Fonction pour obtenir le calendrier des résultats
+                const getEarningsCalendar = async () => {
+                    // Simulation des prochains résultats pour la watchlist
+                    const earnings = [
+                        { ticker: 'GOOGL', date: '2024-12-15', time: 'after-hours', estimate: 1.45 },
+                        { ticker: 'JPM', date: '2024-12-16', time: 'before-open', estimate: 3.89 },
+                        { ticker: 'JNJ', date: '2024-12-17', time: 'before-open', estimate: 2.78 },
+                        { ticker: 'PFE', date: '2024-12-18', time: 'before-open', estimate: 0.45 },
+                        { ticker: 'NKE', date: '2024-12-19', time: 'after-hours', estimate: 0.85 }
+                    ];
+                    return earnings.filter(e => watchlistTickers.includes(e.ticker));
+                };
+
+                // Fonction pour obtenir le calendrier des dividendes
+                const getDividendsCalendar = async () => {
+                    // Simulation des prochains dividendes pour la watchlist
+                    const dividends = [
+                        { ticker: 'T', date: '2024-12-20', amount: 0.2775, ex_date: '2024-12-19' },
+                        { ticker: 'JNJ', date: '2024-12-20', amount: 1.19, ex_date: '2024-12-19' },
+                        { ticker: 'PFE', date: '2024-12-20', amount: 0.42, ex_date: '2024-12-19' },
+                        { ticker: 'JPM', date: '2024-12-20', amount: 1.00, ex_date: '2024-12-19' },
+                        { ticker: 'WFC', date: '2024-12-20', amount: 0.35, ex_date: '2024-12-19' }
+                    ];
+                    return dividends.filter(d => watchlistTickers.includes(d.ticker));
+                };
+
+                // Fonction pour l'analyse sectorielle
+                const getSectorAnalysis = () => {
+                    return {
+                        technology: { tickers: ['GOOGL', 'CSCO', 'MU'], weight: 0.25, trend: 'bullish' },
+                        healthcare: { tickers: ['JNJ', 'MDT', 'PFE', 'UNH'], weight: 0.30, trend: 'neutral' },
+                        financial: { tickers: ['JPM', 'BNS', 'TD', 'WFC'], weight: 0.20, trend: 'bullish' },
+                        consumer: { tickers: ['NKE', 'DEO', 'UL'], weight: 0.15, trend: 'neutral' },
+                        energy: { tickers: ['NTR', 'TRP'], weight: 0.05, trend: 'bearish' },
+                        telecom: { tickers: ['T', 'BCE', 'VZ'], weight: 0.05, trend: 'neutral' }
+                    };
+                };
+
+                // Fonction pour les événements économiques
+                const getEconomicEvents = (type) => {
+                    const today = new Date();
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+
+                    const events = {
+                        today: [
+                            { time: '08:30', event: 'CPI MoM', impact: 'high', forecast: '0.3%' },
+                            { time: '10:00', event: 'Consumer Sentiment', impact: 'medium', forecast: '102.5' },
+                            { time: '14:00', event: 'Fed Speech - Powell', impact: 'high', forecast: 'hawkish tone' }
+                        ],
+                        tomorrow: [
+                            { time: '08:30', event: 'Retail Sales', impact: 'high', forecast: '0.4%' },
+                            { time: '10:00', event: 'Industrial Production', impact: 'medium', forecast: '0.2%' },
+                            { time: '14:00', event: 'FOMC Minutes', impact: 'high', forecast: 'policy insights' }
+                        ]
+                    };
+
+                    return type === 'morning' ? events.today : events.tomorrow;
                 };
 
                 // Fonction pour générer un briefing
@@ -4309,6 +4533,9 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                             throw new Error('Erreur lors de la collecte des données');
                         }
 
+                        // 1.5. Enrichir les données avec les informations de la watchlist
+                        const enrichedMarketData = await enrichWatchlistData(dataResult.data, type);
+
                         // 2. Rechercher les actualités
                         const newsRequest = {
                             service: 'perplexity',
@@ -4342,7 +4569,7 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                         const analysisRequest = {
                             service: 'openai',
                             prompt: prompts[type].openai,
-                            marketData: dataResult.data,
+                            marketData: enrichedMarketData,
                             news: newsResult.content || 'Aucune actualité disponible',
                             source: apiSources.analysis
                         };
@@ -4371,7 +4598,7 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                         // 4. Créer le HTML
                         let html = '';
                         const analysis = analysisResult.content || 'Analyse non disponible';
-                        const data = dataResult.data;
+                        const data = enrichedMarketData;
 
                         switch (type) {
                             case 'morning':
@@ -4800,36 +5027,68 @@ STYLE : Analyse institutionnelle, 1200-1500 mots, français`
                                         </div>
                                     </div>
 
-                                    {/* Analyse IA */}
-                                    <div>
-                                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
-                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>🤖 Analyse IA ({apiSources.analysis})</h4>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                            <div>
-                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>Requête :</h5>
-                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
-                                                }`}>
-                                                    {debugData.analysis.request ? JSON.stringify(debugData.analysis.request, null, 2) : 'Aucune requête'}
-                                                </pre>
-                                            </div>
-                                            <div>
-                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>Réponse :</h5>
-                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                                    debugData.analysis.error 
-                                                        ? (isDarkMode ? 'bg-red-900/20 text-red-300 border-red-600' : 'bg-red-50 text-red-800 border-red-300')
-                                                        : (isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300')
-                                                }`}>
-                                                    {debugData.analysis.response ? JSON.stringify(debugData.analysis.response, null, 2) : 'Aucune réponse'}
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    </div>
+                    {/* Analyse IA */}
+                    <div>
+                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🤖 Analyse IA ({apiSources.analysis})</h4>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                }`}>Requête :</h5>
+                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
+                                }`}>
+                                    {debugData.analysis.request ? JSON.stringify(debugData.analysis.request, null, 2) : 'Aucune requête'}
+                                </pre>
+                            </div>
+                            <div>
+                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                }`}>Réponse :</h5>
+                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                    debugData.analysis.error 
+                                        ? (isDarkMode ? 'bg-red-900/20 text-red-300 border-red-600' : 'bg-red-50 text-red-800 border-red-300')
+                                        : (isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300')
+                                }`}>
+                                    {debugData.analysis.response ? JSON.stringify(debugData.analysis.response, null, 2) : 'Aucune réponse'}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Données Watchlist Enrichies */}
+                    <div>
+                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>📊 Données Watchlist Enrichies</h4>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                }`}>Tickers Suivis :</h5>
+                                <div className={`text-xs p-3 rounded border ${
+                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
+                                }`}>
+                                    {watchlistTickers.join(', ')}
+                                </div>
+                            </div>
+                            <div>
+                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                }`}>Données Enrichies :</h5>
+                                <div className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
+                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
+                                }`}>
+                                    {debugData.marketData.response?.data?.watchlist ? 
+                                        JSON.stringify(debugData.marketData.response.data.watchlist, null, 2) : 
+                                        'Données non encore générées'
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                                 </div>
                             </div>
                         )}
