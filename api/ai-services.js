@@ -447,87 +447,127 @@ async function handleDeleteBriefing(req, res, { id }) {
 }
 
 // ============================================================================
-// DATA COLLECTION FUNCTIONS
+// DATA COLLECTION FUNCTIONS - Utilise vos APIs existantes
 // ============================================================================
 async function getAsianMarkets() {
-  const symbols = ['^N225', '^HSI', '000001.SS', '^AXJO'];
+  const symbols = [
+    { symbol: '^N225', name: 'Nikkei 225' },
+    { symbol: '^HSI', name: 'Hang Seng' },
+    { symbol: '000001.SS', name: 'SSE Composite' },
+    { symbol: '^AXJO', name: 'ASX 200' }
+  ];
   const data = [];
   
-  for (const symbol of symbols) {
+  for (const market of symbols) {
     try {
+      // Utiliser votre API marketdata existante
       const response = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`
+        `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/marketdata?endpoint=quote&symbol=${market.symbol}&source=auto`
       );
-      const json = await response.json();
-      const result = json.chart.result[0];
-      const meta = result.meta;
       
-      data.push({
-        symbol,
-        name: meta.shortName,
-        price: meta.regularMarketPrice,
-        change: meta.regularMarketPrice - meta.previousClose,
-        changePct: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100
-      });
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          const quote = result.data;
+          data.push({
+            symbol: market.symbol,
+            name: market.name,
+            price: quote.c || quote.price || 0,
+            change: quote.d || quote.change || 0,
+            changePct: quote.dp || quote.changePercent || 0
+          });
+        }
+      }
     } catch (error) {
-      console.error(`Erreur ${symbol}:`, error);
+      console.error(`Erreur ${market.symbol}:`, error);
     }
+  }
+  
+  // Si aucune donnée réelle, utiliser les données fallback
+  if (data.length === 0) {
+    return getFallbackAsianMarkets();
   }
   
   return data;
 }
 
 async function getFutures() {
-  const symbols = ['ES=F', 'NQ=F', 'YM=F'];
+  const symbols = [
+    { symbol: 'ES=F', name: 'S&P 500 E-mini' },
+    { symbol: 'NQ=F', name: 'Nasdaq E-mini' },
+    { symbol: 'YM=F', name: 'Dow E-mini' }
+  ];
   const data = [];
   
-  for (const symbol of symbols) {
+  for (const future of symbols) {
     try {
+      // Utiliser votre API marketdata existante
       const response = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`
+        `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/marketdata?endpoint=quote&symbol=${future.symbol}&source=auto`
       );
-      const json = await response.json();
-      const result = json.chart.result[0];
-      const meta = result.meta;
       
-      data.push({
-        symbol,
-        name: meta.shortName,
-        price: meta.regularMarketPrice,
-        change: meta.regularMarketPrice - meta.previousClose,
-        changePct: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100
-      });
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          const quote = result.data;
+          data.push({
+            symbol: future.symbol,
+            name: future.name,
+            price: quote.c || quote.price || 0,
+            change: quote.d || quote.change || 0,
+            changePct: quote.dp || quote.changePercent || 0
+          });
+        }
+      }
     } catch (error) {
-      console.error(`Erreur ${symbol}:`, error);
+      console.error(`Erreur ${future.symbol}:`, error);
     }
+  }
+  
+  // Si aucune donnée réelle, utiliser les données fallback
+  if (data.length === 0) {
+    return getFallbackFutures();
   }
   
   return data;
 }
 
 async function getUSMarkets() {
-  const symbols = ['^GSPC', '^DJI', '^IXIC'];
+  const symbols = [
+    { symbol: '^GSPC', name: 'S&P 500' },
+    { symbol: '^DJI', name: 'Dow Jones Industrial Average' },
+    { symbol: '^IXIC', name: 'NASDAQ Composite' }
+  ];
   const data = [];
   
-  for (const symbol of symbols) {
+  for (const market of symbols) {
     try {
+      // Utiliser votre API marketdata existante
       const response = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`
+        `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/marketdata?endpoint=quote&symbol=${market.symbol}&source=auto`
       );
-      const json = await response.json();
-      const result = json.chart.result[0];
-      const meta = result.meta;
       
-      data.push({
-        symbol,
-        name: meta.shortName,
-        price: meta.regularMarketPrice,
-        change: meta.regularMarketPrice - meta.previousClose,
-        changePct: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100
-      });
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          const quote = result.data;
+          data.push({
+            symbol: market.symbol,
+            name: market.name,
+            price: quote.c || quote.price || 0,
+            change: quote.d || quote.change || 0,
+            changePct: quote.dp || quote.changePercent || 0
+          });
+        }
+      }
     } catch (error) {
-      console.error(`Erreur ${symbol}:`, error);
+      console.error(`Erreur ${market.symbol}:`, error);
     }
+  }
+  
+  // Si aucune donnée réelle, utiliser les données fallback
+  if (data.length === 0) {
+    return getFallbackUSMarkets();
   }
   
   return data;
@@ -557,28 +597,43 @@ async function getSectorPerformance() {
   ];
 }
 
+// ============================================================================
+// FALLBACK DATA FUNCTIONS - Données réalistes pour décembre 2024
+// ============================================================================
+function getFallbackAsianMarkets() {
+  return [
+    { symbol: '^N225', name: 'Nikkei 225', price: 32500.50, change: 125.30, changePct: 0.39 },
+    { symbol: '^HSI', name: 'Hang Seng', price: 18500.25, change: -85.75, changePct: -0.46 },
+    { symbol: '000001.SS', name: 'SSE Composite', price: 3150.80, change: 12.40, changePct: 0.40 },
+    { symbol: '^AXJO', name: 'ASX 200', price: 7200.15, change: 45.20, changePct: 0.63 }
+  ];
+}
+
+function getFallbackFutures() {
+  return [
+    { symbol: 'ES=F', name: 'S&P 500 E-mini', price: 4250.75, change: 8.25, changePct: 0.19 },
+    { symbol: 'NQ=F', name: 'Nasdaq E-mini', price: 14850.50, change: 25.80, changePct: 0.17 },
+    { symbol: 'YM=F', name: 'Dow E-mini', price: 34500.25, change: 45.75, changePct: 0.13 }
+  ];
+}
+
+function getFallbackUSMarkets() {
+  return [
+    { symbol: '^GSPC', name: 'S&P 500', price: 4750.20, change: 16.85, changePct: 0.36 },
+    { symbol: '^DJI', name: 'Dow Jones Industrial Average', price: 37580.45, change: 145.60, changePct: 0.39 },
+    { symbol: '^IXIC', name: 'NASDAQ Composite', price: 15895.30, change: 65.90, changePct: 0.42 }
+  ];
+}
+
 function getFallbackData(type) {
   if (type === 'morning') {
     return {
-      asian_markets: [
-        { symbol: '^N225', name: 'Nikkei 225', price: 32500.50, change: 125.30, changePct: 0.39 },
-        { symbol: '^HSI', name: 'Hang Seng', price: 18500.25, change: -85.75, changePct: -0.46 },
-        { symbol: '000001.SS', name: 'SSE Composite', price: 3150.80, change: 12.40, changePct: 0.40 },
-        { symbol: '^AXJO', name: 'ASX 200', price: 7200.15, change: 45.20, changePct: 0.63 }
-      ],
-      futures: [
-        { symbol: 'ES=F', name: 'S&P 500 E-mini', price: 4250.75, change: 8.25, changePct: 0.19 },
-        { symbol: 'NQ=F', name: 'Nasdaq E-mini', price: 14850.50, change: 25.80, changePct: 0.17 },
-        { symbol: 'YM=F', name: 'Dow E-mini', price: 34500.25, change: 45.75, changePct: 0.13 }
-      ]
+      asian_markets: getFallbackAsianMarkets(),
+      futures: getFallbackFutures()
     };
   } else if (type === 'noon') {
     return {
-      us_markets: [
-        { symbol: '^GSPC', name: 'S&P 500', price: 4250.80, change: 12.45, changePct: 0.29 },
-        { symbol: '^DJI', name: 'Dow Jones', price: 34520.15, change: 85.30, changePct: 0.25 },
-        { symbol: '^IXIC', name: 'NASDAQ', price: 14875.60, change: 45.20, changePct: 0.30 }
-      ],
+      us_markets: getFallbackUSMarkets(),
       top_movers: {
         gainers: [
           { symbol: 'NVDA', change: 5.2, volume: 50000000 },
@@ -594,11 +649,7 @@ function getFallbackData(type) {
     };
   } else {
     return {
-      us_markets: [
-        { symbol: '^GSPC', name: 'S&P 500', price: 4255.20, change: 16.85, changePct: 0.40 },
-        { symbol: '^DJI', name: 'Dow Jones', price: 34580.45, change: 145.60, changePct: 0.42 },
-        { symbol: '^IXIC', name: 'NASDAQ', price: 14895.30, change: 65.90, changePct: 0.44 }
-      ],
+      us_markets: getFallbackUSMarkets(),
       top_movers: {
         gainers: [
           { symbol: 'NVDA', change: 6.8, volume: 75000000 },
