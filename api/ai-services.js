@@ -325,29 +325,50 @@ Note: Analyse simulée - Mode démo sans clé API OpenAI
 // ============================================================================
 // BRIEFING DATA COLLECTOR
 // ============================================================================
-async function handleBriefingData(req, res, { type = 'morning' }) {
+async function handleBriefingData(req, res, { type = 'morning', source = 'apis' }) {
   try {
     if (!['morning', 'noon', 'evening'].includes(type)) {
       return res.status(400).json({ error: 'Type invalide. Utilisez: morning, noon, evening' });
     }
 
+    if (!['apis', 'yahoo'].includes(source)) {
+      return res.status(400).json({ error: 'Source invalide. Utilisez: apis ou yahoo' });
+    }
+
     const data = {};
 
     if (type === 'morning') {
-      data.asian_markets = await getAsianMarkets();
-      data.futures = await getFutures();
+      if (source === 'yahoo') {
+        data.asian_markets = await getAsianMarketsYahoo();
+        data.futures = await getFuturesYahoo();
+      } else {
+        data.asian_markets = await getAsianMarkets();
+        data.futures = await getFutures();
+      }
     } else if (type === 'noon') {
-      data.us_markets = await getUSMarkets();
-      data.top_movers = await getTopMovers();
+      if (source === 'yahoo') {
+        data.us_markets = await getUSMarketsYahoo();
+        data.top_movers = await getTopMovers();
+      } else {
+        data.us_markets = await getUSMarkets();
+        data.top_movers = await getTopMovers();
+      }
     } else if (type === 'evening') {
-      data.us_markets = await getUSMarkets();
-      data.top_movers = await getTopMovers();
-      data.sectors = await getSectorPerformance();
+      if (source === 'yahoo') {
+        data.us_markets = await getUSMarketsYahoo();
+        data.top_movers = await getTopMovers();
+        data.sectors = await getSectorPerformance();
+      } else {
+        data.us_markets = await getUSMarkets();
+        data.top_movers = await getTopMovers();
+        data.sectors = await getSectorPerformance();
+      }
     }
 
     return res.status(200).json({
       success: true,
       type,
+      source,
       data,
       timestamp: new Date().toISOString()
     });
@@ -359,6 +380,7 @@ async function handleBriefingData(req, res, { type = 'morning' }) {
     return res.status(200).json({
       success: true,
       type,
+      source,
       data: fallbackData,
       fallback: true,
       timestamp: new Date().toISOString()
@@ -562,6 +584,130 @@ async function getUSMarkets() {
       }
     } catch (error) {
       console.error(`Erreur ${market.symbol}:`, error);
+    }
+  }
+  
+  // Si aucune donnée réelle, utiliser les données fallback
+  if (data.length === 0) {
+    return getFallbackUSMarkets();
+  }
+  
+  return data;
+}
+
+// ============================================================================
+// YAHOO FINANCE FUNCTIONS - Données directes
+// ============================================================================
+async function getAsianMarketsYahoo() {
+  const symbols = [
+    { symbol: '^N225', name: 'Nikkei 225' },
+    { symbol: '^HSI', name: 'Hang Seng' },
+    { symbol: '000001.SS', name: 'SSE Composite' },
+    { symbol: '^AXJO', name: 'ASX 200' }
+  ];
+  const data = [];
+  
+  for (const market of symbols) {
+    try {
+      const response = await fetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${market.symbol}?interval=1d&range=1d`
+      );
+      
+      if (response.ok) {
+        const json = await response.json();
+        const result = json.chart.result[0];
+        const meta = result.meta;
+        
+        data.push({
+          symbol: market.symbol,
+          name: market.name,
+          price: meta.regularMarketPrice,
+          change: meta.regularMarketPrice - meta.previousClose,
+          changePct: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100
+        });
+      }
+    } catch (error) {
+      console.error(`Erreur Yahoo ${market.symbol}:`, error);
+    }
+  }
+  
+  // Si aucune donnée réelle, utiliser les données fallback
+  if (data.length === 0) {
+    return getFallbackAsianMarkets();
+  }
+  
+  return data;
+}
+
+async function getFuturesYahoo() {
+  const symbols = [
+    { symbol: 'ES=F', name: 'S&P 500 E-mini' },
+    { symbol: 'NQ=F', name: 'Nasdaq E-mini' },
+    { symbol: 'YM=F', name: 'Dow E-mini' }
+  ];
+  const data = [];
+  
+  for (const future of symbols) {
+    try {
+      const response = await fetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${future.symbol}?interval=1d&range=1d`
+      );
+      
+      if (response.ok) {
+        const json = await response.json();
+        const result = json.chart.result[0];
+        const meta = result.meta;
+        
+        data.push({
+          symbol: future.symbol,
+          name: future.name,
+          price: meta.regularMarketPrice,
+          change: meta.regularMarketPrice - meta.previousClose,
+          changePct: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100
+        });
+      }
+    } catch (error) {
+      console.error(`Erreur Yahoo ${future.symbol}:`, error);
+    }
+  }
+  
+  // Si aucune donnée réelle, utiliser les données fallback
+  if (data.length === 0) {
+    return getFallbackFutures();
+  }
+  
+  return data;
+}
+
+async function getUSMarketsYahoo() {
+  const symbols = [
+    { symbol: '^GSPC', name: 'S&P 500' },
+    { symbol: '^DJI', name: 'Dow Jones Industrial Average' },
+    { symbol: '^IXIC', name: 'NASDAQ Composite' }
+  ];
+  const data = [];
+  
+  for (const market of symbols) {
+    try {
+      const response = await fetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${market.symbol}?interval=1d&range=1d`
+      );
+      
+      if (response.ok) {
+        const json = await response.json();
+        const result = json.chart.result[0];
+        const meta = result.meta;
+        
+        data.push({
+          symbol: market.symbol,
+          name: market.name,
+          price: meta.regularMarketPrice,
+          change: meta.regularMarketPrice - meta.previousClose,
+          changePct: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100
+        });
+      }
+    } catch (error) {
+      console.error(`Erreur Yahoo ${market.symbol}:`, error);
     }
   }
   
