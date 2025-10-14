@@ -4132,6 +4132,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     analysis: { request: null, response: null, error: null }
                 });
                 const [showDebug, setShowDebug] = useState(false);
+                const [processLog, setProcessLog] = useState([]);
 
                 // Tickers de la watchlist (même que Seeking Alpha et Titres & Nouvelles)
                 const watchlistTickers = [
@@ -4406,22 +4407,67 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                     }
                 };
 
+                // Fonction de logging pour tracer le processus complet
+                const addLogEntry = (step, type, data, status = 'info') => {
+                    const timestamp = new Date().toISOString();
+                    const logEntry = {
+                        id: Date.now() + Math.random(),
+                        timestamp,
+                        step,
+                        type,
+                        status, // 'info', 'success', 'error', 'warning'
+                        data: typeof data === 'object' ? JSON.stringify(data, null, 2) : data,
+                        size: typeof data === 'object' ? JSON.stringify(data).length : data?.length || 0
+                    };
+                    
+                    setProcessLog(prev => [...prev, logEntry]);
+                    console.log(`📋 [${step}] ${type}:`, data);
+                };
+
+                // Fonction pour nettoyer le log
+                const clearProcessLog = () => {
+                    setProcessLog([]);
+                    addLogEntry('SYSTEM', 'Log Initialisé', 'Nouveau processus de génération de briefing démarré', 'info');
+                };
+
                 // Fonction pour enrichir les données avec les informations de la watchlist
                 const enrichWatchlistData = async (marketData, type) => {
                     try {
+                        addLogEntry('ENRICHMENT', 'Début enrichissement', { type, tickersCount: watchlistTickers.length }, 'info');
+                        
                         // Ajouter les informations spécifiques à la watchlist
+                        const earnings = await getEarningsCalendar();
+                        const dividends = await getDividendsCalendar();
+                        const sectors = getSectorAnalysis();
+                        const events = getEconomicEvents(type);
+                        
+                        addLogEntry('ENRICHMENT', 'Données collectées', {
+                            earnings: earnings.length,
+                            dividends: dividends.length,
+                            sectors: Object.keys(sectors).length,
+                            events: events.length
+                        }, 'success');
+                        
                         const enrichedData = {
                             ...marketData,
                             watchlist: {
                                 tickers: watchlistTickers,
-                                earnings_calendar: await getEarningsCalendar(),
-                                dividends_calendar: await getDividendsCalendar(),
-                                sector_analysis: getSectorAnalysis(),
-                                economic_events: getEconomicEvents(type)
+                                earnings_calendar: earnings,
+                                dividends_calendar: dividends,
+                                sector_analysis: sectors,
+                                economic_events: events
                             }
                         };
+                        
+                        addLogEntry('ENRICHMENT', 'Enrichissement terminé', {
+                            originalSize: JSON.stringify(marketData).length,
+                            enrichedSize: JSON.stringify(enrichedData).length,
+                            watchlistData: enrichedData.watchlist
+                        }, 'success');
+                        
                         return enrichedData;
                     } catch (error) {
+                        addLogEntry('ENRICHMENT', 'Erreur enrichissement', error.message, 'error');
                         console.error('Erreur enrichissement watchlist:', error);
                         return marketData;
                     }
@@ -4494,6 +4540,14 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                     setPreviewHtml('');
 
                     try {
+                        // Initialiser le logging
+                        clearProcessLog();
+                        addLogEntry('GENERATION', 'Début génération briefing', { 
+                            type, 
+                            apiSources,
+                            timestamp: new Date().toISOString()
+                        }, 'info');
+
                         // Reset debug data
                         setDebugData({
                             marketData: { request: null, response: null, error: null },
@@ -4502,11 +4556,18 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                         });
 
                         // 1. Collecter les données marché
+                        addLogEntry('MARKET_DATA', 'Début collecte données marché', { 
+                            source: apiSources.marketData,
+                            type 
+                        }, 'info');
+                        
                         const marketDataRequest = {
                             service: 'briefing-data',
                             type: type,
                             source: apiSources.marketData
                         };
+                        
+                        addLogEntry('MARKET_DATA', 'Requête envoyée', marketDataRequest, 'info');
                         
                         setDebugData(prev => ({
                             ...prev,
@@ -4518,7 +4579,21 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(marketDataRequest)
                         });
+                        
+                        addLogEntry('MARKET_DATA', 'Réponse reçue', { 
+                            status: dataResponse.status,
+                            statusText: dataResponse.statusText,
+                            headers: Object.fromEntries(dataResponse.headers.entries())
+                        }, 'info');
+                        
                         const dataResult = await dataResponse.json();
+                        
+                        addLogEntry('MARKET_DATA', 'Données parsées', {
+                            success: dataResult.success,
+                            dataSize: JSON.stringify(dataResult.data || {}).length,
+                            fallback: dataResult.fallback,
+                            timestamp: dataResult.timestamp
+                        }, dataResult.success ? 'success' : 'error');
                         
                         setDebugData(prev => ({
                             ...prev,
@@ -4530,6 +4605,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                         }));
                         
                         if (!dataResult.success) {
+                            addLogEntry('MARKET_DATA', 'Erreur données marché', dataResult.error, 'error');
                             throw new Error('Erreur lors de la collecte des données');
                         }
 
@@ -4537,12 +4613,24 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                         const enrichedMarketData = await enrichWatchlistData(dataResult.data, type);
 
                         // 2. Rechercher les actualités
+                        addLogEntry('NEWS', 'Début recherche actualités', { 
+                            source: apiSources.news,
+                            promptLength: prompts[type].perplexity.length
+                        }, 'info');
+                        
                         const newsRequest = {
                             service: 'perplexity',
                             prompt: prompts[type].perplexity,
                             recency: 'day',
                             source: apiSources.news
                         };
+                        
+                        addLogEntry('NEWS', 'Requête actualités envoyée', {
+                            service: newsRequest.service,
+                            source: newsRequest.source,
+                            recency: newsRequest.recency,
+                            promptPreview: newsRequest.prompt.substring(0, 200) + '...'
+                        }, 'info');
                         
                         setDebugData(prev => ({
                             ...prev,
@@ -4554,7 +4642,21 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(newsRequest)
                         });
+                        
+                        addLogEntry('NEWS', 'Réponse actualités reçue', { 
+                            status: newsResponse.status,
+                            statusText: newsResponse.statusText
+                        }, 'info');
+                        
                         const newsResult = await newsResponse.json();
+                        
+                        addLogEntry('NEWS', 'Actualités parsées', {
+                            success: newsResult.success,
+                            model: newsResult.model,
+                            contentLength: newsResult.content?.length || 0,
+                            tokens: newsResult.tokens,
+                            fallback: newsResult.fallback
+                        }, newsResult.success ? 'success' : 'error');
                         
                         setDebugData(prev => ({
                             ...prev,
@@ -4566,6 +4668,13 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                         }));
 
                         // 3. Générer l'analyse
+                        addLogEntry('ANALYSIS', 'Début génération analyse IA', { 
+                            source: apiSources.analysis,
+                            promptLength: prompts[type].openai.length,
+                            marketDataSize: JSON.stringify(enrichedMarketData).length,
+                            newsSize: (newsResult.content || '').length
+                        }, 'info');
+                        
                         const analysisRequest = {
                             service: 'openai',
                             prompt: prompts[type].openai,
@@ -4573,6 +4682,14 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                             news: newsResult.content || 'Aucune actualité disponible',
                             source: apiSources.analysis
                         };
+                        
+                        addLogEntry('ANALYSIS', 'Requête analyse envoyée', {
+                            service: analysisRequest.service,
+                            source: analysisRequest.source,
+                            promptPreview: analysisRequest.prompt.substring(0, 200) + '...',
+                            marketDataKeys: Object.keys(analysisRequest.marketData || {}),
+                            newsPreview: analysisRequest.news.substring(0, 100) + '...'
+                        }, 'info');
                         
                         setDebugData(prev => ({
                             ...prev,
@@ -4584,7 +4701,21 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(analysisRequest)
                         });
+                        
+                        addLogEntry('ANALYSIS', 'Réponse analyse reçue', { 
+                            status: analysisResponse.status,
+                            statusText: analysisResponse.statusText
+                        }, 'info');
+                        
                         const analysisResult = await analysisResponse.json();
+                        
+                        addLogEntry('ANALYSIS', 'Analyse parsée', {
+                            success: analysisResult.success,
+                            model: analysisResult.model,
+                            contentLength: analysisResult.content?.length || 0,
+                            tokens: analysisResult.tokens,
+                            fallback: analysisResult.fallback
+                        }, analysisResult.success ? 'success' : 'error');
                         
                         setDebugData(prev => ({
                             ...prev,
@@ -4596,6 +4727,12 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                         }));
 
                         // 4. Créer le HTML
+                        addLogEntry('HTML_GENERATION', 'Début création HTML', { 
+                            type,
+                            analysisLength: (analysisResult.content || '').length,
+                            dataSize: JSON.stringify(enrichedMarketData).length
+                        }, 'info');
+                        
                         let html = '';
                         const analysis = analysisResult.content || 'Analyse non disponible';
                         const data = enrichedMarketData;
@@ -4611,6 +4748,11 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                                 html = createEveningBriefingHTML(analysis, data);
                                 break;
                         }
+                        
+                        addLogEntry('HTML_GENERATION', 'HTML généré', { 
+                            htmlLength: html.length,
+                            template: type
+                        }, 'success');
 
                         // 5. Créer l'objet briefing
                         const briefing = {
@@ -4621,16 +4763,39 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                             analysis,
                             timestamp: new Date().toISOString()
                         };
+                        
+                        addLogEntry('BRIEFING_CREATION', 'Briefing créé', {
+                            type: briefing.type,
+                            subject: briefing.subject,
+                            htmlSize: briefing.html.length,
+                            analysisSize: briefing.analysis.length,
+                            timestamp: briefing.timestamp
+                        }, 'success');
 
                         setCurrentBriefing(briefing);
                         setPreviewHtml(html);
                         setSelectedType(type);
+                        
+                        addLogEntry('COMPLETION', 'Briefing généré avec succès', {
+                            totalTime: Date.now() - new Date(processLog[0]?.timestamp).getTime(),
+                            finalSize: JSON.stringify(briefing).length,
+                            steps: processLog.length
+                        }, 'success');
 
                     } catch (error) {
+                        addLogEntry('ERROR', 'Erreur génération briefing', {
+                            message: error.message,
+                            stack: error.stack,
+                            step: processLog[processLog.length - 1]?.step || 'unknown'
+                        }, 'error');
                         console.error('Erreur génération briefing:', error);
                         setMessage({ type: 'error', text: `Erreur: ${error.message}` });
                     } finally {
                         setLoading(false);
+                        addLogEntry('SYSTEM', 'Processus terminé', {
+                            loading: false,
+                            totalLogs: processLog.length
+                        }, 'info');
                     }
                 };
 
@@ -4942,16 +5107,71 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                                 <h3 className={`text-lg font-semibold transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>🔍 Debug API</h3>
-                                <button
-                                    onClick={() => setShowDebug(!showDebug)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
-                                        showDebug 
-                                            ? (isDarkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white')
-                                            : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                    }`}
-                                >
-                                    {showDebug ? 'Masquer Debug' : 'Afficher Debug'}
-                                </button>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => setShowDebug(!showDebug)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
+                                            showDebug 
+                                                ? (isDarkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white')
+                                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                        }`}
+                                    >
+                                        {showDebug ? 'Masquer Debug' : 'Afficher Debug'}
+                                    </button>
+                                    
+                                    <button
+                                        onClick={() => {
+                                            const logWindow = window.open('', '_blank', 'width=1200,height=800');
+                                            logWindow.document.write(`
+                                                <html>
+                                                    <head>
+                                                        <title>Log Complet - Briefing Email</title>
+                                                        <style>
+                                                            body { font-family: 'Courier New', monospace; margin: 20px; background: #1a1a1a; color: #fff; }
+                                                            .log-entry { margin: 10px 0; padding: 10px; border-left: 4px solid #333; background: #2a2a2a; }
+                                                            .log-entry.success { border-left-color: #10b981; }
+                                                            .log-entry.error { border-left-color: #ef4444; }
+                                                            .log-entry.warning { border-left-color: #f59e0b; }
+                                                            .log-entry.info { border-left-color: #3b82f6; }
+                                                            .timestamp { color: #888; font-size: 0.8em; }
+                                                            .step { font-weight: bold; color: #60a5fa; }
+                                                            .type { color: #fbbf24; }
+                                                            .data { background: #333; padding: 10px; margin: 5px 0; border-radius: 4px; white-space: pre-wrap; }
+                                                            .summary { background: #1e40af; padding: 15px; margin: 20px 0; border-radius: 8px; }
+                                                        </style>
+                                                    </head>
+                                                    <body>
+                                                        <h1>📋 Log Complet - Processus de Génération Briefing</h1>
+                                                        <div class="summary">
+                                                            <h2>📊 Résumé</h2>
+                                                            <p><strong>Total d'entrées:</strong> ${processLog.length}</p>
+                                                            <p><strong>Dernière mise à jour:</strong> ${new Date().toLocaleString('fr-FR')}</p>
+                                                            <p><strong>Statut:</strong> ${processLog.length > 0 ? 'Processus en cours ou terminé' : 'Aucun processus'}</p>
+                                                        </div>
+                                                        ${processLog.map(entry => `
+                                                            <div class="log-entry ${entry.status}">
+                                                                <div class="timestamp">${new Date(entry.timestamp).toLocaleString('fr-FR')}</div>
+                                                                <div class="step">[${entry.step}]</div>
+                                                                <div class="type">${entry.type}</div>
+                                                                <div class="data">${entry.data}</div>
+                                                                <div style="font-size: 0.8em; color: #888;">Taille: ${entry.size} caractères</div>
+                                                            </div>
+                                                        `).join('')}
+                                                        <script>
+                                                            // Auto-refresh toutes les 5 secondes
+                                                            setTimeout(() => location.reload(), 5000);
+                                                        </script>
+                                                    </body>
+                                                </html>
+                                            `);
+                                        }}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'
+                                        }`}
+                                    >
+                                        📋 Log Complet
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -5087,6 +5307,47 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                                     }
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Log en Temps Réel */}
+                    <div>
+                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>📋 Log en Temps Réel</h4>
+                        <div className={`text-xs p-3 rounded border overflow-auto max-h-40 ${
+                            isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
+                        }`}>
+                            {processLog.length === 0 ? (
+                                <div className="text-gray-500 italic">Aucun processus en cours...</div>
+                            ) : (
+                                <div className="space-y-2">
+                                    {processLog.slice(-10).map((entry, index) => (
+                                        <div key={entry.id} className={`p-2 rounded text-xs ${
+                                            entry.status === 'success' ? 'bg-green-100 text-green-800' :
+                                            entry.status === 'error' ? 'bg-red-100 text-red-800' :
+                                            entry.status === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                                            'bg-blue-100 text-blue-800'
+                                        }`}>
+                                            <div className="font-mono">
+                                                <span className="text-gray-500">[{new Date(entry.timestamp).toLocaleTimeString()}]</span>
+                                                <span className="font-bold"> [{entry.step}]</span>
+                                                <span className="text-orange-600"> {entry.type}</span>
+                                            </div>
+                                            <div className="mt-1 text-xs opacity-75">
+                                                {typeof entry.data === 'string' && entry.data.length > 100 
+                                                    ? entry.data.substring(0, 100) + '...' 
+                                                    : entry.data}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {processLog.length > 10 && (
+                                        <div className="text-center text-gray-500 text-xs">
+                                            ... et {processLog.length - 10} autres entrées
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                                 </div>
