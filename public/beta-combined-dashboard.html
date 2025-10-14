@@ -290,7 +290,8 @@ const fetchHybridData = async (symbol, dataType) => {
                 { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
                 { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
-                { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab }
+                { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
+                { id: 'email-briefings', label: '📧 Briefings Email', component: EmailBriefingsTab }
             ];
             
             // États pour  l'interface Seeking Alpha
@@ -3534,6 +3535,1114 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     )}
                 </div>
             );
+
+            // ============================================================================
+            // TEMPLATES HTML EMAIL
+            // ============================================================================
+            
+            const createMorningBriefingHTML = (analysis, data) => {
+                return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .timestamp {
+      opacity: 0.9;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      color: #667eea;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #667eea;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .metric-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #667eea;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .metric-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 5px 0;
+    }
+    .metric-change {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .positive { color: #10b981; }
+    .negative { color: #ef4444; }
+    .neutral { color: #6b7280; }
+    .analysis-content {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 6px;
+      margin: 15px 0;
+      white-space: pre-wrap;
+    }
+    .cta-button {
+      display: inline-block;
+      background: #667eea;
+      color: white !important;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    .footer {
+      background: #1f2937;
+      color: white;
+      padding: 20px 30px;
+      font-size: 12px;
+    }
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📊 Briefing Matinal</h1>
+      <div class="timestamp">${new Date().toLocaleDateString('fr-FR', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</div>
+    </div>
+    
+    <div class="content">
+      ${data.asian_markets ? `
+      <div class="section">
+        <div class="section-title">🌏 Marchés Asiatiques (Clôture)</div>
+        <div class="metric-grid">
+          ${data.asian_markets.map((market) => `
+            <div class="metric-card">
+              <div class="metric-label">${market.name}</div>
+              <div class="metric-value">${market.price.toFixed(2)}</div>
+              <div class="metric-change ${market.change >= 0 ? 'positive' : 'negative'}">
+                ${market.change >= 0 ? '+' : ''}${market.change.toFixed(2)} 
+                (${market.changePct >= 0 ? '+' : ''}${market.changePct.toFixed(2)}%)
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
+      
+      ${data.futures ? `
+      <div class="section">
+        <div class="section-title">📈 Futures US</div>
+        <div class="metric-grid">
+          ${data.futures.map((future) => `
+            <div class="metric-card">
+              <div class="metric-label">${future.name}</div>
+              <div class="metric-value">${future.price.toFixed(2)}</div>
+              <div class="metric-change ${future.change >= 0 ? 'positive' : 'negative'}">
+                ${future.change >= 0 ? '+' : ''}${future.change.toFixed(2)} 
+                (${future.changePct >= 0 ? '+' : ''}${future.changePct.toFixed(2)}%)
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
+      
+      <div class="section">
+        <div class="section-title">🤖 Analyse IA</div>
+        <div class="analysis-content">${analysis}</div>
+      </div>
+      
+      <a href="${window.location.origin}" class="cta-button">
+        Voir le dashboard complet →
+      </a>
+    </div>
+    
+    <div class="footer">
+      <p><strong>Financial AI Dashboard</strong> - Analyse automatisée</p>
+      <p>Sources : Yahoo Finance, OpenAI GPT-4, Perplexity</p>
+      <p style="opacity:0.7; margin-top: 10px;">
+        ⚠️ Analyse à titre informatif uniquement - Pas de conseil d'investissement
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+                `;
+            };
+
+            const createNoonBriefingHTML = (analysis, data) => {
+                return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .timestamp {
+      opacity: 0.9;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      color: #f59e0b;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f59e0b;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .metric-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #f59e0b;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .metric-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 5px 0;
+    }
+    .metric-change {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .positive { color: #10b981; }
+    .negative { color: #ef4444; }
+    .neutral { color: #6b7280; }
+    .analysis-content {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 6px;
+      margin: 15px 0;
+      white-space: pre-wrap;
+    }
+    .mover-list {
+      list-style: none;
+      padding: 0;
+    }
+    .mover-item {
+      background: #f8f9fa;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cta-button {
+      display: inline-block;
+      background: #f59e0b;
+      color: white !important;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    .footer {
+      background: #1f2937;
+      color: white;
+      padding: 20px 30px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚡ Update Mi-Journée</h1>
+      <div class="timestamp">${new Date().toLocaleDateString('fr-FR', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</div>
+    </div>
+    
+    <div class="content">
+      ${data.us_markets ? `
+      <div class="section">
+        <div class="section-title">📊 Marchés US (Mi-séance)</div>
+        <div class="metric-grid">
+          ${data.us_markets.map((market) => `
+            <div class="metric-card">
+              <div class="metric-label">${market.name}</div>
+              <div class="metric-value">${market.price.toFixed(2)}</div>
+              <div class="metric-change ${market.change >= 0 ? 'positive' : 'negative'}">
+                ${market.change >= 0 ? '+' : ''}${market.change.toFixed(2)} 
+                (${market.changePct >= 0 ? '+' : ''}${market.changePct.toFixed(2)}%)
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
+      
+      ${data.top_movers ? `
+      <div class="section">
+        <div class="section-title">🚀 Top Movers</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div>
+            <h4 style="color: #10b981; margin-bottom: 10px;">📈 Hausses</h4>
+            <ul class="mover-list">
+              ${data.top_movers.gainers?.map((stock) => `
+                <li class="mover-item">
+                  <strong>${stock.symbol}</strong>
+                  <span class="positive">+${stock.change.toFixed(2)}%</span>
+                </li>
+              `).join('') || ''}
+            </ul>
+          </div>
+          <div>
+            <h4 style="color: #ef4444; margin-bottom: 10px;">📉 Baisses</h4>
+            <ul class="mover-list">
+              ${data.top_movers.losers?.map((stock) => `
+                <li class="mover-item">
+                  <strong>${stock.symbol}</strong>
+                  <span class="negative">${stock.change.toFixed(2)}%</span>
+                </li>
+              `).join('') || ''}
+            </ul>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      
+      <div class="section">
+        <div class="section-title">🤖 Analyse IA</div>
+        <div class="analysis-content">${analysis}</div>
+      </div>
+      
+      <a href="${window.location.origin}" class="cta-button">
+        Voir le dashboard complet →
+      </a>
+    </div>
+    
+    <div class="footer">
+      <p><strong>Financial AI Dashboard</strong> - Analyse automatisée</p>
+      <p>Sources : Yahoo Finance, OpenAI GPT-4, Perplexity</p>
+      <p style="opacity:0.7; margin-top: 10px;">
+        ⚠️ Analyse à titre informatif uniquement
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+                `;
+            };
+
+            const createEveningBriefingHTML = (analysis, data) => {
+                return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .timestamp {
+      opacity: 0.9;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      color: #1e40af;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #1e40af;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .metric-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #1e40af;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .metric-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 5px 0;
+    }
+    .metric-change {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .positive { color: #10b981; }
+    .negative { color: #ef4444; }
+    .neutral { color: #6b7280; }
+    .analysis-content {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 6px;
+      margin: 15px 0;
+      white-space: pre-wrap;
+    }
+    .summary-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #1e40af;
+    }
+    .cta-button {
+      display: inline-block;
+      background: #1e40af;
+      color: white !important;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    .footer {
+      background: #1f2937;
+      color: white;
+      padding: 20px 30px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌙 Rapport de Clôture</h1>
+      <div class="timestamp">${new Date().toLocaleDateString('fr-FR', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</div>
+    </div>
+    
+    <div class="content">
+      ${data.us_markets ? `
+      <div class="section">
+        <div class="section-title">📊 Performance Finale</div>
+        <div class="metric-grid">
+          ${data.us_markets.map((market) => `
+            <div class="metric-card">
+              <div class="metric-label">${market.name}</div>
+              <div class="metric-value">${market.price.toFixed(2)}</div>
+              <div class="metric-change ${market.change >= 0 ? 'positive' : 'negative'}">
+                ${market.change >= 0 ? '+' : ''}${market.change.toFixed(2)} 
+                (${market.changePct >= 0 ? '+' : ''}${market.changePct.toFixed(2)}%)
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
+      
+      <div class="section">
+        <div class="section-title">🤖 Analyse Approfondie</div>
+        <div class="analysis-content">${analysis}</div>
+      </div>
+      
+      <div class="summary-box">
+        <h3 style="margin-top: 0; color: #1e40af;">📅 À Surveiller Demain</h3>
+        <p>Les catalyseurs et événements clés pour la prochaine séance sont détaillés dans l'analyse ci-dessus.</p>
+      </div>
+      
+      <a href="${window.location.origin}" class="cta-button">
+        Dashboard Complet →
+      </a>
+    </div>
+    
+    <div class="footer">
+      <p><strong>Financial AI Dashboard</strong> - Rapport journalier automatisé</p>
+      <p>Sources : Yahoo Finance, OpenAI GPT-4, Perplexity</p>
+      <p style="opacity:0.7; margin-top: 10px;">
+        ⚠️ Analyse à titre informatif uniquement - Pas de conseil d'investissement
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+                `;
+            };
+
+            // ============================================================================
+            // COMPOSANT EMAIL BRIEFINGS TAB
+            // ============================================================================
+            
+            const EmailBriefingsTab = () => {
+                const [loading, setLoading] = useState(false);
+                const [currentBriefing, setCurrentBriefing] = useState(null);
+                const [previewHtml, setPreviewHtml] = useState('');
+                const [briefingHistory, setBriefingHistory] = useState([]);
+                const [recipients, setRecipients] = useState('');
+                const [selectedType, setSelectedType] = useState('morning');
+
+                // Prompts pour chaque type de briefing
+                const prompts = {
+                    morning: {
+                        perplexity: `Tu es un analyste financier institutionnel préparant le briefing matinal.
+
+RECHERCHE LES INFORMATIONS SUIVANTES (dernières 12 heures) :
+
+📰 ACTUALITÉS MAJEURES :
+- Annonces économiques importantes (Fed, BCE, BOJ)
+- Résultats d'entreprises publiés overnight
+- Événements géopolitiques impactant les marchés
+- Nouvelles réglementaires significatives
+
+📊 DONNÉES ÉCONOMIQUES :
+- Publications de données macro en Asie
+- Agenda économique US/Europe du jour
+- Décisions de taux d'intérêt
+- Indicateurs PMI, emploi, inflation
+
+🏢 MOUVEMENTS CORPORATIFS :
+- Fusions & acquisitions annoncées
+- Guidances révisées
+- Changements de direction
+
+⚡ CATALYSEURS DU JOUR :
+- Événements à surveiller aujourd'hui
+- Publications de résultats attendues
+- Interventions de banquiers centraux
+
+FORMAT : Données factuelles avec chiffres précis, sources citées.
+PÉRIODE : Dernières 12 heures + agenda du jour`,
+                        openai: `Tu es un gestionnaire de portefeuille senior rédigeant le briefing matinal pour clients institutionnels.
+
+STRUCTURE OBLIGATOIRE :
+
+🌏 RÉSUMÉ EXÉCUTIF (3-4 phrases)
+→ Synthèse des mouvements overnight
+→ Thème dominant des marchés
+→ Sentiment général (risk-on/risk-off)
+
+📊 PERFORMANCE DES MARCHÉS
+→ Asie : analyse des variations par région
+→ Futures : implications pour l'ouverture US/EU
+→ Secteurs moteurs identifiés
+
+💡 CATALYSEURS & ACTUALITÉS CLÉS
+→ Top 3 événements impactants
+→ Analyse de leur signification
+
+📈 DONNÉES TECHNIQUES
+→ Niveaux S&P 500
+→ Indicateurs de sentiment (VIX)
+
+🎯 FOCUS DU JOUR
+→ Publications économiques à surveiller
+→ Résultats d'entreprises attendus
+
+⚠️ RISQUES & OPPORTUNITÉS
+→ 2 risques majeurs
+→ 2 opportunités tactiques
+
+STYLE : Professionnel, 800 mots max, français`
+                    },
+                    noon: {
+                        perplexity: `Analyste financier - Update mi-journée
+
+RECHERCHE (dernières 4 heures) :
+
+📢 BREAKING NEWS :
+- Annonces corporate majeures depuis l'ouverture
+- Réactions aux résultats
+- Upgrades/downgrades d'analystes
+
+📊 DONNÉES ÉCONOMIQUES :
+- Chiffres US du matin
+- Déclarations Fed/BCE
+
+🔥 MOUVEMENTS ANORMAUX :
+- Actions avec volume exceptionnel
+- Gaps significatifs
+
+FORMAT : Factuel, chiffres précis, timeframe exact`,
+                        openai: `Gestionnaire de portefeuille - Briefing mi-journée
+
+ANALYSE REQUISE :
+
+⚡ FLASH EXÉCUTIF (2-3 phrases)
+→ Thème dominant de la séance
+
+📈 ANALYSE DE MARCHÉ
+→ Europe : cohérence/divergences
+→ US : réaction à l'ouverture
+
+🔍 DEEP DIVE TOP MOVERS
+→ Catalyseur précis
+→ Implications secteur
+
+🎯 AJUSTEMENTS TACTIQUES
+→ Opportunités intraday
+→ Actions à surveiller
+
+STYLE : Concis, 600 mots max, français`
+                    },
+                    evening: {
+                        perplexity: `Analyste senior - Récapitulatif de clôture
+
+SYNTHÈSE COMPLÈTE DU JOUR :
+
+📊 PERFORMANCE GLOBALE
+🏆 GAGNANTS & PERDANTS
+📢 ÉVÉNEMENTS MARQUANTS
+🔮 APRÈS CLÔTURE
+📅 AGENDA DEMAIN
+
+FOCUS : Bilan factuel + setup pour demain`,
+                        openai: `Gestionnaire de portefeuille senior - Rapport de clôture
+
+RAPPORT STRUCTURÉ :
+
+🎯 SYNTHÈSE EXÉCUTIVE (4-5 phrases)
+📊 ANALYSE DE MARCHÉ APPROFONDIE
+💡 DEEP DIVE ÉVÉNEMENTS
+🔬 ANALYSE SECTORIELLE
+📈 ANALYSE TECHNIQUE
+🔮 PERSPECTIVES & POSITIONNEMENT
+
+STYLE : Analyse institutionnelle, 1200-1500 mots, français`
+                    }
+                };
+
+                // Fonction pour générer un briefing
+                const generateBriefing = async (type) => {
+                    setLoading(true);
+                    setCurrentBriefing(null);
+                    setPreviewHtml('');
+
+                    try {
+                        // 1. Collecter les données marché
+                        const dataResponse = await fetch(`/api/briefing-data?type=${type}`);
+                        const dataResult = await dataResponse.json();
+                        
+                        if (!dataResult.success) {
+                            throw new Error('Erreur lors de la collecte des données');
+                        }
+
+                        // 2. Rechercher les actualités
+                        const newsResponse = await fetch('/api/ai-services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                service: 'perplexity',
+                                prompt: prompts[type].perplexity,
+                                recency: 'day'
+                            })
+                        });
+                        const newsResult = await newsResponse.json();
+
+                        // 3. Générer l'analyse
+                        const analysisResponse = await fetch('/api/ai-services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                service: 'openai',
+                                prompt: prompts[type].openai,
+                                marketData: dataResult.data,
+                                news: newsResult.content || 'Aucune actualité disponible'
+                            })
+                        });
+                        const analysisResult = await analysisResponse.json();
+
+                        // 4. Créer le HTML
+                        let html = '';
+                        const analysis = analysisResult.content || 'Analyse non disponible';
+                        const data = dataResult.data;
+
+                        switch (type) {
+                            case 'morning':
+                                html = createMorningBriefingHTML(analysis, data);
+                                break;
+                            case 'noon':
+                                html = createNoonBriefingHTML(analysis, data);
+                                break;
+                            case 'evening':
+                                html = createEveningBriefingHTML(analysis, data);
+                                break;
+                        }
+
+                        // 5. Créer l'objet briefing
+                        const briefing = {
+                            type,
+                            subject: getSubjectForType(type),
+                            html,
+                            data,
+                            analysis,
+                            timestamp: new Date().toISOString()
+                        };
+
+                        setCurrentBriefing(briefing);
+                        setPreviewHtml(html);
+                        setSelectedType(type);
+
+                    } catch (error) {
+                        console.error('Erreur génération briefing:', error);
+                        setMessage({ type: 'error', text: `Erreur: ${error.message}` });
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+
+                // Fonction pour obtenir le sujet selon le type
+                const getSubjectForType = (type) => {
+                    const date = new Date().toLocaleDateString('fr-FR');
+                    switch (type) {
+                        case 'morning': return `📊 Briefing Matinal - ${date}`;
+                        case 'noon': return `⚡ Update Mi-Journée - ${date}`;
+                        case 'evening': return `🌙 Rapport de Clôture - ${date}`;
+                        default: return `Briefing - ${date}`;
+                    }
+                };
+
+                // Fonction pour sauvegarder le briefing
+                const saveBriefing = async () => {
+                    if (!currentBriefing) return;
+
+                    try {
+                        const response = await fetch('/api/supabase-briefings', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                type: currentBriefing.type,
+                                subject: currentBriefing.subject,
+                                html_content: currentBriefing.html,
+                                market_data: currentBriefing.data,
+                                analysis: currentBriefing.analysis
+                            })
+                        });
+
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            setMessage({ type: 'success', text: 'Briefing sauvegardé avec succès' });
+                            loadBriefingHistory();
+                        } else {
+                            throw new Error(result.error || 'Erreur lors de la sauvegarde');
+                        }
+                    } catch (error) {
+                        console.error('Erreur sauvegarde:', error);
+                        setMessage({ type: 'error', text: `Erreur sauvegarde: ${error.message}` });
+                    }
+                };
+
+                // Fonction pour envoyer l'email
+                const sendEmail = async () => {
+                    if (!currentBriefing || !recipients.trim()) {
+                        setMessage({ type: 'error', text: 'Veuillez saisir au moins un destinataire' });
+                        return;
+                    }
+
+                    try {
+                        const emailList = recipients.split(',').map(email => email.trim()).filter(email => email);
+                        
+                        const response = await fetch('/api/ai-services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                service: 'resend',
+                                recipients: emailList,
+                                subject: currentBriefing.subject,
+                                html: currentBriefing.html
+                            })
+                        });
+
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            setMessage({ type: 'success', text: `Email envoyé à ${emailList.length} destinataire(s)` });
+                        } else {
+                            throw new Error(result.error || 'Erreur lors de l\'envoi');
+                        }
+                    } catch (error) {
+                        console.error('Erreur envoi email:', error);
+                        setMessage({ type: 'error', text: `Erreur envoi: ${error.message}` });
+                    }
+                };
+
+                // Fonction pour charger l'historique
+                const loadBriefingHistory = async () => {
+                    try {
+                        const response = await fetch('/api/supabase-briefings?limit=20');
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            setBriefingHistory(result.data);
+                        }
+                    } catch (error) {
+                        console.error('Erreur chargement historique:', error);
+                    }
+                };
+
+                // Charger l'historique au montage
+                React.useEffect(() => {
+                    loadBriefingHistory();
+                }, []);
+
+                return (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📧 Briefings Email Automatisés</h2>
+                        </div>
+
+                        {/* Boutons de génération */}
+                        <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>Générer un Briefing</h3>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <button
+                                    onClick={() => generateBriefing('morning')}
+                                    disabled={loading}
+                                    className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                                        loading 
+                                            ? 'opacity-50 cursor-not-allowed' 
+                                            : 'hover:scale-105 cursor-pointer'
+                                    } ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 border-blue-500 text-white' 
+                                            : 'bg-gradient-to-r from-blue-500 to-purple-500 border-blue-400 text-white'
+                                    }`}
+                                >
+                                    <div className="text-2xl mb-2">🌅</div>
+                                    <div className="font-semibold">Briefing Matin</div>
+                                    <div className="text-sm opacity-90">Marchés asiatiques + Futures</div>
+                                </button>
+
+                                <button
+                                    onClick={() => generateBriefing('noon')}
+                                    disabled={loading}
+                                    className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                                        loading 
+                                            ? 'opacity-50 cursor-not-allowed' 
+                                            : 'hover:scale-105 cursor-pointer'
+                                    } ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-r from-orange-600 to-yellow-600 border-orange-500 text-white' 
+                                            : 'bg-gradient-to-r from-orange-500 to-yellow-500 border-orange-400 text-white'
+                                    }`}
+                                >
+                                    <div className="text-2xl mb-2">☀️</div>
+                                    <div className="font-semibold">Update Midi</div>
+                                    <div className="text-sm opacity-90">Marchés US + Top Movers</div>
+                                </button>
+
+                                <button
+                                    onClick={() => generateBriefing('evening')}
+                                    disabled={loading}
+                                    className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                                        loading 
+                                            ? 'opacity-50 cursor-not-allowed' 
+                                            : 'hover:scale-105 cursor-pointer'
+                                    } ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 border-indigo-500 text-white' 
+                                            : 'bg-gradient-to-r from-indigo-500 to-blue-500 border-indigo-400 text-white'
+                                    }`}
+                                >
+                                    <div className="text-2xl mb-2">🌙</div>
+                                    <div className="font-semibold">Rapport Soir</div>
+                                    <div className="text-sm opacity-90">Performance finale + Analyse</div>
+                                </button>
+                            </div>
+
+                            {loading && (
+                                <div className="mt-4 text-center">
+                                    <div className="inline-flex items-center space-x-2">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                        <span className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>
+                                            Génération en cours...
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Prévisualisation et actions */}
+                        {currentBriefing && (
+                            <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                            }`}>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        {currentBriefing.subject}
+                                    </h3>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={saveBriefing}
+                                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                        >
+                                            💾 Sauvegarder
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Formulaire d'envoi email */}
+                                <div className="mb-4">
+                                    <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Destinataires (séparés par des virgules)
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={recipients}
+                                            onChange={(e) => setRecipients(e.target.value)}
+                                            placeholder="email1@example.com, email2@example.com"
+                                            className={`flex-1 px-3 py-2 rounded-lg border transition-colors duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                            }`}
+                                        />
+                                        <button
+                                            onClick={sendEmail}
+                                            disabled={!recipients.trim()}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            📧 Envoyer
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Prévisualisation */}
+                                <div className="border rounded-lg overflow-hidden">
+                                    <div className={`p-3 border-b transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+                                    }`}>
+                                        <span className={`text-sm font-medium transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Prévisualisation Email
+                                        </span>
+                                    </div>
+                                    <iframe
+                                        srcDoc={previewHtml}
+                                        className="w-full h-96 border-0"
+                                        title="Email Preview"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Historique des briefings */}
+                        <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📚 Historique des Briefings</h3>
+                            
+                            {briefingHistory.length > 0 ? (
+                                <div className="space-y-3">
+                                    {briefingHistory.map((briefing) => (
+                                        <div
+                                            key={briefing.id}
+                                            className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                                isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+                                            }`}
+                                        >
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <h4 className={`font-medium transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>
+                                                        {briefing.subject}
+                                                    </h4>
+                                                    <p className={`text-sm transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                    }`}>
+                                                        {new Date(briefing.created_at).toLocaleString('fr-FR')}
+                                                    </p>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => {
+                                                            setPreviewHtml(briefing.html_content);
+                                                            setCurrentBriefing({
+                                                                type: briefing.type,
+                                                                subject: briefing.subject,
+                                                                html: briefing.html_content,
+                                                                data: briefing.market_data,
+                                                                analysis: briefing.analysis
+                                                            });
+                                                        }}
+                                                        className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                                    >
+                                                        👁️ Voir
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className={`text-center transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Aucun briefing sauvegardé
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                );
+            };
 
             // Composant onglet Ask Emma avec intégration Gemini
             const AskEmmaTab = () => {
@@ -9645,6 +10754,7 @@ console.log('✅ Données hybrides récupérées:', {
                         {activeTab === 'admin-jsla' && <AdminJSLaiTab />}
                         {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                         {activeTab === 'scrapping-sa' && <ScrappingSATab />}
+                        {activeTab === 'email-briefings' && <EmailBriefingsTab />}
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                     </main>
 
