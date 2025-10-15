@@ -1,7 +1,38 @@
-/**
- * Gemini Chat Validated - Version avec validation avancée
- * Chat Emma IA avec validation et gestion d'erreurs améliorée
- */
+// ============================================================================
+// GEMINI CHAT VALIDATED - Emma En Direct Chatbot (Mode Expert)
+// Version avec validation avancée et gestion d'erreurs améliorée
+// ============================================================================
+//
+// 🛡️  GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 🛡️
+// ============================================================================
+// ⚠️  ATTENTION : Ce fichier contient la configuration validée pour Emma Expert
+// ⚠️  Toute modification peut casser le chatbot de production
+// ⚠️  Toujours tester en local avant de déployer
+//
+// ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
+// - Modèle: gemini-2.0-flash-exp (PAS gemini-1.5-flash)
+// - SDK: @google/generative-ai (PAS @google/genai)
+// - Validation: Messages, tokens, safety settings
+// - Mode Expert: useValidatedMode = true par défaut
+// - Temperature: 0.3 (plus conservateur pour mode expert)
+// - Max tokens: 4000 (plus élevé pour analyses détaillées)
+//
+// 🔒 VARIABLES D'ENVIRONNEMENT REQUISES :
+// - GEMINI_API_KEY (AI...) : ✅ Configurée
+//
+// ❌ INTERDICTIONS ABSOLUES :
+// - Modifier le modèle sans test (gemini-2.0-flash-exp)
+// - Changer le SDK (doit rester @google/generative-ai)
+// - Modifier les paramètres de validation sans test
+// - Changer la température sans test (0.3 pour mode expert)
+// - Modifier les safety settings sans validation
+//
+// 🔧 DÉPANNAGE RAPIDE :
+// - 400 = messages invalides ou manquants
+// - 401 = clé API invalide/expirée
+// - 429 = quota dépassé, attendre ou upgrader
+// - 500 = erreur serveur, vérifier logs
+// ============================================================================
 
 export default async function handler(req, res) {
   // CORS

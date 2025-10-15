@@ -1,27 +1,39 @@
 // ============================================================================
-// API Endpoint: AI Services Unifié
+// API Endpoint: AI Services Unifié - Emma En Direct
 // Regroupe Perplexity, OpenAI et Resend en un seul endpoint
 // ============================================================================
 //
-// ⚠️  CONFIGURATION CRITIQUE - NE PAS MODIFIER ⚠️
+// 🛡️  GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 🛡️
 // ============================================================================
-// ✅ CONFIGURATION QUI FONCTIONNE (Testée le 15/10/2025) :
-// - Utilise fetch() direct vers OpenAI API (PAS le SDK)
-// - Modèle: gpt-4o (PAS gpt-5 qui n'existe pas encore)
-// - Clé API: process.env.OPENAI_API_KEY (configurée dans Vercel)
-// - Timeout: 25 secondes max
-// - Max tokens: 2000
-// - Temperature: 0.7
+// ⚠️  ATTENTION : Ce fichier contient la configuration validée et fonctionnelle
+// ⚠️  Toute modification peut casser le système de production
+// ⚠️  Toujours tester en local avant de déployer
 //
-// ❌ NE PAS UTILISER :
-// - import { OpenAI } from 'openai' (causait des erreurs de déploiement)
-// - gpt-5 (modèle inexistant)
-// - AbortSignal.timeout() dans le body (causait des erreurs)
+// ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
+// - OpenAI: fetch() direct (PAS le SDK) + gpt-4o + 2000 tokens + temp 0.7
+// - Perplexity: sonar-pro + 1500 tokens + temp 0.1 + recency filter
+// - Anthropic: Claude-3-Sonnet (fallback si OpenAI échoue)
+// - Marketaux: SUPPRIMÉ (plus de fallback)
+// - Twelve Data: fallback pour actualités si Perplexity échoue
 //
-// 🔧 DÉPANNAGE :
-// - Si "demo-mode" : vérifier OPENAI_API_KEY dans Vercel
-// - Si timeout : réduire max_tokens ou augmenter timeout
-// - Si erreur 401 : clé API invalide ou expirée
+// 🔒 VARIABLES D'ENVIRONNEMENT REQUISES :
+// - OPENAI_API_KEY (sk-...) : ✅ Configurée
+// - PERPLEXITY_API_KEY (pplx-...) : ✅ Configurée  
+// - ANTHROPIC_API_KEY (sk-ant-...) : ✅ Configurée
+// - TWELVE_DATA_API_KEY (optionnel) : Fallback actualités
+//
+// ❌ INTERDICTIONS ABSOLUES :
+// - Modifier les modèles sans test (gpt-4o, sonar-pro, claude-3-sonnet)
+// - Ajouter Marketaux (supprimé intentionnellement)
+// - Utiliser le SDK OpenAI (causait des erreurs de déploiement)
+// - Modifier les timeouts sans validation
+// - Changer les paramètres de température sans test
+//
+// 🔧 DÉPANNAGE RAPIDE :
+// - Demo-mode = clé API manquante dans Vercel
+// - Timeout = réduire max_tokens ou augmenter timeout
+// - 401 = clé API invalide/expirée
+// - 429 = quota dépassé, attendre ou upgrader
 // ============================================================================
 
 export default async function handler(req, res) {
@@ -106,7 +118,12 @@ export default async function handler(req, res) {
 }
 
 // ============================================================================
-// PERPLEXITY SEARCH
+// PERPLEXITY SEARCH - CONFIGURATION CRITIQUE
+// ============================================================================
+// 🛡️  GUARDRAIL : Cette fonction utilise la configuration validée
+// ⚠️  NE PAS MODIFIER les paramètres sans test complet
+// ✅ CONFIGURATION TESTÉE : sonar-pro + 1500 tokens + temp 0.1 + recency filter
+// ❌ INTERDIT : Ajouter Marketaux (supprimé intentionnellement)
 // ============================================================================
 async function handlePerplexity(req, res, { prompt, recency = 'day' }) {
   try {
@@ -191,7 +208,11 @@ async function handlePerplexity(req, res, { prompt, recency = 'day' }) {
 }
 
 // ============================================================================
-// OPENAI ANALYSIS
+// OPENAI ANALYSIS - CONFIGURATION CRITIQUE
+// ============================================================================
+// 🛡️  GUARDRAIL : Cette fonction utilise la configuration validée
+// ⚠️  NE PAS MODIFIER les paramètres sans test complet
+// ✅ CONFIGURATION TESTÉE : gpt-4o + fetch() direct + 2000 tokens + temp 0.7
 // ============================================================================
 async function handleOpenAI(req, res, { prompt, marketData, news }) {
   try {

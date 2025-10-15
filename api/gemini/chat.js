@@ -1,6 +1,30 @@
-// ========================================
-// /api/gemini/chat - Version avec Function Calling (selon doc officielle Google)
-// ========================================
+// ============================================================================
+// GEMINI CHAT API - Emma En Direct Chatbot
+// Version avec Function Calling (selon doc officielle Google)
+// ============================================================================
+//
+// 🛡️  GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 🛡️
+// ============================================================================
+// ⚠️  ATTENTION : Ce fichier contient la configuration validée pour Emma
+// ⚠️  Toute modification peut casser le chatbot de production
+// ⚠️  Toujours tester en local avant de déployer
+//
+// ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
+// - Modèle: gemini-2.0-flash-exp (PAS gemini-1.5-flash)
+// - SDK: @google/generative-ai (PAS @google/genai)
+// - Function Calling: Activé pour interactions avancées
+// - Safety Settings: Configurés pour Emma (professionnel)
+// - Temperature: 0.7 (équilibre créativité/précision)
+//
+// 🔒 VARIABLES D'ENVIRONNEMENT REQUISES :
+// - GEMINI_API_KEY (AI...) : ✅ Configurée
+//
+// ❌ INTERDICTIONS ABSOLUES :
+// - Modifier le modèle sans test (gemini-2.0-flash-exp)
+// - Changer le SDK (doit rester @google/generative-ai)
+// - Modifier les safety settings sans validation
+// - Désactiver Function Calling sans test
+// - Changer la température sans test
 //
 // 🔄 POUR BASCULER ENTRE LES VERSIONS :
 // 1. Version AVEC Function Calling (actuelle) : Laissez le code tel quel
@@ -11,9 +35,9 @@
 //    - Supprimez le traitement des function calls
 //
 // 📚 Référence : https://ai.google.dev/gemini-api/docs/function-calling
-// ========================================
+// ============================================================================
 
-// import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
+import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
 
 export default async function handler(req, res) {
   // CORS basique
