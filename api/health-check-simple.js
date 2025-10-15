@@ -81,15 +81,8 @@ export default async function handler(req, res) {
         ],
         dependencies: ['GEMINI_API_KEY']
       }),
-      testEndpointWithDetails(`${baseUrl}/api/health-check`, 'Health Check', {
-        description: 'Diagnostic complet des APIs externes',
-        sub_apis: [
-          'Test APIs externes',
-          'Vérification clés API',
-          'Monitoring performance'
-        ],
-        dependencies: ['Toutes les clés API externes']
-      }),
+      // Note: api/health-check.js supprimé pour respecter la limite de 12 fonctions
+      // Utiliser api/health-check-simple.js à la place
       testEndpointWithDetails(`${baseUrl}/api/briefing-cron`, 'Briefing Cron', {
         description: 'Automatisation des briefings Emma En Direct',
         sub_apis: [
