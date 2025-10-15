@@ -122,10 +122,10 @@ export default async function handler(req, res) {
 // ============================================================================
 // 🛡️  GUARDRAIL : Cette fonction utilise la configuration validée
 // ⚠️  NE PAS MODIFIER les paramètres sans test complet
-// ✅ CONFIGURATION TESTÉE : sonar-pro + 1500 tokens + temp 0.1 + recency filter
+// ✅ CONFIGURATION TESTÉE : sonar-reasoning-pro + 2000 tokens + temp 0.1 + recency filter
 // ❌ INTERDIT : Ajouter Marketaux (supprimé intentionnellement)
 // ============================================================================
-async function handlePerplexity(req, res, { prompt, query, section, recency = 'day', model = 'sonar-pro', max_tokens = 2000, temperature = 0.1 }) {
+async function handlePerplexity(req, res, { prompt, query, section, recency = 'day', model = 'sonar-reasoning-pro', max_tokens = 2000, temperature = 0.1 }) {
   try {
     const searchQuery = query || prompt;
     if (!searchQuery) {
@@ -146,7 +146,6 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     }
 
     let response;
-    let model;
 
     // Construire le prompt selon la section
     const enhancedPrompt = buildSectionPrompt(searchQuery, section);
@@ -163,7 +162,8 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
         messages: [{ role: 'user', content: enhancedPrompt }],
         max_tokens: max_tokens,
         temperature: temperature,
-        search_recency_filter: recency
+        search_recency_filter: recency,
+        search_domain_filter: ['finance.yahoo.com', 'bloomberg.com', 'reuters.com', 'marketwatch.com', 'cnbc.com', 'wsj.com', 'ft.com']
       })
     });
 
