@@ -6556,10 +6556,10 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
 
                         {/* Prévisualisation et actions */}
                         {console.log('🔍 État currentBriefing:', currentBriefing)}
-                        {console.log('🔍 Affichage section aperçu:', !!currentBriefing)}
+                        {console.log('🔍 Affichage section aperçu:', true)}
                         {console.log('🔍 Type de briefing:', currentBriefing?.type)}
                         {console.log('🔍 Fallback mode:', currentBriefing?.fallback)}
-                        {currentBriefing && (
+                        {true && (
                             <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                             }`}>
@@ -6568,9 +6568,9 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                         <h3 className={`text-lg font-semibold transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
-                                            {currentBriefing.subject}
+                                            {currentBriefing?.subject || 'Aucun briefing généré'}
                                         </h3>
-                                        {currentBriefing.fallback === true && (
+                                        {currentBriefing?.fallback === true && (
                                             <div className={`text-xs px-2 py-1 rounded-full mt-1 inline-block ${
                                                 isDarkMode 
                                                     ? 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30' 
@@ -6581,7 +6581,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                         )}
                                     </div>
                                     <div className="flex gap-2">
-                                        {currentBriefing.fallback === true && (
+                                        {currentBriefing?.fallback === true && (
                                             <button
                                                 onClick={() => generateBriefing(currentBriefing.type)}
                                                 className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
@@ -6589,16 +6589,19 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                                 🔄 Réessayer
                                             </button>
                                         )}
-                                        <button
-                                            onClick={saveBriefing}
-                                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                                        >
-                                            💾 Sauvegarder
-                                        </button>
+                                        {currentBriefing && (
+                                            <button
+                                                onClick={saveBriefing}
+                                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                            >
+                                                💾 Sauvegarder
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
                                 {/* Formulaire d'envoi email */}
+                                {currentBriefing && (
                                 <div className="mb-4">
                                     <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -6626,6 +6629,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                         </button>
                                     </div>
                                 </div>
+                                )}
 
                                 {/* Prévisualisation */}
                                 <div className="border rounded-lg overflow-hidden">
