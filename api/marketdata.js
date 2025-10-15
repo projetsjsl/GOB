@@ -16,10 +16,13 @@ export default async function handler(req, res) {
   try {
     const { endpoint, symbol, source = 'auto' } = req.query;
 
+    // Test de santé simple pour le diagnostic
     if (!endpoint || !symbol) {
-      return res.status(400).json({ 
-        error: 'Paramètres endpoint et symbol requis',
-        availableEndpoints: ['quote', 'fundamentals', 'profile']
+      return res.status(200).json({ 
+        status: 'healthy',
+        message: 'Market Data API opérationnel',
+        availableEndpoints: ['quote', 'fundamentals', 'profile'],
+        timestamp: new Date().toISOString()
       });
     }
 

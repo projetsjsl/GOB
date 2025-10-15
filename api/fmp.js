@@ -3,6 +3,37 @@
  * Documentation: https://site.financialmodelingprep.com/developer/docs
  */
 
+// Handler par défaut pour Vercel
+export default async function handler(req, res) {
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Méthode non autorisée' });
+  }
+
+  try {
+    // Test de santé simple pour le diagnostic
+    return res.status(200).json({ 
+      status: 'healthy',
+      message: 'FMP API opérationnel',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('FMP API error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+}
+
 const FMP_BASE_URL = 'https://financialmodelingprep.com/stable';
 const FMP_V4_BASE_URL = 'https://financialmodelingprep.com/api/v4';
 

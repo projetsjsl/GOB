@@ -18,7 +18,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Vérifier authentification (CRON_SECRET)
+    // Test de santé simple pour le diagnostic (sans authentification)
+    if (req.method === 'GET' && !req.query.type) {
+      return res.status(200).json({ 
+        status: 'healthy',
+        message: 'Briefing Cron API opérationnel',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Vérifier authentification (CRON_SECRET) pour les vraies opérations
     const authHeader = req.headers['authorization'];
     const expectedAuth = `Bearer ${process.env.CRON_SECRET}`;
     

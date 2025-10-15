@@ -24,6 +24,13 @@ export default async function handler(req, res) {
       
       if (service === 'supabase-briefings') {
         return await handleSupabaseBriefings(req, res, params);
+      } else if (!service) {
+        // Test de santé simple pour le diagnostic
+        return res.status(200).json({ 
+          status: 'healthy',
+          message: 'AI Services endpoint opérationnel',
+          timestamp: new Date().toISOString()
+        });
       } else {
         return res.status(400).json({ error: 'Service non reconnu pour GET/DELETE. Utilisez: supabase-briefings' });
       }
