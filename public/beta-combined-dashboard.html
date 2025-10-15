@@ -2331,7 +2331,14 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                                             <td className={`text-right p-2 font-semibold ${
                                                                 stock.change >= 0 ? 'text-emerald-500' : 'text-red-500'
                                                             }`}>
-                                                                {getChangeValue(stock.change) >= 0 ? '+' : ''}{getChangeValue(stock.change).toFixed(2)}%
+                                                                {(() => {
+                                                                    const change = stock.change;
+                                                                    if (!change) return '0.00%';
+                                                                    const value = typeof change === 'number' ? change : 
+                                                                                 typeof change === 'object' ? (change.raw || change.fmt || 0) : 
+                                                                                 parseFloat(change) || 0;
+                                                                    return (value >= 0 ? '+' : '') + value.toFixed(2) + '%';
+                                                                })()}
                                                             </td>
                                                             <td className="text-right p-2 text-gray-400">
                                                                 {formatNumber(stock.marketCap)}
@@ -4367,7 +4374,13 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
               ${data.top_movers.gainers?.map((stock) => `
                 <li class="mover-item">
                   <strong>${stock.symbol}</strong>
-                  <span class="positive">+${getChangeValue(stock.change).toFixed(2)}%</span>
+                  <span class="positive">+${(() => {
+                    const change = stock.change;
+                    if (!change) return '0.00';
+                    if (typeof change === 'number') return change.toFixed(2);
+                    if (typeof change === 'object') return (change.raw || change.fmt || 0).toFixed(2);
+                    return (parseFloat(change) || 0).toFixed(2);
+                  })()}%</span>
                 </li>
               `).join('') || ''}
             </ul>
@@ -4378,7 +4391,13 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
               ${data.top_movers.losers?.map((stock) => `
                 <li class="mover-item">
                   <strong>${stock.symbol}</strong>
-                  <span class="negative">${getChangeValue(stock.change).toFixed(2)}%</span>
+                  <span class="negative">${(() => {
+                    const change = stock.change;
+                    if (!change) return '0.00';
+                    if (typeof change === 'number') return change.toFixed(2);
+                    if (typeof change === 'object') return (change.raw || change.fmt || 0).toFixed(2);
+                    return (parseFloat(change) || 0).toFixed(2);
+                  })()}%</span>
                 </li>
               `).join('') || ''}
             </ul>
@@ -5237,15 +5256,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                     return type === 'morning' ? events.today : events.tomorrow;
                 };
 
-                // Fonction utilitaire pour extraire la valeur numérique d'un change
-                const getChangeValue = (change) => {
-                    if (!change) return 0;
-                    if (typeof change === 'number') return change;
-                    if (typeof change === 'object') {
-                        return change.raw || change.fmt || 0;
-                    }
-                    return parseFloat(change) || 0;
-                };
+                // Fonction utilitaire pour extraire la valeur numérique d'un change (inline dans les templates)
 
                 // Fonction pour générer un briefing
                 const generateBriefing = async (type) => {
@@ -11386,7 +11397,14 @@ console.log('✅ Données hybrides récupérées:', {
                                                             <td className={`text-right p-2 font-semibold ${
                                                                 stock.change >= 0 ? 'text-emerald-500' : 'text-red-500'
                                                             }`}>
-                                                                {getChangeValue(stock.change) >= 0 ? '+' : ''}{getChangeValue(stock.change).toFixed(2)}%
+                                                                {(() => {
+                                                                    const change = stock.change;
+                                                                    if (!change) return '0.00%';
+                                                                    const value = typeof change === 'number' ? change : 
+                                                                                 typeof change === 'object' ? (change.raw || change.fmt || 0) : 
+                                                                                 parseFloat(change) || 0;
+                                                                    return (value >= 0 ? '+' : '') + value.toFixed(2) + '%';
+                                                                })()}
                                                             </td>
                                                             <td className="text-right p-2 text-gray-400">
                                                                 {formatNumber(stock.marketCap)}
