@@ -1,12 +1,29 @@
-/**
- * Supabase Watchlist API - Version simplifiée
- * Gestion de la watchlist avec Supabase
- * 
- * Version 1.0.0 - Watchlist fonctionnelle avec fallback
- * ✅ Service role key configurée
- * ✅ Fallback opérationnel
- * ✅ Dashboard compatible
- */
+// ============================================================================
+// 🛡️  GUARDRAIL CRITIQUE - SUPABASE WATCHLIST API 🛡️
+// ============================================================================
+// ⚠️  ATTENTION : Ce fichier contient la configuration validée et fonctionnelle
+// ⚠️  Toute modification peut casser la connexion Supabase
+// ⚠️  Toujours tester en local avant de déployer
+// ⚠️  Date de validation : 15 octobre 2025
+// ⚠️  Statut : 100% opérationnel - source: "supabase"
+//
+// ✅ CONFIGURATION VALIDÉE :
+// - Supabase connecté et fonctionnel
+// - Variables d'environnement configurées dans Vercel
+// - Fallback opérationnel en cas de problème
+// - Dashboard compatible
+//
+// ❌ INTERDICTIONS ABSOLUES :
+// - Modifier les variables d'environnement sans test
+// - Changer la logique de connexion Supabase
+// - Supprimer le fallback
+// - Modifier les noms de tables Supabase
+//
+// 🔧 DÉPANNAGE RAPIDE :
+// - source: "fallback" = variables d'environnement manquantes
+// - 500 error = problème de connexion Supabase
+// - 404 error = endpoint non trouvé
+// ============================================================================
 
 import { createClient } from '@supabase/supabase-js';
 
