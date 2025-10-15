@@ -188,6 +188,12 @@ async function handleOpenAI(req, res, { prompt, marketData, news }) {
     const openaiKey = process.env.OPENAI_API_KEY;
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
     
+    // Debug: Log des clés API (sans exposer les valeurs)
+    console.log('🔑 Debug API Keys:', {
+      openaiKey: openaiKey ? `sk-...${openaiKey.slice(-4)}` : 'NOT_FOUND',
+      anthropicKey: anthropicKey ? `sk-ant-...${anthropicKey.slice(-4)}` : 'NOT_FOUND'
+    });
+    
     if (!openaiKey && !anthropicKey) {
       return res.status(200).json({
         success: true,
@@ -224,14 +230,14 @@ Rédige maintenant le briefing selon la structure demandée.
         },
         signal: AbortSignal.timeout(25000), // 25 secondes timeout
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'gpt-4o',
           messages: [{ role: 'user', content: contextualPrompt }],
           max_tokens: 2000,
           temperature: 0.7,
           timeout: 30000
         })
       });
-      model = 'gpt-4';
+      model = 'gpt-4o';
     } else if (anthropicKey) {
       // Utiliser Anthropic Claude
       response = await fetch('https://api.anthropic.com/v1/messages', {
