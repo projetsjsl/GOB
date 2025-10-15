@@ -125,84 +125,79 @@ export default async function handler(req, res) {
 // ✅ CONFIGURATION TESTÉE : sonar-pro + 1500 tokens + temp 0.1 + recency filter
 // ❌ INTERDIT : Ajouter Marketaux (supprimé intentionnellement)
 // ============================================================================
-async function handlePerplexity(req, res, { prompt, recency = 'day' }) {
+async function handlePerplexity(req, res, { prompt, query, section, recency = 'day', model = 'sonar-pro', max_tokens = 2000, temperature = 0.1 }) {
   try {
-    if (!prompt) {
-      return res.status(400).json({ error: 'Le prompt est requis' });
+    const searchQuery = query || prompt;
+    if (!searchQuery) {
+      return res.status(400).json({ error: 'Le prompt ou la requête est requis' });
     }
 
     // Vérifier les clés API disponibles pour les actualités
     const perplexityKey = process.env.PERPLEXITY_API_KEY;
     const twelveDataKey = process.env.TWELVE_DATA_API_KEY;
     
-    if (!perplexityKey && !twelveDataKey) {
+    if (!perplexityKey) {
       return res.status(200).json({
         success: true,
-        content: getFallbackNews(),
+        content: getFallbackContent(section),
         model: 'demo-mode',
-        fallback: true
+        fallback: true,
+        sources: []
       });
     }
 
     let response;
     let model;
 
-    if (perplexityKey) {
-      // Utiliser Perplexity (priorité)
-      response = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${perplexityKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'sonar-pro',
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 1500,
-          temperature: 0.1,
-          search_recency_filter: recency
-        })
-      });
-      model = 'sonar-pro';
-    } else if (twelveDataKey) {
-      // Utiliser Twelve Data pour les actualités
-      response = await fetch(`https://api.twelvedata.com/news?apikey=${twelveDataKey}&limit=10`);
-      model = 'twelve-data';
-    }
+    // Construire le prompt selon la section
+    const enhancedPrompt = buildSectionPrompt(searchQuery, section);
+
+    // Appel à l'API Perplexity
+    response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${perplexityKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: enhancedPrompt }],
+        max_tokens: max_tokens,
+        temperature: temperature,
+        search_recency_filter: recency
+      })
+    });
 
     if (!response.ok) {
       throw new Error(`Erreur Perplexity: ${response.status}`);
     }
 
     const data = await response.json();
-    let content;
-    let tokens = 0;
+    const content = data.choices[0]?.message?.content || '';
+    const tokens = data.usage?.total_tokens || 0;
 
-    if (perplexityKey) {
-      content = data.choices[0]?.message?.content || '';
-      tokens = data.usage?.total_tokens || 0;
-    } else if (twelveDataKey) {
-      // Formater les actualités Twelve Data
-      const articles = data.data || [];
-      content = articles.map(article => 
-        `📰 ${article.title}\n${article.summary}\nSource: ${article.source}\n`
-      ).join('\n');
-    }
+    // Extraire les sources si disponibles
+    const sources = extractSources(content);
 
     return res.status(200).json({
       success: true,
       content,
       model,
-      tokens
+      tokens,
+      sources,
+      section,
+      query: searchQuery
     });
 
   } catch (error) {
     console.error('Erreur Perplexity:', error);
     return res.status(200).json({
       success: true,
-      content: getFallbackNews(),
+      content: getFallbackContent(section),
       model: 'demo-mode',
-      fallback: true
+      fallback: true,
+      sources: [],
+      error: error.message
     });
   }
 }
@@ -1695,4 +1690,51 @@ function getFallbackTickersNews(tickers = [], limit = 5) {
   
   return news;
 }
+
+// ============================================================================
+// FONCTIONS UTILITAIRES PERPLEXITY AI - NOUVELLES SECTIONS
+// ============================================================================
+
+// Construire le prompt selon la section
+function buildSectionPrompt(query, section) {
+  const basePrompts = {
+    news: `Tu es Emma, assistante virtuelle experte en analyse financière. Fournis un résumé détaillé des actualités financières récentes basé sur cette requête: "${query}". Inclus des chiffres précis, des sources et une analyse contextuelle.`,
+    analysis: `Tu es Emma, assistante virtuelle experte en analyse financière. Fournis une analyse technique et fondamentale approfondie basée sur cette requête: "${query}". Inclus des niveaux de support/résistance, des indicateurs et des recommandations.`,
+    writing: `Tu es Emma, assistante virtuelle experte en analyse financière. Rédige un briefing financier professionnel basé sur cette requête: "${query}". Utilise un style expert, factuel et actionnable avec des recommandations tactiques.`,
+    research: `Tu es Emma, assistante virtuelle experte en analyse financière. Effectue une recherche approfondie basée sur cette requête: "${query}". Fournis une analyse détaillée avec des sources et des perspectives.`
+  };
+  
+  return basePrompts[section] || `Tu es Emma, assistante virtuelle experte en analyse financière. Analyse cette requête: "${query}" et fournis une réponse détaillée et professionnelle.`;
+}
+
+// Contenu de fallback selon la section
+function getFallbackContent(section) {
+  const fallbacks = {
+    news: '📰 Actualités financières non disponibles en mode démo. Veuillez configurer la clé API Perplexity pour accéder aux actualités en temps réel.',
+    analysis: '📊 Analyse de marché non disponible en mode démo. Veuillez configurer la clé API Perplexity pour accéder aux analyses en temps réel.',
+    writing: '✍️ Rédaction non disponible en mode démo. Veuillez configurer la clé API Perplexity pour accéder à la rédaction en temps réel.',
+    research: '🔍 Recherche non disponible en mode démo. Veuillez configurer la clé API Perplexity pour accéder à la recherche en temps réel.'
+  };
+  
+  return fallbacks[section] || 'Contenu non disponible en mode démo. Veuillez configurer la clé API Perplexity.';
+}
+
+// Extraire les sources du contenu
+function extractSources(content) {
+  const sources = [];
+  const urlRegex = /https?:\/\/[^\s]+/g;
+  const matches = content.match(urlRegex);
+  
+  if (matches) {
+    matches.forEach(url => {
+      sources.push({
+        url: url,
+        title: url.split('/').pop() || url
+      });
+    });
+  }
+  
+  return sources;
+}
+
 // Force redeploy Wed Oct 15 00:27:32 EDT 2025
