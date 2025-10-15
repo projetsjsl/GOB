@@ -120,12 +120,16 @@ export default async function handler(req, res) {
 // ============================================================================
 // PERPLEXITY SEARCH - CONFIGURATION CRITIQUE
 // ============================================================================
+// 🚀 CACHE SYSTEM : Réduire les appels API pour économiser le quota
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// ============================================================================
 // 🛡️  GUARDRAIL : Cette fonction utilise la configuration validée
 // ⚠️  NE PAS MODIFIER les paramètres sans test complet
 // ✅ CONFIGURATION TESTÉE : sonar-reasoning-pro + 2000 tokens + temp 0.1 + recency filter
 // ❌ INTERDIT : Ajouter Marketaux (supprimé intentionnellement)
 // ============================================================================
-async function handlePerplexity(req, res, { prompt, query, section, recency = 'day', model = 'sonar-reasoning-pro', max_tokens = 2000, temperature = 0.1 }) {
+async function handlePerplexity(req, res, { prompt, query, section, recency = 'day', model = 'sonar-reasoning-pro', max_tokens = 2000, temperature = 0.1, fallbackModel = 'sonar' }) {
   try {
     const searchQuery = query || prompt;
     if (!searchQuery) {
@@ -146,6 +150,25 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     }
 
     let response;
+
+    // Vérifier le cache pour économiser le quota
+    const cacheKey = `${searchQuery}-${section}-${model}`;
+    const cached = cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log(`Cache hit pour ${cacheKey}`);
+      return res.status(200).json({
+        success: true,
+        content: cached.content,
+        model: cached.model,
+        tokens: cached.tokens,
+        sources: cached.sources,
+        section,
+        query: searchQuery,
+        fallback: false,
+        quota_warning: null,
+        cached: true
+      });
+    }
 
     // Construire le prompt selon la section
     const enhancedPrompt = buildSectionPrompt(searchQuery, section);
@@ -168,7 +191,30 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     });
 
     if (!response.ok) {
-      throw new Error(`Erreur Perplexity: ${response.status}`);
+      if (response.status === 429) {
+        // Tentative avec le modèle de fallback (sonar) si quota dépassé
+        console.log(`Quota dépassé pour ${model}, tentative avec ${fallbackModel}`);
+        response = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${perplexityKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: fallbackModel,
+            messages: [{ role: 'user', content: enhancedPrompt }],
+            max_tokens: Math.min(max_tokens, 1000), // Réduire les tokens pour le fallback
+            temperature: temperature,
+            search_recency_filter: recency
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Quota Perplexity dépassé (Tier 0: 50 req/min). Modèles ${model} et ${fallbackModel} indisponibles. Status: ${response.status}`);
+        }
+      } else {
+        throw new Error(`Erreur Perplexity: ${response.status}`);
+      }
     }
 
     const data = await response.json();
@@ -178,14 +224,26 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     // Extraire les sources si disponibles
     const sources = extractSources(content);
 
+    // Mettre en cache la réponse
+    cache.set(cacheKey, {
+      content,
+      model: model,
+      tokens,
+      sources,
+      timestamp: Date.now()
+    });
+
     return res.status(200).json({
       success: true,
       content,
-      model,
+      model: model,
       tokens,
       sources,
       section,
-      query: searchQuery
+      query: searchQuery,
+      fallback: false,
+      quota_warning: null,
+      cached: false
     });
 
   } catch (error) {
