@@ -4485,19 +4485,20 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [selectedType, setSelectedType] = useState('morning');
                 const [dataSource, setDataSource] = useState('apis'); // 'apis' ou 'yahoo'
                 const [apiSources, setApiSources] = useState({
-                    marketData: 'apis', // 'apis' ou 'yahoo'
-                    news: 'perplexity', // 'perplexity', 'marketaux', 'twelve-data'
-                    analysis: 'anthropic' // 'anthropic', 'openai'
+                    marketData: 'yahoo', // 'apis' ou 'yahoo' - Yahoo Finance par défaut
+                    news: 'perplexity', // 'perplexity', 'marketaux', 'twelve-data' - Perplexity par défaut
+                    analysis: 'openai' // 'anthropic', 'openai' - OpenAI par défaut
                 });
                 const [debugData, setDebugData] = useState({
                     marketData: { request: null, response: null, error: null },
                     news: { request: null, response: null, error: null },
                     analysis: { request: null, response: null, error: null }
                 });
-                const [showDebug, setShowDebug] = useState(false);
-                const [processLog, setProcessLog] = useState([]);
-                const [healthStatus, setHealthStatus] = useState(null);
-                const [healthCheckLoading, setHealthCheckLoading] = useState(false);
+        const [showDebug, setShowDebug] = useState(false);
+        const [showFullLog, setShowFullLog] = useState(false);
+        const [processLog, setProcessLog] = useState([]);
+        const [healthStatus, setHealthStatus] = useState(null);
+        const [healthCheckLoading, setHealthCheckLoading] = useState(false);
 
                 // Tickers de la watchlist (même que Seeking Alpha et Titres & Nouvelles)
                 const watchlistTickers = [
@@ -5218,7 +5219,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             service: newsRequest.service,
                             source: newsRequest.source,
                             recency: newsRequest.recency,
-                            promptPreview: newsRequest.prompt.substring(0, 200) + '...'
+                            promptPreview: newsRequest.prompt.substring(0, 200) + '...',
+                            fullPrompt: newsRequest.prompt
                         }, 'info');
                         
                         setDebugData(prev => ({
@@ -5276,6 +5278,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             service: analysisRequest.service,
                             source: analysisRequest.source,
                             promptPreview: analysisRequest.prompt.substring(0, 200) + '...',
+                            fullPrompt: analysisRequest.prompt,
                             marketDataKeys: Object.keys(analysisRequest.marketData || {}),
                             newsPreview: analysisRequest.news.substring(0, 100) + '...'
                         }, 'info');
@@ -5972,11 +5975,150 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                             isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'
                                         }`}
                                     >
-                                        📋 Log Complet
+                                        📋 {showFullLog ? 'Masquer' : 'Voir'} Log Complet
                                     </button>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Log Complet dans la page */}
+                        {showFullLog && (
+                            <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>📋 Log Complet - Processus de Génération Briefing</h3>
+                                
+                                <div className={`p-4 rounded-lg border ${
+                                    isDarkMode ? 'bg-gray-900 border-gray-600' : 'bg-gray-50 border-gray-300'
+                                }`}>
+                                    <div className="mb-4">
+                                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>📊 Résumé</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                            <div className={`p-3 rounded ${
+                                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                            }`}>
+                                                <div className="font-medium">Total d'entrées</div>
+                                                <div className={`text-2xl font-bold ${
+                                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                                }`}>{processLog.length}</div>
+                                            </div>
+                                            <div className={`p-3 rounded ${
+                                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                            }`}>
+                                                <div className="font-medium">Dernière mise à jour</div>
+                                                <div className={`text-sm ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>{new Date().toLocaleString('fr-FR')}</div>
+                                            </div>
+                                            <div className={`p-3 rounded ${
+                                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                            }`}>
+                                                <div className="font-medium">Statut</div>
+                                                <div className={`text-sm ${
+                                                    processLog.length > 0 ? 'text-green-400' : 'text-gray-400'
+                                                }`}>
+                                                    {processLog.length > 0 ? 'Processus en cours ou terminé' : 'Aucun processus'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                                        {processLog.map((entry, index) => (
+                                            <div key={index} className={`p-4 rounded-lg border-l-4 ${
+                                                entry.status === 'success' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' :
+                                                entry.status === 'error' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
+                                                entry.status === 'warning' ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' :
+                                                'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                            }`}>
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className={`text-sm font-medium ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                    }`}>
+                                                        {new Date(entry.timestamp).toLocaleString('fr-FR')}
+                                                    </div>
+                                                    <div className={`px-2 py-1 rounded text-xs font-medium ${
+                                                        entry.status === 'success' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' :
+                                                        entry.status === 'error' ? 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100' :
+                                                        entry.status === 'warning' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' :
+                                                        'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
+                                                    }`}>
+                                                        {entry.status}
+                                                    </div>
+                                                </div>
+                                                <div className={`font-semibold mb-1 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>
+                                                    [{entry.step}]
+                                                </div>
+                                                <div className={`text-sm mb-2 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>
+                                                    {entry.type}
+                                                </div>
+                                                {entry.data && (
+                                                    <div className={`text-xs p-3 rounded border ${
+                                                        isDarkMode ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-800 border-gray-300'
+                                                    }`}>
+                                                        {typeof entry.data === 'object' ? (
+                                                            <div className="space-y-2">
+                                                                {entry.data.fullPrompt && (
+                                                                    <div>
+                                                                        <div className="font-semibold text-blue-400 mb-2">📝 Prompt Complet:</div>
+                                                                        <div className={`p-2 rounded border ${
+                                                                            isDarkMode ? 'bg-gray-900 border-gray-500' : 'bg-white border-gray-400'
+                                                                        }`}>
+                                                                            <pre className="whitespace-pre-wrap text-xs">{entry.data.fullPrompt}</pre>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {entry.data.promptPreview && !entry.data.fullPrompt && (
+                                                                    <div>
+                                                                        <div className="font-semibold text-blue-400 mb-1">📝 Aperçu Prompt:</div>
+                                                                        <div className="italic">{entry.data.promptPreview}</div>
+                                                                    </div>
+                                                                )}
+                                                                {Object.entries(entry.data).map(([key, value]) => {
+                                                                    if (key === 'fullPrompt' || key === 'promptPreview') return null;
+                                                                    return (
+                                                                        <div key={key} className="flex justify-between">
+                                                                            <span className="font-medium">{key}:</span>
+                                                                            <span className="text-right max-w-xs truncate">
+                                                                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                                                                            </span>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        ) : (
+                                                            <pre className="whitespace-pre-wrap">{entry.data}</pre>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                {entry.size && (
+                                                    <div className={`text-xs mt-2 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    }`}>
+                                                        Taille: {entry.size} caractères
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                        {processLog.length === 0 && (
+                                            <div className={`text-center py-8 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                Aucun log disponible. Générez un briefing pour voir les détails.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Panneau Debug */}
                         {showDebug && (

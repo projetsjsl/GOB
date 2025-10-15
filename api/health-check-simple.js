@@ -40,18 +40,113 @@ export default async function handler(req, res) {
       : `https://${req.headers.host}`;
 
     const apiTests = await Promise.allSettled([
-      // Test de nos endpoints internes
-      testEndpoint(`${baseUrl}/api/ai-services`, 'AI Services'),
-      testEndpoint(`${baseUrl}/api/marketdata`, 'Market Data'),
-      testEndpoint(`${baseUrl}/api/supabase-watchlist`, 'Supabase Watchlist'),
-      testEndpoint(`${baseUrl}/api/gemini-key`, 'Gemini Key'),
-      testEndpoint(`${baseUrl}/api/health-check`, 'Health Check'),
-      testEndpoint(`${baseUrl}/api/briefing-cron`, 'Briefing Cron'),
-      testEndpoint(`${baseUrl}/api/fmp`, 'FMP'),
-      testEndpoint(`${baseUrl}/api/github-update`, 'GitHub Update'),
-      testEndpoint(`${baseUrl}/api/test-gemini`, 'Test Gemini'),
-      testEndpoint(`${baseUrl}/api/gemini/chat`, 'Gemini Chat'),
-      testEndpoint(`${baseUrl}/api/gemini/chat-validated`, 'Gemini Chat Validated')
+      // Test de nos endpoints internes avec détails
+      testEndpointWithDetails(`${baseUrl}/api/ai-services`, 'AI Services', {
+        description: 'Services IA unifiés pour Emma En Direct',
+        sub_apis: [
+          'Perplexity (nouvelles financières)',
+          'OpenAI GPT-4 (analyse et rédaction)',
+          'Anthropic Claude (analyse alternative)',
+          'Resend (envoi emails)',
+          'Supabase Briefings (stockage)',
+          'Expert Emma Modules (yield curves, forex, volatility, commodities)'
+        ],
+        dependencies: ['OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'PERPLEXITY_API_KEY', 'RESEND_API_KEY']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/marketdata`, 'Market Data', {
+        description: 'Données de marché multi-sources',
+        sub_apis: [
+          'Yahoo Finance (données temps réel)',
+          'Financial Modeling Prep (FMP)',
+          'Alpha Vantage',
+          'Twelve Data',
+          'Finnhub'
+        ],
+        dependencies: ['FMP_API_KEY', 'ALPHA_VANTAGE_API_KEY', 'TWELVE_DATA_API_KEY', 'FINNHUB_API_KEY']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/supabase-watchlist`, 'Supabase Watchlist', {
+        description: 'Gestion de la watchlist utilisateur',
+        sub_apis: [
+          'Lecture watchlist',
+          'Ajout/suppression tickers',
+          'Synchronisation données'
+        ],
+        dependencies: ['SUPABASE_URL', 'SUPABASE_ANON_KEY']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/gemini-key`, 'Gemini Key', {
+        description: 'Gestion des clés API Gemini',
+        sub_apis: [
+          'Validation clé API',
+          'Test connectivité Gemini'
+        ],
+        dependencies: ['GEMINI_API_KEY']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/health-check`, 'Health Check', {
+        description: 'Diagnostic complet des APIs externes',
+        sub_apis: [
+          'Test APIs externes',
+          'Vérification clés API',
+          'Monitoring performance'
+        ],
+        dependencies: ['Toutes les clés API externes']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/briefing-cron`, 'Briefing Cron', {
+        description: 'Automatisation des briefings Emma En Direct',
+        sub_apis: [
+          'Génération briefings matinaux',
+          'Génération briefings midi',
+          'Génération briefings clôture',
+          'Envoi automatique emails'
+        ],
+        dependencies: ['CRON_SECRET', 'RESEND_API_KEY', 'OPENAI_API_KEY']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/fmp`, 'FMP', {
+        description: 'Financial Modeling Prep API',
+        sub_apis: [
+          'Données fondamentales',
+          'Profils entreprises',
+          'Statements financiers',
+          'Données historiques'
+        ],
+        dependencies: ['FMP_API_KEY']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/github-update`, 'GitHub Update', {
+        description: 'Mise à jour automatique depuis GitHub',
+        sub_apis: [
+          'Webhook GitHub',
+          'Déploiement automatique',
+          'Synchronisation code'
+        ],
+        dependencies: ['GITHUB_WEBHOOK_SECRET']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/test-gemini`, 'Test Gemini', {
+        description: 'Tests de connectivité Gemini',
+        sub_apis: [
+          'Test API Gemini',
+          'Validation fonction calling',
+          'Test prompts'
+        ],
+        dependencies: ['GEMINI_API_KEY']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/gemini/chat`, 'Gemini Chat', {
+        description: 'Chat Emma avec Gemini (mode standard)',
+        sub_apis: [
+          'Chat conversationnel',
+          'Function calling basique',
+          'Réponses Emma'
+        ],
+        dependencies: ['GEMINI_API_KEY']
+      }),
+      testEndpointWithDetails(`${baseUrl}/api/gemini/chat-validated`, 'Gemini Chat Validated', {
+        description: 'Chat Emma avec Gemini (mode validé)',
+        sub_apis: [
+          'Chat avec validation Zod',
+          'Function calling avancé',
+          'Sécurité renforcée',
+          'Mode Expert Emma'
+        ],
+        dependencies: ['GEMINI_API_KEY']
+      })
     ]);
 
     // ============================================================================
@@ -59,16 +154,27 @@ export default async function handler(req, res) {
     // ============================================================================
     
     apiTests.forEach((result, index) => {
-      const apiNames = [
-        'AI Services', 'Market Data', 'Supabase Watchlist', 'Gemini Key', 
-        'Health Check', 'Briefing Cron', 'FMP', 'GitHub Update', 
-        'Test Gemini', 'Gemini Chat', 'Gemini Chat Validated'
+      const apiDetails = [
+        { name: 'AI Services', details: { description: 'Services IA unifiés pour Emma En Direct', sub_apis: ['Perplexity (nouvelles financières)', 'OpenAI GPT-4 (analyse et rédaction)', 'Anthropic Claude (analyse alternative)', 'Resend (envoi emails)', 'Supabase Briefings (stockage)', 'Expert Emma Modules (yield curves, forex, volatility, commodities)'], dependencies: ['OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'PERPLEXITY_API_KEY', 'RESEND_API_KEY'] }},
+        { name: 'Market Data', details: { description: 'Données de marché multi-sources', sub_apis: ['Yahoo Finance (données temps réel)', 'Financial Modeling Prep (FMP)', 'Alpha Vantage', 'Twelve Data', 'Finnhub'], dependencies: ['FMP_API_KEY', 'ALPHA_VANTAGE_API_KEY', 'TWELVE_DATA_API_KEY', 'FINNHUB_API_KEY'] }},
+        { name: 'Supabase Watchlist', details: { description: 'Gestion de la watchlist utilisateur', sub_apis: ['Lecture watchlist', 'Ajout/suppression tickers', 'Synchronisation données'], dependencies: ['SUPABASE_URL', 'SUPABASE_ANON_KEY'] }},
+        { name: 'Gemini Key', details: { description: 'Gestion des clés API Gemini', sub_apis: ['Validation clé API', 'Test connectivité Gemini'], dependencies: ['GEMINI_API_KEY'] }},
+        { name: 'Health Check', details: { description: 'Diagnostic complet des APIs externes', sub_apis: ['Test APIs externes', 'Vérification clés API', 'Monitoring performance'], dependencies: ['Toutes les clés API externes'] }},
+        { name: 'Briefing Cron', details: { description: 'Automatisation des briefings Emma En Direct', sub_apis: ['Génération briefings matinaux', 'Génération briefings midi', 'Génération briefings clôture', 'Envoi automatique emails'], dependencies: ['CRON_SECRET', 'RESEND_API_KEY', 'OPENAI_API_KEY'] }},
+        { name: 'FMP', details: { description: 'Financial Modeling Prep API', sub_apis: ['Données fondamentales', 'Profils entreprises', 'Statements financiers', 'Données historiques'], dependencies: ['FMP_API_KEY'] }},
+        { name: 'GitHub Update', details: { description: 'Mise à jour automatique depuis GitHub', sub_apis: ['Webhook GitHub', 'Déploiement automatique', 'Synchronisation code'], dependencies: ['GITHUB_WEBHOOK_SECRET'] }},
+        { name: 'Test Gemini', details: { description: 'Tests de connectivité Gemini', sub_apis: ['Test API Gemini', 'Validation fonction calling', 'Test prompts'], dependencies: ['GEMINI_API_KEY'] }},
+        { name: 'Gemini Chat', details: { description: 'Chat Emma avec Gemini (mode standard)', sub_apis: ['Chat conversationnel', 'Function calling basique', 'Réponses Emma'], dependencies: ['GEMINI_API_KEY'] }},
+        { name: 'Gemini Chat Validated', details: { description: 'Chat Emma avec Gemini (mode validé)', sub_apis: ['Chat avec validation Zod', 'Function calling avancé', 'Sécurité renforcée', 'Mode Expert Emma'], dependencies: ['GEMINI_API_KEY'] }}
       ];
       
-      const apiName = apiNames[index] || `API ${index + 1}`;
+      const apiInfo = apiDetails[index] || { name: `API ${index + 1}`, details: {} };
       
       if (result.status === 'fulfilled') {
-        healthReport.apis[apiName] = result.value;
+        healthReport.apis[apiInfo.name] = {
+          ...result.value,
+          ...apiInfo.details
+        };
         healthReport.total_apis++;
         
         if (result.value.status === 'healthy') {
@@ -79,11 +185,12 @@ export default async function handler(req, res) {
           healthReport.failed_apis++;
         }
       } else {
-        healthReport.apis[apiName] = {
+        healthReport.apis[apiInfo.name] = {
           status: 'failed',
           error: result.reason?.message || 'Erreur inconnue',
           response_time_ms: 0,
-          last_check: new Date().toISOString()
+          last_check: new Date().toISOString(),
+          ...apiInfo.details
         };
         healthReport.total_apis++;
         healthReport.failed_apis++;
@@ -129,10 +236,10 @@ export default async function handler(req, res) {
 }
 
 // ============================================================================
-// FONCTION DE TEST D'ENDPOINT
+// FONCTION DE TEST D'ENDPOINT AVEC DÉTAILS
 // ============================================================================
 
-async function testEndpoint(url, name) {
+async function testEndpointWithDetails(url, name, details) {
   const startTime = Date.now();
   try {
     const response = await fetch(url, {
@@ -175,6 +282,14 @@ async function testEndpoint(url, name) {
       last_check: new Date().toISOString()
     };
   }
+}
+
+// ============================================================================
+// FONCTION DE TEST D'ENDPOINT (LEGACY)
+// ============================================================================
+
+async function testEndpoint(url, name) {
+  return testEndpointWithDetails(url, name, {});
 }
 
 // ============================================================================
