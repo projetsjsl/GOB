@@ -22,9 +22,6 @@
     "api/gemini-key.js": {
       "maxDuration": 10
     },
-    "api/fmp.js": {
-      "maxDuration": 10
-    },
     "api/github-update.js": {
       "maxDuration": 15
     },

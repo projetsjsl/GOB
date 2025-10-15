@@ -1,7 +1,7 @@
-/**
- * Market Data API - Version simplifiée
- * Fournit les données de marché depuis plusieurs sources
- */
+// ============================================================================
+// MARKET DATA API FIXED - Version corrigée
+// Contourne FMP et utilise directement Yahoo Finance
+// ============================================================================
 
 export default async function handler(req, res) {
   // CORS
@@ -14,152 +14,65 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { endpoint, symbol, source = 'auto' } = req.query;
+    const { endpoint, symbol, source = 'yahoo' } = req.query;
 
     // Test de santé simple pour le diagnostic
     if (!endpoint || !symbol) {
       return res.status(200).json({ 
         status: 'healthy',
-        message: 'Market Data API opérationnel',
-        availableEndpoints: ['quote', 'fundamentals', 'profile'],
+        message: 'Market Data API opérationnel (version corrigée)',
+        availableEndpoints: ['quote'],
+        sources: ['yahoo'],
         timestamp: new Date().toISOString()
       });
     }
 
-    let result;
-
-    switch (endpoint) {
-      case 'quote':
-        result = await getQuote(symbol, source);
-        break;
-      case 'fundamentals':
-        result = await getFundamentals(symbol, source);
-        break;
-      case 'profile':
-        result = await getProfile(symbol, source);
-        break;
-      default:
-        return res.status(404).json({ 
-          error: `Endpoint "${endpoint}" non trouvé`,
-          availableEndpoints: ['quote', 'fundamentals', 'profile']
-        });
+    if (endpoint === 'quote') {
+      // Utiliser directement Yahoo Finance
+      const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
+      
+      const response = await fetch(yahooUrl);
+      if (!response.ok) {
+        throw new Error(`Yahoo Finance error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const result = data.chart.result[0];
+      const meta = result.meta;
+      const quote = result.indicators.quote[0];
+      
+      // Extraire les données
+      const currentPrice = meta.regularMarketPrice;
+      const previousClose = meta.previousClose;
+      const change = currentPrice - previousClose;
+      const changePercent = (change / previousClose) * 100;
+      
+      return res.status(200).json({
+        symbol: symbol.toUpperCase(),
+        c: currentPrice,
+        d: change,
+        dp: changePercent,
+        h: meta.regularMarketDayHigh,
+        l: meta.regularMarketDayLow,
+        o: meta.regularMarketOpen,
+        pc: previousClose,
+        v: meta.regularMarketVolume,
+        source: 'yahoo',
+        timestamp: new Date().toISOString()
+      });
     }
 
-    res.status(200).json(result);
+    return res.status(400).json({
+      error: 'Endpoint non supporté',
+      availableEndpoints: ['quote']
+    });
 
   } catch (error) {
     console.error('Market Data API error:', error);
-    res.status(500).json({
-      error: 'Internal server error',
-      message: error.message
+    return res.status(500).json({
+      error: 'Erreur serveur',
+      message: error.message,
+      timestamp: new Date().toISOString()
     });
-  }
-}
-
-// Récupérer les données de prix
-export async function getQuote(symbol, source = 'auto') {
-  try {
-    // Utiliser FMP comme source principale
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
-    
-    const response = await fetch(`${baseUrl}/api/fmp?endpoint=quote&symbol=${symbol}`);
-    
-    if (!response.ok) {
-      throw new Error(`FMP API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    // Formater les données pour compatibilité
-    return {
-      c: data.price || data.c,           // Prix actuel
-      d: data.change || data.d,          // Variation
-      dp: data.changesPercentage || data.dp, // Pourcentage de variation
-      h: data.dayHigh || data.h,         // Plus haut du jour
-      l: data.dayLow || data.l,          // Plus bas du jour
-      o: data.open || data.o,            // Prix d'ouverture
-      pc: data.previousClose || data.pc, // Prix de clôture précédent
-      volume: data.volume || 0,          // Volume
-      timestamp: new Date().toISOString(),
-      source: 'FMP'
-    };
-
-  } catch (error) {
-    console.error('Error fetching quote:', error);
-    throw error;
-  }
-}
-
-// Récupérer les fondamentaux
-export async function getFundamentals(symbol, source = 'auto') {
-  try {
-    // Utiliser FMP pour les fondamentaux
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
-    
-    const response = await fetch(`${baseUrl}/api/fmp?endpoint=profile&symbol=${symbol}`);
-    
-    if (!response.ok) {
-      throw new Error(`FMP API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    return {
-      symbol,
-      companyName: data.companyName || data.name,
-      sector: data.sector,
-      industry: data.industry,
-      marketCap: data.mktCap || data.marketCapitalization,
-      sharesOutstanding: data.sharesOutstanding,
-      eps: data.eps,
-      pe: data.pe,
-      pb: data.pb,
-      ps: data.ps,
-      dividendYield: data.lastDiv || 0,
-      website: data.website,
-      description: data.description,
-      timestamp: new Date().toISOString(),
-      source: 'FMP'
-    };
-
-  } catch (error) {
-    console.error('Error fetching fundamentals:', error);
-    throw error;
-  }
-}
-
-// Récupérer le profil de l'entreprise
-export async function getProfile(symbol, source = 'auto') {
-  try {
-    // Utiliser FMP pour le profil
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
-    
-    const response = await fetch(`${baseUrl}/api/fmp?endpoint=profile&symbol=${symbol}`);
-    
-    if (!response.ok) {
-      throw new Error(`FMP API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    return {
-      symbol,
-      name: data.companyName || data.name,
-      sector: data.sector,
-      industry: data.industry,
-      country: data.country,
-      exchange: data.exchange,
-      marketCapitalization: data.mktCap || data.marketCapitalization,
-      sharesOutstanding: data.sharesOutstanding,
-      website: data.website,
-      description: data.description,
-      employees: data.fullTimeEmployees,
-      timestamp: new Date().toISOString(),
-      source: 'FMP'
-    };
-
-  } catch (error) {
-    console.error('Error fetching profile:', error);
-    throw error;
   }
 }
