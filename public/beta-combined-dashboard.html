@@ -905,10 +905,6 @@ const fetchHybridData = async (symbol, dataType) => {
                             news: 'Test'
                         })
                     });
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: 'Test de connexion', ticker: 'TEST' })
-                    });
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {
@@ -1428,15 +1424,6 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             prompt: 'Test de connexion API',
                             marketData: {},
                             news: 'Test'
-                        })
-                    });
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            prompt: claudePrompt,
-                            ticker: ticker
                         })
                     });
 
