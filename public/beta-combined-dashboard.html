@@ -7197,8 +7197,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Les données sont déjà incluses dans realTimeContext via stockData, newsData, apiStatus
                         console.log('✅ Utilisation des données existantes du dashboard');
                         
-                        // Utiliser l'API Gemini avec les données fraîches
-                        const response = await generateGeminiResponse(emmaInput);
+                        // Utiliser l'API Perplexity avec les données fraîches
+                        const response = await generatePerplexityResponse(emmaInput);
                         
                         const emmaResponse = {
                             id: Date.now() + 1,
@@ -7218,7 +7218,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Confirmation de réception
                         console.log('✅ Réponse d\'Emma reçue:', response.length, 'caractères');
                     } catch (error) {
-                        console.error('Erreur Gemini:', error?.message || String(error));
+                        console.error('Erreur Perplexity:', error?.message || String(error));
                         // Analyser le type d'erreur pour un message plus précis
                         let errorContent = '';
                         if (error.message.includes('404')) {
@@ -7226,33 +7226,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
 **Solutions possibles :**
 1. Vérifiez que le déploiement Vercel est à jour
-2. Assurez-vous que la variable GEMINI_API_KEY est bien configurée dans Vercel
+2. Assurez-vous que la variable PERPLEXITY_API_KEY est bien configurée dans Vercel
 3. Redéployez votre application si nécessaire
 
 **Diagnostic :** ${error.message}`;
-                        } else if (error.message.includes('Clé API Gemini non configurée')) {
-                            errorContent = `🔑 Clé API Gemini manquante !
+                        } else if (error.message.includes('Clé API Perplexity non configurée')) {
+                            errorContent = `🔑 Clé API Perplexity manquante !
 
 **Configuration requise :**
 1. Allez dans votre dashboard Vercel
 2. Section "Settings" → "Environment Variables"
-3. Ajoutez : GEMINI_API_KEY = votre_clé_api
+3. Ajoutez : PERPLEXITY_API_KEY = votre_clé_api
 4. Redéployez l'application
 
 **Diagnostic :** ${error.message}`;
-                        } else if (error.message.includes('Réponse invalide de l\'API Gemini')) {
-                            errorContent = `🔧 Problème de structure de réponse Gemini !
+                        } else if (error.message.includes('Erreur API Perplexity')) {
+                            errorContent = `🔧 Problème de structure de réponse Perplexity !
 
-**Problème détecté :** La réponse de l'API Gemini a une structure inattendue.
+**Problème détecté :** La réponse de l'API Perplexity a une structure inattendue.
 
 **Solutions :**
-1. Vérifiez que votre clé API Gemini est valide
+1. Vérifiez que votre clé API Perplexity est valide
 2. Consultez la console pour voir la structure complète de la réponse
 3. Essayez de redémarrer la conversation
 
 **Diagnostic :** ${error.message}`;
                         } else {
-                            errorContent = `❌ Erreur de connexion à l'API Gemini.
+                            errorContent = `❌ Erreur de connexion à l'API Perplexity.
 
 **Diagnostic :** ${error.message}
 
@@ -7280,64 +7280,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     }
                 };
 
-                const generateGeminiResponse = async (userMessage) => {
+                const generatePerplexityResponse = async (userMessage) => {
                     try {
-                        // Récupérer la clé API avec diagnostic détaillé
-                        let apiKey = '';
-                        let apiSource = '';
-                        let debugInfo = {};
+                        console.log('🔍 Génération de réponse Perplexity pour:', userMessage);
                         
-                        try {
-                            console.log('🔍 Tentative de récupération de la clé API via /api/gemini-key...');
-                            const response = await fetch('/api/gemini-key');
-                            console.log('📡 Réponse API route:', response.status, response.statusText);
-                            
-                            if (response.ok) {
-                                const data = await response.json();
-                                apiKey = data.apiKey;
-                                apiSource = 'vercel-env';
-                                debugInfo = {
-                                    source: 'vercel-env',
-                                    status: response.status,
-                                    hasApiKey: !!apiKey
-                                };
-                                console.log('✅ Clé API récupérée depuis Vercel');
-                            } else {
-                                const errorData = await response.json().catch(() => ({}));
-                                debugInfo = {
-                                    source: 'vercel-env-failed',
-                                    status: response.status,
-                                    error: errorData
-                                };
-                                console.log('❌ Échec récupération depuis Vercel:', response.status, errorData);
-                            }
-                        } catch (error) {
-                            debugInfo = {
-                                source: 'vercel-env-error',
-                                error: error.message
-                            };
-                            console.log('❌ Erreur réseau API route:', error.message);
-                        }
-
-                        // Fallback vers localStorage si Vercel échoue
-                        if (!apiKey) {
-                            console.log('🔄 Tentative de fallback vers localStorage...');
-                            apiKey = localStorage.getItem('gemini-api-key') || '';
-                            if (apiKey) {
-                                apiSource = 'localStorage';
-                                debugInfo.fallback = 'localStorage';
-                                console.log('✅ Clé API récupérée depuis localStorage');
-                            } else {
-                                console.log('❌ Aucune clé API trouvée dans localStorage');
-                            }
-                        }
-
-                        if (!apiKey) {
-                            const errorMsg = `Clé API Gemini non configurée. Diagnostic: ${JSON.stringify(debugInfo)}`;
-                            console.error('❌', errorMsg);
-                            throw new Error(errorMsg);
-                        }
-
                         // Récupérer les données en temps réel du dashboard
                         const currentStockData = stockData || {};
                         const currentNewsData = newsData || [];
@@ -7365,7 +7311,6 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
 ⚙️ PARAMÈTRES DE CONFIGURATION ACTUELS:
 • Température: ${emmaTemperature} (${emmaTemperature <= 0.3 ? 'Analyses factuelles et précises' : emmaTemperature <= 0.5 ? 'Équilibré et professionnel' : emmaTemperature <= 0.7 ? 'Professionnel et naturel' : 'Créatif et expressif'})
 • Longueur max: ${emmaMaxTokens} tokens (${emmaMaxTokens <= 2048 ? 'Réponses concises' : emmaMaxTokens <= 4096 ? 'Réponses détaillées' : 'Réponses très détaillées'})
-• Function Calling: ${useFunctionCalling ? 'Activé' : 'Désactivé'}
 
 ⚠️ IMPORTANT: Utilisez ces données en temps réel pour vos analyses. Ne dites pas que vous n'avez pas accès aux données actuelles.
 `;
@@ -7373,151 +7318,56 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         // Construire le prompt complet avec les données en temps réel
                         const fullPrompt = `${emmaPrompt}\n\n${realTimeContext}\n\nQuestion de l'utilisateur: ${userMessage}`;
 
-                        let response;
+                        console.log('📤 Envoi de la requête à Perplexity...');
                         
-                        // Utiliser l'API avec function calling si activé
-                        if (useFunctionCalling) {
-                            const apiEndpoint = useValidatedMode ? '/api/gemini/chat-validated' : '/api/gemini/chat';
-                            console.log(`🔧 Utilisation de Gemini Function Calling (${useValidatedMode ? 'validé' : 'standard'}) avec accès aux APIs`);
-                            response = await fetch(apiEndpoint, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    messages: [
-                                        // Historique minimal (multi-tours), on peut l'étendre si besoin
-                                        ...emmaMessages.map(m => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.content })),
-                                        { role: 'user', content: userMessage }
-                                    ],
-                                    temperature: emmaTemperature,
-                                    maxTokens: emmaMaxTokens,
-                                    systemPrompt: emmaPrompt,
-                                    functions: [
-                                        {
-                                            name: 'getMarketData',
-                                            description: 'Récupère les données de marché en temps réel pour un symbole donné',
-                                            parameters: {
-                                                type: 'object',
-                                                properties: {
-                                                    symbol: {
-                                                        type: 'string',
-                                                        description: 'Symbole du titre (ex: AAPL, MSFT, GOOGL)'
-                                                    },
-                                                    endpoint: {
-                                                        type: 'string',
-                                                        enum: ['quote', 'profile', 'news', 'recommendation', 'peers', 'earnings', 'financials'],
-                                                        description: 'Type de données à récupérer'
-                                                    },
-                                                    source: {
-                                                        type: 'string',
-                                                        enum: ['auto', 'yahoo', 'alpha', 'finnhub'],
-                                                        description: 'Source de données (auto = sélection automatique)'
-                                                    }
-                                                },
-                                                required: ['symbol', 'endpoint']
-                                            }
-                                        },
-                                        {
-                                            name: 'getNewsData',
-                                            description: 'Récupère les actualités financières récentes',
-                                            parameters: {
-                                                type: 'object',
-                                                properties: {
-                                                    query: {
-                                                        type: 'string',
-                                                        description: 'Termes de recherche pour les actualités'
-                                                    },
-                                                    limit: {
-                                                        type: 'number',
-                                                        description: 'Nombre maximum d\'articles à récupérer (défaut: 10)'
-                                                    }
-                                                },
-                                                required: ['query']
-                                            }
-                                        },
-                                        {
-                                            name: 'getApiStatus',
-                                            description: 'Vérifie le statut de toutes les APIs disponibles',
-                                            parameters: {
-                                                type: 'object',
-                                                properties: {}
-                                            }
-                                        }
-                                    ]
-                                })
-                            });
-                        } else {
-                            // Utiliser l'API Gemini directe
-                            console.log('🔧 Utilisation de Gemini direct');
-                            response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                        // Utiliser l'API Perplexity via /api/ai-services
+                        const response = await fetch('/api/ai-services', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                                body: JSON.stringify({
-                                    contents: [{
-                                        parts: [{
-                                            text: fullPrompt
-                                        }]
-                                    }],
-                                    generationConfig: {
-                                        temperature: emmaTemperature, // Température dynamique configurée par l'utilisateur
-                                        topK: 20, // Réduit pour plus de précision dans le vocabulaire financier
-                                        topP: 0.8, // Réduit pour plus de cohérence dans les analyses
-                                        maxOutputTokens: 4096, // Maintenu pour analyses détaillées
-                                        candidateCount: 1,
-                                        stopSequences: []
-                                    }
-                                })
-                            });
-                        }
+                            body: JSON.stringify({
+                                service: 'perplexity',
+                                query: fullPrompt,
+                                section: 'analysis',
+                                model: 'sonar-pro',
+                                max_tokens: emmaMaxTokens,
+                                temperature: emmaTemperature,
+                                recency: 'day'
+                            })
+                        });
 
                         if (!response.ok) {
                             const errorData = await response.json().catch(() => ({}));
-                            console.error('❌ Erreur HTTP Gemini:', {
+                            console.error('❌ Erreur HTTP Perplexity:', {
                                 status: response.status,
                                 statusText: response.statusText,
                                 error: errorData
                             });
-                            throw new Error(`Erreur API: ${response.status} - ${errorData.details || errorData.error || response.statusText}`);
+                            throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
                         }
 
                         const data = await response.json();
-                        console.log('✅ Réponse Gemini reçue avec succès');
+                        console.log('📥 Réponse Perplexity reçue:', {
+                            success: data.success,
+                            model: data.model,
+                            contentLength: data.content?.length || 0,
+                            sources: data.sources?.length || 0,
+                            fallback: data.fallback
+                        });
+
+                        if (!data.success) {
+                            throw new Error(data.error || 'Erreur inconnue de l\'API Perplexity');
+                        }
+
+                        let responseText = data.content || '';
                         
-                        // Log de debug pour diagnostiquer la structure de la réponse
-                        console.log('🔍 Réponse Gemini complète:', data);
-                        
-                        // Gérer les deux types de réponses (avec et sans function calling)
-                        let responseText = '';
-                        
-                        if (useFunctionCalling && data.response) {
-                            // Réponse de l'API avec function calling
-                            responseText = data.response;
-                            console.log('✅ Réponse avec Function Calling reçue');
-                        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                            // Structure standard Gemini
-                            responseText = data.candidates[0].content.parts[0].text;
-                        } else if (data.candidates && data.candidates[0] && data.candidates[0].text) {
-                            // Structure alternative possible
-                            responseText = data.candidates[0].text;
-                        } else if (data.text) {
-                            // Structure directe
-                            responseText = data.text;
-                        } else if (data.content && data.content.parts && data.content.parts[0]) {
-                            // Structure alternative
-                            responseText = data.content.parts[0].text;
-                        } else {
-                            console.error('❌ Structure de réponse inattendue:', {
-                                hasCandidates: !!data.candidates,
-                                candidatesLength: data.candidates?.length,
-                                firstCandidate: data.candidates?.[0],
-                                hasText: !!data.text,
-                                hasContent: !!data.content,
-                                fullResponse: data
+                        // Ajouter les sources si disponibles
+                        if (data.sources && data.sources.length > 0) {
+                            responseText += '\n\n**Sources:**\n';
+                            data.sources.forEach((source, index) => {
+                                responseText += `• [${source.title || source.url}](${source.url})\n`;
                             });
-                            throw new Error(`Réponse invalide de l'API Gemini. Structure: ${JSON.stringify(data, null, 2)}`);
                         }
                         
                         // Log de la réponse pour diagnostic
@@ -7530,7 +7380,7 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         
                         return responseText;
                     } catch (error) {
-                        console.error('Erreur Gemini:', error?.message || String(error));
+                        console.error('Erreur Perplexity:', error?.message || String(error));
                         throw error;
                     }
                 };
