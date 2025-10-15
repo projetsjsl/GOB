@@ -5414,14 +5414,18 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         }, 'info');
                         
                         let analysisResult;
+                        let responseText = '';
                         try {
-                            const responseText = await analysisResponse.text();
+                            responseText = await analysisResponse.text();
                             analysisResult = JSON.parse(responseText);
                         } catch (parseError) {
                             console.error('Erreur parsing JSON analyse:', parseError);
+                            console.error('Response text reçu:', responseText ? responseText.substring(0, 500) : 'No response text');
                             addLogEntry('ERROR', 'Erreur parsing JSON analyse', {
                                 error: parseError.message,
-                                responseText: responseText ? responseText.substring(0, 200) : 'No response text'
+                                responseText: responseText ? responseText.substring(0, 200) : 'No response text',
+                                responseStatus: analysisResponse.status,
+                                responseStatusText: analysisResponse.statusText
                             }, 'error');
                             
                             // Fallback avec analyse simulée
@@ -5438,7 +5442,9 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             model: analysisResult.model,
                             contentLength: analysisResult.content?.length || 0,
                             tokens: analysisResult.tokens,
-                            fallback: analysisResult.fallback
+                            fallback: analysisResult.fallback,
+                            responseStatus: analysisResponse.status,
+                            responseStatusText: analysisResponse.statusText
                         }, analysisResult.success ? 'success' : 'error');
                         
                         setDebugData(prev => ({
@@ -5485,7 +5491,9 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             html,
                             data,
                             analysis,
-                            timestamp: new Date().toISOString()
+                            timestamp: new Date().toISOString(),
+                            fallback: analysisResult.fallback || false,
+                            model: analysisResult.model || 'unknown'
                         };
                         
                         addLogEntry('BRIEFING_CREATION', 'Briefing créé', {
@@ -6515,12 +6523,31 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                 isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                             }`}>
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                        {currentBriefing.subject}
-                                    </h3>
+                                    <div>
+                                        <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>
+                                            {currentBriefing.subject}
+                                        </h3>
+                                        {currentBriefing.fallback && (
+                                            <div className={`text-xs px-2 py-1 rounded-full mt-1 inline-block ${
+                                                isDarkMode 
+                                                    ? 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30' 
+                                                    : 'bg-yellow-100 text-yellow-700 border border-yellow-300'
+                                            }`}>
+                                                ⚠️ Mode Fallback - Analyse simulée
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="flex gap-2">
+                                        {currentBriefing.fallback && (
+                                            <button
+                                                onClick={() => generateBriefing(currentBriefing.type)}
+                                                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
+                                            >
+                                                🔄 Réessayer
+                                            </button>
+                                        )}
                                         <button
                                             onClick={saveBriefing}
                                             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
