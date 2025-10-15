@@ -14,7 +14,7 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
     <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -166,7 +166,23 @@
 <body class="min-h-screen">
     <div id="root"></div>
     
-    <script type="text/babel">
+    <script type="text/babel" data-presets="react">
+        // Vérification que Babel fonctionne
+        console.log('🔧 Babel chargé:', typeof Babel !== 'undefined');
+        console.log('🔧 React chargé:', typeof React !== 'undefined');
+        console.log('🔧 ReactDOM chargé:', typeof ReactDOM !== 'undefined');
+        
+        // Gestion d'erreur si Babel ne fonctionne pas
+        if (typeof Babel === 'undefined') {
+            document.getElementById('root').innerHTML = `
+                <div style="padding: 20px; background: #fee; border: 1px solid #fcc; margin: 20px;">
+                    <h2>⚠️ Erreur de Chargement</h2>
+                    <p>Babel n'est pas chargé. Vérifiez votre connexion internet.</p>
+                    <p>Rafraîchissez la page ou essayez en navigation privée.</p>
+                </div>
+            `;
+            throw new Error('Babel non chargé');
+        }
 
 // Version simplifiée de l'API hybride qui fonctionne sans Supabase
 const fetchHybridData = async (symbol, dataType) => {
