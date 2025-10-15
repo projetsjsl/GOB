@@ -47,6 +47,11 @@
       "source": "/",
       "destination": "/beta-combined-dashboard.html",
       "permanent": false
+    },
+    {
+      "source": "/test",
+      "destination": "/test-simple.html",
+      "permanent": false
     }
   ]
 }

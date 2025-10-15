@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        function TestComponent() {
+            return (
+                <div className="p-8 bg-blue-100">
+                    <h1 className="text-2xl font-bold text-blue-800">
+                        Test Simple - Si vous voyez ceci, React fonctionne !
+                    </h1>
+                    <p className="mt-4 text-blue-600">
+                        Date: {new Date().toLocaleString('fr-FR')}
+                    </p>
+                </div>
+            );
+        }
+        
+        ReactDOM.render(<TestComponent />, document.getElementById('root'));
+    </script>
+</body>
+</html>
