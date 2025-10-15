@@ -496,7 +496,8 @@ const fetchHybridData = async (symbol, dataType) => {
                 console.log('📰 Récupération des actualités depuis le cache...');
                 try {
                     // Essayer d'abord le cache Supabase
-                    const cacheResponse = await fetch(`${API_BASE_URL}/api/news/cached?type=general&limit=50`);
+                    // Cache non disponible - passer directement à l'API
+                    const cacheResponse = { ok: false };
                     console.log(`📡 Réponse Cache: ${cacheResponse.status}`);
                     
                     if (cacheResponse.ok) {
@@ -590,7 +591,8 @@ const fetchHybridData = async (symbol, dataType) => {
             const fetchSymbolNews = async (symbol) => {
                 console.log(`📰 Récupération des nouvelles pour ${symbol} depuis le cache...`);
                 try {
-                    const cacheResponse = await fetch(`${API_BASE_URL}/api/news/cached?type=symbol&symbol=${symbol}&limit=20`);
+                    // Cache non disponible - passer directement à l'API
+                    const cacheResponse = { ok: false };
                     console.log(`📡 Réponse Cache Symbol: ${cacheResponse.status}`);
                     
                     if (cacheResponse.ok) {
