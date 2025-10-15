@@ -274,7 +274,8 @@ Rédige maintenant le briefing selon la structure demandée.
           messages: [{ role: 'user', content: contextualPrompt }],
           max_tokens: 2000, // ✅ Limite optimale
           temperature: 0.7, // ✅ Équilibre créativité/précision
-        })
+        }),
+        signal: AbortSignal.timeout(45000) // 45 secondes timeout
       });
       
       model = 'gpt-4o';

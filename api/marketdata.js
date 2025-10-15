@@ -21,13 +21,13 @@ export default async function handler(req, res) {
       return res.status(200).json({ 
         status: 'healthy',
         message: 'Market Data API opérationnel (version corrigée)',
-        availableEndpoints: ['quote'],
+        availableEndpoints: ['quote', 'fundamentals'],
         sources: ['yahoo'],
         timestamp: new Date().toISOString()
       });
     }
 
-    if (endpoint === 'quote') {
+    if (endpoint === 'quote' || endpoint === 'fundamentals') {
       // Utiliser directement Yahoo Finance
       const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
       

@@ -5330,7 +5330,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             console.error('Erreur parsing JSON analyse:', parseError);
                             addLogEntry('ERROR', 'Erreur parsing JSON analyse', {
                                 error: parseError.message,
-                                responseText: (await analysisResponse.text()).substring(0, 200)
+                                responseText: responseText ? responseText.substring(0, 200) : 'No response text'
                             }, 'error');
                             
                             // Fallback avec analyse simulée
