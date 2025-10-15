@@ -4643,31 +4643,54 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 // Prompts Emma En Direct - Style professionnel et technique approfondi
                 const prompts = {
                     morning: {
-                        perplexity: `Tu es Emma, assistante virtuelle experte en analyse financière institutionnelle. Fournis un update matinal détaillé et validé 100% officiel sur la situation globale des marchés, avec un minimum de 1800 mots.
+                        perplexity: `🌅 Prompt Morning Market Briefing — Briefing Matinal Expert
+Tu es Emma, assistante virtuelle experte en analyse financière institutionnelle.
+Rédige un briefing matinal ultra-complet d'environ 1800-2000 mots sur les 12 dernières heures à la fermeture de la veille et à la préouverture, avec :
 
-🚀 PROMPT MATINAL - PRÉOUVERTURE :
+Contenu attendu
+🧾 Résumé du ton et contexte macro, sentiment global de marché (2-3 phrases)
 
-🌍 État global des marchés : performances des indices asiatiques, européens et futures US avec chiffres précis, % de variation, volumes, niveaux clefs (ex : Nikkei +0.4%, DAX -0.2%, S&P futures +0.3%)
+📉 Analyse détaillée des courbes de taux US & CA (2Y, 5Y, 10Y, 30Y), écarts clés, tendances intraday, sources officielles (Slickcharts, Banque du Canada)
 
-📈 Principales données macroéconomiques récentes : PMI, inflation, taux d'intérêt, chiffres emploi (% vs consensus et impact immédiat)
+💱 Devises clés vs USD/CAD, impact sur matières premières, corrélations, données chiffrées (Investing, Banque du Canada)
 
-🏢 Résultats d'entreprises préouverture : titres à fort impact (ex : earnings BAC, MS), comparaison avec consensus EPS, chiffres clés, guidance, réaction boursière (cours, volumes)
+📊 Volatilité & sentiment marché : VIX, MOVE, put/call ratios, indicateurs options, analyse sentiment institutionnel et retail
 
-🔍 Mouvements inhabituels en préouverture : volumes anormaux >200%, gaps >3% sur watchlist, accompagnés d'analyses des causes et implications
+🏭 Performance sectorielle US + CA avec rotations, % moves, drivers macro/micro, sans nommer de titres dans la consigne mais analyses dans la réponse possibles
 
-⚙️ Analyse sectorielle à l'ouverture : performance attendue selon secteurs (tech, finance, énergie, consommation) avec drivers macro et micro
+📈 Analyse des mouvements significatifs sur titres (résultats pré-marché, fusions, volumes anormaux), volumes et gaps, réactions cours
 
-📊 Niveaux techniques clés à suivre sur indices et titres majeurs avec recommandations d'entrée potentielles, stop-loss et objectifs
+🗓️ Calendrier macro & corporate 24-48h : publications clés, résultats attendus, rencontres BC, discours Fed/BCE, anticipation impacts
 
-🗓️ Agenda du jour (macro, earnings, conférences) avec prévisions d'impact et timing détaillé (heures UTC/EST)
+🧭 Synthèse stratégique macro et tactique à court terme, recommandations positionnement, alertes risques
 
-💡 Conseils tactiques précis pour la première session de trading, basés sur les flux institutionnels et retail observés
+🎨 Graphiques clairs inclus (courbes taux, heatmaps sectorielles, volumes consolidés) avec légende et sources
 
-Style : Riche en chiffres et références (sources officielles, liens Reuters, Bloomberg, CNBC) avec URL précises à la fin de chaque section. Format clair avec titres, listes à puces, emojis pour hiérarchiser la lecture. Ton expert, proactif, analytique avec focus sur actionnabilité.
+🔗 Sources validées (Bloomberg, Reuters, CNBC, sites banques centrales, Investing.com) avec URLs`,
+                        openai: `🌅 Prompt Morning Market Briefing — Briefing Matinal Expert
+Tu es Emma, assistante virtuelle experte en analyse financière institutionnelle.
+Rédige un briefing matinal ultra-complet d'environ 1800-2000 mots sur les 12 dernières heures à la fermeture de la veille et à la préouverture, avec :
 
-FORMAT : Données factuelles détaillées avec chiffres précis, sources citées, impact quantifié sur vos secteurs, analyse contextuelle.
-PÉRIODE : Dernières 12 heures + agenda détaillé du jour + perspectives court terme`,
-                        openai: `Tu es Emma, assistante virtuelle experte en analyse financière institutionnelle. Fournis un update matinal détaillé et validé 100% officiel sur la situation globale des marchés, avec un minimum de 1800 mots.
+Contenu attendu
+🧾 Résumé du ton et contexte macro, sentiment global de marché (2-3 phrases)
+
+📉 Analyse détaillée des courbes de taux US & CA (2Y, 5Y, 10Y, 30Y), écarts clés, tendances intraday, sources officielles (Slickcharts, Banque du Canada)
+
+💱 Devises clés vs USD/CAD, impact sur matières premières, corrélations, données chiffrées (Investing, Banque du Canada)
+
+📊 Volatilité & sentiment marché : VIX, MOVE, put/call ratios, indicateurs options, analyse sentiment institutionnel et retail
+
+🏭 Performance sectorielle US + CA avec rotations, % moves, drivers macro/micro, sans nommer de titres dans la consigne mais analyses dans la réponse possibles
+
+📈 Analyse des mouvements significatifs sur titres (résultats pré-marché, fusions, volumes anormaux), volumes et gaps, réactions cours
+
+🗓️ Calendrier macro & corporate 24-48h : publications clés, résultats attendus, rencontres BC, discours Fed/BCE, anticipation impacts
+
+🧭 Synthèse stratégique macro et tactique à court terme, recommandations positionnement, alertes risques
+
+🎨 Graphiques clairs inclus (courbes taux, heatmaps sectorielles, volumes consolidés) avec légende et sources
+
+🔗 Sources validées (Bloomberg, Reuters, CNBC, sites banques centrales, Investing.com) avec URLs
 
 🚀 PROMPT MATINAL - PRÉOUVERTURE :
 
@@ -4740,7 +4763,30 @@ PÉRIODE : Dernières 12 heures + agenda détaillé du jour + perspectives court
 STYLE : Voix Emma - Niveau expert institutionnel, 2000-2500 mots, français, avec chiffres précis, références sectorielles détaillées, et recommandations tactiques approfondies`
                     },
                     noon: {
-                        perplexity: `Tu es Emma, assistante virtuelle experte en analyse financière pour clients institutionnels. Rédige un update intraday détaillé de 1800-2000 mots, validé à 100% par sources officielles et marchés.
+                        perplexity: `⏱️ Prompt Noon Market Briefing — Mise à jour Intraday Approfondie
+Tu es Emma, assistante virtuelle experte en analyse financière.
+Rédige une mise à jour complète de 1800-2200 mots sur la séance en cours, couvrant les dernières 4 heures, avec :
+
+Contenu attendu
+📰 Breaking news corporate : résultats trimestriels, changements de guidance, upgrades/downgrades, rachats, nominations, volumes anormaux, réactions intraday, détails chiffrés précis
+
+📈 Données macro EU/US publiées en matinée (retail sales, PPI, consumer sentiment), comparaison consensus vs réalité, impacts marchés
+
+🔥 Mouvements anormaux sur watchlist (gaps >5%, volumes multipliés), activités options, put/call ratios, sentiment détaillé retail et institutionnel, flux analysés
+
+🏭 Analyse sectorielle approfondie (tech, santé, finance, consommation, énergie, télécoms) avec drivers fondamentaux, implications stratégiques, analyses libres sur titres
+
+📉 Analyse technique intraday (supports, résistances, oscillateurs RSI/MACD, volumes, VIX, corrélations inter-marchés), implications tactiques
+
+💹 Flux institutionnels et retail : rotation sectorielle, flux devises/obligations/actions, analyse sentiment et volumes
+
+🗒️ Calendrier après-midi : discours Fed (Powell), publications économiques clés, résultats after-market, votes/actionnariat
+
+🎯 Recommandations tactiques : niveaux d'entry, stops, hedging, diversification, gestion de risques avec chiffres et scénarios détaillés
+
+📊 Graphiques riches : heatmaps secteurs, volumes titres, courbes techniques, sentiment options
+
+🔗 Sources fiables : Bloomberg, CNBC, Reuters, sites banques centrales, Investing, CBOE
 
 ⏱️ PROMPT MI-JOURNÉE - UPDATE INTRADAY :
 
@@ -4761,7 +4807,30 @@ STYLE : Voix Emma - Niveau expert institutionnel, 2000-2500 mots, français, ave
 🔔 Recommandations tactiques intraday : niveaux d'entrée, stops, hedging, diversification, gestion risques face à la volatilité
 
 Style : Format riche en données et analyses chiffrées (ex : BAC +4.5% intraday, MS EPS $2.80 vs 2.10 consensus). Sources citées systématiquement avec URL (Reuters, CNBC, Bloomberg). Structure claire avec titres, sous-titres, emojis, listes pour faciliter la lecture rapide. Ton expert, synthétique et concret, focalisé sur insights opérationnels à haute valeur ajoutée.`,
-                        openai: `Tu es Emma, assistante virtuelle experte en analyse financière pour clients institutionnels. Rédige un update intraday détaillé de 1800-2000 mots, validé à 100% par sources officielles et marchés.
+                        openai: `⏱️ Prompt Noon Market Briefing — Mise à jour Intraday Approfondie
+Tu es Emma, assistante virtuelle experte en analyse financière.
+Rédige une mise à jour complète de 1800-2200 mots sur la séance en cours, couvrant les dernières 4 heures, avec :
+
+Contenu attendu
+📰 Breaking news corporate : résultats trimestriels, changements de guidance, upgrades/downgrades, rachats, nominations, volumes anormaux, réactions intraday, détails chiffrés précis
+
+📈 Données macro EU/US publiées en matinée (retail sales, PPI, consumer sentiment), comparaison consensus vs réalité, impacts marchés
+
+🔥 Mouvements anormaux sur watchlist (gaps >5%, volumes multipliés), activités options, put/call ratios, sentiment détaillé retail et institutionnel, flux analysés
+
+🏭 Analyse sectorielle approfondie (tech, santé, finance, consommation, énergie, télécoms) avec drivers fondamentaux, implications stratégiques, analyses libres sur titres
+
+📉 Analyse technique intraday (supports, résistances, oscillateurs RSI/MACD, volumes, VIX, corrélations inter-marchés), implications tactiques
+
+💹 Flux institutionnels et retail : rotation sectorielle, flux devises/obligations/actions, analyse sentiment et volumes
+
+🗒️ Calendrier après-midi : discours Fed (Powell), publications économiques clés, résultats after-market, votes/actionnariat
+
+🎯 Recommandations tactiques : niveaux d'entry, stops, hedging, diversification, gestion de risques avec chiffres et scénarios détaillés
+
+📊 Graphiques riches : heatmaps secteurs, volumes titres, courbes techniques, sentiment options
+
+🔗 Sources fiables : Bloomberg, CNBC, Reuters, sites banques centrales, Investing, CBOE
 
 ⏱️ PROMPT MI-JOURNÉE - UPDATE INTRADAY :
 
@@ -4784,7 +4853,30 @@ Style : Format riche en données et analyses chiffrées (ex : BAC +4.5% intraday
 Style : Format riche en données et analyses chiffrées (ex : BAC +4.5% intraday, MS EPS $2.80 vs 2.10 consensus). Sources citées systématiquement avec URL (Reuters, CNBC, Bloomberg). Structure claire avec titres, sous-titres, emojis, listes pour faciliter la lecture rapide. Ton expert, synthétique et concret, focalisé sur insights opérationnels à haute valeur ajoutée.`
                     },
                     evening: {
-                        perplexity: `Tu es Emma, assistante virtuelle experte en analyse financière pour clients institutionnels. Livre une analyse détaillée et validée à 100%, de 1800-2000 mots, sur la séance boursière clôturée.
+                        perplexity: `🌇 Prompt Market Close Briefing — Synthèse & Perspectives Expert
+Tu es Emma, assistante virtuelle experte.
+Livre un briefing de clôture complet (1800-2200 mots) sur la séance clôturée avec :
+
+Contenu attendu
+📉 Synthèse marchés détaillée (indices majeurs US/CA/EU), % variations, volumes, volatilité, gaps, faits marquants
+
+🏢 Review résultats after-market et intraday : analyse des écarts vs consensus, guidances, réactions marchés, avec liberté d'individuer les titres à mentionner
+
+🗞️ Événements macro-financiers : discours Fed/BCE, publications du jour, impacts sur taux, devises, actions
+
+📊 Analyse des flux fin de séance : volumes, VIX, rapports put/call, rotation trading final, corrélations inter-actifs
+
+📉 Analyse technique fin de séance : supports, résistances, oscillateurs, impulsion, perspectives pour séance prochaine
+
+💼 Positionnements institutionnels & retail : mouvements notables, réallocations sectorielles, flux intraday
+
+🗓️ Points à surveiller demain : publications macro, earnings, événements corporate, discours banques centrales
+
+🎯 Recommandations tactiques overnight & open next day : stops, hedge, opportunités, anticipation risques
+
+📈 Graphiques et images : courbes taux, heatmaps, volumes, sentiment, légendes soignées
+
+🔗 Citations sources accessibles : Bloomberg, CNBC, Reuters, sites officiels banques centrales, Investing.com
 
 📊 PROMPT CLÔTURE - SYNTHÈSE ET PERSPECTIVES :
 
@@ -4855,7 +4947,30 @@ Style : Information dense, riche en données et chiffres, 100% sourcé (endpoint
 - Analyse des gaps et niveaux de retournement
 
 FOCUS : Bilan factuel complet et détaillé + setup tactique pour demain avec niveaux clés, recommandations sectorielles, et gestion des risques`,
-                        openai: `Tu es Emma, assistante virtuelle experte en analyse financière pour clients institutionnels. Livre une analyse détaillée et validée à 100%, de 1800-2000 mots, sur la séance boursière clôturée.
+                        openai: `🌇 Prompt Market Close Briefing — Synthèse & Perspectives Expert
+Tu es Emma, assistante virtuelle experte.
+Livre un briefing de clôture complet (1800-2200 mots) sur la séance clôturée avec :
+
+Contenu attendu
+📉 Synthèse marchés détaillée (indices majeurs US/CA/EU), % variations, volumes, volatilité, gaps, faits marquants
+
+🏢 Review résultats after-market et intraday : analyse des écarts vs consensus, guidances, réactions marchés, avec liberté d'individuer les titres à mentionner
+
+🗞️ Événements macro-financiers : discours Fed/BCE, publications du jour, impacts sur taux, devises, actions
+
+📊 Analyse des flux fin de séance : volumes, VIX, rapports put/call, rotation trading final, corrélations inter-actifs
+
+📉 Analyse technique fin de séance : supports, résistances, oscillateurs, impulsion, perspectives pour séance prochaine
+
+💼 Positionnements institutionnels & retail : mouvements notables, réallocations sectorielles, flux intraday
+
+🗓️ Points à surveiller demain : publications macro, earnings, événements corporate, discours banques centrales
+
+🎯 Recommandations tactiques overnight & open next day : stops, hedge, opportunités, anticipation risques
+
+📈 Graphiques et images : courbes taux, heatmaps, volumes, sentiment, légendes soignées
+
+🔗 Citations sources accessibles : Bloomberg, CNBC, Reuters, sites officiels banques centrales, Investing.com
 
 📊 PROMPT CLÔTURE - SYNTHÈSE ET PERSPECTIVES :
 
@@ -12707,6 +12822,11 @@ console.log('✅ Données hybrides récupérées:', {
                 const [results, setResults] = React.useState({});
                 const [query, setQuery] = React.useState('');
                 const [message, setMessage] = React.useState({ type: '', text: '' });
+                const [showLogs, setShowLogs] = React.useState(false);
+                const [logs, setLogs] = React.useState([]);
+                const [emailRecipients, setEmailRecipients] = React.useState('projetsjsl@gmail.com');
+                const [emailSubject, setEmailSubject] = React.useState('');
+                const [sendingEmail, setSendingEmail] = React.useState(false);
 
                 const sections = [
                     { id: 'news', label: '📰 Actualités Financières', icon: '📰' },
@@ -12718,9 +12838,46 @@ console.log('✅ Données hybrides récupérées:', {
                 const handlePerplexityQuery = async (section, customQuery = null) => {
                     setLoading(true);
                     setMessage({ type: '', text: '' });
+                    setLogs([]);
+
+                    const startTime = Date.now();
+                    const queryText = customQuery || query || getDefaultQuery(section);
+                    
+                    // Log initial
+                    const initialLog = {
+                        timestamp: new Date().toISOString(),
+                        step: 'INITIALISATION',
+                        message: `🚀 Début génération ${sections.find(s => s.id === section)?.label}`,
+                        details: {
+                            section: section,
+                            query: queryText,
+                            model: 'sonar-pro',
+                            max_tokens: 2000,
+                            temperature: 0.1
+                        }
+                    };
+                    setLogs(prev => [...prev, initialLog]);
 
                     try {
-                        const queryText = customQuery || query || getDefaultQuery(section);
+                        // Log requête API
+                        const requestLog = {
+                            timestamp: new Date().toISOString(),
+                            step: 'REQUÊTE_API',
+                            message: '📡 Envoi requête vers /api/ai-services',
+                            details: {
+                                endpoint: '/api/ai-services',
+                                method: 'POST',
+                                payload: {
+                                    service: 'perplexity',
+                                    query: queryText,
+                                    section: section,
+                                    model: 'sonar-pro',
+                                    max_tokens: 2000,
+                                    temperature: 0.1
+                                }
+                            }
+                        };
+                        setLogs(prev => [...prev, requestLog]);
                         
                         const response = await fetch('/api/ai-services', {
                             method: 'POST',
@@ -12735,24 +12892,92 @@ console.log('✅ Données hybrides récupérées:', {
                             })
                         });
 
+                        // Log réponse reçue
+                        const responseLog = {
+                            timestamp: new Date().toISOString(),
+                            step: 'RÉPONSE_API',
+                            message: `📥 Réponse reçue: ${response.status} ${response.statusText}`,
+                            details: {
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: Object.fromEntries(response.headers.entries())
+                            }
+                        };
+                        setLogs(prev => [...prev, responseLog]);
+
                         const result = await response.json();
                         
+                        // Log parsing
+                        const parseLog = {
+                            timestamp: new Date().toISOString(),
+                            step: 'PARSING_RÉPONSE',
+                            message: '🔍 Analyse de la réponse JSON',
+                            details: {
+                                success: result.success,
+                                model: result.model,
+                                tokens: result.tokens,
+                                sources_count: result.sources?.length || 0,
+                                content_length: result.content?.length || 0,
+                                fallback: result.fallback || false
+                            }
+                        };
+                        setLogs(prev => [...prev, parseLog]);
+                        
                         if (result.success) {
+                            const finalResult = {
+                                content: result.content,
+                                sources: result.sources || [],
+                                timestamp: new Date().toISOString(),
+                                query: queryText,
+                                model: result.model,
+                                tokens: result.tokens,
+                                fallback: result.fallback || false
+                            };
+                            
                             setResults(prev => ({
                                 ...prev,
-                                [section]: {
-                                    content: result.content,
-                                    sources: result.sources || [],
-                                    timestamp: new Date().toISOString(),
-                                    query: queryText
-                                }
+                                [section]: finalResult
                             }));
+                            
+                            // Log succès
+                            const successLog = {
+                                timestamp: new Date().toISOString(),
+                                step: 'SUCCÈS',
+                                message: `✅ ${sections.find(s => s.id === section)?.label} généré avec succès`,
+                                details: {
+                                    total_time: Date.now() - startTime,
+                                    content_size: result.content?.length || 0,
+                                    sources_found: result.sources?.length || 0,
+                                    tokens_used: result.tokens || 0
+                                }
+                            };
+                            setLogs(prev => [...prev, successLog]);
+                            
                             setMessage({ type: 'success', text: `✅ ${sections.find(s => s.id === section)?.label} généré avec succès` });
+                            
+                            // Auto-remplir le sujet email
+                            if (!emailSubject) {
+                                setEmailSubject(`${sections.find(s => s.id === section)?.label} - ${new Date().toLocaleDateString('fr-FR')}`);
+                            }
                         } else {
                             throw new Error(result.error || 'Erreur lors de la génération');
                         }
                     } catch (error) {
                         console.error('Erreur Perplexity:', error);
+                        
+                        // Log erreur
+                        const errorLog = {
+                            timestamp: new Date().toISOString(),
+                            step: 'ERREUR',
+                            message: `❌ Erreur: ${error.message}`,
+                            details: {
+                                error_type: error.name,
+                                error_message: error.message,
+                                total_time: Date.now() - startTime
+                            }
+                        };
+                        setLogs(prev => [...prev, errorLog]);
+                        
                         setMessage({ type: 'error', text: `❌ Erreur: ${error.message}` });
                     } finally {
                         setLoading(false);
@@ -12771,6 +12996,42 @@ console.log('✅ Données hybrides récupérées:', {
 
                 const getSectionIcon = (section) => {
                     return sections.find(s => s.id === section)?.icon || '📊';
+                };
+
+                const handleSendEmail = async () => {
+                    if (!results[activeSection]) {
+                        setMessage({ type: 'error', text: '❌ Aucun contenu à envoyer' });
+                        return;
+                    }
+
+                    setSendingEmail(true);
+                    setMessage({ type: '', text: '' });
+
+                    try {
+                        const response = await fetch('/api/ai-services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                service: 'resend',
+                                subject: emailSubject || `${sections.find(s => s.id === activeSection)?.label} - ${new Date().toLocaleDateString('fr-FR')}`,
+                                html: results[activeSection].content.replace(/\n/g, '<br>'),
+                                recipients: emailRecipients.split(',').map(email => email.trim())
+                            })
+                        });
+
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            setMessage({ type: 'success', text: `✅ Email envoyé avec succès à ${result.recipients.join(', ')}` });
+                        } else {
+                            throw new Error(result.error || 'Erreur lors de l\'envoi');
+                        }
+                    } catch (error) {
+                        console.error('Erreur envoi email:', error);
+                        setMessage({ type: 'error', text: `❌ Erreur envoi: ${error.message}` });
+                    } finally {
+                        setSendingEmail(false);
+                    }
                 };
 
                 return (
@@ -12844,6 +13105,110 @@ console.log('✅ Données hybrides récupérées:', {
                                     : 'bg-red-100 text-red-800 border border-red-200'
                             }`}>
                                 {message.text}
+                            </div>
+                        )}
+
+                        {/* Contrôles avancés */}
+                        <div className="mb-6 flex flex-wrap gap-4 items-center">
+                            <button
+                                onClick={() => setShowLogs(!showLogs)}
+                                className={`px-4 py-2 rounded-lg transition-colors ${
+                                    showLogs 
+                                        ? 'bg-blue-600 text-white' 
+                                        : isDarkMode 
+                                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                            >
+                                📋 {showLogs ? 'Masquer' : 'Afficher'} Logs Détaillés
+                            </button>
+                            
+                            {results[activeSection] && (
+                                <div className="flex gap-2 items-center">
+                                    <input
+                                        type="text"
+                                        value={emailRecipients}
+                                        onChange={(e) => setEmailRecipients(e.target.value)}
+                                        placeholder="Destinataires (séparés par des virgules)"
+                                        className={`px-3 py-2 rounded border text-sm ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                        }`}
+                                    />
+                                    <input
+                                        type="text"
+                                        value={emailSubject}
+                                        onChange={(e) => setEmailSubject(e.target.value)}
+                                        placeholder="Sujet de l'email"
+                                        className={`px-3 py-2 rounded border text-sm ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                        }`}
+                                    />
+                                    <button
+                                        onClick={handleSendEmail}
+                                        disabled={sendingEmail || !results[activeSection]}
+                                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 text-sm"
+                                    >
+                                        {sendingEmail ? '⏳' : '📧'} Envoyer
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Logs détaillés */}
+                        {showLogs && logs.length > 0 && (
+                            <div className={`mb-6 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'
+                            }`}>
+                                <div className={`p-4 border-b transition-colors duration-300 ${
+                                    isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                                }`}>
+                                    <h4 className={`text-lg font-semibold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        📋 Logs Détaillés - {logs.length} étapes
+                                    </h4>
+                                </div>
+                                <div className="p-4 max-h-96 overflow-y-auto">
+                                    {logs.map((log, index) => (
+                                        <div key={index} className={`mb-3 p-3 rounded border-l-4 ${
+                                            log.step === 'SUCCÈS' ? 'border-green-500 bg-green-50' :
+                                            log.step === 'ERREUR' ? 'border-red-500 bg-red-50' :
+                                            log.step === 'INITIALISATION' ? 'border-blue-500 bg-blue-50' :
+                                            'border-gray-500 bg-gray-50'
+                                        }`}>
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <span className={`font-medium ${
+                                                        log.step === 'SUCCÈS' ? 'text-green-800' :
+                                                        log.step === 'ERREUR' ? 'text-red-800' :
+                                                        log.step === 'INITIALISATION' ? 'text-blue-800' :
+                                                        'text-gray-800'
+                                                    }`}>
+                                                        {log.step}
+                                                    </span>
+                                                    <span className="ml-2 text-gray-600">{log.message}</span>
+                                                </div>
+                                                <span className="text-xs text-gray-500">
+                                                    {new Date(log.timestamp).toLocaleTimeString('fr-FR')}
+                                                </span>
+                                            </div>
+                                            {log.details && (
+                                                <details className="mt-2">
+                                                    <summary className="text-sm text-gray-600 cursor-pointer">
+                                                        Détails techniques
+                                                    </summary>
+                                                    <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-x-auto">
+                                                        {JSON.stringify(log.details, null, 2)}
+                                                    </pre>
+                                                </details>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
