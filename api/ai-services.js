@@ -3,7 +3,7 @@
 // Regroupe Perplexity, OpenAI et Resend en un seul endpoint
 // ============================================================================
 
-import { OpenAI } from 'openai';
+// import { OpenAI } from 'openai'; // Temporairement désactivé pour debug
 
 export default async function handler(req, res) {
   // CORS headers
@@ -228,32 +228,32 @@ Rédige maintenant le briefing selon la structure demandée.
     let model;
 
     if (openaiKey) {
-      // Utiliser OpenAI avec le SDK officiel
-      console.log('🚀 Appel OpenAI avec SDK, clé:', `sk-...${openaiKey.slice(-4)}`);
+      // Utiliser OpenAI avec fetch() (méthode qui fonctionne)
+      console.log('🚀 Appel OpenAI avec fetch, clé:', `sk-...${openaiKey.slice(-4)}`);
       
-      const openai = new OpenAI({
-        apiKey: openaiKey,
-      });
-
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [{ role: 'user', content: contextualPrompt }],
-        max_tokens: 2000,
-        temperature: 0.7,
-      });
-
-      console.log('✅ Réponse OpenAI reçue via SDK');
-      model = 'gpt-4o';
-      
-      // Simuler une réponse pour la compatibilité avec le code existant
-      response = {
-        ok: true,
-        status: 200,
-        json: async () => ({
-          choices: [{ message: { content: completion.choices[0].message.content } }],
-          usage: completion.usage
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          messages: [{ role: 'user', content: contextualPrompt }],
+          max_tokens: 2000,
+          temperature: 0.7,
         })
-      };
+      });
+      
+      model = 'gpt-4o';
+      console.log('✅ Réponse OpenAI reçue, status:', response.status);
+      
+      if (!response.ok) {
+        console.error('❌ Erreur OpenAI:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('❌ Détails erreur:', errorText);
+        throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+      }
     } else if (anthropicKey) {
       // Utiliser Anthropic Claude
       response = await fetch('https://api.anthropic.com/v1/messages', {
