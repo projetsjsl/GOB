@@ -116,10 +116,9 @@ async function handlePerplexity(req, res, { prompt, recency = 'day' }) {
 
     // Vérifier les clés API disponibles pour les actualités
     const perplexityKey = process.env.PERPLEXITY_API_KEY;
-    const marketauxKey = process.env.MARKETAUX_API_KEY;
     const twelveDataKey = process.env.TWELVE_DATA_API_KEY;
     
-    if (!perplexityKey && !marketauxKey && !twelveDataKey) {
+    if (!perplexityKey && !twelveDataKey) {
       return res.status(200).json({
         success: true,
         content: getFallbackNews(),
@@ -148,10 +147,6 @@ async function handlePerplexity(req, res, { prompt, recency = 'day' }) {
         })
       });
       model = 'sonar-pro';
-    } else if (marketauxKey) {
-      // Utiliser Marketaux pour les actualités
-      response = await fetch(`https://api.marketaux.com/v1/news/all?api_token=${marketauxKey}&limit=10&language=fr`);
-      model = 'marketaux';
     } else if (twelveDataKey) {
       // Utiliser Twelve Data pour les actualités
       response = await fetch(`https://api.twelvedata.com/news?apikey=${twelveDataKey}&limit=10`);
@@ -169,12 +164,6 @@ async function handlePerplexity(req, res, { prompt, recency = 'day' }) {
     if (perplexityKey) {
       content = data.choices[0]?.message?.content || '';
       tokens = data.usage?.total_tokens || 0;
-    } else if (marketauxKey) {
-      // Formater les actualités Marketaux
-      const articles = data.data || [];
-      content = articles.map(article => 
-        `📰 ${article.title}\n${article.description}\nSource: ${article.source}\n`
-      ).join('\n');
     } else if (twelveDataKey) {
       // Formater les actualités Twelve Data
       const articles = data.data || [];
