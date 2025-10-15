@@ -4,9 +4,6 @@
     "api/ai-services.js": {
       "maxDuration": 30
     },
-    "api/health-check.js": {
-      "maxDuration": 15
-    },
     "api/health-check-simple.js": {
       "maxDuration": 10
     },
