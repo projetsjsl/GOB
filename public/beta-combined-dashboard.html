@@ -4439,23 +4439,119 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                 // Fonction pour enrichir les données avec les informations de la watchlist
                 const enrichWatchlistData = async (marketData, type) => {
                     try {
-                        addLogEntry('ENRICHMENT', 'Début enrichissement', { type, tickersCount: watchlistTickers.length }, 'info');
+                        addLogEntry('ENRICHMENT_EXPERT', 'Début enrichissement Expert Emma', { 
+                            type, 
+                            tickersCount: watchlistTickers.length 
+                        }, 'info');
                         
-                        // Ajouter les informations spécifiques à la watchlist
-                        const earnings = await getEarningsCalendar();
-                        const dividends = await getDividendsCalendar();
+                        // ============================================================================
+                        // APPELS PARALLÈLES MODULES EXPERT EMMA
+                        // ============================================================================
+                        
+                        const [
+                            yieldCurvesData,
+                            forexDetailedData,
+                            volatilityAdvancedData,
+                            commoditiesData,
+                            tickersNewsData,
+                            earnings,
+                            dividends
+                        ] = await Promise.all([
+                            // Module 1: Courbes de taux US + CA
+                            fetch('/api/ai-services', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ service: 'yield-curves' })
+                            }).then(r => r.json()).catch(e => {
+                                addLogEntry('YIELD_CURVES', 'Erreur', e.message, 'error');
+                                return { success: false, data: null };
+                            }),
+                            
+                            // Module 2: Forex détaillé vs USD + CAD
+                            fetch('/api/ai-services', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ service: 'forex-detailed' })
+                            }).then(r => r.json()).catch(e => {
+                                addLogEntry('FOREX_DETAILED', 'Erreur', e.message, 'error');
+                                return { success: false, data: null };
+                            }),
+                            
+                            // Module 3: Volatilité VIX + MOVE
+                            fetch('/api/ai-services', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ service: 'volatility-advanced' })
+                            }).then(r => r.json()).catch(e => {
+                                addLogEntry('VOLATILITY_ADVANCED', 'Erreur', e.message, 'error');
+                                return { success: false, data: null };
+                            }),
+                            
+                            // Module 4: Commodities (WTI, Or, Cuivre, Argent)
+                            fetch('/api/ai-services', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ service: 'commodities' })
+                            }).then(r => r.json()).catch(e => {
+                                addLogEntry('COMMODITIES', 'Erreur', e.message, 'error');
+                                return { success: false, data: null };
+                            }),
+                            
+                            // Module 5: Nouvelles 26 tickers + Watchlist Dan
+                            fetch('/api/ai-services', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ 
+                                    service: 'tickers-news',
+                                    tickers: tickers, // 26 tickers principaux
+                                    watchlistTickers: watchlistTickers
+                                })
+                            }).then(r => r.json()).catch(e => {
+                                addLogEntry('TICKERS_NEWS', 'Erreur', e.message, 'error');
+                                return { success: false, data: { main_tickers: [], watchlist_dan: [] } };
+                            }),
+                            
+                            // Module 6: Earnings calendar (existant)
+                            getEarningsCalendar(),
+                            
+                            // Module 7: Dividends calendar (existant)
+                            getDividendsCalendar()
+                        ]);
+                        
+                        addLogEntry('ENRICHMENT_EXPERT', 'Modules Expert collectés', {
+                            yieldCurves: yieldCurvesData.success,
+                            forex: forexDetailedData.success,
+                            volatility: volatilityAdvancedData.success,
+                            commodities: commoditiesData.success,
+                            tickersNews: tickersNewsData.success,
+                            earnings: earnings.length,
+                            dividends: dividends.length
+                        }, 'success');
+                        
+                        // Ajouter les données existantes
                         const sectors = getSectorAnalysis();
                         const events = getEconomicEvents(type);
                         
-                        addLogEntry('ENRICHMENT', 'Données collectées', {
-                            earnings: earnings.length,
-                            dividends: dividends.length,
-                            sectors: Object.keys(sectors).length,
-                            events: events.length
-                        }, 'success');
-                        
+                        // Structure enrichie complète
                         const enrichedData = {
                             ...marketData,
+                            // ============================================================================
+                            // MODULES EXPERT EMMA EN DIRECT
+                            // ============================================================================
+                            expert_modules: {
+                                yield_curves: yieldCurvesData.data,
+                                forex_detailed: forexDetailedData.data,
+                                volatility_advanced: volatilityAdvancedData.data,
+                                commodities: commoditiesData.data,
+                                tickers_news: tickersNewsData.data || { main_tickers: [], watchlist_dan: [] },
+                                sources_status: {
+                                    yieldCurves: yieldCurvesData.source || 'unavailable',
+                                    forex: forexDetailedData.source || 'unavailable',
+                                    volatility: volatilityAdvancedData.source || 'unavailable',
+                                    commodities: commoditiesData.source || 'unavailable'
+                                }
+                            },
+                            // Données watchlist existantes
                             watchlist: {
                                 tickers: watchlistTickers,
                                 earnings_calendar: earnings,
@@ -4465,16 +4561,23 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                             }
                         };
                         
-                        addLogEntry('ENRICHMENT', 'Enrichissement terminé', {
+                        addLogEntry('ENRICHMENT_EXPERT', 'Enrichissement Expert terminé', {
                             originalSize: JSON.stringify(marketData).length,
                             enrichedSize: JSON.stringify(enrichedData).length,
+                            expertModulesCount: 5,
                             watchlistData: enrichedData.watchlist
                         }, 'success');
                         
+                        // Stocker les données enrichies dans debugData
+                        setDebugData(prev => ({
+                            ...prev,
+                            expertModules: enrichedData.expert_modules
+                        }));
+                        
                         return enrichedData;
                     } catch (error) {
-                        addLogEntry('ENRICHMENT', 'Erreur enrichissement', error.message, 'error');
-                        console.error('Erreur enrichissement watchlist:', error);
+                        addLogEntry('ENRICHMENT_EXPERT', 'Erreur critique enrichissement', error.message, 'error');
+                        console.error('Erreur enrichissement Expert Emma:', error);
                         return marketData;
                     }
                 };
@@ -4904,9 +5007,21 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                 return (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📧 Briefings Email Automatisés</h2>
+                            <div>
+                                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>📡 Emma En Direct</h2>
+                                <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    L'analyse des marchés, sans filtre · Powered by JSL AI
+                                </p>
+                            </div>
+                            <span className="px-3 py-1 rounded-full text-xs font-bold" style={{
+                                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                                color: '#78350f',
+                                border: '2px solid #f59e0b'
+                            }}>
+                                BÊTA v1.0
+                            </span>
                         </div>
 
                         {/* Sélecteur détaillé des sources API */}
@@ -11537,7 +11652,7 @@ console.log('✅ Données hybrides récupérées:', {
                 { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
                 { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
-                { id: 'email-briefings', label: '📧 Briefings Email', component: EmailBriefingsTab }
+                { id: 'email-briefings', label: '📡 Emma En Direct', component: EmailBriefingsTab }
             ];
 
             return (
