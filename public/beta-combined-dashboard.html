@@ -5177,11 +5177,17 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                                                         '<p><strong>Statut:</strong> ' + (processLog.length > 0 ? 'Processus en cours ou terminé' : 'Aucun processus') + '</p>' +
                                                     '</div>' +
                                                     logEntries +
-                                                    '<script>setTimeout(() => location.reload(), 5000);</script>' +
                                                 '</body>' +
                                             '</html>';
                                             
                                             logWindow.document.write(logHTML);
+                                            
+                                            // Ajouter le script après l'écriture du HTML
+                                            setTimeout(() => {
+                                                if (logWindow && !logWindow.closed) {
+                                                    logWindow.location.reload();
+                                                }
+                                            }, 5000);
                                         }}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
                                             isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'
