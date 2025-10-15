@@ -1,5 +1,4 @@
 {
-  "_comment": "🛡️ GUARDRAIL CRITIQUE - Configuration Vercel validée le 15/10/2025 - 11 fonctions (limite 12) - NE PAS MODIFIER sans test complet",
   "version": 2,
   "functions": {
     "api/ai-services.js": {
