@@ -12720,61 +12720,114 @@ console.log('✅ Données hybrides récupérées:', {
                         console.log(`Table ${index}:`, table.className, table.id, table.querySelectorAll('tr').length + ' lignes');
                     });
                     
-                    // Extraire les événements du calendrier (structure Finviz)
+                    // Extraire les événements du calendrier (structure Finviz réelle)
                     const events = [];
                     
-                    // Chercher spécifiquement la table du calendrier économique
-                    const calendarTable = doc.querySelector('table[id*="calendar"], table[class*="calendar"], .calendar table, #calendar table');
+                    // Debug: Log de la structure HTML pour comprendre
+                    console.log('🔍 Recherche des éléments du calendrier...');
                     
-                    if (calendarTable) {
-                        const eventRows = calendarTable.querySelectorAll('tr');
+                    // Chercher les lignes d'événements dans le calendrier Finviz
+                    // Structure: chaque événement est dans une ligne avec des colonnes spécifiques
+                    const eventRows = doc.querySelectorAll('tr');
+                    
+                    eventRows.forEach((row, index) => {
+                        const cells = row.querySelectorAll('td');
+                        const rowText = row.textContent.trim();
                         
-                        eventRows.forEach(row => {
-                            const cells = row.querySelectorAll('td');
-                            if (cells.length >= 4) {
-                                const time = cells[0]?.textContent?.trim();
-                                const currency = cells[1]?.textContent?.trim();
-                                const importance = cells[2]?.textContent?.trim();
-                                const event = cells[3]?.textContent?.trim();
-                                const actual = cells[4]?.textContent?.trim();
-                                const forecast = cells[5]?.textContent?.trim();
-                                const previous = cells[6]?.textContent?.trim();
-                                
-                                // Filtrer les lignes qui contiennent des données d'événements valides
-                                if (time && event && time.match(/\d{1,2}:\d{2}/) && !time.includes('Time')) {
-                                    events.push({
-                                        time,
-                                        currency,
-                                        importance,
-                                        event,
-                                        actual,
-                                        forecast,
-                                        previous
-                                    });
-                                }
+                        // Debug: Log des lignes qui contiennent des heures
+                        if (rowText.match(/\d{1,2}:\d{2}\s+(AM|PM)/)) {
+                            console.log(`📅 Ligne ${index} avec heure:`, rowText.substring(0, 100));
+                        }
+                        
+                        // Chercher les lignes qui contiennent des événements économiques
+                        if (cells.length >= 6 && rowText.match(/\d{1,2}:\d{2}\s+(AM|PM)/)) {
+                            // Structure Finviz: Impact, For, Actual, Expected, Prior, Alerts
+                            const impact = cells[0]?.textContent?.trim();
+                            const forPeriod = cells[1]?.textContent?.trim();
+                            const actual = cells[2]?.textContent?.trim();
+                            const expected = cells[3]?.textContent?.trim();
+                            const prior = cells[4]?.textContent?.trim();
+                            
+                            // Extraire l'heure et l'événement du texte de la ligne
+                            const timeMatch = rowText.match(/(\d{1,2}:\d{2}\s+(AM|PM))/);
+                            const time = timeMatch ? timeMatch[1] : '';
+                            
+                            // Extraire le nom de l'événement (après l'heure)
+                            const eventMatch = rowText.match(/\d{1,2}:\d{2}\s+(AM|PM)\s+(.+?)(?:\s+\d|$)/);
+                            const event = eventMatch ? eventMatch[2].trim() : '';
+                            
+                            // Déterminer l'importance basée sur les barres d'impact
+                            let importance = 'Low';
+                            if (impact && impact.includes('|||')) {
+                                importance = 'High';
+                            } else if (impact && impact.includes('||')) {
+                                importance = 'Medium';
                             }
-                        });
-                    }
+                            
+                            // Déterminer la devise basée sur l'événement
+                            let currency = 'USD';
+                            if (event.includes('Fed') || event.includes('CPI') || event.includes('PPI') || 
+                                event.includes('Jobless') || event.includes('Retail') || event.includes('Manufacturing')) {
+                                currency = 'USD';
+                            } else if (event.includes('Eurozone') || event.includes('ECB')) {
+                                currency = 'EUR';
+                            } else if (event.includes('Bank of England') || event.includes('BoE')) {
+                                currency = 'GBP';
+                            }
+                            
+                            if (time && event && !event.includes('Release')) {
+                                events.push({
+                                    time,
+                                    currency,
+                                    importance,
+                                    event,
+                                    actual: actual || 'N/A',
+                                    forecast: expected || 'N/A',
+                                    previous: prior || 'N/A'
+                                });
+                            }
+                        }
+                    });
                     
-                    // Si pas de table spécifique trouvée, essayer une approche alternative
+                    // Si toujours pas d'événements, essayer une approche par regex
                     if (events.length === 0) {
-                        // Chercher des patterns dans le HTML qui ressemblent à des événements économiques
+                        console.log('🔍 Tentative avec regex...');
                         const htmlText = htmlContent;
-                        const eventPatterns = htmlText.match(/(\d{1,2}:\d{2})\s+([A-Z]{3})\s+([A-Z]+)\s+([^<]+)/g);
+                        
+                        // Pattern pour capturer les événements économiques
+                        const eventPatterns = htmlText.match(/>\s*(\d{1,2}:\d{2}\s+(AM|PM))\s+([^<]+?)(?:\s+\d|$)/g);
                         
                         if (eventPatterns) {
-                            eventPatterns.forEach(pattern => {
-                                const parts = pattern.split(/\s+/);
-                                if (parts.length >= 4) {
-                                    events.push({
-                                        time: parts[0],
-                                        currency: parts[1],
-                                        importance: parts[2],
-                                        event: parts.slice(3).join(' '),
-                                        actual: 'N/A',
-                                        forecast: 'N/A',
-                                        previous: 'N/A'
-                                    });
+                            console.log('📊 Patterns trouvés:', eventPatterns.length);
+                            eventPatterns.forEach((pattern, index) => {
+                                const timeMatch = pattern.match(/(\d{1,2}:\d{2}\s+(AM|PM))/);
+                                const eventMatch = pattern.match(/>\s*\d{1,2}:\d{2}\s+(AM|PM)\s+(.+?)(?:\s+\d|$)/);
+                                
+                                if (timeMatch && eventMatch) {
+                                    const time = timeMatch[1];
+                                    const event = eventMatch[2].trim();
+                                    
+                                    // Éviter les doublons et les lignes de navigation
+                                    if (!event.includes('Release') && !event.includes('Home') && 
+                                        !event.includes('News') && !event.includes('Screener')) {
+                                        
+                                        let currency = 'USD';
+                                        if (event.includes('Eurozone') || event.includes('ECB')) {
+                                            currency = 'EUR';
+                                        } else if (event.includes('Bank of England') || event.includes('BoE')) {
+                                            currency = 'GBP';
+                                        }
+                                        
+                                        events.push({
+                                            time,
+                                            currency,
+                                            importance: 'Medium',
+                                            event,
+                                            actual: 'N/A',
+                                            forecast: 'N/A',
+                                            previous: 'N/A'
+                                        });
+                                    }
                                 }
                             });
                         }
