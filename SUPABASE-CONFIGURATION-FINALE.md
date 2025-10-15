@@ -16,7 +16,7 @@ No more than 12 Serverless Functions can be added to a Deployment on the Hobby p
 ### ✅ **Après** : Build Success
 - **Fonctions supprimées** : `api/health-check.js` (redondant)
 - **Fonctions conservées** : 11 fonctions essentielles
-- **Nouvelle fonction** : `api/test-supabase.js` pour tester Supabase
+- **Test Supabase intégré** : dans `api/health-check-simple.js`
 
 ---
 
@@ -34,7 +34,7 @@ No more than 12 Serverless Functions can be added to a Deployment on the Hobby p
 | 8 | `api/gemini/chat.js` | Chat Emma standard | ✅ Essentiel |
 | 9 | `api/gemini/chat-validated.js` | Chat Emma expert | ✅ Essentiel |
 | 10 | `api/gemini/tools.js` | Outils Emma | ✅ Essentiel |
-| 11 | `api/test-supabase.js` | Test connexion Supabase | ✅ **NOUVEAU** |
+| 11 | `api/health-check-simple.js` | Diagnostic APIs + Test Supabase | ✅ **INTÉGRÉ** |
 
 **Total** : 11 fonctions (limite : 12) ✅
 
@@ -72,8 +72,8 @@ SUPABASE_SERVICE_ROLE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ### **Étape 3 : Tester la connexion**
 
 ```bash
-# Test de connexion Supabase
-curl https://gobapps.com/api/test-supabase
+# Test de connexion Supabase (via health-check-simple)
+curl https://gobapps.com/api/health-check-simple
 
 # Test de l'API Watchlist
 curl https://gobapps.com/api/supabase-watchlist
@@ -148,7 +148,7 @@ curl https://gobapps.com/api/supabase-watchlist
 ## 📋 **CHECKLIST FINALE**
 
 - [x] **Build error résolu** - Limite 12 fonctions respectée
-- [x] **Endpoint de test créé** - `api/test-supabase.js`
+- [x] **Test Supabase intégré** - dans `api/health-check-simple.js`
 - [x] **Fonction redondante supprimée** - `api/health-check.js`
 - [x] **Configuration prête** - 11 fonctions essentielles
 - [ ] **Variables d'environnement configurées** - Dans Vercel

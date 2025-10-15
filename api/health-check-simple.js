@@ -121,6 +121,16 @@ export default async function handler(req, res) {
         ],
         dependencies: ['GEMINI_API_KEY']
       }),
+      testEndpointWithDetails(`${baseUrl}/api/supabase-watchlist`, 'Supabase Connection', {
+        description: 'Test de connexion Supabase et watchlist',
+        sub_apis: [
+          'Test variables d\'environnement Supabase',
+          'Test connexion base de données',
+          'Test accès tables (watchlists, briefings)',
+          'Vérification source (supabase vs fallback)'
+        ],
+        dependencies: ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY']
+      }),
       testEndpointWithDetails(`${baseUrl}/api/gemini/chat`, 'Gemini Chat', {
         description: 'Chat Emma avec Gemini (mode standard)',
         sub_apis: [

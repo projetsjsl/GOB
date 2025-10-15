@@ -9,8 +9,8 @@
 ## 🎯 **MODIFICATIONS RÉALISÉES**
 
 ### ✅ **1. Nouvel endpoint de test créé :**
-- **Fichier** : `api/test-supabase.js`
-- **URL** : `https://gobapps.com/api/test-supabase`
+- **Test Supabase intégré** : dans `api/health-check-simple.js`
+- **URL** : `https://gobapps.com/api/health-check-simple`
 - **Fonction** : Test complet de la connexion Supabase
 
 ### ✅ **2. Script de configuration créé :**

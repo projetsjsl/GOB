@@ -70,7 +70,7 @@ SUPABASE_SERVICE_ROLE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 Après le redéploiement, tester :
 
 \`\`\`bash
-curl https://gobapps.com/api/test-supabase
+curl https://gobapps.com/api/health-check-simple
 \`\`\`
 
 Résultat attendu :
@@ -136,7 +136,7 @@ function main() {
   console.log('\n📋 Prochaines étapes :');
   console.log('1. Modifier les valeurs dans .env.local avec vos vraies clés Supabase');
   console.log('2. Suivre les instructions dans VERCEL-SUPABASE-SETUP.md');
-  console.log('3. Tester avec : curl https://gobapps.com/api/test-supabase');
+  console.log('3. Tester avec : curl https://gobapps.com/api/health-check-simple');
 }
 
 if (require.main === module) {

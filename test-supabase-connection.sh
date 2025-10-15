@@ -7,14 +7,13 @@
 echo "🔍 Test de connexion Supabase..."
 echo "=================================="
 
-# Test 1: Endpoint de test Supabase
-echo "📋 Test 1: Endpoint de test Supabase"
-echo "------------------------------------"
-curl -s "https://gobapps.com/api/test-supabase" | jq '{
+# Test 1: Endpoint de test Supabase (via health-check-simple)
+echo "📋 Test 1: Test Supabase via Health Check"
+echo "----------------------------------------"
+curl -s "https://gobapps.com/api/health-check-simple" | jq '{
   status: .status,
   message: .message,
-  environment: .environment,
-  summary: .summary
+  apis: .apis | map(select(.name == "Supabase Connection"))
 }' 2>/dev/null || echo "❌ Erreur lors du test Supabase"
 
 echo ""
@@ -44,6 +43,7 @@ echo "1. Aller dans Vercel → Settings → Environment Variables"
 echo "2. Ajouter les 3 variables Supabase"
 echo "3. Redéployer l'application"
 echo "4. Relancer ce test"
+echo "   - Test Supabase maintenant via health-check-simple"
 
 echo ""
 echo "✅ Test terminé !"
