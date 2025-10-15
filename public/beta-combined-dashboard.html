@@ -5460,7 +5460,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(analysisRequest),
-                            signal: AbortSignal.timeout(45000) // 45 secondes timeout pour l'analyse
+                            signal: AbortSignal.timeout(90000) // 90 secondes timeout pour l'analyse
                         });
                         
                         addLogEntry('ANALYSIS', 'Réponse analyse reçue', { 
@@ -5573,6 +5573,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         setSelectedType(type);
                         
                         console.log('✅ États React mis à jour avec succès');
+                        console.log('🔍 Briefing object:', briefing);
+                        console.log('🔍 HTML length:', html.length);
                         
                         addLogEntry('COMPLETION', 'Briefing généré avec succès', {
                             totalTime: Date.now() - new Date(processLog[0]?.timestamp).getTime(),
@@ -5615,6 +5617,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             setSelectedType(type);
                             
                             console.log('✅ Briefing de fallback créé et états mis à jour');
+                            console.log('🔍 Fallback briefing object:', fallbackBriefing);
+                            console.log('🔍 Preview HTML length:', fallbackHtml.length);
                         }
                     } finally {
                         setLoading(false);
@@ -6598,10 +6602,14 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         </div>
 
                         {/* Prévisualisation et actions */}
-                        {console.log('🔍 État currentBriefing:', currentBriefing)}
-                        {console.log('🔍 Affichage section aperçu:', true)}
-                        {console.log('🔍 Type de briefing:', currentBriefing?.type)}
-                        {console.log('🔍 Fallback mode:', currentBriefing?.fallback)}
+                        {(() => {
+                            console.log('🔍 État currentBriefing:', currentBriefing);
+                            console.log('🔍 Affichage section aperçu:', true);
+                            console.log('🔍 Type de briefing:', currentBriefing?.type || 'Aucun');
+                            console.log('🔍 Fallback mode:', currentBriefing?.fallback || false);
+                            console.log('🔍 État previewHtml:', previewHtml ? 'Contenu présent' : 'Vide');
+                            return null;
+                        })()}
                         {true && (
                             <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
