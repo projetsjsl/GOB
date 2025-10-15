@@ -264,7 +264,7 @@ const fetchHybridData = async (symbol, dataType) => {
       symbol,
       dataType,
       data: data,
-      source: 'yahoo-finance',
+      source: 'perplexity',
       fallback: false,
       metadata: {
         confidence: 0.9,
@@ -5254,16 +5254,17 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             analysis: { request: null, response: null, error: null }
                         });
 
-                        // 1. Collecter les données marché
+                        // 1. Collecter les données marché via Perplexity
                         addLogEntry('MARKET_DATA', 'Début collecte données marché', { 
-                            source: apiSources.marketData,
+                            source: 'perplexity',
                             type 
                         }, 'info');
                         
                         const marketDataRequest = {
-                            service: 'briefing-data',
-                            type: type,
-                            source: apiSources.marketData
+                            service: 'perplexity',
+                            query: `Données de marché actuelles pour briefing ${type}: indices US (S&P 500, NASDAQ, DOW), devises (USD/CAD, EUR/USD), matières premières (or, pétrole), taux d'intérêt, volatilité VIX`,
+                            section: 'market-data',
+                            recency: 'day'
                         };
                         
                         addLogEntry('MARKET_DATA', 'Requête envoyée', marketDataRequest, 'info');
@@ -5290,7 +5291,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         
                         addLogEntry('MARKET_DATA', 'Données parsées', {
                             success: dataResult.success,
-                            dataSize: JSON.stringify(dataResult.data || {}).length,
+                            contentLength: dataResult.content?.length || 0,
+                            model: dataResult.model,
                             fallback: dataResult.fallback,
                             timestamp: dataResult.timestamp
                         }, dataResult.success ? 'success' : 'error');
@@ -5309,12 +5311,25 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             throw new Error('Erreur lors de la collecte des données');
                         }
 
-                        // 1.5. Enrichir les données avec les informations de la watchlist
-                        const enrichedMarketData = await enrichWatchlistData(dataResult.data, type);
+                        // 1.5. Créer un objet de données marché basé sur la réponse Perplexity
+                        const marketData = {
+                            source: 'perplexity',
+                            content: dataResult.content,
+                            model: dataResult.model,
+                            timestamp: new Date().toISOString(),
+                            fallback: dataResult.fallback || false
+                        };
+                        
+                        // Enrichir avec les informations de la watchlist (simplifié pour Perplexity)
+                        const enrichedMarketData = {
+                            ...marketData,
+                            watchlist: watchlistTickers.slice(0, 5), // Limiter pour éviter les erreurs
+                            type: type
+                        };
 
                         // 2. Rechercher les actualités
                         addLogEntry('NEWS', 'Début recherche actualités', { 
-                            source: apiSources.news,
+                            source: 'perplexity',
                             promptLength: prompts[type].perplexity.length
                         }, 'info');
                         
@@ -5322,12 +5337,12 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             service: 'perplexity',
                             prompt: prompts[type].perplexity,
                             recency: 'day',
-                            source: apiSources.news
+                            section: 'news'
                         };
                         
                         addLogEntry('NEWS', 'Requête actualités envoyée', {
                             service: newsRequest.service,
-                            source: newsRequest.source,
+                            section: newsRequest.section,
                             recency: newsRequest.recency,
                             promptPreview: newsRequest.prompt.substring(0, 200) + '...',
                             fullPrompt: newsRequest.prompt
@@ -5382,12 +5397,12 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             prompt: prompts[type].perplexity,
                             marketData: enrichedMarketData,
                             news: newsResult.content || 'Aucune actualité disponible',
-                            source: apiSources.analysis
+                            section: 'analysis'
                         };
                         
                         addLogEntry('ANALYSIS', 'Requête analyse envoyée', {
                             service: analysisRequest.service,
-                            source: analysisRequest.source,
+                            section: analysisRequest.section,
                             promptPreview: analysisRequest.prompt.substring(0, 200) + '...',
                             fullPrompt: analysisRequest.prompt,
                             marketDataKeys: Object.keys(analysisRequest.marketData || {}),
