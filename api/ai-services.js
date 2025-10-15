@@ -445,7 +445,7 @@ Rédige maintenant le briefing selon la structure demandée.
           max_tokens: 2000, // ✅ Limite optimale
           temperature: 0.7, // ✅ Équilibre créativité/précision
         }),
-        signal: AbortSignal.timeout(45000) // 45 secondes timeout
+        signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
       });
       
       model = 'gpt-4o';
@@ -466,7 +466,7 @@ Rédige maintenant le briefing selon la structure demandée.
           'Content-Type': 'application/json',
           'anthropic-version': '2023-06-01'
         },
-        signal: AbortSignal.timeout(25000), // 25 secondes timeout
+        signal: AbortSignal.timeout(120000), // 120 secondes timeout pour Perplexity
         body: JSON.stringify({
           model: 'claude-3-sonnet-20240229',
           max_tokens: 2500,

@@ -5310,7 +5310,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(marketDataRequest),
-                            signal: AbortSignal.timeout(30000) // 30 secondes timeout
+                            signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
                         });
                         
                         addLogEntry('MARKET_DATA', 'Réponse reçue', { 
@@ -5396,7 +5396,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(newsRequest),
-                            signal: AbortSignal.timeout(60000) // 60 secondes timeout pour Perplexity
+                            signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
                         });
                         
                         addLogEntry('NEWS', 'Réponse actualités reçue', { 
@@ -5463,7 +5463,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(analysisRequest),
-                            signal: AbortSignal.timeout(90000) // 90 secondes timeout pour l'analyse
+                            signal: AbortSignal.timeout(120000) // 120 secondes timeout pour l'analyse Perplexity
                         });
                         
                         addLogEntry('ANALYSIS', 'Réponse analyse reçue', { 
@@ -7343,7 +7343,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 const generatePerplexityResponse = async (userMessage) => {
                     try {
                         console.log('🔍 Génération de réponse Perplexity pour:', userMessage);
-                        
+
                         // Récupérer les données en temps réel du dashboard
                         const currentStockData = stockData || {};
                         const currentNewsData = newsData || [];
@@ -7382,20 +7382,20 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         
                         // Utiliser l'API Perplexity via /api/ai-services
                         const response = await fetch('/api/ai-services', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
                                 service: 'perplexity',
                                 query: fullPrompt,
                                 section: 'analysis',
                                 model: 'sonar-reasoning-pro',
                                 max_tokens: emmaMaxTokens,
-                                temperature: emmaTemperature,
+                                    temperature: emmaTemperature,
                                 recency: 'day'
-                            })
-                        });
+                                })
+                            });
 
                         if (!response.ok) {
                             const errorData = await response.json().catch(() => ({}));

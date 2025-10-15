@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/ai-services.js": {
-      "maxDuration": 60
+      "maxDuration": 120
     },
     "api/health-check-simple.js": {
       "maxDuration": 10
