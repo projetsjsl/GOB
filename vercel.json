@@ -13,20 +13,11 @@
     "api/marketdata.js": {
       "maxDuration": 10
     },
-    "api/fmp.js": {
-      "maxDuration": 10
-    },
     "api/supabase-watchlist.js": {
       "maxDuration": 15
     },
-    "api/unified-serverless.js": {
-      "maxDuration": 30
-    },
     "api/gemini-key.js": {
       "maxDuration": 10
-    },
-    "api/github-update.js": {
-      "maxDuration": 15
     }
   },
   "headers": [
