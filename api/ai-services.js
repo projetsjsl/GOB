@@ -236,15 +236,22 @@ Rédige maintenant le briefing selon la structure demandée.
         },
         signal: AbortSignal.timeout(25000), // 25 secondes timeout
         body: JSON.stringify({
-          model: 'gpt-5',
+          model: 'gpt-4o',
           messages: [{ role: 'user', content: contextualPrompt }],
           max_tokens: 2000,
           temperature: 0.7,
           timeout: 30000
         })
       });
-      model = 'gpt-5';
+      model = 'gpt-4o';
       console.log('✅ Réponse OpenAI reçue, status:', response.status);
+      
+      if (!response.ok) {
+        console.error('❌ Erreur OpenAI:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('❌ Détails erreur:', errorText);
+        throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+      }
     } else if (anthropicKey) {
       // Utiliser Anthropic Claude
       response = await fetch('https://api.anthropic.com/v1/messages', {
