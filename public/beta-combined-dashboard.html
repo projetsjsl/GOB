@@ -5138,7 +5138,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                                     <button
                                         onClick={() => {
                                             const logWindow = window.open('', '_blank', 'width=1200,height=800');
-                                            logWindow.document.write(`
+                                            const logHTML = `
                                                 <html>
                                                     <head>
                                                         <title>Log Complet - Briefing Email</title>
@@ -5164,22 +5164,22 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                                                             <p><strong>Dernière mise à jour:</strong> ${new Date().toLocaleString('fr-FR')}</p>
                                                             <p><strong>Statut:</strong> ${processLog.length > 0 ? 'Processus en cours ou terminé' : 'Aucun processus'}</p>
                                                         </div>
-                                                        ${processLog.map(entry => `
-                                                            <div class="log-entry ${entry.status}">
-                                                                <div class="timestamp">${new Date(entry.timestamp).toLocaleString('fr-FR')}</div>
-                                                                <div class="step">[${entry.step}]</div>
-                                                                <div class="type">${entry.type}</div>
-                                                                <div class="data">${entry.data}</div>
-                                                                <div style="font-size: 0.8em; color: #888;">Taille: ${entry.size} caractères</div>
-                                                            </div>
-                                                        `).join('')}
+                                                        ${processLog.map(entry => 
+                                                            '<div class="log-entry ' + entry.status + '">' +
+                                                                '<div class="timestamp">' + new Date(entry.timestamp).toLocaleString('fr-FR') + '</div>' +
+                                                                '<div class="step">[' + entry.step + ']</div>' +
+                                                                '<div class="type">' + entry.type + '</div>' +
+                                                                '<div class="data">' + entry.data + '</div>' +
+                                                                '<div style="font-size: 0.8em; color: #888;">Taille: ' + entry.size + ' caractères</div>' +
+                                                            '</div>'
+                                                        ).join('')}
                                                         <script>
-                                                            // Auto-refresh toutes les 5 secondes
                                                             setTimeout(() => location.reload(), 5000);
                                                         </script>
                                                     </body>
                                                 </html>
-                                            `);
+                                            `;
+                                            logWindow.document.write(logHTML);
                                         }}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
                                             isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'
