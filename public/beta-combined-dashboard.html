@@ -8093,17 +8093,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 );
             };
 
-            // Configuration des onglets (après déclaration des composants)
-            const tabs = [
-                { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
-                { id: 'intellistocks', label: '📈 JLab™', component: IntelliStocksTab },
-                { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
-                { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
-                { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
-                { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
-                { id: 'email-briefings', label: '📧 Briefings Email', component: EmailBriefingsTab }
-            ];
-
             // Composant onglet Stocks & News
             const StocksNewsTab = () => (
                 <div className="space-y-6">
@@ -9066,6 +9055,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 </div>
             );
+
+            // Configuration des onglets (après déclaration de tous les composants)
+            const tabs = [
+                { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
+                { id: 'intellistocks', label: '📈 JLab™', component: IntelliStocksTab },
+                { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
+                { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
+                { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
+                { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
+                { id: 'email-briefings', label: '📧 Briefings Email', component: EmailBriefingsTab }
+            ];
 
             // ============================================
             // COMPOSANT INTELLISTOCKS
