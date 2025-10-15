@@ -278,17 +278,6 @@ const fetchHybridData = async (symbol, dataType) => {
                 return icons[name] || <div className={className}></div>;
             };
 
-        // Configuration des onglets (après déclaration des composants)
-        tabs = [
-            { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
-            { id: 'intellistocks', label: '📈 JLab™', component: IntelliStocksTab },
-            { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
-            { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
-            { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
-            { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
-            { id: 'email-briefings', label: '📧 Briefings Email', component: EmailBriefingsTab }
-        ];
-
         const BetaCombinedDashboard = () => {
             // États principaux
             const [activeTab, setActiveTab] = useState('stocks-news');
@@ -8103,6 +8092,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
                 );
             };
+
+            // Configuration des onglets (après déclaration des composants)
+            const tabs = [
+                { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
+                { id: 'intellistocks', label: '📈 JLab™', component: IntelliStocksTab },
+                { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
+                { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
+                { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
+                { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
+                { id: 'email-briefings', label: '📧 Briefings Email', component: EmailBriefingsTab }
+            ];
 
             // Composant onglet Stocks & News
             const StocksNewsTab = () => (
