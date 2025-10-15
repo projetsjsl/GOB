@@ -496,7 +496,9 @@ async function handleBriefingData(req, res, { type = 'morning', source = 'apis' 
         data.futures = await getFuturesYahoo();
       } else {
         data.asian_markets = await getAsianMarkets();
-        data.futures = await getFutures();
+        const futuresResult = await getFutures();
+        data.futures = futuresResult.data || futuresResult;
+        fallbackIndicators.futures = futuresResult.fallback || false;
       }
     } else if (type === 'noon') {
       if (source === 'yahoo') {
@@ -697,19 +699,19 @@ async function getFutures() {
     try {
       // Utiliser votre API marketdata existante
       const response = await fetch(
-        `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/marketdata?endpoint=quote&symbol=${future.symbol}&source=auto`
+        `https://gob-git-main-projetsjsls-projects.vercel.app/api/marketdata?endpoint=quote&symbol=${future.symbol}&source=auto`
       );
       
       if (response.ok) {
         const result = await response.json();
-        if (result.success && result.data) {
-          const quote = result.data;
+        // L'API marketdata retourne directement les données, pas dans un objet data
+        if (result.c !== undefined) {
           data.push({
             symbol: future.symbol,
             name: future.name,
-            price: quote.c || quote.price || 0,
-            change: quote.d || quote.change || 0,
-            changePct: quote.dp || quote.changePercent || 0
+            price: result.c || 0,
+            change: result.d || 0,
+            changePct: result.dp || 0
           });
         }
       }
@@ -720,10 +722,21 @@ async function getFutures() {
   
   // Si aucune donnée réelle, utiliser les données fallback
   if (data.length === 0) {
-    return getFallbackFutures();
+    return {
+      data: getFallbackFutures(),
+      fallback: true,
+      source: 'fallback',
+      error: 'API marketdata indisponible',
+      timestamp: new Date().toISOString()
+    };
   }
   
-  return data;
+  return {
+    data: data,
+    fallback: false,
+    source: 'yahoo-finance',
+    timestamp: new Date().toISOString()
+  };
 }
 
 async function getUSMarkets() {
