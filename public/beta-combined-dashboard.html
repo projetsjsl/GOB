@@ -5138,47 +5138,49 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 1500-2000 mots, fran
                                     <button
                                         onClick={() => {
                                             const logWindow = window.open('', '_blank', 'width=1200,height=800');
-                                            const logHTML = `
-                                                <html>
-                                                    <head>
-                                                        <title>Log Complet - Briefing Email</title>
-                                                        <style>
-                                                            body { font-family: 'Courier New', monospace; margin: 20px; background: #1a1a1a; color: #fff; }
-                                                            .log-entry { margin: 10px 0; padding: 10px; border-left: 4px solid #333; background: #2a2a2a; }
-                                                            .log-entry.success { border-left-color: #10b981; }
-                                                            .log-entry.error { border-left-color: #ef4444; }
-                                                            .log-entry.warning { border-left-color: #f59e0b; }
-                                                            .log-entry.info { border-left-color: #3b82f6; }
-                                                            .timestamp { color: #888; font-size: 0.8em; }
-                                                            .step { font-weight: bold; color: #60a5fa; }
-                                                            .type { color: #fbbf24; }
-                                                            .data { background: #333; padding: 10px; margin: 5px 0; border-radius: 4px; white-space: pre-wrap; }
-                                                            .summary { background: #1e40af; padding: 15px; margin: 20px 0; border-radius: 8px; }
-                                                        </style>
-                                                    </head>
-                                                    <body>
-                                                        <h1>📋 Log Complet - Processus de Génération Briefing</h1>
-                                                        <div class="summary">
-                                                            <h2>📊 Résumé</h2>
-                                                            <p><strong>Total d'entrées:</strong> ${processLog.length}</p>
-                                                            <p><strong>Dernière mise à jour:</strong> ${new Date().toLocaleString('fr-FR')}</p>
-                                                            <p><strong>Statut:</strong> ${processLog.length > 0 ? 'Processus en cours ou terminé' : 'Aucun processus'}</p>
-                                                        </div>
-                                                        ${processLog.map(entry => 
-                                                            '<div class="log-entry ' + entry.status + '">' +
-                                                                '<div class="timestamp">' + new Date(entry.timestamp).toLocaleString('fr-FR') + '</div>' +
-                                                                '<div class="step">[' + entry.step + ']</div>' +
-                                                                '<div class="type">' + entry.type + '</div>' +
-                                                                '<div class="data">' + entry.data + '</div>' +
-                                                                '<div style="font-size: 0.8em; color: #888;">Taille: ' + entry.size + ' caractères</div>' +
-                                                            '</div>'
-                                                        ).join('')}
-                                                        <script>
-                                                            setTimeout(() => location.reload(), 5000);
-                                                        </script>
-                                                    </body>
-                                                </html>
-                                            `;
+                                            
+                                            // Construire le HTML du log
+                                            let logEntries = '';
+                                            processLog.forEach(entry => {
+                                                logEntries += '<div class="log-entry ' + entry.status + '">' +
+                                                    '<div class="timestamp">' + new Date(entry.timestamp).toLocaleString('fr-FR') + '</div>' +
+                                                    '<div class="step">[' + entry.step + ']</div>' +
+                                                    '<div class="type">' + entry.type + '</div>' +
+                                                    '<div class="data">' + entry.data + '</div>' +
+                                                    '<div style="font-size: 0.8em; color: #888;">Taille: ' + entry.size + ' caractères</div>' +
+                                                '</div>';
+                                            });
+                                            
+                                            const logHTML = '<html>' +
+                                                '<head>' +
+                                                    '<title>Log Complet - Briefing Email</title>' +
+                                                    '<style>' +
+                                                        'body { font-family: "Courier New", monospace; margin: 20px; background: #1a1a1a; color: #fff; }' +
+                                                        '.log-entry { margin: 10px 0; padding: 10px; border-left: 4px solid #333; background: #2a2a2a; }' +
+                                                        '.log-entry.success { border-left-color: #10b981; }' +
+                                                        '.log-entry.error { border-left-color: #ef4444; }' +
+                                                        '.log-entry.warning { border-left-color: #f59e0b; }' +
+                                                        '.log-entry.info { border-left-color: #3b82f6; }' +
+                                                        '.timestamp { color: #888; font-size: 0.8em; }' +
+                                                        '.step { font-weight: bold; color: #60a5fa; }' +
+                                                        '.type { color: #fbbf24; }' +
+                                                        '.data { background: #333; padding: 10px; margin: 5px 0; border-radius: 4px; white-space: pre-wrap; }' +
+                                                        '.summary { background: #1e40af; padding: 15px; margin: 20px 0; border-radius: 8px; }' +
+                                                    '</style>' +
+                                                '</head>' +
+                                                '<body>' +
+                                                    '<h1>📋 Log Complet - Processus de Génération Briefing</h1>' +
+                                                    '<div class="summary">' +
+                                                        '<h2>📊 Résumé</h2>' +
+                                                        '<p><strong>Total d\'entrées:</strong> ' + processLog.length + '</p>' +
+                                                        '<p><strong>Dernière mise à jour:</strong> ' + new Date().toLocaleString('fr-FR') + '</p>' +
+                                                        '<p><strong>Statut:</strong> ' + (processLog.length > 0 ? 'Processus en cours ou terminé' : 'Aucun processus') + '</p>' +
+                                                    '</div>' +
+                                                    logEntries +
+                                                    '<script>setTimeout(() => location.reload(), 5000);</script>' +
+                                                '</body>' +
+                                            '</html>';
+                                            
                                             logWindow.document.write(logHTML);
                                         }}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
