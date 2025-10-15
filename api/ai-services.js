@@ -29,7 +29,12 @@ export default async function handler(req, res) {
         return res.status(200).json({ 
           status: 'healthy',
           message: 'AI Services endpoint opérationnel',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          debug: {
+            openai_key: process.env.OPENAI_API_KEY ? `sk-...${process.env.OPENAI_API_KEY.slice(-4)}` : 'NOT_FOUND',
+            anthropic_key: process.env.ANTHROPIC_API_KEY ? `sk-ant-...${process.env.ANTHROPIC_API_KEY.slice(-4)}` : 'NOT_FOUND',
+            perplexity_key: process.env.PERPLEXITY_API_KEY ? `pplx-...${process.env.PERPLEXITY_API_KEY.slice(-4)}` : 'NOT_FOUND'
+          }
         });
       } else {
         return res.status(400).json({ error: 'Service non reconnu pour GET/DELETE. Utilisez: supabase-briefings' });
