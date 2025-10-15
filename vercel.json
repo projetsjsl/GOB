@@ -33,6 +33,9 @@
     },
     "api/gemini/tools.js": {
       "maxDuration": 20
+    },
+    "api/test-supabase.js": {
+      "maxDuration": 10
     }
   },
   "headers": [
