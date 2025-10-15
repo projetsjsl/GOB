@@ -5570,10 +5570,11 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         // En cas de timeout, créer un briefing de fallback pour l'affichage
                         if (error.message.includes('timeout') || error.message.includes('timed out')) {
                             console.log('🔄 Création d\'un briefing de fallback suite au timeout...');
+                            const fallbackHtml = getFallbackBriefingHTML(type);
                             const fallbackBriefing = {
                                 type,
                                 subject: getSubjectForType(type) + ' (Mode Fallback)',
-                                html: getFallbackBriefingHTML(type),
+                                html: fallbackHtml,
                                 data: { fallback: true, error: 'Timeout API' },
                                 analysis: { content: 'Analyse non disponible - Timeout API', fallback: true },
                                 timestamp: new Date().toISOString(),
@@ -5581,9 +5582,17 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                 model: 'fallback-timeout'
                             };
                             
+                            console.log('🎯 Mise à jour fallback briefing:', {
+                                type: fallbackBriefing.type,
+                                hasHtml: !!fallbackBriefing.html,
+                                htmlLength: fallbackBriefing.html.length
+                            });
+                            
                             setCurrentBriefing(fallbackBriefing);
-                            setPreviewHtml(fallbackBriefing.html + '');
+                            setPreviewHtml(fallbackHtml + '');
                             setSelectedType(type);
+                            
+                            console.log('✅ Briefing de fallback créé et états mis à jour');
                         }
                     } finally {
                         setLoading(false);
@@ -6646,6 +6655,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         {/* Prévisualisation et actions */}
                         {console.log('🔍 État currentBriefing:', currentBriefing)}
                         {console.log('🔍 Affichage section aperçu:', !!currentBriefing)}
+                        {console.log('🔍 Type de briefing:', currentBriefing?.type)}
+                        {console.log('🔍 Fallback mode:', currentBriefing?.fallback)}
                         {currentBriefing && (
                             <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -6728,6 +6739,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                     {console.log('🔍 État previewHtml:', previewHtml ? previewHtml.substring(0, 200) + '...' : 'null')}
                                     {previewHtml ? (
                                         <iframe
+                                            key={previewHtml} // Force React à recréer l'iframe
                                             srcDoc={previewHtml}
                                             className="w-full h-96 border-0"
                                             title="Email Preview"
