@@ -5377,7 +5377,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(newsRequest),
-                            signal: AbortSignal.timeout(30000) // 30 secondes timeout
+                            signal: AbortSignal.timeout(60000) // 60 secondes timeout pour Perplexity
                         });
                         
                         addLogEntry('NEWS', 'Réponse actualités reçue', { 
@@ -5546,7 +5546,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         });
                         
                         setCurrentBriefing(briefing);
-                        setPreviewHtml(html);
+                        // Forcer React à détecter le changement en créant une nouvelle référence
+                        setPreviewHtml(html + '');
                         setSelectedType(type);
                         
                         console.log('✅ États React mis à jour avec succès');
@@ -5565,6 +5566,25 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         }, 'error');
                         console.error('Erreur génération briefing:', error);
                         setMessage({ type: 'error', text: `Erreur: ${error.message}` });
+                        
+                        // En cas de timeout, créer un briefing de fallback pour l'affichage
+                        if (error.message.includes('timeout') || error.message.includes('timed out')) {
+                            console.log('🔄 Création d\'un briefing de fallback suite au timeout...');
+                            const fallbackBriefing = {
+                                type,
+                                subject: getSubjectForType(type) + ' (Mode Fallback)',
+                                html: getFallbackBriefingHTML(type),
+                                data: { fallback: true, error: 'Timeout API' },
+                                analysis: { content: 'Analyse non disponible - Timeout API', fallback: true },
+                                timestamp: new Date().toISOString(),
+                                fallback: true,
+                                model: 'fallback-timeout'
+                            };
+                            
+                            setCurrentBriefing(fallbackBriefing);
+                            setPreviewHtml(fallbackBriefing.html + '');
+                            setSelectedType(type);
+                        }
                     } finally {
                         setLoading(false);
                         addLogEntry('SYSTEM', 'Processus terminé', {
@@ -5583,6 +5603,60 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         case 'evening': return `🌙 Rapport de Clôture - ${date}`;
                         default: return `Briefing - ${date}`;
                     }
+                };
+
+                // Fonction pour générer un HTML de fallback
+                const getFallbackBriefingHTML = (type) => {
+                    const date = new Date().toLocaleDateString('fr-FR');
+                    const time = new Date().toLocaleTimeString('fr-FR');
+                    
+                    return `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>Briefing Fallback - ${date}</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+                                .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                                .header { text-align: center; border-bottom: 2px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 20px; }
+                                .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                                .content { line-height: 1.6; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="header">
+                                    <h1>${getSubjectForType(type)} (Mode Fallback)</h1>
+                                    <p>Généré le ${date} à ${time}</p>
+                                </div>
+                                
+                                <div class="warning">
+                                    <h3>⚠️ Mode Fallback Activé</h3>
+                                    <p>Les APIs ont rencontré un timeout. Ce briefing utilise des données de fallback pour l'affichage.</p>
+                                </div>
+                                
+                                <div class="content">
+                                    <h2>📊 Résumé du Marché</h2>
+                                    <p>Les données de marché ne sont pas disponibles en raison d'un timeout des APIs. Veuillez réessayer dans quelques instants.</p>
+                                    
+                                    <h2>📰 Actualités</h2>
+                                    <p>Les actualités ne sont pas disponibles en raison d'un timeout de l'API Perplexity.</p>
+                                    
+                                    <h2>🤖 Analyse IA</h2>
+                                    <p>L'analyse IA n'est pas disponible en raison d'un timeout de l'API OpenAI.</p>
+                                    
+                                    <h2>🔄 Recommandations</h2>
+                                    <ul>
+                                        <li>Réessayez de générer le briefing dans quelques minutes</li>
+                                        <li>Vérifiez votre connexion internet</li>
+                                        <li>Contactez le support si le problème persiste</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                    `;
                 };
 
                 // Fonction pour sauvegarder le briefing
