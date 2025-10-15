@@ -2,8 +2,27 @@
 // API Endpoint: AI Services Unifié
 // Regroupe Perplexity, OpenAI et Resend en un seul endpoint
 // ============================================================================
-
-// import { OpenAI } from 'openai'; // Temporairement désactivé pour debug
+//
+// ⚠️  CONFIGURATION CRITIQUE - NE PAS MODIFIER ⚠️
+// ============================================================================
+// ✅ CONFIGURATION QUI FONCTIONNE (Testée le 15/10/2025) :
+// - Utilise fetch() direct vers OpenAI API (PAS le SDK)
+// - Modèle: gpt-4o (PAS gpt-5 qui n'existe pas encore)
+// - Clé API: process.env.OPENAI_API_KEY (configurée dans Vercel)
+// - Timeout: 25 secondes max
+// - Max tokens: 2000
+// - Temperature: 0.7
+//
+// ❌ NE PAS UTILISER :
+// - import { OpenAI } from 'openai' (causait des erreurs de déploiement)
+// - gpt-5 (modèle inexistant)
+// - AbortSignal.timeout() dans le body (causait des erreurs)
+//
+// 🔧 DÉPANNAGE :
+// - Si "demo-mode" : vérifier OPENAI_API_KEY dans Vercel
+// - Si timeout : réduire max_tokens ou augmenter timeout
+// - Si erreur 401 : clé API invalide ou expirée
+// ============================================================================
 
 export default async function handler(req, res) {
   // CORS headers
@@ -195,12 +214,14 @@ async function handleOpenAI(req, res, { prompt, marketData, news }) {
     const openaiKey = process.env.OPENAI_API_KEY;
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
     
-    // Debug: Log des clés API (sans exposer les valeurs)
+    // ✅ DEBUG CRITIQUE - Garder pour diagnostic
+    // Log des clés API (sans exposer les valeurs complètes)
     console.log('🔑 Debug API Keys:', {
       openaiKey: openaiKey ? `sk-...${openaiKey.slice(-4)}` : 'NOT_FOUND',
       anthropicKey: anthropicKey ? `sk-ant-...${anthropicKey.slice(-4)}` : 'NOT_FOUND'
     });
     
+    // ✅ FALLBACK CRITIQUE - Garder pour mode démo
     if (!openaiKey && !anthropicKey) {
       return res.status(200).json({
         success: true,
@@ -228,7 +249,8 @@ Rédige maintenant le briefing selon la structure demandée.
     let model;
 
     if (openaiKey) {
-      // Utiliser OpenAI avec fetch() (méthode qui fonctionne)
+      // ✅ CONFIGURATION QUI FONCTIONNE - NE PAS MODIFIER
+      // Utilise fetch() direct vers OpenAI API (PAS le SDK)
       console.log('🚀 Appel OpenAI avec fetch, clé:', `sk-...${openaiKey.slice(-4)}`);
       
       response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -238,10 +260,10 @@ Rédige maintenant le briefing selon la structure demandée.
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o', // ✅ Modèle testé et fonctionnel
           messages: [{ role: 'user', content: contextualPrompt }],
-          max_tokens: 2000,
-          temperature: 0.7,
+          max_tokens: 2000, // ✅ Limite optimale
+          temperature: 0.7, // ✅ Équilibre créativité/précision
         })
       });
       
