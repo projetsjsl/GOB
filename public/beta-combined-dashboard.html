@@ -6568,6 +6568,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
 
                         {/* Prévisualisation et actions */}
                         {console.log('🔍 État currentBriefing:', currentBriefing)}
+                        {console.log('🔍 Affichage section aperçu:', !!currentBriefing)}
                         {currentBriefing && (
                             <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -6647,10 +6648,13 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                             Prévisualisation Email
                                         </span>
                                     </div>
+                                    {console.log('🔍 État previewHtml:', previewHtml ? previewHtml.substring(0, 200) + '...' : 'null')}
                                     <iframe
                                         srcDoc={previewHtml}
                                         className="w-full h-96 border-0"
                                         title="Email Preview"
+                                        onLoad={() => console.log('✅ Iframe chargé avec succès')}
+                                        onError={() => console.log('❌ Erreur chargement iframe')}
                                     />
                                 </div>
                             </div>
