@@ -1,34 +1,34 @@
 {
   "version": 2,
   "functions": {
-    "api/gemini/chat.js": {
+    "api/ai-services.js": {
       "maxDuration": 30
     },
-    "api/gemini/chat-validated.js": {
-      "maxDuration": 30
+    "api/health-check.js": {
+      "maxDuration": 15
     },
-    "api/unified-serverless.js": {
-      "maxDuration": 30
+    "api/briefing-cron.js": {
+      "maxDuration": 60
     },
     "api/marketdata.js": {
+      "maxDuration": 10
+    },
+    "api/fmp.js": {
       "maxDuration": 10
     },
     "api/supabase-watchlist.js": {
       "maxDuration": 15
     },
-    "api/test-gemini.js": {
+    "api/unified-serverless.js": {
+      "maxDuration": 30
+    },
+    "api/gemini-key.js": {
       "maxDuration": 10
     },
-    "api/cron/refresh-news.js": {
-      "maxDuration": 60
+    "api/github-update.js": {
+      "maxDuration": 15
     }
   },
-  "crons": [
-    {
-      "path": "/api/cron/refresh-news",
-      "schedule": "0 11 * * *"
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
