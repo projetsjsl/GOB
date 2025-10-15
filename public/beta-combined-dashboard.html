@@ -4588,6 +4588,15 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     'TRP', 'UNH', 'UL', 'VZ', 'WFC'
                 ];
 
+                // ============================================================================
+                // EMMA EN DIRECT 100% PERPLEXITY - PROMPTS ULTRA-DÉTAILLÉS
+                // ============================================================================
+                // 🎯 Architecture ultra-simplifiée : 1 requête Perplexity → Contenu complet
+                // ✅ Plus de Yahoo Finance, plus de variables multiples, plus de complexité
+                // ✅ Prompts de 2000+ mots = analyses professionnelles complètes
+                // ✅ 4 modèles de backup + cache intelligent + monitoring en temps réel
+                // ============================================================================
+                
                 // Prompts Emma En Direct - Style professionnel et technique approfondi
                 const prompts = {
                     morning: {
@@ -5223,6 +5232,15 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
 
                 // Fonction utilitaire pour extraire la valeur numérique d'un change (inline dans les templates)
 
+                // ============================================================================
+                // GÉNÉRATION BRIEFING EMMA EN DIRECT - ARCHITECTURE ULTRA-SIMPLE
+                // ============================================================================
+                // 🎯 FLUX SIMPLIFIÉ : 1 requête Perplexity → Analyse complète → HTML
+                // ✅ Plus de collecte de données multiples, plus de variables complexes
+                // ✅ Prompt ultra-détaillé (2000+ mots) = contenu professionnel complet
+                // ✅ Système de backup multi-modèles + cache intelligent + monitoring
+                // ============================================================================
+                
                 // Fonction pour générer un briefing
                 const generateBriefing = async (type) => {
                     console.log('🚀 DÉBUT generateBriefing:', { type, loading });
@@ -5254,7 +5272,13 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             analysis: { request: null, response: null, error: null }
                         });
 
-                        // 1. Collecter les données marché via Perplexity
+                        // ============================================================================
+                        // 1. COLLECTE DONNÉES MARCHÉ VIA PERPLEXITY (ULTRA-SIMPLIFIÉ)
+                        // ============================================================================
+                        // 🎯 AVANT : Yahoo Finance + variables multiples + complexité
+                        // ✅ MAINTENANT : 1 requête Perplexity → Données complètes
+                        // ============================================================================
+                        
                         addLogEntry('MARKET_DATA', 'Début collecte données marché', { 
                             source: 'perplexity',
                             type 
@@ -5328,6 +5352,13 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         };
 
                         // 2. Rechercher les actualités
+                        // ============================================================================
+                        // 2. RECHERCHE ACTUALITÉS VIA PERPLEXITY (ULTRA-SIMPLIFIÉ)
+                        // ============================================================================
+                        // 🎯 AVANT : Marketaux + variables + complexité
+                        // ✅ MAINTENANT : 1 requête Perplexity → Actualités complètes
+                        // ============================================================================
+                        
                         addLogEntry('NEWS', 'Début recherche actualités', { 
                             source: 'perplexity',
                             promptLength: prompts[type].perplexity.length
@@ -5384,9 +5415,15 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             }
                         }));
 
-                        // 3. Générer l'analyse
+                        // ============================================================================
+                        // 3. GÉNÉRATION ANALYSE VIA PERPLEXITY (ULTRA-SIMPLIFIÉ)
+                        // ============================================================================
+                        // 🎯 AVANT : OpenAI + variables + complexité
+                        // ✅ MAINTENANT : 1 requête Perplexity → Analyse complète (2000+ mots)
+                        // ============================================================================
+                        
                         addLogEntry('ANALYSIS', 'Début génération analyse IA', { 
-                            source: apiSources.analysis,
+                            source: 'perplexity',
                             promptLength: prompts[type].perplexity.length,
                             marketDataSize: JSON.stringify(enrichedMarketData).length,
                             newsSize: (newsResult.content || '').length
