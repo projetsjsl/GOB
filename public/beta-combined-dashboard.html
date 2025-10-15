@@ -4618,9 +4618,14 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [selectedType, setSelectedType] = useState('morning');
                 const [dataSource, setDataSource] = useState('apis'); // 'apis' ou 'yahoo'
                 const [apiSources, setApiSources] = useState({
-                    marketData: 'yahoo', // 'apis' ou 'yahoo' - Yahoo Finance par défaut
-                    news: 'perplexity', // 'perplexity', 'marketaux', 'twelve-data' - Perplexity par défaut
-                    analysis: 'openai' // 'anthropic', 'openai' - OpenAI par défaut
+                    marketData: 'yahoo', // 'yahoo' - Yahoo Finance par défaut
+                    news: 'perplexity', // 'perplexity' - Perplexity par défaut
+                    analysis: 'perplexity' // 'perplexity' - Perplexity par défaut
+                });
+                const [perplexityEnabled, setPerplexityEnabled] = useState({
+                    marketData: true,
+                    news: true,
+                    analysis: true
                 });
                 const [debugData, setDebugData] = useState({
                     marketData: { request: null, response: null, error: null },
@@ -5998,44 +6003,14 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                     <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>📊 Données de Marché</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div className="space-y-3">
                                         <div 
-                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                                apiSources.marketData === 'apis' 
-                                                    ? (isDarkMode ? 'border-green-500 bg-green-900/20' : 'border-green-500 bg-green-50')
-                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                                                isDarkMode ? 'border-blue-500 bg-blue-900/20' : 'border-blue-500 bg-blue-50'
                                             }`}
-                                            onClick={() => setApiSources({...apiSources, marketData: 'apis'})}
                                         >
                                             <div className="flex items-center space-x-2">
-                                                <div className={`w-3 h-3 rounded-full border-2 ${
-                                                    apiSources.marketData === 'apis' 
-                                                        ? 'border-green-500 bg-green-500' 
-                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                                }`}></div>
-                                                <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>APIs Professionnelles</span>
-                                            </div>
-                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>FMP, Alpha Vantage, Marketaux</p>
-                                        </div>
-
-                                        <div 
-                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                                apiSources.marketData === 'yahoo' 
-                                                    ? (isDarkMode ? 'border-blue-500 bg-blue-900/20' : 'border-blue-500 bg-blue-50')
-                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
-                                            }`}
-                                            onClick={() => setApiSources({...apiSources, marketData: 'yahoo'})}
-                                        >
-                                            <div className="flex items-center space-x-2">
-                                                <div className={`w-3 h-3 rounded-full border-2 ${
-                                                    apiSources.marketData === 'yahoo' 
-                                                        ? 'border-blue-500 bg-blue-500' 
-                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                                }`}></div>
+                                                <div className="w-3 h-3 rounded-full border-2 border-blue-500 bg-blue-500"></div>
                                                 <span className={`text-sm font-medium transition-colors duration-300 ${
                                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                                 }`}>Yahoo Finance</span>
@@ -6043,6 +6018,24 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                             <p className={`text-xs mt-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                             }`}>Données directes</p>
+                                        </div>
+                                        
+                                        <div className="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                id="perplexity-market"
+                                                checked={perplexityEnabled.marketData}
+                                                onChange={(e) => setPerplexityEnabled({...perplexityEnabled, marketData: e.target.checked})}
+                                                className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                                            />
+                                            <label 
+                                                htmlFor="perplexity-market" 
+                                                className={`text-sm cursor-pointer transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}
+                                            >
+                                                ✨ Enrichir avec Perplexity AI
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -6052,74 +6045,30 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                     <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>📰 Actualités</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div className="space-y-3">
                                         <div 
-                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                                apiSources.news === 'perplexity' 
-                                                    ? (isDarkMode ? 'border-purple-500 bg-purple-900/20' : 'border-purple-500 bg-purple-50')
-                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                                                isDarkMode ? 'border-purple-500 bg-purple-900/20' : 'border-purple-500 bg-purple-50'
                                             }`}
-                                            onClick={() => setApiSources({...apiSources, news: 'perplexity'})}
                                         >
-                                            <div className="flex items-center space-x-2">
-                                                <div className={`w-3 h-3 rounded-full border-2 ${
-                                                    apiSources.news === 'perplexity' 
-                                                        ? 'border-purple-500 bg-purple-500' 
-                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                                }`}></div>
-                                                <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>Perplexity</span>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-2">
+                                                    <div className="w-3 h-3 rounded-full border-2 border-purple-500 bg-purple-500"></div>
+                                                    <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>Perplexity AI</span>
+                                                </div>
+                                                <input
+                                                    type="checkbox"
+                                                    id="perplexity-news"
+                                                    checked={perplexityEnabled.news}
+                                                    onChange={(e) => setPerplexityEnabled({...perplexityEnabled, news: e.target.checked})}
+                                                    className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                                                />
                                             </div>
                                             <p className={`text-xs mt-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>IA de recherche</p>
-                                        </div>
-
-                                        <div 
-                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                                apiSources.news === 'marketaux' 
-                                                    ? (isDarkMode ? 'border-orange-500 bg-orange-900/20' : 'border-orange-500 bg-orange-50')
-                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
-                                            }`}
-                                            onClick={() => setApiSources({...apiSources, news: 'marketaux'})}
-                                        >
-                                            <div className="flex items-center space-x-2">
-                                                <div className={`w-3 h-3 rounded-full border-2 ${
-                                                    apiSources.news === 'marketaux' 
-                                                        ? 'border-orange-500 bg-orange-500' 
-                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                                }`}></div>
-                                                <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>Marketaux</span>
-                                            </div>
-                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>Actualités financières</p>
-                                        </div>
-
-                                        <div 
-                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                                apiSources.news === 'twelve-data' 
-                                                    ? (isDarkMode ? 'border-cyan-500 bg-cyan-900/20' : 'border-cyan-500 bg-cyan-50')
-                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
-                                            }`}
-                                            onClick={() => setApiSources({...apiSources, news: 'twelve-data'})}
-                                        >
-                                            <div className="flex items-center space-x-2">
-                                                <div className={`w-3 h-3 rounded-full border-2 ${
-                                                    apiSources.news === 'twelve-data' 
-                                                        ? 'border-cyan-500 bg-cyan-500' 
-                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                                }`}></div>
-                                                <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>Twelve Data</span>
-                                            </div>
-                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>Actualités alternatives</p>
+                                            }`}>IA de recherche - Sources vérifiées</p>
                                         </div>
                                     </div>
                                 </div>
@@ -6129,51 +6078,30 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                     <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>🤖 Analyse IA</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div className="space-y-3">
                                         <div 
-                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                                apiSources.analysis === 'anthropic' 
-                                                    ? (isDarkMode ? 'border-indigo-500 bg-indigo-900/20' : 'border-indigo-500 bg-indigo-50')
-                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                            className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                                                isDarkMode ? 'border-purple-500 bg-purple-900/20' : 'border-purple-500 bg-purple-50'
                                             }`}
-                                            onClick={() => setApiSources({...apiSources, analysis: 'anthropic'})}
                                         >
-                                            <div className="flex items-center space-x-2">
-                                                <div className={`w-3 h-3 rounded-full border-2 ${
-                                                    apiSources.analysis === 'anthropic' 
-                                                        ? 'border-indigo-500 bg-indigo-500' 
-                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                                }`}></div>
-                                                <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>Claude (Anthropic)</span>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-2">
+                                                    <div className="w-3 h-3 rounded-full border-2 border-purple-500 bg-purple-500"></div>
+                                                    <span className={`text-sm font-medium transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>Perplexity AI</span>
+                                                </div>
+                                                <input
+                                                    type="checkbox"
+                                                    id="perplexity-analysis"
+                                                    checked={perplexityEnabled.analysis}
+                                                    onChange={(e) => setPerplexityEnabled({...perplexityEnabled, analysis: e.target.checked})}
+                                                    className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                                                />
                                             </div>
                                             <p className={`text-xs mt-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>Claude-3-Sonnet</p>
-                                        </div>
-
-                                        <div 
-                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                                apiSources.analysis === 'openai' 
-                                                    ? (isDarkMode ? 'border-emerald-500 bg-emerald-900/20' : 'border-emerald-500 bg-emerald-50')
-                                                    : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
-                                            }`}
-                                            onClick={() => setApiSources({...apiSources, analysis: 'openai'})}
-                                        >
-                                            <div className="flex items-center space-x-2">
-                                                <div className={`w-3 h-3 rounded-full border-2 ${
-                                                    apiSources.analysis === 'openai' 
-                                                        ? 'border-emerald-500 bg-emerald-500' 
-                                                        : (isDarkMode ? 'border-gray-400' : 'border-gray-300')
-                                                }`}></div>
-                                                <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>GPT-4 (OpenAI)</span>
-                                            </div>
-                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>GPT-4 Turbo</p>
+                                            }`}>Analyse experte - Sonar Pro</p>
                                         </div>
                                     </div>
                                 </div>
@@ -12814,512 +12742,15 @@ console.log('✅ Données hybrides récupérées:', {
             };
 
             // ============================================================================
-            // COMPOSANT PERPLEXITY AI - MOTEUR PRINCIPAL EMMA EN DIRECT
+            // COMPOSANT PERPLEXITY AI - SUPPRIMÉ (Redondant avec Emma En Direct)
+            // La fonctionnalité Perplexity est maintenant intégrée dans EmailBriefingsTab
             // ============================================================================
-            const PerplexityTab = () => {
-                const [activeSection, setActiveSection] = React.useState('news');
-                const [loading, setLoading] = React.useState(false);
-                const [results, setResults] = React.useState({});
-                const [query, setQuery] = React.useState('');
-                const [message, setMessage] = React.useState({ type: '', text: '' });
-                const [showLogs, setShowLogs] = React.useState(false);
-                const [logs, setLogs] = React.useState([]);
-                const [emailRecipients, setEmailRecipients] = React.useState('projetsjsl@gmail.com');
-                const [emailSubject, setEmailSubject] = React.useState('');
-                const [sendingEmail, setSendingEmail] = React.useState(false);
-
-                const sections = [
-                    { id: 'news', label: '📰 Actualités Financières', icon: '📰' },
-                    { id: 'analysis', label: '📊 Analyse de Marché', icon: '📊' },
-                    { id: 'writing', label: '✍️ Rédaction Emma', icon: '✍️' },
-                    { id: 'research', label: '🔍 Recherche Approfondie', icon: '🔍' }
-                ];
-
-                const handlePerplexityQuery = async (section, customQuery = null) => {
-                    setLoading(true);
-                    setMessage({ type: '', text: '' });
-                    setLogs([]);
-
-                    const startTime = Date.now();
-                    const queryText = customQuery || query || getDefaultQuery(section);
-                    
-                    // Log initial
-                    const initialLog = {
-                        timestamp: new Date().toISOString(),
-                        step: 'INITIALISATION',
-                        message: `🚀 Début génération ${sections.find(s => s.id === section)?.label}`,
-                        details: {
-                            section: section,
-                            query: queryText,
-                            model: 'sonar-pro',
-                            max_tokens: 2000,
-                            temperature: 0.1
-                        }
-                    };
-                    setLogs(prev => [...prev, initialLog]);
-
-                    try {
-                        // Log requête API
-                        const requestLog = {
-                            timestamp: new Date().toISOString(),
-                            step: 'REQUÊTE_API',
-                            message: '📡 Envoi requête vers /api/ai-services',
-                            details: {
-                                endpoint: '/api/ai-services',
-                                method: 'POST',
-                                payload: {
-                                    service: 'perplexity',
-                                    query: queryText,
-                                    section: section,
-                                    model: 'sonar-pro',
-                                    max_tokens: 2000,
-                                    temperature: 0.1
-                                }
-                            }
-                        };
-                        setLogs(prev => [...prev, requestLog]);
-                        
-                        const response = await fetch('/api/ai-services', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                service: 'perplexity',
-                                query: queryText,
-                                section: section,
-                                model: 'sonar-pro',
-                                max_tokens: 2000,
-                                temperature: 0.1
-                            })
-                        });
-
-                        // Log réponse reçue
-                        const responseLog = {
-                            timestamp: new Date().toISOString(),
-                            step: 'RÉPONSE_API',
-                            message: `📥 Réponse reçue: ${response.status} ${response.statusText}`,
-                            details: {
-                                status: response.status,
-                                statusText: response.statusText,
-                                headers: Object.fromEntries(response.headers.entries())
-                            }
-                        };
-                        setLogs(prev => [...prev, responseLog]);
-
-                        const result = await response.json();
-                        
-                        // Log parsing
-                        const parseLog = {
-                            timestamp: new Date().toISOString(),
-                            step: 'PARSING_RÉPONSE',
-                            message: '🔍 Analyse de la réponse JSON',
-                            details: {
-                                success: result.success,
-                                model: result.model,
-                                tokens: result.tokens,
-                                sources_count: result.sources?.length || 0,
-                                content_length: result.content?.length || 0,
-                                fallback: result.fallback || false
-                            }
-                        };
-                        setLogs(prev => [...prev, parseLog]);
-                        
-                        if (result.success) {
-                            const finalResult = {
-                                content: result.content,
-                                sources: result.sources || [],
-                                timestamp: new Date().toISOString(),
-                                query: queryText,
-                                model: result.model,
-                                tokens: result.tokens,
-                                fallback: result.fallback || false
-                            };
-                            
-                            setResults(prev => ({
-                                ...prev,
-                                [section]: finalResult
-                            }));
-                            
-                            // Log succès
-                            const successLog = {
-                                timestamp: new Date().toISOString(),
-                                step: 'SUCCÈS',
-                                message: `✅ ${sections.find(s => s.id === section)?.label} généré avec succès`,
-                                details: {
-                                    total_time: Date.now() - startTime,
-                                    content_size: result.content?.length || 0,
-                                    sources_found: result.sources?.length || 0,
-                                    tokens_used: result.tokens || 0
-                                }
-                            };
-                            setLogs(prev => [...prev, successLog]);
-                            
-                            setMessage({ type: 'success', text: `✅ ${sections.find(s => s.id === section)?.label} généré avec succès` });
-                            
-                            // Auto-remplir le sujet email
-                            if (!emailSubject) {
-                                setEmailSubject(`${sections.find(s => s.id === section)?.label} - ${new Date().toLocaleDateString('fr-FR')}`);
-                            }
-                        } else {
-                            throw new Error(result.error || 'Erreur lors de la génération');
-                        }
-                    } catch (error) {
-                        console.error('Erreur Perplexity:', error);
-                        
-                        // Log erreur
-                        const errorLog = {
-                            timestamp: new Date().toISOString(),
-                            step: 'ERREUR',
-                            message: `❌ Erreur: ${error.message}`,
-                            details: {
-                                error_type: error.name,
-                                error_message: error.message,
-                                total_time: Date.now() - startTime
-                            }
-                        };
-                        setLogs(prev => [...prev, errorLog]);
-                        
-                        setMessage({ type: 'error', text: `❌ Erreur: ${error.message}` });
-                    } finally {
-                        setLoading(false);
-                    }
-                };
-
-                const getDefaultQuery = (section) => {
-                    const queries = {
-                        news: 'Actualités financières récentes, marchés boursiers, résultats d\'entreprises, données macroéconomiques importantes des dernières 24h',
-                        analysis: 'Analyse technique et fondamentale des marchés, tendances sectorielles, indicateurs économiques, sentiment des investisseurs',
-                        writing: 'Rédaction d\'un briefing financier professionnel avec style Emma, analyse experte et recommandations tactiques',
-                        research: 'Recherche approfondie sur les titres de la watchlist, analyse des fondamentaux, actualités corporate et perspectives'
-                    };
-                    return queries[section] || '';
-                };
-
-                const getSectionIcon = (section) => {
-                    return sections.find(s => s.id === section)?.icon || '📊';
-                };
-
-                const handleSendEmail = async () => {
-                    if (!results[activeSection]) {
-                        setMessage({ type: 'error', text: '❌ Aucun contenu à envoyer' });
-                        return;
-                    }
-
-                    setSendingEmail(true);
-                    setMessage({ type: '', text: '' });
-
-                    try {
-                        const response = await fetch('/api/ai-services', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                service: 'resend',
-                                subject: emailSubject || `${sections.find(s => s.id === activeSection)?.label} - ${new Date().toLocaleDateString('fr-FR')}`,
-                                html: results[activeSection].content.replace(/\n/g, '<br>'),
-                                recipients: emailRecipients.split(',').map(email => email.trim())
-                            })
-                        });
-
-                        const result = await response.json();
-                        
-                        if (result.success) {
-                            setMessage({ type: 'success', text: `✅ Email envoyé avec succès à ${result.recipients.join(', ')}` });
-                        } else {
-                            throw new Error(result.error || 'Erreur lors de l\'envoi');
-                        }
-                    } catch (error) {
-                        console.error('Erreur envoi email:', error);
-                        setMessage({ type: 'error', text: `❌ Erreur envoi: ${error.message}` });
-                    } finally {
-                        setSendingEmail(false);
-                    }
-                };
-
-                return (
-                    <div className={`p-6 transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900' : 'bg-white'
-                    }`}>
-                        {/* Header */}
-                        <div className="mb-6">
-                            <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                                🤖 Perplexity AI - Emma En Direct
-                            </h2>
-                            <p className={`text-sm transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                Moteur principal d'analyse financière avec Sonar Pro
-                            </p>
-                        </div>
-
-                        {/* Navigation des sections */}
-                        <div className="mb-6">
-                            <div className="flex flex-wrap gap-2">
-                                {sections.map((section) => (
-                                    <button
-                                        key={section.id}
-                                        onClick={() => setActiveSection(section.id)}
-                                        className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
-                                            activeSection === section.id
-                                                ? 'bg-blue-600 text-white'
-                                                : isDarkMode
-                                                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        {section.icon} {section.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Zone de requête personnalisée */}
-                        <div className="mb-6">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                    placeholder={`Requête personnalisée pour ${sections.find(s => s.id === activeSection)?.label}...`}
-                                    className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${
-                                        isDarkMode
-                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                    }`}
-                                />
-                                <button
-                                    onClick={() => handlePerplexityQuery(activeSection)}
-                                    disabled={loading}
-                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                                >
-                                    {loading ? '⏳' : '🚀'} Rechercher
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Message de statut */}
-                        {message.text && (
-                            <div className={`mb-4 p-3 rounded-lg ${
-                                message.type === 'success' 
-                                    ? 'bg-green-100 text-green-800 border border-green-200'
-                                    : 'bg-red-100 text-red-800 border border-red-200'
-                            }`}>
-                                {message.text}
-                            </div>
-                        )}
-
-                        {/* Contrôles avancés */}
-                        <div className="mb-6 flex flex-wrap gap-4 items-center">
-                            <button
-                                onClick={() => setShowLogs(!showLogs)}
-                                className={`px-4 py-2 rounded-lg transition-colors ${
-                                    showLogs 
-                                        ? 'bg-blue-600 text-white' 
-                                        : isDarkMode 
-                                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
-                            >
-                                📋 {showLogs ? 'Masquer' : 'Afficher'} Logs Détaillés
-                            </button>
-                            
-                            {results[activeSection] && (
-                                <div className="flex gap-2 items-center">
-                                    <input
-                                        type="text"
-                                        value={emailRecipients}
-                                        onChange={(e) => setEmailRecipients(e.target.value)}
-                                        placeholder="Destinataires (séparés par des virgules)"
-                                        className={`px-3 py-2 rounded border text-sm ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                        }`}
-                                    />
-                                    <input
-                                        type="text"
-                                        value={emailSubject}
-                                        onChange={(e) => setEmailSubject(e.target.value)}
-                                        placeholder="Sujet de l'email"
-                                        className={`px-3 py-2 rounded border text-sm ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                        }`}
-                                    />
-                                    <button
-                                        onClick={handleSendEmail}
-                                        disabled={sendingEmail || !results[activeSection]}
-                                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 text-sm"
-                                    >
-                                        {sendingEmail ? '⏳' : '📧'} Envoyer
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Logs détaillés */}
-                        {showLogs && logs.length > 0 && (
-                            <div className={`mb-6 rounded-lg border transition-colors duration-300 ${
-                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'
-                            }`}>
-                                <div className={`p-4 border-b transition-colors duration-300 ${
-                                    isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                                }`}>
-                                    <h4 className={`text-lg font-semibold transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                        📋 Logs Détaillés - {logs.length} étapes
-                                    </h4>
-                                </div>
-                                <div className="p-4 max-h-96 overflow-y-auto">
-                                    {logs.map((log, index) => (
-                                        <div key={index} className={`mb-3 p-3 rounded border-l-4 ${
-                                            log.step === 'SUCCÈS' ? 'border-green-500 bg-green-50' :
-                                            log.step === 'ERREUR' ? 'border-red-500 bg-red-50' :
-                                            log.step === 'INITIALISATION' ? 'border-blue-500 bg-blue-50' :
-                                            'border-gray-500 bg-gray-50'
-                                        }`}>
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <span className={`font-medium ${
-                                                        log.step === 'SUCCÈS' ? 'text-green-800' :
-                                                        log.step === 'ERREUR' ? 'text-red-800' :
-                                                        log.step === 'INITIALISATION' ? 'text-blue-800' :
-                                                        'text-gray-800'
-                                                    }`}>
-                                                        {log.step}
-                                                    </span>
-                                                    <span className="ml-2 text-gray-600">{log.message}</span>
-                                                </div>
-                                                <span className="text-xs text-gray-500">
-                                                    {new Date(log.timestamp).toLocaleTimeString('fr-FR')}
-                                                </span>
-                                            </div>
-                                            {log.details && (
-                                                <details className="mt-2">
-                                                    <summary className="text-sm text-gray-600 cursor-pointer">
-                                                        Détails techniques
-                                                    </summary>
-                                                    <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-x-auto">
-                                                        {JSON.stringify(log.details, null, 2)}
-                                                    </pre>
-                                                </details>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Contenu de la section active */}
-                        <div className={`rounded-lg border transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                        }`}>
-                            {/* Header de la section */}
-                            <div className={`p-4 border-b transition-colors duration-300 ${
-                                isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                            }`}>
-                                <div className="flex justify-between items-center">
-                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                        {getSectionIcon(activeSection)} {sections.find(s => s.id === activeSection)?.label}
-                                    </h3>
-                                    <button
-                                        onClick={() => handlePerplexityQuery(activeSection)}
-                                        disabled={loading}
-                                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50"
-                                    >
-                                        {loading ? '⏳ Génération...' : '🔄 Actualiser'}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Contenu */}
-                            <div className="p-6">
-                                {loading ? (
-                                    <div className="text-center py-8">
-                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                                        <p className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                        }`}>
-                                            Perplexity AI analyse en cours...
-                                        </p>
-                                    </div>
-                                ) : results[activeSection] ? (
-                                    <div>
-                                        {/* Contenu principal */}
-                                        <div className={`prose max-w-none transition-colors duration-300 ${
-                                            isDarkMode ? 'prose-invert' : ''
-                                        }`}>
-                                            <div dangerouslySetInnerHTML={{ 
-                                                __html: results[activeSection].content.replace(/\n/g, '<br>') 
-                                            }} />
-                                        </div>
-
-                                        {/* Sources */}
-                                        {results[activeSection].sources && results[activeSection].sources.length > 0 && (
-                                            <div className="mt-6 pt-4 border-t border-gray-200">
-                                                <h4 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                                }`}>
-                                                    📚 Sources
-                                                </h4>
-                                                <ul className="space-y-1">
-                                                    {results[activeSection].sources.map((source, index) => (
-                                                        <li key={index} className="text-sm">
-                                                            <a 
-                                                                href={source.url} 
-                                                                target="_blank" 
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-600 hover:text-blue-800 transition-colors"
-                                                            >
-                                                                {source.title || source.url}
-                                                            </a>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-
-                                        {/* Métadonnées */}
-                                        <div className="mt-4 pt-4 border-t border-gray-200">
-                                            <p className={`text-xs transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                                            }`}>
-                                                Généré le {new Date(results[activeSection].timestamp).toLocaleString('fr-FR')} 
-                                                | Requête: "{results[activeSection].query}"
-                                            </p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-8">
-                                        <div className="text-6xl mb-4">{getSectionIcon(activeSection)}</div>
-                                        <h4 className={`text-lg font-medium mb-2 transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>
-                                            Aucun contenu généré
-                                        </h4>
-                                        <p className={`text-sm transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-500' : 'text-gray-500'
-                                        }`}>
-                                            Cliquez sur "Rechercher" ou "Actualiser" pour générer du contenu avec Perplexity AI
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                );
-            };
 
             // Configuration des onglets (après déclaration de TOUS les composants)
             const tabs = [
                 { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
                 { id: 'intellistocks', label: '📈 JLab™', component: IntelliStocksTab },
                 { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
-                { id: 'perplexity-ai', label: '🤖 Perplexity AI', component: PerplexityTab },
                 { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
                 { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
