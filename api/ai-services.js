@@ -36,6 +36,40 @@
 // - 429 = quota dépassé, attendre ou upgrader
 // ============================================================================
 
+// ============================================================================
+// MONITORING ET STATISTIQUES
+// ============================================================================
+// 📊 Statistiques d'utilisation des modèles
+const modelStats = {
+  totalRequests: 0,
+  successfulRequests: 0,
+  failedRequests: 0,
+  modelUsage: {},
+  quotaHits: 0,
+  cacheHits: 0,
+  lastReset: Date.now()
+};
+
+function updateModelStats(model, success, fromCache = false) {
+  modelStats.totalRequests++;
+  if (success) {
+    modelStats.successfulRequests++;
+    if (fromCache) modelStats.cacheHits++;
+  } else {
+    modelStats.failedRequests++;
+  }
+  
+  if (!modelStats.modelUsage[model]) {
+    modelStats.modelUsage[model] = { requests: 0, successes: 0, failures: 0 };
+  }
+  modelStats.modelUsage[model].requests++;
+  if (success) {
+    modelStats.modelUsage[model].successes++;
+  } else {
+    modelStats.modelUsage[model].failures++;
+  }
+}
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -57,6 +91,24 @@ export default async function handler(req, res) {
       
       if (service === 'supabase-briefings') {
         return await handleSupabaseBriefings(req, res, params);
+      } else if (service === 'monitoring') {
+        // 📊 Endpoint de monitoring
+        const uptime = Date.now() - modelStats.lastReset;
+        const successRate = modelStats.totalRequests > 0 ? 
+          (modelStats.successfulRequests / modelStats.totalRequests * 100).toFixed(2) : 0;
+        
+        return res.json({
+          success: true,
+          stats: {
+            ...modelStats,
+            uptime: Math.floor(uptime / 1000),
+            successRate: `${successRate}%`,
+            cacheHitRate: modelStats.totalRequests > 0 ? 
+              (modelStats.cacheHits / modelStats.totalRequests * 100).toFixed(2) + '%' : '0%',
+            availableModels: Object.keys(PERPLEXITY_MODELS),
+            modelConfig: MODEL_CONFIG
+          }
+        });
       } else if (!service) {
         // Test de santé simple pour le diagnostic
         return res.status(200).json({ 
@@ -123,13 +175,101 @@ export default async function handler(req, res) {
 // 🚀 CACHE SYSTEM : Réduire les appels API pour économiser le quota
 const cache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// 🎯 MODÈLES PERPLEXITY - HIÉRARCHIE DE BACKUP
+const PERPLEXITY_MODELS = {
+  // TIER 0-5 : Modèles premium (50 req/min)
+  primary: 'sonar-reasoning-pro',    // DeepSeek-R1 + CoT (analyses complexes)
+  backup1: 'sonar-reasoning',        // Raisonnement rapide (analyses moyennes)
+  backup2: 'sonar-pro',              // Recherche avancée (requêtes complexes)
+  backup3: 'sonar',                  // Recherche basique (requêtes simples)
+  
+  // TIER 1+ : Modèle expert (5 req/min - usage limité)
+  expert: 'sonar-deep-research'      // Recherche exhaustive (rapports complets)
+};
+
+// 📊 CONFIGURATION PAR TYPE D'USAGE
+const MODEL_CONFIG = {
+  'analysis': {
+    models: ['sonar-reasoning-pro', 'sonar-reasoning', 'sonar-pro', 'sonar'],
+    max_tokens: [2000, 1500, 1000, 800],
+    description: 'Analyses financières complexes'
+  },
+  'news': {
+    models: ['sonar-pro', 'sonar', 'sonar-reasoning', 'sonar-reasoning-pro'],
+    max_tokens: [1500, 1000, 1200, 1800],
+    description: 'Actualités et recherche d\'informations'
+  },
+  'research': {
+    models: ['sonar-deep-research', 'sonar-reasoning-pro', 'sonar-reasoning', 'sonar-pro'],
+    max_tokens: [3000, 2000, 1500, 1000],
+    description: 'Recherche approfondie et rapports'
+  }
+};
 // ============================================================================
 // 🛡️  GUARDRAIL : Cette fonction utilise la configuration validée
 // ⚠️  NE PAS MODIFIER les paramètres sans test complet
 // ✅ CONFIGURATION TESTÉE : sonar-reasoning-pro + 2000 tokens + temp 0.1 + recency filter
 // ❌ INTERDIT : Ajouter Marketaux (supprimé intentionnellement)
 // ============================================================================
-async function handlePerplexity(req, res, { prompt, query, section, recency = 'day', model = 'sonar-reasoning-pro', max_tokens = 2000, temperature = 0.1, fallbackModel = 'sonar' }) {
+// 🔄 FONCTION DE BACKUP INTELLIGENT
+async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency = 'day') {
+  const config = MODEL_CONFIG[section] || MODEL_CONFIG['analysis'];
+  const models = config.models;
+  const maxTokensList = config.max_tokens;
+  
+  for (let i = 0; i < models.length; i++) {
+    const model = models[i];
+    const maxTokens = maxTokensList[i];
+    
+    try {
+      console.log(`Tentative avec ${model} (${config.description})`);
+      
+      const response = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${perplexityKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: maxTokens,
+          temperature: 0.1,
+          search_recency_filter: recency,
+          search_domain_filter: ['finance.yahoo.com', 'bloomberg.com', 'reuters.com', 'marketwatch.com', 'cnbc.com', 'wsj.com', 'ft.com']
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          success: true,
+          data,
+          model,
+          maxTokens,
+          attempt: i + 1,
+          totalAttempts: models.length
+        };
+      } else if (response.status === 429) {
+        console.log(`Quota dépassé pour ${model}, tentative suivante...`);
+        continue; // Essayer le modèle suivant
+      } else {
+        throw new Error(`Erreur ${response.status} avec ${model}`);
+      }
+    } catch (error) {
+      console.log(`Erreur avec ${model}: ${error.message}`);
+      if (i === models.length - 1) {
+        throw error; // Dernière tentative échouée
+      }
+      continue; // Essayer le modèle suivant
+    }
+  }
+  
+  throw new Error('Tous les modèles Perplexity ont échoué');
+}
+
+async function handlePerplexity(req, res, { prompt, query, section, recency = 'day', model = 'sonar-reasoning-pro', max_tokens = 2000, temperature = 0.1 }) {
   try {
     const searchQuery = query || prompt;
     if (!searchQuery) {
@@ -152,10 +292,13 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     let response;
 
     // Vérifier le cache pour économiser le quota
-    const cacheKey = `${searchQuery}-${section}-${model}`;
+    const cacheKey = `${searchQuery}-${section}`;
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       console.log(`Cache hit pour ${cacheKey}`);
+      // Mettre à jour les statistiques (cache hit)
+      updateModelStats(cached.model, true, true);
+      
       return res.status(200).json({
         success: true,
         content: cached.content,
@@ -166,84 +309,55 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
         query: searchQuery,
         fallback: false,
         quota_warning: null,
-        cached: true
+        cached: true,
+        backup_info: cached.backup_info
       });
     }
 
     // Construire le prompt selon la section
     const enhancedPrompt = buildSectionPrompt(searchQuery, section);
 
-    // Appel à l'API Perplexity
-    response = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${perplexityKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [{ role: 'user', content: enhancedPrompt }],
-        max_tokens: max_tokens,
-        temperature: temperature,
-        search_recency_filter: recency,
-        search_domain_filter: ['finance.yahoo.com', 'bloomberg.com', 'reuters.com', 'marketwatch.com', 'cnbc.com', 'wsj.com', 'ft.com']
-      })
-    });
-
-    if (!response.ok) {
-      if (response.status === 429) {
-        // Tentative avec le modèle de fallback (sonar) si quota dépassé
-        console.log(`Quota dépassé pour ${model}, tentative avec ${fallbackModel}`);
-        response = await fetch('https://api.perplexity.ai/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${perplexityKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: fallbackModel,
-            messages: [{ role: 'user', content: enhancedPrompt }],
-            max_tokens: Math.min(max_tokens, 1000), // Réduire les tokens pour le fallback
-            temperature: temperature,
-            search_recency_filter: recency
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Quota Perplexity dépassé (Tier 0: 50 req/min). Modèles ${model} et ${fallbackModel} indisponibles. Status: ${response.status}`);
-        }
-      } else {
-        throw new Error(`Erreur Perplexity: ${response.status}`);
-      }
-    }
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content || '';
-    const tokens = data.usage?.total_tokens || 0;
-
-    // Extraire les sources si disponibles
+    // Utiliser le système de backup intelligent
+    const result = await tryPerplexityWithBackup(perplexityKey, enhancedPrompt, section, recency);
+    
+    const content = result.data.choices[0]?.message?.content || '';
+    const tokens = result.data.usage?.total_tokens || 0;
     const sources = extractSources(content);
 
     // Mettre en cache la réponse
     cache.set(cacheKey, {
       content,
-      model: model,
+      model: result.model,
       tokens,
       sources,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      backup_info: {
+        attempt: result.attempt,
+        totalAttempts: result.totalAttempts,
+        maxTokens: result.maxTokens
+      }
     });
 
+    // Mettre à jour les statistiques
+    updateModelStats(result.model, true, false);
+    
     return res.status(200).json({
       success: true,
       content,
-      model: model,
+      model: result.model,
       tokens,
       sources,
       section,
       query: searchQuery,
-      fallback: false,
-      quota_warning: null,
-      cached: false
+      fallback: result.attempt > 1,
+      quota_warning: result.attempt > 1 ? `Backup utilisé: ${result.model} (tentative ${result.attempt}/${result.totalAttempts})` : null,
+      cached: false,
+      backup_info: {
+        attempt: result.attempt,
+        totalAttempts: result.totalAttempts,
+        maxTokens: result.maxTokens,
+        description: MODEL_CONFIG[section]?.description || 'Analyse standard'
+      }
     });
 
   } catch (error) {
