@@ -37,7 +37,8 @@
 // 📚 Référence : https://ai.google.dev/gemini-api/docs/function-calling
 // ============================================================================
 
-import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
+// TEMPORAIREMENT DÉSACTIVÉ - Import cause FUNCTION_INVOCATION_FAILED sur Vercel
+// import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
 
 export default async function handler(req, res) {
   // CORS basique
