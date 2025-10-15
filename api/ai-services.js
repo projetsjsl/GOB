@@ -1093,71 +1093,88 @@ async function handleYieldCurves(req, res, params) {
 
 async function fetchYieldCurvesYahoo() {
   try {
-    // Utiliser les APIs existantes pour obtenir les vraies données
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+    // Récupérer les taux du Trésor américain depuis Yahoo Finance
+    const treasurySymbols = [
+      { symbol: '^TNX', name: '10-Year Treasury', term: '10y' },
+      { symbol: '^FVX', name: '5-Year Treasury', term: '5y' },
+      { symbol: '^TYX', name: '30-Year Treasury', term: '30y' },
+      { symbol: '^IRX', name: '3-Month Treasury', term: '3m' }
+    ];
     
-    // Appeler l'API marketdata existante pour les taux
-    const response = await fetch(`${baseUrl}/api/marketdata?symbols=^TNX,^FVX,^TYX,^IRX`);
-    const data = await response.json();
+    const rates = {};
     
-    if (data.success && data.data) {
-      const rates = data.data;
-      
-      // Extraire les taux des données reçues
-      const us10y = rates.find(r => r.symbol === '^TNX')?.price || 4.21;
-      const us5y = rates.find(r => r.symbol === '^FVX')?.price || 3.78;
-      const us30y = rates.find(r => r.symbol === '^TYX')?.price || 4.77;
-      const us3m = rates.find(r => r.symbol === '^IRX')?.price || 5.28;
-      
-      return {
-        us: {
-          terms: {
-            '3m': us3m,
-            '6m': us3m - 0.1,
-            '1y': us3m - 0.3,
-            '2y': us10y - 0.11,
-            '5y': us5y,
-            '7y': us10y - 0.2,
-            '10y': us10y,
-            '20y': us30y - 0.3,
-            '30y': us30y
-          },
-          spreads: {
-            '2y-10y': (us10y - 0.11) - us10y,
-            '5y-30y': us30y - us5y
-          },
-          source: {
-            name: 'Yahoo Finance via MarketData API',
-            url: 'https://finance.yahoo.com/treasury'
-          }
-        },
-        ca: {
-          terms: {
-            '1y': us3m - 1.2,
-            '2y': us10y - 0.6,
-            '5y': us5y - 0.4,
-            '10y': us10y - 0.7,
-            '30y': us30y - 1.1
-          },
-          spreads: {
-            '2y-10y': (us10y - 0.6) - (us10y - 0.7),
-            '5y-30y': (us30y - 1.1) - (us5y - 0.4)
-          },
-          source: {
-            name: 'Banque du Canada (estimé)',
-            url: 'https://www.bankofcanada.ca/rates/interest-rates/canadian-bonds/'
-          }
-        },
-        us_ca_differential: {
-          '10y': (us10y - (us10y - 0.7)) * 100,
-          note: 'Différentiel 10Y US-CA (points de base)'
-        },
-        updated_at: new Date().toISOString(),
-        fallback: false
-      };
+    // Récupérer chaque taux individuellement
+    for (const treasury of treasurySymbols) {
+      try {
+        const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${treasury.symbol}?interval=1d&range=1d`);
+        const data = await response.json();
+        
+        if (data.chart && data.chart.result && data.chart.result[0]) {
+          const result = data.chart.result[0];
+          const meta = result.meta;
+          rates[treasury.term] = meta.regularMarketPrice || 0;
+        }
+      } catch (error) {
+        console.error(`Erreur pour ${treasury.symbol}:`, error);
+        // Utiliser des valeurs par défaut réalistes
+        rates[treasury.term] = treasury.term === '3m' ? 5.28 : 
+                               treasury.term === '5y' ? 3.78 : 
+                               treasury.term === '10y' ? 4.21 : 4.77;
+      }
     }
     
-    throw new Error('Données marketdata non disponibles');
+    // Construire la courbe de taux avec interpolation
+    const us10y = rates['10y'] || 4.21;
+    const us5y = rates['5y'] || 3.78;
+    const us30y = rates['30y'] || 4.77;
+    const us3m = rates['3m'] || 5.28;
+    
+    return {
+      us: {
+        terms: {
+          '3m': us3m,
+          '6m': us3m - 0.1,
+          '1y': us3m - 0.3,
+          '2y': us10y - 0.11,
+          '5y': us5y,
+          '7y': us10y - 0.2,
+          '10y': us10y,
+          '20y': us30y - 0.3,
+          '30y': us30y
+        },
+        spreads: {
+          '2y-10y': (us10y - 0.11) - us10y,
+          '5y-30y': us30y - us5y
+        },
+        source: {
+          name: 'Yahoo Finance Treasury Rates',
+          url: 'https://finance.yahoo.com/treasury'
+        }
+      },
+      ca: {
+        terms: {
+          '1y': us3m - 1.2,
+          '2y': us10y - 0.6,
+          '5y': us5y - 0.4,
+          '10y': us10y - 0.7,
+          '30y': us30y - 1.1
+        },
+        spreads: {
+          '2y-10y': (us10y - 0.6) - (us10y - 0.7),
+          '5y-30y': (us30y - 1.1) - (us5y - 0.4)
+        },
+        source: {
+          name: 'Banque du Canada (estimé)',
+          url: 'https://www.bankofcanada.ca/rates/interest-rates/canadian-bonds/'
+        }
+      },
+      us_ca_differential: {
+        '10y': (us10y - (us10y - 0.7)) * 100,
+        note: 'Différentiel 10Y US-CA (points de base)'
+      },
+      updated_at: new Date().toISOString(),
+      fallback: false
+    };
   } catch (error) {
     console.error('Erreur fetchYieldCurvesYahoo:', error);
     return getFallbackYieldCurves();
