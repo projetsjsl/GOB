@@ -137,12 +137,11 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     const twelveDataKey = process.env.TWELVE_DATA_API_KEY;
     
     if (!perplexityKey) {
-      return res.status(200).json({
-        success: true,
-        content: getFallbackContent(section),
-        model: 'demo-mode',
-        fallback: true,
-        sources: []
+      return res.status(400).json({
+        success: false,
+        error: 'Clé API Perplexity manquante. Configurez PERPLEXITY_API_KEY dans Vercel.',
+        model: 'error',
+        fallback: false
       });
     }
 
@@ -191,13 +190,11 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
 
   } catch (error) {
     console.error('Erreur Perplexity:', error);
-    return res.status(200).json({
-      success: true,
-      content: getFallbackContent(section),
-      model: 'demo-mode',
-      fallback: true,
-      sources: [],
-      error: error.message
+    return res.status(500).json({
+      success: false,
+      error: `Erreur API Perplexity: ${error.message}. Vérifiez votre clé API PERPLEXITY_API_KEY.`,
+      model: 'error',
+      fallback: false
     });
   }
 }
@@ -226,13 +223,13 @@ async function handleOpenAI(req, res, { prompt, marketData, news }) {
       anthropicKey: anthropicKey ? `sk-ant-...${anthropicKey.slice(-4)}` : 'NOT_FOUND'
     });
     
-    // ✅ FALLBACK CRITIQUE - Garder pour mode démo
+    // ERREUR : Pas de clés API configurées
     if (!openaiKey && !anthropicKey) {
-      return res.status(200).json({
-        success: true,
-        content: getFallbackAnalysis(),
-        model: 'demo-mode',
-        fallback: true
+      return res.status(400).json({
+        success: false,
+        error: 'Aucune clé API configurée. Configurez OPENAI_API_KEY ou ANTHROPIC_API_KEY dans Vercel.',
+        model: 'error',
+        fallback: false
       });
     }
 
@@ -326,11 +323,11 @@ Rédige maintenant le briefing selon la structure demandée.
 
   } catch (error) {
     console.error('Erreur OpenAI:', error);
-    return res.status(200).json({
-      success: true,
-      content: getFallbackAnalysis(),
-      model: 'demo-mode',
-      fallback: true
+    return res.status(500).json({
+      success: false,
+      error: `Erreur API OpenAI: ${error.message}. Vérifiez votre clé API OPENAI_API_KEY.`,
+      model: 'error',
+      fallback: false
     });
   }
 }
@@ -436,38 +433,7 @@ Note: Données simulées - Mode démo sans clé API Perplexity
   `;
 }
 
-function getFallbackAnalysis() {
-  return `
-🌏 RÉSUMÉ EXÉCUTIF
-Les marchés asiatiques affichent une performance mitigée ce matin, avec le Nikkei en légère hausse (+0.8%) tandis que le Hang Seng recule de 1.2%. Les futures US pointent vers une ouverture positive, suggérant un sentiment risk-on modéré.
-
-📊 PERFORMANCE DES MARCHÉS
-• Asie : Divergences régionales marquées
-• Futures : ES +0.3%, NQ +0.5%, YM +0.2%
-• Secteurs moteurs : Technologie, Santé
-
-💡 CATALYSEURS & ACTUALITÉS CLÉS
-1. Résultats NVDA dépassent les attentes (+15% revenus)
-2. Fed maintient les taux, ton plus accommodant
-3. Tensions géopolitiques en recul
-
-📈 DONNÉES TECHNIQUES
-• S&P 500 : Support 4,200, Résistance 4,350
-• VIX : 18.5 (sentiment neutre)
-• Volume : Moyen, pas de panique
-
-🎯 FOCUS DU JOUR
-• Publication données emploi US 14h30
-• Conférence Fed 15h00
-• Résultats META après clôture
-
-⚠️ RISQUES & OPPORTUNITÉS
-Risques : Escalade géopolitique, inflation persistante
-Opportunités : Tech oversold, rotation sectorielle
-
-Note: Analyse simulée - Mode démo sans clé API OpenAI
-  `;
-}
+// Fonction getFallbackAnalysis SUPPRIMÉE - Plus de contenu demo
 
 // ============================================================================
 // BRIEFING DATA COLLECTOR
@@ -1707,17 +1673,7 @@ function buildSectionPrompt(query, section) {
   return basePrompts[section] || `Tu es Emma, assistante virtuelle experte en analyse financière. Analyse cette requête: "${query}" et fournis une réponse détaillée et professionnelle.`;
 }
 
-// Contenu de fallback selon la section
-function getFallbackContent(section) {
-  const fallbacks = {
-    news: '📰 Actualités financières non disponibles en mode démo. Veuillez configurer la clé API Perplexity pour accéder aux actualités en temps réel.',
-    analysis: '📊 Analyse de marché non disponible en mode démo. Veuillez configurer la clé API Perplexity pour accéder aux analyses en temps réel.',
-    writing: '✍️ Rédaction non disponible en mode démo. Veuillez configurer la clé API Perplexity pour accéder à la rédaction en temps réel.',
-    research: '🔍 Recherche non disponible en mode démo. Veuillez configurer la clé API Perplexity pour accéder à la recherche en temps réel.'
-  };
-  
-  return fallbacks[section] || 'Contenu non disponible en mode démo. Veuillez configurer la clé API Perplexity.';
-}
+// Fonction getFallbackContent SUPPRIMÉE - Plus de contenu demo
 
 // Extraire les sources du contenu
 function extractSources(content) {
