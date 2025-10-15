@@ -12706,38 +12706,79 @@ console.log('✅ Données hybrides récupérées:', {
                     const data = await response.json();
                     const htmlContent = data.contents;
                     
+                    // Debug: Log du HTML reçu (premiers 1000 caractères)
+                    console.log('📄 HTML reçu de Finviz:', htmlContent.substring(0, 1000));
+                    
                     // Parser le HTML pour extraire les événements économiques
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(htmlContent, 'text/html');
                     
+                    // Debug: Log des tables trouvées
+                    const allTables = doc.querySelectorAll('table');
+                    console.log('📊 Nombre de tables trouvées:', allTables.length);
+                    allTables.forEach((table, index) => {
+                        console.log(`Table ${index}:`, table.className, table.id, table.querySelectorAll('tr').length + ' lignes');
+                    });
+                    
                     // Extraire les événements du calendrier (structure Finviz)
                     const events = [];
-                    const eventRows = doc.querySelectorAll('table tr');
                     
-                    eventRows.forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        if (cells.length >= 4) {
-                            const time = cells[0]?.textContent?.trim();
-                            const currency = cells[1]?.textContent?.trim();
-                            const importance = cells[2]?.textContent?.trim();
-                            const event = cells[3]?.textContent?.trim();
-                            const actual = cells[4]?.textContent?.trim();
-                            const forecast = cells[5]?.textContent?.trim();
-                            const previous = cells[6]?.textContent?.trim();
-                            
-                            if (time && event) {
-                                events.push({
-                                    time,
-                                    currency,
-                                    importance,
-                                    event,
-                                    actual,
-                                    forecast,
-                                    previous
-                                });
+                    // Chercher spécifiquement la table du calendrier économique
+                    const calendarTable = doc.querySelector('table[id*="calendar"], table[class*="calendar"], .calendar table, #calendar table');
+                    
+                    if (calendarTable) {
+                        const eventRows = calendarTable.querySelectorAll('tr');
+                        
+                        eventRows.forEach(row => {
+                            const cells = row.querySelectorAll('td');
+                            if (cells.length >= 4) {
+                                const time = cells[0]?.textContent?.trim();
+                                const currency = cells[1]?.textContent?.trim();
+                                const importance = cells[2]?.textContent?.trim();
+                                const event = cells[3]?.textContent?.trim();
+                                const actual = cells[4]?.textContent?.trim();
+                                const forecast = cells[5]?.textContent?.trim();
+                                const previous = cells[6]?.textContent?.trim();
+                                
+                                // Filtrer les lignes qui contiennent des données d'événements valides
+                                if (time && event && time.match(/\d{1,2}:\d{2}/) && !time.includes('Time')) {
+                                    events.push({
+                                        time,
+                                        currency,
+                                        importance,
+                                        event,
+                                        actual,
+                                        forecast,
+                                        previous
+                                    });
+                                }
                             }
+                        });
+                    }
+                    
+                    // Si pas de table spécifique trouvée, essayer une approche alternative
+                    if (events.length === 0) {
+                        // Chercher des patterns dans le HTML qui ressemblent à des événements économiques
+                        const htmlText = htmlContent;
+                        const eventPatterns = htmlText.match(/(\d{1,2}:\d{2})\s+([A-Z]{3})\s+([A-Z]+)\s+([^<]+)/g);
+                        
+                        if (eventPatterns) {
+                            eventPatterns.forEach(pattern => {
+                                const parts = pattern.split(/\s+/);
+                                if (parts.length >= 4) {
+                                    events.push({
+                                        time: parts[0],
+                                        currency: parts[1],
+                                        importance: parts[2],
+                                        event: parts.slice(3).join(' '),
+                                        actual: 'N/A',
+                                        forecast: 'N/A',
+                                        previous: 'N/A'
+                                    });
+                                }
+                            });
                         }
-                    });
+                    }
                     
                     setEconomicCalendarData(events);
                     setMessage({ type: 'success', text: `Calendrier économique chargé: ${events.length} événements` });
@@ -12774,9 +12815,28 @@ console.log('✅ Données hybrides récupérées:', {
                             actual: '5.25%',
                             forecast: '5.25%',
                             previous: '5.00%'
+                        },
+                        {
+                            time: '09:00',
+                            currency: 'EUR',
+                            importance: 'Medium',
+                            event: 'Eurozone CPI',
+                            actual: '2.4%',
+                            forecast: '2.3%',
+                            previous: '2.2%'
+                        },
+                        {
+                            time: '11:30',
+                            currency: 'GBP',
+                            importance: 'High',
+                            event: 'Bank of England Rate Decision',
+                            actual: '5.25%',
+                            forecast: '5.25%',
+                            previous: '5.00%'
                         }
                     ];
                     setEconomicCalendarData(demoEvents);
+                    setMessage({ type: 'warning', text: 'Données de démonstration - Erreur de récupération des données en temps réel' });
                 } finally {
                     setLoading(false);
                 }
