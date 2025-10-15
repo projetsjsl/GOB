@@ -214,36 +214,16 @@ const fetchHybridData = async (symbol, dataType) => {
         apiUrl = `/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`;
         break;
       case 'analyst':
-        // Utiliser des données simulées réalistes
-        fallbackSource = true;
-        break;
+        // ERREUR : Pas de données simulées
+        throw new Error(`Données analyst non disponibles. API analyst non configurée.`);
       case 'earnings':
-        // Utiliser des données simulées réalistes
-        fallbackSource = true;
-        break;
+        // ERREUR : Pas de données simulées
+        throw new Error(`Données earnings non disponibles. API earnings non configurée.`);
       default:
         throw new Error(`Type de données non supporté: ${dataType}`);
     }
     
-    // Gérer les cas spéciaux
-    if (fallbackSource) {
-      // Retourner des données simulées réalistes pour analyst et earnings
-      const mockData = generateMockDataForType(symbol, dataType);
-      return {
-        success: true,
-        symbol,
-        dataType,
-        data: mockData,
-        source: 'fallback',
-        fallback: true,
-        metadata: {
-          confidence: 0.7,
-          freshness: 'simulated',
-          lastUpdated: new Date().toISOString(),
-          note: `Données simulées pour ${dataType} - API indisponible`
-        }
-      };
-    }
+    // ERREUR : Pas de fallback - Les cas spéciaux sont gérés par les throw Error ci-dessus
     
     // Gérer les appels spéciaux
     if (dataType === 'news') {
@@ -296,49 +276,12 @@ const fetchHybridData = async (symbol, dataType) => {
   } catch (error) {
     console.error(`❌ Erreur ${dataType} pour ${symbol}:`, error);
     
-    // Retourner des données de fallback réalistes
-    const fallbackData = generateMockDataForType(symbol, dataType);
-    return {
-      success: true,
-      symbol,
-      dataType,
-      data: fallbackData,
-      source: 'fallback',
-      fallback: true,
-      error: error.message,
-      metadata: {
-        confidence: 0.6,
-        freshness: 'simulated',
-        lastUpdated: new Date().toISOString(),
-        note: `Données de fallback pour ${dataType} - ${error.message}`
-      }
-    };
+    // ERREUR : Pas de fallback - Propager l'erreur
+    throw new Error(`Erreur API ${dataType} pour ${symbol}: ${error.message}`);
   }
 };
 
-// Fonction pour générer des données de fallback réalistes
-const generateMockDataForType = (symbol, dataType) => {
-  const basePrice = Math.random() * 200 + 50; // Prix entre 50 et 250
-  
-  switch (dataType) {
-    case 'analyst':
-      return {
-        rating: 'BUY',
-        targetPrice: basePrice * (1 + Math.random() * 0.2),
-        numberOfAnalysts: Math.floor(Math.random() * 20) + 10,
-        recommendation: ['BUY', 'HOLD', 'SELL'][Math.floor(Math.random() * 3)]
-      };
-    case 'earnings':
-      return {
-        actual: basePrice * 0.1 + Math.random() * 0.5,
-        estimate: basePrice * 0.1,
-        surprise: (Math.random() - 0.5) * 0.2,
-        date: new Date().toISOString().split('T')[0]
-      };
-    default:
-      return {};
-  }
-};
+// Fonction generateMockDataForType SUPPRIMÉE - Plus de données simulées
 
         const { useState, useEffect, useRef } = React;
 
@@ -990,7 +933,7 @@ const generateMockDataForType = (symbol, dataType) => {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            service: 'openai',
+                            service: 'perplexity',
                             prompt: 'Test de connexion API',
                             marketData: {},
                             news: 'Test'
@@ -1511,7 +1454,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            service: 'openai',
+                            service: 'perplexity',
                             prompt: 'Test de connexion API',
                             marketData: {},
                             news: 'Test'
@@ -5429,14 +5372,14 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         // 3. Générer l'analyse
                         addLogEntry('ANALYSIS', 'Début génération analyse IA', { 
                             source: apiSources.analysis,
-                            promptLength: prompts[type].openai.length,
+                            promptLength: prompts[type].perplexity.length,
                             marketDataSize: JSON.stringify(enrichedMarketData).length,
                             newsSize: (newsResult.content || '').length
                         }, 'info');
                         
                         const analysisRequest = {
-                            service: 'openai',
-                            prompt: prompts[type].openai,
+                            service: 'perplexity',
+                            prompt: prompts[type].perplexity,
                             marketData: enrichedMarketData,
                             news: newsResult.content || 'Aucune actualité disponible',
                             source: apiSources.analysis
@@ -5483,13 +5426,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                 responseStatusText: analysisResponse.statusText
                             }, 'error');
                             
-                            // Fallback avec analyse simulée
-                            analysisResult = {
-                                success: true,
-                                content: getFallbackAnalysis(),
-                                model: 'fallback-mode',
-                                fallback: true
-                            };
+                            // ERREUR : Pas de fallback demo
+                            throw new Error(`Erreur API Perplexity: ${error.message}. Vérifiez votre clé API PERPLEXITY_API_KEY.`);
                         }
                         
                         addLogEntry('ANALYSIS', 'Analyse parsée', {
@@ -5591,34 +5529,9 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         console.error('Erreur génération briefing:', error);
                         setMessage({ type: 'error', text: `Erreur: ${error.message}` });
                         
-                        // En cas de timeout, créer un briefing de fallback pour l'affichage
+                        // ERREUR : Pas de fallback demo - Timeout API
                         if (error.message.includes('timeout') || error.message.includes('timed out')) {
-                            console.log('🔄 Création d\'un briefing de fallback suite au timeout...');
-                            const fallbackHtml = getFallbackBriefingHTML(type);
-                            const fallbackBriefing = {
-                                type,
-                                subject: getSubjectForType(type) + ' (Mode Fallback)',
-                                html: fallbackHtml,
-                                data: { fallback: true, error: 'Timeout API' },
-                                analysis: { content: 'Analyse non disponible - Timeout API', fallback: true },
-                                timestamp: new Date().toISOString(),
-                                fallback: true,
-                                model: 'fallback-timeout'
-                            };
-                            
-                            console.log('🎯 Mise à jour fallback briefing:', {
-                                type: fallbackBriefing.type,
-                                hasHtml: !!fallbackBriefing.html,
-                                htmlLength: fallbackBriefing.html.length
-                            });
-                            
-                            setCurrentBriefing(fallbackBriefing);
-                            setPreviewHtml(fallbackHtml + '');
-                            setSelectedType(type);
-                            
-                            console.log('✅ Briefing de fallback créé et états mis à jour');
-                            console.log('🔍 Fallback briefing object:', fallbackBriefing);
-                            console.log('🔍 Preview HTML length:', fallbackHtml.length);
+                            throw new Error(`Timeout API Perplexity (90s dépassé). Vérifiez votre connexion et votre clé API PERPLEXITY_API_KEY.`);
                         }
                     } finally {
                         setLoading(false);
@@ -5640,59 +5553,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                     }
                 };
 
-                // Fonction pour générer un HTML de fallback
-                const getFallbackBriefingHTML = (type) => {
-                    const date = new Date().toLocaleDateString('fr-FR');
-                    const time = new Date().toLocaleTimeString('fr-FR');
-                    
-                    return `
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                            <meta charset="UTF-8">
-                            <title>Briefing Fallback - ${date}</title>
-                            <style>
-                                body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-                                .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                                .header { text-align: center; border-bottom: 2px solid #e0e0e0; padding-bottom: 20px; margin-bottom: 20px; }
-                                .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0; }
-                                .content { line-height: 1.6; }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="container">
-                                <div class="header">
-                                    <h1>${getSubjectForType(type)} (Mode Fallback)</h1>
-                                    <p>Généré le ${date} à ${time}</p>
-                                </div>
-                                
-                                <div class="warning">
-                                    <h3>⚠️ Mode Fallback Activé</h3>
-                                    <p>Les APIs ont rencontré un timeout. Ce briefing utilise des données de fallback pour l'affichage.</p>
-                                </div>
-                                
-                                <div class="content">
-                                    <h2>📊 Résumé du Marché</h2>
-                                    <p>Les données de marché ne sont pas disponibles en raison d'un timeout des APIs. Veuillez réessayer dans quelques instants.</p>
-                                    
-                                    <h2>📰 Actualités</h2>
-                                    <p>Les actualités ne sont pas disponibles en raison d'un timeout de l'API Perplexity.</p>
-                                    
-                                    <h2>🤖 Analyse IA</h2>
-                                    <p>L'analyse IA n'est pas disponible en raison d'un timeout de l'API OpenAI.</p>
-                                    
-                                    <h2>🔄 Recommandations</h2>
-                                    <ul>
-                                        <li>Réessayez de générer le briefing dans quelques minutes</li>
-                                        <li>Vérifiez votre connexion internet</li>
-                                        <li>Contactez le support si le problème persiste</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                    `;
-                };
+                // Fonction fallback HTML SUPPRIMÉE - Plus de contenu demo
 
                 // Fonction pour sauvegarder le briefing
                 const saveBriefing = async () => {
@@ -12944,27 +12805,7 @@ console.log('✅ Données hybrides récupérées:', {
             );
         };
 
-        // Fonction fallback pour l'analyse
-        function getFallbackAnalysis() {
-            return `
-# Emma En Direct · Analyse de Marché
-
-## 📊 Vue d'ensemble des Marchés
-Les marchés financiers montrent une activité mitigée aujourd'hui, avec des signaux contrastés selon les secteurs. L'indice S&P 500 évolue dans une fourchette étroite, reflétant l'attentisme des investisseurs face aux incertitudes macroéconomiques.
-
-## 🎯 Points Clés à Surveiller
-- **Inflation** : Les données récentes suggèrent une stabilisation des pressions inflationnistes
-- **Politique monétaire** : Les banques centrales maintiennent une approche prudente
-- **Earnings** : La saison des résultats approche avec des attentes modérées
-
-## 💡 Recommandations Stratégiques
-1. **Diversification** : Maintenir une allocation équilibrée entre actions et obligations
-2. **Secteurs défensifs** : Privilégier les secteurs résilients (santé, utilities)
-3. **Horizon temporel** : Adopter une perspective à moyen terme
-
-*Note: Analyse générée en mode fallback - Vérifiez les données réelles*
-            `.trim();
-        }
+        // Fonction fallback SUPPRIMÉE - Plus de contenu demo
 
         ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
     </script>
