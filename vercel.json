@@ -7,6 +7,9 @@
     "api/health-check.js": {
       "maxDuration": 15
     },
+    "api/health-check-simple.js": {
+      "maxDuration": 10
+    },
     "api/briefing-cron.js": {
       "maxDuration": 60
     },
