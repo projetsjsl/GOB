@@ -227,6 +227,7 @@ Rédige maintenant le briefing selon la structure demandée.
 
     if (openaiKey) {
       // Utiliser OpenAI
+      console.log('🚀 Appel OpenAI avec clé:', `sk-...${openaiKey.slice(-4)}`);
       response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -243,6 +244,7 @@ Rédige maintenant le briefing selon la structure demandée.
         })
       });
       model = 'gpt-5';
+      console.log('✅ Réponse OpenAI reçue, status:', response.status);
     } else if (anthropicKey) {
       // Utiliser Anthropic Claude
       response = await fetch('https://api.anthropic.com/v1/messages', {
