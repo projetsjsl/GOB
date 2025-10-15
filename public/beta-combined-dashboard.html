@@ -5299,7 +5299,25 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             statusText: analysisResponse.statusText
                         }, 'info');
                         
-                        const analysisResult = await analysisResponse.json();
+                        let analysisResult;
+                        try {
+                            const responseText = await analysisResponse.text();
+                            analysisResult = JSON.parse(responseText);
+                        } catch (parseError) {
+                            console.error('Erreur parsing JSON analyse:', parseError);
+                            addLogEntry('ERROR', 'Erreur parsing JSON analyse', {
+                                error: parseError.message,
+                                responseText: (await analysisResponse.text()).substring(0, 200)
+                            }, 'error');
+                            
+                            // Fallback avec analyse simulée
+                            analysisResult = {
+                                success: true,
+                                content: getFallbackAnalysis(),
+                                model: 'fallback-mode',
+                                fallback: true
+                            };
+                        }
                         
                         addLogEntry('ANALYSIS', 'Analyse parsée', {
                             success: analysisResult.success,
@@ -12648,6 +12666,28 @@ console.log('✅ Données hybrides récupérées:', {
                 </div>
             );
         };
+
+        // Fonction fallback pour l'analyse
+        function getFallbackAnalysis() {
+            return `
+# Emma En Direct · Analyse de Marché
+
+## 📊 Vue d'ensemble des Marchés
+Les marchés financiers montrent une activité mitigée aujourd'hui, avec des signaux contrastés selon les secteurs. L'indice S&P 500 évolue dans une fourchette étroite, reflétant l'attentisme des investisseurs face aux incertitudes macroéconomiques.
+
+## 🎯 Points Clés à Surveiller
+- **Inflation** : Les données récentes suggèrent une stabilisation des pressions inflationnistes
+- **Politique monétaire** : Les banques centrales maintiennent une approche prudente
+- **Earnings** : La saison des résultats approche avec des attentes modérées
+
+## 💡 Recommandations Stratégiques
+1. **Diversification** : Maintenir une allocation équilibrée entre actions et obligations
+2. **Secteurs défensifs** : Privilégier les secteurs résilients (santé, utilities)
+3. **Horizon temporel** : Adopter une perspective à moyen terme
+
+*Note: Analyse générée en mode fallback - Vérifiez les données réelles*
+            `.trim();
+        }
 
         ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
     </script>

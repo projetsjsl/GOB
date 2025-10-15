@@ -36,6 +36,12 @@
     },
     "api/gemini/chat-validated.js": {
       "maxDuration": 30
+    },
+    "api/news.js": {
+      "maxDuration": 10
+    },
+    "api/claude.js": {
+      "maxDuration": 10
     }
   },
   "headers": [

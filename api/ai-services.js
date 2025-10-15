@@ -222,11 +222,13 @@ Rédige maintenant le briefing selon la structure demandée.
           'Authorization': `Bearer ${openaiKey}`,
           'Content-Type': 'application/json',
         },
+        signal: AbortSignal.timeout(25000), // 25 secondes timeout
         body: JSON.stringify({
           model: 'gpt-4',
           messages: [{ role: 'user', content: contextualPrompt }],
-          max_tokens: 2500,
-          temperature: 0.7
+          max_tokens: 2000,
+          temperature: 0.7,
+          timeout: 30000
         })
       });
       model = 'gpt-4';
@@ -239,6 +241,7 @@ Rédige maintenant le briefing selon la structure demandée.
           'Content-Type': 'application/json',
           'anthropic-version': '2023-06-01'
         },
+        signal: AbortSignal.timeout(25000), // 25 secondes timeout
         body: JSON.stringify({
           model: 'claude-3-sonnet-20240229',
           max_tokens: 2500,
