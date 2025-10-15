@@ -278,6 +278,17 @@ const fetchHybridData = async (symbol, dataType) => {
                 return icons[name] || <div className={className}></div>;
             };
 
+        // Configuration des onglets (après déclaration des composants)
+        tabs = [
+            { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
+            { id: 'intellistocks', label: '📈 JLab™', component: IntelliStocksTab },
+            { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
+            { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
+            { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
+            { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
+            { id: 'email-briefings', label: '📧 Briefings Email', component: EmailBriefingsTab }
+        ];
+
         const BetaCombinedDashboard = () => {
             // États principaux
             const [activeTab, setActiveTab] = useState('stocks-news');
@@ -299,16 +310,6 @@ const fetchHybridData = async (symbol, dataType) => {
             const [newsFilter, setNewsFilter] = useState('all'); // Filtre pour les actualités
             const [filteredNews, setFilteredNews] = useState([]); // Actualités filtrées
 
-            // Configuration des onglets
-            const tabs = [
-                { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
-                { id: 'intellistocks', label: '📈 JLab™', component: IntelliStocksTab },
-                { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
-                { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
-                { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
-                { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
-                { id: 'email-briefings', label: '📧 Briefings Email', component: EmailBriefingsTab }
-            ];
             
             // États pour  l'interface Seeking Alpha
             const [githubToken, setGithubToken] = useState('');
