@@ -1,23 +1,13 @@
-// ============================================================================
-// API Gemini Chat Validated - Endpoint avec validation Zod pour l'onglet Ask Emma
-// ============================================================================
-
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { z } from 'zod';
-
-// Schéma de validation pour les réponses
-const ResponseSchema = z.object({
-  response: z.string().min(1, "La réponse ne peut pas être vide"),
-  confidence: z.number().min(0).max(1).optional(),
-  sources: z.array(z.string()).optional(),
-  timestamp: z.string().optional()
-});
+/**
+ * Gemini Chat Validated - Version avec validation avancée
+ * Chat Emma IA avec validation et gestion d'erreurs améliorée
+ */
 
 export default async function handler(req, res) {
-  // CORS headers
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -28,142 +18,111 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, useFunctionCalling = false } = req.body;
+    const { messages, useValidatedMode = true } = req.body;
 
-    if (!message) {
-      return res.status(400).json({ error: 'Message requis' });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ 
+        error: 'Messages requis',
+        details: 'Le paramètre messages doit être un tableau non vide'
+      });
     }
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
     
     if (!geminiApiKey) {
-      return res.status(500).json({ 
-        error: 'Clé API Gemini non configurée',
-        details: 'Veuillez configurer GEMINI_API_KEY dans les variables d\'environnement Vercel'
+      console.log('❌ Clé API Gemini non configurée');
+      return res.status(503).json({
+        error: 'Service non disponible',
+        message: 'Clé API Gemini non configurée',
+        help: 'Configurez GEMINI_API_KEY dans Vercel'
       });
     }
 
-    const genAI = new GoogleGenerativeAI(geminiApiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash-exp",
-      generationConfig: {
-        temperature: 0.5, // Température plus basse pour plus de cohérence
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 2048,
+    console.log('✅ Messages valides reçus:', messages.length, 'messages');
+    console.log('🔧 Mode validé activé:', useValidatedMode);
+
+    // Validation avancée des messages
+    const validatedMessages = messages.map((msg, index) => {
+      if (!msg.role || !msg.content) {
+        throw new Error(`Message ${index + 1} invalide: role et content requis`);
       }
+      
+      if (!['user', 'assistant', 'system'].includes(msg.role)) {
+        throw new Error(`Message ${index + 1}: role invalide (${msg.role})`);
+      }
+      
+      return {
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: String(msg.content) }]
+      };
     });
 
-    // Prompt amélioré pour la validation
-    const validatedPrompt = `
-    Vous êtes Emma, une experte en finance et IA. Répondez de manière précise et validée.
-    
-    Message de l'utilisateur: ${message}
-    
-    Veuillez fournir une réponse structurée et validée. Si vous n'êtes pas certain d'une information, indiquez-le clairement.
-    `;
+    console.log('🔧 Initialisation Gemini avec model: gemini-2.0-flash-exp');
+    console.log('📤 Envoi de la requête à Gemini');
 
-    let response;
-    
-    if (useFunctionCalling) {
-      // Mode avec function calling et validation
-      const tools = [
-        {
-          functionDeclarations: [
-            {
-              name: "get_validated_market_data",
-              description: "Obtenir des données de marché validées pour un symbole",
-              parameters: {
-                type: "object",
-                properties: {
-                  symbol: {
-                    type: "string",
-                    description: "Symbole de l'action (ex: AAPL, TSLA)"
-                  },
-                  validate: {
-                    type: "boolean",
-                    description: "Valider les données avant de les retourner"
-                  }
-                },
-                required: ["symbol", "validate"]
-              }
-            },
-            {
-              name: "get_validated_news",
-              description: "Obtenir les dernières nouvelles financières validées",
-              parameters: {
-                type: "object",
-                properties: {
-                  query: {
-                    type: "string",
-                    description: "Terme de recherche pour les nouvelles"
-                  },
-                  limit: {
-                    type: "number",
-                    description: "Nombre maximum de nouvelles à retourner"
-                  },
-                  validate: {
-                    type: "boolean",
-                    description: "Valider les sources avant de les retourner"
-                  }
-                },
-                required: ["query", "validate"]
-              }
-            }
-          ]
-        }
-      ];
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: validatedMessages,
+        generationConfig: {
+          maxOutputTokens: 2000,
+          temperature: 0.7,
+          topP: 0.8,
+          topK: 40
+        },
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_HARASSMENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_HATE_SPEECH',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          }
+        ]
+      })
+    });
 
-      response = await model.generateContent([validatedPrompt], { tools });
-    } else {
-      // Mode standard avec validation
-      response = await model.generateContent([validatedPrompt]);
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('❌ Erreur Gemini API:', response.status, errorData);
+      throw new Error(`Gemini API error: ${response.status} - ${errorData}`);
     }
 
-    const result = await response.response;
-    const text = result.text();
+    const data = await response.json();
+    console.log('✅ Réponse Gemini reçue');
 
-    // Validation de la réponse avec Zod
-    const validatedResponse = {
-      response: text,
-      confidence: 0.9, // Confiance élevée pour le mode validé
-      sources: ["Gemini 2.0 Flash Exp"],
-      timestamp: new Date().toISOString()
-    };
-
-    const validationResult = ResponseSchema.safeParse(validatedResponse);
+    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     
-    if (!validationResult.success) {
-      console.warn('⚠️ Validation Zod échouée:', validationResult.error);
-      // Retourner quand même la réponse mais avec un avertissement
-      return res.status(200).json({
-        success: true,
-        response: text,
-        model: "gemini-2.0-flash-exp",
-        functionCalling: useFunctionCalling,
-        validated: false,
-        validationWarning: "Réponse non validée par Zod",
-        timestamp: new Date().toISOString()
-      });
+    if (!responseText) {
+      console.error('❌ Réponse Gemini vide:', data);
+      throw new Error('Réponse vide de Gemini');
     }
+
+    console.log('✅ Réponse validée et envoyée');
 
     return res.status(200).json({
       success: true,
-      response: text,
-      model: "gemini-2.0-flash-exp",
-      functionCalling: useFunctionCalling,
-      validated: true,
-      confidence: validatedResponse.confidence,
-      sources: validatedResponse.sources,
+      response: responseText,
+      usage: {
+        promptTokens: data?.usageMetadata?.promptTokenCount || 0,
+        responseTokens: data?.usageMetadata?.candidatesTokenCount || 0,
+        totalTokens: data?.usageMetadata?.totalTokenCount || 0
+      },
+      model: 'gemini-2.0-flash-exp',
+      validated: useValidatedMode,
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
-    console.error('❌ Erreur Gemini Chat Validated:', error);
+    console.error('❌ Erreur lors de l\'appel à Gemini:', error?.message || String(error));
+    
     return res.status(500).json({
-      success: false,
-      error: error.message,
-      details: 'Erreur lors de la génération de la réponse Gemini validée',
+      error: 'Erreur lors de l\'appel à Gemini',
+      details: error?.message || String(error),
       timestamp: new Date().toISOString()
     });
   }
