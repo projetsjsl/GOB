@@ -230,14 +230,14 @@ Rédige maintenant le briefing selon la structure demandée.
         },
         signal: AbortSignal.timeout(25000), // 25 secondes timeout
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-5',
           messages: [{ role: 'user', content: contextualPrompt }],
           max_tokens: 2000,
           temperature: 0.7,
           timeout: 30000
         })
       });
-      model = 'gpt-4o';
+      model = 'gpt-5';
     } else if (anthropicKey) {
       // Utiliser Anthropic Claude
       response = await fetch('https://api.anthropic.com/v1/messages', {
