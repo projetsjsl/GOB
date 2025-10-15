@@ -12531,7 +12531,12 @@ console.log('✅ Données hybrides récupérées:', {
             const EconomicCalendarTab = () => {
                 const [isRefreshing, setIsRefreshing] = useState(false);
 
+                // Debug: Log du chargement du composant
+                console.log('📅 EconomicCalendarTab chargé');
+                console.log('📊 Données actuelles:', economicCalendarData);
+
                 const handleRefresh = async () => {
+                    console.log('🔄 Actualisation du calendrier...');
                     setIsRefreshing(true);
                     await fetchEconomicCalendar();
                     setTimeout(() => setIsRefreshing(false), 1000);
@@ -12598,17 +12603,76 @@ console.log('✅ Données hybrides récupérées:', {
                             <div className="text-center py-12">
                                 <div className="text-6xl mb-4">📅</div>
                                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                                    Aucun événement économique
+                                    Chargement du calendrier économique...
                                 </h3>
                                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                                    Cliquez sur "Actualiser" pour charger les événements du jour
+                                    Récupération des données depuis Finviz en cours
                                 </p>
-                                <button
-                                    onClick={handleRefresh}
-                                    className="btn-ripple px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-all"
-                                >
-                                    Charger le calendrier
-                                </button>
+                                <div className="flex justify-center space-x-4">
+                                    <button
+                                        onClick={handleRefresh}
+                                        className="btn-ripple px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-all"
+                                    >
+                                        🔄 Actualiser
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            // Charger les données de démonstration immédiatement
+                                            const demoEvents = [
+                                                {
+                                                    time: '08:30 AM',
+                                                    currency: 'USD',
+                                                    importance: 'High',
+                                                    event: 'NY Empire State Manufacturing Index',
+                                                    actual: '10.70',
+                                                    forecast: '-1.00',
+                                                    previous: '-8.70'
+                                                },
+                                                {
+                                                    time: '08:30 AM',
+                                                    currency: 'USD',
+                                                    importance: 'High',
+                                                    event: 'Inflation Rate MoM',
+                                                    actual: 'N/A',
+                                                    forecast: '0.3%',
+                                                    previous: '0.4%'
+                                                },
+                                                {
+                                                    time: '08:30 AM',
+                                                    currency: 'USD',
+                                                    importance: 'High',
+                                                    event: 'Core Inflation Rate YoY',
+                                                    actual: 'N/A',
+                                                    forecast: 'N/A',
+                                                    previous: '3.1%'
+                                                },
+                                                {
+                                                    time: '12:55 PM',
+                                                    currency: 'USD',
+                                                    importance: 'Low',
+                                                    event: 'Fed Paulson Speech',
+                                                    actual: 'N/A',
+                                                    forecast: 'N/A',
+                                                    previous: 'N/A'
+                                                },
+                                                {
+                                                    time: '12:20 PM',
+                                                    currency: 'USD',
+                                                    importance: 'High',
+                                                    event: 'Fed Chair Powell Speech',
+                                                    actual: 'N/A',
+                                                    forecast: 'N/A',
+                                                    previous: 'N/A'
+                                                }
+                                            ];
+                                            setEconomicCalendarData(demoEvents);
+                                            setMessage({ type: 'info', text: 'Données de démonstration chargées' });
+                                        }}
+                                        className="btn-ripple px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-all"
+                                    >
+                                        📊 Données Demo
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <div className="space-y-4">
