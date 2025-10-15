@@ -172,6 +172,12 @@ export default async function handler(req, res) {
 // ============================================================================
 // PERPLEXITY SEARCH - CONFIGURATION CRITIQUE
 // ============================================================================
+// 🎯 EMMA EN DIRECT 100% PERPLEXITY - SYSTÈME ULTRA-SIMPLIFIÉ
+// ✅ Architecture : 1 requête Perplexity → Prompt complet → Analyse directe → HTML
+// ✅ Plus de Yahoo Finance, plus de variables multiples, plus de complexité
+// ✅ 4 modèles de backup + cache intelligent + monitoring en temps réel
+// ✅ Prompt ultra-détaillé (2000+ mots) = contenu professionnel complet
+// ============================================================================
 // 🚀 CACHE SYSTEM : Réduire les appels API pour économiser le quota
 const cache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
