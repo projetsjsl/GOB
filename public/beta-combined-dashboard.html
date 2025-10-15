@@ -529,7 +529,15 @@ const fetchHybridData = async (symbol, dataType) => {
                     const tickersQuery = tickers.join(' OR ');
                     console.log(`🔍 Recherche directe pour: ${tickersQuery}`);
                     
-                    const response = await fetch(`${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=20&strict=true`);
+                    const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            service: 'perplexity',
+                            prompt: `Actualités financières récentes pour: ${tickersQuery}`,
+                            recency: 'day'
+                        })
+                    });
                     console.log(`📡 Réponse API Directe: ${response.status}`);
                     
                     if (!response.ok) {
@@ -803,7 +811,15 @@ const fetchHybridData = async (symbol, dataType) => {
                 // Test NewsAPI
                 try {
                     const startTime = Date.now();
-                    const response = await fetch(`${API_BASE_URL}/api/news?q=finance&limit=5&strict=true`);
+                    const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            service: 'perplexity',
+                            prompt: 'Actualités financières générales',
+                            recency: 'day'
+                        })
+                    });
                     const responseTime = Date.now() - startTime;
                     
                     if (response.ok) {
@@ -877,7 +893,16 @@ const fetchHybridData = async (symbol, dataType) => {
                 // Test Claude API (si configuré)
                 try {
                     const startTime = Date.now();
-                    const response = await fetch(`${API_BASE_URL}/api/claude`, {
+                    const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            service: 'openai',
+                            prompt: 'Test de connexion API',
+                            marketData: {},
+                            news: 'Test'
+                        })
+                    });
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ prompt: 'Test de connexion', ticker: 'TEST' })
@@ -1393,7 +1418,16 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     `;
 
                     // Appeler l'API Claude (vous devrez configurer votre endpoint)
-                    const response = await fetch(`${API_BASE_URL}/api/claude`, {
+                    const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            service: 'openai',
+                            prompt: 'Test de connexion API',
+                            marketData: {},
+                            news: 'Test'
+                        })
+                    });
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
