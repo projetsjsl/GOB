@@ -121,8 +121,8 @@ export default async function handler(req, res) {
             perplexity_key: process.env.PERPLEXITY_API_KEY ? `pplx-...${process.env.PERPLEXITY_API_KEY.slice(-4)}` : 'NOT_FOUND'
           }
         });
-      } else {
-        return res.status(400).json({ error: 'Service non reconnu pour GET/DELETE. Utilisez: supabase-briefings' });
+      } else if (service && service !== 'monitoring') {
+        return res.status(400).json({ error: 'Service non reconnu pour GET/DELETE. Utilisez: supabase-briefings, monitoring' });
       }
     }
 
