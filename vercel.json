@@ -28,14 +28,14 @@
     "api/github-update.js": {
       "maxDuration": 15
     },
-    "api/test-gemini.js": {
-      "maxDuration": 10
-    },
     "api/gemini/chat.js": {
       "maxDuration": 30
     },
     "api/gemini/chat-validated.js": {
       "maxDuration": 30
+    },
+    "api/gemini/tools.js": {
+      "maxDuration": 20
     }
   },
   "headers": [
