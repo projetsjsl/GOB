@@ -5249,12 +5249,15 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
 
                 // Fonction pour générer un briefing
                 const generateBriefing = async (type) => {
+                    console.log('🚀 DÉBUT generateBriefing:', { type, loading });
+                    
                     // Protection contre les générations multiples
                     if (loading) {
                         console.log('⚠️ Génération déjà en cours, ignoré');
                         return;
                     }
                     
+                    console.log('✅ Démarrage de la génération...');
                     setLoading(true);
                     setCurrentBriefing(null);
                     setPreviewHtml('');
@@ -5520,9 +5523,19 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             timestamp: briefing.timestamp
                         }, 'success');
 
+                        console.log('🎯 Mise à jour des états React:', {
+                            briefingType: briefing.type,
+                            hasHtml: !!briefing.html,
+                            htmlLength: briefing.html.length,
+                            fallback: briefing.fallback,
+                            model: briefing.model
+                        });
+                        
                         setCurrentBriefing(briefing);
                         setPreviewHtml(html);
                         setSelectedType(type);
+                        
+                        console.log('✅ États React mis à jour avec succès');
                         
                         addLogEntry('COMPLETION', 'Briefing généré avec succès', {
                             totalTime: Date.now() - new Date(processLog[0]?.timestamp).getTime(),
@@ -6465,7 +6478,10 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <button
-                                    onClick={() => generateBriefing('morning')}
+                                    onClick={() => {
+                                        console.log('🖱️ Clic sur Briefing Matin');
+                                        generateBriefing('morning');
+                                    }}
                                     disabled={loading}
                                     className={`p-4 rounded-lg border-2 transition-all duration-300 ${
                                         loading 
@@ -6483,7 +6499,10 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                 </button>
 
                                 <button
-                                    onClick={() => generateBriefing('noon')}
+                                    onClick={() => {
+                                        console.log('🖱️ Clic sur Update Midi');
+                                        generateBriefing('noon');
+                                    }}
                                     disabled={loading}
                                     className={`p-4 rounded-lg border-2 transition-all duration-300 ${
                                         loading 
@@ -6501,7 +6520,10 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                 </button>
 
                                 <button
-                                    onClick={() => generateBriefing('evening')}
+                                    onClick={() => {
+                                        console.log('🖱️ Clic sur Rapport Soir');
+                                        generateBriefing('evening');
+                                    }}
                                     disabled={loading}
                                     className={`p-4 rounded-lg border-2 transition-all duration-300 ${
                                         loading 
@@ -6534,6 +6556,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         </div>
 
                         {/* Prévisualisation et actions */}
+                        {console.log('🔍 État currentBriefing:', currentBriefing)}
                         {currentBriefing && (
                             <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
