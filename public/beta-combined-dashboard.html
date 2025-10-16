@@ -807,6 +807,156 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
             };
 
+            // 🔄 FONCTION BATCH REFRESH - Actualiser tous les onglets via Emma Agent
+            const batchRefreshAllTabs = async () => {
+                console.log('🔄 Emma Agent Batch Refresh - START');
+                const startTime = Date.now();
+                setLoading(true);
+
+                try {
+                    // Préparer les contextes pour chaque onglet avec Cognitive Scaffolding
+                    const contexts = {
+                        jlab: {
+                            tickers: teamTickers,
+                            analysis_type: 'jlab_intellistocks_population',
+                            include_jsla_score: true,
+                            include_valuation_analysis: true,
+                            include_risk_assessment: true,
+                            include_sector_analysis: true,
+                            include_technical_indicators: true
+                        },
+                        watchlist: {
+                            tickers: watchlistTickers,
+                            analysis_type: 'watchlist_detailed_analysis',
+                            include_fundamentals: true,
+                            include_technical: true,
+                            include_news: true,
+                            include_analyst_recommendations: true,
+                            news_limit: 3
+                        },
+                        stocks_news: {
+                            tickers: teamTickers,
+                            analysis_type: 'stocks_news_population',
+                            news_requested: true,
+                            news_limit: 50,
+                            include_market_indices: true,
+                            include_top_movers: true,
+                            include_economic_calendar: true,
+                            include_earnings_calendar: true
+                        }
+                    };
+
+                    console.log('📊 Batch Refresh Contexts:', contexts);
+
+                    // Appels parallèles pour les 3 onglets via Emma Agent
+                    const [jlabResult, watchlistResult, newsResult] = await Promise.allSettled([
+                        fetch('/api/emma-agent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                message: "Peupler l'onglet JLab (IntelliStocks) avec des analyses avancées. Calculer les scores JSLAI™, analyser les ratios financiers, évaluer la valorisation, et fournir des recommandations d'investissement basées sur l'analyse quantitative et qualitative.",
+                                context: contexts.jlab
+                            })
+                        }).then(r => r.json()),
+
+                        fetch('/api/emma-agent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                message: "Analyser en détail tous les tickers de la watchlist Dan. Récupérer les données fondamentales, techniques, actualités et recommandations d'analystes. Fournir une analyse complète de chaque action avec insights et recommandations.",
+                                context: contexts.watchlist
+                            })
+                        }).then(r => r.json()),
+
+                        fetch('/api/emma-agent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                message: "Récupérer les données de prix, news, et recommandations pour tous les tickers d'équipe. Analyse les performances, actualités récentes, et fournis des insights sur chaque action.",
+                                context: contexts.stocks_news
+                            })
+                        }).then(r => r.json())
+                    ]);
+
+                    // Parser les résultats
+                    const jlab = jlabResult.status === 'fulfilled' ? jlabResult.value : null;
+                    const watchlist = watchlistResult.status === 'fulfilled' ? watchlistResult.value : null;
+                    const news = newsResult.status === 'fulfilled' ? newsResult.value : null;
+
+                    const executionTime = Date.now() - startTime;
+
+                    // Log des résultats
+                    console.log('✅ Emma Agent Batch Refresh - COMPLETED:', {
+                        jlab: {
+                            success: jlab?.success,
+                            tools_used: jlab?.tools_used,
+                            intent: jlab?.intent,
+                            confidence: jlab?.confidence,
+                            is_reliable: jlab?.is_reliable
+                        },
+                        watchlist: {
+                            success: watchlist?.success,
+                            tools_used: watchlist?.tools_used,
+                            intent: watchlist?.intent,
+                            confidence: watchlist?.confidence,
+                            is_reliable: watchlist?.is_reliable
+                        },
+                        news: {
+                            success: news?.success,
+                            tools_used: news?.tools_used,
+                            intent: news?.intent,
+                            confidence: news?.confidence,
+                            is_reliable: news?.is_reliable
+                        },
+                        execution_time_ms: executionTime
+                    });
+
+                    // Afficher les résultats
+                    const successCount = [jlab?.success, watchlist?.success, news?.success].filter(Boolean).length;
+
+                    if (successCount === 3) {
+                        showMessage(`✅ Tous les onglets actualisés avec succès (${(executionTime/1000).toFixed(1)}s)`, 'success');
+                    } else if (successCount > 0) {
+                        showMessage(`⚠️ ${successCount}/3 onglets actualisés (${(executionTime/1000).toFixed(1)}s)`, 'warning');
+                    } else {
+                        showMessage(`❌ Échec de l'actualisation des onglets`, 'error');
+                    }
+
+                    // Sauvegarder les statistiques de batch refresh
+                    await savePopulateConfig('batch-refresh', {
+                        jlab_success: jlab?.success,
+                        jlab_tools: jlab?.tools_used,
+                        jlab_reliable: jlab?.is_reliable,
+                        watchlist_success: watchlist?.success,
+                        watchlist_tools: watchlist?.tools_used,
+                        watchlist_reliable: watchlist?.is_reliable,
+                        news_success: news?.success,
+                        news_tools: news?.tools_used,
+                        news_reliable: news?.is_reliable,
+                        execution_time_ms: executionTime,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    return {
+                        success: successCount > 0,
+                        jlab: jlab?.success,
+                        watchlist: watchlist?.success,
+                        news: news?.success,
+                        execution_time_ms: executionTime
+                    };
+
+                } catch (error) {
+                    console.error('❌ Emma Agent Batch Refresh - ERROR:', error);
+                    showMessage(`Erreur batch refresh: ${error.message}`, 'error');
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                } finally {
+                    setLoading(false);
+                }
+            };
+
             // Fonction pour récupérer les nouvelles d'un symbole spécifique depuis le cache
             const fetchSymbolNews = async (symbol) => {
                 console.log(`📰 Récupération des nouvelles pour ${symbol} depuis le cache...`);
