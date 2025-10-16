@@ -848,14 +848,18 @@ const fetchHybridData = async (symbol, dataType) => {
 
                     console.log('📊 Batch Refresh Contexts:', contexts);
 
-                    // Appels parallèles pour les 3 onglets via Emma Agent
+                    // Appels parallèles pour les 3 onglets via Emma Agent (MODE DATA pour JSON structuré)
                     const [jlabResult, watchlistResult, newsResult] = await Promise.allSettled([
                         fetch('/api/emma-agent', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                message: "Peupler l'onglet JLab (IntelliStocks) avec des analyses avancées. Calculer les scores JSLAI™, analyser les ratios financiers, évaluer la valorisation, et fournir des recommandations d'investissement basées sur l'analyse quantitative et qualitative.",
-                                context: contexts.jlab
+                                message: "Récupérer prix, PE, volume, marketCap, EPS, ROE, revenueGrowth, debtToEquity pour tous les tickers",
+                                context: {
+                                    ...contexts.jlab,
+                                    output_mode: 'data',  // ← MODE DATA pour JSON structuré
+                                    fields_requested: ['price', 'pe', 'volume', 'marketCap', 'eps', 'roe', 'revenueGrowth', 'debtToEquity']
+                                }
                             })
                         }).then(r => r.json()),
 
@@ -863,8 +867,12 @@ const fetchHybridData = async (symbol, dataType) => {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                message: "Analyser en détail tous les tickers de la watchlist Dan. Récupérer les données fondamentales, techniques, actualités et recommandations d'analystes. Fournir une analyse complète de chaque action avec insights et recommandations.",
-                                context: contexts.watchlist
+                                message: "Récupérer prix, variation, volume, RSI, MACD, SMA50, SMA200 pour tous les tickers watchlist",
+                                context: {
+                                    ...contexts.watchlist,
+                                    output_mode: 'data',  // ← MODE DATA pour JSON structuré
+                                    fields_requested: ['price', 'change', 'changePercent', 'volume', 'rsi', 'macd', 'sma50', 'sma200']
+                                }
                             })
                         }).then(r => r.json()),
 
@@ -872,8 +880,12 @@ const fetchHybridData = async (symbol, dataType) => {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                message: "Récupérer les données de prix, news, et recommandations pour tous les tickers d'équipe. Analyse les performances, actualités récentes, et fournis des insights sur chaque action.",
-                                context: contexts.stocks_news
+                                message: "Récupérer prix, news (top 10), analyst_recommendations, marketCap pour tous les tickers",
+                                context: {
+                                    ...contexts.stocks_news,
+                                    output_mode: 'data',  // ← MODE DATA pour JSON structuré
+                                    fields_requested: ['price', 'news', 'analyst_recommendations', 'marketCap']
+                                }
                             })
                         }).then(r => r.json())
                     ]);
@@ -6300,6 +6312,7 @@ RÉPONDS EN JSON UNIQUEMENT:
                             body: JSON.stringify({
                                 message: `Récupérer les données pour briefing ${type}. Focus: ${intentData.summary}`,
                                 context: {
+                                    output_mode: 'data',  // ← MODE DATA pour récupération de données
                                     briefing_type: type,
                                     intent: intentData.intent,
                                     suggested_tools: intentData.recommended_tools,
