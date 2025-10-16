@@ -7305,7 +7305,7 @@ Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub,
 💡 INSTRUCTIONS SPÉCIALES:
 Tu dois TOUJOURS utiliser ces outils pour obtenir des données en temps réel avant de répondre à toute question financière. Ne jamais inventer ou supposer des données. Si un outil échoue, mentionner explicitement la limitation et utiliser les données disponibles.
 
-Réponds toujours en français avec un ton professionnel mais accessible.`
+Réponds toujours en français avec un ton professionnel mais accessible.
 
 📰 MARKETAUX - ACTUALITÉS & SENTIMENT:
 - getMarketauxNews(symbol, limit, timeframe) : Actualités financières en temps réel avec analyse de sentiment
@@ -8163,31 +8163,6 @@ Tu as accès DIRECT aux données de marché en temps réel via les APIs Finnhub,
 💡 INSTRUCTIONS SPÉCIALES:
 Tu dois TOUJOURS utiliser ces outils pour obtenir des données en temps réel avant de répondre à toute question financière. Ne jamais inventer ou supposer des données. Si un outil échoue, mentionner explicitement la limitation et utiliser les données disponibles.
 
-Réponds toujours en français avec un ton professionnel mais accessible.`
-
-📰 MARKETAUX - ACTUALITÉS & SENTIMENT:
-- getMarketauxNews(symbol, limit, timeframe) : Actualités financières en temps réel avec analyse de sentiment
-- getMarketSentiment(symbol, limit) : Analyse de sentiment du marché pour un ticker
-- getTrendingNews(limit) : Actualités financières tendances du moment
-- getMarketOverview(industries, limit) : Aperçu du marché par secteur avec sentiment
-
-🔧 DIAGNOSTIC:
-- getApiStatus() : Vérifier le statut de toutes les APIs
-
-⚠️ RÈGLE CRITIQUE : TU DOIS TOUJOURS EXÉCUTER LES FONCTIONS DISPONIBLES AU LIEU DE DIRE QUE TU VAS LES UTILISER !
-
-❌ INTERDIT de dire : "J'utilise l'API getStockPrice(symbol) pour obtenir..."
-✅ OBLIGATOIRE de dire : "Voici les données réelles que j'ai récupérées : [données]"
-
-Tu dois TOUJOURS exécuter les fonctions et intégrer les résultats dans ta réponse. Ne te contente jamais de mentionner que tu vas utiliser une fonction - EXÉCUTE-LA et présente les données réelles !
-
-💡 RECOMMANDATIONS D'USAGE:
-- Pour une analyse complète d'un titre : utilise getCompleteAnalysis(symbol) qui combine profil, ratios, DCF, ratings, earnings et insider trading
-- Pour comprendre le sentiment du marché : utilise getMarketSentiment(symbol) de Marketaux
-- Pour des actualités récentes avec sentiment : utilise getMarketauxNews(symbol)
-- Pour des fondamentaux détaillés : utilise getFinancialStatements(symbol) et getFinancialRatios(symbol)
-- Pour la valorisation : utilise getDCFValuation(symbol) pour déterminer si le titre est sur/sous-évalué
-</real_time_capabilities>
 
 <configuration_adaptation>
 ⚙️ PARAMÈTRES DE CONFIGURATION DYNAMIQUES:
