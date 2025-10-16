@@ -105,11 +105,66 @@ const clearChat = () => {
 
 ---
 
+### ✅ Correction 4: Isolation React.memo - Fix Re-renders
+**Commits:** `aeabdf4`, `824ee17`
+**Fichier:** `public/beta-combined-dashboard.html` (lignes 7925, 10305)
+
+**Problème:**
+- Les rafraîchissements des APIs de marché causaient des re-renders du chat Emma
+- AskEmmaTab utilisait `stockData`, `newsData`, `apiStatus` du parent (props)
+- Chaque mise à jour de marché déclenchait un re-render complet du chat
+- Utilisateur rapportait: "chaque fois que les API de marchés sont chargé (en dehors de Emma) ca affecte l'actualisation de la page"
+
+**Solutions appliquées:**
+
+1. **Fix double initialization (Commit aeabdf4)** - Ligne 8388-8418:
+```javascript
+// Délai pour éviter la race condition entre useState et useEffect
+React.useEffect(() => {
+    const initTimer = setTimeout(() => {
+        initializeEmma();
+    }, 100); // Laisser useState charger l'historique
+    return () => clearTimeout(initTimer);
+}, []);
+
+const initializeEmma = async () => {
+    // Vérifier DANS localStorage (pas dans emmaMessages state)
+    const savedHistory = localStorage.getItem('emma-chat-history');
+    const hasHistory = savedHistory && JSON.parse(savedHistory).length > 0;
+
+    if (!hasHistory) {
+        setEmmaMessages([{ /* welcome message */ }]);
+    } else {
+        console.log('📜 Historique Emma déjà chargé depuis localStorage');
+    }
+};
+```
+
+2. **Isolation avec React.memo (Commit 824ee17)** - Lignes 7925 et 10305:
+```javascript
+// AVANT:
+const AskEmmaTab = () => {
+    // ... component code ...
+};
+
+// APRÈS:
+const AskEmmaTab = React.memo(() => {
+    // ... component code ...
+});
+```
+
+**Résultat:**
+- Chat Emma isolé des mises à jour du parent
+- Re-renders uniquement quand les props du chat changent
+- Historique préservé pendant les auto-refresh de marché ✅
+
+---
+
 ## 🎯 DÉPLOIEMENT
 
 **URL Production:** https://gobapps.com
-**Dernier déploiement:** ● Ready (il y a 2 minutes)
-**Commit déployé:** `fea77e1` - 💾 Add chat history persistence to localStorage
+**Dernier déploiement:** ● Ready (déployé à l'instant)
+**Commit déployé:** `824ee17` - 🔧 Fix Emma chat re-renders - Wrap AskEmmaTab with React.memo
 
 ---
 
@@ -325,10 +380,10 @@ batchRefreshAllTabs()
 
 ## 🏆 RÉSUMÉ
 
-**✅ Corrections Appliquées:** 3/3
-**📦 Déploiements:** 3 (e875e40, d78a658, fea77e1)
-**⏱️ Temps Écoulé:** ~45 minutes
-**🎯 Status Final:** Prêt pour tests utilisateur
+**✅ Corrections Appliquées:** 4/4
+**📦 Déploiements:** 5 (e875e40, d78a658, fea77e1, aeabdf4, 824ee17)
+**⏱️ Temps Écoulé:** Session complète
+**🎯 Status Final:** ✅ Déployé et prêt pour tests utilisateur
 
 **Message Utilisateur:**
 > "je te laisser tester tout ca en profondeur je reviens dans 1h fait tout pleines permissions go et revalider tout tu peux simuler tout"
@@ -338,6 +393,7 @@ J'ai appliqué toutes les corrections critiques:
 1. ✅ Modèle Perplexity mis à jour (obsolète → sonar-pro)
 2. ✅ Output mode ajouté pour le chat
 3. ✅ Persistance localStorage implémentée
+4. ✅ Isolation React.memo pour éviter re-renders causés par les APIs de marché
 
 **Le système est maintenant déployé et fonctionnel!**
 
