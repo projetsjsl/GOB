@@ -9401,7 +9401,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <p className={`text-xs transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                 }`}>
-                                    ⚙️ Température: {emmaTemperature} • Longueur: {emmaMaxTokens} tokens • Function Calling: {useFunctionCalling ? 'ON' : 'OFF'}{useValidatedMode ? ' • Mode Validé: ON' : ''}
+                                    ⚙️ Température: {emmaTemperature} • Longueur: {emmaMaxTokens} tokens
                                 </p>
                             </div>
                             <div className="flex gap-2">
@@ -9471,123 +9471,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <p className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                     }`}>Analyste financière virtuelle</p>
-                                </div>
-                            </div>
-
-                            {/* Slide de Sélection de Mode */}
-                            <div className={`mb-4 p-4 rounded-lg border transition-colors duration-300 ${
-                                isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
-                            }`}>
-                                <h4 className={`text-sm font-medium mb-3 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                    🚀 Mode d'Interaction avec Emma
-                                </h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {/* Version Directe */}
-                                    <div 
-                                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                            !useFunctionCalling 
-                                                ? isDarkMode 
-                                                    ? 'border-green-500 bg-green-900/20' 
-                                                    : 'border-green-500 bg-green-50'
-                                                : isDarkMode 
-                                                    ? 'border-gray-600 bg-gray-700 hover:border-gray-500' 
-                                                    : 'border-gray-300 bg-gray-50 hover:border-gray-400'
-                                        }`}
-                                        onClick={() => {
-                                            setUseFunctionCalling(false);
-                                            saveFunctionCalling();
-                                        }}
-                                    >
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-lg">💬</span>
-                                            <span className={`font-medium ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>
-                                                Version Directe
-                                            </span>
-                                        </div>
-                                        <p className={`text-xs ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                        }`}>
-                                            Conversation standard avec Emma. Réponses rapides et fiables.
-                                        </p>
-                                        <div className={`text-xs mt-2 px-2 py-1 rounded ${
-                                            !useFunctionCalling 
-                                                ? 'bg-green-100 text-green-700' 
-                                                : isDarkMode 
-                                                    ? 'bg-gray-600 text-gray-300' 
-                                                    : 'bg-gray-200 text-gray-600'
-                                        }`}>
-                                            {!useFunctionCalling ? '✅ Actif' : 'Inactif'}
-                                        </div>
-                                    </div>
-
-                                    {/* Version Function Calling */}
-                                    <div 
-                                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                                            useFunctionCalling 
-                                                ? isDarkMode 
-                                                    ? 'border-blue-500 bg-blue-900/20' 
-                                                    : 'border-blue-500 bg-blue-50'
-                                                : isDarkMode 
-                                                    ? 'border-gray-600 bg-gray-700 hover:border-gray-500' 
-                                                    : 'border-gray-300 bg-gray-50 hover:border-gray-400'
-                                        }`}
-                                        onClick={() => {
-                                            setUseFunctionCalling(true);
-                                            saveFunctionCalling();
-                                        }}
-                                    >
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-lg">🔧</span>
-                                            <span className={`font-medium ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>
-                                                Version Function Calling
-                                            </span>
-                                        </div>
-                                        <p className={`text-xs ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                        }`}>
-                                            Emma peut exécuter des fonctions pour récupérer des données en temps réel.
-                                        </p>
-                                        <div className={`text-xs mt-2 px-2 py-1 rounded ${
-                                            useFunctionCalling 
-                                                ? 'bg-blue-100 text-blue-700' 
-                                                : isDarkMode 
-                                                    ? 'bg-gray-600 text-gray-300' 
-                                                    : 'bg-gray-200 text-gray-600'
-                                        }`}>
-                                            {useFunctionCalling ? '✅ Actif' : 'Inactif'}
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {/* Indicateur de Statut */}
-                                <div className={`mt-3 p-2 rounded text-xs ${
-                                    useFunctionCalling 
-                                        ? isDarkMode 
-                                            ? 'bg-blue-900/30 text-blue-300' 
-                                            : 'bg-blue-100 text-blue-700'
-                                        : isDarkMode 
-                                            ? 'bg-green-900/30 text-green-300' 
-                                            : 'bg-green-100 text-green-700'
-                                }`}>
-                                    <span className="font-medium">
-                                        {useFunctionCalling ? '🔧 Mode Function Calling' : '💬 Mode Direct'}
-                                    </span>
-                                    {useFunctionCalling && (
-                                        <span className="ml-2">
-                                            • Emma peut exécuter des fonctions pour récupérer des données en temps réel
-                                        </span>
-                                    )}
-                                    {!useFunctionCalling && (
-                                        <span className="ml-2">
-                                            • Conversation standard avec Emma
-                                        </span>
-                                    )}
                                 </div>
                             </div>
 
@@ -9709,16 +9592,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 }`}>
                                                                     Longueur: {emmaMaxTokens} ({emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'})
                                                                 </span>
-                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                    useFunctionCalling ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                                                                }`}>
-                                                                    API: {useFunctionCalling ? 'ON' : 'OFF'}
-                                                                </span>
-                                                                {useValidatedMode && (
-                                                                    <span className="px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700">
-                                                                        Validé: ON
-                                                                    </span>
-                                                                )}
                                                             </div>
                                                         </div>
                                                     )}
@@ -9762,16 +9635,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             }`}>
                                                                 {emmaMaxTokens} tokens
                                                             </span>
-                                                            <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                useFunctionCalling ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                                                            }`}>
-                                                                API: {useFunctionCalling ? 'ON' : 'OFF'}
-                                                            </span>
-                                                            {useValidatedMode && (
-                                                                <span className="px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700">
-                                                                    Validé: ON
-                                                                </span>
-                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -9999,72 +9862,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                                 
                                 <div className="space-y-4">
-                                    {/* Contrôle Function Calling */}
-                                    <div className={`p-3 rounded-lg border ${
-                                        isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-gray-100 border-gray-300'
-                                    }`}>
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <label className={`text-sm font-medium transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                                }`}>
-                                                    🔧 Function Calling (Données Temps Réel)
-                                                </label>
-                                                <p className={`text-xs mt-1 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                }`}>
-                                                    Emma peut accéder aux données financières actuelles via nos APIs
-                                                </p>
-                                            </div>
-                                            <label className="relative inline-flex items-center cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={useFunctionCalling}
-                                                    onChange={(e) => {
-                                                        setUseFunctionCalling(e.target.checked);
-                                                        saveFunctionCalling();
-                                                    }}
-                                                    className="sr-only peer"
-                                                />
-                                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    {/* Contrôle Mode Validé */}
-                                    {useFunctionCalling && (
-                                        <div className={`p-3 rounded-lg border ${
-                                            isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-gray-100 border-gray-300'
-                                        }`}>
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <label className={`text-sm font-medium transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                                    }`}>
-                                                        🔍 Mode Validé (3 Étapes)
-                                                    </label>
-                                                    <p className={`text-xs mt-1 transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                    }`}>
-                                                        Emma valide les données API et bonifie ses réponses
-                                                    </p>
-                                                </div>
-                                                <label className="relative inline-flex items-center cursor-pointer">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={useValidatedMode}
-                                                        onChange={(e) => {
-                                                            setUseValidatedMode(e.target.checked);
-                                                            saveValidatedMode();
-                                                        }}
-                                                        className="sr-only peer"
-                                                    />
-                                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    )}
-
                                     {/* Slider de température */}
                                     <div>
                                         <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
