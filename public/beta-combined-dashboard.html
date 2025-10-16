@@ -38,6 +38,14 @@
                 console.log('Heroicons disponible:', typeof window.Heroicons !== 'undefined');
                 console.log('LucideIcon disponible:', typeof window.LucideIcon !== 'undefined');
                 
+                // Vérification détaillée de LucideIcon
+                if (typeof window.LucideIcon === 'function') {
+                    console.log('✅ LucideIcon fonction correctement définie');
+                    console.log('Icônes disponibles:', Object.keys(window.LucideIcon({ name: 'test' }).props || {}));
+                } else {
+                    console.warn('⚠️ LucideIcon non disponible - vérification de la définition...');
+                }
+                
                 // Message informatif sur les avertissements de production
                 console.log('ℹ️ Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
                 console.log('ℹ️ Ce fichier utilise intentionnellement des CDN pour la portabilité');
@@ -300,6 +308,8 @@ const fetchHybridData = async (symbol, dataType) => {
 
         const { useState, useEffect, useRef } = React;
 
+        // Initialisation immédiate de LucideIcon pour s'assurer qu'il soit disponible
+        if (typeof window.LucideIcon === 'undefined') {
             // Composant d'icônes SVG inline (remplace Lucide) - Défini globalement
             window.LucideIcon = ({ name, className = "w-4 h-4" }) => {
                 const icons = {
@@ -322,10 +332,20 @@ const fetchHybridData = async (symbol, dataType) => {
                     'X': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>,
                     'ArrowUpRight': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7v10" /></svg>,
                     'ArrowDownRight': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7L7 17M7 17h10M7 17V7" /></svg>,
-                    'DollarSign': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>
+                    'DollarSign': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>,
+                    'Filter': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>,
+                    'Calendar': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>,
+                    'Mail': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
+                    'Clock': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+                    'CheckCircle': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+                    'Info': <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 };
-                return icons[name] || <div className={className}></div>;
+                return icons[name] || <div className={className} title={`Icône manquante: ${name}`}></div>;
             };
+        }
+        
+        // Vérification que LucideIcon est bien défini
+        console.log('🔧 LucideIcon initialisé:', typeof window.LucideIcon);
 
         const BetaCombinedDashboard = () => {
             // États principaux
