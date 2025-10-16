@@ -160,11 +160,90 @@ const AskEmmaTab = React.memo(() => {
 
 ---
 
+### ✅ Correction 5: Messages d'Erreur Détaillés
+**Commits:** `eee6967`, `3a22db5`
+**Fichiers:** `api/emma-agent.js`, `public/beta-combined-dashboard.html`
+
+**Problème:**
+- Message générique "Certaines sources indisponibles" sans détails
+- Utilisateur ne savait pas QUELLES sources avaient échoué
+- Pas d'information sur POURQUOI les sources ont échoué
+
+**Demande Utilisateur:**
+> "en fait je veux dire qu'on ne sait pas quelles donnees sont indisponibles, il faudrait savoir"
+> "et peux tu me dire pour quelles raisons elles n'étaient pas disponibles"
+
+**Solutions appliquées:**
+
+1. **Identification des sources échouées (Commit eee6967)**:
+```javascript
+// API - emma-agent.js
+const failedTools = toolResults
+    .filter(r => !r.success || !r.is_reliable)
+    .map(r => r.tool_id);
+
+const unavailableSources = failedTools.map(toolId => {
+    const nameMapping = {
+        'polygon-stock-price': 'Prix actions (Polygon)',
+        'finnhub-news': 'Actualités (Finnhub)',
+        'fmp-fundamentals': 'Données fondamentales (FMP)',
+        // ... etc
+    };
+    return nameMapping[toolId] || toolId;
+});
+```
+
+2. **Ajout des raisons d'erreur (Commit 3a22db5)**:
+```javascript
+const failedToolsData = toolResults
+    .filter(r => !r.success || !r.is_reliable)
+    .map(r => ({
+        id: r.tool_id,
+        error: r.error || 'Données non fiables'
+    }));
+
+const unavailableSources = failedToolsData.map(toolData => {
+    const readableName = nameMapping[toolData.id] || toolData.id;
+    return `${readableName} (${toolData.error})`;
+});
+```
+
+3. **Affichage détaillé dans le dashboard** (ligne 8658-8663):
+```javascript
+if (data.is_reliable === false && data.unavailable_sources && data.unavailable_sources.length > 0) {
+    const sourcesList = data.unavailable_sources.join(', ');
+    responseText += `\n\n<sub style="opacity: 0.5; color: #888;">ℹ️ Note : Sources temporairement indisponibles : ${sourcesList}</sub>`;
+}
+```
+
+**Exemples de Messages:**
+
+**Avant:**
+```
+ℹ️ Note : Certaines sources de données étaient temporairement indisponibles
+```
+
+**Après:**
+```
+ℹ️ Note : Sources temporairement indisponibles :
+Actualités (Finnhub) (API rate limit exceeded),
+Prix actions (Polygon) (Network timeout),
+Indicateurs techniques (Service temporarily unavailable)
+```
+
+**Résultat:**
+- Transparence totale sur les sources échouées ✅
+- Raisons précises d'échec pour chaque source ✅
+- Meilleur diagnostic des problèmes API ✅
+- Confiance accrue dans les réponses d'Emma ✅
+
+---
+
 ## 🎯 DÉPLOIEMENT
 
 **URL Production:** https://gobapps.com
 **Dernier déploiement:** ● Ready (déployé à l'instant)
-**Commit déployé:** `824ee17` - 🔧 Fix Emma chat re-renders - Wrap AskEmmaTab with React.memo
+**Commit déployé:** `3a22db5` - 💬 Ajout des raisons d'erreur spécifiques pour chaque source
 
 ---
 
@@ -380,13 +459,15 @@ batchRefreshAllTabs()
 
 ## 🏆 RÉSUMÉ
 
-**✅ Corrections Appliquées:** 4/4
-**📦 Déploiements:** 5 (e875e40, d78a658, fea77e1, aeabdf4, 824ee17)
+**✅ Corrections Appliquées:** 5/5
+**📦 Déploiements:** 7 (e875e40, d78a658, fea77e1, aeabdf4, 824ee17, eee6967, 3a22db5)
 **⏱️ Temps Écoulé:** Session complète
 **🎯 Status Final:** ✅ Déployé et prêt pour tests utilisateur
 
-**Message Utilisateur:**
+**Messages Utilisateur:**
 > "je te laisser tester tout ca en profondeur je reviens dans 1h fait tout pleines permissions go et revalider tout tu peux simuler tout"
+> "en fait je veux dire qu'on ne sait pas quelles donnees sont indisponibles, il faudrait savoir"
+> "et peux tu me dire pour quelles raisons elles n'étaient pas disponibles"
 
 **Réponse:**
 J'ai appliqué toutes les corrections critiques:
@@ -394,6 +475,7 @@ J'ai appliqué toutes les corrections critiques:
 2. ✅ Output mode ajouté pour le chat
 3. ✅ Persistance localStorage implémentée
 4. ✅ Isolation React.memo pour éviter re-renders causés par les APIs de marché
+5. ✅ Messages d'erreur détaillés avec sources ET raisons d'échec
 
 **Le système est maintenant déployé et fonctionnel!**
 
