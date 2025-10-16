@@ -1986,6 +1986,200 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         </div>
                     </div>
 
+                    {/* Section Monitoring API Emma */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode
+                            ? 'bg-gray-900 border-gray-700'
+                            : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🤖 Monitoring Emma AI</h3>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className="text-purple-600 font-medium mb-2">🧠 Emma Agent</div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Status: <span className="text-green-500">✅ Opérationnel</span>
+                                    </div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Outils: 12 disponibles
+                                    </div>
+                                </div>
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className="text-blue-600 font-medium mb-2">📧 Briefings</div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Cron: <span className="text-green-500">✅ Actif</span>
+                                    </div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Horaires: 7h20 • 11h50 • 16h20
+                                    </div>
+                                </div>
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className="text-emerald-600 font-medium mb-2">🗄️ Supabase</div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Tables: 4 créées
+                                    </div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Tickers: {teamTickers.length} team + {watchlistTickers.length} watchlist
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        fetch('/api/emma-agent', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                message: 'Test de connexion Emma Agent',
+                                                context: { test: true }
+                                            })
+                                        }).then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                showMessage('✅ Emma Agent opérationnel', 'success');
+                                            } else {
+                                                showMessage('❌ Emma Agent erreur: ' + data.error, 'error');
+                                            }
+                                        }).catch(error => {
+                                            showMessage('❌ Erreur connexion Emma Agent', 'error');
+                                        });
+                                    }}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                                >
+                                    🧪 Tester Emma Agent
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        fetch('/api/emma-briefing?type=morning')
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                showMessage('✅ Emma Briefing opérationnel', 'success');
+                                            } else {
+                                                showMessage('❌ Emma Briefing erreur: ' + data.error, 'error');
+                                            }
+                                        }).catch(error => {
+                                            showMessage('❌ Erreur connexion Emma Briefing', 'error');
+                                        });
+                                    }}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    📧 Tester Briefing
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Section Gestion des Outils Emma */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode
+                            ? 'bg-gray-900 border-gray-700'
+                            : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🔧 Gestion des Outils Emma</h3>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>📊 Outils Financiers</h4>
+                                    <div className="space-y-1 text-sm">
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Polygon Stock Price</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• FMP Fundamentals</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Finnhub News</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Twelve Data Technical</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Alpha Vantage Ratios</div>
+                                    </div>
+                                </div>
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>🗄️ Outils Supabase</h4>
+                                    <div className="space-y-1 text-sm">
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Watchlist Manager</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Team Tickers</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Economic Calendar</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Earnings Calendar</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Analyst Recommendations</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        fetch('/api/emma-agent', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                message: 'Afficher la configuration des outils',
+                                                context: { action: 'show_tools_config' }
+                                            })
+                                        }).then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                showMessage('✅ Configuration des outils récupérée', 'success');
+                                                console.log('Tools Config:', data.tools_config);
+                                            } else {
+                                                showMessage('❌ Erreur récupération config', 'error');
+                                            }
+                                        }).catch(error => {
+                                            showMessage('❌ Erreur connexion', 'error');
+                                        });
+                                    }}
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                                >
+                                    ⚙️ Voir Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Section Configuration */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                         isDarkMode 
@@ -12816,7 +13010,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 endpoint = '/api/calendar-economic';
                         }
 
-                        const response = await fetch(`/api${endpoint}`);
+                        const response = await fetch(endpoint);
                         const result = await response.json();
                         
                         if (result.success) {
