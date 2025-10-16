@@ -60,25 +60,32 @@ class SmartAgent {
             this._saveUsageStats();
 
             // Identifier les outils qui ont échoué ou retourné des données non fiables
-            const failedTools = toolResults
+            const failedToolsData = toolResults
                 .filter(r => !r.success || !r.is_reliable)
-                .map(r => r.tool_id);
+                .map(r => ({
+                    id: r.tool_id,
+                    error: r.error || 'Données non fiables'
+                }));
 
-            const unavailableSources = failedTools.map(toolId => {
-                // Mapping des IDs techniques vers des noms lisibles
-                const nameMapping = {
-                    'polygon-stock-price': 'Prix actions (Polygon)',
-                    'fmp-fundamentals': 'Données fondamentales (FMP)',
-                    'finnhub-news': 'Actualités (Finnhub)',
-                    'twelve-data-technical': 'Indicateurs techniques',
-                    'alpha-vantage-ratios': 'Ratios financiers',
-                    'yahoo-finance': 'Yahoo Finance',
-                    'supabase-watchlist': 'Watchlist',
-                    'economic-calendar': 'Calendrier économique',
-                    'earnings-calendar': 'Calendrier résultats',
-                    'analyst-recommendations': 'Recommandations analystes'
-                };
-                return nameMapping[toolId] || toolId;
+            const failedTools = failedToolsData.map(t => t.id);
+
+            // Mapping des IDs techniques vers des noms lisibles
+            const nameMapping = {
+                'polygon-stock-price': 'Prix actions (Polygon)',
+                'fmp-fundamentals': 'Données fondamentales (FMP)',
+                'finnhub-news': 'Actualités (Finnhub)',
+                'twelve-data-technical': 'Indicateurs techniques',
+                'alpha-vantage-ratios': 'Ratios financiers',
+                'yahoo-finance': 'Yahoo Finance',
+                'supabase-watchlist': 'Watchlist',
+                'economic-calendar': 'Calendrier économique',
+                'earnings-calendar': 'Calendrier résultats',
+                'analyst-recommendations': 'Recommandations analystes'
+            };
+
+            const unavailableSources = failedToolsData.map(toolData => {
+                const readableName = nameMapping[toolData.id] || toolData.id;
+                return `${readableName} (${toolData.error})`;
             });
 
             return {
