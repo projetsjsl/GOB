@@ -1723,45 +1723,91 @@ Générez une réponse JSON avec cette structure exacte:
 Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     `;
 
-                    // Appeler l'API Claude (vous devrez configurer votre endpoint)
-                    const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            service: 'perplexity',
-                            prompt: 'Test de connexion API',
-                            marketData: {},
-                            news: 'Test'
-                        })
-                    });
-
-                    if (!response.ok) {
-                        console.warn(`⚠️ Claude API indisponible (${response.status}) - Utilisation de la réponse de démonstration`);
-                        // Utiliser une réponse de démonstration au lieu de lever une erreur
-                        const mockAnalysis = {
-                            summary: `🤖 **Analyse de démonstration pour ${ticker}**\n\n**Résumé:**\nService d'IA temporairement indisponible. Voici une analyse simulée basée sur les données disponibles.\n\n**Recommandation:**\n- Service en maintenance\n- Retour prévu sous 24h\n- Données de marché toujours disponibles\n\n**Note:** Cette réponse est générée en mode démonstration.`,
-                            confidence: 0.7,
-                            timestamp: new Date().toISOString()
-                        };
-                        setEmmaResponse(mockAnalysis.summary);
-                        setEmmaLoading(false);
-                        return;
+                    // Appeler l'API avec gestion d'erreur robuste
+                    const analysisResult = await analyzeWithClaudeAndUpdateRobust(claudePrompt, scrapedData);
+                    
+                    if (analysisResult.status === "success") {
+                        addScrapingLog(`✅ Analyse Claude terminée pour ${ticker}`, 'success');
+                        // Mettre à jour les fichiers JSON via GitHub API
+                        await updateStockDataFiles(ticker, analysisResult.data, scrapedData);
+                        return analysisResult.data;
+                    } else {
+                        addScrapingLog(`❌ Erreur analyse Claude pour ${ticker}: ${analysisResult.error}`, 'error');
+                        throw new Error(analysisResult.error);
                     }
-
-                    const claudeResponse = await response.json();
-                    const analysisData = JSON.parse(claudeResponse.analysis);
-
-                    addScrapingLog(`✅ Analyse Claude terminée pour ${ticker}`, 'success');
-
-                    // Mettre à jour les fichiers JSON via GitHub API
-                    await updateStockDataFiles(ticker, analysisData, scrapedData);
-
-                    return analysisData;
 
                 } catch (error) {
                     addScrapingLog(`❌ Erreur analyse Claude pour ${ticker}: ${error.message}`, 'error');
                     throw error;
                 }
+            };
+
+            // Fonction robuste pour l'analyse avec gestion d'erreur améliorée
+            const analyzeWithClaudeAndUpdateRobust = async (prompt, contextData) => {
+                try {
+                    const startTime = Date.now();
+                    const analysisResponse = await fetch(`${API_BASE_URL}/api/ai-services`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            service: "perplexity",
+                            prompt: prompt,
+                            context: contextData
+                        })
+                    });
+
+                    const responseTime = Date.now() - startTime;
+                    const rawText = await analysisResponse.text();
+
+                    if (!rawText || !rawText.trim().startsWith("{")) {
+                        console.error("Réponse inattendue de l'API :", rawText.substring(0, 300));
+                        throw new Error("Réponse Perplexity invalide ou vide");
+                    }
+
+                    const analysisResult = JSON.parse(rawText);
+
+                    if (analysisResponse.ok) {
+                        console.log("Analyse Perplexity réussie", analysisResult);
+                        return {
+                            status: "success",
+                            responseTime,
+                            data: analysisResult,
+                            error: null
+                        };
+                    } else {
+                        console.warn("Erreur HTTP API Perplexity :", analysisResponse.status);
+                        return {
+                            status: "error",
+                            responseTime,
+                            data: null,
+                            error: "Erreur HTTP " + analysisResponse.status
+                        };
+                    }
+                } catch (error) {
+                    console.error("Erreur dans analyzeWithClaudeAndUpdateRobust:", error);
+                    return {
+                        status: "error",
+                        responseTime: 0,
+                        data: null,
+                        error: error.message
+                    };
+                }
+            };
+
+            // Fonction pour mettre à jour l'affichage avec gestion d'erreur
+            const updateDashboardWithAnalysis = (analysisData) => {
+                if (!analysisData || analysisData.status !== "success" || !analysisData.data) {
+                    // Gestion d'erreur UX
+                    const errorMessage = "❗ Analyse impossible : " + (analysisData?.error || "Erreur inconnue.");
+                    setEmmaResponse(errorMessage);
+                    setEmmaLoading(false);
+                    return;
+                }
+
+                // Adapter le parsing selon l'affichage
+                let resultText = analysisData.data.summary || JSON.stringify(analysisData.data, null, 2);
+                setEmmaResponse(resultText);
+                setEmmaLoading(false);
             };
 
             // Fonction pour mettre à jour les fichiers JSON via GitHub API
