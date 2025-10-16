@@ -13444,9 +13444,6 @@ console.log('✅ Données hybrides récupérées:', {
             }
         };
 
-        // Fermeture de la fonction BetaCombinedDashboard
-        };
-        
         // Utiliser beforeunload au lieu de unload (non deprecated)
         window.addEventListener('beforeunload', handlePageUnload);
         
@@ -13497,6 +13494,9 @@ console.log('✅ Données hybrides récupérées:', {
             // DOM déjà chargé, initialiser immédiatement
             setTimeout(initializeDashboard, 100); // Petit délai pour s'assurer que tout est prêt
         }
+
+        // Fermeture de la fonction BetaCombinedDashboard
+        };
     </script>
     
     
