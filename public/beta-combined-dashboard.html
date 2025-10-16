@@ -229,7 +229,13 @@ const fetchHybridData = async (symbol, dataType) => {
     if (dataType === 'news') {
       const response = await fetch(apiUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+        mode: 'cors',
         body: JSON.stringify({ service: 'tickers-news', symbol: symbol })
       });
       if (!response.ok) {
@@ -251,7 +257,16 @@ const fetchHybridData = async (symbol, dataType) => {
       };
     }
     
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+      mode: 'cors',
+    });
     if (!response.ok) {
       throw new Error(`API ${dataType} échouée: ${response.status}`);
     }
@@ -472,7 +487,14 @@ const fetchHybridData = async (symbol, dataType) => {
             const fetchStockData = async (ticker) => {
                 try {
                     // Essayer d'abord la nouvelle API unifiée avec Yahoo Finance (gratuit)
-                    const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`);
+                    const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*',
+                        },
+                        mode: 'cors',
+                    });
                     if (!response.ok) throw new Error(`API error: ${response.status}`);
                     return await response.json();
                 } catch (error) {
@@ -496,7 +518,14 @@ const fetchHybridData = async (symbol, dataType) => {
                         // Charger les fondamentaux pour alimenter P/E/Dividende/Secteur
                         let fundamentals = null;
                         try {
-                            const fundamentalsResp = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${ticker}&source=auto`);
+                            const fundamentalsResp = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${ticker}&source=auto`, {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Access-Control-Allow-Origin': '*',
+                                },
+                                mode: 'cors',
+                            });
                             if (fundamentalsResp.ok) fundamentals = await fundamentalsResp.json();
                         } catch (e) {
                             console.warn(`⚠️ Fundamentals non disponibles pour ${ticker}`, e?.message || e);
@@ -6471,13 +6500,13 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                         <div className="flex items-center space-x-2">
                                             <input
                                                 type="checkbox"
-                                                id="yahoo-fallback"
+                                                id="yahoo-fallback-settings"
                                                 checked={false}
                                                 disabled={true}
                                                 className="w-4 h-4 text-gray-400 rounded focus:ring-gray-300"
                                             />
                                             <label 
-                                                htmlFor="yahoo-fallback" 
+                                                htmlFor="yahoo-fallback-settings" 
                                                 className={`text-sm cursor-not-allowed transition-colors duration-300 ${
                                                     isDarkMode ? 'text-gray-500' : 'text-gray-400'
                                                 }`}
@@ -6508,7 +6537,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                                 </div>
                                                 <input
                                                     type="checkbox"
-                                                    id="perplexity-news"
+                                                    id="perplexity-news-settings"
                                                     checked={perplexityEnabled.news}
                                                     onChange={(e) => setPerplexityEnabled({...perplexityEnabled, news: e.target.checked})}
                                                     className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
@@ -6541,7 +6570,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                                 </div>
                                                 <input
                                                     type="checkbox"
-                                                    id="perplexity-analysis"
+                                                    id="perplexity-analysis-settings"
                                                     checked={perplexityEnabled.analysis}
                                                     onChange={(e) => setPerplexityEnabled({...perplexityEnabled, analysis: e.target.checked})}
                                                     className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
@@ -13383,6 +13412,24 @@ console.log('✅ Données hybrides récupérées:', {
 
         // Fonction fallback SUPPRIMÉE - Plus de contenu demo
         // Dashboard optimisé avec Emma AI v2.0 Advanced
+        
+        // Gestionnaire d'événements moderne (remplace les event listeners deprecated)
+        const handlePageUnload = (event) => {
+            // Sauvegarder l'état avant de quitter
+            if (window.localStorage) {
+                try {
+                    localStorage.setItem('dashboard-state', JSON.stringify({
+                        timestamp: Date.now(),
+                        darkMode: document.body.classList.contains('dark')
+                    }));
+                } catch (e) {
+                    console.warn('Impossible de sauvegarder l\'état:', e);
+                }
+            }
+        };
+        
+        // Utiliser beforeunload au lieu de unload (non deprecated)
+        window.addEventListener('beforeunload', handlePageUnload);
 
         ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
     </script>
