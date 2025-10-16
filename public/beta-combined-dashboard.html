@@ -8384,17 +8384,25 @@ Tu es maintenant Emma, Analyste Financière Experte.
 Réponds toujours en français québécois, adopte un ton professionnel équilibré, et structure tes analyses selon la méthodologie décrite. N'hésite pas à rechercher sur le web pour fournir des données actuelles et citer tes sources.
 Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
-                // Initialiser Emma au chargement
+                // Initialiser Emma au chargement (APRÈS que useState ait chargé l'historique)
                 React.useEffect(() => {
-                    initializeEmma();
+                    // Utiliser un délai pour s'assurer que useState a terminé son initialisation
+                    const initTimer = setTimeout(() => {
+                        initializeEmma();
+                    }, 100); // 100ms pour laisser le temps à useState
+
+                    return () => clearTimeout(initTimer);
                 }, []);
 
                 const initializeEmma = async () => {
                     try {
-                        // Initialiser avec le message de bienvenue SEULEMENT si l'historique est vide
+                        // L'historique est déjà chargé dans useState via la fonction d'initialisation
+                        // Vérifier DANS localStorage car emmaMessages pourrait être périmé ici
                         const savedHistory = localStorage.getItem('emma-chat-history');
+                        const hasHistory = savedHistory && JSON.parse(savedHistory).length > 0;
 
-                        if (!savedHistory || JSON.parse(savedHistory).length === 0) {
+                        if (!hasHistory) {
+                            // Aucun historique sauvegardé - ajouter welcome message
                             const welcomeMessage = useFunctionCalling
                                 ? 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières en temps réel\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n- Accès direct aux APIs financières (Finnhub, Alpha Vantage, etc.)\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?'
                                 : 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n\n**Exemples de questions :**\n- "Analyse le profil de Microsoft"\n- "Quelles sont les tendances du marché ?"\n- "Explique-moi le ratio P/E"\n- "Comment naviguer dans le dashboard ?"\n\nComment puis-je vous assister aujourd\'hui ?';
@@ -8404,8 +8412,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                 content: welcomeMessage,
                                 timestamp: new Date().toISOString()
                             }]);
+                            console.log('👋 Welcome message ajouté (aucun historique sauvegardé)');
                         } else {
-                            console.log('📜 Historique Emma chargé depuis localStorage');
+                            console.log('📜 Historique Emma déjà chargé depuis localStorage');
                         }
                         
                         // Charger le prompt depuis localStorage
