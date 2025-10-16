@@ -7922,7 +7922,16 @@ ${basePrompt}
 
             // Composant onglet Ask Emma avec intégration Gemini
             const AskEmmaTab = () => {
-                const [emmaMessages, setEmmaMessages] = useState([]);
+                // Charger les messages depuis localStorage au démarrage
+                const [emmaMessages, setEmmaMessages] = useState(() => {
+                    try {
+                        const saved = localStorage.getItem('emma-chat-history');
+                        return saved ? JSON.parse(saved) : [];
+                    } catch (error) {
+                        console.error('Erreur chargement historique Emma:', error);
+                        return [];
+                    }
+                });
                 const [emmaInput, setEmmaInput] = useState('');
                 const [emmaLoading, setEmmaLoading] = useState(false);
                 const chatContainerRef = useRef(null);
@@ -8382,16 +8391,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const initializeEmma = async () => {
                     try {
-                        // Initialiser avec le message de bienvenue (session uniquement - pas de persistance)
-                        const welcomeMessage = useFunctionCalling 
-                            ? 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières en temps réel\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n- Accès direct aux APIs financières (Finnhub, Alpha Vantage, etc.)\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?'
-                            : 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n\n**Exemples de questions :**\n- "Analyse le profil de Microsoft"\n- "Quelles sont les tendances du marché ?"\n- "Explique-moi le ratio P/E"\n- "Comment naviguer dans le dashboard ?"\n\nComment puis-je vous assister aujourd\'hui ?';
-                        
+                        // Initialiser avec le message de bienvenue SEULEMENT si l'historique est vide
+                        const savedHistory = localStorage.getItem('emma-chat-history');
+
+                        if (!savedHistory || JSON.parse(savedHistory).length === 0) {
+                            const welcomeMessage = useFunctionCalling
+                                ? 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières en temps réel\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n- Accès direct aux APIs financières (Finnhub, Alpha Vantage, etc.)\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?'
+                                : 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**CAPACITÉS DISPONIBLES :**\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n\n**Exemples de questions :**\n- "Analyse le profil de Microsoft"\n- "Quelles sont les tendances du marché ?"\n- "Explique-moi le ratio P/E"\n- "Comment naviguer dans le dashboard ?"\n\nComment puis-je vous assister aujourd\'hui ?';
+
                             setEmmaMessages([{
                                 type: 'emma',
-                            content: welcomeMessage,
+                                content: welcomeMessage,
                                 timestamp: new Date().toISOString()
                             }]);
+                        } else {
+                            console.log('📜 Historique Emma chargé depuis localStorage');
+                        }
                         
                         // Charger le prompt depuis localStorage
                         const savedPrompt = localStorage.getItem('emma-financial-prompt');
@@ -8495,7 +8510,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             // Supprimer le message de confirmation temporaire
                             const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
                             const newMessages = [...filteredMessages, emmaResponse];
-                            // Pas de sauvegarde - session uniquement
+                            // Sauvegarde automatique via useEffect
                             return newMessages;
                         });
                         
@@ -8650,12 +8665,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 };
 
                 const clearChat = () => {
-                    // Vider l'historique de la session uniquement (pas de persistance)
-                    setEmmaMessages([{
+                    // Vider l'historique ET le localStorage
+                    const resetMessages = [{
                         type: 'emma',
                         content: 'Chat vidé ! Comment puis-je vous assister ?',
                         timestamp: new Date().toISOString()
-                    }]);
+                    }];
+                    setEmmaMessages(resetMessages);
+                    localStorage.removeItem('emma-chat-history');
+                    console.log('🗑️ Historique Emma vidé (mémoire + localStorage)');
                 };
 
                 // Fonction d'auto-scroll vers le bas du chat avec animation fluide
@@ -8679,6 +8697,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         scrollToBottom();
                     }
                 }, [emmaLoading]);
+
+                // Sauvegarder l'historique dans localStorage à chaque changement
+                useEffect(() => {
+                    try {
+                        if (emmaMessages.length > 0) {
+                            localStorage.setItem('emma-chat-history', JSON.stringify(emmaMessages));
+                            console.log('💾 Historique Emma sauvegardé:', emmaMessages.length, 'messages');
+                        }
+                    } catch (error) {
+                        console.error('❌ Erreur sauvegarde historique Emma:', error);
+                    }
+                }, [emmaMessages]);
 
                 // Détecter le scroll pour afficher/masquer le bouton "Aller en bas"
                 useEffect(() => {
