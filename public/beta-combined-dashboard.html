@@ -12558,19 +12558,19 @@ console.log('✅ Données hybrides récupérées:', {
                         let endpoint = '';
                         switch(activeSubTab) {
                             case 'economic':
-                                endpoint = '/api/calendar/economic';
+                                endpoint = '/api/calendar-economic';
                                 break;
                             case 'earnings':
-                                endpoint = '/api/calendar/earnings';
+                                endpoint = '/api/calendar-earnings';
                                 break;
                             case 'dividends':
-                                endpoint = '/api/calendar/dividends';
+                                endpoint = '/api/calendar-dividends';
                                 break;
                             default:
-                                endpoint = '/api/calendar/economic';
+                                endpoint = '/api/calendar-economic';
                         }
 
-                        const response = await fetch(`http://localhost:5002${endpoint}`);
+                        const response = await fetch(`/api${endpoint}`);
                         const result = await response.json();
                         
                         if (result.success) {
