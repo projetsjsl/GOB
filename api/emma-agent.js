@@ -65,6 +65,7 @@ class SmartAgent {
                 tools_used: selectedTools.map(t => t.id),
                 intent: intentData ? intentData.intent : 'unknown',
                 confidence: intentData ? intentData.confidence : null,
+                output_mode: context.output_mode || 'chat',
                 execution_time_ms: Date.now() - (context.start_time || Date.now()),
                 conversation_length: this.conversationHistory.length,
                 is_reliable: toolResults.every(r => r.is_reliable)
@@ -486,10 +487,13 @@ RÉPONDS EN JSON UNIQUEMENT (pas de texte avant ou après):
     }
 
     /**
-     * Génération de la réponse finale avec Perplexity
+     * Génération de la réponse finale avec Perplexity (avec post-traitement selon mode)
      */
     async _generate_response(userMessage, toolResults, context, intentData = null) {
         try {
+            const outputMode = context.output_mode || 'chat';
+            console.log(`🎯 Generating response for mode: ${outputMode}`);
+
             // Préparation du contexte pour Perplexity
             const toolsData = toolResults
                 .filter(r => r.success && r.data)
@@ -509,7 +513,16 @@ RÉPONDS EN JSON UNIQUEMENT (pas de texte avant ou après):
             );
 
             // Appel à Perplexity
-            const perplexityResponse = await this._call_perplexity(perplexityPrompt);
+            let perplexityResponse = await this._call_perplexity(perplexityPrompt, outputMode);
+
+            // Post-traitement selon le mode
+            if (outputMode === 'data') {
+                // Valider et parser le JSON
+                perplexityResponse = this._validateAndParseJSON(perplexityResponse);
+            } else if (outputMode === 'briefing') {
+                // Nettoyer le Markdown (enlever éventuels artifacts)
+                perplexityResponse = this._cleanMarkdown(perplexityResponse);
+            }
 
             return perplexityResponse;
 
@@ -517,15 +530,78 @@ RÉPONDS EN JSON UNIQUEMENT (pas de texte avant ou après):
             console.error('❌ Response generation failed:', error);
 
             // Réponse de fallback basée sur les données des outils
-            return this._generateFallbackResponse(userMessage, toolResults);
+            return this._generateFallbackResponse(userMessage, toolResults, context.output_mode);
         }
     }
 
     /**
-     * Construction du prompt pour Perplexity
+     * Validation et parsing JSON (MODE DATA)
+     */
+    _validateAndParseJSON(response) {
+        try {
+            console.log('🔍 Validating JSON response...');
+
+            // Extraire JSON si du texte avant/après
+            const jsonMatch = response.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                console.error('❌ No JSON found in response');
+                return '{}'; // Fallback: objet vide
+            }
+
+            // Parser pour valider
+            const parsed = JSON.parse(jsonMatch[0]);
+
+            // Retourner JSON stringifié proprement
+            console.log('✅ JSON validated successfully');
+            return JSON.stringify(parsed, null, 2);
+
+        } catch (error) {
+            console.error('❌ JSON validation failed:', error.message);
+            console.error('Response was:', response.substring(0, 200));
+            return '{}'; // Fallback: objet vide
+        }
+    }
+
+    /**
+     * Nettoyage Markdown (MODE BRIEFING)
+     */
+    _cleanMarkdown(markdown) {
+        // Enlever éventuels code blocks markdown si présents
+        let cleaned = markdown.replace(/^```markdown\n/, '').replace(/\n```$/, '');
+
+        // Nettoyer espaces multiples
+        cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+
+        return cleaned.trim();
+    }
+
+    /**
+     * Construction du prompt pour Perplexity (ROUTER - 3 MODES)
      */
     _buildPerplexityPrompt(userMessage, toolsData, conversationContext, context, intentData = null) {
-        // Ajouter contexte d'intention si disponible
+        const outputMode = context.output_mode || 'chat'; // Default: chat
+        console.log(`🎯 Building prompt for mode: ${outputMode}`);
+
+        switch (outputMode) {
+            case 'chat':
+                return this._buildChatPrompt(userMessage, toolsData, conversationContext, intentData);
+
+            case 'data':
+                return this._buildDataPrompt(userMessage, toolsData, context);
+
+            case 'briefing':
+                return this._buildBriefingPrompt(userMessage, toolsData, context, intentData);
+
+            default:
+                console.warn(`⚠️ Unknown output_mode: ${outputMode}, fallback to chat`);
+                return this._buildChatPrompt(userMessage, toolsData, conversationContext, intentData);
+        }
+    }
+
+    /**
+     * MODE CHAT: Réponse conversationnelle naturelle
+     */
+    _buildChatPrompt(userMessage, toolsData, conversationContext, intentData) {
         let intentContext = '';
         if (intentData) {
             intentContext = `\nINTENTION DÉTECTÉE:
@@ -535,7 +611,7 @@ RÉPONDS EN JSON UNIQUEMENT (pas de texte avant ou après):
 - Tickers identifiés: ${intentData.tickers?.join(', ') || 'aucun'}\n`;
         }
 
-        let prompt = `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.
+        return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.
 
 CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
@@ -546,17 +622,140 @@ ${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n
 QUESTION DE L'UTILISATEUR: ${userMessage}
 
 INSTRUCTIONS:
-1. Utilise UNIQUEMENT les données fournies par les outils (pas de données fictives)
-2. Si les données sont insuffisantes, indique-le clairement
-3. Sois précis et cite tes sources (outils utilisés)
-4. Adapte ton ton selon le contexte (professionnel mais accessible)
-5. Si c'est une question technique, sois détaillé
-6. Si c'est une question générale, sois concis
+1. Réponds de manière CONVERSATIONNELLE et NATURELLE
+2. Utilise UNIQUEMENT les données fournies par les outils (pas de données fictives)
+3. Cite tes sources (outils utilisés) en fin de réponse
+4. Sois précis mais accessible
+5. Si les données sont insuffisantes, indique-le clairement
+6. Adapte ton ton: professionnel mais chaleureux
 ${intentData ? `7. L'intention de l'utilisateur est: ${intentData.intent} - réponds en conséquence` : ''}
 
 RÉPONSE:`;
+    }
 
-        return prompt;
+    /**
+     * MODE DATA: JSON structuré SEULEMENT
+     */
+    _buildDataPrompt(userMessage, toolsData, context) {
+        const tickers = context.tickers || context.key_tickers || [];
+        const fieldsRequested = context.fields_requested || [];
+
+        return `Tu es Emma Data Extractor. Extrait et structure les données demandées en JSON STRICT.
+
+DONNÉES DISPONIBLES DES OUTILS:
+${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n')}
+
+DEMANDE: ${userMessage}
+
+TICKERS DEMANDÉS: ${tickers.join(', ') || 'tous disponibles'}
+CHAMPS DEMANDÉS: ${fieldsRequested.join(', ') || 'tous pertinents'}
+
+INSTRUCTIONS CRITIQUES:
+1. RETOURNER UNIQUEMENT DU JSON VALIDE - PAS DE TEXTE AVANT OU APRÈS
+2. Structure: { "TICKER": { "field": value, ... } }
+3. Inclure SEULEMENT les champs demandés ou pertinents au contexte
+4. Valeurs numériques en NUMBER, pas en STRING
+5. Si donnée manquante: utiliser null
+6. Pas de commentaires, pas d'explications, SEULEMENT JSON
+7. Utiliser les noms de champs anglais standards: price, pe, volume, marketCap, eps, etc.
+
+EXEMPLE FORMAT ATTENDU:
+{
+  "AAPL": {
+    "price": 245.67,
+    "change": 5.67,
+    "changePercent": 2.34,
+    "volume": 58234567,
+    "marketCap": 3850000000000,
+    "pe": 32.4,
+    "eps": 7.58
+  },
+  "MSFT": {
+    "price": 428.32,
+    "change": 3.21,
+    "changePercent": 0.75,
+    "volume": 24567890,
+    "marketCap": 3200000000000,
+    "pe": 38.1,
+    "eps": 11.24
+  }
+}
+
+RÉPONSE JSON:`;
+    }
+
+    /**
+     * MODE BRIEFING: Analyse détaillée pour email
+     */
+    _buildBriefingPrompt(userMessage, toolsData, context, intentData) {
+        const briefingType = context.briefing_type || context.type || 'general';
+        const importanceLevel = intentData?.importance_level || context.importance_level || 5;
+        const trendingTopics = intentData?.trending_topics || [];
+
+        return `Tu es Emma Financial Analyst. Rédige une analyse approfondie pour un briefing ${briefingType}.
+
+DONNÉES DISPONIBLES DES OUTILS:
+${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n')}
+
+CONTEXTE: ${userMessage}
+
+INTENT DÉTECTÉ:
+- Type: ${intentData?.intent || 'market_overview'}
+- Importance: ${importanceLevel}/10
+- Trending Topics: ${trendingTopics.join(', ') || 'N/A'}
+
+TYPE DE BRIEFING: ${briefingType}
+
+INSTRUCTIONS:
+1. Rédige une analyse DÉTAILLÉE et PROFESSIONNELLE (1500-2000 mots minimum)
+2. Structure OBLIGATOIRE avec sections claires (##, ###)
+3. Inclure des DONNÉES CHIFFRÉES précises (prix, %, volumes, etc.)
+4. Citer les SOURCES en bas de réponse
+5. Ton: Professionnel institutionnel
+6. Focus sur l'ACTIONNABLE et les INSIGHTS
+7. Format MARKDOWN avec émojis appropriés (📊, 📈, ⚠️, etc.)
+8. Si importance >= 8: commencer par une section BREAKING avec les événements majeurs
+
+STRUCTURE ATTENDUE:
+
+## 📊 [Titre Principal Contextualisé]
+
+**Résumé Exécutif:** [2-3 phrases capturant l'essentiel de l'analyse]
+
+### 📈 Performance du Jour
+[Analyse détaillée des mouvements de prix, volumes, catalyseurs du jour]
+- Indices: S&P 500, NASDAQ, DOW
+- Actions clés: variations, volumes
+- Catalyseurs identifiés
+
+### 💼 Analyse Fondamentale
+[Métriques clés: PE, revenus, marges, croissance, valorisation]
+- Résultats trimestriels si disponibles
+- Guidance management
+- Comparaison sectorielle
+
+### 📉 Analyse Technique
+[Indicateurs techniques et niveaux clés]
+- RSI, MACD, moyennes mobiles
+- Support et résistance
+- Sentiment technique (bullish/bearish)
+
+### 📰 Actualités et Catalyseurs
+[News importantes avec impact marché]
+- Événements économiques
+- Annonces entreprises
+- Changements ratings analystes
+
+### 🎯 Recommandations et Points de Surveillance
+[Insights actionnables et zones à surveiller]
+- Opportunités identifiées
+- Risques à monitorer
+- Niveaux techniques clés
+
+---
+**Sources:** [Liste précise des outils/APIs utilisés: Polygon.io, FMP, Finnhub, etc.]
+
+RÉPONSE MARKDOWN:`;
     }
 
     /**
@@ -601,23 +800,38 @@ RÉPONSE:`;
     }
 
     /**
-     * Réponse de fallback si Perplexity échoue
+     * Réponse de fallback si Perplexity échoue (adapté selon mode)
      */
-    _generateFallbackResponse(userMessage, toolResults) {
+    _generateFallbackResponse(userMessage, toolResults, outputMode = 'chat') {
         const successfulResults = toolResults.filter(r => r.success && r.data);
-        
+
         if (successfulResults.length === 0) {
+            if (outputMode === 'data') {
+                return '{}';
+            }
             return "Désolé, je n'ai pas pu récupérer de données fiables pour répondre à votre question. Veuillez réessayer.";
         }
-        
+
+        // Mode DATA: retourner JSON
+        if (outputMode === 'data') {
+            const dataObj = {};
+            successfulResults.forEach(result => {
+                if (result.data && typeof result.data === 'object') {
+                    Object.assign(dataObj, result.data);
+                }
+            });
+            return JSON.stringify(dataObj, null, 2);
+        }
+
+        // Mode CHAT ou BRIEFING: retourner texte formaté
         let response = "Voici les informations que j'ai pu récupérer :\n\n";
-        
+
         successfulResults.forEach(result => {
             response += `**${result.tool_id}**: ${JSON.stringify(result.data, null, 2)}\n\n`;
         });
-        
+
         response += "Note: Cette réponse est basée uniquement sur les données disponibles. Pour une analyse plus approfondie, veuillez reformuler votre question.";
-        
+
         return response;
     }
 
