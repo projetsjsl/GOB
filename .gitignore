@@ -67,3 +67,4 @@ debug_*.png
 # Temporary files
 *.tmp
 *.temp
+.vercel
