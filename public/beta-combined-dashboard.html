@@ -13488,6 +13488,7 @@ console.log('✅ Données hybrides récupérées:', {
                     console.warn('Impossible de sauvegarder l\'état:', e);
                 }
             }
+
             // Utiliser beforeunload au lieu de unload (non deprecated)
             window.addEventListener('beforeunload', handlePageUnload);
             
