@@ -7923,6 +7923,9 @@ ${basePrompt}
             // Composant onglet Ask Emma avec intégration Gemini
             // Isolé avec React.memo pour éviter les re-renders causés par les mises à jour de marché
             const AskEmmaTab = React.memo(() => {
+                // État pour l'animation de chargement de l'historique
+                const [historyLoading, setHistoryLoading] = useState(true);
+
                 // Charger les messages depuis localStorage au démarrage
                 const [emmaMessages, setEmmaMessages] = useState(() => {
                     try {
@@ -8438,8 +8441,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         // Vérifier la connexion Gemini
                         await checkGeminiConnection();
+
+                        // Fin du chargement de l'historique
+                        setHistoryLoading(false);
+                        console.log('✅ Historique Emma chargé et prêt');
                     } catch (error) {
                         console.error('Erreur initialisation Emma:', error?.message || String(error));
+                        // Même en cas d'erreur, arrêter l'animation de chargement
+                        setHistoryLoading(false);
                     }
                 };
 
@@ -9590,12 +9599,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
                                     }`}
                                 >
-                                {emmaMessages.length === 0 ? (
+                                {historyLoading ? (
+                                    // Animation de chargement pendant la restauration de l'historique
+                                    <div className="flex flex-col items-center justify-center gap-4 py-12">
+                                        <div className="w-16 h-16 rounded-full overflow-hidden">
+                                            <img
+                                                src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
+                                                alt="Emma"
+                                                className="w-full h-full object-cover animate-pulse"
+                                            />
+                                        </div>
+                                        <div className={`flex flex-col items-center gap-2 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        }`}>
+                                            <div className="flex gap-1">
+                                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{animationDelay: '0ms'}}></div>
+                                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{animationDelay: '150ms'}}></div>
+                                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{animationDelay: '300ms'}}></div>
+                                            </div>
+                                            <p className="text-sm">Chargement de votre historique...</p>
+                                        </div>
+                                    </div>
+                                ) : emmaMessages.length === 0 ? (
                                     <div className="flex gap-3 mb-4">
                                         <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                                            <img 
-                                                src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
-                                                alt="Emma" 
+                                            <img
+                                                src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
+                                                alt="Emma"
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
@@ -9605,7 +9635,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             <p className={`text-sm leading-relaxed mb-3 ${
                                                 isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                             }`}>
-                                                Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière. 
+                                                Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Experte financière IA de JSLAI. Je peux vous aider avec l'analyse et l'évaluation financière.
                                                 {useFunctionCalling ? ' Je peux également récupérer des données en temps réel via les APIs financières.' : ' Je vous fournis des analyses basées sur mes connaissances.'}
                                                 Quel est votre défi financier ?
                                             </p>
