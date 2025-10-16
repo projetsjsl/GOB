@@ -13291,8 +13291,9 @@ console.log('✅ Données hybrides récupérées:', {
                 { id: 'seeking-alpha', label: '📈 Stocks News', component: SeekingAlphaTab },
                 { id: 'email-briefings', label: '📡 Emma En Direct', component: EmailBriefingsTab },
                 { id: 'economic-calendar', label: '📅 Calendrier Économique', component: EconomicCalendarTab }
-            ];
+            ]; // End tabs array
 
+            // Main component JSX return (inside BetaCombinedDashboard function)
             return (
                 <div className={`min-h-screen transition-colors duration-300 ${
                     isDarkMode 
