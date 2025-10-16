@@ -7926,6 +7926,9 @@ ${basePrompt}
                 // État pour l'animation de chargement de l'historique
                 const [historyLoading, setHistoryLoading] = useState(true);
 
+                // Flag pour éviter les sauvegardes pendant l'initialisation
+                const isInitializingRef = useRef(true);
+
                 // Charger les messages depuis localStorage au démarrage
                 const [emmaMessages, setEmmaMessages] = useState(() => {
                     try {
@@ -8417,9 +8420,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                 timestamp: new Date().toISOString()
                             }]);
                             console.log('👋 Welcome message ajouté (aucun historique sauvegardé)');
-                        } else {
-                            console.log('📜 Historique Emma déjà chargé depuis localStorage');
                         }
+                        // Historique déjà chargé depuis localStorage via useState
                         
                         // Charger le prompt depuis localStorage
                         const savedPrompt = localStorage.getItem('emma-financial-prompt');
@@ -8444,11 +8446,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                         // Fin du chargement de l'historique
                         setHistoryLoading(false);
+
+                        // Activer la sauvegarde localStorage maintenant que l'initialisation est terminée
+                        isInitializingRef.current = false;
+
                         console.log('✅ Historique Emma chargé et prêt');
                     } catch (error) {
                         console.error('Erreur initialisation Emma:', error?.message || String(error));
-                        // Même en cas d'erreur, arrêter l'animation de chargement
+                        // Même en cas d'erreur, arrêter l'animation de chargement et activer la sauvegarde
                         setHistoryLoading(false);
+                        isInitializingRef.current = false;
                     }
                 };
 
@@ -8720,8 +8727,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     }
                 }, [emmaLoading]);
 
-                // Sauvegarder l'historique dans localStorage à chaque changement
+                // Sauvegarder l'historique dans localStorage à chaque changement (sauf pendant l'initialisation)
                 useEffect(() => {
+                    // Ne pas sauvegarder pendant l'initialisation pour éviter les re-renders redondants
+                    if (isInitializingRef.current) {
+                        return;
+                    }
+
                     try {
                         if (emmaMessages.length > 0) {
                             localStorage.setItem('emma-chat-history', JSON.stringify(emmaMessages));
@@ -9541,7 +9553,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
-                                        {console.log('📋 Messages à afficher:', emmaMessages.length, emmaMessages)}
                                         {emmaMessages.map((message) => (
                                             <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                                                 {message.type !== 'user' && (
