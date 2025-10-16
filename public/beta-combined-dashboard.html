@@ -315,7 +315,9 @@ const fetchHybridData = async (symbol, dataType) => {
         const BetaCombinedDashboard = () => {
             // États principaux
             const [activeTab, setActiveTab] = useState('stocks-news');
-            const [tickers, setTickers] = useState(['GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT', 'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE', 'TRP', 'T', 'UNH', 'UL', 'VZ', 'WFC']);
+            const [tickers, setTickers] = useState([]);
+            const [teamTickers, setTeamTickers] = useState([]);
+            const [watchlistTickers, setWatchlistTickers] = useState([]);
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
             const [seekingAlphaData, setSeekingAlphaData] = useState({});
@@ -619,6 +621,81 @@ const fetchHybridData = async (symbol, dataType) => {
                     ];
                     setNewsData(fallbackNews);
                     setFilteredNews(fallbackNews);
+                }
+            };
+
+            // Fonction Emma Populate pour Stocks & News
+            const emmaPopulateStocksNews = async () => {
+                console.log('🤖 Emma Populate Stocks & News...');
+                setLoading(true);
+                
+                try {
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: "Récupérer les données de prix, news, et recommandations pour tous les tickers d'équipe. Analyse les performances, actualités récentes, et fournis des insights sur chaque action.",
+                            context: {
+                                tickers: teamTickers,
+                                news_requested: true,
+                                analysis_type: 'stocks_news_population'
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Sauvegarder la configuration utilisée
+                        await savePopulateConfig('stocks-news', {
+                            tools_used: result.tools_used,
+                            execution_time: result.execution_time_ms,
+                            is_reliable: result.is_reliable,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        showMessage(`Emma a analysé ${teamTickers.length} tickers avec ${result.tools_used?.length || 0} outils`, 'success');
+                        console.log('✅ Emma Populate Stocks & News completed:', result);
+                    } else {
+                        throw new Error(result.error || 'Emma analysis failed');
+                    }
+                } catch (error) {
+                    console.error('❌ Emma Populate Stocks & News error:', error);
+                    showMessage(`Erreur Emma: ${error.message}`, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            // Fonction pour sauvegarder la configuration de population
+            const savePopulateConfig = async (tabName, config) => {
+                try {
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Sauvegarder la configuration de population pour l'onglet ${tabName}`,
+                            context: {
+                                action: 'save_config',
+                                tab_name: tabName,
+                                config: config
+                            }
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`✅ Configuration sauvegardée pour ${tabName}`);
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur sauvegarde config:', error);
                 }
             };
 
@@ -978,6 +1055,41 @@ const fetchHybridData = async (symbol, dataType) => {
             const [initialLoadComplete, setInitialLoadComplete] = useState(false);
             const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
+            // Fonction pour charger les tickers depuis Supabase
+            const loadTickersFromSupabase = async () => {
+                try {
+                    console.log('📊 Chargement des tickers depuis Supabase...');
+                    const response = await fetch('/api/config/tickers');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        setTeamTickers(data.team_tickers || []);
+                        setWatchlistTickers(data.watchlist_tickers || []);
+                        setTickers(data.team_tickers || []); // Utiliser team_tickers par défaut
+                        console.log(`✅ Tickers chargés: ${data.team_tickers?.length || 0} équipe, ${data.watchlist_tickers?.length || 0} watchlist`);
+                    } else {
+                        throw new Error(data.error || 'Failed to fetch tickers');
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur chargement tickers:', error.message);
+                    // Fallback vers liste hardcodée
+                    const fallbackTickers = [
+                        'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
+                        'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
+                        'TRP', 'UNH', 'UL', 'VZ', 'WFC'
+                    ];
+                    setTeamTickers(fallbackTickers);
+                    setWatchlistTickers(fallbackTickers);
+                    setTickers(fallbackTickers);
+                    console.log('⚠️ Utilisation des tickers de fallback');
+                }
+            };
+
             // Chargement initial UNE SEULE FOIS au démarrage avec écran de chargement
             useEffect(() => {
                 if (initialLoadComplete) return; // Éviter les rechargements
@@ -989,6 +1101,7 @@ const fetchHybridData = async (symbol, dataType) => {
                     try {
                         // Chargement silencieux en arrière-plan (pas de await pour ne pas bloquer)
                         Promise.all([
+                            loadTickersFromSupabase(),
                             fetchSeekingAlphaData(),
                             fetchSeekingAlphaStockData(),
                             refreshAllStocks(),
@@ -4589,12 +4702,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
         const [healthStatus, setHealthStatus] = useState(null);
         const [healthCheckLoading, setHealthCheckLoading] = useState(false);
 
-                // Tickers de la watchlist (même que Seeking Alpha et Titres & Nouvelles)
-                const watchlistTickers = [
-                    'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT', 
-                    'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE', 
-                    'TRP', 'UNH', 'UL', 'VZ', 'WFC'
-                ];
+                // Tickers de la watchlist (récupérés depuis Supabase)
+                // Utilise l'état global watchlistTickers chargé depuis Supabase
 
                 // ============================================================================
                 // EMMA EN DIRECT 100% PERPLEXITY - PROMPTS ULTRA-DÉTAILLÉS
@@ -9084,6 +9193,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
                                 Actualiser News
+                            </button>
+                            <button
+                                onClick={emmaPopulateStocksNews}
+                                disabled={loading}
+                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
+                            >
+                                <span>🤖</span>
+                                Emma Populate
                             </button>
                         </div>
                     </div>
