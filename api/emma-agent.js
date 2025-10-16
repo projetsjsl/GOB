@@ -1,6 +1,11 @@
 /**
- * Emma Agent - Système de Function Calling Intelligent
- * Agent principal pour Emma avec scoring automatique et sélection d'outils
+ * Emma Agent - Système de Function Calling Intelligent avec Cognitive Scaffolding
+ *
+ * Architecture:
+ * - COGNITIVE SCAFFOLDING LAYER: Analyse d'intention avec Perplexity
+ * - ReAct REASONING LAYER: Sélection intelligente d'outils
+ * - TOOL USE LAYER: Exécution parallèle avec fallbacks
+ * - SYNTHESIS LAYER: Génération de réponse finale
  */
 
 import fs from 'fs';
@@ -19,8 +24,24 @@ class SmartAgent {
     async processRequest(userMessage, context = {}) {
         try {
             console.log('🤖 Emma Agent: Processing request:', userMessage.substring(0, 100) + '...');
-            
-            // 1. Planification avec scoring
+
+            // 0. COGNITIVE SCAFFOLDING: Analyse d'intention avec Perplexity
+            const intentData = await this._analyzeIntent(userMessage, context);
+            console.log('🧠 Intent analysis:', intentData ? intentData.intent : 'fallback to keyword scoring');
+
+            // Si clarification nécessaire, retourner immédiatement
+            if (intentData && intentData.needs_clarification) {
+                return this._handleClarification(intentData, userMessage);
+            }
+
+            // Enrichir le contexte avec les données d'intention
+            if (intentData) {
+                context.intent_data = intentData;
+                context.extracted_tickers = intentData.tickers || [];
+                context.suggested_tools = intentData.suggested_tools || [];
+            }
+
+            // 1. Planification avec scoring (enrichi par l'intent)
             const selectedTools = await this._plan_with_scoring(userMessage, context);
             console.log('📋 Selected tools:', selectedTools.map(t => t.id));
 
@@ -29,7 +50,7 @@ class SmartAgent {
             console.log('⚡ Tool execution completed');
 
             // 3. Génération de la réponse finale
-            const finalResponse = await this._generate_response(userMessage, toolResults, context);
+            const finalResponse = await this._generate_response(userMessage, toolResults, context, intentData);
             console.log('✨ Final response generated');
 
             // 4. Mise à jour de l'historique
@@ -42,6 +63,8 @@ class SmartAgent {
                 success: true,
                 response: finalResponse,
                 tools_used: selectedTools.map(t => t.id),
+                intent: intentData ? intentData.intent : 'unknown',
+                confidence: intentData ? intentData.confidence : null,
                 execution_time_ms: Date.now() - (context.start_time || Date.now()),
                 conversation_length: this.conversationHistory.length,
                 is_reliable: toolResults.every(r => r.is_reliable)
@@ -59,37 +82,194 @@ class SmartAgent {
     }
 
     /**
+     * COGNITIVE SCAFFOLDING LAYER
+     * Analyse d'intention avec Perplexity pour comprendre la demande
+     */
+    async _analyzeIntent(userMessage, context) {
+        try {
+            console.log('🧠 Starting intent analysis...');
+
+            // Construire le prompt d'analyse d'intention
+            const intentPrompt = `Analyse cette demande utilisateur et extrais les informations suivantes en JSON strict:
+
+DEMANDE: "${userMessage}"
+
+CONTEXTE DISPONIBLE:
+- Tickers d'équipe: ${context.tickers?.join(', ') || 'aucun'}
+- Données en cache: ${Object.keys(context.stockData || {}).join(', ') || 'aucunes'}
+
+OUTILS DISPONIBLES:
+- polygon-stock-price: Prix actions temps réel
+- fmp-fundamentals: Données fondamentales (PE, revenus, marges)
+- calculator: Calculs financiers (ratios, moyennes)
+- twelve-data-technical: Indicateurs techniques (RSI, MACD, SMA)
+- alpha-vantage-ratios: Ratios financiers avancés
+- finnhub-news: Actualités financières
+- supabase-watchlist: Watchlist Dan
+- team-tickers: Tickers de l'équipe
+- economic-calendar: Calendrier économique
+- earnings-calendar: Calendrier des résultats
+- analyst-recommendations: Recommandations d'analystes
+- yahoo-finance: Fallback général
+
+INSTRUCTIONS:
+1. Détermine l'INTENTION principale: stock_price, fundamentals, technical_analysis, news, portfolio_analysis, market_overview, calculation, comparative_analysis
+2. Extrais les TICKERS mentionnés (convertis "Apple" → "AAPL", "Tesla" → "TSLA", "Microsoft" → "MSFT", "Google" → "GOOGL", etc.)
+3. Détermine les OUTILS NÉCESSAIRES (1-5 outils max, par ordre de pertinence)
+4. Détecte si CLARIFICATION NÉCESSAIRE (confidence < 0.5 ou paramètres manquants)
+5. Extrais PARAMÈTRES ADDITIONNELS (dates, périodes, types d'analyse)
+
+RÉPONDS EN JSON UNIQUEMENT (pas de texte avant ou après):
+{
+  "intent": "stock_price",
+  "confidence": 0.95,
+  "tickers": ["AAPL"],
+  "suggested_tools": ["polygon-stock-price", "finnhub-news"],
+  "parameters": {
+    "timeframe": "realtime",
+    "analysis_type": "quick"
+  },
+  "needs_clarification": false,
+  "clarification_questions": [],
+  "user_intent_summary": "L'utilisateur veut le prix actuel d'Apple"
+}`;
+
+            // Appel Perplexity léger (sonar - rapide et économique)
+            const response = await this._call_perplexity_intent(intentPrompt);
+
+            // Parser le JSON (extraire le JSON de la réponse)
+            const jsonMatch = response.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                console.warn('⚠️ Intent analysis: No JSON found in response');
+                return null;
+            }
+
+            const intentData = JSON.parse(jsonMatch[0]);
+            console.log('✅ Intent analyzed:', intentData);
+
+            return intentData;
+
+        } catch (error) {
+            console.error('❌ Intent analysis failed:', error.message);
+            // Retombe gracieusement sur le scoring par mots-clés
+            return null;
+        }
+    }
+
+    /**
+     * Appel Perplexity optimisé pour l'analyse d'intention
+     * Utilise le modèle "sonar" (le plus rapide et économique)
+     */
+    async _call_perplexity_intent(prompt) {
+        const response = await fetch('https://api.perplexity.ai/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'sonar',  // Modèle le plus rapide (pas online search)
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 500,  // Court pour intent analysis
+                temperature: 0.1  // Très déterministe pour extraire JSON
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Perplexity intent API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.choices[0].message.content;
+    }
+
+    /**
+     * Gère les clarifications quand l'intention est ambiguë
+     */
+    _handleClarification(intentData, userMessage) {
+        console.log('💬 Clarification needed, returning questions');
+
+        let clarificationResponse = `Pour vous fournir une réponse précise, j'ai besoin de quelques précisions :\n\n`;
+
+        // Ajouter les questions de clarification
+        intentData.clarification_questions.forEach((question, index) => {
+            clarificationResponse += `${index + 1}. ${question}\n`;
+        });
+
+        // Ajouter des exemples si disponibles
+        if (intentData.user_intent_summary) {
+            clarificationResponse += `\n💡 **Contexte détecté:** ${intentData.user_intent_summary}\n`;
+        }
+
+        // Suggestions basées sur l'intent détecté
+        if (intentData.intent === 'stock_analysis' && !intentData.tickers.length) {
+            clarificationResponse += `\n**Exemples:**\n`;
+            clarificationResponse += `- "Analyse technique de AAPL"\n`;
+            clarificationResponse += `- "Fondamentaux de Tesla"\n`;
+            clarificationResponse += `- "Actualités Microsoft"\n`;
+        }
+
+        return {
+            success: true,
+            response: clarificationResponse,
+            needs_clarification: true,
+            intent: intentData.intent,
+            confidence: intentData.confidence,
+            tools_used: [],
+            is_reliable: true
+        };
+    }
+
+    /**
      * Sélection intelligente des outils basée sur scoring
+     * (Enrichi par l'analyse d'intention si disponible)
      */
     async _plan_with_scoring(userMessage, context) {
         const message = userMessage.toLowerCase();
         const availableTools = this.toolsConfig.tools.filter(tool => tool.enabled);
-        
+
+        // Si intent analysis a suggéré des outils, leur donner la priorité
+        const suggestedTools = context.suggested_tools || [];
+        const extractedTickers = context.extracted_tickers || context.tickers || [];
+
         // Scoring des outils
         const scoredTools = availableTools.map(tool => {
             let score = 0;
-            
+
             // Score de base (priorité inversée - plus bas = mieux)
             score += (tool.priority * 10);
-            
-            // Score de pertinence contextuelle
-            const relevanceScore = this._calculateRelevanceScore(tool, message, context);
+
+            // COGNITIVE SCAFFOLDING BOOST: Si l'outil est suggéré par intent analysis
+            if (suggestedTools.includes(tool.id)) {
+                const suggestionIndex = suggestedTools.indexOf(tool.id);
+                // Plus l'outil est tôt dans la liste, plus le boost est fort
+                const intentBoost = 100 - (suggestionIndex * 10); // 100, 90, 80, 70, 60
+                score -= intentBoost;
+                console.log(`🎯 Intent boost for ${tool.id}: -${intentBoost} points`);
+            }
+
+            // Score de pertinence contextuelle (enrichi par tickers extraits)
+            const relevanceScore = this._calculateRelevanceScore(tool, message, {
+                ...context,
+                tickers: extractedTickers.length > 0 ? extractedTickers : context.tickers
+            });
             score -= relevanceScore;
-            
+
             // Score de performance historique
             const performanceScore = this._calculatePerformanceScore(tool.id);
             score -= performanceScore;
-            
+
             // Bonus pour outils récemment utilisés avec succès
             const recencyBonus = this._calculateRecencyBonus(tool.id);
             score -= recencyBonus;
-            
+
             return {
                 ...tool,
                 calculated_score: score,
                 relevance_score: relevanceScore,
                 performance_score: performanceScore,
-                recency_bonus: recencyBonus
+                recency_bonus: recencyBonus,
+                intent_boosted: suggestedTools.includes(tool.id)
             };
         });
 
@@ -308,7 +488,7 @@ class SmartAgent {
     /**
      * Génération de la réponse finale avec Perplexity
      */
-    async _generate_response(userMessage, toolResults, context) {
+    async _generate_response(userMessage, toolResults, context, intentData = null) {
         try {
             // Préparation du contexte pour Perplexity
             const toolsData = toolResults
@@ -317,24 +497,25 @@ class SmartAgent {
                     tool: r.tool_id,
                     data: r.data
                 }));
-            
+
             const conversationContext = this.conversationHistory.slice(-5); // 5 derniers échanges
-            
+
             const perplexityPrompt = this._buildPerplexityPrompt(
-                userMessage, 
-                toolsData, 
-                conversationContext, 
-                context
+                userMessage,
+                toolsData,
+                conversationContext,
+                context,
+                intentData
             );
-            
+
             // Appel à Perplexity
             const perplexityResponse = await this._call_perplexity(perplexityPrompt);
-            
+
             return perplexityResponse;
-            
+
         } catch (error) {
             console.error('❌ Response generation failed:', error);
-            
+
             // Réponse de fallback basée sur les données des outils
             return this._generateFallbackResponse(userMessage, toolResults);
         }
@@ -343,12 +524,22 @@ class SmartAgent {
     /**
      * Construction du prompt pour Perplexity
      */
-    _buildPerplexityPrompt(userMessage, toolsData, conversationContext, context) {
+    _buildPerplexityPrompt(userMessage, toolsData, conversationContext, context, intentData = null) {
+        // Ajouter contexte d'intention si disponible
+        let intentContext = '';
+        if (intentData) {
+            intentContext = `\nINTENTION DÉTECTÉE:
+- Type: ${intentData.intent}
+- Confiance: ${(intentData.confidence * 100).toFixed(0)}%
+- Résumé: ${intentData.user_intent_summary || 'Non spécifié'}
+- Tickers identifiés: ${intentData.tickers?.join(', ') || 'aucun'}\n`;
+        }
+
         let prompt = `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.
 
 CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
-
+${intentContext}
 DONNÉES DISPONIBLES DES OUTILS:
 ${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n')}
 
@@ -361,6 +552,7 @@ INSTRUCTIONS:
 4. Adapte ton ton selon le contexte (professionnel mais accessible)
 5. Si c'est une question technique, sois détaillé
 6. Si c'est une question générale, sois concis
+${intentData ? `7. L'intention de l'utilisateur est: ${intentData.intent} - réponds en conséquence` : ''}
 
 RÉPONSE:`;
 
