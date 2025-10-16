@@ -770,7 +770,7 @@ RÉPONSE MARKDOWN:`;
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: 'llama-3.1-sonar-small-128k-online',
+                    model: 'sonar-pro',  // Modèle actuel Perplexity (puissant et rapide)
                     messages: [
                         {
                             role: 'system',
@@ -787,7 +787,9 @@ RÉPONSE MARKDOWN:`;
             });
 
             if (!response.ok) {
-                throw new Error(`Perplexity API error: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                console.error('❌ Perplexity API error details:', errorData);
+                throw new Error(`Perplexity API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
             }
 
             const data = await response.json();
@@ -795,7 +797,7 @@ RÉPONSE MARKDOWN:`;
 
         } catch (error) {
             console.error('❌ Perplexity API error:', error);
-            throw new Error('Erreur de communication avec Perplexity');
+            throw new Error(`Erreur de communication avec Perplexity: ${error.message}`);
         }
     }
 
