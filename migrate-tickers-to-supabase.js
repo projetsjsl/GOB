@@ -120,16 +120,14 @@ async function migrateTickersToSupabase() {
 }
 
 // Exécution du script
-if (require.main === module) {
-    migrateTickersToSupabase()
-        .then(() => {
-            console.log('✅ Migration script completed');
-            process.exit(0);
-        })
-        .catch((error) => {
-            console.error('❌ Migration script failed:', error);
-            process.exit(1);
-        });
-}
+migrateTickersToSupabase()
+    .then(() => {
+        console.log('✅ Migration script completed');
+        process.exit(0);
+    })
+    .catch((error) => {
+        console.error('❌ Migration script failed:', error);
+        process.exit(1);
+    });
 
 module.exports = { migrateTickersToSupabase, TEAM_TICKERS };

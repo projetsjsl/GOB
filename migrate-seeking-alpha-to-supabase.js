@@ -156,16 +156,14 @@ async function migrateSeekingAlphaToSupabase() {
 }
 
 // Exécution du script
-if (require.main === module) {
-    migrateSeekingAlphaToSupabase()
-        .then(() => {
-            console.log('✅ Migration script completed');
-            process.exit(0);
-        })
-        .catch((error) => {
-            console.error('❌ Migration script failed:', error);
-            process.exit(1);
-        });
-}
+migrateSeekingAlphaToSupabase()
+    .then(() => {
+        console.log('✅ Migration script completed');
+        process.exit(0);
+    })
+    .catch((error) => {
+        console.error('❌ Migration script failed:', error);
+        process.exit(1);
+    });
 
 module.exports = { migrateSeekingAlphaToSupabase };
