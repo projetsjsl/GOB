@@ -699,6 +699,114 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
             };
 
+            // Fonction Emma Populate pour Dan's Watchlist
+            const emmaPopulateWatchlist = async () => {
+                console.log('🤖 Emma Populate Dan\'s Watchlist...');
+                setLoading(true);
+                
+                try {
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: "Analyser en détail tous les tickers de la watchlist Dan. Récupérer les données fondamentales, techniques, actualités et recommandations d'analystes. Fournir une analyse complète de chaque action avec insights et recommandations.",
+                            context: {
+                                tickers: watchlistTickers,
+                                analysis_type: 'watchlist_detailed_analysis',
+                                include_fundamentals: true,
+                                include_technical: true,
+                                include_news: true,
+                                include_analyst_recommendations: true
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Sauvegarder la configuration utilisée
+                        await savePopulateConfig('watchlist', {
+                            tools_used: result.tools_used,
+                            execution_time: result.execution_time_ms,
+                            is_reliable: result.is_reliable,
+                            tickers_analyzed: watchlistTickers.length,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        showMessage(`Emma a analysé en détail ${watchlistTickers.length} tickers de la watchlist avec ${result.tools_used?.length || 0} outils`, 'success');
+                        console.log('✅ Emma Populate Watchlist completed:', result);
+                    } else {
+                        throw new Error(result.error || 'Emma analysis failed');
+                    }
+                } catch (error) {
+                    console.error('❌ Emma Populate Watchlist error:', error);
+                    showMessage(`Erreur Emma: ${error.message}`, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            // Fonction Emma Populate pour JLab (IntelliStocks)
+            const emmaPopulateJLab = async () => {
+                console.log('🤖 Emma Populate JLab (IntelliStocks)...');
+                setLoading(true);
+                
+                try {
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: "Peupler l'onglet JLab (IntelliStocks) avec des analyses avancées. Calculer les scores JSLAI™, analyser les ratios financiers, évaluer la valorisation, et fournir des recommandations d'investissement basées sur l'analyse quantitative et qualitative.",
+                            context: {
+                                tickers: teamTickers,
+                                analysis_type: 'jlab_intellistocks_population',
+                                include_jsla_score: true,
+                                include_valuation_analysis: true,
+                                include_risk_assessment: true,
+                                include_sector_analysis: true,
+                                include_technical_indicators: true
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Sauvegarder la configuration utilisée
+                        await savePopulateConfig('jlab', {
+                            tools_used: result.tools_used,
+                            execution_time: result.execution_time_ms,
+                            is_reliable: result.is_reliable,
+                            tickers_analyzed: teamTickers.length,
+                            jsla_scores_calculated: true,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        showMessage(`Emma a peuplé JLab avec ${teamTickers.length} tickers et calculé les scores JSLAI™ avec ${result.tools_used?.length || 0} outils`, 'success');
+                        console.log('✅ Emma Populate JLab completed:', result);
+                    } else {
+                        throw new Error(result.error || 'Emma analysis failed');
+                    }
+                } catch (error) {
+                    console.error('❌ Emma Populate JLab error:', error);
+                    showMessage(`Erreur Emma: ${error.message}`, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
             // Fonction pour récupérer les nouvelles d'un symbole spécifique depuis le cache
             const fetchSymbolNews = async (symbol) => {
                 console.log(`📰 Récupération des nouvelles pour ${symbol} depuis le cache...`);
@@ -2449,6 +2557,14 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
                                 >
                                     {watchlistLoading ? 'Actualisation...' : '🔄 Actualiser'}
+                                </button>
+                                <button
+                                    onClick={emmaPopulateWatchlist}
+                                    disabled={watchlistLoading}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    <span>🤖</span>
+                                    Emma Populate
                                 </button>
                                 <div className={`text-sm px-4 py-2 rounded ${
                                     isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
