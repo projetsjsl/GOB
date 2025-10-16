@@ -7921,7 +7921,8 @@ ${basePrompt}
             };
 
             // Composant onglet Ask Emma avec intégration Gemini
-            const AskEmmaTab = () => {
+            // Isolé avec React.memo pour éviter les re-renders causés par les mises à jour de marché
+            const AskEmmaTab = React.memo(() => {
                 // Charger les messages depuis localStorage au démarrage
                 const [emmaMessages, setEmmaMessages] = useState(() => {
                     try {
@@ -10301,7 +10302,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     </div>
                 );
-            };
+            });
 
             // Composant onglet Stocks & News
             const StocksNewsTab = () => (
