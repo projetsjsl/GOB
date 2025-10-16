@@ -10,6 +10,12 @@
     "api/briefing-cron.js": {
       "maxDuration": 60
     },
+    "api/emma-agent.js": {
+      "maxDuration": 60
+    },
+    "api/emma-briefing.js": {
+      "maxDuration": 45
+    },
     "api/marketdata.js": {
       "maxDuration": 10
     },
@@ -32,6 +38,20 @@
       "maxDuration": 20
     }
   },
+  "crons": [
+    {
+      "path": "/api/briefing-cron?type=morning",
+      "schedule": "20 11 * * 1-5"
+    },
+    {
+      "path": "/api/briefing-cron?type=midday", 
+      "schedule": "50 15 * * 1-5"
+    },
+    {
+      "path": "/api/briefing-cron?type=evening",
+      "schedule": "20 20 * * 1-5"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

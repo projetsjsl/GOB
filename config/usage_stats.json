@@ -1,0 +1,110 @@
+{
+  "polygon-stock-price": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "fmp-fundamentals": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "calculator": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "twelve-data-technical": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "alpha-vantage-ratios": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "finnhub-news": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "supabase-watchlist": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "team-tickers": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "economic-calendar": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "earnings-calendar": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "analyst-recommendations": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  },
+  "yahoo-finance": {
+    "total_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "average_response_time_ms": 0,
+    "last_used": null,
+    "success_rate": 0,
+    "error_history": []
+  }
+}

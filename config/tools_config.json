@@ -1,0 +1,285 @@
+{
+  "tools": [
+    {
+      "id": "polygon-stock-price",
+      "name": "Polygon Stock Price",
+      "description": "Récupère les prix en temps réel des actions via Polygon.io",
+      "category": "financial_data",
+      "priority": 1,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action (ex: AAPL, GOOGL)"
+        }
+      },
+      "implementation": {
+        "file": "polygon-stock-price-tool.js",
+        "endpoint": "https://api.polygon.io/v2/aggs/ticker/{ticker}/prev",
+        "api_key_env": "POLYGON_API_KEY"
+      },
+      "fallback_tools": ["yahoo-finance"],
+      "usage_context": ["price", "quote", "stock", "ticker", "prix", "cours"],
+      "keywords": ["price", "quote", "stock", "ticker", "prix", "cours", "real-time", "temps réel"]
+    },
+    {
+      "id": "fmp-fundamentals",
+      "name": "FMP Fundamentals",
+      "description": "Données fondamentales des entreprises via Financial Modeling Prep",
+      "category": "financial_data",
+      "priority": 2,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        }
+      },
+      "implementation": {
+        "file": "fmp-fundamentals-tool.js",
+        "endpoint": "https://financialmodelingprep.com/api/v3/profile/{ticker}",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": ["alpha-vantage-ratios"],
+      "usage_context": ["fundamentals", "company", "profile", "fundamentaux", "entreprise"],
+      "keywords": ["fundamentals", "company", "profile", "fundamentaux", "entreprise", "financials", "financier"]
+    },
+    {
+      "id": "calculator",
+      "name": "Financial Calculator",
+      "description": "Calculs financiers (ratios, valorisation, métriques)",
+      "category": "calculation",
+      "priority": 3,
+      "enabled": true,
+      "parameters": {
+        "operation": {
+          "type": "string",
+          "required": true,
+          "description": "Type de calcul (pe_ratio, market_cap, dividend_yield, etc.)"
+        },
+        "values": {
+          "type": "object",
+          "required": true,
+          "description": "Valeurs pour le calcul"
+        }
+      },
+      "implementation": {
+        "file": "calculator-tool.js",
+        "type": "local"
+      },
+      "fallback_tools": [],
+      "usage_context": ["calculate", "ratio", "valuation", "calculer", "ratio", "valorisation"],
+      "keywords": ["calculate", "ratio", "valuation", "calculer", "ratio", "valorisation", "pe", "market cap", "dividend"]
+    },
+    {
+      "id": "twelve-data-technical",
+      "name": "Twelve Data Technical",
+      "description": "Indicateurs techniques et analyses via Twelve Data",
+      "category": "technical_analysis",
+      "priority": 4,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        },
+        "indicator": {
+          "type": "string",
+          "required": false,
+          "description": "Indicateur technique (RSI, MACD, SMA, etc.)"
+        }
+      },
+      "implementation": {
+        "file": "twelve-data-technical-tool.js",
+        "endpoint": "https://api.twelvedata.com/technical_indicators",
+        "api_key_env": "TWELVE_DATA_API_KEY"
+      },
+      "fallback_tools": ["yahoo-finance"],
+      "usage_context": ["technical", "indicator", "analysis", "technique", "indicateur", "analyse"],
+      "keywords": ["technical", "indicator", "analysis", "technique", "indicateur", "analyse", "rsi", "macd", "sma", "ema"]
+    },
+    {
+      "id": "alpha-vantage-ratios",
+      "name": "Alpha Vantage Ratios",
+      "description": "Ratios financiers avancés via Alpha Vantage",
+      "category": "financial_data",
+      "priority": 5,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        }
+      },
+      "implementation": {
+        "file": "alpha-vantage-ratios-tool.js",
+        "endpoint": "https://www.alphavantage.co/query",
+        "api_key_env": "ALPHA_VANTAGE_API_KEY"
+      },
+      "fallback_tools": ["fmp-fundamentals"],
+      "usage_context": ["ratios", "financial", "metrics", "ratios", "financier", "métriques"],
+      "keywords": ["ratios", "financial", "metrics", "ratios", "financier", "métriques", "pe", "pb", "roe", "roa"]
+    },
+    {
+      "id": "finnhub-news",
+      "name": "Finnhub News",
+      "description": "Actualités financières en temps réel via Finnhub",
+      "category": "news",
+      "priority": 6,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": false,
+          "description": "Symbole de l'action (optionnel pour news générales)"
+        }
+      },
+      "implementation": {
+        "file": "finnhub-news-tool.js",
+        "endpoint": "https://finnhub.io/api/v1/company-news",
+        "api_key_env": "FINNHUB_API_KEY"
+      },
+      "fallback_tools": [],
+      "usage_context": ["news", "actualités", "information", "market", "marché"],
+      "keywords": ["news", "actualités", "information", "market", "marché", "breaking", "urgent", "urgent"]
+    },
+    {
+      "id": "supabase-watchlist",
+      "name": "Supabase Watchlist",
+      "description": "Lecture de la watchlist Dan depuis Supabase",
+      "category": "data_source",
+      "priority": 7,
+      "enabled": true,
+      "parameters": {},
+      "implementation": {
+        "file": "supabase-watchlist-tool.js",
+        "type": "supabase",
+        "table": "watchlist"
+      },
+      "fallback_tools": [],
+      "usage_context": ["watchlist", "dan", "portfolio", "suivi"],
+      "keywords": ["watchlist", "dan", "portfolio", "suivi", "tracking", "monitoring"]
+    },
+    {
+      "id": "team-tickers",
+      "name": "Team Tickers",
+      "description": "Lecture des tickers d'équipe depuis Supabase",
+      "category": "data_source",
+      "priority": 8,
+      "enabled": true,
+      "parameters": {},
+      "implementation": {
+        "file": "team-tickers-tool.js",
+        "type": "supabase",
+        "table": "team_tickers"
+      },
+      "fallback_tools": [],
+      "usage_context": ["team", "tickers", "équipe", "liste", "stocks"],
+      "keywords": ["team", "tickers", "équipe", "liste", "stocks", "actions", "portfolio"]
+    },
+    {
+      "id": "economic-calendar",
+      "name": "Economic Calendar",
+      "description": "Calendrier économique et événements macro",
+      "category": "macro_data",
+      "priority": 9,
+      "enabled": true,
+      "parameters": {
+        "date": {
+          "type": "string",
+          "required": false,
+          "description": "Date au format YYYY-MM-DD (défaut: aujourd'hui)"
+        }
+      },
+      "implementation": {
+        "file": "economic-calendar-tool.js",
+        "endpoint": "https://financialmodelingprep.com/api/v3/economic_calendar",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": [],
+      "usage_context": ["economic", "calendar", "macro", "économique", "calendrier"],
+      "keywords": ["economic", "calendar", "macro", "économique", "calendrier", "events", "événements"]
+    },
+    {
+      "id": "earnings-calendar",
+      "name": "Earnings Calendar",
+      "description": "Calendrier des résultats d'entreprises",
+      "category": "earnings",
+      "priority": 10,
+      "enabled": true,
+      "parameters": {
+        "date": {
+          "type": "string",
+          "required": false,
+          "description": "Date au format YYYY-MM-DD (défaut: aujourd'hui)"
+        }
+      },
+      "implementation": {
+        "file": "earnings-calendar-tool.js",
+        "endpoint": "https://financialmodelingprep.com/api/v3/earning_calendar",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": [],
+      "usage_context": ["earnings", "results", "résultats", "bénéfices"],
+      "keywords": ["earnings", "results", "résultats", "bénéfices", "quarterly", "trimestriel"]
+    },
+    {
+      "id": "analyst-recommendations",
+      "name": "Analyst Recommendations",
+      "description": "Recommandations d'analystes financiers",
+      "category": "analyst_data",
+      "priority": 11,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        }
+      },
+      "implementation": {
+        "file": "analyst-recommendations-tool.js",
+        "endpoint": "https://financialmodelingprep.com/api/v3/grade/{ticker}",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": [],
+      "usage_context": ["analyst", "recommendation", "rating", "analyste", "recommandation"],
+      "keywords": ["analyst", "recommendation", "rating", "analyste", "recommandation", "buy", "sell", "hold"]
+    },
+    {
+      "id": "yahoo-finance",
+      "name": "Yahoo Finance",
+      "description": "Données Yahoo Finance (fallback général)",
+      "category": "financial_data",
+      "priority": 12,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        }
+      },
+      "implementation": {
+        "file": "yahoo-finance-tool.js",
+        "type": "scraping",
+        "endpoint": "https://finance.yahoo.com/quote/{ticker}"
+      },
+      "fallback_tools": [],
+      "usage_context": ["fallback", "backup", "general", "général"],
+      "keywords": ["fallback", "backup", "general", "général", "yahoo", "finance"]
+    }
+  ],
+  "config": {
+    "max_concurrent_tools": 5,
+    "timeout_ms": 10000,
+    "retry_attempts": 2,
+    "cache_duration_minutes": 5,
+    "enable_auto_fallback": true,
+    "log_level": "info"
+  }
+}
