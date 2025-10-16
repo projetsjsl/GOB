@@ -7844,6 +7844,65 @@ ${basePrompt}
                                 </p>
                             )}
                         </div>
+
+                        {/* Panneau de Debugging - Process Log */}
+                        {processLog.length > 0 && (
+                            <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    🔍 Logs de Génération
+                                </h3>
+
+                                <div className="space-y-2 max-h-96 overflow-y-auto">
+                                    {processLog.map((log, index) => (
+                                        <div
+                                            key={index}
+                                            className={`p-3 rounded border text-sm font-mono ${
+                                                log.level === 'error'
+                                                    ? isDarkMode ? 'bg-red-900/20 border-red-500/30 text-red-300' : 'bg-red-50 border-red-200 text-red-700'
+                                                    : log.level === 'success'
+                                                    ? isDarkMode ? 'bg-green-900/20 border-green-500/30 text-green-300' : 'bg-green-50 border-green-200 text-green-700'
+                                                    : isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-700'
+                                            }`}
+                                        >
+                                            <div className="flex items-start justify-between mb-1">
+                                                <span className="font-semibold">
+                                                    {log.level === 'error' ? '❌' : log.level === 'success' ? '✅' : 'ℹ️'} {log.step}
+                                                </span>
+                                                <span className="text-xs opacity-70">
+                                                    {new Date(log.timestamp).toLocaleTimeString('fr-FR')}
+                                                </span>
+                                            </div>
+                                            <div className="opacity-90">{log.message}</div>
+                                            {log.data && Object.keys(log.data).length > 0 && (
+                                                <details className="mt-2">
+                                                    <summary className="cursor-pointer opacity-70 hover:opacity-100">
+                                                        Détails technique
+                                                    </summary>
+                                                    <pre className="mt-2 p-2 rounded bg-black/20 overflow-x-auto text-xs">
+                                                        {JSON.stringify(log.data, null, 2)}
+                                                    </pre>
+                                                </details>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <button
+                                    onClick={() => {
+                                        clearProcessLog();
+                                        setCurrentStep('');
+                                        setStepDetails('');
+                                    }}
+                                    className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors text-sm"
+                                >
+                                    🗑️ Effacer les logs
+                                </button>
+                            </div>
+                        )}
                     </div>
                 );
             };
