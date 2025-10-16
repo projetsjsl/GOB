@@ -12973,16 +12973,44 @@ console.log('✅ Données hybrides récupérées:', {
             // COMPOSANT CALENDRIER ÉCONOMIQUE AMÉLIORÉ
             // ============================================================================
             const EconomicCalendarTab = () => {
+                // Initialize with fallback data so component is never blank
                 const [activeSubTab, setActiveSubTab] = useState('economic');
-                const [calendarData, setCalendarData] = useState([]);
+                const [calendarData, setCalendarData] = useState(getFallbackData());
                 const [loading, setLoading] = useState(false);
                 const [error, setError] = useState(null);
                 const [isRefreshing, setIsRefreshing] = useState(false);
 
+                // Helper function defined before use
+                function getFallbackData() {
+                    return [{
+                        date: 'Mon Oct 16',
+                        events: [
+                            {
+                                time: '12:55 PM',
+                                currency: 'USD',
+                                impact: 2,
+                                event: 'Fed Paulson Speech',
+                                actual: 'N/A',
+                                forecast: 'N/A',
+                                previous: 'N/A'
+                            },
+                            {
+                                time: '08:30 AM',
+                                currency: 'USD',
+                                impact: 3,
+                                event: 'NY Empire State Manufacturing Index',
+                                actual: '10.70',
+                                forecast: '-1.00',
+                                previous: '-8.70'
+                            }
+                        ]
+                    }];
+                }
+
                 // Debug: Log du chargement du composant
                 console.log('📅 EconomicCalendarTab chargé');
-                console.log('📊 Données actuelles:', economicCalendarData);
-                console.log('🔧 État du composant:', { activeSubTab, calendarData, loading, error });
+                console.log('📊 Données init:', calendarData);
+                console.log('🔧 État du composant:', { activeSubTab, loading, error });
 
                 // Charger les données au changement d'onglet
                 React.useEffect(() => {
@@ -13028,32 +13056,6 @@ console.log('✅ Données hybrides récupérées:', {
                     } finally {
                         setLoading(false);
                     }
-                };
-
-                const getFallbackData = () => {
-                    return [{
-                        date: 'Mon Oct 13',
-                        events: [
-                            { 
-                                time: '12:55 PM', 
-                                currency: 'USD',
-                                impact: 2, 
-                                event: 'Fed Paulson Speech', 
-                                actual: 'N/A', 
-                                forecast: 'N/A', 
-                                previous: 'N/A' 
-                            },
-                            { 
-                                time: '08:30 AM', 
-                                currency: 'USD',
-                                impact: 3, 
-                                event: 'NY Empire State Manufacturing Index', 
-                                actual: '10.70', 
-                                forecast: '-1.00', 
-                                previous: '-8.70' 
-                            }
-                        ]
-                    }];
                 };
 
                 const handleRefresh = async () => {
