@@ -5140,6 +5140,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [briefingHistory, setBriefingHistory] = useState([]);
                 const [recipients, setRecipients] = useState('');
                 const [selectedType, setSelectedType] = useState('morning');
+                const [currentStep, setCurrentStep] = useState('');
+                const [stepDetails, setStepDetails] = useState('');
                 const [dataSource, setDataSource] = useState('apis'); // 'apis' ou 'yahoo'
                 const [apiSources, setApiSources] = useState({
                     marketData: 'perplexity', // 'perplexity' - Perplexity 100% par défaut
@@ -6488,6 +6490,8 @@ ${basePrompt}
                     setLoading(true);
                     setCurrentBriefing(null);
                     setPreviewHtml('');
+                    setCurrentStep('Initialisation...');
+                    setStepDetails('Préparation de l\'analyse cognitive');
 
                     try {
                         // Initialiser le logging
@@ -6498,18 +6502,29 @@ ${basePrompt}
                         }, 'info');
 
                         // ÉTAPE 0: Intent Analysis
+                        setCurrentStep('ÉTAPE 0/4: Analyse de l\'Intent');
+                        setStepDetails('Emma analyse l\'actualité du jour et détecte les sujets importants...');
                         addLogEntry('STEP_0', 'ÉTAPE 0: Intent Analysis', {}, 'info');
                         const intentData = await analyzeIntent(type);
+                        setStepDetails(`Intent détecté: ${intentData.intent} (Confiance: ${(intentData.confidence * 100).toFixed(0)}%, Importance: ${intentData.importance_level}/10)`);
 
                         // ÉTAPE 1: Smart Data Gathering
+                        setCurrentStep('ÉTAPE 1/4: Collecte de Données');
+                        setStepDetails(`Emma récupère les données avec les outils recommandés: ${intentData.recommended_tools?.join(', ') || 'outils standard'}...`);
                         addLogEntry('STEP_1', 'ÉTAPE 1: Smart Data Gathering', {}, 'info');
                         const smartData = await gatherSmartData(type, intentData);
+                        setStepDetails(`Données collectées avec ${smartData.tools_used?.length || 0} outils: ${smartData.tools_used?.join(', ') || 'aucun'}`);
 
                         // ÉTAPE 2: Content Selection
+                        setCurrentStep('ÉTAPE 2/4: Sélection du Contenu');
+                        setStepDetails('Emma décide quelles sections inclure dans le briefing...');
                         addLogEntry('STEP_2', 'ÉTAPE 2: Content Selection', {}, 'info');
                         const selectedSections = selectEmailContent(intentData, smartData);
+                        setStepDetails(`${selectedSections.length} sections sélectionnées pour l'email`);
 
                         // ÉTAPE 3: Adaptive Email Generation
+                        setCurrentStep('ÉTAPE 3/4: Génération Adaptative');
+                        setStepDetails('Perplexity rédige le briefing avec le prompt adapté au contexte...');
                         addLogEntry('STEP_3', 'ÉTAPE 3: Adaptive Email Generation', {}, 'info');
                         const adaptivePrompt = buildAdaptivePrompt(type, intentData, selectedSections);
 
@@ -6538,6 +6553,12 @@ ${basePrompt}
                             model: analysisResult.model,
                             contentLength: analysisResult.content?.length || 0
                         }, 'success');
+
+                        setStepDetails(`Analyse complétée avec ${analysisResult.model} (${analysisResult.content?.length || 0} caractères)`);
+
+                        // ÉTAPE 4: Création HTML et Preview
+                        setCurrentStep('ÉTAPE 4/4: Création du Preview');
+                        setStepDetails('Génération du HTML et préparation de l\'aperçu...');
 
                         // Créer le HTML
                         let html = '';
@@ -6595,15 +6616,28 @@ ${basePrompt}
                             steps: processLog.length
                         }, 'success');
 
+                        setCurrentStep('✅ Briefing généré avec succès!');
+                        setStepDetails(`Analyse cognitive complétée en ${Math.round((Date.now() - new Date(processLog[0]?.timestamp).getTime()) / 1000)}s`);
+
                         console.log('✅ COGNITIVE BRIEFING COMPLETE');
 
                     } catch (error) {
                         addLogEntry('ERROR', 'Erreur génération cognitive briefing', {
                             message: error.message,
-                            stack: error.stack
+                            stack: error.stack,
+                            currentStep: currentStep
                         }, 'error');
                         console.error('❌ Cognitive Briefing error:', error);
-                        setMessage({ type: 'error', text: `Erreur: ${error.message}` });
+
+                        setCurrentStep('❌ Erreur lors de la génération');
+                        setStepDetails(`Erreur: ${error.message}`);
+                        setMessage({ type: 'error', text: `❌ Erreur cognitive briefing: ${error.message}` });
+
+                        // Afficher l'erreur pendant 5 secondes avant de réinitialiser
+                        setTimeout(() => {
+                            setCurrentStep('');
+                            setStepDetails('');
+                        }, 5000);
                     } finally {
                         setLoading(false);
                     }
@@ -7520,14 +7554,27 @@ ${basePrompt}
                             </div>
 
                             {loading && (
-                                <div className="mt-4 text-center">
-                                    <div className="inline-flex items-center space-x-2">
-                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                                        <span className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                        }`}>
-                                            Génération en cours...
-                                        </span>
+                                <div className={`mt-4 p-4 rounded-lg border-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-blue-900/20 border-blue-500/30' : 'bg-blue-50 border-blue-200'
+                                }`}>
+                                    <div className="flex items-start space-x-3">
+                                        <div className="flex-shrink-0 mt-1">
+                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className={`font-semibold mb-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                            }`}>
+                                                {currentStep || 'Génération en cours...'}
+                                            </div>
+                                            {stepDetails && (
+                                                <div className={`text-sm transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                }`}>
+                                                    {stepDetails}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             )}
