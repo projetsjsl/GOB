@@ -13488,29 +13488,28 @@ console.log('✅ Données hybrides récupérées:', {
                     console.warn('Impossible de sauvegarder l\'état:', e);
                 }
             }
-        };
-
-        // Utiliser beforeunload au lieu de unload (non deprecated)
-        window.addEventListener('beforeunload', handlePageUnload);
-        
-        // Protection contre les erreurs de scripts externes (share-modal.js, etc.)
-        window.addEventListener('error', function(event) {
-            if (event.message && (event.message.includes('addEventListener') || event.message.includes('Cannot read properties of null'))) {
-                console.warn('⚠️ Script externe (probablement extension Chrome) tentant d\'accéder à un élément inexistant:', event.filename);
-                event.preventDefault();
-                return false;
-            }
-        });
-        
-        // Protection spécifique contre les extensions Chrome
-        const originalQuerySelector = document.querySelector;
-        document.querySelector = function(selector) {
-            const element = originalQuerySelector.call(this, selector);
-            if (!element && (selector.includes('tui-image-editor') || selector.includes('xxdialog'))) {
-                console.warn('⚠️ Extension Chrome tentant d\'accéder à un élément inexistant:', selector);
-                return null;
-            }
-            return element;
+            // Utiliser beforeunload au lieu de unload (non deprecated)
+            window.addEventListener('beforeunload', handlePageUnload);
+            
+            // Protection contre les erreurs de scripts externes (share-modal.js, etc.)
+            window.addEventListener('error', function(event) {
+                if (event.message && (event.message.includes('addEventListener') || event.message.includes('Cannot read properties of null'))) {
+                    console.warn('⚠️ Script externe (probablement extension Chrome) tentant d\'accéder à un élément inexistant:', event.filename);
+                    event.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Protection spécifique contre les extensions Chrome
+            const originalQuerySelector = document.querySelector;
+            document.querySelector = function(selector) {
+                const element = originalQuerySelector.call(this, selector);
+                if (!element && (selector.includes('tui-image-editor') || selector.includes('xxdialog'))) {
+                    console.warn('⚠️ Extension Chrome tentant d\'accéder à un élément inexistant:', selector);
+                    return null;
+                }
+                return element;
+            };
         };
 
         // Vérification que le DOM est prêt avant le rendu avec protection d'erreur
@@ -13531,9 +13530,6 @@ console.log('✅ Données hybrides récupérées:', {
                     rootElement.innerHTML = '<div style="padding: 20px; color: red;">Erreur de chargement du dashboard. Veuillez recharger la page.</div>';
                 }
             }
-        };
-
-        // Fermeture de la fonction BetaCombinedDashboard
         };
 
         // Attendre que le DOM soit complètement chargé
