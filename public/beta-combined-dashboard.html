@@ -13471,26 +13471,31 @@ console.log('✅ Données hybrides récupérées:', {
         };
 
         // Vérification que le DOM est prêt avant le rendu avec protection d'erreur
-        try {
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    try {
-                        ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
-                    } catch (error) {
-                        console.error('Erreur lors du rendu React:', error);
-                        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">Erreur de chargement du dashboard. Veuillez recharger la page.</div>';
-                    }
-                });
-            } else {
-                try {
-                    ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
-                } catch (error) {
-                    console.error('Erreur lors du rendu React:', error);
-                    document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">Erreur de chargement du dashboard. Veuillez recharger la page.</div>';
+        const initializeDashboard = () => {
+            try {
+                const rootElement = document.getElementById('root');
+                if (!rootElement) {
+                    console.error('Élément root non trouvé');
+                    return;
+                }
+                
+                ReactDOM.render(<BetaCombinedDashboard />, rootElement);
+                console.log('✅ Dashboard initialisé avec succès');
+            } catch (error) {
+                console.error('Erreur lors du rendu React:', error);
+                const rootElement = document.getElementById('root');
+                if (rootElement) {
+                    rootElement.innerHTML = '<div style="padding: 20px; color: red;">Erreur de chargement du dashboard. Veuillez recharger la page.</div>';
                 }
             }
-        } catch (error) {
-            console.error('Erreur critique dans l\'initialisation:', error);
+        };
+
+        // Attendre que le DOM soit complètement chargé
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeDashboard);
+        } else {
+            // DOM déjà chargé, initialiser immédiatement
+            setTimeout(initializeDashboard, 100); // Petit délai pour s'assurer que tout est prêt
         }
     </script>
     
