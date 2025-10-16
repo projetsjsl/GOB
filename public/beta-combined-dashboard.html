@@ -8587,6 +8587,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             body: JSON.stringify({
                                 message: userMessage,
                                 context: {
+                                    output_mode: 'chat',  // ← MODE CHAT pour réponse conversationnelle
                                     tickers: tickers,
                                     news_requested: true,
                                     stockData: currentStockData,
