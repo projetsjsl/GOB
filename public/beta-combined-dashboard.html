@@ -7765,64 +7765,42 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const generatePerplexityResponse = async (userMessage) => {
                     try {
-                        console.log('🔍 Génération de réponse Perplexity pour:', userMessage);
+                        console.log('🔍 Génération de réponse Emma Agent pour:', userMessage);
 
                         // Récupérer les données en temps réel du dashboard
                         const currentStockData = stockData || {};
                         const currentNewsData = newsData || [];
                         const currentApiStatus = apiStatus || {};
-                        
-                        // Construire le contexte avec les données actuelles
-                        const realTimeContext = `
-DONNÉES EN TEMPS RÉEL DISPONIBLES:
 
-📊 DONNÉES DE MARCHÉ ACTUELLES:
-${Object.entries(currentStockData).map(([ticker, data]) => 
-    `${ticker}: Prix=${data.c}, Variation=${data.d} (${data.dp}%), Haut=${data.h}, Bas=${data.l}, Volume=${data.v || 'N/A'}`
-).join('\n')}
+                        // Extraire les tickers de l'équipe
+                        const tickers = teamTickers || Object.keys(currentStockData);
 
-📰 ACTUALITÉS RÉCENTES:
-${currentNewsData.slice(0, 5).map(article => 
-    `- ${article.title} (${article.source?.name || 'Source'})`
-).join('\n')}
+                        console.log('📤 Envoi de la requête à Emma Agent avec function calling...');
 
-🔧 STATUT DES APIs:
-${Object.entries(currentApiStatus).map(([api, status]) => 
-    `${api}: ${status.status} (${status.responseTime}ms)${status.error ? ` - ${status.error}` : ''}`
-).join('\n')}
-
-⚙️ PARAMÈTRES DE CONFIGURATION ACTUELS:
-• Température: ${emmaTemperature} (${emmaTemperature <= 0.3 ? 'Analyses factuelles et précises' : emmaTemperature <= 0.5 ? 'Équilibré et professionnel' : emmaTemperature <= 0.7 ? 'Professionnel et naturel' : 'Créatif et expressif'})
-• Longueur max: ${emmaMaxTokens} tokens (${emmaMaxTokens <= 2048 ? 'Réponses concises' : emmaMaxTokens <= 4096 ? 'Réponses détaillées' : 'Réponses très détaillées'})
-
-⚠️ IMPORTANT: Utilisez ces données en temps réel pour vos analyses. Ne dites pas que vous n'avez pas accès aux données actuelles.
-`;
-
-                        // Construire le prompt complet avec les données en temps réel
-                        const fullPrompt = `${emmaPrompt}\n\n${realTimeContext}\n\nQuestion de l'utilisateur: ${userMessage}`;
-
-                        console.log('📤 Envoi de la requête à Perplexity...');
-                        
-                        // Utiliser l'API Perplexity via /api/ai-services
-                        const response = await fetch('/api/ai-services', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                service: 'perplexity',
-                                query: fullPrompt,
-                                section: 'analysis',
-                                model: 'sonar-reasoning-pro',
-                                max_tokens: emmaMaxTokens,
+                        // Utiliser Emma Agent avec Perplexity function calling complet
+                        const response = await fetch('/api/emma-agent', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                message: userMessage,
+                                context: {
+                                    tickers: tickers,
+                                    news_requested: true,
+                                    stockData: currentStockData,
+                                    newsData: currentNewsData,
+                                    apiStatus: currentApiStatus,
+                                    emmaPrompt: emmaPrompt,
                                     temperature: emmaTemperature,
-                                recency: 'day'
-                                })
-                            });
+                                    max_tokens: emmaMaxTokens
+                                }
+                            })
+                        });
 
                         if (!response.ok) {
                             const errorData = await response.json().catch(() => ({}));
-                            console.error('❌ Erreur HTTP Perplexity:', {
+                            console.error('❌ Erreur HTTP Emma Agent:', {
                                 status: response.status,
                                 statusText: response.statusText,
                                 error: errorData
@@ -7831,39 +7809,40 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         }
 
                         const data = await response.json();
-                        console.log('📥 Réponse Perplexity reçue:', {
+                        console.log('📥 Réponse Emma Agent reçue:', {
                             success: data.success,
-                            model: data.model,
-                            contentLength: data.content?.length || 0,
-                            sources: data.sources?.length || 0,
-                            fallback: data.fallback
+                            tools_used: data.tools_used,
+                            is_reliable: data.is_reliable,
+                            responseLength: data.response?.length || 0
                         });
 
                         if (!data.success) {
-                            throw new Error(data.error || 'Erreur inconnue de l\'API Perplexity');
+                            throw new Error(data.error || 'Erreur inconnue de Emma Agent');
                         }
 
-                        let responseText = data.content || '';
-                        
-                        // Ajouter les sources si disponibles
-                        if (data.sources && data.sources.length > 0) {
-                            responseText += '\n\n**Sources:**\n';
-                            data.sources.forEach((source, index) => {
-                                responseText += `• [${source.title || source.url}](${source.url})\n`;
-                            });
+                        let responseText = data.response || '';
+
+                        // Ajouter l'info sur les outils utilisés
+                        if (data.tools_used && data.tools_used.length > 0) {
+                            responseText += `\n\n🔧 **Outils utilisés:** ${data.tools_used.join(', ')}`;
                         }
-                        
+
+                        // Indicateur de fiabilité
+                        if (data.is_reliable === false) {
+                            responseText += '\n\n⚠️ *Certaines données n\'ont pas pu être récupérées*';
+                        }
+
                         // Log de la réponse pour diagnostic
                         console.log(`📝 Réponse Emma (${responseText.length} caractères):`, responseText);
-                        
+
                         // Vérifier si la réponse semble tronquée
                         if (responseText.length < 50) {
                             console.warn('⚠️ Réponse très courte, possible troncature');
                         }
-                        
+
                         return responseText;
                     } catch (error) {
-                        console.error('Erreur Perplexity:', error?.message || String(error));
+                        console.error('Erreur Emma Agent:', error?.message || String(error));
                         throw error;
                     }
                 };
