@@ -8654,8 +8654,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             responseText += `\n\n🔧 **Outils utilisés:** ${data.tools_used.join(', ')}`;
                         }
 
-                        // Indicateur de fiabilité (discret)
-                        if (data.is_reliable === false) {
+                        // Indicateur de fiabilité (discret) - afficher les sources spécifiques
+                        if (data.is_reliable === false && data.unavailable_sources && data.unavailable_sources.length > 0) {
+                            const sourcesList = data.unavailable_sources.join(', ');
+                            responseText += `\n\n<sub style="opacity: 0.5; color: #888;">ℹ️ Note : Sources temporairement indisponibles : ${sourcesList}</sub>`;
+                        } else if (data.is_reliable === false) {
                             responseText += '\n\n<sub style="opacity: 0.5; color: #888;">ℹ️ Note : Certaines sources de données étaient temporairement indisponibles</sub>';
                         }
 
