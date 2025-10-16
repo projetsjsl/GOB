@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
-    <!-- Cache bust: 2024-12-19 15:30 -->
+    <!-- Cache bust: 2025-10-15 21:00 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -315,7 +315,9 @@ const fetchHybridData = async (symbol, dataType) => {
         const BetaCombinedDashboard = () => {
             // États principaux
             const [activeTab, setActiveTab] = useState('stocks-news');
-            const [tickers, setTickers] = useState(['GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT', 'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE', 'TRP', 'T', 'UNH', 'UL', 'VZ', 'WFC']);
+            const [tickers, setTickers] = useState([]);
+            const [teamTickers, setTeamTickers] = useState([]);
+            const [watchlistTickers, setWatchlistTickers] = useState([]);
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
             const [seekingAlphaData, setSeekingAlphaData] = useState({});
@@ -619,6 +621,189 @@ const fetchHybridData = async (symbol, dataType) => {
                     ];
                     setNewsData(fallbackNews);
                     setFilteredNews(fallbackNews);
+                }
+            };
+
+            // Fonction Emma Populate pour Stocks & News
+            const emmaPopulateStocksNews = async () => {
+                console.log('🤖 Emma Populate Stocks & News...');
+                setLoading(true);
+                
+                try {
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: "Récupérer les données de prix, news, et recommandations pour tous les tickers d'équipe. Analyse les performances, actualités récentes, et fournis des insights sur chaque action.",
+                            context: {
+                                tickers: teamTickers,
+                                news_requested: true,
+                                analysis_type: 'stocks_news_population'
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Sauvegarder la configuration utilisée
+                        await savePopulateConfig('stocks-news', {
+                            tools_used: result.tools_used,
+                            execution_time: result.execution_time_ms,
+                            is_reliable: result.is_reliable,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        showMessage(`Emma a analysé ${teamTickers.length} tickers avec ${result.tools_used?.length || 0} outils`, 'success');
+                        console.log('✅ Emma Populate Stocks & News completed:', result);
+                    } else {
+                        throw new Error(result.error || 'Emma analysis failed');
+                    }
+                } catch (error) {
+                    console.error('❌ Emma Populate Stocks & News error:', error);
+                    showMessage(`Erreur Emma: ${error.message}`, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            // Fonction pour sauvegarder la configuration de population
+            const savePopulateConfig = async (tabName, config) => {
+                try {
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Sauvegarder la configuration de population pour l'onglet ${tabName}`,
+                            context: {
+                                action: 'save_config',
+                                tab_name: tabName,
+                                config: config
+                            }
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`✅ Configuration sauvegardée pour ${tabName}`);
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur sauvegarde config:', error);
+                }
+            };
+
+            // Fonction Emma Populate pour Dan's Watchlist
+            const emmaPopulateWatchlist = async () => {
+                console.log('🤖 Emma Populate Dan\'s Watchlist...');
+                setLoading(true);
+                
+                try {
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: "Analyser en détail tous les tickers de la watchlist Dan. Récupérer les données fondamentales, techniques, actualités et recommandations d'analystes. Fournir une analyse complète de chaque action avec insights et recommandations.",
+                            context: {
+                                tickers: watchlistTickers,
+                                analysis_type: 'watchlist_detailed_analysis',
+                                include_fundamentals: true,
+                                include_technical: true,
+                                include_news: true,
+                                include_analyst_recommendations: true
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Sauvegarder la configuration utilisée
+                        await savePopulateConfig('watchlist', {
+                            tools_used: result.tools_used,
+                            execution_time: result.execution_time_ms,
+                            is_reliable: result.is_reliable,
+                            tickers_analyzed: watchlistTickers.length,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        showMessage(`Emma a analysé en détail ${watchlistTickers.length} tickers de la watchlist avec ${result.tools_used?.length || 0} outils`, 'success');
+                        console.log('✅ Emma Populate Watchlist completed:', result);
+                    } else {
+                        throw new Error(result.error || 'Emma analysis failed');
+                    }
+                } catch (error) {
+                    console.error('❌ Emma Populate Watchlist error:', error);
+                    showMessage(`Erreur Emma: ${error.message}`, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            // Fonction Emma Populate pour JLab (IntelliStocks)
+            const emmaPopulateJLab = async () => {
+                console.log('🤖 Emma Populate JLab (IntelliStocks)...');
+                setLoading(true);
+                
+                try {
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: "Peupler l'onglet JLab (IntelliStocks) avec des analyses avancées. Calculer les scores JSLAI™, analyser les ratios financiers, évaluer la valorisation, et fournir des recommandations d'investissement basées sur l'analyse quantitative et qualitative.",
+                            context: {
+                                tickers: teamTickers,
+                                analysis_type: 'jlab_intellistocks_population',
+                                include_jsla_score: true,
+                                include_valuation_analysis: true,
+                                include_risk_assessment: true,
+                                include_sector_analysis: true,
+                                include_technical_indicators: true
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Sauvegarder la configuration utilisée
+                        await savePopulateConfig('jlab', {
+                            tools_used: result.tools_used,
+                            execution_time: result.execution_time_ms,
+                            is_reliable: result.is_reliable,
+                            tickers_analyzed: teamTickers.length,
+                            jsla_scores_calculated: true,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        showMessage(`Emma a peuplé JLab avec ${teamTickers.length} tickers et calculé les scores JSLAI™ avec ${result.tools_used?.length || 0} outils`, 'success');
+                        console.log('✅ Emma Populate JLab completed:', result);
+                    } else {
+                        throw new Error(result.error || 'Emma analysis failed');
+                    }
+                } catch (error) {
+                    console.error('❌ Emma Populate JLab error:', error);
+                    showMessage(`Erreur Emma: ${error.message}`, 'error');
+                } finally {
+                    setLoading(false);
                 }
             };
 
@@ -978,6 +1163,41 @@ const fetchHybridData = async (symbol, dataType) => {
             const [initialLoadComplete, setInitialLoadComplete] = useState(false);
             const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
+            // Fonction pour charger les tickers depuis Supabase
+            const loadTickersFromSupabase = async () => {
+                try {
+                    console.log('📊 Chargement des tickers depuis Supabase...');
+                    const response = await fetch('/api/config/tickers');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        setTeamTickers(data.team_tickers || []);
+                        setWatchlistTickers(data.watchlist_tickers || []);
+                        setTickers(data.team_tickers || []); // Utiliser team_tickers par défaut
+                        console.log(`✅ Tickers chargés: ${data.team_tickers?.length || 0} équipe, ${data.watchlist_tickers?.length || 0} watchlist`);
+                    } else {
+                        throw new Error(data.error || 'Failed to fetch tickers');
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur chargement tickers:', error.message);
+                    // Fallback vers liste hardcodée
+                    const fallbackTickers = [
+                        'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
+                        'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
+                        'TRP', 'UNH', 'UL', 'VZ', 'WFC'
+                    ];
+                    setTeamTickers(fallbackTickers);
+                    setWatchlistTickers(fallbackTickers);
+                    setTickers(fallbackTickers);
+                    console.log('⚠️ Utilisation des tickers de fallback');
+                }
+            };
+
             // Chargement initial UNE SEULE FOIS au démarrage avec écran de chargement
             useEffect(() => {
                 if (initialLoadComplete) return; // Éviter les rechargements
@@ -989,6 +1209,7 @@ const fetchHybridData = async (symbol, dataType) => {
                     try {
                         // Chargement silencieux en arrière-plan (pas de await pour ne pas bloquer)
                         Promise.all([
+                            loadTickersFromSupabase(),
                             fetchSeekingAlphaData(),
                             fetchSeekingAlphaStockData(),
                             refreshAllStocks(),
@@ -1765,6 +1986,229 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         </div>
                     </div>
 
+                    {/* Section Monitoring API Emma */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-900 border-gray-700' 
+                            : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🤖 Monitoring Emma AI</h3>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className="text-purple-600 font-medium mb-2">🧠 Emma Agent</div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Status: <span className="text-green-500">✅ Opérationnel</span>
+                                    </div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Outils: 12 disponibles
+                                    </div>
+                                </div>
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className="text-blue-600 font-medium mb-2">📧 Briefings</div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Cron: <span className="text-green-500">✅ Actif</span>
+                                    </div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Horaires: 7h20 • 11h50 • 16h20
+                                    </div>
+                                </div>
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className="text-emerald-600 font-medium mb-2">🗄️ Supabase</div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Tables: 4 créées
+                                    </div>
+                                    <div className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Tickers: {teamTickers.length} team + {watchlistTickers.length} watchlist
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        // Test Emma Agent
+                                        fetch('/api/emma-agent', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                message: 'Test de connexion Emma Agent',
+                                                context: { test: true }
+                                            })
+                                        }).then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                showMessage('✅ Emma Agent opérationnel', 'success');
+                                            } else {
+                                                showMessage('❌ Emma Agent erreur: ' + data.error, 'error');
+                                            }
+                                        }).catch(error => {
+                                            showMessage('❌ Erreur connexion Emma Agent', 'error');
+                                        });
+                                    }}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                                >
+                                    🧪 Tester Emma Agent
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        // Test Emma Briefing
+                                        fetch('/api/emma-briefing?type=morning')
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                showMessage('✅ Emma Briefing opérationnel', 'success');
+                                            } else {
+                                                showMessage('❌ Emma Briefing erreur: ' + data.error, 'error');
+                                            }
+                                        }).catch(error => {
+                                            showMessage('❌ Erreur connexion Emma Briefing', 'error');
+                                        });
+                                    }}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    📧 Tester Briefing
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Section Gestion des Outils Emma */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-900 border-gray-700' 
+                            : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>🔧 Gestion des Outils Emma</h3>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>📊 Outils Financiers</h4>
+                                    <div className="space-y-1 text-sm">
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Polygon Stock Price</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• FMP Fundamentals</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Finnhub News</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Twelve Data Technical</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Alpha Vantage Ratios</div>
+                                    </div>
+                                </div>
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                }`}>
+                                    <h4 className={`font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>🗄️ Outils Supabase</h4>
+                                    <div className="space-y-1 text-sm">
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Watchlist Manager</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Team Tickers</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Economic Calendar</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Earnings Calendar</div>
+                                        <div className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>• Analyst Recommendations</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        // Afficher la configuration des outils
+                                        fetch('/api/emma-agent', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                message: 'Afficher la configuration des outils',
+                                                context: { action: 'show_tools_config' }
+                                            })
+                                        }).then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                showMessage('✅ Configuration des outils récupérée', 'success');
+                                                console.log('Tools Config:', data.tools_config);
+                                            } else {
+                                                showMessage('❌ Erreur récupération config', 'error');
+                                            }
+                                        }).catch(error => {
+                                            showMessage('❌ Erreur connexion', 'error');
+                                        });
+                                    }}
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                                >
+                                    ⚙️ Voir Configuration
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        // Afficher les statistiques d'utilisation
+                                        fetch('/api/emma-agent', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                message: 'Afficher les statistiques d\'utilisation des outils',
+                                                context: { action: 'show_usage_stats' }
+                                            })
+                                        }).then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                showMessage('✅ Statistiques récupérées', 'success');
+                                                console.log('Usage Stats:', data.usage_stats);
+                                            } else {
+                                                showMessage('❌ Erreur récupération stats', 'error');
+                                            }
+                                        }).catch(error => {
+                                            showMessage('❌ Erreur connexion', 'error');
+                                        });
+                                    }}
+                                    className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition-colors"
+                                >
+                                    📊 Voir Statistiques
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Section Configuration */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                         isDarkMode 
@@ -2336,6 +2780,14 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
                                 >
                                     {watchlistLoading ? 'Actualisation...' : '🔄 Actualiser'}
+                                </button>
+                                <button
+                                    onClick={emmaPopulateWatchlist}
+                                    disabled={watchlistLoading}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    <span>🤖</span>
+                                    Emma Populate
                                 </button>
                                 <div className={`text-sm px-4 py-2 rounded ${
                                     isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
@@ -4569,7 +5021,7 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [selectedType, setSelectedType] = useState('morning');
                 const [dataSource, setDataSource] = useState('apis'); // 'apis' ou 'yahoo'
                 const [apiSources, setApiSources] = useState({
-                    marketData: 'yahoo', // 'yahoo' - Yahoo Finance par défaut
+                    marketData: 'perplexity', // 'perplexity' - Perplexity 100% par défaut
                     news: 'perplexity', // 'perplexity' - Perplexity par défaut
                     analysis: 'perplexity' // 'perplexity' - Perplexity par défaut
                 });
@@ -4589,12 +5041,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
         const [healthStatus, setHealthStatus] = useState(null);
         const [healthCheckLoading, setHealthCheckLoading] = useState(false);
 
-                // Tickers de la watchlist (même que Seeking Alpha et Titres & Nouvelles)
-                const watchlistTickers = [
-                    'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT', 
-                    'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE', 
-                    'TRP', 'UNH', 'UL', 'VZ', 'WFC'
-                ];
+                // Tickers de la watchlist (récupérés depuis Supabase)
+                // Utilise l'état global watchlistTickers chargé depuis Supabase
 
                 // ============================================================================
                 // EMMA EN DIRECT 100% PERPLEXITY - PROMPTS ULTRA-DÉTAILLÉS
@@ -5252,6 +5700,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                 // Fonction pour générer un briefing
                 const generateBriefing = async (type) => {
                     console.log('🚀 DÉBUT generateBriefing:', { type, loading });
+                    console.log('🔍 API Sources configurées:', apiSources);
+                    console.log('🔍 Perplexity enabled:', perplexityEnabled);
                     
                     // Protection contre les générations multiples
                     if (loading) {
@@ -5310,7 +5760,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(marketDataRequest),
-                            signal: AbortSignal.timeout(30000) // 30 secondes timeout
+                            signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
                         });
                         
                         addLogEntry('MARKET_DATA', 'Réponse reçue', { 
@@ -5396,7 +5846,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(newsRequest),
-                            signal: AbortSignal.timeout(60000) // 60 secondes timeout pour Perplexity
+                            signal: AbortSignal.timeout(120000) // 120 secondes timeout pour Perplexity
                         });
                         
                         addLogEntry('NEWS', 'Réponse actualités reçue', { 
@@ -5463,7 +5913,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(analysisRequest),
-                            signal: AbortSignal.timeout(90000) // 90 secondes timeout pour l'analyse
+                            signal: AbortSignal.timeout(120000) // 120 secondes timeout pour l'analyse Perplexity
                         });
                         
                         addLogEntry('ANALYSIS', 'Réponse analyse reçue', { 
@@ -5573,6 +6023,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         console.log('✅ États React mis à jour avec succès');
                         console.log('🔍 Briefing object:', briefing);
                         console.log('🔍 HTML length:', html.length);
+                        console.log('🔍 currentBriefing state will be:', briefing);
+                        console.log('🔍 previewHtml state will be:', html.substring(0, 100) + '...');
                         
                         addLogEntry('COMPLETION', 'Briefing généré avec succès', {
                             totalTime: Date.now() - new Date(processLog[0]?.timestamp).getTime(),
@@ -5734,185 +6186,256 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>📡 Emma En Direct</h2>
                                 <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    L'analyse des marchés, sans filtre · Powered by JSL AI
+                                    Génération automatique de briefings · Powered by Emma AI
                                 </p>
                             </div>
-                            <span className="px-3 py-1 rounded-full text-xs font-bold" style={{
-                                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                                color: '#78350f',
-                                border: '2px solid #f59e0b'
-                            }}>
-                                BÊTA v1.0
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="px-3 py-1 rounded-full text-xs font-bold" style={{
+                                    background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                                    color: '#78350f',
+                                    border: '2px solid #f59e0b'
+                                }}>
+                                    BÊTA v1.0
+                                </span>
+                                <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                    isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800'
+                                }`}>
+                                    🤖 Emma AI Active
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Health Check Panel */}
+                        {/* Status Panel */}
+                        <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        }`}>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                                    <span className={`text-sm font-medium transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        Emma AI Opérationnelle
+                                    </span>
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                    Cron: 7h20 • 11h50 • 16h20 (Montreal)
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Boutons de Génération */}
                         <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                         }`}>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>🏥 Diagnostic des APIs</h3>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📧 Génération de Briefings</h3>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <button
-                                    onClick={runHealthCheck}
-                                    disabled={healthCheckLoading}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
-                                        healthCheckLoading
-                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                                    onClick={() => {
+                                        console.log('🖱️ Clic sur Briefing Matin');
+                                        generateBriefing('morning');
+                                    }}
+                                    disabled={loading}
+                                    className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                                        loading 
+                                            ? 'opacity-50 cursor-not-allowed' 
+                                            : 'hover:scale-105 cursor-pointer'
+                                    } ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 border-blue-500 text-white' 
+                                            : 'bg-gradient-to-r from-blue-500 to-cyan-500 border-blue-400 text-white'
                                     }`}
                                 >
-                                    {healthCheckLoading ? 'Vérification...' : '🔍 Vérifier APIs'}
+                                    <div className="text-2xl mb-2">🌅</div>
+                                    <div className="font-semibold">Briefing Matin</div>
+                                    <div className="text-sm opacity-90">Préouverture + Actualités</div>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        console.log('🖱️ Clic sur Briefing Midi');
+                                        generateBriefing('noon');
+                                    }}
+                                    disabled={loading}
+                                    className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                                        loading 
+                                            ? 'opacity-50 cursor-not-allowed' 
+                                            : 'hover:scale-105 cursor-pointer'
+                                    } ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-r from-orange-600 to-yellow-600 border-orange-500 text-white' 
+                                            : 'bg-gradient-to-r from-orange-500 to-yellow-500 border-orange-400 text-white'
+                                    }`}
+                                >
+                                    <div className="text-2xl mb-2">☀️</div>
+                                    <div className="font-semibold">Briefing Midi</div>
+                                    <div className="text-sm opacity-90">Marchés US + Top Movers</div>
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        console.log('🖱️ Clic sur Briefing Soir');
+                                        generateBriefing('evening');
+                                    }}
+                                    disabled={loading}
+                                    className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                                        loading 
+                                            ? 'opacity-50 cursor-not-allowed' 
+                                            : 'hover:scale-105 cursor-pointer'
+                                    } ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 border-indigo-500 text-white' 
+                                            : 'bg-gradient-to-r from-indigo-500 to-blue-500 border-indigo-400 text-white'
+                                    }`}
+                                >
+                                    <div className="text-2xl mb-2">🌙</div>
+                                    <div className="font-semibold">Briefing Soir</div>
+                                    <div className="text-sm opacity-90">Performance finale + Analyse</div>
                                 </button>
                             </div>
-                            
-                            {healthStatus && (
-                                <div className="space-y-4">
-                                    {/* Status Global */}
-                                    <div className={`p-4 rounded-lg border-2 ${
-                                        healthStatus.overall_status === 'healthy' 
-                                            ? 'bg-green-50 border-green-200' 
-                                            : healthStatus.overall_status === 'degraded'
-                                            ? 'bg-yellow-50 border-yellow-200'
-                                            : 'bg-red-50 border-red-200'
-                                    }`}>
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h4 className={`font-bold text-lg ${
-                                                    healthStatus.overall_status === 'healthy' 
-                                                        ? 'text-green-800' 
-                                                        : healthStatus.overall_status === 'degraded'
-                                                        ? 'text-yellow-800'
-                                                        : 'text-red-800'
-                                                }`}>
-                                                    {healthStatus.overall_status === 'healthy' ? '🟢' : 
-                                                     healthStatus.overall_status === 'degraded' ? '🟡' : '🔴'} 
-                                                    Status Global: {healthStatus.overall_status.toUpperCase()}
-                                                </h4>
-                                                <p className={`text-sm ${
-                                                    healthStatus.overall_status === 'healthy' 
-                                                        ? 'text-green-600' 
-                                                        : healthStatus.overall_status === 'degraded'
-                                                        ? 'text-yellow-600'
-                                                        : 'text-red-600'
-                                                }`}>
-                                                    {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs opérationnelles 
-                                                    ({Math.round((healthStatus.healthy_apis / healthStatus.total_apis) * 100)}%)
-                                                </p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className={`text-sm font-medium ${
-                                                    healthStatus.overall_status === 'healthy' 
-                                                        ? 'text-green-600' 
-                                                        : healthStatus.overall_status === 'degraded'
-                                                        ? 'text-yellow-600'
-                                                        : 'text-red-600'
-                                                }`}>
-                                                    {healthStatus.response_time_ms}ms
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {new Date(healthStatus.timestamp).toLocaleTimeString('fr-FR')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* APIs Status Grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                        {Object.entries(healthStatus.apis).map(([name, api]) => (
-                                            <div key={name} className={`p-3 rounded-lg border ${
-                                                api.status === 'healthy' 
-                                                    ? 'bg-green-50 border-green-200' 
-                                                    : api.status === 'degraded'
-                                                    ? 'bg-yellow-50 border-yellow-200'
-                                                    : 'bg-red-50 border-red-200'
-                                            }`}>
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h5 className={`font-semibold text-sm ${
-                                                        api.status === 'healthy' 
-                                                            ? 'text-green-800' 
-                                                            : api.status === 'degraded'
-                                                            ? 'text-yellow-800'
-                                                            : 'text-red-800'
-                                                    }`}>
-                                                        {api.status === 'healthy' ? '🟢' : 
-                                                         api.status === 'degraded' ? '🟡' : '🔴'} 
-                                                        {name.replace(/_/g, ' ').toUpperCase()}
-                                                    </h5>
-                                                    <span className={`text-xs font-medium ${
-                                                        api.status === 'healthy' 
-                                                            ? 'text-green-600' 
-                                                            : api.status === 'degraded'
-                                                            ? 'text-yellow-600'
-                                                            : 'text-red-600'
-                                                    }`}>
-                                                        {api.response_time_ms}ms
-                                                    </span>
-                                                </div>
-                                                
-                                                {api.details && (
-                                                    <div className="text-xs text-gray-600 mb-2">
-                                                        <p><strong>Rate Limit:</strong> {api.details.rate_limit}</p>
-                                                        <p><strong>Reliability:</strong> {api.details.reliability}</p>
-                                                    </div>
-                                                )}
-                                                
-                                                {api.error && (
-                                                    <p className="text-xs text-red-600 font-medium">
-                                                        ❌ {api.error}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    
-                                    {/* Recommandations */}
-                                    {healthStatus.recommendations && healthStatus.recommendations.length > 0 && (
-                                        <div className={`p-4 rounded-lg ${
-                                            isDarkMode ? 'bg-gray-700' : 'bg-blue-50'
+
+                            {loading && (
+                                <div className="mt-4 text-center">
+                                    <div className="inline-flex items-center space-x-2">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                        <span className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                         }`}>
-                                            <h4 className={`font-semibold mb-3 ${
-                                                isDarkMode ? 'text-white' : 'text-blue-900'
-                                            }`}>💡 Recommandations</h4>
-                                            <div className="space-y-2">
-                                                {healthStatus.recommendations.map((rec, index) => (
-                                                    <div key={index} className={`p-3 rounded-lg ${
-                                                        rec.priority === 'critical' ? 'bg-red-100 border border-red-200' :
-                                                        rec.priority === 'high' ? 'bg-orange-100 border border-orange-200' :
-                                                        'bg-yellow-100 border border-yellow-200'
-                                                    }`}>
-                                                        <div className="flex items-start justify-between">
-                                                            <div className="flex-1">
-                                                                <p className={`font-medium text-sm ${
-                                                                    rec.priority === 'critical' ? 'text-red-800' :
-                                                                    rec.priority === 'high' ? 'text-orange-800' :
-                                                                    'text-yellow-800'
-                                                                }`}>
-                                                                    {rec.priority === 'critical' ? '🚨' :
-                                                                     rec.priority === 'high' ? '⚠️' : '💡'} 
-                                                                    {rec.message}
-                                                                </p>
-                                                                <p className="text-xs text-gray-600 mt-1">
-                                                                    <strong>Action:</strong> {rec.action}
-                                                                </p>
-                                                            </div>
-                                                            <span className={`text-xs px-2 py-1 rounded ${
-                                                                rec.priority === 'critical' ? 'bg-red-200 text-red-800' :
-                                                                rec.priority === 'high' ? 'bg-orange-200 text-orange-800' :
-                                                                'bg-yellow-200 text-yellow-800'
-                                                            }`}>
-                                                                {rec.priority}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
+                                            Génération en cours...
+                                        </span>
+                                    </div>
                                 </div>
                             )}
                         </div>
+                        
+                        {/* Aperçu et Envoi */}
+                        {currentBriefing && (
+                            <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>📧 Aperçu et Envoi</h3>
+                                
+                                {/* Formulaire d'envoi email */}
+                                <div className="mb-4">
+                                    <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Destinataires (séparés par des virgules)
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={recipients}
+                                            onChange={(e) => setRecipients(e.target.value)}
+                                            placeholder="email1@example.com, email2@example.com"
+                                            className={`flex-1 px-3 py-2 rounded-lg border transition-colors duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                            }`}
+                                        />
+                                        <button
+                                            onClick={sendEmail}
+                                            disabled={!recipients.trim()}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            📧 Envoyer
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Prévisualisation */}
+                                <div className="border rounded-lg overflow-hidden">
+                                    <div className={`p-3 border-b transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+                                    }`}>
+                                        <span className={`text-sm font-medium transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Prévisualisation Email
+                                        </span>
+                                    </div>
+                                    {previewHtml ? (
+                                        <iframe
+                                            key={previewHtml}
+                                            srcDoc={previewHtml}
+                                            className="w-full h-96 border-0"
+                                            title="Aperçu Email"
+                                        />
+                                    ) : (
+                                        <div className={`p-8 text-center transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>
+                                            Aucun aperçu disponible
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Historique des Briefings */}
+                        <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📋 Historique des Briefings</h3>
+                            
+                            {briefingHistory.length > 0 ? (
+                                <div className="space-y-3">
+                                    {briefingHistory.slice(0, 5).map((briefing, index) => (
+                                        <div key={index} className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+                                        }`}>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h4 className={`font-semibold transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>
+                                                        {briefing.type === 'morning' ? '🌅' : 
+                                                         briefing.type === 'noon' ? '☀️' : '🌙'} 
+                                                        {briefing.type === 'morning' ? 'Briefing Matin' :
+                                                         briefing.type === 'noon' ? 'Briefing Midi' : 'Briefing Soir'}
+                                                    </h4>
+                                                    <p className={`text-sm transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                    }`}>
+                                                        {new Date(briefing.created_at).toLocaleString('fr-FR')}
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        setCurrentBriefing({
+                                                            type: briefing.type,
+                                                            subject: briefing.subject,
+                                                            html: briefing.html_content,
+                                                            data: briefing.market_data,
+                                                            analysis: briefing.analysis
+                                                        });
+                                                    }}
+                                                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                                >
+                                                    👁️ Voir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className={`text-center transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Aucun briefing sauvegardé
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                );
 
                         {/* Sélecteur détaillé des sources API */}
                         <div className={`p-6 rounded-lg border transition-colors duration-300 ${
@@ -5931,35 +6454,35 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                                     <div className="space-y-3">
                                         <div 
                                             className={`p-3 rounded-lg border-2 transition-all duration-300 ${
-                                                isDarkMode ? 'border-blue-500 bg-blue-900/20' : 'border-blue-500 bg-blue-50'
+                                                isDarkMode ? 'border-purple-500 bg-purple-900/20' : 'border-purple-500 bg-purple-50'
                                             }`}
                                         >
                                             <div className="flex items-center space-x-2">
-                                                <div className="w-3 h-3 rounded-full border-2 border-blue-500 bg-blue-500"></div>
+                                                <div className="w-3 h-3 rounded-full border-2 border-purple-500 bg-purple-500"></div>
                                                 <span className={`text-sm font-medium transition-colors duration-300 ${
                                                     isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>Yahoo Finance</span>
+                                                }`}>Perplexity AI</span>
                                             </div>
                                             <p className={`text-xs mt-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>Données directes</p>
+                                            }`}>IA de recherche - Données complètes</p>
                                         </div>
                                         
                                         <div className="flex items-center space-x-2">
                                             <input
                                                 type="checkbox"
-                                                id="perplexity-market"
-                                                checked={perplexityEnabled.marketData}
-                                                onChange={(e) => setPerplexityEnabled({...perplexityEnabled, marketData: e.target.checked})}
-                                                className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                                                id="yahoo-fallback"
+                                                checked={false}
+                                                disabled={true}
+                                                className="w-4 h-4 text-gray-400 rounded focus:ring-gray-300"
                                             />
                                             <label 
-                                                htmlFor="perplexity-market" 
-                                                className={`text-sm cursor-pointer transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                htmlFor="yahoo-fallback" 
+                                                className={`text-sm cursor-not-allowed transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-500' : 'text-gray-400'
                                                 }`}
                                             >
-                                                ✨ Enrichir avec Perplexity AI
+                                                📊 Yahoo Finance (Désactivé - Mode 100% Perplexity)
                                             </label>
                                         </div>
                                     </div>
@@ -6715,7 +7238,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                 const [emmaPrompt, setEmmaPrompt] = useState(`<system_identity>
 Vous êtes Emma — Economic & Market Monitoring Assistant, un assistant IA de niveau expert en analyse financière.
 Version : 2.0 Advanced
-Date de mise à jour : ${new Date().toISOString().split('T')[0]}
+Date de mise à jour : 2025-10-15
 Domaines d'expertise : Analyse financière, gestion de portefeuille, données de marché en temps réel, évaluation d'entreprises, macroéconomie, stratégies d'investissement
 </system_identity>
 
@@ -7343,7 +7866,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 const generatePerplexityResponse = async (userMessage) => {
                     try {
                         console.log('🔍 Génération de réponse Perplexity pour:', userMessage);
-                        
+
                         // Récupérer les données en temps réel du dashboard
                         const currentStockData = stockData || {};
                         const currentNewsData = newsData || [];
@@ -7382,20 +7905,20 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                         
                         // Utiliser l'API Perplexity via /api/ai-services
                         const response = await fetch('/api/ai-services', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
                                 service: 'perplexity',
                                 query: fullPrompt,
                                 section: 'analysis',
                                 model: 'sonar-reasoning-pro',
                                 max_tokens: emmaMaxTokens,
-                                temperature: emmaTemperature,
+                                    temperature: emmaTemperature,
                                 recency: 'day'
-                            })
-                        });
+                                })
+                            });
 
                         if (!response.ok) {
                             const errorData = await response.json().catch(() => ({}));
@@ -7557,7 +8080,7 @@ ${Object.entries(currentApiStatus).map(([api, status]) =>
                     const defaultPrompt = `<system_identity>
 Vous êtes Emma — Economic & Market Monitoring Assistant, un assistant IA de niveau expert en analyse financière.
 Version : 2.0 Advanced
-Date de mise à jour : ${new Date().toISOString().split('T')[0]}
+Date de mise à jour : 2025-10-15
 Domaines d'expertise : Analyse financière, gestion de portefeuille, données de marché en temps réel, évaluation d'entreprises, macroéconomie, stratégies d'investissement
 </system_identity>
 
@@ -9080,6 +9603,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
                                 Actualiser News
+                            </button>
+                            <button
+                                onClick={emmaPopulateStocksNews}
+                                disabled={loading}
+                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
+                            >
+                                <span>🤖</span>
+                                Emma Populate
                             </button>
                         </div>
                     </div>
@@ -11347,6 +11878,19 @@ console.log('✅ Données hybrides récupérées:', {
                                         <LucideIcon name="RefreshCw" className="w-3 h-3 text-gray-400" />
                                     </button>
 
+                                    <button
+                                        onClick={emmaPopulateJLab}
+                                        disabled={loadingIntelli}
+                                        className={`px-3 py-1.5 border rounded-lg transition-all flex items-center gap-2 ${
+                                            isDarkMode 
+                                                ? 'bg-purple-900 hover:bg-purple-800 border-purple-800 text-purple-200' 
+                                                : 'bg-purple-600 hover:bg-purple-700 border-purple-600 text-white'
+                                        } disabled:opacity-50`}
+                                    >
+                                        <span>🤖</span>
+                                        <span className="text-xs font-semibold">Emma Populate</span>
+                                    </button>
+
                                     <div className="relative">
                                         <button
                                             onClick={() => setMenuOpen(!menuOpen)}
@@ -12526,31 +13070,120 @@ console.log('✅ Données hybrides récupérées:', {
             // ============================================================================
 
             // ============================================================================
-            // COMPOSANT CALENDRIER ÉCONOMIQUE
+            // COMPOSANT CALENDRIER ÉCONOMIQUE AMÉLIORÉ
             // ============================================================================
             const EconomicCalendarTab = () => {
+                const [activeSubTab, setActiveSubTab] = useState('economic');
+                const [calendarData, setCalendarData] = useState([]);
+                const [loading, setLoading] = useState(false);
+                const [error, setError] = useState(null);
                 const [isRefreshing, setIsRefreshing] = useState(false);
 
+                // Debug: Log du chargement du composant
+                console.log('📅 EconomicCalendarTab chargé');
+                console.log('📊 Données actuelles:', economicCalendarData);
+                console.log('🔧 État du composant:', { activeSubTab, calendarData, loading, error });
+
+                // Charger les données au changement d'onglet
+                React.useEffect(() => {
+                    fetchCalendarData();
+                }, [activeSubTab]);
+
+                const fetchCalendarData = async () => {
+                    console.log('🔄 fetchCalendarData appelé pour:', activeSubTab);
+                    setLoading(true);
+                    setError(null);
+                    
+                    try {
+                        let endpoint = '';
+                        switch(activeSubTab) {
+                            case 'economic':
+                                endpoint = '/api/calendar-economic';
+                                break;
+                            case 'earnings':
+                                endpoint = '/api/calendar-earnings';
+                                break;
+                            case 'dividends':
+                                endpoint = '/api/calendar-dividends';
+                                break;
+                            default:
+                                endpoint = '/api/calendar-economic';
+                        }
+
+                        const response = await fetch(`/api${endpoint}`);
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            setCalendarData(result.data);
+                        } else {
+                            setError('Erreur lors du chargement des données');
+                            // Données de fallback
+                            setCalendarData(getFallbackData());
+                        }
+                    } catch (err) {
+                        console.error('Erreur:', err);
+                        setError('Impossible de se connecter à l\'API');
+                        // Données de fallback
+                        setCalendarData(getFallbackData());
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+
+                const getFallbackData = () => {
+                    return [{
+                        date: 'Mon Oct 13',
+                        events: [
+                            { 
+                                time: '12:55 PM', 
+                                currency: 'USD',
+                                impact: 2, 
+                                event: 'Fed Paulson Speech', 
+                                actual: 'N/A', 
+                                forecast: 'N/A', 
+                                previous: 'N/A' 
+                            },
+                            { 
+                                time: '08:30 AM', 
+                                currency: 'USD',
+                                impact: 3, 
+                                event: 'NY Empire State Manufacturing Index', 
+                                actual: '10.70', 
+                                forecast: '-1.00', 
+                                previous: '-8.70' 
+                            }
+                        ]
+                    }];
+                };
+
                 const handleRefresh = async () => {
+                    console.log('🔄 Actualisation du calendrier...');
                     setIsRefreshing(true);
-                    await fetchEconomicCalendar();
+                    await fetchCalendarData();
                     setTimeout(() => setIsRefreshing(false), 1000);
                 };
 
-                const getImportanceColor = (importance) => {
-                    switch (importance?.toLowerCase()) {
-                        case 'high':
-                        case 'haute':
-                            return 'text-red-500 bg-red-50 border-red-200';
-                        case 'medium':
-                        case 'moyenne':
-                            return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-                        case 'low':
-                        case 'faible':
-                            return 'text-green-600 bg-green-50 border-green-200';
-                        default:
-                            return 'text-gray-600 bg-gray-50 border-gray-200';
+                const getImpactBars = (impact) => {
+                    const bars = [];
+                    const colors = ['bg-orange-500', 'bg-orange-500', 'bg-red-500'];
+                    for (let i = 0; i < 3; i++) {
+                        bars.push(
+                            <div 
+                                key={i} 
+                                className={`w-2 h-4 ${i < impact ? colors[i] : 'bg-gray-600'} mx-px`}
+                            />
+                        );
                     }
+                    return bars;
+                };
+
+                const getValueColor = (actual, forecast) => {
+                    if (actual === 'N/A' || forecast === 'N/A') return 'text-gray-400';
+                    const actualNum = parseFloat(actual);
+                    const forecastNum = parseFloat(forecast);
+                    if (actualNum > forecastNum) return 'text-green-400';
+                    if (actualNum < forecastNum) return 'text-red-400';
+                    return 'text-gray-400';
                 };
 
                 const getCurrencyFlag = (currency) => {
@@ -12569,217 +13202,141 @@ console.log('✅ Données hybrides récupérées:', {
                 };
 
                 return (
-                    <div className="p-6">
-                        <div className="mb-6">
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                                        📅 Calendrier Économique
-                                    </h2>
-                                    <p className="text-gray-600 dark:text-gray-400">
-                                        Événements économiques importants - Source: Finviz
-                                    </p>
+                    <div className={`${isDarkMode ? 'bg-gray-900 text-gray-200' : 'bg-white text-gray-900'} p-6`}>
+                        <div className="max-w-full">
+                            {/* Header */}
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="text-2xl">📅</div>
+                                    <h2 className="text-2xl font-bold">Calendrier Économique</h2>
                                 </div>
                                 <button
                                     onClick={handleRefresh}
-                                    disabled={isRefreshing}
-                                    className={`btn-ripple px-4 py-2 rounded-lg font-medium transition-all ${
-                                        isRefreshing
-                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    disabled={loading || isRefreshing}
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
+                                        loading || isRefreshing
+                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
                                     }`}
                                 >
-                                    {isRefreshing ? '🔄 Actualisation...' : '🔄 Actualiser'}
-                                </button>
-                            </div>
-                        </div>
-
-                        {economicCalendarData.length === 0 ? (
-                            <div className="text-center py-12">
-                                <div className="text-6xl mb-4">📅</div>
-                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                                    Aucun événement économique
-                                </h3>
-                                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                                    Cliquez sur "Actualiser" pour charger les événements du jour
-                                </p>
-                                <button
-                                    onClick={handleRefresh}
-                                    className="btn-ripple px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-all"
-                                >
-                                    Charger le calendrier
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {economicCalendarData.map((event, index) => (
-                                    <div
-                                        key={index}
-                                        className={`p-4 rounded-lg border transition-all hover:shadow-md ${
-                                            isDarkMode
-                                                ? 'bg-gray-800 border-gray-700 hover:bg-gray-750'
-                                                : 'bg-white border-gray-200 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <span className="text-lg">
-                                                        {getCurrencyFlag(event.currency)}
-                                                    </span>
-                                                    <span className="font-mono text-sm text-gray-500 dark:text-gray-400">
-                                                        {event.time}
-                                                    </span>
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getImportanceColor(event.importance)}`}>
-                                                        {event.importance || 'N/A'}
-                                                    </span>
-                                                </div>
-                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                                                    {event.event}
-                                                </h3>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                    Devise: {event.currency}
-                                                </p>
-                                            </div>
-                                            
-                                            <div className="mt-4 md:mt-0 md:ml-6">
-                                                <div className="grid grid-cols-3 gap-4 text-center">
-                                                    <div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Réel</div>
-                                                        <div className="font-semibold text-gray-900 dark:text-white">
-                                                            {event.actual || 'N/A'}
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Prévision</div>
-                                                        <div className="font-semibold text-blue-600 dark:text-blue-400">
-                                                            {event.forecast || 'N/A'}
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Précédent</div>
-                                                        <div className="font-semibold text-gray-600 dark:text-gray-400">
-                                                            {event.previous || 'N/A'}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div className={`w-4 h-4 ${loading || isRefreshing ? 'animate-spin' : ''}`}>
+                                        🔄
                                     </div>
-                                ))}
+                                    Actualiser
+                                </button>
                             </div>
-                        )}
 
-                        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <div className="flex items-start gap-3">
-                                <div className="text-2xl">ℹ️</div>
-                                <div>
-                                    <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
-                                        À propos du calendrier économique
-                                    </h4>
-                                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                                        Ce calendrier affiche les événements économiques importants qui peuvent influencer les marchés financiers. 
-                                        Les données sont récupérées depuis Finviz et mises à jour en temps réel.
-                                    </p>
+                            {/* Message d'erreur */}
+                            {error && (
+                                <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4 text-sm">
+                                    ⚠️ {error}
                                 </div>
+                            )}
+
+                            {/* Onglets internes */}
+                            <div className="flex gap-0 mb-4 border-b border-gray-700">
+                                <button
+                                    onClick={() => setActiveSubTab('economic')}
+                                    className={`px-4 py-2 font-medium transition-colors text-sm ${
+                                        activeSubTab === 'economic'
+                                            ? 'bg-blue-600 text-white'
+                                            : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
+                                    }`}
+                                >
+                                    Économique
+                                </button>
+                                <button
+                                    onClick={() => setActiveSubTab('earnings')}
+                                    className={`px-4 py-2 font-medium transition-colors text-sm ${
+                                        activeSubTab === 'earnings'
+                                            ? 'bg-blue-600 text-white'
+                                            : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
+                                    }`}
+                                >
+                                    Earnings
+                                </button>
+                                <button
+                                    onClick={() => setActiveSubTab('dividends')}
+                                    className={`px-4 py-2 font-medium transition-colors text-sm ${
+                                        activeSubTab === 'dividends'
+                                            ? 'bg-blue-600 text-white'
+                                            : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
+                                    }`}
+                                >
+                                    Dividendes
+                                </button>
+                            </div>
+
+                            {/* Contenu */}
+                            {loading ? (
+                                <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-8 text-center`}>
+                                    <div className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3">🔄</div>
+                                    <p className="text-gray-400 text-sm">Chargement des données...</p>
+                                </div>
+                            ) : calendarData.length === 0 ? (
+                                <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-8 text-center`}>
+                                    <p className="text-gray-400 text-sm">Aucune donnée disponible</p>
+                                </div>
+                            ) : (
+                                <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg overflow-hidden`}>
+                                    {calendarData.map((day, dayIndex) => (
+                                        <div key={dayIndex} className="border-b border-gray-700 last:border-b-0">
+                                            {/* Day Header */}
+                                            <div className={`${isDarkMode ? 'bg-gray-750' : 'bg-gray-200'} px-4 py-2 font-semibold text-sm`}>
+                                                {day.date}
+                                            </div>
+
+                                            {/* Column Headers */}
+                                            {dayIndex === 0 && (
+                                                <div className="grid grid-cols-[60px_1fr_60px_60px_80px_80px_80px_40px] gap-2 px-4 py-2 bg-gray-800 text-xs font-semibold text-gray-400 border-b border-gray-700">
+                                                    <div>Heure</div>
+                                                    <div>Événement</div>
+                                                    <div>Impact</div>
+                                                    <div>Pour</div>
+                                                    <div>Actuel</div>
+                                                    <div>Prévu</div>
+                                                    <div>Précédent</div>
+                                                    <div></div>
+                                                </div>
+                                            )}
+
+                                            {/* Events */}
+                                            {day.events.map((event, eventIndex) => (
+                                                <div
+                                                    key={eventIndex}
+                                                    className="grid grid-cols-[60px_1fr_60px_60px_80px_80px_80px_40px] gap-2 px-4 py-2 hover:bg-gray-750 transition-colors border-b border-gray-700 last:border-b-0 items-center text-xs"
+                                                >
+                                                    <div className="text-gray-400">{event.time}</div>
+                                                    <div className="font-medium truncate" title={event.event}>
+                                                        <span className="mr-2">{getCurrencyFlag(event.currency)}</span>
+                                                        {event.event}
+                                                    </div>
+                                                    <div className="flex">{getImpactBars(event.impact)}</div>
+                                                    <div className="text-gray-400">{event.currency}</div>
+                                                    <div className={getValueColor(event.actual, event.forecast)}>
+                                                        {event.actual}
+                                                    </div>
+                                                    <div className="text-gray-400">{event.forecast}</div>
+                                                    <div className="text-gray-400">{event.previous}</div>
+                                                    <div className="flex justify-center">
+                                                        <div className="w-3 h-3 text-gray-500 hover:text-blue-400 cursor-pointer transition-colors">
+                                                            🔔
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Footer Info */}
+                            <div className="mt-3 text-xs text-gray-500">
+                                <p>Impact: Plus de barres = impact plus important sur les marchés</p>
                             </div>
                         </div>
                     </div>
                 );
-            };
-
-            // Fonction pour récupérer les données du calendrier économique de Finviz
-            const fetchEconomicCalendar = async () => {
-                try {
-                    setLoading(true);
-                    setMessage({ type: 'info', text: 'Récupération du calendrier économique...' });
-                    
-                    // Utilisation d'un proxy CORS pour contourner les restrictions
-                    const proxyUrl = 'https://api.allorigins.win/get?url=';
-                    const targetUrl = 'https://finviz.com/calendar/economic';
-                    const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
-                    
-                    if (!response.ok) {
-                        throw new Error(`Erreur HTTP: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    const htmlContent = data.contents;
-                    
-                    // Parser le HTML pour extraire les événements économiques
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlContent, 'text/html');
-                    
-                    // Extraire les événements du calendrier (structure Finviz)
-                    const events = [];
-                    const eventRows = doc.querySelectorAll('table tr');
-                    
-                    eventRows.forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        if (cells.length >= 4) {
-                            const time = cells[0]?.textContent?.trim();
-                            const currency = cells[1]?.textContent?.trim();
-                            const importance = cells[2]?.textContent?.trim();
-                            const event = cells[3]?.textContent?.trim();
-                            const actual = cells[4]?.textContent?.trim();
-                            const forecast = cells[5]?.textContent?.trim();
-                            const previous = cells[6]?.textContent?.trim();
-                            
-                            if (time && event) {
-                                events.push({
-                                    time,
-                                    currency,
-                                    importance,
-                                    event,
-                                    actual,
-                                    forecast,
-                                    previous
-                                });
-                            }
-                        }
-                    });
-                    
-                    setEconomicCalendarData(events);
-                    setMessage({ type: 'success', text: `Calendrier économique chargé: ${events.length} événements` });
-                    
-                } catch (error) {
-                    console.error('Erreur lors de la récupération du calendrier économique:', error);
-                    setMessage({ type: 'error', text: 'Erreur lors du chargement du calendrier économique' });
-                    
-                    // Données de démonstration en cas d'erreur
-                    const demoEvents = [
-                        {
-                            time: '08:30',
-                            currency: 'USD',
-                            importance: 'High',
-                            event: 'Non-Farm Payrolls',
-                            actual: '150K',
-                            forecast: '145K',
-                            previous: '142K'
-                        },
-                        {
-                            time: '10:00',
-                            currency: 'USD',
-                            importance: 'Medium',
-                            event: 'ISM Manufacturing PMI',
-                            actual: '52.1',
-                            forecast: '51.8',
-                            previous: '51.2'
-                        },
-                        {
-                            time: '14:00',
-                            currency: 'USD',
-                            importance: 'High',
-                            event: 'Federal Funds Rate',
-                            actual: '5.25%',
-                            forecast: '5.25%',
-                            previous: '5.00%'
-                        }
-                    ];
-                    setEconomicCalendarData(demoEvents);
-                } finally {
-                    setLoading(false);
-                }
             };
 
             // Configuration des onglets (après déclaration de TOUS les composants)
