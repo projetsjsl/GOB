@@ -316,7 +316,7 @@ if __name__ == '__main__':
     print("   - GET /api/calendar/earnings")
     print("   - GET /api/calendar/dividends")
     print("   - GET /api/health")
-    print("🌐 Serveur démarré sur http://0.0.0.0:5001")
+    print("🌐 Serveur démarré sur http://0.0.0.0:5002")
     
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5002, debug=True)
 

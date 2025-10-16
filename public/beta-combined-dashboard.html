@@ -12542,6 +12542,7 @@ console.log('✅ Données hybrides récupérées:', {
                 // Debug: Log du chargement du composant
                 console.log('📅 EconomicCalendarTab chargé');
                 console.log('📊 Données actuelles:', economicCalendarData);
+                console.log('🔧 État du composant:', { activeSubTab, calendarData, loading, error });
 
                 // Charger les données au changement d'onglet
                 React.useEffect(() => {
@@ -12549,6 +12550,7 @@ console.log('✅ Données hybrides récupérées:', {
                 }, [activeSubTab]);
 
                 const fetchCalendarData = async () => {
+                    console.log('🔄 fetchCalendarData appelé pour:', activeSubTab);
                     setLoading(true);
                     setError(null);
                     
@@ -12568,7 +12570,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 endpoint = '/api/calendar/economic';
                         }
 
-                        const response = await fetch(`http://localhost:5001${endpoint}`);
+                        const response = await fetch(`http://localhost:5002${endpoint}`);
                         const result = await response.json();
                         
                         if (result.success) {
