@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:57:23.240Z",
+  "lastUpdate": "2025-10-17T20:57:30.690Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -349,54 +349,66 @@
     "JPM": {},
     "LVMHF": {
       "ticker": "LVMHF",
-      "companyName": null,
-      "lastUpdate": "2025-10-17T20:28:46.284Z",
+      "companyName": "N/A",
+      "lastUpdate": "2025-10-17T20:57:25.000Z",
       "metrics": {
-        "marketCap": null,
-        "bpaGrowth": null,
-        "peRatio": null,
-        "sector": null,
-        "industry": null,
-        "dividendYield": null,
-        "dividendFrequency": null,
-        "exDivDate": null,
-        "annualPayout": null,
-        "price": null,
-        "priceChange": null
+        "marketCap": "N/A",
+        "bpaGrowth": "N/A",
+        "peRatio": "N/A",
+        "sector": "N/A",
+        "industry": "N/A",
+        "dividendYield": "N/A",
+        "dividendFrequency": "N/A",
+        "exDivDate": "N/A",
+        "annualPayout": "N/A",
+        "price": "N/A",
+        "priceChange": "N/A"
       },
       "companyProfile": {
-        "description": null,
-        "employees": null,
-        "innovation": null
+        "description": "N/A",
+        "employees": "N/A",
+        "innovation": "N/A"
       },
       "competition": {
-        "competitors": [],
-        "valueProposition": null,
-        "advantages": null
+        "competitors": [
+          "N/A",
+          "N/A",
+          "N/A"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
       },
       "quantRating": {
-        "overall": null,
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "overall": "N/A",
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
       "sectorAnalysis": {
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
-      "intermediateConclusion": null,
-      "strengths": [],
-      "concerns": [],
+      "intermediateConclusion": "N/A",
+      "strengths": [
+        "N/A",
+        "N/A",
+        "N/A"
+      ],
+      "concerns": [
+        "N/A",
+        "N/A",
+        "N/A"
+      ],
       "finalConclusion": {
-        "strengths": null,
-        "weaknesses": null,
-        "recommendation": null,
-        "rating": null
+        "strengths": "N/A",
+        "weaknesses": "N/A",
+        "recommendation": "N/A",
+        "rating": "N/A"
       }
     },
     "MG": {
