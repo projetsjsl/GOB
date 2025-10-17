@@ -6535,23 +6535,43 @@ ${basePrompt}
                         const selectedSections = selectEmailContent(intentData, smartData);
                         setStepDetails(`${selectedSections.length} sections sélectionnées pour l'email`);
 
-                        // ÉTAPE 3: Adaptive Email Generation
+                        // ÉTAPE 3: Adaptive Email Generation avec Emma Agent
                         setCurrentStep('ÉTAPE 3/4: Génération Adaptative');
-                        setStepDetails('Perplexity rédige le briefing avec le prompt adapté au contexte...');
+                        setStepDetails('Emma Agent génère le briefing en mode BRIEFING...');
                         addLogEntry('STEP_3', 'ÉTAPE 3: Adaptive Email Generation', {}, 'info');
-                        const adaptivePrompt = buildAdaptivePrompt(type, intentData, selectedSections);
 
-                        // Appel Perplexity avec prompt adaptatif
-                        const analysisResponse = await fetch('/api/ai-services', {
+                        // Construire le message pour Emma Agent
+                        const briefingMessage = `Génère un briefing ${type} détaillé (1800-2200 mots) sur la séance de marché.
+
+CONTEXTE:
+- Intent: ${intentData.intent}
+- Importance: ${intentData.importance_level}/10
+- Sujets clés: ${intentData.trending_topics?.join(', ') || 'N/A'}
+- Tickers: ${intentData.key_tickers?.join(', ') || teamTickers.join(', ')}
+
+DONNÉES COLLECTÉES:
+${JSON.stringify(smartData, null, 2)}
+
+SECTIONS PRIORITAIRES:
+${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}
+
+Rédige une analyse approfondie et professionnelle avec données chiffrées précises.`;
+
+                        // Appel Emma Agent en MODE BRIEFING
+                        const analysisResponse = await fetch('/api/emma-agent', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                service: 'perplexity',
-                                prompt: adaptivePrompt,
-                                section: 'cognitive-analysis',
-                                model: 'sonar-reasoning-pro',
-                                max_tokens: 3000,
-                                temperature: 0.2
+                                message: briefingMessage,
+                                context: {
+                                    output_mode: 'briefing',  // ← MODE BRIEFING
+                                    briefing_type: type,
+                                    intent_data: intentData,
+                                    smart_data: smartData,
+                                    tickers: intentData.key_tickers || teamTickers,
+                                    importance_level: intentData.importance_level,
+                                    trending_topics: intentData.trending_topics
+                                }
                             }),
                             signal: AbortSignal.timeout(120000)
                         });
@@ -6559,15 +6579,18 @@ ${basePrompt}
                         const analysisResult = await analysisResponse.json();
 
                         if (!analysisResult.success) {
-                            throw new Error('Perplexity analysis failed');
+                            throw new Error('Emma Agent briefing generation failed: ' + (analysisResult.error || 'Unknown error'));
                         }
 
-                        addLogEntry('PERPLEXITY_ANALYSIS', 'Analyse Perplexity complétée', {
-                            model: analysisResult.model,
-                            contentLength: analysisResult.content?.length || 0
+                        addLogEntry('EMMA_BRIEFING', 'Briefing Emma Agent généré', {
+                            mode: 'briefing',
+                            intent: analysisResult.intent,
+                            confidence: analysisResult.confidence,
+                            tools_used: analysisResult.tools_used?.length || 0,
+                            contentLength: analysisResult.response?.length || 0
                         }, 'success');
 
-                        setStepDetails(`Analyse complétée avec ${analysisResult.model} (${analysisResult.content?.length || 0} caractères)`);
+                        setStepDetails(`Briefing généré par Emma Agent (${analysisResult.response?.length || 0} caractères, ${analysisResult.tools_used?.length || 0} outils utilisés)`);
 
                         // ÉTAPE 4: Création HTML et Preview
                         setCurrentStep('ÉTAPE 4/4: Création du Preview');
@@ -6575,12 +6598,14 @@ ${basePrompt}
 
                         // Créer le HTML
                         let html = '';
-                        const analysis = analysisResult.content || 'Analyse non disponible';
+                        const analysis = analysisResult.response || 'Analyse non disponible';
                         const data = {
-                            source: 'emma-agent-cognitive',
+                            source: 'emma-agent-briefing-mode',
                             intentData,
                             smartData,
                             selectedSections,
+                            tools_used: analysisResult.tools_used || [],
+                            failed_tools: analysisResult.failed_tools || [],
                             timestamp: new Date().toISOString()
                         };
 
@@ -6607,7 +6632,10 @@ ${basePrompt}
                             smartData,
                             selectedSections,
                             timestamp: new Date().toISOString(),
-                            model: analysisResult.model || 'unknown',
+                            model: 'emma-agent-briefing-mode',
+                            tools_used: analysisResult.tools_used || [],
+                            failed_tools: analysisResult.failed_tools || [],
+                            unavailable_sources: analysisResult.unavailable_sources || [],
                             cognitive: true  // Flag pour distinguer des anciens briefings
                         };
 

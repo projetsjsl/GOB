@@ -816,8 +816,16 @@ RÉPONSE MARKDOWN:`;
     /**
      * Appel à l'API Perplexity
      */
-    async _call_perplexity(prompt) {
+    async _call_perplexity(prompt, outputMode = 'chat') {
         try {
+            // Ajuster max_tokens selon le mode
+            let maxTokens = 1000;  // Default pour chat
+            if (outputMode === 'briefing') {
+                maxTokens = 3000;  // Briefing détaillé: 1500-2000 mots nécessitent ~2500-3000 tokens
+            } else if (outputMode === 'data') {
+                maxTokens = 500;  // JSON structuré: court
+            }
+
             const response = await fetch('https://api.perplexity.ai/chat/completions', {
                 method: 'POST',
                 headers: {
@@ -836,8 +844,8 @@ RÉPONSE MARKDOWN:`;
                             content: prompt
                         }
                     ],
-                    max_tokens: 1000,
-                    temperature: 0.7
+                    max_tokens: maxTokens,
+                    temperature: outputMode === 'briefing' ? 0.5 : 0.7  // Plus déterministe pour briefings
                 })
             });
 

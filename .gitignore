@@ -68,3 +68,4 @@ debug_*.png
 *.tmp
 *.temp
 .vercel
+.env.vercel
