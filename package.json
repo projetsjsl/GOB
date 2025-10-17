@@ -9,7 +9,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "cron:edt": "bash scripts/change-cron-timezone.sh edt",
+    "cron:est": "bash scripts/change-cron-timezone.sh est"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",
