@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:58:25.408Z",
+  "lastUpdate": "2025-10-17T20:58:37.032Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -125,7 +125,7 @@
     "CNR": {
       "ticker": "CNR",
       "companyName": "Core Natural Resources, Inc.",
-      "lastUpdate": "2025-10-17T20:55:17.212Z",
+      "lastUpdate": "2025-10-17T20:58:28.347Z",
       "metrics": {
         "marketCap": "$4.78B",
         "bpaGrowth": "-21.64%",
@@ -136,24 +136,22 @@
         "dividendFrequency": "Quarterly",
         "exDivDate": "2025-08-29",
         "annualPayout": "$0.40",
-        "price": "$89.82",
-        "priceChange": "-3.30%"
+        "price": "N/A",
+        "priceChange": "N/A"
       },
       "companyProfile": {
-        "description": "Core Natural Resources, Inc., avec ses filiales, produit, vend et exporte du charbon métallurgique et thermique aux États-Unis et à l'international. Elle opère à travers deux segments, le Pennsylvania Mining Complex (PAMC) et le CONSOL Marine Terminal. Le segment PAMC est impliqué dans l'extraction minière, la préparation et la commercialisation de charbon bitumineux pour les producteurs d'électricité, les utilisateurs finaux industriels et les utilisateurs finaux métallurgiques. Le segment CONSOL Marine Terminal fournit des services de terminal d'exportation de charbon via le port de Baltimore.",
+        "description": "Core Natural Resources, Inc. (CNR) est un producteur et exportateur majeur de charbon métallurgique et thermique, opérant principalement aux États-Unis avec d'importantes capacités d'exportation. La société est issue d'une fusion entre Arch Resources et CONSOL Energy en janvier 2025, combinant leurs actifs de charbon de haute qualité et leur réseau logistique robuste. CNR opère à travers deux segments principaux : le Pennsylvania Mining Complex (PAMC) et le CONSOL Marine Terminal.",
         "employees": "2,076",
-        "innovation": "N/A"
+        "innovation": "La société se concentre sur des pratiques durables et l'innovation dans les produits dérivés du charbon."
       },
       "competition": {
         "competitors": [
-          "Peabody Energy Corporation",
-          "Warrior Met Coal, Inc.",
-          "Alpha Metallurgical Resources, Inc.",
-          "CNX Resources Corporation",
-          "Alliance Resource Partners, L.P. Common Units"
+          "Peabody Energy Corporation (BTU)",
+          "Warrior Met Coal, Inc. (HCC)",
+          "Alpha Metallurgical Resources, Inc. (AMR)"
         ],
-        "valueProposition": "N/A",
-        "advantages": "N/A"
+        "valueProposition": "CNR se différencie par son vaste réseau logistique et ses fortes capacités d'exportation, soutenues par des participations dans deux terminaux d'exportation maritime.",
+        "advantages": "Sa base de production à faible coût et sa capacité à passer des marchés nationaux aux marchés d'exportation lui confèrent un avantage concurrentiel, lui permettant de faire face efficacement aux fluctuations du marché."
       },
       "quantRating": {
         "overall": "SELL",
@@ -164,28 +162,28 @@
         "revisions": "F"
       },
       "sectorAnalysis": {
-        "valuation": "N/A",
-        "growth": "N/A",
-        "profitability": "N/A",
+        "valuation": "CNR est confrontée à un paysage de valorisation difficile. Son ratio P/E est de 192, nettement supérieur à la médiane du secteur de 14, ce qui indique que l'action est extrêmement chère. De plus, le ratio Prix/Flux de trésorerie est de 13, contre 5 pour le secteur, ce qui suggère une surévaluation.",
+        "growth": "Bien que la croissance des revenus de CNR soit forte à 47 %, dépassant largement les 1 % du secteur, d'autres indicateurs de croissance sont préoccupants. La croissance du BPA est notamment négative à -96 %, ce qui reflète de graves difficultés en matière d'expansion des bénéfices.",
+        "profitability": "CNR a du mal",
         "momentum": "N/A",
         "revisions": "N/A"
       },
-      "intermediateConclusion": "CNR présente une note globale de vente (SELL) selon l'évaluation quantitative de Seeking Alpha. Les notes factorielles montrent des faiblesses en valorisation et révisions, mais un momentum relativement fort.",
+      "intermediateConclusion": "La performance financière de CNR présente des défis importants en matière de valorisation, de croissance, de rentabilité, de momentum et de révisions des bénéfices, ce qui conduit à des perspectives pessimistes. La société se différencie par son vaste réseau logistique et ses fortes capacités d'exportation.",
       "strengths": [
-        "Forte croissance des revenus (mentionnée dans les analyses)",
-        "Plan de rachat d'actions (mentionné dans les analyses)",
-        "Dividende versé trimestriellement"
+        "Vaste réseau logistique",
+        "Fortes capacités d'exportation",
+        "Base de production à faible coût"
       ],
       "concerns": [
-        "Marges faibles (mentionnées dans les analyses)",
-        "Risque élevé de mauvaise performance (alerte Seeking Alpha)",
-        "Note de valorisation F"
+        "Valorisation élevée",
+        "Croissance du BPA négative",
+        "Difficultés en matière de rentabilité"
       ],
       "finalConclusion": {
-        "strengths": "CNR démontre une forte croissance des revenus et un plan de rachat d'actions attractif pour les actionnaires.",
-        "weaknesses": "Cependant, les marges faibles et une valorisation médiocre soulèvent des inquiétudes quant à la rentabilité et à la durabilité à long terme.",
-        "recommendation": "Compte tenu des signaux mitigés, une position neutre (Hold) semble appropriée. Il est crucial de surveiller l'évolution des marges et les révisions des analystes.",
-        "rating": "Hold"
+        "strengths": "CNR possède un vaste réseau logistique et de fortes capacités d'exportation, ainsi qu'une base de production à faible coût.",
+        "weaknesses": "La société est confrontée à une valorisation élevée, une croissance du BPA négative et des difficultés en matière de rentabilité.",
+        "recommendation": "Compte tenu des défis importants en matière de valorisation, de croissance et de rentabilité, une recommandation de vente semble appropriée. Les investisseurs devraient faire preuve de prudence à l'égard de CNR.",
+        "rating": "Sell"
       }
     },
     "CSCO": {
