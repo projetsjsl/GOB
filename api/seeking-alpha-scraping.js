@@ -38,30 +38,73 @@ export default async function handler(req, res) {
 
       if (type === 'raw') {
         // Fetch raw scraped data from EXISTING table: seeking_alpha_data
-        let query = supabase
-          .from('seeking_alpha_data')
-          .select('*')
-          .order('scraped_at', { ascending: false });
+        if (latest === 'true') {
+          // Get only the latest scrape per ticker (deduplicate)
+          let query = supabase
+            .from('seeking_alpha_data')
+            .select('*')
+            .order('scraped_at', { ascending: false });
 
-        if (ticker) {
-          query = query.eq('ticker', ticker.toUpperCase());
+          const { data: allData, error: fetchError } = await query;
+
+          if (fetchError) {
+            throw new Error(`Supabase error: ${fetchError.message}`);
+          }
+
+          // Deduplicate: keep only latest per ticker
+          const latestByTicker = {};
+          allData.forEach(item => {
+            if (!latestByTicker[item.ticker] ||
+                new Date(item.scraped_at) > new Date(latestByTicker[item.ticker].scraped_at)) {
+              latestByTicker[item.ticker] = item;
+            }
+          });
+
+          let data = Object.values(latestByTicker);
+
+          // Apply ticker filter if provided
+          if (ticker) {
+            data = data.filter(item => item.ticker === ticker.toUpperCase());
+          }
+
+          // Apply limit
+          data = data.slice(0, parseInt(limit));
+
+          return res.status(200).json({
+            success: true,
+            type: 'raw',
+            filter: 'latest',
+            data,
+            count: data.length,
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          // Fetch all raw data (with duplicates)
+          let query = supabase
+            .from('seeking_alpha_data')
+            .select('*')
+            .order('scraped_at', { ascending: false });
+
+          if (ticker) {
+            query = query.eq('ticker', ticker.toUpperCase());
+          }
+
+          query = query.limit(parseInt(limit));
+
+          const { data, error } = await query;
+
+          if (error) {
+            throw new Error(`Supabase error: ${error.message}`);
+          }
+
+          return res.status(200).json({
+            success: true,
+            type: 'raw',
+            data,
+            count: data.length,
+            timestamp: new Date().toISOString()
+          });
         }
-
-        query = query.limit(parseInt(limit));
-
-        const { data, error } = await query;
-
-        if (error) {
-          throw new Error(`Supabase error: ${error.message}`);
-        }
-
-        return res.status(200).json({
-          success: true,
-          type: 'raw',
-          data,
-          count: data.length,
-          timestamp: new Date().toISOString()
-        });
       }
 
       if (type === 'analysis') {
