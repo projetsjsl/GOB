@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:58:37.032Z",
+  "lastUpdate": "2025-10-17T20:58:46.758Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -59,7 +59,7 @@
     "BCE": {
       "ticker": "BCE",
       "companyName": "BCE Inc.",
-      "lastUpdate": "2025-10-17T20:38:00.000Z",
+      "lastUpdate": "2025-10-17T20:58:38.966Z",
       "metrics": {
         "marketCap": "$22.08B",
         "bpaGrowth": "-6.95%",
@@ -74,17 +74,17 @@
         "priceChange": "+2.41%"
       },
       "companyProfile": {
-        "description": "BCE Inc. est une entreprise de communication qui fournit des services sans fil, filaires, internet, de diffusion en continu et de télévision à des clients résidentiels, commerciaux et de gros au Canada. Elle opère à travers deux segments : Bell Communication and Technology Services et Bell Media. La société a été fondée en 1880 et son siège social est situé à Verdun, Canada.",
+        "description": "BCE Inc. est une entreprise de communication qui fournit des services sans fil, filaires, internet, de diffusion en continu et de télévision aux clients résidentiels, commerciaux et de gros au Canada. Elle opère dans deux segments : Bell Communication and Technology Services et Bell Media. L'entreprise a été fondée en 1880 et son siège social est situé à Verdun, Canada.",
         "employees": "40,390",
         "innovation": "N/A"
       },
       "competition": {
         "competitors": [
-          "TELUS Corporation",
-          "The Bank of Nova Scotia",
-          "The Toronto-Dominion Bank",
-          "Rogers Communications Inc.",
-          "TC Energy Corporation"
+          "TU",
+          "BNS",
+          "TD",
+          "RCI",
+          "TRP"
         ],
         "valueProposition": "N/A",
         "advantages": "N/A"
@@ -104,21 +104,21 @@
         "momentum": "N/A",
         "revisions": "N/A"
       },
-      "intermediateConclusion": "BCE Inc. est une entreprise de télécommunications établie avec une capitalisation boursière importante et un rendement de dividende attractif. Cependant, sa note de croissance est faible et son ratio de distribution est élevé, ce qui pourrait susciter des inquiétudes quant à la durabilité du dividende.",
+      "intermediateConclusion": "BCE Inc. est une entreprise de télécommunications intégrée avec une capitalisation boursière de 22,08 milliards de dollars. Elle offre un rendement de dividende de 5,26 %, mais fait face à des défis de croissance, comme en témoigne sa note F en croissance.",
       "strengths": [
         "Forte rentabilité (note A)",
-        "Rendement du dividende élevé (5.26%)",
+        "Rendement du dividende attractif",
         "Note de cohérence du dividende élevée (A-)"
       ],
       "concerns": [
         "Faible croissance (note F)",
-        "Ratio de distribution élevé (114.22%)",
-        "Endettement élevé (Total Debt / Equity (MRQ): 204.38%)"
+        "Note de révision des bénéfices faible (C)",
+        "Ratio de distribution élevé (114.22%)"
       ],
       "finalConclusion": {
-        "strengths": "BCE présente une forte rentabilité et un rendement de dividende élevé, ce qui en fait une option attrayante pour les investisseurs axés sur le revenu.",
+        "strengths": "BCE présente une forte rentabilité et un rendement de dividende attractif, ce qui en fait une option potentielle pour les investisseurs axés sur le revenu.",
         "weaknesses": "Cependant, la faible croissance et le ratio de distribution élevé soulèvent des inquiétudes quant à la durabilité du dividende à long terme.",
-        "recommendation": "Compte tenu des forces et des faiblesses, une position de maintien (HOLD) pourrait être appropriée pour les investisseurs existants. Les nouveaux investisseurs devraient examiner attentivement les perspectives de croissance et la durabilité du dividende avant d'investir.",
+        "recommendation": "Compte tenu des forces et des faiblesses mitigées, une position neutre (Hold) semble appropriée. Les investisseurs devraient surveiller de près les efforts de l'entreprise pour améliorer sa croissance et gérer son ratio de distribution.",
         "rating": "Hold"
       }
     },
