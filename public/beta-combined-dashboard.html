@@ -2017,18 +2017,42 @@ const fetchHybridData = async (symbol, dataType) => {
 
                 try {
                     // Préparer le prompt pour Gemini (formateur de données UNIQUEMENT)
-                    const geminiPrompt = `Tu es un extracteur de données financières. Analyse UNIQUEMENT les données Seeking Alpha ci-dessous pour ${ticker}.
+                    const fullText = typeof scrapedData === 'string' ? scrapedData :
+                                   (scrapedData.fullText || JSON.stringify(scrapedData));
 
-DONNÉES SEEKING ALPHA (${ticker}):
-${typeof scrapedData === 'string' ? scrapedData.substring(0, 3000) : JSON.stringify(scrapedData).substring(0, 3000)}
+                    // Utiliser jusqu'à 15000 caractères pour avoir plus de contexte
+                    const textForAnalysis = fullText.substring(0, 15000);
 
-INSTRUCTIONS - EXTRACTION ET FORMATAGE UNIQUEMENT:
-1. PARSER les données Seeking Alpha fournies ci-dessus
-2. EXTRAIRE toutes les métriques, ratings, et informations disponibles
-3. NE PAS rechercher d'informations supplémentaires sur le web
-4. NE PAS ajouter de données externes
-5. FORMATER les données extraites selon la structure JSON ci-dessous
-6. RETOURNER UNIQUEMENT du JSON valide (pas de markdown, pas de commentaires)
+                    const geminiPrompt = `Tu es un extracteur expert de données Seeking Alpha Virtual Analyst Report. Extrais TOUTES les informations disponibles pour ${ticker}.
+
+DONNEES SEEKING ALPHA (${ticker}) - ${textForAnalysis.length} caracteres:
+${textForAnalysis}
+
+STRUCTURE DE LA PAGE SEEKING ALPHA:
+Une page Virtual Analyst Report contient typiquement:
+- En-tete: Nom compagnie, ticker, prix, variation, capitalisation boursiere
+- Section Key Metrics: Metriques fondamentales (P/E, croissance BPA, dividende)
+- Section Quant Ratings: Notes A-F pour Valuation, Growth, Profitability, Momentum, Revisions
+- Section Sector Analysis: Comparaison avec le secteur
+- Section Company Profile: Description, industrie, employes
+- Section Investment Thesis ou Analysis: Forces, faiblesses, recommandations
+- Section Competitors ou Peer Comparison: Entreprises concurrentes
+
+INSTRUCTIONS D EXTRACTION:
+1. LIRE ATTENTIVEMENT toutes les donnees ci-dessus
+2. EXTRAIRE chaque metrique, note, et information presente
+3. Si une donnee n est PAS dans le texte: utiliser "N/A" (ne jamais laisser vide ou null)
+4. RESPECTER les formats: garder $ et % dans les valeurs, dates en YYYY-MM-DD
+5. TRADUIRE les descriptions en francais (mais garder les notes A-F en anglais)
+6. RETOURNER UNIQUEMENT du JSON valide sans markdown sans commentaires
+
+EXEMPLES D EXTRACTION:
+- Si tu vois "Market Cap: $95.62B" alors "marketCap": "$95.62B"
+- Si tu vois "P/E Ratio: 11.84" alors "peRatio": "11.84"
+- Si tu vois "Dividend Yield: 3.53%" alors "dividendYield": "3.53%"
+- Si tu vois "Quant Rating: A-" alors "overall": "A-"
+- Si tu vois "Valuation: B+" alors "valuation": "B+"
+- Si une donnee est absente utiliser "N/A"
 
 STRUCTURE JSON OBLIGATOIRE:
 {
