@@ -3,8 +3,6 @@
  * Endpoint: /api/calendar-economic
  */
 
-import { NextResponse } from 'next/server';
-
 export default async function handler(req, res) {
     // Configuration CORS pour Vercel
     res.setHeader('Access-Control-Allow-Origin', '*');
