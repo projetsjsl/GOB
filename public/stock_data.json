@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:27:28.118Z",
+  "lastUpdate": "2025-10-17T20:27:42.348Z",
   "stocks": {
     "GOOGL": {
       "ticker": "GOOGL",
@@ -1026,58 +1026,53 @@
     "NTR": {
       "ticker": "NTR",
       "companyName": "Nutrien Ltd.",
-      "lastUpdate": "2025-10-09T16:48:56.289Z",
+      "lastUpdate": "2025-10-17T20:27:29.607Z",
       "metrics": {
-        "marketCap": "En attente d'analyse",
-        "bpaGrowth": "En attente d'analyse",
-        "peRatio": "En attente d'analyse",
-        "sector": "Materials - Fertilizers",
-        "dividendYield": "En attente d'analyse",
-        "dividendFrequency": "Quarterly",
-        "exDivDate": "En attente d'analyse",
-        "annualPayout": "En attente d'analyse",
-        "price": "En attente d'analyse",
-        "priceChange": "En attente d'analyse"
+        "marketCap": null,
+        "bpaGrowth": null,
+        "peRatio": null,
+        "sector": "Basic Materials",
+        "industry": null,
+        "dividendYield": null,
+        "dividendFrequency": null,
+        "exDivDate": null,
+        "annualPayout": null,
+        "price": 57.42,
+        "priceChange": 1.77
       },
       "companyProfile": {
-        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
-        "employees": "En attente d'analyse",
-        "innovation": "En attente d'analyse"
+        "description": "Nutrien Ltd. est un leader mondial dans la production et la distribution de nutriments pour cultures agricoles. L'entreprise fournit des solutions intégrées pour optimiser les rendements et la durabilité agricole. Son vaste réseau couvre la chaîne d'approvisionnement, des intrants à la distribution. Nutrien s'engage à l'innovation et à la croissance durable dans le secteur des matériaux de base.",
+        "employees": null,
+        "innovation": null
       },
       "competition": {
-        "competitors": [
-          "Mosaic",
-          "CF Industries"
-        ],
-        "valueProposition": "En attente d'analyse",
-        "advantages": "En attente d'analyse"
+        "competitors": [],
+        "valueProposition": null,
+        "advantages": null
       },
       "quantRating": {
-        "valuation": "N/A",
-        "growth": "N/A",
-        "profitability": "N/A",
-        "momentum": "N/A",
-        "revisions": "N/A"
+        "overall": null,
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
       },
       "sectorAnalysis": {
-        "valuation": "En attente d'analyse",
-        "growth": "En attente d'analyse",
-        "profitability": "En attente d'analyse",
-        "momentum": "En attente d'analyse",
-        "revisions": "En attente d'analyse"
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
       },
-      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
-      "strengths": [
-        "Données en cours de traitement"
-      ],
-      "concerns": [
-        "Analyse en attente"
-      ],
+      "intermediateConclusion": null,
+      "strengths": [],
+      "concerns": [],
       "finalConclusion": {
-        "strengths": "En attente d'analyse",
-        "weaknesses": "En attente d'analyse",
-        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
-        "rating": "Pending"
+        "strengths": null,
+        "weaknesses": null,
+        "recommendation": null,
+        "rating": null
       }
     },
     "PFE": {},
