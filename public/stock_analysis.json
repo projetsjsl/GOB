@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-10-17T20:31:51.137Z",
+  "last_update": "2025-10-17T20:32:02.242Z",
   "stocks": [
     {
       "ticker": "GOOGL",
@@ -156,9 +156,15 @@
       "timestamp": "2025-10-17T20:29:48.781Z",
       "raw_text": "🤖 GOB Auto-Scraper: Scraping WFC... En cours\nSkip to content\nHome page Seeking Alpha - Power to Investors\nHome\nAnalysis\nNews\nMarket Data\nINVESTING GROUPS\nExplore Investing Groups\nAlpha Picks\n1\nPORTFOLIOS\nPortfolio 1\n0.57%\nCreate Portfolio\n+\nSAVED SCREENS\nCreate Screen\n+\nFIND & COMPARE\nTop Stocks\nTop ETFs\nStock Screener\nETF Screener\nComparisons\nUpgrade To PRO\nExplore Alpha Picks\nSearch field\nEntering text into the input field will update the search result below\nEntering text into the input field will update the search result below\nGIVE A FEEDBACK\nNOTIFICATIONS\n\nBuild a data-driven portfolio for capital appreciation. Start now »\n\nLearn More\nWFC  Wells Fargo & Company\nAnalyze With AI\nsymbol alerts\nFollow\n275.56K followers\n$83.28\n-0.72 (-0.86%)\n4:00 PM 10/17/25\nNYSE | $USD | Post-Market: $83.28 4:12 PM\nSummary\nRatings\nFinancials\nEarnings\nDividends\nValuation\nGrowth\nProfitability\nMomentum\nPeers\nOptions\nCharting\nSeeking Alpha - Power to Investors\nPower to Investors\nFOLLOW US\n\nDOWNLOAD APP\n\nACCOUNT\nAccount Settings\nManage My Portfolio\nPrivacy\nCreate Portfolio\nAlert Preferences\nSUBSCRIPTIONS\nPremium & Pro\nGroup Subscriptions\nAlpha Picks\nAbout Alpha Picks\nFREE Newsletters\nINVESTING GROUPS\nLearn About Investing Groups\nMost Popular\nFree Trials\nTop Rated\nDividend Investing\nValue Investing\nOptions Trading\nGrowth Stocks\nBiotech Investing\nTech Stocks\nQuantitative Investing\nLEARN\nInvesting Resources\nInvesting Education\nInvesting Strategies\nRetirement Investing\nStock Market Sectors\nStock Market Holidays & Hours\nAfter Hours Trading\nPortfolio Management\nCryptocurrency\nDividend Investing\nPortfolio Strategy\nFixed Income\nRetirement\nIPO's\nPodcasts\nVideo Hub\nEvents\nEditors' Picks\nSTOCK ANALYSIS\nStock Ideas\nLong Ideas\nStock Upgrades & Downgrades\nEditors' Picks\nQuick Picks & Lists\nEmerging Markets\nSTOCK SCREENER\nStocks by Quant\nTop Stocks\nTop Quant Dividend Stocks\nHigh Dividend Yield Stocks\nTop Dividend Stocks\nETFS & FUNDS\nETF Screener\nETF Analysis\nETF Guide\nMutual Funds\nClosed End Funds\nEditors' Picks\nDIVIDENDS\nDividend Stock News\nREITs\nDividend Ideas\nDividend Strategy\nDividend Quick Picks\nEditors' Picks\nANALYSIS BY SECTOR\nEnergy\nCommunication Services\nReal Estate\nConsumer Staples\nTech\nBasic Materials\nHealthcare\nConsumer\nUtilities\nFinancials\nIndustrials\nSTOCK COMPARISON TOOLS\nFAANG Stocks\nGold ETFs\nCash Equivalents\nBig Bank Stocks\nBig Pharma Stocks\nRetail Stocks\nTOP INDEXES\nDow Jones\nS&P 500\nNasdaq\nGold\nBitcoin\nMARKET OUTLOOK\nToday's Market\nUS Economy\nGold & Precious Metals\nCommodities\nForex\nEditors' Picks\nCryptocurrency\nMARKET DATA\nBond ETFs\nCommodity ETFs\nCountry ETFs\nCurrency ETFs\nDividend ETFs\nEmerging Market ETFs\nGlobal and Regional ETFs\nGrowth vs. Value ETFs\nMarket Cap ETFs\nReal Estate ETFs\nSector ETFs\nETF Strategies\nSmart Beta\nThemes & Subsectors ETFs\nCryptocurrency\nMARKET NEWS\nTop News\nTrending News\nOn the Move\nMarket Pulse\nGlobal Markets\nNotable Calls\nBuybacks\nCommodities\nCryptocurrency\nDebt/Share Issuance\nDividends - Stocks\nDividends - Funds\nGuidance\nIPOs\nSPACs\nBudget & Regulation\nJobs & Employment\nPolitics\nM&A\nUS Economy\nWall Street Breakfast\nNEWS BY SECTOR\nConsumer\nEnergy\nFinancials\nHealthcare\nTech\nEARNINGS\nEarnings Calendar\nEarnings News\nEarnings Analysis\nEarnings Calls Transcripts\nSubscription Support: 1-347-509-6837\nContact Us\nAbout Us\nGroup Subscriptions\nAffiliate Program\nCareers\nSitemap\nRSS Feed\nTerms Of Use\nPrivacy\nMarket Data Sources\n© 2025 Seeking Alpha",
       "url": "https://seekingalpha.com/symbol/WFC/virtual_analyst_report"
+    },
+    {
+      "ticker": "CVS-TEST",
+      "timestamp": "2025-10-17T20:32:02.024Z",
+      "raw_text": "CVS Health Corporation test data - Virtual Analyst Report from Seeking Alpha...",
+      "url": "https://seekingalpha.com/symbol/CVS/virtual_analyst_report"
     }
   ],
-  "total_stocks": 26,
-  "successful": 26,
+  "total_stocks": 27,
+  "successful": 27,
   "failed": 0
 }
