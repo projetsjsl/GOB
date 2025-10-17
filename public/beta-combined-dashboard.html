@@ -8498,10 +8498,10 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                 // Flag pour éviter les sauvegardes pendant l'initialisation
                 const isInitializingRef = useRef(true);
 
-                // Charger les messages depuis localStorage au démarrage
+                // Charger les messages depuis sessionStorage au démarrage (reset à chaque nouvelle session)
                 const [emmaMessages, setEmmaMessages] = useState(() => {
                     try {
-                        const saved = localStorage.getItem('emma-chat-history');
+                        const saved = sessionStorage.getItem('emma-chat-history');
                         return saved ? JSON.parse(saved) : [];
                     } catch (error) {
                         console.error('Erreur chargement historique Emma:', error);
@@ -8982,8 +8982,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 const initializeEmma = async () => {
                     try {
                         // L'historique est déjà chargé dans useState via la fonction d'initialisation
-                        // Vérifier DANS localStorage car emmaMessages pourrait être périmé ici
-                        const savedHistory = localStorage.getItem('emma-chat-history');
+                        // Vérifier DANS sessionStorage car emmaMessages pourrait être périmé ici
+                        const savedHistory = sessionStorage.getItem('emma-chat-history');
                         const hasHistory = savedHistory && JSON.parse(savedHistory).length > 0;
 
                         if (!hasHistory) {
@@ -9279,8 +9279,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         timestamp: new Date().toISOString()
                     }];
                     setEmmaMessages(resetMessages);
-                    localStorage.removeItem('emma-chat-history');
-                    console.log('🗑️ Historique Emma vidé (mémoire + localStorage)');
+                    sessionStorage.removeItem('emma-chat-history');
+                    console.log('🗑️ Historique Emma vidé (mémoire + sessionStorage)');
                 };
 
                 // Fonction d'auto-scroll vers le bas du chat avec animation fluide
@@ -9314,7 +9314,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                     try {
                         if (emmaMessages.length > 0) {
-                            localStorage.setItem('emma-chat-history', JSON.stringify(emmaMessages));
+                            sessionStorage.setItem('emma-chat-history', JSON.stringify(emmaMessages));
                             console.log('💾 Historique Emma sauvegardé:', emmaMessages.length, 'messages');
                         }
                     } catch (error) {
