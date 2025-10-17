@@ -8294,7 +8294,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
             // Composant onglet Ask Emma avec intégration Gemini
             // Isolé avec React.memo pour éviter les re-renders causés par les mises à jour de marché
-            const AskEmmaTab = React.memo(({ prefillMessage, setPrefillMessage }) => {
+            const AskEmmaTab = React.memo(({ prefillMessage = '', setPrefillMessage = () => {} }) => {
                 // État pour l'animation de chargement de l'historique
                 const [historyLoading, setHistoryLoading] = useState(true);
 
@@ -8775,12 +8775,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 // Handle prefill message from other tabs
                 React.useEffect(() => {
-                    if (prefillMessage && prefillMessage.trim()) {
+                    if (prefillMessage && prefillMessage.trim() && typeof setPrefillMessage === 'function') {
                         console.log('📝 Prefill message received:', prefillMessage);
                         setEmmaInput(prefillMessage);
                         setPrefillMessage(''); // Clear the prefill message after using it
                     }
-                }, [prefillMessage]);
+                }, [prefillMessage, setPrefillMessage]);
 
                 const initializeEmma = async () => {
                     try {
