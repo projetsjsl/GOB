@@ -1878,7 +1878,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                 
                                 // Analyser avec Claude et mettre à jour les fichiers
                                 try {
-                                    await analyzeWithClaudeAndUpdate(ticker, event.data.data);
+                                    await analyzeWithPerplexityAndUpdate(ticker, event.data.data);
                                     addScrapingLog(`🎉 Traitement complet terminé pour ${ticker}`, 'success');
                                 } catch (claudeError) {
                                     addScrapingLog(`⚠️ Erreur analyse Claude pour ${ticker}: ${claudeError.message}`, 'warning');
@@ -2097,101 +2097,125 @@ const fetchHybridData = async (symbol, dataType) => {
             };
 
             // Fonction pour analyser les données avec Claude et mettre à jour les fichiers
-            const analyzeWithClaudeAndUpdate = async (ticker, scrapedData) => {
-                addScrapingLog(`🤖 Analyse avec Claude pour ${ticker}...`, 'info');
-                
+            const analyzeWithPerplexityAndUpdate = async (ticker, scrapedData) => {
+                addScrapingLog(`🌐 Analyse avec Perplexity AI pour ${ticker}...`, 'info');
+
                 try {
-                    // Préparer les données pour Claude
-                    const claudePrompt = `
-Analysez les données suivantes de Seeking Alpha pour ${ticker} et générez une analyse complète au format JSON.
+                    // Préparer le prompt pour Perplexity (avec recherche web en temps réel!)
+                    const perplexityPrompt = `Analyse ${ticker} en utilisant les données Seeking Alpha ci-dessous ET recherche web en temps réel pour informations récentes.
 
-Données extraites:
-${JSON.stringify(scrapedData, null, 2)}
+DONNÉES SEEKING ALPHA (${ticker}):
+${typeof scrapedData === 'string' ? scrapedData.substring(0, 3000) : JSON.stringify(scrapedData).substring(0, 3000)}
 
-Générez une réponse JSON avec cette structure exacte:
+INSTRUCTIONS - RETOURNER JSON STRICT:
+1. Extraire les métriques clés des données Seeking Alpha
+2. RECHERCHER en temps réel: actualités récentes, résultats financiers, recommandations d'analystes
+3. Combiner les deux sources pour une analyse complète et à jour
+4. RETOURNER UNIQUEMENT du JSON valide (pas de markdown, pas de texte)
+
+STRUCTURE JSON OBLIGATOIRE:
 {
   "ticker": "${ticker}",
-  "companyName": "Nom de l'entreprise",
+  "companyName": "Nom complet de l'entreprise",
   "lastUpdate": "${new Date().toISOString()}",
   "metrics": {
-    "marketCap": "Capitalisation boursière",
-    "bpaGrowth": "Croissance BPA",
-    "peRatio": "Ratio P/E",
+    "marketCap": "Capitalisation (ex: $95.62B)",
+    "bpaGrowth": "Croissance BPA % (ex: -6.45%)",
+    "peRatio": "P/E ratio (ex: 11.84)",
     "sector": "Secteur",
-    "dividendYield": "Rendement dividende",
-    "dividendFrequency": "Fréquence dividende",
-    "exDivDate": "Date ex-dividende",
-    "annualPayout": "Paiement annuel",
-    "price": "Prix actuel",
-    "priceChange": "Changement de prix"
+    "industry": "Industrie spécifique",
+    "dividendYield": "Rendement % (ex: 3.53%)",
+    "dividendFrequency": "Quarterly/Annual/etc",
+    "exDivDate": "Date ex-dividende YYYY-MM-DD",
+    "annualPayout": "Paiement annuel $ (ex: 2.66)",
+    "price": "Prix actuel $ (ex: 76.87)",
+    "priceChange": "Variation % (ex: +1.96%)"
   },
   "companyProfile": {
-    "description": "Description de l'entreprise en français",
-    "employees": "Nombre d'employés si disponible",
-    "innovation": "Innovations et investissements clés"
+    "description": "Description en français (3-4 phrases)",
+    "employees": "Nombre d'employés si dispo",
+    "innovation": "Investissements clés récents"
   },
   "competition": {
-    "competitors": ["Concurrent 1", "Concurrent 2"],
+    "competitors": ["Concurrent 1", "Concurrent 2", "Concurrent 3"],
     "valueProposition": "Proposition de valeur unique",
-    "advantages": "Avantages concurrentiels"
+    "advantages": "Avantages compétitifs"
   },
   "quantRating": {
-    "valuation": "Grade A-F",
-    "growth": "Grade A-F", 
-    "profitability": "Grade A-F",
-    "momentum": "Grade A-F",
-    "revisions": "Grade A-F"
+    "overall": "Note globale A-F",
+    "valuation": "Note valorisation A-F",
+    "growth": "Note croissance A-F",
+    "profitability": "Note rentabilité A-F",
+    "momentum": "Note momentum A-F",
+    "revisions": "Note révisions analystes A-F"
   },
   "sectorAnalysis": {
-    "valuation": "Analyse de valorisation",
-    "growth": "Analyse de croissance",
-    "profitability": "Analyse de rentabilité",
-    "momentum": "Analyse de momentum",
-    "revisions": "Analyse des révisions"
+    "valuation": "Analyse valorisation vs secteur",
+    "growth": "Analyse croissance vs secteur",
+    "profitability": "Analyse rentabilité",
+    "momentum": "Analyse momentum boursier",
+    "revisions": "Analyse révisions analystes"
   },
-  "intermediateConclusion": "Conclusion intermédiaire",
+  "intermediateConclusion": "Conclusion intermédiaire 2-3 phrases",
   "strengths": ["Force 1", "Force 2", "Force 3"],
   "concerns": ["Préoccupation 1", "Préoccupation 2", "Préoccupation 3"],
   "finalConclusion": {
-    "strengths": "Résumé des forces",
-    "weaknesses": "Résumé des faiblesses", 
-    "recommendation": "Recommandation détaillée",
+    "strengths": "Résumé forces",
+    "weaknesses": "Résumé faiblesses",
+    "recommendation": "Recommandation détaillée avec rationale",
     "rating": "Buy/Hold/Sell"
   }
-}
+}`;
 
-Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
-                    `;
-
-                    // Appeler l'API Claude (vous devrez configurer votre endpoint)
-                    const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
+                    // Appeler Emma Agent avec Perplexity (mode DATA pour JSON structuré)
+                    const response = await fetch(`${API_BASE_URL}/api/emma-agent`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            service: 'perplexity',
-                            prompt: 'Test de connexion API',
-                            marketData: {},
-                            news: 'Test'
+                            message: perplexityPrompt,
+                            context: {
+                                output_mode: 'data',  // MODE DATA: retourne du JSON
+                                tickers: [ticker.toUpperCase()],
+                                requested_fields: [
+                                    'companyName', 'metrics', 'quantRating',
+                                    'strengths', 'concerns', 'finalConclusion'
+                                ]
+                            }
                         })
                     });
 
                     if (!response.ok) {
-                        console.warn(`⚠️ Claude API indisponible (${response.status}) - Utilisation de la réponse de démonstration`);
-                        // Utiliser une réponse de démonstration au lieu de lever une erreur
-                        const mockAnalysis = {
-                            summary: `🤖 **Analyse de démonstration pour ${ticker}**\n\n**Résumé:**\nService d'IA temporairement indisponible. Voici une analyse simulée basée sur les données disponibles.\n\n**Recommandation:**\n- Service en maintenance\n- Retour prévu sous 24h\n- Données de marché toujours disponibles\n\n**Note:** Cette réponse est générée en mode démonstration.`,
-                            confidence: 0.7,
-                            timestamp: new Date().toISOString()
-                        };
-                        setEmmaResponse(mockAnalysis.summary);
-                        setEmmaLoading(false);
-                        return;
+                        throw new Error(`Perplexity API error: ${response.status}`);
                     }
 
-                    const claudeResponse = await response.json();
-                    const analysisData = JSON.parse(claudeResponse.analysis);
+                    const perplexityResponse = await response.json();
 
-                    addScrapingLog(`✅ Analyse Claude terminée pour ${ticker}`, 'success');
+                    if (!perplexityResponse.success) {
+                        throw new Error(perplexityResponse.error || 'Perplexity analysis failed');
+                    }
+
+                    // Parser le JSON de la réponse
+                    let analysisData;
+                    try {
+                        // La réponse est dans perplexityResponse.response
+                        analysisData = typeof perplexityResponse.response === 'string'
+                            ? JSON.parse(perplexityResponse.response)
+                            : perplexityResponse.response;
+
+                        // Si le JSON contient le ticker comme clé, extraire
+                        if (analysisData[ticker.toUpperCase()]) {
+                            analysisData = {
+                                ticker: ticker.toUpperCase(),
+                                ...analysisData[ticker.toUpperCase()]
+                            };
+                        }
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        throw new Error('Failed to parse Perplexity JSON response');
+                    }
+
+                    addScrapingLog(`✅ Analyse Perplexity terminée pour ${ticker}`, 'success');
+                    console.log('📊 Perplexity analysis result:', analysisData);
 
                     // ========================================================================
                     // STEP 1: Save raw scraped data to Supabase
@@ -2684,27 +2708,27 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                             </button>
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🤖 Démarrage de l\'analyse Claude sur les données existantes...', 'info');
+                                    addScrapingLog('🌐 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
                                     try {
                                         for (const ticker of tickers) {
                                             const existingData = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
                                             if (existingData) {
-                                                addScrapingLog(`🔄 Analyse de ${ticker} avec Claude...`, 'info');
-                                                await analyzeWithClaudeAndUpdate(ticker, {
+                                                addScrapingLog(`🔄 Analyse de ${ticker} avec Perplexity AI...`, 'info');
+                                                await analyzeWithPerplexityAndUpdate(ticker, {
                                                     fullText: existingData.raw_text,
                                                     url: existingData.url,
                                                     content: {}
                                                 });
                                             }
                                         }
-                                        addScrapingLog('🎉 Analyse Claude terminée pour tous les tickers', 'success');
+                                        addScrapingLog('🎉 Analyse Perplexity terminée pour tous les tickers', 'success');
                                     } catch (error) {
-                                        addScrapingLog(`❌ Erreur analyse Claude: ${error.message}`, 'error');
+                                        addScrapingLog(`❌ Erreur analyse Perplexity: ${error.message}`, 'error');
                                     }
                                 }}
                                 className="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition-colors"
                             >
-                                🤖 Analyser avec Claude
+                                🌐 Analyser avec Perplexity
                             </button>
                         </div>
                     </div>
