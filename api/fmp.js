@@ -79,15 +79,26 @@ export default async function handler(req, res) {
 
     console.log(`🔗 FMP API call: ${endpoint} - ${fmpUrl.split('?')[0]}`);
 
-    // Fetch from FMP
+    // Fetch from FMP with proper headers (User-Agent required to avoid 403)
     const fmpResponse = await fetch(fmpUrl, {
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'User-Agent': 'GOB-Financial-Dashboard/1.0',
+        'Accept-Encoding': 'gzip, deflate'
       }
     });
 
     if (!fmpResponse.ok) {
-      throw new Error(`FMP API error: ${fmpResponse.status} ${fmpResponse.statusText}`);
+      // Try to get error details from FMP response
+      let errorDetails = `${fmpResponse.status} ${fmpResponse.statusText}`;
+      try {
+        const errorBody = await fmpResponse.text();
+        console.error(`❌ FMP Error Response: ${errorBody}`);
+        errorDetails += ` - ${errorBody}`;
+      } catch (e) {
+        // Ignore parse error
+      }
+      throw new Error(`FMP API error: ${errorDetails}`);
     }
 
     const data = await fmpResponse.json();
