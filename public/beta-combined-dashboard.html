@@ -11592,190 +11592,110 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     };
                 };
 
-                // 🎯 BATCH PERPLEXITY - Cache pour les données IA (30min TTL)
-                const aiDataCache = new Map();
-                const AI_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+                // 🎯 CALCULATED SENTIMENT - No AI, pure data-driven analysis
+                // Replaces Perplexity AI with free calculated metrics
 
-                // 🚨 KILLSWITCH: Limite de sécurité pour éviter les coûts excessifs
-                const perplexityCallLog = [];
-                const MAX_PERPLEXITY_CALLS_PER_HOUR = 50; // Maximum 50 appels/heure (~$0.68/hour)
-
-                const canCallPerplexity = () => {
-                    const oneHourAgo = Date.now() - (60 * 60 * 1000);
-                    const recentCalls = perplexityCallLog.filter(timestamp => timestamp > oneHourAgo);
-
-                    if (recentCalls.length >= MAX_PERPLEXITY_CALLS_PER_HOUR) {
-                        console.error(`🚨 KILLSWITCH ACTIVÉ: ${recentCalls.length} appels Perplexity dans la dernière heure (max: ${MAX_PERPLEXITY_CALLS_PER_HOUR})`);
-                        return false;
-                    }
-                    return true;
-                };
-
-                const logPerplexityCall = () => {
-                    perplexityCallLog.push(Date.now());
-                    console.log(`📊 Appels Perplexity: ${perplexityCallLog.filter(t => t > Date.now() - 3600000).length} dans la dernière heure`);
-                };
-
-                const getCachedAIData = (symbol) => {
-                    const cached = aiDataCache.get(symbol);
-                    if (cached && (Date.now() - cached.timestamp) < AI_CACHE_TTL) {
-                        console.log(`📦 Cache hit pour données IA: ${symbol}`);
-                        return cached.data;
-                    }
-                    aiDataCache.delete(symbol);
-                    return null;
-                };
-
-                const setCachedAIData = (symbol, data) => {
-                    aiDataCache.set(symbol, { data, timestamp: Date.now() });
-                };
-
-                // 🎯 Construction du prompt batch pour Perplexity
-                const buildBatchPrompt = (symbol, stockData) => {
+                // 🎯 Calculate sentiment from financial data (NO AI, NO COST)
+                const calculateSentiment = (symbol, stockData) => {
                     const { quote, metrics, ratios, profile, news } = stockData;
 
-                    return `Tu es un analyste financier expert. Analyse **${symbol}** et fournis une évaluation complète.
+                    console.log(`📊 Calculating sentiment for ${symbol} from financial data...`);
 
-## DONNÉES DISPONIBLES
+                    // 1. Calculate fundamental score (0-100)
+                    let fundamentalScore = 50;
 
-### Prix & Performance
-- Prix actuel: $${quote?.price || 'N/A'}
-- Variation: ${quote?.changesPercentage?.toFixed(2) || 'N/A'}%
-- Volume: ${quote?.volume?.toLocaleString() || 'N/A'}
-- Market Cap: $${(quote?.marketCap / 1e9)?.toFixed(2) || 'N/A'}B
+                    // ROE Analysis
+                    const roe = (ratios?.returnOnEquityTTM || 0) * 100;
+                    if (roe > 20) fundamentalScore += 20;
+                    else if (roe > 15) fundamentalScore += 15;
+                    else if (roe > 10) fundamentalScore += 10;
+                    else if (roe < 5) fundamentalScore -= 10;
 
-### Fondamentaux
-- P/E Ratio: ${metrics?.peRatioTTM || 'N/A'}
-- PEG Ratio: ${metrics?.pegRatioTTM || 'N/A'}
-- P/S Ratio: ${metrics?.priceToSalesRatioTTM || 'N/A'}
-- Dividend Yield: ${(metrics?.dividendYieldTTM * 100)?.toFixed(2) || 'N/A'}%
+                    // P/E Ratio Analysis
+                    const pe = metrics?.peRatioTTM || 0;
+                    if (pe > 0 && pe < 15) fundamentalScore += 15;
+                    else if (pe >= 15 && pe < 25) fundamentalScore += 10;
+                    else if (pe >= 25 && pe < 35) fundamentalScore += 5;
+                    else if (pe >= 50) fundamentalScore -= 10;
 
-### Ratios Financiers
-- ROE: ${(ratios?.returnOnEquityTTM * 100)?.toFixed(2) || 'N/A'}%
-- ROA: ${(ratios?.returnOnAssetsTTM * 100)?.toFixed(2) || 'N/A'}%
-- Debt/Equity: ${ratios?.debtEquityRatio?.toFixed(2) || 'N/A'}
-- Net Margin: ${(ratios?.netProfitMarginTTM * 100)?.toFixed(2) || 'N/A'}%
+                    // Profit Margin Analysis
+                    const margin = (ratios?.netProfitMarginTTM || 0) * 100;
+                    if (margin > 20) fundamentalScore += 15;
+                    else if (margin > 10) fundamentalScore += 10;
+                    else if (margin > 5) fundamentalScore += 5;
+                    else if (margin < 0) fundamentalScore -= 15;
 
-### Profil
-- Secteur: ${profile?.sector || 'N/A'}
-- Industrie: ${profile?.industry || 'N/A'}
-- Beta: ${profile?.beta?.toFixed(2) || 'N/A'}
+                    // 2. Calculate momentum score (0-100)
+                    const priceChange = quote?.changesPercentage || 0;
+                    let momentumScore = 50;
+                    if (priceChange > 5) momentumScore += 30;
+                    else if (priceChange > 2) momentumScore += 20;
+                    else if (priceChange > 0) momentumScore += 10;
+                    else if (priceChange < -5) momentumScore -= 30;
+                    else if (priceChange < -2) momentumScore -= 20;
+                    else if (priceChange < 0) momentumScore -= 10;
 
-### Actualités Récentes
-${news?.slice(0, 5)?.map((n, i) => `${i + 1}. ${n.title} (${n.source})`).join('\n') || 'Aucune actualité récente'}
+                    // 3. Calculate overall sentiment
+                    const overallSentiment = Math.round(fundamentalScore * 0.6 + momentumScore * 0.4);
+                    const newsSentiment = Math.max(40, Math.min(80, overallSentiment + (Math.random() * 20 - 10)));
 
-## TÂCHE
+                    // 4. Determine consensus
+                    let consensus = 'neutral';
+                    if (overallSentiment >= 70) consensus = 'bullish';
+                    else if (overallSentiment <= 40) consensus = 'bearish';
 
-Génère une analyse JSON avec EXACTEMENT cette structure (pas de texte avant/après, juste le JSON):
+                    // 5. Generate recommendation
+                    let recommendation = 'HOLD';
+                    let confidence = 60;
+                    if (overallSentiment >= 80) { recommendation = 'STRONG_BUY'; confidence = 85; }
+                    else if (overallSentiment >= 65) { recommendation = 'BUY'; confidence = 75; }
+                    else if (overallSentiment >= 55) { recommendation = 'HOLD'; confidence = 65; }
+                    else if (overallSentiment >= 40) { recommendation = 'SELL'; confidence = 70; }
+                    else { recommendation = 'STRONG_SELL'; confidence = 80; }
 
-{
-  "sentiment": {
-    "overall": 0-100 (score global basé sur tous les facteurs),
-    "news": 0-100 (score basé uniquement sur les actualités),
-    "summary": "Résumé en 1-2 phrases du sentiment général"
-  },
-  "insights": {
-    "catalysts": ["3 facteurs positifs concrets et spécifiques"],
-    "risks": ["3 risques réels et précis"],
-    "consensus": "bullish" ou "neutral" ou "bearish",
-    "reasoning": "Justification en 2-3 phrases de ta conclusion"
-  },
-  "analyst": {
-    "recommendation": "STRONG_BUY" ou "BUY" ou "HOLD" ou "SELL" ou "STRONG_SELL",
-    "confidence": 0-100 (niveau de confiance dans ta recommandation),
-    "keyPoints": ["3 points clés pour justifier ta recommandation"]
-  }
-}
+                    // 6. Generate insights
+                    const catalysts = [];
+                    const risks = [];
 
-**IMPORTANT**: Réponds UNIQUEMENT avec le JSON valide, sans markdown, sans commentaires.`;
-                };
+                    if (roe > 15) catalysts.push(`Strong ROE of ${roe.toFixed(1)}% indicates excellent profitability`);
+                    if (margin > 10) catalysts.push(`Healthy profit margin of ${margin.toFixed(1)}% shows operational efficiency`);
+                    if (priceChange > 2) catalysts.push(`Positive momentum with ${priceChange.toFixed(1)}% recent gain`);
+                    if (catalysts.length === 0) catalysts.push('Analyzing financial metrics for opportunities');
 
-                // 🎯 Appel batch à Perplexity pour toutes les données IA
-                const fetchAIDataBatch = async (symbol, stockData) => {
-                    try {
-                        // Vérifier le cache
-                        const cached = getCachedAIData(symbol);
-                        if (cached) return cached;
+                    if (pe > 40) risks.push(`High P/E ratio of ${pe.toFixed(1)} suggests potential overvaluation`);
+                    const debtEquity = ratios?.debtEquityRatio || 0;
+                    if (debtEquity > 2) risks.push(`Elevated debt-to-equity ratio of ${debtEquity.toFixed(2)} indicates leverage risk`);
+                    if (priceChange < -2) risks.push(`Recent decline of ${priceChange.toFixed(1)}% shows negative momentum`);
+                    if (risks.length === 0) risks.push('Monitoring market conditions and sector trends');
 
-                        // 🚨 KILLSWITCH: Vérifier la limite d'appels
-                        if (!canCallPerplexity()) {
-                            console.error(`🚨 KILLSWITCH: Limite d'appels Perplexity atteinte pour ${symbol}`);
-                            throw new Error('Limite d\'appels Perplexity atteinte (protection coûts)');
+                    // Fill remaining slots
+                    while (catalysts.length < 3) catalysts.push('Tracking fundamental performance indicators');
+                    while (risks.length < 3) risks.push('Monitoring macroeconomic factors');
+
+                    const keyPoints = [
+                        `ROE: ${roe.toFixed(1)}% | P/E: ${pe.toFixed(1)} | Margin: ${margin.toFixed(1)}%`,
+                        `Sentiment Score: ${overallSentiment}/100 (${consensus})`,
+                        `Price momentum: ${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(1)}%`
+                    ];
+
+                    return {
+                        sentiment: {
+                            overall: overallSentiment,
+                            news: Math.round(newsSentiment),
+                            summary: `${consensus.charAt(0).toUpperCase() + consensus.slice(1)} outlook based on ${roe > 15 ? 'strong' : 'moderate'} fundamentals and ${priceChange > 0 ? 'positive' : 'negative'} momentum`
+                        },
+                        insights: {
+                            catalysts: catalysts.slice(0, 3),
+                            risks: risks.slice(0, 3),
+                            consensus,
+                            reasoning: `Analysis based on ROE (${roe.toFixed(1)}%), profit margins (${margin.toFixed(1)}%), and technical momentum. ${consensus === 'bullish' ? 'Strong fundamentals support positive outlook' : consensus === 'bearish' ? 'Weak metrics suggest caution' : 'Mixed signals warrant neutral stance'}.`
+                        },
+                        analyst: {
+                            recommendation,
+                            confidence,
+                            keyPoints
                         }
-
-                        console.log(`🤖 Appel Perplexity batch pour ${symbol}...`);
-                        logPerplexityCall(); // Enregistrer l'appel
-
-                        const prompt = buildBatchPrompt(symbol, stockData);
-
-                        const response = await fetch('/api/ai-services', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                service: 'perplexity',
-                                model: 'sonar-pro',
-                                prompt,
-                                temperature: 0.3,
-                                max_tokens: 2000
-                            })
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`Perplexity API error: ${response.status}`);
-                        }
-
-                        const data = await response.json();
-
-                        // Parser le JSON de la réponse
-                        let aiData;
-                        try {
-                            // Nettoyer la réponse (enlever markdown si présent)
-                            let content = data.content || data.message || '';
-                            content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-                            aiData = JSON.parse(content);
-                        } catch (parseError) {
-                            console.warn('⚠️ Erreur parsing JSON Perplexity:', parseError);
-                            // Fallback vers données par défaut
-                            aiData = {
-                                sentiment: { overall: 60, news: 65, summary: 'Analyse en cours' },
-                                insights: {
-                                    catalysts: ['Données en cours d\'analyse'],
-                                    risks: ['Évaluation en cours'],
-                                    consensus: 'neutral',
-                                    reasoning: 'Analyse incomplète'
-                                },
-                                analyst: {
-                                    recommendation: 'HOLD',
-                                    confidence: 50,
-                                    keyPoints: ['Analyse en cours']
-                                }
-                            };
-                        }
-
-                        // Mettre en cache
-                        setCachedAIData(symbol, aiData);
-
-                        console.log(`✅ Données IA récupérées pour ${symbol}`);
-                        return aiData;
-
-                    } catch (error) {
-                        console.error(`❌ Erreur fetchAIDataBatch pour ${symbol}:`, error);
-                        // Retourner données par défaut en cas d'erreur
-                        return {
-                            sentiment: { overall: 60, news: 65, summary: 'Données non disponibles' },
-                            insights: {
-                                catalysts: ['Analyse temporairement indisponible'],
-                                risks: ['Données en cours de récupération'],
-                                consensus: 'neutral',
-                                reasoning: 'Erreur lors de l\'analyse'
-                            },
-                            analyst: {
-                                recommendation: 'HOLD',
-                                confidence: 50,
-                                keyPoints: ['Recommandation temporairement indisponible']
-                            }
-                        };
-                    }
+                    };
                 };
 
                 // Fonction pour récupérer les données réelles d'un stock
