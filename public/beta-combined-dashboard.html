@@ -10559,25 +10559,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }`}>📊 Titres & nouvelles</h2>
                         <div className="flex gap-2">
                             <button
-                                onClick={refreshAllStocks}
+                                onClick={() => {
+                                    refreshAllStocks();
+                                    fetchNews();
+                                }}
                                 disabled={loading}
-                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${
+                                    isDarkMode
+                                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                }`}
                             >
-                                {loading ? 'Actualisation...' : 'Actualiser Stocks'}
-                            </button>
-                            <button
-                                onClick={fetchNews}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                            >
-                                Actualiser News
-                            </button>
-                            <button
-                                onClick={emmaPopulateStocksNews}
-                                disabled={loading}
-                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
-                            >
-                                <span>🤖</span>
-                                Emma Populate
+                                {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
                             </button>
                         </div>
                     </div>
@@ -10762,14 +10755,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         </td>
                                                         <td className="py-4 px-3">
                                                             <button
-                                                                onClick={() => setSelectedStock(ticker)}
+                                                                onClick={() => {
+                                                                    setSelectedStock(ticker);
+                                                                    setActiveTab('jlab');
+                                                                }}
                                                                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 hover:scale-[1.02] shadow ${
-                                                                    isDarkMode 
-                                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-blue-500/25' 
+                                                                    isDarkMode
+                                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-blue-500/25'
                                                                         : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white shadow-blue-400/25'
                                                                 }`}
                                                             >
-                                                                📊 Voir détail
+                                                                📊 Voir dans JLab
                                                             </button>
                                                         </td>
                                                     </tr>
