@@ -1101,6 +1101,17 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    // Vérifier que PERPLEXITY_API_KEY est configurée
+    if (!process.env.PERPLEXITY_API_KEY) {
+        console.error('❌ PERPLEXITY_API_KEY is not configured!');
+        return res.status(503).json({
+            success: false,
+            error: 'PERPLEXITY_API_KEY non configurée',
+            response: '⚙️ Configuration manquante: La clé API Perplexity n\'est pas configurée dans Vercel. Veuillez ajouter PERPLEXITY_API_KEY dans les variables d\'environnement Vercel.',
+            is_reliable: false
+        });
+    }
+
     try {
         // Initialisation de l'agent si nécessaire
         if (!emmaAgent) {
