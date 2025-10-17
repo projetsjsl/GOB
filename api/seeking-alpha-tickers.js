@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       let query = supabase
         .from('team_tickers')
         .select('*')
-        .order('priority', { ascending: false, nullsLast: true })
+        .eq('active', true) // Only active tickers
         .order('ticker', { ascending: true });
 
       query = query.limit(parseInt(limit));
@@ -83,12 +83,12 @@ export default async function handler(req, res) {
     // POST - Add new ticker(s) to team_tickers
     // ============================================================================
     if (req.method === 'POST') {
-      const { ticker, tickers: tickerList, priority } = req.body;
+      const { ticker, tickers: tickerList, active = true } = req.body;
 
       // Support both single ticker and batch insert
       const tickersToInsert = tickerList
-        ? tickerList.map(t => ({ ticker: t, priority: priority || null }))
-        : [{ ticker, priority: priority || null }];
+        ? tickerList.map(t => ({ ticker: t, active: active }))
+        : [{ ticker, active: active }];
 
       const { data, error } = await supabase
         .from('team_tickers')
@@ -116,10 +116,10 @@ export default async function handler(req, res) {
     }
 
     // ============================================================================
-    // PUT - Update ticker priority in team_tickers
+    // PUT - Update ticker active status in team_tickers
     // ============================================================================
     if (req.method === 'PUT') {
-      const { ticker, priority } = req.body;
+      const { ticker, active } = req.body;
 
       if (!ticker) {
         return res.status(400).json({
@@ -130,7 +130,7 @@ export default async function handler(req, res) {
 
       const { data, error } = await supabase
         .from('team_tickers')
-        .update({ priority })
+        .update({ active })
         .eq('ticker', ticker)
         .select();
 
@@ -147,7 +147,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: 'Ticker priority updated',
+        message: 'Ticker active status updated',
         ticker: data[0],
         timestamp: new Date().toISOString()
       });
