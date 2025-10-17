@@ -6789,6 +6789,13 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }, 'info');
 
                         // Appel Emma Agent en MODE BRIEFING
+                        console.log('🔄 Appel Emma Agent API en MODE BRIEFING...');
+                        addLogEntry('API_CALL_START', 'Début appel Emma Agent API', {
+                            endpoint: '/api/emma-agent',
+                            mode: 'briefing',
+                            promptLength: briefingMessage.length
+                        }, 'info');
+
                         const analysisResponse = await fetch('/api/emma-agent', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -6807,7 +6814,27 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             signal: AbortSignal.timeout(120000)
                         });
 
+                        console.log('📡 Emma Agent Response Status:', analysisResponse.status, analysisResponse.statusText);
+                        addLogEntry('API_RESPONSE', 'Réponse Emma Agent reçue', {
+                            status: analysisResponse.status,
+                            statusText: analysisResponse.statusText,
+                            ok: analysisResponse.ok
+                        }, analysisResponse.ok ? 'success' : 'error');
+
+                        if (!analysisResponse.ok) {
+                            const errorText = await analysisResponse.text();
+                            console.error('❌ Emma Agent API Error:', errorText);
+                            throw new Error(`Emma Agent API error (${analysisResponse.status}): ${errorText.substring(0, 200)}`);
+                        }
+
                         const analysisResult = await analysisResponse.json();
+                        console.log('📊 Emma Agent Result:', {
+                            success: analysisResult.success,
+                            hasResponse: !!analysisResult.response,
+                            responseLength: analysisResult.response?.length || 0,
+                            intent: analysisResult.intent,
+                            toolsUsed: analysisResult.tools_used?.length || 0
+                        });
 
                         if (!analysisResult.success) {
                             throw new Error('Emma Agent briefing generation failed: ' + (analysisResult.error || 'Unknown error'));
