@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:56:55.441Z",
+  "lastUpdate": "2025-10-17T20:57:04.232Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -512,53 +512,66 @@
     "MU": {
       "ticker": "MU",
       "companyName": "Micron Technology, Inc.",
-      "lastUpdate": "2025-10-17T20:28:34.086Z",
+      "lastUpdate": "2025-10-17T20:56:56.896Z",
       "metrics": {
-        "marketCap": null,
-        "bpaGrowth": null,
-        "peRatio": null,
-        "sector": "Tech",
-        "industry": null,
-        "dividendYield": null,
-        "dividendFrequency": null,
-        "exDivDate": null,
-        "annualPayout": null,
-        "price": 202.38,
-        "priceChange": -0.07
+        "marketCap": "$227.33B",
+        "bpaGrowth": "N/A",
+        "peRatio": "12.15",
+        "sector": "Information Technology",
+        "industry": "Semiconductors",
+        "dividendYield": "0.23%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-10-03",
+        "annualPayout": "$0.46",
+        "price": "$202.38",
+        "priceChange": "-0.07%"
       },
       "companyProfile": {
-        "description": "Micron Technology, Inc. est un leader mondial de la fabrication de solutions de mémoire et de stockage, destinées aux marchés des serveurs, PC, mobiles et automobiles. L'entreprise développe des technologies avancées DRAM, NAND et NOR pour répondre aux besoins croissants en données. Micron investit dans l'innovation afin de renforcer la performance, la fiabilité et l'efficacité énergétique de ses produits. Son siège social est situé aux États-Unis.",
-        "employees": null,
-        "innovation": null
+        "description": "Micron Technology, Inc. conçoit, développe, fabrique et vend des produits de mémoire et de stockage aux États-Unis, à Taïwan, à Singapour, au Japon, en Malaisie, en Chine, en Inde et à l'international. Elle opère à travers les segments Cloud Memory Business Unit (CMBU); Core Data Center Business Unit (CDCBU); Mobile and Client Business Unit (MCBU); et Automotive and Embedded Business Unit (AEBU). La société commercialise ses produits de mémoire et de stockage de semi-conducteurs sous les marques Micron et Crucial.",
+        "employees": "53,000",
+        "innovation": "Produits de leadership technologique qui incluent les technologies 1y DRAM et G9 NAND."
       },
       "competition": {
-        "competitors": [],
-        "valueProposition": null,
-        "advantages": null
+        "competitors": [
+          "AMD",
+          "TSM",
+          "AVGO",
+          "QCOM",
+          "INTC"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
       },
       "quantRating": {
-        "overall": null,
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "overall": "STRONG BUY",
+        "valuation": "B+",
+        "growth": "A+",
+        "profitability": "A+",
+        "momentum": "A",
+        "revisions": "A"
       },
       "sectorAnalysis": {
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
-      "intermediateConclusion": null,
-      "strengths": [],
-      "concerns": [],
+      "intermediateConclusion": "Micron Technology est une entreprise solide dans le secteur des semi-conducteurs, avec de fortes notes de croissance et de rentabilité. Les analystes de Seeking Alpha et de Wall Street ont une opinion majoritairement positive sur l'action.",
+      "strengths": [
+        "Forte croissance",
+        "Forte rentabilité",
+        "Bonnes notes des analystes"
+      ],
+      "concerns": [
+        "Ventes importantes d'actions par les dirigeants",
+        "Potentiel ralentissement du marché"
+      ],
       "finalConclusion": {
-        "strengths": null,
-        "weaknesses": null,
-        "recommendation": null,
-        "rating": null
+        "strengths": "Micron bénéficie d'une forte position dans le secteur des semi-conducteurs, soutenue par une croissance et une rentabilité élevées.",
+        "weaknesses": "Les ventes d'actions par les dirigeants pourraient susciter des inquiétudes quant aux perspectives d'avenir de l'entreprise.",
+        "recommendation": "Micron est une entreprise prometteuse, mais les investisseurs doivent surveiller attentivement les ventes d'actions par les dirigeants et les tendances du marché.",
+        "rating": "Buy"
       }
     },
     "NSRGY": {
