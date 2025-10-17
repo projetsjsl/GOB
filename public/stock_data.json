@@ -1,8 +1,70 @@
 {
-  "lastUpdate": "2025-10-17T20:59:07.635Z",
+  "lastUpdate": "2025-10-17T20:59:17.197Z",
   "stocks": {
     "GOOGL": {},
-    "T": {},
+    "T": {
+      "ticker": "T",
+      "companyName": "AT&T Inc.",
+      "lastUpdate": "2025-10-17T20:24:00.000Z",
+      "metrics": {
+        "marketCap": "$187.34B",
+        "bpaGrowth": "N/A",
+        "peRatio": "14.91",
+        "sector": "Communication Services",
+        "industry": "Integrated Telecommunication Services",
+        "dividendYield": "4.24%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-10-10",
+        "annualPayout": "$1.11",
+        "price": "$26.34",
+        "priceChange": "+0.53%"
+      },
+      "companyProfile": {
+        "description": "AT&T Inc. fournit des services de télécommunications et de technologie dans le monde entier. La société opère à travers deux segments, Communications et Amérique latine. Le segment Communications offre des services de communication vocale et de données sans fil et vend des combinés, des cartes de données sans fil, des appareils informatiques sans fil, des étuis/housses de protection et des chargeurs sans fil par le biais de ses propres magasins, agents et magasins de détail tiers. La société a été fondée en 1983 et est basée à Dallas, Texas.",
+        "employees": "140,990",
+        "innovation": "N/A"
+      },
+      "competition": {
+        "competitors": [
+          "Verizon Communications Inc.",
+          "T-Mobile"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "C+",
+        "growth": "F",
+        "profitability": "A+",
+        "momentum": "B-",
+        "revisions": "B-"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "AT&T présente une rentabilité élevée (A+) mais une faible croissance (F) selon l'évaluation quantitative de Seeking Alpha. Les analystes de Seeking Alpha ont une opinion neutre (HOLD) sur l'action, tandis que Wall Street est plus optimiste (BUY).",
+      "strengths": [
+        "Forte rentabilité",
+        "Rendement du dividende attractif",
+        "Position dominante dans le secteur des télécommunications"
+      ],
+      "concerns": [
+        "Faible croissance",
+        "Endettement élevé",
+        "Concurrence accrue"
+      ],
+      "finalConclusion": {
+        "strengths": "AT&T bénéficie d'une forte rentabilité et d'un rendement du dividende attractif, ce qui en fait une valeur potentielle pour les investisseurs axés sur le revenu.",
+        "weaknesses": "Cependant, la faible croissance et l'endettement élevé suscitent des inquiétudes quant à la capacité de l'entreprise à générer des rendements à long terme.",
+        "recommendation": "Compte tenu des forces et des faiblesses, une position neutre (HOLD) semble appropriée pour le moment. Il est conseillé de surveiller l'évolution de la croissance et de la dette avant de prendre une décision d'investissement plus tranchée.",
+        "rating": "Hold"
+      }
+    },
     "BNS": {
       "ticker": "BNS",
       "companyName": "The Bank of Nova Scotia",
