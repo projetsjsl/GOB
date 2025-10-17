@@ -1690,22 +1690,24 @@ const fetchHybridData = async (symbol, dataType) => {
                 const loadAllData = async () => {
                     console.log('📊 Chargement des données en arrière-plan...');
                     try {
-                        // Chargement silencieux en arrière-plan (pas de await pour ne pas bloquer)
-                        Promise.all([
-                            loadTickersFromSupabase(),
+                        // STEP 1: Load tickers first (required by refreshAllStocks)
+                        console.log('📊 Étape 1: Chargement des tickers...');
+                        await loadTickersFromSupabase();
+
+                        // STEP 2: Load data that depends on tickers + independent data
+                        console.log('📊 Étape 2: Chargement des données stocks et actualités...');
+                        await Promise.all([
+                            refreshAllStocks(),  // Needs tickers to be loaded
+                            fetchNews(),          // Needs tickers to be loaded
                             preloadWatchlist(),
                             fetchSeekingAlphaData(),
                             fetchSeekingAlphaStockData(),
-                            refreshAllStocks(),
-                            fetchNews(),
                             checkApiStatus()
-                        ]).then(() => {
-                            console.log('✅ Toutes les données chargées en arrière-plan');
-                        }).catch(error => {
-                            console.error('❌ Erreur lors du chargement des données:', error?.message || String(error));
-                        });
+                        ]);
+
+                        console.log('✅ Toutes les données chargées en arrière-plan');
                     } catch (error) {
-                        console.error('❌ Erreur lors du chargement:', error?.message || String(error));
+                        console.error('❌ Erreur lors du chargement des données:', error?.message || String(error));
                     }
                 };
                 
@@ -15048,37 +15050,59 @@ console.log('✅ Données hybrides récupérées:', {
                     console.log('🔄 fetchCalendarData appelé pour:', activeSubTab);
                     setLoading(true);
                     setError(null);
-                    
-                    try {
-                        let endpoint = '';
-                        switch(activeSubTab) {
-                            case 'economic':
-                                endpoint = '/api/calendar-economic';
-                                break;
-                            case 'earnings':
-                                endpoint = '/api/calendar-earnings';
-                                break;
-                            case 'dividends':
-                                endpoint = '/api/calendar-dividends';
-                                break;
-                            default:
-                                endpoint = '/api/calendar-economic';
-                        }
 
-                        const response = await fetch(endpoint);
-                        const result = await response.json();
-                        
-                        if (result.success) {
-                            setCalendarData(result.data);
+                    try {
+                        if (activeSubTab === 'earnings') {
+                            // Use FMP earnings-calendar endpoint
+                            const today = new Date();
+                            const futureDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+                            const from = today.toISOString().split('T')[0];
+                            const to = futureDate.toISOString().split('T')[0];
+
+                            const response = await fetch(`/api/fmp?endpoint=earnings-calendar&from=${from}&to=${to}`);
+                            const result = await response.json();
+
+                            if (result.success && result.data) {
+                                // Transform FMP earnings data to calendar format
+                                const groupedByDate = {};
+                                result.data.forEach(earning => {
+                                    const date = earning.date;
+                                    if (!groupedByDate[date]) {
+                                        groupedByDate[date] = {
+                                            date: new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+                                            events: []
+                                        };
+                                    }
+                                    groupedByDate[date].events.push({
+                                        time: 'Market Close',
+                                        ticker: earning.symbol,
+                                        event: `${earning.symbol} Earnings`,
+                                        epsActual: earning.epsActual || 'N/A',
+                                        epsEstimated: earning.epsEstimated || 'N/A',
+                                        revenueActual: earning.revenueActual ? `$${(earning.revenueActual / 1e9).toFixed(2)}B` : 'N/A',
+                                        revenueEstimated: earning.revenueEstimated ? `$${(earning.revenueEstimated / 1e9).toFixed(2)}B` : 'N/A'
+                                    });
+                                });
+                                setCalendarData(Object.values(groupedByDate));
+                                console.log(`✅ ${result.data.length} earnings events loaded`);
+                            } else {
+                                setError('Aucune donnée disponible');
+                                setCalendarData(getFallbackData());
+                            }
+                        } else if (activeSubTab === 'economic') {
+                            // Economic calendar requires paid FMP plan - show info message
+                            setError('📊 Le calendrier économique nécessite un abonnement FMP payant');
+                            setCalendarData(getFallbackData());
+                        } else if (activeSubTab === 'dividends') {
+                            // Dividends calendar not implemented yet
+                            setError('📊 Calendrier des dividendes à venir prochainement');
+                            setCalendarData(getFallbackData());
                         } else {
-                            setError('Erreur lors du chargement des données');
-                            // Données de fallback
                             setCalendarData(getFallbackData());
                         }
                     } catch (err) {
-                        console.error('Erreur:', err);
-                        setError('Impossible de se connecter à l\'API');
-                        // Données de fallback
+                        console.error('❌ Erreur fetchCalendarData:', err);
+                        setError(`Impossible de charger les données: ${err.message}`);
                         setCalendarData(getFallbackData());
                     } finally {
                         setLoading(false);
@@ -15595,7 +15619,7 @@ console.log('✅ Données hybrides récupérées:', {
                             <div className="text-center">
                                 <div className="mb-6">
                                     <img
-                                        src={'daniel-ouellet.jpg'}
+                                        src={'daniel-ouellet.jpg?v=20251017'}
                                         alt="Daniel Ouellet"
                                         className="emma-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-blue-500"
                                     />
