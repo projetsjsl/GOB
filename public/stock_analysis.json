@@ -1,5 +1,5 @@
 {
-  "last_update": "2025-10-17T20:28:45.595Z",
+  "last_update": "2025-10-17T20:28:55.006Z",
   "stocks": [
     {
       "ticker": "GOOGL",
@@ -75,8 +75,8 @@
     },
     {
       "ticker": "LVMHF",
-      "timestamp": "2025-10-09T16:48:09.627Z",
-      "raw_text": "\n\nWhoops, we’ve hit a bottom.Getting lost on Seeking Alpha is annoying; being lost in the stock market is worse. Try one of these links to get back on track.Trending Stock AnalysisMarket NewsKey Market DataDividend Stock AnalysisQuant RatingsStock IdeasTrending AnalysisTrending NewsTo ensure this doesn’t happen in the future, please enable Javascript and cookies in your browser.Is this happening to you frequently? Please report it on our feedback forum.If you have an ad-blocker enabled you may be blocked from proceeding. Please disable your ad-blocker and refresh.\n\n\n<iframe height=\"0\" src=\"https://www.googletagmanager.com/ns.html?id=GTM-MSK9R8B\" style=\"display:none;visibility:hidden\" title=\"google-tag-manager\" width=\"0\"></iframe><img alt=\"\" src=\"/_sa_track/samw/noscript?noscript[disabled]=true\">\n\n\n\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n\n\n!function(b,e,f,g,a,c,d){b.fbq||(a=b.fbq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._fbq||(b._fbq=a),a.push=a,a.loaded=!0,a.version=\"2.0\",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,\"script\",\"https://connect.facebook.net/en_US/fbevents.js\");fbq(\"init\",\"228550053985270\");fbq(\"track\",\"PageView\");\n<img height=\"1\" width=\"1\" style=\"display:none\" src=\"https://www.facebook.com/tr?id=228550053985270&amp;ev=PageView&amp;noscript=1\">\n\n!function(b,e,f,g,a,c,d){b.saq||(a=b.saq=function(){a.callMethod?a.callMethod.apply(a,arguments):a.queue.push(arguments)},b._saq||(b._saq=a),a.push=a,a.loaded=!0,a.version=\"1.0\",a.queue=[],c=e.createElement(f),c.async=!0,c.src=g,d=e.getElementsByTagName(f)[0],d.parentNode.insertBefore(c,d))}(window,document,\"script\",\"https://tags.srv.stackadapt.com/events.js\");saq(\"ts\",\"blaF1FtON6tR_IxV4MjJrA\");!function(a,b){var e=\"0024c043618e075e435f95a5ef5ef386f5\";if(a.obApi)b=function(d){return Object.prototype.toString.call(d)===\"[object Array]\"?d:[d]},a.obApi.marketerId=b(a.obApi.marketerId).concat(b(e));else{var c=a.obApi=function(){c.dispatch?c.dispatch.apply(c,arguments):c.queue.push(arguments)};c.version=\"1.1\";c.loaded=!0;c.marketerId=e;c.queue=[];a=b.createElement(\"script\");a.async=!0;a.src=\"//amplify.outbrain.com/cp/obtp.js\";a.type=\"text/javascript\";b=b.getElementsByTagName(\"script\")[0];b.parentNode.insertBefore(a,\nb)}}(window,document);obApi(\"track\",\"PAGE_VIEW\");\n",
+      "timestamp": "2025-10-17T20:28:54.487Z",
+      "raw_text": "🤖 GOB Auto-Scraper: Scraping LVMHF... En cours\nWhoops, we’ve hit a bottom.\nGetting lost on Seeking Alpha is annoying; being lost in the stock market is worse. Try one of these links to get back on track.\nTrending Stock Analysis\nMarket News\nKey Market Data\nDividend Stock Analysis\nQuant Ratings\nStock Ideas\nTrending Analysis\nTrending News",
       "url": "https://seekingalpha.com/symbol/LVMHF/virtual_analyst_report"
     },
     {
