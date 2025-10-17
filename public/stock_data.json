@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:29:56.046Z",
+  "lastUpdate": "2025-10-17T20:30:19.836Z",
   "stocks": {
     "GOOGL": {
       "ticker": "GOOGL",
@@ -343,59 +343,54 @@
     },
     "CSCO": {
       "ticker": "CSCO",
-      "companyName": "Cisco Systems Inc.",
-      "lastUpdate": "2025-10-09T16:47:20.903Z",
+      "companyName": "Cisco Systems, Inc.",
+      "lastUpdate": "2025-10-17T20:29:57.402Z",
       "metrics": {
-        "marketCap": "En attente d'analyse",
-        "bpaGrowth": "En attente d'analyse",
-        "peRatio": "En attente d'analyse",
-        "sector": "Technology",
-        "dividendYield": "En attente d'analyse",
-        "dividendFrequency": "Quarterly",
-        "exDivDate": "En attente d'analyse",
-        "annualPayout": "En attente d'analyse",
-        "price": "En attente d'analyse",
-        "priceChange": "En attente d'analyse"
+        "marketCap": null,
+        "bpaGrowth": null,
+        "peRatio": null,
+        "sector": "Tech",
+        "industry": null,
+        "dividendYield": null,
+        "dividendFrequency": null,
+        "exDivDate": null,
+        "annualPayout": null,
+        "price": 70.13,
+        "priceChange": 1.51
       },
       "companyProfile": {
-        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
-        "employees": "En attente d'analyse",
-        "innovation": "En attente d'analyse"
+        "description": "Cisco Systems, Inc. est un leader mondial dans les technologies de réseau et d’infrastructure pour Internet. L’entreprise fournit des solutions matérielles, logicielles et de services pour soutenir la connectivité, la cybersécurité et la collaboration des entreprises. Cisco est reconnue pour sa gamme complète de routeurs, commutateurs et systèmes de communication. Elle joue un rôle clé dans le développement des réseaux d’entreprise et l’adoption du cloud.",
+        "employees": null,
+        "innovation": null
       },
       "competition": {
-        "competitors": [
-          "Juniper",
-          "Arista"
-        ],
-        "valueProposition": "En attente d'analyse",
-        "advantages": "En attente d'analyse"
+        "competitors": [],
+        "valueProposition": null,
+        "advantages": null
       },
       "quantRating": {
-        "valuation": "N/A",
-        "growth": "N/A",
-        "profitability": "N/A",
-        "momentum": "N/A",
-        "revisions": "N/A"
+        "overall": null,
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
       },
       "sectorAnalysis": {
-        "valuation": "En attente d'analyse",
-        "growth": "En attente d'analyse",
-        "profitability": "En attente d'analyse",
-        "momentum": "En attente d'analyse",
-        "revisions": "En attente d'analyse"
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
       },
-      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
-      "strengths": [
-        "Données en cours de traitement"
-      ],
-      "concerns": [
-        "Analyse en attente"
-      ],
+      "intermediateConclusion": null,
+      "strengths": [],
+      "concerns": [],
       "finalConclusion": {
-        "strengths": "En attente d'analyse",
-        "weaknesses": "En attente d'analyse",
-        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
-        "rating": "Pending"
+        "strengths": null,
+        "weaknesses": null,
+        "recommendation": null,
+        "rating": null
       }
     },
     "CVS": {
