@@ -210,15 +210,17 @@ const fetchHybridData = async (symbol, dataType) => {
         apiUrl = `/api/ai-services`;
         break;
       case 'prices':
-        // Utiliser l'API marketdata pour les prix historiques
-        apiUrl = `/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`;
+        // Utiliser l'API marketdata pour les données intraday (OHLCV 5min)
+        apiUrl = `/api/marketdata?endpoint=intraday&symbol=${symbol}&interval=5min&outputsize=78`;
         break;
       case 'analyst':
-        // ERREUR : Pas de données simulées
-        throw new Error(`Données analyst non disponibles. API analyst non configurée.`);
+        // Utiliser l'API marketdata pour les estimations d'analystes
+        apiUrl = `/api/marketdata?endpoint=analyst&symbol=${symbol}&source=auto`;
+        break;
       case 'earnings':
-        // ERREUR : Pas de données simulées
-        throw new Error(`Données earnings non disponibles. API earnings non configurée.`);
+        // Utiliser l'API marketdata pour le calendrier des earnings
+        apiUrl = `/api/marketdata?endpoint=earnings&symbol=${symbol}&source=auto`;
+        break;
       default:
         throw new Error(`Type de données non supporté: ${dataType}`);
     }
@@ -11584,6 +11586,165 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     };
                 };
 
+                // 🎯 BATCH PERPLEXITY - Cache pour les données IA (30min TTL)
+                const aiDataCache = new Map();
+                const AI_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+                const getCachedAIData = (symbol) => {
+                    const cached = aiDataCache.get(symbol);
+                    if (cached && (Date.now() - cached.timestamp) < AI_CACHE_TTL) {
+                        console.log(`📦 Cache hit pour données IA: ${symbol}`);
+                        return cached.data;
+                    }
+                    aiDataCache.delete(symbol);
+                    return null;
+                };
+
+                const setCachedAIData = (symbol, data) => {
+                    aiDataCache.set(symbol, { data, timestamp: Date.now() });
+                };
+
+                // 🎯 Construction du prompt batch pour Perplexity
+                const buildBatchPrompt = (symbol, stockData) => {
+                    const { quote, metrics, ratios, profile, news } = stockData;
+
+                    return `Tu es un analyste financier expert. Analyse **${symbol}** et fournis une évaluation complète.
+
+## DONNÉES DISPONIBLES
+
+### Prix & Performance
+- Prix actuel: $${quote?.price || 'N/A'}
+- Variation: ${quote?.changesPercentage?.toFixed(2) || 'N/A'}%
+- Volume: ${quote?.volume?.toLocaleString() || 'N/A'}
+- Market Cap: $${(quote?.marketCap / 1e9)?.toFixed(2) || 'N/A'}B
+
+### Fondamentaux
+- P/E Ratio: ${metrics?.peRatioTTM || 'N/A'}
+- PEG Ratio: ${metrics?.pegRatioTTM || 'N/A'}
+- P/S Ratio: ${metrics?.priceToSalesRatioTTM || 'N/A'}
+- Dividend Yield: ${(metrics?.dividendYieldTTM * 100)?.toFixed(2) || 'N/A'}%
+
+### Ratios Financiers
+- ROE: ${(ratios?.returnOnEquityTTM * 100)?.toFixed(2) || 'N/A'}%
+- ROA: ${(ratios?.returnOnAssetsTTM * 100)?.toFixed(2) || 'N/A'}%
+- Debt/Equity: ${ratios?.debtEquityRatio?.toFixed(2) || 'N/A'}
+- Net Margin: ${(ratios?.netProfitMarginTTM * 100)?.toFixed(2) || 'N/A'}%
+
+### Profil
+- Secteur: ${profile?.sector || 'N/A'}
+- Industrie: ${profile?.industry || 'N/A'}
+- Beta: ${profile?.beta?.toFixed(2) || 'N/A'}
+
+### Actualités Récentes
+${news?.slice(0, 5)?.map((n, i) => `${i + 1}. ${n.title} (${n.source})`).join('\n') || 'Aucune actualité récente'}
+
+## TÂCHE
+
+Génère une analyse JSON avec EXACTEMENT cette structure (pas de texte avant/après, juste le JSON):
+
+{
+  "sentiment": {
+    "overall": 0-100 (score global basé sur tous les facteurs),
+    "news": 0-100 (score basé uniquement sur les actualités),
+    "summary": "Résumé en 1-2 phrases du sentiment général"
+  },
+  "insights": {
+    "catalysts": ["3 facteurs positifs concrets et spécifiques"],
+    "risks": ["3 risques réels et précis"],
+    "consensus": "bullish" ou "neutral" ou "bearish",
+    "reasoning": "Justification en 2-3 phrases de ta conclusion"
+  },
+  "analyst": {
+    "recommendation": "STRONG_BUY" ou "BUY" ou "HOLD" ou "SELL" ou "STRONG_SELL",
+    "confidence": 0-100 (niveau de confiance dans ta recommandation),
+    "keyPoints": ["3 points clés pour justifier ta recommandation"]
+  }
+}
+
+**IMPORTANT**: Réponds UNIQUEMENT avec le JSON valide, sans markdown, sans commentaires.`;
+                };
+
+                // 🎯 Appel batch à Perplexity pour toutes les données IA
+                const fetchAIDataBatch = async (symbol, stockData) => {
+                    try {
+                        // Vérifier le cache
+                        const cached = getCachedAIData(symbol);
+                        if (cached) return cached;
+
+                        console.log(`🤖 Appel Perplexity batch pour ${symbol}...`);
+
+                        const prompt = buildBatchPrompt(symbol, stockData);
+
+                        const response = await fetch('/api/ai-services', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                service: 'perplexity',
+                                model: 'sonar-pro',
+                                prompt,
+                                temperature: 0.3,
+                                max_tokens: 2000
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`Perplexity API error: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+
+                        // Parser le JSON de la réponse
+                        let aiData;
+                        try {
+                            // Nettoyer la réponse (enlever markdown si présent)
+                            let content = data.content || data.message || '';
+                            content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                            aiData = JSON.parse(content);
+                        } catch (parseError) {
+                            console.warn('⚠️ Erreur parsing JSON Perplexity:', parseError);
+                            // Fallback vers données par défaut
+                            aiData = {
+                                sentiment: { overall: 60, news: 65, summary: 'Analyse en cours' },
+                                insights: {
+                                    catalysts: ['Données en cours d\'analyse'],
+                                    risks: ['Évaluation en cours'],
+                                    consensus: 'neutral',
+                                    reasoning: 'Analyse incomplète'
+                                },
+                                analyst: {
+                                    recommendation: 'HOLD',
+                                    confidence: 50,
+                                    keyPoints: ['Analyse en cours']
+                                }
+                            };
+                        }
+
+                        // Mettre en cache
+                        setCachedAIData(symbol, aiData);
+
+                        console.log(`✅ Données IA récupérées pour ${symbol}`);
+                        return aiData;
+
+                    } catch (error) {
+                        console.error(`❌ Erreur fetchAIDataBatch pour ${symbol}:`, error);
+                        // Retourner données par défaut en cas d'erreur
+                        return {
+                            sentiment: { overall: 60, news: 65, summary: 'Données non disponibles' },
+                            insights: {
+                                catalysts: ['Analyse temporairement indisponible'],
+                                risks: ['Données en cours de récupération'],
+                                consensus: 'neutral',
+                                reasoning: 'Erreur lors de l\'analyse'
+                            },
+                            analyst: {
+                                recommendation: 'HOLD',
+                                confidence: 50,
+                                keyPoints: ['Recommandation temporairement indisponible']
+                            }
+                        };
+                    }
+                };
+
                 // Fonction pour récupérer les données réelles d'un stock
                 const fetchRealStockData = async (symbol, currentTimeframe = '1D') => {
                     try {
@@ -11759,31 +11920,104 @@ console.log('✅ Données hybrides récupérées:', {
                             scores.profitability = profitabilityScore;
                             totalScore += (profitabilityScore * jslaiConfig.profitability) / 100;
                             
-                            // 3. GROWTH (score neutre pour l'instant)
-                            scores.growth = 60;
-                            totalScore += (60 * jslaiConfig.growth) / 100;
-                            
-                            // 4. FINANCIAL HEALTH (basé sur debt/equity)
-                            const de = ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null;
-                            let healthScore = 50;
-                            if (de !== null) {
-                                if (de < 0.3) healthScore = 100;
-                                else if (de < 0.5) healthScore = 85;
-                                else if (de < 1.0) healthScore = 70;
-                                else if (de < 1.5) healthScore = 55;
-                                else if (de < 2.0) healthScore = 40;
-                                else healthScore = 25;
+                            // 3. GROWTH (basé sur croissance revenue + marges)
+                            const grossMargin = ratios?.data?.[0]?.grossProfitMarginTTM || ratios?.grossProfitMarginTTM || null;
+                            const netMargin = ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null;
+                            let growthScore = 60; // Neutre par défaut
+
+                            // Utiliser les marges comme proxy de croissance
+                            if (grossMargin && netMargin) {
+                                const avgMargin = (grossMargin + netMargin) / 2;
+                                if (avgMargin > 0.30) growthScore = 100; // Marges >30% = excellente croissance
+                                else if (avgMargin > 0.20) growthScore = 85;
+                                else if (avgMargin > 0.15) growthScore = 70;
+                                else if (avgMargin > 0.10) growthScore = 55;
+                                else if (avgMargin > 0.05) growthScore = 40;
+                                else growthScore = 25;
                             }
+                            scores.growth = growthScore;
+                            totalScore += (growthScore * jslaiConfig.growth) / 100;
+
+                            // 4. FINANCIAL HEALTH (basé sur debt/equity + current ratio)
+                            const de = ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null;
+                            const currentRatio = ratios?.data?.[0]?.currentRatio || ratios?.currentRatio || null;
+                            let healthScore = 50;
+
+                            // Score basé sur D/E
+                            let deScore = 50;
+                            if (de !== null) {
+                                if (de < 0.3) deScore = 100;
+                                else if (de < 0.5) deScore = 85;
+                                else if (de < 1.0) deScore = 70;
+                                else if (de < 1.5) deScore = 55;
+                                else if (de < 2.0) deScore = 40;
+                                else deScore = 25;
+                            }
+
+                            // Score basé sur Current Ratio (liquidité)
+                            let liquidityScore = 50;
+                            if (currentRatio !== null) {
+                                if (currentRatio > 3.0) liquidityScore = 100;
+                                else if (currentRatio > 2.0) liquidityScore = 85;
+                                else if (currentRatio > 1.5) liquidityScore = 70;
+                                else if (currentRatio > 1.0) liquidityScore = 55;
+                                else if (currentRatio > 0.5) liquidityScore = 40;
+                                else liquidityScore = 25;
+                            }
+
+                            // Moyenne pondérée: 60% D/E, 40% liquidité
+                            healthScore = Math.round((deScore * 0.6) + (liquidityScore * 0.4));
                             scores.financialHealth = healthScore;
                             totalScore += (healthScore * jslaiConfig.financialHealth) / 100;
-                            
-                            // 5-7. MOMENTUM, MOAT, SECTOR (scores neutres pour l'instant)
-                            scores.momentum = 55;
-                            scores.moat = 60;
-                            scores.sectorPosition = 60;
-                            totalScore += (55 * jslaiConfig.momentum) / 100;
-                            totalScore += (60 * jslaiConfig.moat) / 100;
-                            totalScore += (60 * jslaiConfig.sectorPosition) / 100;
+
+                            // 5. MOMENTUM (basé sur performance récente)
+                            const priceChange = quote?.dp || 0; // Variation % depuis fermeture
+                            let momentumScore = 50;
+
+                            if (priceChange > 10) momentumScore = 100; // +10%+ = très fort momentum
+                            else if (priceChange > 5) momentumScore = 85;
+                            else if (priceChange > 2) momentumScore = 70;
+                            else if (priceChange > 0) momentumScore = 60;
+                            else if (priceChange > -2) momentumScore = 45;
+                            else if (priceChange > -5) momentumScore = 30;
+                            else momentumScore = 15;
+
+                            scores.momentum = momentumScore;
+                            totalScore += (momentumScore * jslaiConfig.momentum) / 100;
+
+                            // 6. MOAT (basé sur marges opérationnelles et brutes)
+                            const operatingMargin = ratios?.data?.[0]?.operatingProfitMarginTTM || ratios?.operatingProfitMarginTTM || null;
+                            let moatScore = 60; // Neutre par défaut
+
+                            // Entreprises avec fortes marges = moat économique solide
+                            if (grossMargin && operatingMargin) {
+                                const avgProfitMargin = (grossMargin + operatingMargin) / 2;
+                                if (avgProfitMargin > 0.40) moatScore = 100; // Marges >40% = moat exceptionnel
+                                else if (avgProfitMargin > 0.30) moatScore = 85;
+                                else if (avgProfitMargin > 0.20) moatScore = 70;
+                                else if (avgProfitMargin > 0.15) moatScore = 60;
+                                else if (avgProfitMargin > 0.10) moatScore = 45;
+                                else moatScore = 30;
+                            }
+                            scores.moat = moatScore;
+                            totalScore += (moatScore * jslaiConfig.moat) / 100;
+
+                            // 7. SECTOR POSITION (basé sur beta - volatilité vs marché)
+                            const beta = profile?.data?.[0]?.beta || profile?.beta || null;
+                            let sectorScore = 60; // Neutre par défaut
+
+                            // Beta < 1 = moins volatil que le marché (bon signe)
+                            // Beta > 1 = plus volatil (risque)
+                            if (beta !== null) {
+                                if (beta < 0.5) sectorScore = 100; // Très stable
+                                else if (beta < 0.8) sectorScore = 85;
+                                else if (beta < 1.0) sectorScore = 75;
+                                else if (beta < 1.2) sectorScore = 60;
+                                else if (beta < 1.5) sectorScore = 45;
+                                else sectorScore = 30; // Très volatil
+                            }
+                            scores.sectorPosition = sectorScore;
+                            totalScore += (sectorScore * jslaiConfig.sectorPosition) / 100;
                             
                             const finalScore = Math.round(totalScore);
                             
@@ -11803,7 +12037,38 @@ console.log('✅ Données hybrides récupérées:', {
                         };
 
                         const jslaiScore = calculateJSLAIScore();
-                        
+
+                        // 🎯 Appel batch Perplexity pour données IA (Sentiment + Insights + Analyst)
+                        const aiData = await fetchAIDataBatch(symbol, {
+                            quote: {
+                                price: quote?.c || 0,
+                                changesPercentage: quote?.dp || 0,
+                                volume: quote?.volume || 0,
+                                marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0
+                            },
+                            metrics: {
+                                peRatioTTM: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
+                                pegRatioTTM: ratios?.data?.[0]?.pegRatioTTM || ratios?.pegRatioTTM || null,
+                                priceToSalesRatioTTM: ratios?.data?.[0]?.priceToSalesRatioTTM || ratios?.priceToSalesRatioTTM || null,
+                                dividendYieldTTM: ratios?.data?.[0]?.dividendYieldTTM || ratios?.dividendYieldTTM || null
+                            },
+                            ratios: {
+                                returnOnEquityTTM: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
+                                returnOnAssetsTTM: ratios?.data?.[0]?.returnOnAssetsTTM || ratios?.returnOnAssetsTTM || null,
+                                debtEquityRatio: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
+                                netProfitMarginTTM: ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null
+                            },
+                            profile: {
+                                sector: profile?.data?.[0]?.sector || profile?.sector || 'Unknown',
+                                industry: profile?.data?.[0]?.industry || profile?.industry || 'Unknown',
+                                beta: profile?.data?.[0]?.beta || profile?.beta || null
+                            },
+                            news: news?.news?.slice(0, 5)?.map(article => ({
+                                title: article.title,
+                                source: article.source?.name || 'Unknown'
+                            })) || []
+                        });
+
                         // Construire l'objet de données structuré
                         return {
                             jslaiScore: jslaiScore,  // 🎯 Score JSLAI™ ajouté
@@ -12045,16 +12310,12 @@ console.log('✅ Données hybrides récupérées:', {
                                 sentiment: article.sentiment || 'neutral'
                             })) || [],
                             sentiment: {
-                                overall: news?.sentimentAnalysis?.positivePercent || 60,
-                                news: news?.sentimentAnalysis?.positivePercent || 65,
-                                social: 60,
-                                institutional: 55,
-                                retail: 70,
-                                summary: news?.sentimentAnalysis?.overallSentiment === 'positive' 
-                                    ? 'Sentiment globalement positif' 
-                                    : news?.sentimentAnalysis?.overallSentiment === 'negative'
-                                    ? 'Sentiment globalement négatif'
-                                    : 'Sentiment neutre'
+                                overall: aiData?.sentiment?.overall || 60,
+                                news: aiData?.sentiment?.news || 65,
+                                social: 60,  // Pas encore disponible via IA
+                                institutional: 55,  // Pas encore disponible via IA
+                                retail: 70,  // Pas encore disponible via IA
+                                summary: aiData?.sentiment?.summary || 'Analyse en cours'
                             },
                             // 🎯 Nouvelles données avec validation croisée
                             analystRecommendations: analystData ? {
@@ -12096,20 +12357,25 @@ console.log('✅ Données hybrides récupérées:', {
                                 }
                             },
                             insights: {
-                                catalysts: news?.news?.slice(0, 3)?.map(article => article.title) || [
+                                catalysts: aiData?.insights?.catalysts || [
                                     'Analyse en cours des catalyseurs de marché',
                                     'Surveillance des annonces d\'entreprise',
                                     'Suivi des tendances du secteur'
                                 ],
-                                risks: [
+                                risks: aiData?.insights?.risks || [
                                     'Volatilité du marché',
                                     'Conditions macroéconomiques',
                                     'Concurrence sectorielle'
                                 ],
-                                consensus: news?.sentimentAnalysis?.overallSentiment === 'positive' ? 'bullish' : 
-                                          news?.sentimentAnalysis?.overallSentiment === 'negative' ? 'bearish' : 'neutral',
-                                reasoning: news?.sentimentAnalysis?.summary || 'Analyse basée sur les données de marché actuelles'
+                                consensus: aiData?.insights?.consensus || 'neutral',
+                                reasoning: aiData?.insights?.reasoning || 'Analyse basée sur les données de marché actuelles'
                             },
+                            // 🎯 Recommandations d'analyste IA (batch Perplexity)
+                            aiAnalyst: aiData?.analyst ? {
+                                recommendation: aiData.analyst.recommendation,
+                                confidence: aiData.analyst.confidence,
+                                keyPoints: aiData.analyst.keyPoints
+                            } : null,
                             // 🎯 Indicateurs de fallback pour transparence
                             fallbackIndicators: fallbackIndicators,
                             dataQuality: {
@@ -12183,6 +12449,40 @@ console.log('✅ Données hybrides récupérées:', {
                     // ⚡ OPTIMISATION API: Pas d'auto-refresh
                     // Chargement uniquement au changement de stock ou manuel
                 }, [selectedStock]);
+
+                // 🔄 AUTO-REFRESH: Actualisation périodique des données (5 min)
+                useEffect(() => {
+                    // Ne pas auto-refresh si pas de stock sélectionné
+                    if (!selectedStock) return;
+
+                    // Définir l'intervalle de refresh (5 minutes = 300000ms)
+                    const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+                    console.log(`🔄 Auto-refresh activé pour ${selectedStock} (intervalle: 5 min)`);
+
+                    const refreshInterval = setInterval(async () => {
+                        try {
+                            console.log(`🔄 Auto-refresh: Actualisation des données pour ${selectedStock}...`);
+
+                            const realData = await fetchRealStockData(selectedStock, timeframe);
+                            if (realData && realData.quote && realData.quote.price > 0) {
+                                setStockDataIntelli(realData);
+                                setConnected(true);
+                                setLastUpdateIntelli(new Date());
+                                console.log('✅ Auto-refresh: Données actualisées avec succès');
+                            }
+                        } catch (error) {
+                            console.warn('⚠️ Auto-refresh: Erreur lors de l\'actualisation:', error?.message);
+                            // Ne pas afficher d'erreur à l'utilisateur pour auto-refresh
+                        }
+                    }, REFRESH_INTERVAL);
+
+                    // Nettoyer l'intervalle quand le composant unmount ou stock change
+                    return () => {
+                        console.log(`🛑 Auto-refresh désactivé pour ${selectedStock}`);
+                        clearInterval(refreshInterval);
+                    };
+                }, [selectedStock, timeframe]);
 
                 // Timer (désactivé pour éviter les actualisations inutiles)
                 // useEffect(() => {

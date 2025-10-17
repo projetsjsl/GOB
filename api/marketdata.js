@@ -12,7 +12,9 @@ const cache = new Map();
 const CACHE_TTL = {
   quote: 5 * 60 * 1000,        // 5 minutes
   fundamentals: 60 * 60 * 1000, // 1 heure
-  intraday: 5 * 60 * 1000       // 5 minutes
+  intraday: 5 * 60 * 1000,      // 5 minutes
+  analyst: 60 * 60 * 1000,      // 1 heure
+  earnings: 60 * 60 * 1000      // 1 heure
 };
 
 // Helpers
@@ -172,6 +174,96 @@ const fetchFundamentalsFromFMP = async (symbol) => {
   };
 };
 
+// Source 4: FMP (Analyst Recommendations)
+const fetchAnalystFromFMP = async (symbol) => {
+  if (!FMP_API_KEY) {
+    throw new Error('FMP_API_KEY manquante');
+  }
+
+  try {
+    const url = `https://financialmodelingprep.com/api/v3/analyst-estimates/${symbol}?apikey=${FMP_API_KEY}`;
+    const response = await fetchWithTimeout(url);
+
+    if (!response.ok) {
+      throw new Error(`FMP Analyst API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Calculer le consensus
+    if (data && data.length > 0) {
+      const latest = data[0];
+
+      return {
+        symbol: symbol.toUpperCase(),
+        consensus: {
+          estimatedRevenue: latest.estimatedRevenueAvg || null,
+          estimatedEPS: latest.estimatedEpsAvg || null,
+          estimatedEPSHigh: latest.estimatedEpsHigh || null,
+          estimatedEPSLow: latest.estimatedEpsLow || null,
+          numberAnalysts: latest.numberAnalystEstimatedRevenue || 0
+        },
+        estimates: data.slice(0, 4), // 4 derniers trimestres
+        source: 'fmp',
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    return {
+      symbol: symbol.toUpperCase(),
+      consensus: null,
+      estimates: [],
+      source: 'fmp',
+      timestamp: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.warn(`⚠️ FMP Analyst failed for ${symbol}:`, error.message);
+    throw error;
+  }
+};
+
+// Source 5: FMP (Earnings Calendar)
+const fetchEarningsFromFMP = async (symbol) => {
+  if (!FMP_API_KEY) {
+    throw new Error('FMP_API_KEY manquante');
+  }
+
+  try {
+    // Fetch en parallèle: calendar + historical earnings
+    const [calendarRes, historicalRes] = await Promise.allSettled([
+      fetchWithTimeout(`https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${symbol}&apikey=${FMP_API_KEY}`),
+      fetchWithTimeout(`https://financialmodelingprep.com/api/v3/historical/earning_calendar/${symbol}?apikey=${FMP_API_KEY}`)
+    ]);
+
+    const calendar = calendarRes.status === 'fulfilled' && calendarRes.value.ok
+      ? await calendarRes.value.json() : [];
+    const historical = historicalRes.status === 'fulfilled' && historicalRes.value.ok
+      ? await historicalRes.value.json() : [];
+
+    // Trouver la prochaine date d'earnings
+    const upcoming = calendar.filter(e => new Date(e.date) >= new Date());
+    const nextEarnings = upcoming.length > 0 ? upcoming[0] : null;
+
+    return {
+      symbol: symbol.toUpperCase(),
+      consensus: {
+        nextEarningsDate: nextEarnings?.date || null,
+        estimatedEPS: nextEarnings?.eps || null,
+        estimatedRevenue: nextEarnings?.revenue || null
+      },
+      upcoming: upcoming.slice(0, 3),
+      historical: historical.slice(0, 8), // 8 derniers résultats
+      source: 'fmp',
+      timestamp: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.warn(`⚠️ FMP Earnings failed for ${symbol}:`, error.message);
+    throw error;
+  }
+};
+
 // ============================================================================
 // HANDLER PRINCIPAL
 // ============================================================================
@@ -194,17 +286,21 @@ export default async function handler(req, res) {
       return res.status(200).json({
         status: 'healthy',
         message: 'Market Data API opérationnel - Sources optimisées',
-        version: '2.0',
-        availableEndpoints: ['quote', 'fundamentals', 'intraday'],
+        version: '3.0',
+        availableEndpoints: ['quote', 'fundamentals', 'intraday', 'analyst', 'earnings'],
         sources: {
           quote: 'Polygon.io (preferred) → Twelve Data (fallback)',
           fundamentals: 'FMP (parallel fetch: profile + ratios + quote)',
-          intraday: 'Twelve Data (5min intervals)'
+          intraday: 'Twelve Data (5min intervals)',
+          analyst: 'FMP (analyst estimates)',
+          earnings: 'FMP (earnings calendar + historical)'
         },
         cache: {
           quote: '5 min',
           fundamentals: '1 hour',
-          intraday: '5 min'
+          intraday: '5 min',
+          analyst: '1 hour',
+          earnings: '1 hour'
         },
         timestamp: new Date().toISOString()
       });
@@ -283,9 +379,47 @@ export default async function handler(req, res) {
       return res.status(200).json(intradayData);
     }
 
+    // ========================================================================
+    // ENDPOINT: ANALYST
+    // ========================================================================
+    if (endpoint === 'analyst') {
+      // Vérifier cache
+      if (useCache) {
+        const cached = getFromCache(cacheKey, CACHE_TTL.analyst);
+        if (cached) return res.status(200).json({ ...cached, cached: true });
+      }
+
+      const analystData = await fetchAnalystFromFMP(symbol);
+
+      // Mettre en cache
+      setCache(cacheKey, analystData);
+
+      console.log(`✅ Analyst: ${symbol} from FMP`);
+      return res.status(200).json(analystData);
+    }
+
+    // ========================================================================
+    // ENDPOINT: EARNINGS
+    // ========================================================================
+    if (endpoint === 'earnings') {
+      // Vérifier cache
+      if (useCache) {
+        const cached = getFromCache(cacheKey, CACHE_TTL.earnings);
+        if (cached) return res.status(200).json({ ...cached, cached: true });
+      }
+
+      const earningsData = await fetchEarningsFromFMP(symbol);
+
+      // Mettre en cache
+      setCache(cacheKey, earningsData);
+
+      console.log(`✅ Earnings: ${symbol} from FMP`);
+      return res.status(200).json(earningsData);
+    }
+
     return res.status(400).json({
       error: 'Endpoint non supporté',
-      availableEndpoints: ['quote', 'fundamentals', 'intraday']
+      availableEndpoints: ['quote', 'fundamentals', 'intraday', 'analyst', 'earnings']
     });
 
   } catch (error) {
