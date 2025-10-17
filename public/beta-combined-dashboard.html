@@ -1883,7 +1883,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                     await analyzeWithPerplexityAndUpdate(ticker, event.data.data);
                                     addScrapingLog(`🎉 Traitement complet terminé pour ${ticker}`, 'success');
                                 } catch (claudeError) {
-                                    addScrapingLog(`⚠️ Erreur analyse Claude pour ${ticker}: ${claudeError.message}`, 'warning');
+                                    addScrapingLog(`⚠️ Erreur analyse Perplexity pour ${ticker}: ${claudeError.message}`, 'warning');
                                     addScrapingLog(`💾 Données scrapées sauvegardées localement`, 'info');
                                 }
                                 
@@ -2288,10 +2288,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     }
 
                     // ========================================================================
-                    // STEP 2: Save Claude analysis to Supabase
+                    // STEP 2: Save Perplexity analysis to Supabase
                     // ========================================================================
                     try {
-                        addScrapingLog(`💾 Sauvegarde de l'analyse Claude dans Supabase pour ${ticker}...`, 'info');
+                        addScrapingLog(`💾 Sauvegarde de l'analyse Perplexity dans Supabase pour ${ticker}...`, 'info');
 
                         const analysisResponse = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=analysis`, {
                             method: 'POST',
@@ -2324,8 +2324,8 @@ STRUCTURE JSON OBLIGATOIRE:
 
                         if (analysisResponse.ok) {
                             const analysisResult = await analysisResponse.json();
-                            addScrapingLog(`✅ Analyse Claude sauvegardée dans Supabase: ${ticker}`, 'success');
-                            console.log(`✅ Claude analysis saved to Supabase:`, analysisResult);
+                            addScrapingLog(`✅ Analyse Perplexity sauvegardée dans Supabase: ${ticker}`, 'success');
+                            console.log(`✅ Perplexity analysis saved to Supabase:`, analysisResult);
                         } else {
                             const errorText = await analysisResponse.text();
                             throw new Error(`HTTP ${analysisResponse.status}: ${errorText}`);
@@ -2345,7 +2345,7 @@ STRUCTURE JSON OBLIGATOIRE:
                     return analysisData;
 
                 } catch (error) {
-                    addScrapingLog(`❌ Erreur analyse Claude pour ${ticker}: ${error.message}`, 'error');
+                    addScrapingLog(`❌ Erreur analyse Perplexity pour ${ticker}: ${error.message}`, 'error');
                     throw error;
                 }
             };
@@ -4650,7 +4650,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             }`}>
                                 <div>• <strong>Claude API:</strong> Configurez ANTHROPIC_API_KEY pour l'analyse automatique</div>
                                 <div>• <strong>GitHub API:</strong> Configurez GITHUB_TOKEN pour la mise à jour des fichiers</div>
-                                <div>• <strong>Fonctionnalité:</strong> Scraping → Analyse Claude → Mise à jour JSON automatique</div>
+                                <div>• <strong>Fonctionnalité:</strong> Scraping → Analyse Perplexity → Mise à jour JSON automatique</div>
                                 <div>• <strong>Bouton:</strong> "🤖 Analyser avec Claude" pour traiter les données existantes</div>
                             </div>
                         </div>
@@ -4735,7 +4735,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             </button>
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🤖 Démarrage de l\'analyse Claude sur les données existantes...', 'info');
+                                    addScrapingLog('🤖 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
                                     try {
                                         for (const ticker of tickers) {
                                             const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
@@ -4743,9 +4743,9 @@ STRUCTURE JSON OBLIGATOIRE:
                                                 await analyzeWithClaude(ticker, seekingAlphaItem.parsedData);
                                             }
                                         }
-                                        addScrapingLog('✅ Analyse Claude terminée pour tous les titres', 'success');
+                                        addScrapingLog('✅ Analyse Perplexity terminée pour tous les titres', 'success');
                                     } catch (error) {
-                                        addScrapingLog(`❌ Erreur analyse Claude: ${error.message}`, 'error');
+                                        addScrapingLog(`❌ Erreur analyse Perplexity: ${error.message}`, 'error');
                                     }
                                 }}
                                 className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
