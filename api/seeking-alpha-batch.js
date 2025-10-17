@@ -160,12 +160,12 @@ async function processBatch(batch_id, tickers, force_refresh) {
         }
       }
 
-      // Fetch latest raw data for this ticker
+      // Fetch latest raw data for this ticker from EXISTING table: seeking_alpha_data
       const { data: rawData, error: rawError } = await supabase
-        .from('seeking_alpha_raw_data')
+        .from('seeking_alpha_data')
         .select('*')
         .eq('ticker', tickerUpper)
-        .order('scraped_at', { ascending: false })
+        .order('timestamp', { ascending: false })
         .limit(1)
         .single();
 

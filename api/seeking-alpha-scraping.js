@@ -37,11 +37,11 @@ export default async function handler(req, res) {
       const { ticker, limit = 50, latest = 'false' } = req.query;
 
       if (type === 'raw') {
-        // Fetch raw scraped data
+        // Fetch raw scraped data from EXISTING table: seeking_alpha_data
         let query = supabase
-          .from('seeking_alpha_raw_data')
+          .from('seeking_alpha_data')
           .select('*')
-          .order('scraped_at', { ascending: false });
+          .order('timestamp', { ascending: false }); // Your table uses 'timestamp' not 'scraped_at'
 
         if (ticker) {
           query = query.eq('ticker', ticker.toUpperCase());
@@ -133,40 +133,34 @@ export default async function handler(req, res) {
     // ============================================================================
     if (req.method === 'POST') {
       if (type === 'raw') {
-        // Save raw scraped data
+        // Save raw scraped data to EXISTING table: seeking_alpha_data
         const {
           ticker,
           url,
           raw_text,
           raw_html,
-          scrape_method = 'manual',
-          scrape_duration_ms,
-          user_agent,
           status = 'success',
-          error_message,
-          metadata
+          error_message
         } = req.body;
 
-        if (!ticker || !url || !raw_text) {
+        if (!ticker || !raw_text) {
           return res.status(400).json({
             success: false,
-            error: 'ticker, url, and raw_text are required'
+            error: 'ticker and raw_text are required'
           });
         }
 
+        // Adapt to your existing table structure (seeking_alpha_data)
         const { data, error } = await supabase
-          .from('seeking_alpha_raw_data')
+          .from('seeking_alpha_data')
           .insert({
             ticker: ticker.toUpperCase(),
-            url,
-            raw_html,
+            url: url || `https://seekingalpha.com/symbol/${ticker}/virtual_analyst_report`,
             raw_text,
-            scrape_method,
-            scrape_duration_ms,
-            user_agent,
-            status,
-            error_message,
-            metadata
+            raw_html: raw_html || null,
+            timestamp: new Date().toISOString(),
+            status: status,
+            error_message: error_message || null
           })
           .select();
 
@@ -174,16 +168,10 @@ export default async function handler(req, res) {
           throw new Error(`Supabase error: ${error.message}`);
         }
 
-        // Update last_scraped timestamp in tickers table
-        await supabase
-          .from('tickers')
-          .update({ last_scraped: new Date().toISOString() })
-          .eq('ticker', ticker.toUpperCase());
-
         return res.status(201).json({
           success: true,
           type: 'raw',
-          message: 'Raw data saved',
+          message: 'Raw data saved to seeking_alpha_data',
           data: data[0],
           timestamp: new Date().toISOString()
         });

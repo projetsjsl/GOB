@@ -1,9 +1,9 @@
 /**
- * Seeking Alpha Tickers API - CRUD operations for tickers table
+ * Seeking Alpha Tickers API - CRUD operations for team_tickers table (existing)
  *
- * GET     /api/seeking-alpha-tickers?active=true&source=team&limit=50
- * POST    /api/seeking-alpha-tickers (body: {ticker, company_name, sector, source})
- * PUT     /api/seeking-alpha-tickers (body: {ticker, updates})
+ * GET     /api/seeking-alpha-tickers?limit=50
+ * POST    /api/seeking-alpha-tickers (body: {ticker, priority})
+ * PUT     /api/seeking-alpha-tickers (body: {ticker, priority})
  * DELETE  /api/seeking-alpha-tickers?ticker=AAPL
  */
 
@@ -25,67 +25,50 @@ export default async function handler(req, res) {
 
   try {
     // ============================================================================
-    // GET - Fetch tickers with optional filters
+    // GET - Fetch tickers from EXISTING table: team_tickers
     // ============================================================================
     if (req.method === 'GET') {
       const {
-        active,
-        source,
         limit = 100,
-        scraping_enabled,
-        needs_scraping,
+        needs_analysis,
         max_age_hours = 24
       } = req.query;
 
-      let query = supabase
-        .from('tickers')
-        .select('*')
-        .order('ticker', { ascending: true });
-
-      // Filter by active status
-      if (active !== undefined) {
-        query = query.eq('is_active', active === 'true');
-      }
-
-      // Filter by source (team, watchlist, manual, all)
-      if (source) {
-        query = query.eq('source', source);
-      }
-
-      // Filter by scraping enabled
-      if (scraping_enabled !== undefined) {
-        query = query.eq('scraping_enabled', scraping_enabled === 'true');
-      }
-
-      // Apply limit
-      query = query.limit(parseInt(limit));
-
-      const { data: tickers, error } = await query;
-
-      if (error) {
-        throw new Error(`Supabase error: ${error.message}`);
-      }
-
-      // If needs_scraping=true, use the smart function to get stale tickers
-      if (needs_scraping === 'true') {
+      // If needs_analysis=true, use the function to get tickers needing analysis
+      if (needs_analysis === 'true') {
         const { data: staleTickers, error: funcError } = await supabase
-          .rpc('get_tickers_to_scrape', {
+          .rpc('get_tickers_needing_analysis', {
             max_age_hours: parseInt(max_age_hours),
             limit_count: parseInt(limit)
           });
 
         if (funcError) {
-          console.error('Error calling get_tickers_to_scrape:', funcError);
+          console.error('Error calling get_tickers_needing_analysis:', funcError);
           // Fall through to return all tickers if function fails
         } else {
           return res.status(200).json({
             success: true,
             tickers: staleTickers,
             count: staleTickers.length,
-            filter: 'needs_scraping',
+            filter: 'needs_analysis',
             timestamp: new Date().toISOString()
           });
         }
+      }
+
+      // Fetch all tickers from team_tickers (your existing table)
+      let query = supabase
+        .from('team_tickers')
+        .select('*')
+        .order('priority', { ascending: false, nullsLast: true })
+        .order('ticker', { ascending: true });
+
+      query = query.limit(parseInt(limit));
+
+      const { data: tickers, error } = await query;
+
+      if (error) {
+        throw new Error(`Supabase error: ${error.message}`);
       }
 
       return res.status(200).json({
@@ -97,16 +80,18 @@ export default async function handler(req, res) {
     }
 
     // ============================================================================
-    // POST - Add new ticker(s)
+    // POST - Add new ticker(s) to team_tickers
     // ============================================================================
     if (req.method === 'POST') {
-      const { ticker, tickers: tickerList, company_name, sector, source = 'manual' } = req.body;
+      const { ticker, tickers: tickerList, priority } = req.body;
 
       // Support both single ticker and batch insert
-      const tickersToInsert = tickerList ? tickerList : [{ ticker, company_name, sector, source }];
+      const tickersToInsert = tickerList
+        ? tickerList.map(t => ({ ticker: t, priority: priority || null }))
+        : [{ ticker, priority: priority || null }];
 
       const { data, error } = await supabase
-        .from('tickers')
+        .from('team_tickers')
         .insert(tickersToInsert)
         .select();
 
@@ -124,17 +109,17 @@ export default async function handler(req, res) {
 
       return res.status(201).json({
         success: true,
-        message: `Added ${data.length} ticker(s)`,
+        message: `Added ${data.length} ticker(s) to team_tickers`,
         tickers: data,
         timestamp: new Date().toISOString()
       });
     }
 
     // ============================================================================
-    // PUT - Update ticker
+    // PUT - Update ticker priority in team_tickers
     // ============================================================================
     if (req.method === 'PUT') {
-      const { ticker, updates } = req.body;
+      const { ticker, priority } = req.body;
 
       if (!ticker) {
         return res.status(400).json({
@@ -144,8 +129,8 @@ export default async function handler(req, res) {
       }
 
       const { data, error } = await supabase
-        .from('tickers')
-        .update(updates)
+        .from('team_tickers')
+        .update({ priority })
         .eq('ticker', ticker)
         .select();
 
@@ -156,20 +141,20 @@ export default async function handler(req, res) {
       if (data.length === 0) {
         return res.status(404).json({
           success: false,
-          error: 'Ticker not found'
+          error: 'Ticker not found in team_tickers'
         });
       }
 
       return res.status(200).json({
         success: true,
-        message: 'Ticker updated',
+        message: 'Ticker priority updated',
         ticker: data[0],
         timestamp: new Date().toISOString()
       });
     }
 
     // ============================================================================
-    // DELETE - Remove ticker
+    // DELETE - Remove ticker from team_tickers
     // ============================================================================
     if (req.method === 'DELETE') {
       const { ticker } = req.query;
@@ -182,7 +167,7 @@ export default async function handler(req, res) {
       }
 
       const { error } = await supabase
-        .from('tickers')
+        .from('team_tickers')
         .delete()
         .eq('ticker', ticker);
 
@@ -192,7 +177,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: `Ticker ${ticker} deleted`,
+        message: `Ticker ${ticker} deleted from team_tickers`,
         timestamp: new Date().toISOString()
       });
     }
