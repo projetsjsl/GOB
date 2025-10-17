@@ -2193,7 +2193,91 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
 
                     addScrapingLog(`✅ Analyse Claude terminée pour ${ticker}`, 'success');
 
-                    // Mettre à jour les fichiers JSON via GitHub API
+                    // ========================================================================
+                    // STEP 1: Save raw scraped data to Supabase
+                    // ========================================================================
+                    try {
+                        addScrapingLog(`💾 Sauvegarde des données brutes dans Supabase pour ${ticker}...`, 'info');
+
+                        const rawResponse = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=raw`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ticker: ticker.toUpperCase(),
+                                url: scrapedData.url || `https://seekingalpha.com/symbol/${ticker}/virtual_analyst_report`,
+                                raw_text: scrapedData.fullText || scrapedData.content || JSON.stringify(scrapedData),
+                                raw_html: scrapedData.raw_html || null,
+                                status: 'success'
+                            })
+                        });
+
+                        if (rawResponse.ok) {
+                            const rawResult = await rawResponse.json();
+                            addScrapingLog(`✅ Données brutes sauvegardées dans Supabase: ${ticker}`, 'success');
+                            console.log(`✅ Raw data saved to Supabase:`, rawResult);
+                        } else {
+                            const errorText = await rawResponse.text();
+                            throw new Error(`HTTP ${rawResponse.status}: ${errorText}`);
+                        }
+                    } catch (error) {
+                        console.error(`❌ Failed to save raw data to Supabase:`, error);
+                        addScrapingLog(`⚠️ Échec sauvegarde données brutes: ${error.message}`, 'warning');
+                        // Continue despite error - not blocking
+                    }
+
+                    // ========================================================================
+                    // STEP 2: Save Claude analysis to Supabase
+                    // ========================================================================
+                    try {
+                        addScrapingLog(`💾 Sauvegarde de l'analyse Claude dans Supabase pour ${ticker}...`, 'info');
+
+                        const analysisResponse = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=analysis`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ticker: ticker.toUpperCase(),
+                                company_name: analysisData.companyName,
+                                sector: analysisData.metrics?.sector,
+                                industry: analysisData.metrics?.industry,
+                                current_price: parseFloat(analysisData.metrics?.price) || null,
+                                market_cap: analysisData.metrics?.marketCap,
+                                pe_ratio: parseFloat(analysisData.metrics?.peRatio) || null,
+                                dividend_yield: parseFloat(analysisData.metrics?.dividendYield) || null,
+                                annual_dividend: parseFloat(analysisData.metrics?.annualPayout) || null,
+                                ex_dividend_date: analysisData.metrics?.exDivDate,
+                                quant_overall: analysisData.quantRating?.overall,
+                                quant_valuation: analysisData.quantRating?.valuation,
+                                quant_growth: analysisData.quantRating?.growth,
+                                quant_profitability: analysisData.quantRating?.profitability,
+                                quant_momentum: analysisData.quantRating?.momentum,
+                                quant_eps_revisions: analysisData.quantRating?.revisions,
+                                strengths: analysisData.strengths || [],
+                                concerns: analysisData.concerns || [],
+                                analyst_rating: analysisData.finalConclusion?.rating,
+                                analyst_recommendation: analysisData.finalConclusion?.recommendation,
+                                company_description: analysisData.companyProfile?.description,
+                                analysis_model: 'claude-3-5-sonnet-20241022'
+                            })
+                        });
+
+                        if (analysisResponse.ok) {
+                            const analysisResult = await analysisResponse.json();
+                            addScrapingLog(`✅ Analyse Claude sauvegardée dans Supabase: ${ticker}`, 'success');
+                            console.log(`✅ Claude analysis saved to Supabase:`, analysisResult);
+                        } else {
+                            const errorText = await analysisResponse.text();
+                            throw new Error(`HTTP ${analysisResponse.status}: ${errorText}`);
+                        }
+                    } catch (error) {
+                        console.error(`❌ Failed to save analysis to Supabase:`, error);
+                        addScrapingLog(`⚠️ Échec sauvegarde analyse: ${error.message}`, 'warning');
+                        // Continue despite error - not blocking
+                    }
+
+                    // ========================================================================
+                    // STEP 3: Update JSON files via GitHub API (fallback/backup)
+                    // ========================================================================
+                    addScrapingLog(`📝 Sauvegarde de secours dans GitHub JSON...`, 'info');
                     await updateStockDataFiles(ticker, analysisData, scrapedData);
 
                     return analysisData;
