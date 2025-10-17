@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:28:44.893Z",
+  "lastUpdate": "2025-10-17T20:28:54.097Z",
   "stocks": {
     "GOOGL": {
       "ticker": "GOOGL",
@@ -629,59 +629,54 @@
     "JPM": {},
     "LVMHF": {
       "ticker": "LVMHF",
-      "companyName": "LVMH Moët Hennessy Louis Vuitton",
-      "lastUpdate": "2025-10-09T16:48:09.627Z",
+      "companyName": null,
+      "lastUpdate": "2025-10-17T20:28:46.284Z",
       "metrics": {
-        "marketCap": "En attente d'analyse",
-        "bpaGrowth": "En attente d'analyse",
-        "peRatio": "En attente d'analyse",
-        "sector": "Consumer Goods - Luxury",
-        "dividendYield": "En attente d'analyse",
-        "dividendFrequency": "Annual",
-        "exDivDate": "En attente d'analyse",
-        "annualPayout": "En attente d'analyse",
-        "price": "En attente d'analyse",
-        "priceChange": "En attente d'analyse"
+        "marketCap": null,
+        "bpaGrowth": null,
+        "peRatio": null,
+        "sector": null,
+        "industry": null,
+        "dividendYield": null,
+        "dividendFrequency": null,
+        "exDivDate": null,
+        "annualPayout": null,
+        "price": null,
+        "priceChange": null
       },
       "companyProfile": {
-        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
-        "employees": "En attente d'analyse",
-        "innovation": "En attente d'analyse"
+        "description": null,
+        "employees": null,
+        "innovation": null
       },
       "competition": {
-        "competitors": [
-          "Kering",
-          "Richemont"
-        ],
-        "valueProposition": "En attente d'analyse",
-        "advantages": "En attente d'analyse"
+        "competitors": [],
+        "valueProposition": null,
+        "advantages": null
       },
       "quantRating": {
-        "valuation": "N/A",
-        "growth": "N/A",
-        "profitability": "N/A",
-        "momentum": "N/A",
-        "revisions": "N/A"
+        "overall": null,
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
       },
       "sectorAnalysis": {
-        "valuation": "En attente d'analyse",
-        "growth": "En attente d'analyse",
-        "profitability": "En attente d'analyse",
-        "momentum": "En attente d'analyse",
-        "revisions": "En attente d'analyse"
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
       },
-      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
-      "strengths": [
-        "Données en cours de traitement"
-      ],
-      "concerns": [
-        "Analyse en attente"
-      ],
+      "intermediateConclusion": null,
+      "strengths": [],
+      "concerns": [],
       "finalConclusion": {
-        "strengths": "En attente d'analyse",
-        "weaknesses": "En attente d'analyse",
-        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
-        "rating": "Pending"
+        "strengths": null,
+        "weaknesses": null,
+        "recommendation": null,
+        "rating": null
       }
     },
     "MG": {
