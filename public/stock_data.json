@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:43:45.501Z",
+  "lastUpdate": "2025-10-17T20:43:47.088Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -646,7 +646,7 @@
     "WFC": {
       "ticker": "WFC",
       "companyName": "Wells Fargo & Company",
-      "lastUpdate": "2025-10-17T20:43:41.238Z",
+      "lastUpdate": "2025-10-17T20:24:00.000Z",
       "metrics": {
         "marketCap": null,
         "bpaGrowth": null,
@@ -657,7 +657,7 @@
         "dividendFrequency": null,
         "exDivDate": null,
         "annualPayout": null,
-        "price": "83.28",
+        "price": "$83.28",
         "priceChange": "-0.86%"
       },
       "companyProfile": {
