@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-09T16:50:29.808Z",
+  "lastUpdate": "2025-10-17T20:26:19.643Z",
   "stocks": {
     "GOOGL": {
       "ticker": "GOOGL",
@@ -77,7 +77,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Verizon", "T-Mobile"],
+        "competitors": [
+          "Verizon",
+          "T-Mobile"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -131,7 +134,11 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["TD", "RBC", "BMO"],
+        "competitors": [
+          "TD",
+          "RBC",
+          "BMO"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -185,7 +192,11 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["BNS", "RBC", "BMO"],
+        "competitors": [
+          "BNS",
+          "RBC",
+          "BMO"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -239,7 +250,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Rogers", "Telus"],
+        "competitors": [
+          "Rogers",
+          "Telus"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -293,7 +307,9 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["CP Rail"],
+        "competitors": [
+          "CP Rail"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -347,7 +363,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Juniper", "Arista"],
+        "competitors": [
+          "Juniper",
+          "Arista"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -401,7 +420,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Walgreens", "UnitedHealth"],
+        "competitors": [
+          "Walgreens",
+          "UnitedHealth"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -455,7 +477,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Pernod Ricard", "Brown-Forman"],
+        "competitors": [
+          "Pernod Ricard",
+          "Brown-Forman"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -509,7 +534,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Abbott", "Boston Scientific"],
+        "competitors": [
+          "Abbott",
+          "Boston Scientific"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -563,7 +591,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Pfizer", "Merck"],
+        "competitors": [
+          "Pfizer",
+          "Merck"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -617,7 +648,11 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Bank of America", "Wells Fargo", "Citigroup"],
+        "competitors": [
+          "Bank of America",
+          "Wells Fargo",
+          "Citigroup"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -671,7 +706,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Kering", "Richemont"],
+        "competitors": [
+          "Kering",
+          "Richemont"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -779,7 +817,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Sun Life", "Great-West Lifeco"],
+        "competitors": [
+          "Sun Life",
+          "Great-West Lifeco"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -833,7 +874,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Samsung", "SK Hynix"],
+        "competitors": [
+          "Samsung",
+          "SK Hynix"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -887,7 +931,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Unilever", "Procter & Gamble"],
+        "competitors": [
+          "Unilever",
+          "Procter & Gamble"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -941,7 +988,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Adidas", "Under Armour"],
+        "competitors": [
+          "Adidas",
+          "Under Armour"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -995,7 +1045,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Mosaic", "CF Industries"],
+        "competitors": [
+          "Mosaic",
+          "CF Industries"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -1027,60 +1080,7 @@
         "rating": "Pending"
       }
     },
-    "PFE": {
-      "ticker": "PFE",
-      "companyName": "Pfizer Inc.",
-      "lastUpdate": "2025-10-09T16:49:04.344Z",
-      "metrics": {
-        "marketCap": "En attente d'analyse",
-        "bpaGrowth": "En attente d'analyse",
-        "peRatio": "En attente d'analyse",
-        "sector": "Healthcare - Pharmaceuticals",
-        "dividendYield": "En attente d'analyse",
-        "dividendFrequency": "Quarterly",
-        "exDivDate": "En attente d'analyse",
-        "annualPayout": "En attente d'analyse",
-        "price": "En attente d'analyse",
-        "priceChange": "En attente d'analyse"
-      },
-      "companyProfile": {
-        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
-        "employees": "En attente d'analyse",
-        "innovation": "En attente d'analyse"
-      },
-      "competition": {
-        "competitors": ["Johnson & Johnson", "Merck"],
-        "valueProposition": "En attente d'analyse",
-        "advantages": "En attente d'analyse"
-      },
-      "quantRating": {
-        "valuation": "N/A",
-        "growth": "N/A",
-        "profitability": "N/A",
-        "momentum": "N/A",
-        "revisions": "N/A"
-      },
-      "sectorAnalysis": {
-        "valuation": "En attente d'analyse",
-        "growth": "En attente d'analyse",
-        "profitability": "En attente d'analyse",
-        "momentum": "En attente d'analyse",
-        "revisions": "En attente d'analyse"
-      },
-      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
-      "strengths": [
-        "Données en cours de traitement"
-      ],
-      "concerns": [
-        "Analyse en attente"
-      ],
-      "finalConclusion": {
-        "strengths": "En attente d'analyse",
-        "weaknesses": "En attente d'analyse",
-        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
-        "rating": "Pending"
-      }
-    },
+    "PFE": {},
     "TRP": {
       "ticker": "TRP",
       "companyName": "TC Energy Corporation",
@@ -1103,7 +1103,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Enbridge", "Kinder Morgan"],
+        "competitors": [
+          "Enbridge",
+          "Kinder Morgan"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -1157,7 +1160,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["CVS Health", "Anthem"],
+        "competitors": [
+          "CVS Health",
+          "Anthem"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -1211,7 +1217,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["Procter & Gamble", "Nestlé"],
+        "competitors": [
+          "Procter & Gamble",
+          "Nestlé"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -1265,7 +1274,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["AT&T", "T-Mobile"],
+        "competitors": [
+          "AT&T",
+          "T-Mobile"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
@@ -1319,7 +1331,10 @@
         "innovation": "En attente d'analyse"
       },
       "competition": {
-        "competitors": ["JPMorgan Chase", "Bank of America"],
+        "competitors": [
+          "JPMorgan Chase",
+          "Bank of America"
+        ],
         "valueProposition": "En attente d'analyse",
         "advantages": "En attente d'analyse"
       },
