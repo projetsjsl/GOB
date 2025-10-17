@@ -686,9 +686,10 @@ const fetchHybridData = async (symbol, dataType) => {
 
                 } catch (error) {
                     addLog(`❌ ERREUR CRITIQUE: ${error.message}`, 'error');
+                    addLog('💡 Vérifiez les clés API dans Admin JSLAI', 'warning');
                     setNewsData([]);
                     setFilteredNews([]);
-                    showMessage('❌ Impossible de charger les actualités - Vérifiez les clés API dans Admin JSLAI', 'error');
+                    // Pas de message overlay - tout va dans les logs Admin JSLAI
                 }
             };
 
@@ -2191,6 +2192,57 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         </div>
                         <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
                             💡 <strong>Info:</strong> Les violations sont automatiquement trackées. Consultez les logs système ci-dessus pour plus de détails.
+                        </div>
+                    </div>
+
+                    {/* 🤖 Configuration Emma IA */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>🤖 Configuration Emma IA</h3>
+                            <div className={`px-3 py-1 rounded text-xs font-medium ${
+                                emmaConnected
+                                    ? isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
+                                    : isDarkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-200 text-red-900'
+                            }`}>
+                                {emmaConnected ? '✅ Gemini Actif' : '❌ Gemini Inactif'}
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                onClick={() => setShowPromptEditor(!showPromptEditor)}
+                                className={`px-4 py-2 rounded transition-colors ${
+                                    isDarkMode
+                                        ? 'bg-purple-800 hover:bg-purple-700 text-white'
+                                        : 'bg-purple-600 hover:bg-purple-700 text-white'
+                                }`}
+                            >
+                                📝 Modifier Prompt
+                            </button>
+                            <button
+                                onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
+                                className={`px-4 py-2 rounded transition-colors ${
+                                    isDarkMode
+                                        ? 'bg-blue-800 hover:bg-blue-700 text-white'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                }`}
+                            >
+                                🌡️ Température
+                            </button>
+                            <button
+                                onClick={() => setShowLengthEditor(!showLengthEditor)}
+                                className={`px-4 py-2 rounded transition-colors ${
+                                    isDarkMode
+                                        ? 'bg-orange-800 hover:bg-orange-700 text-white'
+                                        : 'bg-orange-600 hover:bg-orange-700 text-white'
+                                }`}
+                            >
+                                📏 Longueur Réponse
+                            </button>
+                        </div>
+                        <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
+                            💡 <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement.
                         </div>
                     </div>
 
@@ -10014,29 +10066,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 >
                                     ✉️ Envoyer par courriel
                                 </button>
-                                <button
-                                    onClick={() => setShowPromptEditor(!showPromptEditor)}
-                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-                                >
-                                    📝 Prompt
-                                </button>
-                                <button
-                                    onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                                >
-                                    🌡️ Température
-                                </button>
-                                <button
-                                    onClick={() => setShowLengthEditor(!showLengthEditor)}
-                                    className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
-                                >
-                                    📏 Longueur
-                                </button>
-                                <div className={`px-3 py-2 rounded text-sm font-medium ${
-                                    emmaConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                }`}>
-                                    {emmaConnected ? '✅ Gemini Connecté' : '❌ Gemini Non Connecté'}
-                                </div>
                             </div>
                         </div>
 
