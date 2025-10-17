@@ -546,11 +546,11 @@ const fetchHybridData = async (symbol, dataType) => {
                     // Cache non disponible - passer directement à l'API
                     const cacheResponse = { ok: false };
                     console.log(`📡 Réponse Cache: ${cacheResponse.status}`);
-                    
+
                     if (cacheResponse.ok) {
                         const cacheData = await cacheResponse.json();
                         console.log('📊 Données cache reçues:', cacheData);
-                        
+
                         if (cacheData.cached && cacheData.data && cacheData.data.length > 0) {
                             // Convertir le format du cache vers le format attendu
                             const articles = cacheData.data.map(item => ({
@@ -562,19 +562,22 @@ const fetchHybridData = async (symbol, dataType) => {
                                 sentiment: item.sentiment,
                                 category: item.category
                             }));
-                            
+
                             setNewsData(articles);
                             setFilteredNews(articles);
-                            
+
                             const sources = cacheData.sources ? cacheData.sources.join(', ') : 'Cache';
                             showMessage(`${articles.length} actualités chargées depuis le cache (${sources})`, 'success');
                             return;
                         }
                     }
-                    
+
                     // Si cache vide ou erreur, fallback vers FMP News API (GRATUIT)
                     console.log('⚠️ Cache vide ou erreur, fallback vers FMP News API gratuite...');
-                    const tickersQuery = tickers.slice(0, 5).join(','); // Limiter à 5 tickers max
+                    // Use default tickers if tickers array is empty
+                    const defaultTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA'];
+                    const availableTickers = tickers.length > 0 ? tickers : defaultTickers;
+                    const tickersQuery = availableTickers.slice(0, 5).join(','); // Limiter à 5 tickers max
                     console.log(`🔍 Recherche FMP News pour: ${tickersQuery}`);
 
                     const response = await fetch(`${API_BASE_URL}/api/fmp?endpoint=news&symbols=${tickersQuery}&limit=50`);
