@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:28:07.289Z",
+  "lastUpdate": "2025-10-17T20:28:21.512Z",
   "stocks": {
     "GOOGL": {
       "ticker": "GOOGL",
@@ -743,56 +743,54 @@
     },
     "MG": {
       "ticker": "MG",
-      "companyName": "Mistras Group Inc.",
-      "lastUpdate": "2025-10-09T16:48:17.267Z",
+      "companyName": "Mistras Group, Inc.",
+      "lastUpdate": "2025-10-17T20:28:08.924Z",
       "metrics": {
-        "marketCap": "En attente d'analyse",
-        "bpaGrowth": "En attente d'analyse",
-        "peRatio": "En attente d'analyse",
-        "sector": "Industrial Services",
-        "dividendYield": "En attente d'analyse",
-        "dividendFrequency": "N/A",
-        "exDivDate": "En attente d'analyse",
-        "annualPayout": "En attente d'analyse",
-        "price": "En attente d'analyse",
-        "priceChange": "En attente d'analyse"
+        "marketCap": null,
+        "bpaGrowth": null,
+        "peRatio": null,
+        "sector": null,
+        "industry": null,
+        "dividendYield": null,
+        "dividendFrequency": null,
+        "exDivDate": null,
+        "annualPayout": null,
+        "price": 9.5,
+        "priceChange": -1.76
       },
       "companyProfile": {
-        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
-        "employees": "En attente d'analyse",
-        "innovation": "En attente d'analyse"
+        "description": "Mistras Group, Inc. est une société américaine spécialisée dans l’inspection, le contrôle non destructif et les services de gestion d’actifs pour les secteurs industriel et énergétique. Elle propose des solutions technologiques pour garantir la sécurité, la fiabilité et la performance des infrastructures critiques. L’entreprise accompagne ses clients dans la gestion proactive des risques et l’optimisation de la maintenance. Mistras met l’accent sur l’innovation et la qualité de ses prestations.",
+        "employees": null,
+        "innovation": null
       },
       "competition": {
         "competitors": [],
-        "valueProposition": "En attente d'analyse",
-        "advantages": "En attente d'analyse"
+        "valueProposition": null,
+        "advantages": null
       },
       "quantRating": {
-        "valuation": "N/A",
-        "growth": "N/A",
-        "profitability": "N/A",
-        "momentum": "N/A",
-        "revisions": "N/A"
+        "overall": null,
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
       },
       "sectorAnalysis": {
-        "valuation": "En attente d'analyse",
-        "growth": "En attente d'analyse",
-        "profitability": "En attente d'analyse",
-        "momentum": "En attente d'analyse",
-        "revisions": "En attente d'analyse"
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
       },
-      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
-      "strengths": [
-        "Données en cours de traitement"
-      ],
-      "concerns": [
-        "Analyse en attente"
-      ],
+      "intermediateConclusion": null,
+      "strengths": [],
+      "concerns": [],
       "finalConclusion": {
-        "strengths": "En attente d'analyse",
-        "weaknesses": "En attente d'analyse",
-        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
-        "rating": "Pending"
+        "strengths": null,
+        "weaknesses": null,
+        "recommendation": null,
+        "rating": null
       }
     },
     "MFC": {
