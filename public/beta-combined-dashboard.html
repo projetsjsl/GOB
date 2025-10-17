@@ -14903,8 +14903,8 @@ console.log('✅ Données hybrides récupérées:', {
                 };
 
                 // Filter calendar data based on user selections (Finviz-style)
-                const filteredCalendarData = calendarData.map(day => {
-                    const filteredEvents = day.events.filter(event => {
+                const filteredCalendarData = (Array.isArray(calendarData) ? calendarData : []).map(day => {
+                    const filteredEvents = (Array.isArray(day.events) ? day.events : []).filter(event => {
                         // Search query filter
                         if (searchQuery && !event.event.toLowerCase().includes(searchQuery.toLowerCase())) {
                             return false;
@@ -14955,14 +14955,16 @@ console.log('✅ Données hybrides récupérées:', {
 
                 // Get unique currencies from data for filter dropdown
                 const availableCurrencies = [...new Set(
-                    calendarData.flatMap(day => day.events.map(e => e.currency))
+                    (Array.isArray(calendarData) ? calendarData : []).flatMap(day =>
+                        (Array.isArray(day.events) ? day.events : []).map(e => e.currency || 'USD')
+                    )
                 )].sort();
 
                 // Get unique tickers from data for filter dropdown (earnings/dividends only)
                 const availableTickers = (activeSubTab === 'earnings' || activeSubTab === 'dividends')
                     ? [...new Set(
-                        calendarData.flatMap(day =>
-                            day.events.map(e => extractTicker(e.event)).filter(t => t !== null)
+                        (Array.isArray(calendarData) ? calendarData : []).flatMap(day =>
+                            (Array.isArray(day.events) ? day.events : []).map(e => extractTicker(e.event)).filter(t => t !== null)
                         )
                     )].sort()
                     : [];
