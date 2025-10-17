@@ -1798,80 +1798,26 @@ const fetchHybridData = async (symbol, dataType) => {
             const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
             const scrapeTicker = async (ticker) => {
-                addScrapingLog(`🤖 Démarrage du scraping AUTOMATIQUE pour ${ticker}...`, 'info');
+                addScrapingLog(`🌐 Ouverture de la page pour ${ticker}...`, 'info');
 
                 try {
-                    // NOUVEAU SYSTÈME: Scraping côté serveur avec Puppeteer
-                    // Plus besoin de popups ou de copie manuelle!
-                    addScrapingLog(`🌐 Scraping serveur en cours pour ${ticker}...`, 'info');
+                    // SYSTÈME TAMPERMONKEY:
+                    // On ouvre juste la page - Tampermonkey fait le reste automatiquement!
+                    const url = `https://seekingalpha.com/symbol/${ticker}/virtual_analyst_report`;
 
-                    const response = await fetch(`/api/scrape-seeking-alpha?ticker=${ticker}`, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
+                    const newWindow = window.open(url, `_sa_${ticker}`, 'width=1200,height=800');
 
-                    if (!response.ok) {
-                        throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                        throw new Error('Popup bloqué - autorisez les popups pour ce site');
                     }
 
-                    const result = await response.json();
+                    addScrapingLog(`✅ Page ouverte pour ${ticker}`, 'success');
+                    addScrapingLog(`🤖 Tampermonkey va scraper automatiquement!`, 'info');
 
-                    if (!result.success) {
-                        throw new Error(result.error || 'Erreur de scraping');
-                    }
-
-                    addScrapingLog(`✅ Scraping réussi pour ${ticker} - ${result.data.fullText.length} caractères extraits`, 'success');
-
-                    // Sauvegarder les données brutes dans Supabase
-                    addScrapingLog(`💾 Sauvegarde des données brutes dans Supabase...`, 'info');
-
-                    try {
-                        const saveResponse = await fetch('/api/seeking-alpha-scraping', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                ticker: ticker,
-                                url: result.data.url,
-                                raw_text: result.data.fullText,
-                                sections: result.data.sections || {},
-                                timestamp: result.data.timestamp
-                            })
-                        });
-
-                        if (saveResponse.ok) {
-                            addScrapingLog(`✅ Données brutes sauvegardées pour ${ticker}`, 'success');
-                        } else {
-                            addScrapingLog(`⚠️ Avertissement: Sauvegarde partielle pour ${ticker}`, 'warning');
-                        }
-                    } catch (saveError) {
-                        addScrapingLog(`⚠️ Erreur sauvegarde Supabase: ${saveError.message}`, 'warning');
-                    }
-
-                    // Analyser avec Perplexity et structurer les données
-                    addScrapingLog(`🤖 Analyse Perplexity en cours pour ${ticker}...`, 'info');
-
-                    try {
-                        await analyzeWithPerplexityAndUpdate(ticker, {
-                            fullText: result.data.fullText,
-                            url: result.data.url,
-                            content: result.data.sections || {}
-                        });
-
-                        addScrapingLog(`🎉 Traitement complet terminé pour ${ticker}!`, 'success');
-                        return { success: true, ticker };
-
-                    } catch (perplexityError) {
-                        addScrapingLog(`⚠️ Erreur analyse Perplexity pour ${ticker}: ${perplexityError.message}`, 'warning');
-                        addScrapingLog(`💾 Données brutes sauvegardées, analyse à refaire plus tard`, 'info');
-                        return { success: false, ticker, error: perplexityError.message };
-                    }
+                    return { success: true, ticker };
 
                 } catch (error) {
-                    addScrapingLog(`❌ Erreur scraping automatique pour ${ticker}: ${error.message}`, 'error');
+                    addScrapingLog(`❌ Erreur pour ${ticker}: ${error.message}`, 'error');
                     throw error;
                 }
             };
