@@ -370,6 +370,7 @@ const fetchHybridData = async (symbol, dataType) => {
             });
             const [showEmmaIntro, setShowEmmaIntro] = useState(false);
             const [showDanIntro, setShowDanIntro] = useState(false);
+            const [showJLabIntro, setShowJLabIntro] = useState(false);
             const [emmaPrefillMessage, setEmmaPrefillMessage] = useState('');
             const clickSoundRef = useRef(null);
             const tabSoundRef = useRef(null);
@@ -510,6 +511,13 @@ const fetchHybridData = async (symbol, dataType) => {
                     setShowDanIntro(true);
                     setTimeout(() => setShowDanIntro(false), 3000);
                     sessionStorage.setItem('dan-intro-shown', 'true');
+                }
+
+                // Afficher intro JLab si c'est la première visite
+                if (tabId === 'intellistocks' && !sessionStorage.getItem('jlab-intro-shown')) {
+                    setShowJLabIntro(true);
+                    setTimeout(() => setShowJLabIntro(false), 3000);
+                    sessionStorage.setItem('jlab-intro-shown', 'true');
                 }
             };
 
@@ -15088,6 +15096,23 @@ console.log('✅ Données hybrides récupérées:', {
                                 </div>
                                 <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">Dan's Watchlist</h2>
                                 <p className="text-blue-300 text-lg">Portefeuille Daniel Ouellet • GOB</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Intro JLab - première visite de session */}
+                    {showJLabIntro && activeTab === 'intellistocks' && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
+                            <div className="text-center">
+                                <div className="mb-6">
+                                    <img
+                                        src={'jlab.png'}
+                                        alt="JLab"
+                                        className="emma-intro-image w-72 h-72 md:w-96 md:h-96 object-contain shadow-2xl"
+                                    />
+                                </div>
+                                <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">JLab™</h2>
+                                <p className="text-orange-300 text-lg">Laboratoire d'analyse financière • JSL AI</p>
                             </div>
                         </div>
                     )}
