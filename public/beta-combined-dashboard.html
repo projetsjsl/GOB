@@ -1646,11 +1646,12 @@ const fetchHybridData = async (symbol, dataType) => {
             }, [activeTab]); // Se déclenche seulement au changement d'onglet
 
             // Chargement automatique du calendrier économique à l'ouverture de l'onglet
-            useEffect(() => {
-                if (activeTab === 'economic-calendar' && economicCalendarData.length === 0) {
-                    fetchEconomicCalendar();
-                }
-            }, [activeTab]);
+            // OBSOLÈTE: EconomicCalendarTab gère maintenant son propre chargement de données
+            // useEffect(() => {
+            //     if (activeTab === 'economic-calendar' && economicCalendarData.length === 0) {
+            //         fetchEconomicCalendar();
+            //     }
+            // }, [activeTab]);
 
             // (Code Emma supprimé - déjà géré plus haut)
 
@@ -6289,7 +6290,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                 };
 
                 // Fonction de logging pour tracer le processus complet
-                const addLogEntry = (step, type, data, status = 'info') => {
+                function addLogEntry(step, type, data, status = 'info') {
                     const timestamp = new Date().toISOString();
                     const logEntry = {
                         id: Date.now() + Math.random(),
@@ -6300,10 +6301,10 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         data: typeof data === 'object' ? JSON.stringify(data, null, 2) : data,
                         size: typeof data === 'object' ? JSON.stringify(data).length : data?.length || 0
                     };
-                    
+
                     setProcessLog(prev => [...prev, logEntry]);
                     console.log(`📋 [${step}] ${type}:`, data);
-                };
+                }
 
                 // Fonction pour nettoyer le log
                 const clearProcessLog = () => {
@@ -7794,7 +7795,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                 };
 
                 // Fonction pour exécuter le diagnostic des APIs
-                const runHealthCheck = async () => {
+                async function runHealthCheck() {
                     setHealthCheckLoading(true);
                     try {
                         const response = await fetch('/api/health-check-simple');
@@ -7817,7 +7818,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                     } finally {
                         setHealthCheckLoading(false);
                     }
-                };
+                }
 
                 // Charger l'historique au montage
                 React.useEffect(() => {
