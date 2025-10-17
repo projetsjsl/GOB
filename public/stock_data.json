@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:58:46.758Z",
+  "lastUpdate": "2025-10-17T20:58:56.975Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -55,7 +55,72 @@
         "rating": null
       }
     },
-    "TD": {},
+    "TD": {
+      "ticker": "TD",
+      "companyName": "The Toronto-Dominion Bank",
+      "lastUpdate": "2025-10-17T20:58:48.789Z",
+      "metrics": {
+        "marketCap": "$135.08B",
+        "bpaGrowth": "N/A",
+        "peRatio": "9.35",
+        "sector": "Financials",
+        "industry": "Diversified Banks",
+        "dividendYield": "3.80%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-10-10",
+        "annualPayout": "$2.99",
+        "price": "$79.19",
+        "priceChange": "+0.60%"
+      },
+      "companyProfile": {
+        "description": "The Toronto-Dominion Bank, avec ses filiales, fournit divers produits et services financiers au Canada, aux États-Unis et à l'international. Elle opère à travers quatre segments : Services bancaires aux particuliers et aux entreprises au Canada, Commerce de détail aux États-Unis, Gestion de patrimoine et assurances, et Services bancaires de gros. La société offre des dépôts personnels, tels que des produits de chèques, d'épargne et d'investissement, des services de financement, d'investissement, de gestion de trésorerie, de commerce international et de services bancaires quotidiens aux entreprises, ainsi que des options de financement aux clients au point de vente pour les achats d'automobiles et de véhicules récréatifs.",
+        "employees": "101,577",
+        "innovation": "N/A"
+      },
+      "competition": {
+        "competitors": [
+          "Royal Bank of Canada",
+          "The Bank of Nova Scotia",
+          "Bank of Montreal",
+          "Canadian Imperial Bank of Commerce",
+          "BCE Inc."
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "C",
+        "growth": "D",
+        "profitability": "A+",
+        "momentum": "A",
+        "revisions": "B+"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "Les notes Quant indiquent une position de 'Hold' pour TD. La rentabilité est excellente (A+), mais la valorisation et la croissance sont des points faibles (C et D respectivement).",
+      "strengths": [
+        "Forte rentabilité",
+        "Momentum boursier élevé",
+        "Historique de croissance des dividendes"
+      ],
+      "concerns": [
+        "Note de valorisation faible",
+        "Note de croissance faible",
+        "Ventes d'initiés récentes"
+      ],
+      "finalConclusion": {
+        "strengths": "TD présente une forte rentabilité et un historique de croissance des dividendes solide.",
+        "weaknesses": "Les faiblesses résident dans sa valorisation et sa croissance, comme indiqué par les notes Quant.",
+        "recommendation": "Compte tenu des forces et des faiblesses, une position neutre (Hold) semble appropriée pour le moment. Il est important de surveiller l'évolution de la croissance et de la valorisation.",
+        "rating": "Hold"
+      }
+    },
     "BCE": {
       "ticker": "BCE",
       "companyName": "BCE Inc.",
