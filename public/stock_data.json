@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:57:38.733Z",
+  "lastUpdate": "2025-10-17T20:57:48.022Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -345,7 +345,72 @@
       }
     },
     "MDT": {},
-    "JNJ": {},
+    "JNJ": {
+      "ticker": "JNJ",
+      "companyName": "Johnson & Johnson",
+      "lastUpdate": "2025-10-17T20:39:00.000Z",
+      "metrics": {
+        "marketCap": "$462.69B",
+        "bpaGrowth": "N/A",
+        "peRatio": "17.69",
+        "sector": "Health Care",
+        "industry": "Pharmaceuticals",
+        "dividendYield": "2.71%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-11-25",
+        "annualPayout": "$5.20",
+        "price": "$193.22",
+        "priceChange": "+0.57%"
+      },
+      "companyProfile": {
+        "description": "Johnson & Johnson est une entreprise mondiale spécialisée dans la recherche et le développement, la fabrication et la vente de divers produits dans le domaine de la santé. Elle opère à travers deux segments : Innovative Medicine et MedTech. Le segment Innovative Medicine propose des produits pour divers domaines thérapeutiques, tandis que le segment MedTech fournit des produits d'électrophysiologie, des technologies de récupération cardiaque, des produits de restauration circulatoire et des soins neurovasculaires.",
+        "employees": "138,100",
+        "innovation": "Orthopaedics spin-off, ciblage d'une croissance des ventes de 5.7% pour 2025, accélération de MedTech et Innovative Medicine."
+      },
+      "competition": {
+        "competitors": [
+          "PG",
+          "ABBV",
+          "KO",
+          "PFE",
+          "MRK"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "C",
+        "growth": "F",
+        "profitability": "A+",
+        "momentum": "B-",
+        "revisions": "A+"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "Johnson & Johnson affiche une forte rentabilité et des révisions d'analystes positives, mais sa valorisation est moyenne et sa croissance est faible selon l'évaluation quantitative de Seeking Alpha. Les notes de dividendes sont globalement bonnes, avec une excellente constance.",
+      "strengths": [
+        "Forte rentabilité (A+)",
+        "Excellentes révisions d'analystes (A+)",
+        "Longue histoire de croissance des dividendes (62 ans)"
+      ],
+      "concerns": [
+        "Faible note de croissance (F)",
+        "Note de valorisation moyenne (C)",
+        "Ventes d'actions par des initiés"
+      ],
+      "finalConclusion": {
+        "strengths": "JNJ bénéficie d'une rentabilité exceptionnelle et d'une solide réputation en matière de dividendes, ce qui en fait un investissement stable pour les investisseurs axés sur le revenu.",
+        "weaknesses": "La faible croissance et la valorisation moyenne pourraient limiter le potentiel d'appréciation du capital à court terme.",
+        "recommendation": "Compte tenu de la note globale HOLD et des forces et faiblesses identifiées, JNJ pourrait être un bon choix pour les investisseurs conservateurs à la recherche de revenus stables, mais pourrait ne pas convenir à ceux qui recherchent une croissance rapide.",
+        "rating": "HOLD"
+      }
+    },
     "JPM": {
       "ticker": "JPM",
       "companyName": "JPMorgan Chase & Co.",
