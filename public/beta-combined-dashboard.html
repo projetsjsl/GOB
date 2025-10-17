@@ -6990,22 +6990,54 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
                     try {
                         const emailList = recipients.split(',').map(email => email.trim()).filter(email => email);
-                        
-                        const response = await fetch('/api/ai-services', {
+
+                        const response = await fetch('/api/send-email', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                service: 'resend',
-                                recipients: emailList,
                                 subject: currentBriefing.subject,
-                                html: currentBriefing.html
+                                html: currentBriefing.html,
+                                to: emailList.join(','),
+                                briefingType: currentBriefing.type || 'manual'
                             })
                         });
 
                         const result = await response.json();
-                        
+
                         if (result.success) {
-                            setMessage({ type: 'success', text: `Email envoyé à ${emailList.length} destinataire(s)` });
+                            setMessage({ type: 'success', text: `✅ Email envoyé à ${emailList.length} destinataire(s) via Resend` });
+                            setRecipients(''); // Clear input after success
+                        } else {
+                            throw new Error(result.error || 'Erreur lors de l\'envoi');
+                        }
+                    } catch (error) {
+                        console.error('Erreur envoi email:', error);
+                        setMessage({ type: 'error', text: `Erreur envoi: ${error.message}` });
+                    }
+                };
+
+                // Fonction pour envoyer rapidement au destinataire par défaut
+                const sendBriefingEmailQuick = async () => {
+                    if (!currentBriefing) {
+                        setMessage({ type: 'error', text: 'Aucun briefing à envoyer' });
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/send-email', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                subject: currentBriefing.subject,
+                                html: currentBriefing.html,
+                                briefingType: currentBriefing.type || 'manual'
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            setMessage({ type: 'success', text: '✅ Briefing envoyé par email via Resend' });
                         } else {
                             throw new Error(result.error || 'Erreur lors de l\'envoi');
                         }
@@ -7981,19 +8013,34 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             </button>
                                         )}
                                         {currentBriefing && (
-                                            <button
-                                                onClick={saveBriefing}
-                                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                                    isDarkMode
-                                                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                                                        : 'bg-green-500 hover:bg-green-600 text-white'
-                                                }`}
-                                            >
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                                </svg>
-                                                Sauvegarder
-                                            </button>
+                                            <>
+                                                <button
+                                                    onClick={sendBriefingEmailQuick}
+                                                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                                                        isDarkMode
+                                                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                    }`}
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Envoyer Email
+                                                </button>
+                                                <button
+                                                    onClick={saveBriefing}
+                                                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                                                        isDarkMode
+                                                            ? 'bg-green-600 hover:bg-green-700 text-white'
+                                                            : 'bg-green-500 hover:bg-green-600 text-white'
+                                                    }`}
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                                    </svg>
+                                                    Sauvegarder
+                                                </button>
+                                            </>
                                         )}
                                     </div>
                                 </div>
