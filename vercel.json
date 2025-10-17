@@ -51,6 +51,9 @@
     },
     "api/seeking-alpha-batch.js": {
       "maxDuration": 300
+    },
+    "api/scrape-seeking-alpha.js": {
+      "maxDuration": 60
     }
   },
   "crons": [],
