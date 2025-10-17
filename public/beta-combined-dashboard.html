@@ -7,6 +7,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
+    <!-- Favicon JSLAI -->
+    <link rel="icon" type="image/png" href="jlab.png">
+    <link rel="apple-touch-icon" href="jlab.png">
     <!-- Cache bust: 2025-10-15 21:00 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -9772,9 +9775,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Indicateur de fiabilité (discret) - afficher les sources spécifiques
                         if (data.is_reliable === false && data.unavailable_sources && data.unavailable_sources.length > 0) {
                             const sourcesList = data.unavailable_sources.join(', ');
-                            responseText += `\n\n<sub style="opacity: 0.5; color: #888;">ℹ️ Note : Sources temporairement indisponibles : ${sourcesList}</sub>`;
+                            responseText += `\n\n---\n_ℹ️ Note : Sources temporairement indisponibles : ${sourcesList}_`;
                         } else if (data.is_reliable === false) {
-                            responseText += '\n\n<sub style="opacity: 0.5; color: #888;">ℹ️ Note : Certaines sources de données étaient temporairement indisponibles</sub>';
+                            responseText += '\n\n---\n_ℹ️ Note : Certaines sources de données étaient temporairement indisponibles_';
                         }
 
                         // Log de la réponse pour diagnostic
