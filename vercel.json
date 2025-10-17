@@ -42,6 +42,15 @@
     },
     "api/cron-briefings.js": {
       "maxDuration": 300
+    },
+    "api/seeking-alpha-tickers.js": {
+      "maxDuration": 15
+    },
+    "api/seeking-alpha-scraping.js": {
+      "maxDuration": 30
+    },
+    "api/seeking-alpha-batch.js": {
+      "maxDuration": 300
     }
   },
   "crons": [],

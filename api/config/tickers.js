@@ -28,20 +28,25 @@ export default async function handler(req, res) {
         let result = {};
 
         if (!list || list === 'team') {
-            // Récupérer les tickers d'équipe
-            const teamResponse = await fetch(`${supabaseUrl}/rest/v1/team_tickers?select=*&order=priority.desc,ticker.asc`, {
-                headers: {
-                    'apikey': supabaseKey,
-                    'Authorization': `Bearer ${supabaseKey}`,
-                    'Content-Type': 'application/json'
+            // Récupérer les tickers d'équipe depuis la nouvelle table `tickers`
+            const teamResponse = await fetch(
+                `${supabaseUrl}/rest/v1/tickers?select=ticker&source=eq.team&is_active=eq.true&order=ticker.asc`,
+                {
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`,
+                        'Content-Type': 'application/json'
+                    }
                 }
-            });
+            );
 
             if (teamResponse.ok) {
                 const teamData = await teamResponse.json();
                 result.team_tickers = teamData.map(item => item.ticker);
                 result.team_count = teamData.length;
+                result.team_source = 'supabase';
             } else {
+                console.warn(`⚠️ Team tickers Supabase error: ${teamResponse.status}`);
                 // Fallback vers liste hardcodée
                 result.team_tickers = [
                     'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
@@ -54,7 +59,8 @@ export default async function handler(req, res) {
         }
 
         if (!list || list === 'watchlist') {
-            // Récupérer les tickers de la watchlist
+            // Récupérer les tickers de la watchlist depuis l'ancienne table `watchlist`
+            // (keeping backward compatibility with existing watchlist table)
             const watchlistResponse = await fetch(`${supabaseUrl}/rest/v1/watchlist?select=*`, {
                 headers: {
                     'apikey': supabaseKey,
@@ -67,8 +73,10 @@ export default async function handler(req, res) {
                 const watchlistData = await watchlistResponse.json();
                 result.watchlist_tickers = watchlistData.map(item => item.ticker);
                 result.watchlist_count = watchlistData.length;
+                result.watchlist_source = 'supabase';
             } else {
-                // Fallback vers liste hardcodée (même que team pour l'instant)
+                console.warn(`⚠️ Watchlist Supabase error: ${watchlistResponse.status}`);
+                // Fallback vers liste hardcodée
                 result.watchlist_tickers = [
                     'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
                     'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',

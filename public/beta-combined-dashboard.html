@@ -1338,46 +1338,127 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
             };
             
-            // Données   Seeking Alpha
+            // Données Seeking Alpha (RAW DATA from Supabase)
             const fetchSeekingAlphaData = async () => {
                 try {
-                    const response = await fetch('/stock_analysis.json');
+                    console.log('📊 Chargement des données brutes Seeking Alpha depuis Supabase...');
+                    const response = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=raw&limit=100`);
                     if (response.ok) {
-                        const data = await response.json();
-                        
-                        // Parser les données brutes pour chaque stock
-                        if (data.stocks && Array.isArray(data.stocks)) {
-                            data.stocks = data.stocks.map(stock => ({
-                                ...stock,
-                                parsedData: parseSeekingAlphaRawText(stock.raw_text)
-                            }));
+                        const result = await response.json();
+
+                        if (result.success && result.data) {
+                            // Convert Supabase data to old format for backward compatibility
+                            const formattedData = {
+                                stocks: result.data.map(item => ({
+                                    ticker: item.ticker,
+                                    raw_text: item.raw_text,
+                                    url: item.url,
+                                    scraped_at: item.scraped_at,
+                                    status: item.status,
+                                    parsedData: parseSeekingAlphaRawText(item.raw_text)
+                                })),
+                                timestamp: result.timestamp,
+                                source: 'supabase'
+                            };
+
+                            setSeekingAlphaData(formattedData);
+                            console.log(`✅ Seeking Alpha raw data chargée depuis Supabase: ${formattedData.stocks.length} stocks`);
+                        } else {
+                            console.warn('⚠️ Aucune donnée raw Seeking Alpha disponible dans Supabase');
+                            setSeekingAlphaData({ stocks: [], source: 'supabase_empty' });
                         }
-                        
-                        setSeekingAlphaData(data);
-                        console.log('✅ Seeking Alpha data chargée et parsée:', data.stocks?.length || 0, 'stocks');
-                    } else if (response.status === 404) {
-                        console.warn('⚠️ Fichier stock_analysis.json non trouvé (404). Données Seeking Alpha non disponibles.');
                     } else {
-                        console.warn(`⚠️ Erreur ${response.status} lors du chargement de stock_analysis.json`);
+                        console.warn(`⚠️ Erreur ${response.status} lors du chargement des données raw Seeking Alpha`);
+
+                        // Fallback to old JSON file
+                        console.log('🔄 Tentative de chargement depuis stock_analysis.json (fallback)...');
+                        const fallbackResponse = await fetch('/stock_analysis.json');
+                        if (fallbackResponse.ok) {
+                            const data = await fallbackResponse.json();
+                            if (data.stocks && Array.isArray(data.stocks)) {
+                                data.stocks = data.stocks.map(stock => ({
+                                    ...stock,
+                                    parsedData: parseSeekingAlphaRawText(stock.raw_text)
+                                }));
+                            }
+                            setSeekingAlphaData({ ...data, source: 'json_fallback' });
+                            console.log('✅ Données chargées depuis JSON (fallback)');
+                        }
                     }
                 } catch (error) {
-                    console.error('Erreur fetch Seeking Alpha:', error?.message || String(error));
+                    console.error('❌ Erreur fetch Seeking Alpha raw data:', error?.message || String(error));
+                    setSeekingAlphaData({ stocks: [], source: 'error' });
                 }
             };
 
+            // Données Seeking Alpha ANALYZED (Claude AI results from Supabase)
             const fetchSeekingAlphaStockData = async () => {
                 try {
-                    const response = await fetch('/stock_data.json');
+                    console.log('📊 Chargement des analyses Claude depuis Supabase...');
+                    const response = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=analysis&latest=true&limit=100`);
+
                     if (response.ok) {
-                        const data = await response.json();
-                        setSeekingAlphaStockData(data);
-                    } else if (response.status === 404) {
-                        console.warn('⚠️ Fichier stock_data.json non trouvé (404). Données Seeking Alpha stock non disponibles.');
+                        const result = await response.json();
+
+                        if (result.success && result.data) {
+                            // Convert Supabase data to old format for backward compatibility
+                            const stocksObject = {};
+                            result.data.forEach(item => {
+                                stocksObject[item.ticker] = {
+                                    ticker: item.ticker,
+                                    companyName: item.company_name,
+                                    lastUpdate: item.analyzed_at,
+                                    metrics: {
+                                        marketCap: item.market_cap,
+                                        peRatio: item.pe_ratio,
+                                        sector: item.sector,
+                                        dividendYield: item.dividend_yield,
+                                        dividendFrequency: item.dividend_frequency,
+                                        exDivDate: item.ex_dividend_date,
+                                        annualPayout: item.annual_dividend,
+                                        price: item.current_price,
+                                        priceChange: item.price_change
+                                    },
+                                    quantRating: {
+                                        valuation: item.quant_valuation,
+                                        growth: item.quant_growth,
+                                        profitability: item.quant_profitability,
+                                        momentum: item.quant_momentum,
+                                        revisions: item.quant_eps_revisions
+                                    },
+                                    strengths: item.strengths || [],
+                                    concerns: item.concerns || [],
+                                    finalConclusion: {
+                                        recommendation: item.analyst_recommendation,
+                                        rating: item.analyst_rating
+                                    },
+                                    companyProfile: {
+                                        description: item.company_description
+                                    }
+                                };
+                            });
+
+                            setSeekingAlphaStockData({ stocks: stocksObject, source: 'supabase' });
+                            console.log(`✅ Seeking Alpha analyses chargées depuis Supabase: ${Object.keys(stocksObject).length} stocks`);
+                        } else {
+                            console.warn('⚠️ Aucune analyse Seeking Alpha disponible dans Supabase');
+                            setSeekingAlphaStockData({ stocks: {}, source: 'supabase_empty' });
+                        }
                     } else {
-                        console.warn(`⚠️ Erreur ${response.status} lors du chargement de stock_data.json`);
+                        console.warn(`⚠️ Erreur ${response.status} lors du chargement des analyses Seeking Alpha`);
+
+                        // Fallback to old JSON file
+                        console.log('🔄 Tentative de chargement depuis stock_data.json (fallback)...');
+                        const fallbackResponse = await fetch('/stock_data.json');
+                        if (fallbackResponse.ok) {
+                            const data = await fallbackResponse.json();
+                            setSeekingAlphaStockData({ ...data, source: 'json_fallback' });
+                            console.log('✅ Données chargées depuis JSON (fallback)');
+                        }
                     }
                 } catch (error) {
-                    console.error('Erreur fetch Seeking Alpha stock data:', error?.message || String(error));
+                    console.error('❌ Erreur fetch Seeking Alpha analyses:', error?.message || String(error));
+                    setSeekingAlphaStockData({ stocks: {}, source: 'error' });
                 }
             };
 
