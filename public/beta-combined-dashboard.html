@@ -14384,6 +14384,7 @@ console.log('✅ Données hybrides récupérées:', {
                 const [searchQuery, setSearchQuery] = useState('');
                 const [filterImpact, setFilterImpact] = useState('all'); // all, 1, 2, 3
                 const [filterCurrency, setFilterCurrency] = useState('all');
+                const [filterTicker, setFilterTicker] = useState('all'); // For earnings/dividends
                 const [dateRange, setDateRange] = useState('week'); // today, week, month
 
                 // Helper function for fallback data
@@ -14421,6 +14422,8 @@ console.log('✅ Données hybrides récupérées:', {
                 // Charger les données au changement d'onglet
                 React.useEffect(() => {
                     fetchCalendarData();
+                    // Reset ticker filter when switching tabs
+                    setFilterTicker('all');
                 }, [activeSubTab]);
 
                 const fetchCalendarData = async () => {
@@ -14511,6 +14514,13 @@ console.log('✅ Données hybrides récupérées:', {
                     return flags[currency] || '🌍';
                 };
 
+                // Helper: Extract ticker symbol from event name (for earnings/dividends)
+                const extractTicker = (eventName) => {
+                    // Look for ticker pattern: "AAPL Earnings" or "MSFT Dividend"
+                    const match = eventName.match(/^([A-Z]{1,5})\s/);
+                    return match ? match[1] : null;
+                };
+
                 // Filter calendar data based on user selections (Finviz-style)
                 const filteredCalendarData = calendarData.map(day => {
                     const filteredEvents = day.events.filter(event => {
@@ -14529,6 +14539,14 @@ console.log('✅ Données hybrides récupérées:', {
                             return false;
                         }
 
+                        // Ticker filter (for earnings/dividends only)
+                        if (filterTicker !== 'all' && (activeSubTab === 'earnings' || activeSubTab === 'dividends')) {
+                            const ticker = extractTicker(event.event);
+                            if (!ticker || ticker !== filterTicker) {
+                                return false;
+                            }
+                        }
+
                         return true;
                     });
 
@@ -14539,6 +14557,15 @@ console.log('✅ Données hybrides récupérées:', {
                 const availableCurrencies = [...new Set(
                     calendarData.flatMap(day => day.events.map(e => e.currency))
                 )].sort();
+
+                // Get unique tickers from data for filter dropdown (earnings/dividends only)
+                const availableTickers = (activeSubTab === 'earnings' || activeSubTab === 'dividends')
+                    ? [...new Set(
+                        calendarData.flatMap(day =>
+                            day.events.map(e => extractTicker(e.event)).filter(t => t !== null)
+                        )
+                    )].sort()
+                    : [];
 
                 return (
                     <div className={`${isDarkMode ? 'bg-gray-900 text-gray-200' : 'bg-white text-gray-900'} p-6`}>
@@ -14567,7 +14594,11 @@ console.log('✅ Données hybrides récupérées:', {
 
                             {/* Finviz-Style Filter Bar */}
                             <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-4 mb-4`}>
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <div className={`grid grid-cols-1 gap-3 ${
+                                    activeSubTab === 'earnings' || activeSubTab === 'dividends'
+                                        ? 'md:grid-cols-5'
+                                        : 'md:grid-cols-4'
+                                }`}>
                                     {/* Search Box */}
                                     <div className="col-span-1 md:col-span-2">
                                         <input
@@ -14582,6 +14613,28 @@ console.log('✅ Données hybrides récupérées:', {
                                             } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                         />
                                     </div>
+
+                                    {/* Ticker Filter - Only for Earnings/Dividends */}
+                                    {(activeSubTab === 'earnings' || activeSubTab === 'dividends') && (
+                                        <div>
+                                            <select
+                                                value={filterTicker}
+                                                onChange={(e) => setFilterTicker(e.target.value)}
+                                                className={`w-full px-3 py-2 rounded-md text-sm ${
+                                                    isDarkMode
+                                                        ? 'bg-gray-700 text-white border-gray-600'
+                                                        : 'bg-white text-gray-900 border-gray-300'
+                                                } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                            >
+                                                <option value="all">All Tickers ({availableTickers.length})</option>
+                                                {availableTickers.map(ticker => (
+                                                    <option key={ticker} value={ticker}>
+                                                        {ticker}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
 
                                     {/* Impact Filter */}
                                     <div>
@@ -14623,12 +14676,17 @@ console.log('✅ Données hybrides récupérées:', {
                                 </div>
 
                                 {/* Active Filters Display */}
-                                {(searchQuery || filterImpact !== 'all' || filterCurrency !== 'all') && (
+                                {(searchQuery || filterImpact !== 'all' || filterCurrency !== 'all' || filterTicker !== 'all') && (
                                     <div className="flex flex-wrap gap-2 mt-3">
                                         <span className="text-xs text-gray-400">Active filters:</span>
                                         {searchQuery && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
                                                 Search: "{searchQuery}"
+                                            </span>
+                                        )}
+                                        {filterTicker !== 'all' && (
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-purple-900 text-purple-200' : 'bg-purple-100 text-purple-800'}`}>
+                                                Ticker: {filterTicker}
                                             </span>
                                         )}
                                         {filterImpact !== 'all' && (
@@ -14646,6 +14704,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 setSearchQuery('');
                                                 setFilterImpact('all');
                                                 setFilterCurrency('all');
+                                                setFilterTicker('all');
                                             }}
                                             className="text-xs text-red-400 hover:text-red-300 underline"
                                         >
