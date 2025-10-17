@@ -69,10 +69,28 @@ export default async function handler(req, res) {
         fmpUrl = `https://financialmodelingprep.com/stable/profile?symbol=${fundSymbol}&apikey=${apiKey}`;
         break;
 
+      case 'ratios':
+        // Financial ratios (P/E, P/B, ROE, ROA, debt ratios, etc.)
+        const ratiosSymbol = symbol || ticker || 'AAPL';
+        fmpUrl = `https://financialmodelingprep.com/stable/ratios?symbol=${ratiosSymbol}&apikey=${apiKey}`;
+        break;
+
+      case 'key-metrics':
+        // Key financial metrics (revenue, net income, P/E, market cap, etc.)
+        const metricsSymbol = symbol || ticker || 'AAPL';
+        fmpUrl = `https://financialmodelingprep.com/stable/key-metrics?symbol=${metricsSymbol}&apikey=${apiKey}`;
+        break;
+
+      case 'ratings':
+        // Company ratings snapshot
+        const ratingsSymbol = symbol || ticker || 'AAPL';
+        fmpUrl = `https://financialmodelingprep.com/stable/ratings-snapshot?symbol=${ratingsSymbol}&apikey=${apiKey}`;
+        break;
+
       default:
         return res.status(400).json({
           error: 'Invalid endpoint',
-          supported: ['news', 'ticker-news', 'quote', 'profile', 'fundamentals']
+          supported: ['news', 'ticker-news', 'quote', 'profile', 'fundamentals', 'ratios', 'key-metrics', 'ratings']
         });
     }
 
