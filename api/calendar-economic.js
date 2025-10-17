@@ -19,55 +19,88 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    const from = new Date().toISOString().split('T')[0];
+    const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    // Cascade fallback: FMP → Twelve Data → Static fallback
+    let events = null;
+    let source = 'fallback';
+    let errors = [];
+
+    // Try 1: FMP (Primary)
     try {
-        console.log('🔄 Récupération du calendrier économique depuis FMP...');
-
+        console.log('🔄 [1/2] Trying FMP...');
         const FMP_API_KEY = process.env.FMP_API_KEY;
-        if (!FMP_API_KEY) {
-            throw new Error('FMP_API_KEY non configurée');
+
+        if (FMP_API_KEY) {
+            const response = await fetch(
+                `https://financialmodelingprep.com/api/v3/economic_calendar?from=${from}&to=${to}&apikey=${FMP_API_KEY}`,
+                { timeout: 5000 }
+            );
+
+            if (response.ok) {
+                const fmpData = await response.json();
+                if (Array.isArray(fmpData) && fmpData.length > 0) {
+                    events = parseFMPCalendar(fmpData);
+                    source = 'fmp';
+                    console.log(`✅ FMP: ${events.length} days of events`);
+                }
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
+        } else {
+            throw new Error('FMP_API_KEY not configured');
         }
-
-        // Récupérer les événements économiques des 7 prochains jours depuis FMP
-        const from = new Date().toISOString().split('T')[0];
-        const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-        const response = await fetch(
-            `https://financialmodelingprep.com/api/v3/economic_calendar?from=${from}&to=${to}&apikey=${FMP_API_KEY}`
-        );
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP FMP: ${response.status}`);
-        }
-
-        const fmpData = await response.json();
-        console.log('✅ Données FMP récupérées');
-
-        // Convertir le format FMP vers le format attendu
-        const events = parseFMPCalendar(fmpData);
-
-        console.log(`📊 ${events.length} jours d'événements trouvés`);
-
-        return res.status(200).json({
-            success: true,
-            data: events,
-            source: 'fmp',
-            timestamp: new Date().toISOString()
-        });
-
     } catch (error) {
-        console.error('❌ Erreur:', error);
-        
-        // Données de fallback en cas d'erreur
-        const fallbackData = getFallbackData();
-        
-        return res.status(200).json({
-            success: true,
-            data: fallbackData,
-            source: 'fallback',
-            timestamp: new Date().toISOString(),
-            error: error.message
-        });
+        errors.push(`FMP: ${error.message}`);
+        console.log(`⚠️ FMP failed: ${error.message}`);
     }
+
+    // Try 2: Twelve Data (Fallback)
+    if (!events) {
+        try {
+            console.log('🔄 [2/2] Trying Twelve Data...');
+            const TWELVE_API_KEY = process.env.TWELVE_DATA_API_KEY;
+
+            if (TWELVE_API_KEY) {
+                const response = await fetch(
+                    `https://api.twelvedata.com/economic_calendar?apikey=${TWELVE_API_KEY}`,
+                    { timeout: 5000 }
+                );
+
+                if (response.ok) {
+                    const twelveData = await response.json();
+                    if (twelveData.data && Array.isArray(twelveData.data)) {
+                        events = parseTwelveDataCalendar(twelveData.data);
+                        source = 'twelve_data';
+                        console.log(`✅ Twelve Data: ${events.length} days of events`);
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } else {
+                throw new Error('TWELVE_DATA_API_KEY not configured');
+            }
+        } catch (error) {
+            errors.push(`Twelve Data: ${error.message}`);
+            console.log(`⚠️ Twelve Data failed: ${error.message}`);
+        }
+    }
+
+    // Final fallback: Static data
+    if (!events) {
+        console.log('📦 Using static fallback data');
+        events = getFallbackData();
+        source = 'static_fallback';
+    }
+
+    return res.status(200).json({
+        success: true,
+        data: events,
+        source: source,
+        fallback_tried: errors.length > 0 ? errors : undefined,
+        timestamp: new Date().toISOString()
+    });
 }
 
 function parseFMPCalendar(fmpData) {
@@ -122,6 +155,55 @@ function parseFMPCalendar(fmpData) {
     });
 
     // Convertir l'objet en tableau et trier par date
+    return Object.values(eventsByDate).sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+    });
+}
+
+function parseTwelveDataCalendar(twelveData) {
+    // Convert Twelve Data format to expected frontend format
+    const eventsByDate = {};
+
+    twelveData.forEach(item => {
+        const date = new Date(item.date);
+        const dateStr = date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        // Map importance to impact level
+        let impact = 2; // Medium default
+        if (item.importance === 'high' || item.importance === '3') {
+            impact = 3;
+        } else if (item.importance === 'low' || item.importance === '1') {
+            impact = 1;
+        }
+
+        const time = item.time || 'TBD';
+
+        const event = {
+            time,
+            currency: item.currency || 'USD',
+            impact,
+            event: item.event || item.name,
+            actual: item.actual || 'N/A',
+            forecast: item.forecast || item.estimate || 'N/A',
+            previous: item.previous || 'N/A'
+        };
+
+        if (!eventsByDate[dateStr]) {
+            eventsByDate[dateStr] = {
+                date: dateStr,
+                events: []
+            };
+        }
+
+        eventsByDate[dateStr].events.push(event);
+    });
+
     return Object.values(eventsByDate).sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);

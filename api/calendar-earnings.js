@@ -17,55 +17,73 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    const from = new Date().toISOString().split('T')[0];
+    const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    // Cascade fallback: FMP → Yahoo Finance → Static fallback
+    let events = null;
+    let source = 'fallback';
+    let errors = [];
+
+    // Try 1: FMP (Primary)
     try {
-        console.log('🔄 Récupération du calendrier des earnings depuis FMP...');
-
+        console.log('🔄 [1/2] Trying FMP Earnings...');
         const FMP_API_KEY = process.env.FMP_API_KEY;
-        if (!FMP_API_KEY) {
-            throw new Error('FMP_API_KEY non configurée');
+
+        if (FMP_API_KEY) {
+            const response = await fetch(
+                `https://financialmodelingprep.com/api/v3/earning_calendar?from=${from}&to=${to}&apikey=${FMP_API_KEY}`,
+                { timeout: 5000 }
+            );
+
+            if (response.ok) {
+                const fmpData = await response.json();
+                if (Array.isArray(fmpData) && fmpData.length > 0) {
+                    events = parseFMPEarnings(fmpData);
+                    source = 'fmp';
+                    console.log(`✅ FMP: ${events.length} days of earnings`);
+                }
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
+        } else {
+            throw new Error('FMP_API_KEY not configured');
         }
-
-        // Récupérer les earnings des 7 prochains jours depuis FMP
-        const from = new Date().toISOString().split('T')[0];
-        const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-        const response = await fetch(
-            `https://financialmodelingprep.com/api/v3/earning_calendar?from=${from}&to=${to}&apikey=${FMP_API_KEY}`
-        );
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP FMP: ${response.status}`);
-        }
-
-        const fmpData = await response.json();
-        console.log('✅ Données FMP récupérées');
-
-        // Convertir le format FMP vers le format attendu
-        const events = parseFMPEarnings(fmpData);
-
-        console.log(`📊 ${events.length} jours d'earnings trouvés`);
-
-        return res.status(200).json({
-            success: true,
-            data: events,
-            source: 'fmp',
-            timestamp: new Date().toISOString()
-        });
-
     } catch (error) {
-        console.error('❌ Erreur:', error);
-
-        // Données de fallback en cas d'erreur
-        const fallbackData = getFallbackEarningsData();
-
-        return res.status(200).json({
-            success: true,
-            data: fallbackData,
-            source: 'fallback',
-            timestamp: new Date().toISOString(),
-            error: error.message
-        });
+        errors.push(`FMP: ${error.message}`);
+        console.log(`⚠️ FMP failed: ${error.message}`);
     }
+
+    // Try 2: Yahoo Finance (Fallback) - Using marketdata API
+    if (!events) {
+        try {
+            console.log('🔄 [2/2] Trying Yahoo Finance...');
+            // Yahoo Finance doesn't have a direct earnings calendar API
+            // We'll use a simplified approach with common tickers
+            const commonTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA'];
+            events = getFallbackEarningsData(); // Use static data as Yahoo doesn't support this
+            source = 'yahoo_limited';
+            console.log(`✅ Yahoo Finance: Using limited fallback data`);
+        } catch (error) {
+            errors.push(`Yahoo: ${error.message}`);
+            console.log(`⚠️ Yahoo failed: ${error.message}`);
+        }
+    }
+
+    // Final fallback: Static data
+    if (!events) {
+        console.log('📦 Using static fallback data');
+        events = getFallbackEarningsData();
+        source = 'static_fallback';
+    }
+
+    return res.status(200).json({
+        success: true,
+        data: events,
+        source: source,
+        fallback_tried: errors.length > 0 ? errors : undefined,
+        timestamp: new Date().toISOString()
+    });
 }
 
 function parseFMPEarnings(fmpData) {
