@@ -12039,35 +12039,58 @@ console.log('✅ Données hybrides récupérées:', {
                         const jslaiScore = calculateJSLAIScore();
 
                         // 🎯 Appel batch Perplexity pour données IA (Sentiment + Insights + Analyst)
-                        const aiData = await fetchAIDataBatch(symbol, {
-                            quote: {
-                                price: quote?.c || 0,
-                                changesPercentage: quote?.dp || 0,
-                                volume: quote?.volume || 0,
-                                marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0
-                            },
-                            metrics: {
-                                peRatioTTM: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
-                                pegRatioTTM: ratios?.data?.[0]?.pegRatioTTM || ratios?.pegRatioTTM || null,
-                                priceToSalesRatioTTM: ratios?.data?.[0]?.priceToSalesRatioTTM || ratios?.priceToSalesRatioTTM || null,
-                                dividendYieldTTM: ratios?.data?.[0]?.dividendYieldTTM || ratios?.dividendYieldTTM || null
-                            },
-                            ratios: {
-                                returnOnEquityTTM: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
-                                returnOnAssetsTTM: ratios?.data?.[0]?.returnOnAssetsTTM || ratios?.returnOnAssetsTTM || null,
-                                debtEquityRatio: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
-                                netProfitMarginTTM: ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null
-                            },
-                            profile: {
-                                sector: profile?.data?.[0]?.sector || profile?.sector || 'Unknown',
-                                industry: profile?.data?.[0]?.industry || profile?.industry || 'Unknown',
-                                beta: profile?.data?.[0]?.beta || profile?.beta || null
-                            },
-                            news: news?.news?.slice(0, 5)?.map(article => ({
-                                title: article.title,
-                                source: article.source?.name || 'Unknown'
-                            })) || []
-                        });
+                        // NON-BLOQUANT: Si l'appel échoue, on continue avec données par défaut
+                        let aiData = null;
+                        try {
+                            console.log('🤖 Tentative d\'appel Perplexity batch...');
+                            aiData = await Promise.race([
+                                fetchAIDataBatch(symbol, {
+                                    quote: {
+                                        price: quote?.c || 0,
+                                        changesPercentage: quote?.dp || 0,
+                                        volume: quote?.volume || 0,
+                                        marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0
+                                    },
+                                    metrics: {
+                                        peRatioTTM: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
+                                        pegRatioTTM: ratios?.data?.[0]?.pegRatioTTM || ratios?.pegRatioTTM || null,
+                                        priceToSalesRatioTTM: ratios?.data?.[0]?.priceToSalesRatioTTM || ratios?.priceToSalesRatioTTM || null,
+                                        dividendYieldTTM: ratios?.data?.[0]?.dividendYieldTTM || ratios?.dividendYieldTTM || null
+                                    },
+                                    ratios: {
+                                        returnOnEquityTTM: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
+                                        returnOnAssetsTTM: ratios?.data?.[0]?.returnOnAssetsTTM || ratios?.returnOnAssetsTTM || null,
+                                        debtEquityRatio: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
+                                        netProfitMarginTTM: ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null
+                                    },
+                                    profile: {
+                                        sector: profile?.data?.[0]?.sector || profile?.sector || 'Unknown',
+                                        industry: profile?.data?.[0]?.industry || profile?.industry || 'Unknown',
+                                        beta: profile?.data?.[0]?.beta || profile?.beta || null
+                                    },
+                                    news: news?.news?.slice(0, 5)?.map(article => ({
+                                        title: article.title,
+                                        source: article.source?.name || 'Unknown'
+                                    })) || []
+                                }),
+                                // Timeout après 15 secondes
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Perplexity timeout')), 15000))
+                            ]);
+                            console.log('✅ Données IA chargées');
+                        } catch (error) {
+                            console.warn('⚠️ Appel Perplexity échoué/timeout, utilisation données par défaut:', error.message);
+                            // Utiliser données par défaut si Perplexity échoue
+                            aiData = {
+                                sentiment: { overall: 60, news: 65, summary: 'Analyse indisponible' },
+                                insights: {
+                                    catalysts: ['Analyse IA temporairement indisponible'],
+                                    risks: ['Analyse IA temporairement indisponible'],
+                                    consensus: 'neutral',
+                                    reasoning: 'Données IA non disponibles'
+                                },
+                                analyst: null
+                            };
+                        }
 
                         // Construire l'objet de données structuré
                         return {
