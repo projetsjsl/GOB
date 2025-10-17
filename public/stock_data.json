@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:57:30.690Z",
+  "lastUpdate": "2025-10-17T20:57:38.733Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -346,7 +346,72 @@
     },
     "MDT": {},
     "JNJ": {},
-    "JPM": {},
+    "JPM": {
+      "ticker": "JPM",
+      "companyName": "JPMorgan Chase & Co.",
+      "lastUpdate": "2025-10-17T20:57:32.367Z",
+      "metrics": {
+        "marketCap": "$812.69B",
+        "bpaGrowth": "N/A",
+        "peRatio": "14.79",
+        "sector": "Financials",
+        "industry": "Diversified Banks",
+        "dividendYield": "2.01%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-10-06",
+        "annualPayout": "$6.00",
+        "price": "$297.56",
+        "priceChange": "-0.33%"
+      },
+      "companyProfile": {
+        "description": "JPMorgan Chase & Co. est une société de services financiers opérant à l'échelle mondiale. Elle propose des produits de dépôt, d'investissement et de prêt, ainsi que des services de gestion de trésorerie et de paiement. La société fournit également des services de banque d'investissement, de gestion d'actifs et de patrimoine à une clientèle diversifiée, allant des particuliers aux grandes entreprises et aux institutions.",
+        "employees": "318,153",
+        "innovation": "N/A"
+      },
+      "competition": {
+        "competitors": [
+          "Bank of America Corporation",
+          "The Goldman Sachs Group, Inc.",
+          "Citigroup Inc.",
+          "Wells Fargo & Company",
+          "Visa Inc."
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "D-",
+        "growth": "C",
+        "profitability": "F",
+        "momentum": "A-",
+        "revisions": "B-"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "Les notes de Seeking Alpha indiquent un mélange de signaux pour JPM. Le momentum est fort, mais la valorisation et la rentabilité sont préoccupantes.",
+      "strengths": [
+        "Forte position de marché",
+        "Dividendes en croissance constante",
+        "Momentum boursier élevé"
+      ],
+      "concerns": [
+        "Note de rentabilité faible",
+        "Note de valorisation faible",
+        "Endettement élevé"
+      ],
+      "finalConclusion": {
+        "strengths": "JPM bénéficie d'une position dominante dans le secteur financier et d'une solide réputation.",
+        "weaknesses": "La rentabilité et la valorisation sont des points faibles importants.",
+        "recommendation": "Compte tenu des forces et des faiblesses, une position neutre (Hold) semble appropriée pour le moment. Il est important de surveiller l'évolution de la rentabilité et de la valorisation.",
+        "rating": "Hold"
+      }
+    },
     "LVMHF": {
       "ticker": "LVMHF",
       "companyName": "N/A",
