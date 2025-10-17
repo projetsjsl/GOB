@@ -553,101 +553,114 @@ const fetchHybridData = async (symbol, dataType) => {
                 showMessage(message, successCount > 0 ? 'success' : 'warning');
             };
 
-            // Actualités avec Cache Supabase
+            // Actualités avec stratégie multi-sources (NO DEMO DATA)
             const fetchNews = async () => {
-                console.log('📰 Récupération des actualités depuis le cache...');
+                addLog('📰 Démarrage récupération actualités...', 'info');
+
+                const defaultTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA'];
+                const availableTickers = tickers.length > 0 ? tickers : defaultTickers;
+                const tickersQuery = availableTickers.slice(0, 5).join(',');
+
                 try {
-                    // Essayer d'abord le cache Supabase
-                    // Cache non disponible - passer directement à l'API
-                    const cacheResponse = { ok: false };
-                    console.log(`📡 Réponse Cache: ${cacheResponse.status}`);
+                    // SOURCE 1: FMP News (Primary - Free)
+                    addLog(`🔍 Tentative FMP News pour: ${tickersQuery}`, 'info');
+                    try {
+                        const fmpResponse = await fetch(`${API_BASE_URL}/api/fmp?endpoint=news&symbols=${tickersQuery}&limit=50`);
 
-                    if (cacheResponse.ok) {
-                        const cacheData = await cacheResponse.json();
-                        console.log('📊 Données cache reçues:', cacheData);
-
-                        if (cacheData.cached && cacheData.data && cacheData.data.length > 0) {
-                            // Convertir le format du cache vers le format attendu
-                            const articles = cacheData.data.map(item => ({
-                                title: item.title,
-                                description: item.description,
-                                url: item.url,
-                                publishedAt: item.published_at,
-                                source: { name: item.source },
-                                sentiment: item.sentiment,
-                                category: item.category
+                        if (fmpResponse.ok) {
+                            const fmpData = await fmpResponse.json();
+                            const newsArticles = (fmpData.news || fmpData || []).map(article => ({
+                                title: article.title,
+                                description: article.text || article.description || '',
+                                url: article.url || article.link || '#',
+                                publishedAt: article.publishedDate || article.publishedAt || new Date().toISOString(),
+                                source: { name: article.site || article.source || 'FMP' },
+                                sentiment: article.sentiment || 'neutral',
+                                category: article.symbol || 'general'
                             }));
 
-                            setNewsData(articles);
-                            setFilteredNews(articles);
-
-                            const sources = cacheData.sources ? cacheData.sources.join(', ') : 'Cache';
-                            showMessage(`${articles.length} actualités chargées depuis le cache (${sources})`, 'success');
-                            return;
-                        }
-                    }
-
-                    // Si cache vide ou erreur, fallback vers FMP News API (GRATUIT)
-                    console.log('⚠️ Cache vide ou erreur, fallback vers FMP News API gratuite...');
-                    // Use default tickers if tickers array is empty
-                    const defaultTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA'];
-                    const availableTickers = tickers.length > 0 ? tickers : defaultTickers;
-                    const tickersQuery = availableTickers.slice(0, 5).join(','); // Limiter à 5 tickers max
-                    console.log(`🔍 Recherche FMP News pour: ${tickersQuery}`);
-
-                    const response = await fetch(`${API_BASE_URL}/api/fmp?endpoint=news&symbols=${tickersQuery}&limit=50`);
-                    console.log(`📡 Réponse FMP News: ${response.status}`);
-                    
-                    if (!response.ok) {
-                        console.warn(`⚠️ News API indisponible (${response.status}) - Utilisation des données de démonstration`);
-                        // Utiliser des données de démonstration au lieu de lever une erreur
-                        const mockNews = [
-                            {
-                                title: "📊 Marchés financiers - Données de démonstration",
-                                description: "Service d'actualités temporairement indisponible. Données simulées affichées.",
-                                url: "#",
-                                publishedAt: new Date().toISOString(),
-                                source: { name: "Mode Démo" }
+                            if (newsArticles.length > 0) {
+                                setNewsData(newsArticles);
+                                setFilteredNews(newsArticles);
+                                addLog(`✅ ${newsArticles.length} actualités chargées depuis FMP`, 'success');
+                                return;
                             }
-                        ];
-                        setNewsData(mockNews);
-                        setFilteredNews(mockNews);
-                        return;
-                    }
-                    
-                    const data = await response.json();
-                    console.log('📊 Données FMP News reçues:', data);
-
-                    // Convertir le format FMP vers le format attendu
-                    const newsArticles = (data.news || data || []).map(article => ({
-                        title: article.title,
-                        description: article.text || article.description || '',
-                        url: article.url || article.link || '#',
-                        publishedAt: article.publishedDate || article.publishedAt || new Date().toISOString(),
-                        source: { name: article.site || article.source || 'FMP' },
-                        sentiment: article.sentiment || 'neutral',
-                        category: article.symbol || 'general'
-                    }));
-
-                    setNewsData(newsArticles);
-                    setFilteredNews(newsArticles);
-
-                    showMessage(`${newsArticles.length} actualités chargées depuis FMP (gratuit)`, 'success');
-                } catch (error) {
-                    console.error('❌ Erreur fetch news:', error?.message || String(error));
-                    showMessage('Erreur chargement actualités', 'error');
-                    
-                    const fallbackNews = [
-                        {
-                            title: "Actualités financières non disponibles",
-                            description: "Impossible de charger les actualités. Vérifiez la configuration des APIs.",
-                            url: "#",
-                            publishedAt: new Date().toISOString(),
-                            source: { name: "Système" }
                         }
-                    ];
-                    setNewsData(fallbackNews);
-                    setFilteredNews(fallbackNews);
+                        addLog('⚠️ FMP News: réponse vide ou erreur', 'warning');
+                    } catch (fmpError) {
+                        addLog(`❌ FMP News erreur: ${fmpError.message}`, 'error');
+                    }
+
+                    // SOURCE 2: Finnhub News (Fallback)
+                    addLog('🔄 Tentative Finnhub News...', 'info');
+                    try {
+                        const today = new Date().toISOString().split('T')[0];
+                        const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
+
+                        const finnhubResponse = await fetch(
+                            `${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${availableTickers[0]}&from=${weekAgo}&to=${today}`
+                        );
+
+                        if (finnhubResponse.ok) {
+                            const finnhubData = await finnhubResponse.json();
+                            const newsArticles = (finnhubData || []).slice(0, 50).map(article => ({
+                                title: article.headline,
+                                description: article.summary || '',
+                                url: article.url || '#',
+                                publishedAt: new Date(article.datetime * 1000).toISOString(),
+                                source: { name: article.source || 'Finnhub' },
+                                sentiment: article.sentiment || 'neutral',
+                                category: availableTickers[0]
+                            }));
+
+                            if (newsArticles.length > 0) {
+                                setNewsData(newsArticles);
+                                setFilteredNews(newsArticles);
+                                addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub`, 'success');
+                                return;
+                            }
+                        }
+                        addLog('⚠️ Finnhub News: réponse vide ou erreur', 'warning');
+                    } catch (finnhubError) {
+                        addLog(`❌ Finnhub News erreur: ${finnhubError.message}`, 'error');
+                    }
+
+                    // SOURCE 3: General Market News (Last Resort)
+                    addLog('🔄 Tentative General Market News...', 'info');
+                    try {
+                        const generalResponse = await fetch(`${API_BASE_URL}/api/fmp?endpoint=news&limit=50`);
+
+                        if (generalResponse.ok) {
+                            const generalData = await generalResponse.json();
+                            const newsArticles = (generalData.news || generalData || []).map(article => ({
+                                title: article.title,
+                                description: article.text || article.description || '',
+                                url: article.url || article.link || '#',
+                                publishedAt: article.publishedDate || article.publishedAt || new Date().toISOString(),
+                                source: { name: article.site || article.source || 'FMP' },
+                                sentiment: article.sentiment || 'neutral',
+                                category: 'general'
+                            }));
+
+                            if (newsArticles.length > 0) {
+                                setNewsData(newsArticles);
+                                setFilteredNews(newsArticles);
+                                addLog(`✅ ${newsArticles.length} actualités générales chargées`, 'success');
+                                return;
+                            }
+                        }
+                    } catch (generalError) {
+                        addLog(`❌ General News erreur: ${generalError.message}`, 'error');
+                    }
+
+                    // Toutes les sources ont échoué - pas de données disponibles
+                    throw new Error('Toutes les sources d\'actualités ont échoué');
+
+                } catch (error) {
+                    addLog(`❌ ERREUR CRITIQUE: ${error.message}`, 'error');
+                    setNewsData([]);
+                    setFilteredNews([]);
+                    showMessage('❌ Impossible de charger les actualités - Vérifiez les clés API dans Admin JSLAI', 'error');
                 }
             };
 
