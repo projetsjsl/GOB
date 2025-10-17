@@ -458,6 +458,12 @@ const fetchHybridData = async (symbol, dataType) => {
             const tabSoundRef = useRef(null);
             const audioCtxRef = useRef(null);
 
+            // États pour Emma (partagés entre AskEmmaTab et AdminJSLaiTab)
+            const [emmaConnected, setEmmaConnected] = useState(false);
+            const [showPromptEditor, setShowPromptEditor] = useState(false);
+            const [showTemperatureEditor, setShowTemperatureEditor] = useState(false);
+            const [showLengthEditor, setShowLengthEditor] = useState(false);
+
             // Configuration API
             const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
             
@@ -2169,7 +2175,16 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
             };
 
             // Composant onglet Admin-JSLAI
-            const AdminJSLaiTab = () => (
+            const AdminJSLaiTab = ({
+                emmaConnected,
+                setEmmaConnected,
+                showPromptEditor,
+                setShowPromptEditor,
+                showTemperatureEditor,
+                setShowTemperatureEditor,
+                showLengthEditor,
+                setShowLengthEditor
+            }) => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
@@ -8681,7 +8696,18 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
             // Composant onglet Ask Emma avec intégration Gemini
             // Isolé avec React.memo pour éviter les re-renders causés par les mises à jour de marché
-            const AskEmmaTab = React.memo(({ prefillMessage = '', setPrefillMessage = () => {} }) => {
+            const AskEmmaTab = React.memo(({
+                prefillMessage = '',
+                setPrefillMessage = () => {},
+                emmaConnected,
+                setEmmaConnected,
+                showPromptEditor,
+                setShowPromptEditor,
+                showTemperatureEditor,
+                setShowTemperatureEditor,
+                showLengthEditor,
+                setShowLengthEditor
+            }) => {
                 // État pour l'animation de chargement de l'historique
                 const [historyLoading, setHistoryLoading] = useState(true);
 
@@ -8702,10 +8728,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                 const [emmaLoading, setEmmaLoading] = useState(false);
                 const chatContainerRef = useRef(null);
                 const [emmaApiKey, setEmmaApiKey] = useState('');
-                const [emmaConnected, setEmmaConnected] = useState(false);
-                const [showPromptEditor, setShowPromptEditor] = useState(false);
-                const [showTemperatureEditor, setShowTemperatureEditor] = useState(false);
-                const [showLengthEditor, setShowLengthEditor] = useState(false);
+                // emmaConnected, showPromptEditor, showTemperatureEditor, showLengthEditor maintenant dans le parent
                 const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
                 const [emmaMaxTokens, setEmmaMaxTokens] = useState(4096); // Longueur de réponse par défaut
                 const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
@@ -15603,8 +15626,28 @@ console.log('✅ Données hybrides récupérées:', {
                     }`}>
                         {activeTab === 'stocks-news' && <StocksNewsTab />}
                         {activeTab === 'intellistocks' && <IntelliStocksTab />}
-                        {activeTab === 'ask-emma' && <AskEmmaTab prefillMessage={emmaPrefillMessage} setPrefillMessage={setEmmaPrefillMessage} />}
-                        {activeTab === 'admin-jsla' && <AdminJSLaiTab />}
+                        {activeTab === 'ask-emma' && <AskEmmaTab
+                            prefillMessage={emmaPrefillMessage}
+                            setPrefillMessage={setEmmaPrefillMessage}
+                            emmaConnected={emmaConnected}
+                            setEmmaConnected={setEmmaConnected}
+                            showPromptEditor={showPromptEditor}
+                            setShowPromptEditor={setShowPromptEditor}
+                            showTemperatureEditor={showTemperatureEditor}
+                            setShowTemperatureEditor={setShowTemperatureEditor}
+                            showLengthEditor={showLengthEditor}
+                            setShowLengthEditor={setShowLengthEditor}
+                        />}
+                        {activeTab === 'admin-jsla' && <AdminJSLaiTab
+                            emmaConnected={emmaConnected}
+                            setEmmaConnected={setEmmaConnected}
+                            showPromptEditor={showPromptEditor}
+                            setShowPromptEditor={setShowPromptEditor}
+                            showTemperatureEditor={showTemperatureEditor}
+                            setShowTemperatureEditor={setShowTemperatureEditor}
+                            showLengthEditor={showLengthEditor}
+                            setShowLengthEditor={setShowLengthEditor}
+                        />}
                         {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                         {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                         {activeTab === 'email-briefings' && <EmailBriefingsTab />}
