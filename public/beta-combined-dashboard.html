@@ -5263,6 +5263,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 const [currentBriefing, setCurrentBriefing] = useState(null);
                 const [previewHtml, setPreviewHtml] = useState('');
                 const [briefingHistory, setBriefingHistory] = useState([]);
+                const [customTopic, setCustomTopic] = useState('');
+                const [showCustomModal, setShowCustomModal] = useState(false);
                 const [recipients, setRecipients] = useState('');
                 const [selectedType, setSelectedType] = useState('morning');
                 const [currentStep, setCurrentStep] = useState('');
@@ -6860,6 +6862,11 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             case 'evening':
                                 html = createEveningBriefingHTML(analysis, data);
                                 break;
+                            case 'custom':
+                                html = createCustomBriefingHTML(analysis, data, customTopic);
+                                break;
+                            default:
+                                html = createMorningBriefingHTML(analysis, data);
                         }
 
                         // ÉTAPE 4: Create Briefing Object avec Metadata
