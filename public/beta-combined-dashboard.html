@@ -6540,22 +6540,136 @@ ${basePrompt}
                         setStepDetails('Emma Agent génère le briefing en mode BRIEFING...');
                         addLogEntry('STEP_3', 'ÉTAPE 3: Adaptive Email Generation', {}, 'info');
 
-                        // Construire le message pour Emma Agent
-                        const briefingMessage = `Génère un briefing ${type} détaillé (1800-2200 mots) sur la séance de marché.
+                        // Construire le message ADAPTATIF pour Emma Agent
+                        let briefingMessage = '';
 
-CONTEXTE:
+                        // BASE PROMPT selon le type de briefing
+                        const basePrompt = prompts[type]?.perplexity || prompts[type]?.openai || '';
+
+                        // ADAPTATION CONTEXTUELLE selon l'intent et l'importance
+                        if (intentData.importance_level >= 8) {
+                            // 🚨 BREAKING NEWS - Importance critique
+                            briefingMessage = `🚨 BREAKING - Événement majeur détecté
+
+${intentData.trending_topics[0] || 'Événement de marché significatif'}
+
+${basePrompt}
+
+⚠️ INSTRUCTIONS SPÉCIALES POUR CET ÉVÉNEMENT MAJEUR:
+- COMMENCER par l'événement majeur et son impact immédiat
+- Style: Urgent mais professionnel et factuel
+- Inclure implications immédiates pour le marché
+- Recommandations tactiques urgentes
+- Niveaux techniques critiques à surveiller
+- Scénarios possibles et probabilités
+
+CONTEXTE CRITIQUE:
+- Intent: ${intentData.intent}
+- Niveau d'importance: ${intentData.importance_level}/10 (⚠️ CRITIQUE)
+- Catalyseur principal: ${intentData.trending_topics[0]}
+- Tickers impactés: ${intentData.key_tickers?.join(', ') || teamTickers.join(', ')}`;
+
+                        } else if (intentData.intent === 'earnings_day') {
+                            // 📈 EARNINGS DAY
+                            briefingMessage = `📈 EARNINGS DAY - ${intentData.key_tickers?.join(', ') || 'N/A'}
+
+${basePrompt}
+
+📊 FOCUS PRIORITAIRE EARNINGS:
+- Résultats vs attentes (EPS, revenus)
+- Guidance management et perspectives
+- Réaction marché et volumes
+- Implications sectorielles
+- Comparaison peers et multiples de valorisation
+- Conférence calls et highlights
+
+CONTEXTE EARNINGS:
 - Intent: ${intentData.intent}
 - Importance: ${intentData.importance_level}/10
-- Sujets clés: ${intentData.trending_topics?.join(', ') || 'N/A'}
-- Tickers: ${intentData.key_tickers?.join(', ') || teamTickers.join(', ')}
+- Entreprises clés: ${intentData.key_tickers?.join(', ') || 'N/A'}
+- Tendances détectées: ${intentData.trending_topics?.join(', ') || 'N/A'}`;
 
-DONNÉES COLLECTÉES:
-${JSON.stringify(smartData, null, 2)}
+                        } else if (intentData.intent === 'fed_decision' || intentData.intent === 'central_bank') {
+                            // 🏛️ FED/CENTRAL BANK DECISION
+                            briefingMessage = `🏛️ DÉCISION BANQUE CENTRALE
 
-SECTIONS PRIORITAIRES:
-${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}
+${basePrompt}
 
-Rédige une analyse approfondie et professionnelle avec données chiffrées précises.`;
+🎯 FOCUS PRIORITAIRE POLITIQUE MONÉTAIRE:
+- Décision taux et communiqué officiel
+- Dot plot et forward guidance
+- Commentaires président/gouverneur
+- Réaction courbe de taux et obligataire
+- Impact devises et actions
+- Implications court et moyen terme
+
+CONTEXTE BANQUE CENTRALE:
+- Intent: ${intentData.intent}
+- Importance: ${intentData.importance_level}/10
+- Événement: ${intentData.trending_topics[0] || 'Décision politique monétaire'}`;
+
+                        } else if (intentData.intent === 'market_crash' || intentData.intent === 'high_volatility') {
+                            // 📉 VOLATILITÉ EXTRÊME / CRASH
+                            briefingMessage = `📉 ALERTE VOLATILITÉ - ${intentData.trending_topics[0] || 'Mouvements de marché inhabituels'}
+
+${basePrompt}
+
+⚡ FOCUS PRIORITAIRE VOLATILITÉ:
+- Ampleur des mouvements et vitesse
+- Secteurs et valeurs les plus touchés
+- VIX et indicateurs de stress
+- Flux et volumes anormaux
+- Corrélations rompues
+- Historique et comparaisons
+- Niveaux de support critiques
+
+CONTEXTE VOLATILITÉ:
+- Intent: ${intentData.intent}
+- Importance: ${intentData.importance_level}/10
+- Catalyseur: ${intentData.trending_topics[0] || 'Mouvement de marché significatif'}`;
+
+                        } else {
+                            // 📊 BRIEFING STANDARD
+                            briefingMessage = `${basePrompt}
+
+CONTEXTE DU BRIEFING:
+- Intent: ${intentData.intent}
+- Importance: ${intentData.importance_level}/10
+- Sujets clés: ${intentData.trending_topics?.join(', ') || 'Analyse de marché générale'}
+- Tickers focus: ${intentData.key_tickers?.join(', ') || teamTickers.join(', ')}`;
+                        }
+
+                        // SECTIONS SÉLECTIONNÉES PAR ORDRE DE PRIORITÉ
+                        briefingMessage += `\n\nSECTIONS À INCLURE (PAR ORDRE DE PRIORITÉ):
+${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
+
+                        // DONNÉES EMMA AGENT COLLECTÉES
+                        briefingMessage += `\n\nDONNÉES EMMA AGENT DISPONIBLES:`;
+                        selectedSections.forEach(section => {
+                            if (section.content) {
+                                const contentPreview = typeof section.content === 'string'
+                                    ? section.content.substring(0, 500)
+                                    : JSON.stringify(section.content).substring(0, 500);
+                                briefingMessage += `\n\n📦 ${section.title}:\n${contentPreview}${section.content.length > 500 ? '...' : ''}`;
+                            }
+                        });
+
+                        briefingMessage += `\n\n✅ INSTRUCTIONS FINALES:
+- Rédige une analyse APPROFONDIE et PROFESSIONNELLE (1800-2200 mots minimum)
+- Utilise les DONNÉES RÉELLES ci-dessus (pas de données fictives)
+- Structure MARKDOWN avec sections claires (##, ###)
+- Inclure DONNÉES CHIFFRÉES précises (prix, %, volumes, etc.)
+- Ton: Professionnel institutionnel adapté à l'importance ${intentData.importance_level}/10
+- Focus sur l'ACTIONNABLE et les INSIGHTS
+- Citer les SOURCES en fin d'analyse`;
+
+                        console.log('✅ Adaptive prompt built:', briefingMessage.length, 'chars');
+                        addLogEntry('ADAPTIVE_PROMPT', 'Prompt adaptatif créé', {
+                            length: briefingMessage.length,
+                            intent: intentData.intent,
+                            importance: intentData.importance_level,
+                            type: type
+                        }, 'info');
 
                         // Appel Emma Agent en MODE BRIEFING
                         const analysisResponse = await fetch('/api/emma-agent', {
