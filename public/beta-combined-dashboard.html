@@ -1929,11 +1929,28 @@ const fetchHybridData = async (symbol, dataType) => {
                     addScrapingLog('⚠️ Scraping déjà en cours', 'warning');
                     return;
                 }
-                
+
+                // Confirmation que l'utilisateur est connecté à Seeking Alpha
+                const isLoggedIn = confirm(
+                    '🔐 IMPORTANT: Êtes-vous connecté à Seeking Alpha?\n\n' +
+                    'Si non:\n' +
+                    '1. Cliquez sur "Annuler"\n' +
+                    '2. Utilisez le bouton "🔐 Se connecter à Seeking Alpha"\n' +
+                    '3. Connectez-vous dans le nouvel onglet\n' +
+                    '4. Revenez ici et cliquez à nouveau sur "🚀 Lancer le Scraper"\n\n' +
+                    'Si oui, cliquez sur "OK" pour continuer.'
+                );
+
+                if (!isLoggedIn) {
+                    addScrapingLog('⏸️ Scraping annulé - Veuillez vous connecter d\'abord', 'warning');
+                    addScrapingLog('💡 Utilisez le bouton "🔐 Se connecter à Seeking Alpha" ci-dessus', 'info');
+                    return;
+                }
+
                 setScrapingStatus('running');
                 setScrapingProgress(0);
                 setScrapingLogs([]);
-                
+
                 addScrapingLog('🚀 Démarrage du scraper Seeking Alpha', 'info');
                 addScrapingLog(`📊 Tickers à traiter: ${tickers.join(', ')}`, 'info');
                 
@@ -2101,17 +2118,19 @@ const fetchHybridData = async (symbol, dataType) => {
                 addScrapingLog(`🌐 Analyse avec Perplexity AI pour ${ticker}...`, 'info');
 
                 try {
-                    // Préparer le prompt pour Perplexity (avec recherche web en temps réel!)
-                    const perplexityPrompt = `Analyse ${ticker} en utilisant les données Seeking Alpha ci-dessous ET recherche web en temps réel pour informations récentes.
+                    // Préparer le prompt pour Perplexity (formateur de données UNIQUEMENT)
+                    const perplexityPrompt = `Tu es un extracteur de données financières. Analyse UNIQUEMENT les données Seeking Alpha ci-dessous pour ${ticker}.
 
 DONNÉES SEEKING ALPHA (${ticker}):
 ${typeof scrapedData === 'string' ? scrapedData.substring(0, 3000) : JSON.stringify(scrapedData).substring(0, 3000)}
 
-INSTRUCTIONS - RETOURNER JSON STRICT:
-1. Extraire les métriques clés des données Seeking Alpha
-2. RECHERCHER en temps réel: actualités récentes, résultats financiers, recommandations d'analystes
-3. Combiner les deux sources pour une analyse complète et à jour
-4. RETOURNER UNIQUEMENT du JSON valide (pas de markdown, pas de texte)
+INSTRUCTIONS - EXTRACTION ET FORMATAGE UNIQUEMENT:
+1. PARSER les données Seeking Alpha fournies ci-dessus
+2. EXTRAIRE toutes les métriques, ratings, et informations disponibles
+3. NE PAS rechercher d'informations supplémentaires sur le web
+4. NE PAS ajouter de données externes
+5. FORMATER les données extraites selon la structure JSON ci-dessous
+6. RETOURNER UNIQUEMENT du JSON valide (pas de markdown, pas de commentaires)
 
 STRUCTURE JSON OBLIGATOIRE:
 {
@@ -2680,7 +2699,22 @@ STRUCTURE JSON OBLIGATOIRE:
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>🔧 Scraping Seeking Alpha</h3>
+                        <div className={`mb-3 p-3 rounded text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'bg-yellow-900/30 text-yellow-200 border border-yellow-700' : 'bg-yellow-50 text-yellow-800 border border-yellow-200'
+                        }`}>
+                            ⚠️ <strong>Important:</strong> Connectez-vous d'abord à Seeking Alpha avec le bouton "🔐 Se connecter" ci-dessous, sinon les URLs seront bloquées et les données incomplètes.
+                        </div>
                         <div className="flex flex-wrap gap-2">
+                            <button
+                                onClick={() => {
+                                    addScrapingLog('🔐 Ouverture de la page de connexion Seeking Alpha...', 'info');
+                                    window.open('https://seekingalpha.com/account/login', '_blank');
+                                    addScrapingLog('✅ Connectez-vous, puis revenez ici pour lancer le scraper', 'success');
+                                }}
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-semibold"
+                            >
+                                🔐 Se connecter à Seeking Alpha
+                            </button>
                             <button
                                 onClick={runSeekingAlphaScraper}
                                 disabled={scrapingStatus === 'running'}
