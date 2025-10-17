@@ -2175,7 +2175,56 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                 }
             };
 
-            // Composant onglet Admin-JSLAI
+            // ============================================================================
+            // HELPER FUNCTIONS FOR ADMIN JSLAI (moved here for proper scope)
+            // ============================================================================
+
+            // Fonction de logging pour tracer le processus complet
+            function addLogEntry(step, type, data, status = 'info') {
+                const timestamp = new Date().toISOString();
+                const logEntry = {
+                    id: Date.now() + Math.random(),
+                    timestamp,
+                    step,
+                    type,
+                    status, // 'info', 'success', 'error', 'warning'
+                    data: typeof data === 'object' ? JSON.stringify(data, null, 2) : data,
+                    size: typeof data === 'object' ? JSON.stringify(data).length : data?.length || 0
+                };
+
+                setProcessLog(prev => [...prev, logEntry]);
+                console.log(`📋 [${step}] ${type}:`, data);
+            }
+
+            // Fonction pour exécuter le diagnostic des APIs
+            async function runHealthCheck() {
+                setHealthCheckLoading(true);
+                try {
+                    const response = await fetch('/api/health-check-simple');
+                    const result = await response.json();
+
+                    if (result.success) {
+                        setHealthStatus(result.health);
+                        addLogEntry('HEALTH_CHECK', 'Diagnostic APIs terminé', {
+                            overall_status: result.health.overall_status,
+                            healthy_apis: result.health.healthy_apis,
+                            total_apis: result.health.total_apis,
+                            response_time: result.health.response_time_ms
+                        }, 'success');
+                    } else {
+                        throw new Error(result.error || 'Erreur diagnostic');
+                    }
+                } catch (error) {
+                    addLogEntry('HEALTH_CHECK', 'Erreur diagnostic APIs', error.message, 'error');
+                    console.error('Erreur health check:', error);
+                } finally {
+                    setHealthCheckLoading(false);
+                }
+            }
+
+            // ============================================================================
+            // COMPOSANT ADMIN-JSLAI
+            // ============================================================================
             const AdminJSLaiTab = ({
                 emmaConnected,
                 setEmmaConnected,
@@ -6289,22 +6338,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                     }
                 };
 
-                // Fonction de logging pour tracer le processus complet
-                function addLogEntry(step, type, data, status = 'info') {
-                    const timestamp = new Date().toISOString();
-                    const logEntry = {
-                        id: Date.now() + Math.random(),
-                        timestamp,
-                        step,
-                        type,
-                        status, // 'info', 'success', 'error', 'warning'
-                        data: typeof data === 'object' ? JSON.stringify(data, null, 2) : data,
-                        size: typeof data === 'object' ? JSON.stringify(data).length : data?.length || 0
-                    };
-
-                    setProcessLog(prev => [...prev, logEntry]);
-                    console.log(`📋 [${step}] ${type}:`, data);
-                }
+                // NOTE: addLogEntry() moved to line ~2183 (before AdminJSLaiTab for proper scope)
 
                 // Fonction pour nettoyer le log
                 const clearProcessLog = () => {
@@ -7794,31 +7828,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                     }
                 };
 
-                // Fonction pour exécuter le diagnostic des APIs
-                async function runHealthCheck() {
-                    setHealthCheckLoading(true);
-                    try {
-                        const response = await fetch('/api/health-check-simple');
-                        const result = await response.json();
-                        
-                        if (result.success) {
-                            setHealthStatus(result.health);
-                            addLogEntry('HEALTH_CHECK', 'Diagnostic APIs terminé', {
-                                overall_status: result.health.overall_status,
-                                healthy_apis: result.health.healthy_apis,
-                                total_apis: result.health.total_apis,
-                                response_time: result.health.response_time_ms
-                            }, 'success');
-                        } else {
-                            throw new Error(result.error || 'Erreur diagnostic');
-                        }
-                    } catch (error) {
-                        addLogEntry('HEALTH_CHECK', 'Erreur diagnostic APIs', error.message, 'error');
-                        console.error('Erreur health check:', error);
-                    } finally {
-                        setHealthCheckLoading(false);
-                    }
-                }
+                // NOTE: runHealthCheck() moved to line ~2200 (before AdminJSLaiTab for proper scope)
 
                 // Charger l'historique au montage
                 React.useEffect(() => {
