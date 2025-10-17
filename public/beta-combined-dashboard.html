@@ -70,9 +70,88 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        /* Réduction globale pour mobile: police et espacements à 50% */
+        /* 📱 MOBILE - COMPACT VIEW for Global Overview */
         @media (max-width: 768px) {
-            html { font-size: 50%; }
+            /* Compact global scaling for dashboard view */
+            html { font-size: 55%; }
+            body { padding: 6px; }
+
+            /* Compact header */
+            header { padding: 10px !important; }
+            header img { width: 36px !important; height: 36px !important; }
+            header h1 { font-size: 1.3rem !important; }
+            header p { font-size: 0.65rem !important; }
+
+            /* Ticker banner compact */
+            .ticker-content > div {
+                padding: 6px 10px !important;
+                font-size: 0.65rem !important;
+            }
+
+            /* Navigation tabs - horizontal scroll */
+            nav {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+                padding: 6px !important;
+            }
+
+            nav::-webkit-scrollbar { display: none; }
+
+            nav button {
+                flex-shrink: 0 !important;
+                white-space: nowrap !important;
+                padding: 10px 14px !important;
+                font-size: 0.75rem !important;
+            }
+
+            /* Tables: horizontal scroll */
+            table {
+                display: block !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                white-space: nowrap !important;
+                font-size: 0.7rem !important;
+            }
+
+            /* Buttons slightly larger for touch */
+            button, .btn, a[class*="btn"] {
+                min-height: 36px !important;
+                padding: 8px 12px !important;
+            }
+
+            /* Input fields prevent iOS zoom */
+            input, textarea, select {
+                font-size: 16px !important; /* Prevent zoom on focus */
+                padding: 8px !important;
+                min-height: 36px !important;
+            }
+
+            /* Compact card spacing */
+            .space-y-6 > * + * { margin-top: 12px !important; }
+            .space-y-4 > * + * { margin-top: 8px !important; }
+            .space-y-2 > * + * { margin-top: 4px !important; }
+
+            .p-6 { padding: 12px !important; }
+            .p-4 { padding: 8px !important; }
+            .p-3 { padding: 6px !important; }
+            .p-2 { padding: 4px !important; }
+
+            /* Gap reduction */
+            .gap-6 { gap: 12px !important; }
+            .gap-4 { gap: 8px !important; }
+            .gap-2 { gap: 4px !important; }
+
+            /* Grid stays but more compact */
+            .grid {
+                gap: 8px !important;
+            }
+
+            /* Charts and images responsive */
+            img, canvas, svg {
+                max-width: 100% !important;
+                height: auto !important;
+            }
         }
         .seeking-alpha-card {
             background: linear-gradient(135deg, #1f1f1f 0%, #2d2d2d 100%);
