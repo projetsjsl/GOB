@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:44:11.680Z",
+  "lastUpdate": "2025-10-17T20:54:19.882Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -540,29 +540,35 @@
     "TRP": {
       "ticker": "TRP",
       "companyName": "TC Energy Corporation",
-      "lastUpdate": "2025-10-17T20:00:00.000Z",
+      "lastUpdate": "2025-10-17T20:54:12.518Z",
       "metrics": {
-        "marketCap": null,
-        "bpaGrowth": null,
-        "peRatio": null,
-        "sector": null,
-        "industry": null,
-        "dividendYield": null,
-        "dividendFrequency": null,
-        "exDivDate": null,
-        "annualPayout": null,
+        "marketCap": "$53.53B",
+        "bpaGrowth": "-6.64%",
+        "peRatio": "20.12",
+        "sector": "Energy",
+        "industry": "Oil and Gas Storage and Transportation",
+        "dividendYield": "4.70%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-09-29",
+        "annualPayout": "$2.42",
         "price": "$51.44",
         "priceChange": "-0.04%"
       },
       "companyProfile": {
-        "description": null,
-        "employees": null,
-        "innovation": null
+        "description": "TC Energy Corporation, fondée en 1951 et basée à Calgary, Canada, est une entreprise d'infrastructure énergétique en Amérique du Nord. Elle opère à travers quatre segments principaux : les pipelines de gaz naturel canadiens, les pipelines de gaz naturel américains, les pipelines de gaz naturel mexicains et les solutions énergétiques. La société construit et exploite un réseau de 93 700 kilomètres de pipelines de gaz naturel, qui transporte le gaz naturel des bassins d'approvisionnement vers les entreprises de distribution locales, les centrales électriques, les installations industrielles, les pipelines d'interconnexion, les terminaux d'exportation de GNL et d'autres entreprises.",
+        "employees": "6,668",
+        "innovation": "N/A"
       },
       "competition": {
-        "competitors": [],
-        "valueProposition": null,
-        "advantages": null
+        "competitors": [
+          "Pembina Pipeline Corporation",
+          "Enbridge Inc.",
+          "The Williams Companies, Inc.",
+          "Canadian Natural Resources Limited",
+          "Suncor Energy Inc."
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
       },
       "quantRating": {
         "overall": "HOLD",
@@ -573,20 +579,28 @@
         "revisions": "C+"
       },
       "sectorAnalysis": {
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
-      "intermediateConclusion": null,
-      "strengths": [],
-      "concerns": [],
+      "intermediateConclusion": "TC Energy est une entreprise d'infrastructure énergétique avec une capitalisation boursière importante et un rendement de dividende attractif. Cependant, les notes Quant indiquent des faiblesses en termes de valorisation et de croissance.",
+      "strengths": [
+        "Infrastructure établie",
+        "Rendement de dividende élevé",
+        "Présence nord-américaine"
+      ],
+      "concerns": [
+        "Valorisation faible",
+        "Croissance limitée",
+        "Ratio de distribution élevé"
+      ],
       "finalConclusion": {
-        "strengths": null,
-        "weaknesses": null,
-        "recommendation": null,
-        "rating": null
+        "strengths": "TC Energy possède une infrastructure solide et offre un rendement de dividende intéressant, ce qui peut attirer les investisseurs axés sur le revenu.",
+        "weaknesses": "La valorisation et la croissance sont des points faibles, et le ratio de distribution élevé pourrait susciter des inquiétudes quant à la durabilité du dividende.",
+        "recommendation": "Compte tenu des forces et des faiblesses, une position de maintien (HOLD) semble appropriée. Les investisseurs devraient surveiller de près la croissance future et la capacité de l'entreprise à maintenir son dividende.",
+        "rating": "HOLD"
       }
     },
     "UNH": {
