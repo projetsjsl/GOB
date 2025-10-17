@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:28:54.097Z",
+  "lastUpdate": "2025-10-17T20:29:05.356Z",
   "stocks": {
     "GOOGL": {
       "ticker": "GOOGL",
@@ -569,63 +569,7 @@
         "rating": "Pending"
       }
     },
-    "JNJ": {
-      "ticker": "JNJ",
-      "companyName": "Johnson & Johnson",
-      "lastUpdate": "2025-10-09T16:47:53.724Z",
-      "metrics": {
-        "marketCap": "En attente d'analyse",
-        "bpaGrowth": "En attente d'analyse",
-        "peRatio": "En attente d'analyse",
-        "sector": "Healthcare",
-        "dividendYield": "En attente d'analyse",
-        "dividendFrequency": "Quarterly",
-        "exDivDate": "En attente d'analyse",
-        "annualPayout": "En attente d'analyse",
-        "price": "En attente d'analyse",
-        "priceChange": "En attente d'analyse"
-      },
-      "companyProfile": {
-        "description": "Données scrapées disponibles - En attente d'analyse par Claude API",
-        "employees": "En attente d'analyse",
-        "innovation": "En attente d'analyse"
-      },
-      "competition": {
-        "competitors": [
-          "Pfizer",
-          "Merck"
-        ],
-        "valueProposition": "En attente d'analyse",
-        "advantages": "En attente d'analyse"
-      },
-      "quantRating": {
-        "valuation": "N/A",
-        "growth": "N/A",
-        "profitability": "N/A",
-        "momentum": "N/A",
-        "revisions": "N/A"
-      },
-      "sectorAnalysis": {
-        "valuation": "En attente d'analyse",
-        "growth": "En attente d'analyse",
-        "profitability": "En attente d'analyse",
-        "momentum": "En attente d'analyse",
-        "revisions": "En attente d'analyse"
-      },
-      "intermediateConclusion": "Données brutes collectées le 2025-10-09. Analyse complète en attente du traitement par Claude API.",
-      "strengths": [
-        "Données en cours de traitement"
-      ],
-      "concerns": [
-        "Analyse en attente"
-      ],
-      "finalConclusion": {
-        "strengths": "En attente d'analyse",
-        "weaknesses": "En attente d'analyse",
-        "recommendation": "Les données brutes ont été collectées avec succès. L'analyse détaillée sera disponible après le traitement par Claude API.",
-        "rating": "Pending"
-      }
-    },
+    "JNJ": {},
     "JPM": {},
     "LVMHF": {
       "ticker": "LVMHF",
