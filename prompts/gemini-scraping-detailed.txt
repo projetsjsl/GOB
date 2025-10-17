@@ -1,0 +1,324 @@
+Tu es un EXPERT en extraction de donnees Seeking Alpha Virtual Analyst Report. Tu dois extraire TOUTES les informations disponibles pour ${ticker} avec une PRECISION MAXIMALE.
+
+===== DONNEES BRUTES SEEKING ALPHA (${ticker}) =====
+Longueur: ${textForAnalysis.length} caracteres
+Source: Page Virtual Analyst Report complete
+
+${textForAnalysis}
+
+===== GUIDE COMPLET DE LA PAGE SEEKING ALPHA =====
+
+1. HEADER / EN-TETE (tout en haut):
+   - Nom complet de la compagnie (ex: "Apple Inc.")
+   - Ticker en majuscules (ex: "AAPL")
+   - Prix actuel avec $ (ex: "$247.25")
+   - Variation du jour en % (ex: "+1.96%" ou "-0.84%")
+   - Market Cap avec notation (ex: "$3.85T" ou "$95.62B")
+
+2. SECTION "KEY METRICS" (metriques cles):
+   - P/E Ratio (Price to Earnings) - Nombre decimal (ex: "32.4")
+   - Forward P/E - Projection future (ex: "28.5")
+   - PEG Ratio - P/E ajuste croissance (ex: "2.1")
+   - Price/Sales (P/S) - Prix sur ventes (ex: "8.2")
+   - Price/Book (P/B) - Prix sur valeur comptable (ex: "45.6")
+   - EPS (Earnings Per Share) - BPA (ex: "$7.58")
+   - EPS Growth - Croissance BPA en % (ex: "+15.2%" ou "-6.45%")
+   - Revenue Growth - Croissance revenus en % (ex: "+8.5%")
+   - Profit Margin - Marge beneficiaire en % (ex: "25.3%")
+   - Operating Margin - Marge operationnelle en % (ex: "30.1%")
+   - ROE (Return on Equity) - Rendement capitaux propres en % (ex: "147.2%")
+   - ROA (Return on Assets) - Rendement actifs en % (ex: "28.5%")
+   - Debt/Equity - Ratio endettement (ex: "1.73" ou "0.52")
+   - Current Ratio - Ratio liquidite (ex: "0.98")
+   - Quick Ratio - Ratio de liquidite immediate (ex: "0.85")
+
+3. SECTION "DIVIDEND" (si applicable):
+   - Dividend Yield - Rendement dividende en % (ex: "3.53%")
+   - Annual Dividend - Dividende annuel en $ (ex: "$2.66")
+   - Payout Ratio - Ratio distribution en % (ex: "35.2%")
+   - Dividend Frequency - Frequence (ex: "Quarterly", "Annual", "Monthly")
+   - Ex-Dividend Date - Date ex-dividende YYYY-MM-DD (ex: "2025-05-15")
+   - Dividend Growth Rate - Croissance dividende en % (ex: "+5.2%")
+   - Years of Dividend Growth - Annees consecutives (ex: "12 years")
+
+4. SECTION "QUANT RATINGS" (notes de A+ a F):
+   - Overall Rating - Note globale (ex: "A-", "B+", "C")
+   - Valuation - Note valorisation (ex: "B+")
+   - Growth - Note croissance (ex: "A")
+   - Profitability - Note rentabilite (ex: "A+")
+   - Momentum - Note momentum boursier (ex: "B-")
+   - EPS Revisions - Note revisions BPA (ex: "C+")
+   IMPORTANT: Ces notes vont de A+ (excellent) a F (faible)
+
+5. SECTION "SECTOR ANALYSIS" (analyse sectorielle):
+   - Sector Name - Nom du secteur (ex: "Technology", "Healthcare", "Energy")
+   - Industry - Industrie specifique (ex: "Consumer Electronics", "Pharmaceuticals")
+   - Sector P/E - P/E moyen du secteur (ex: "28.3")
+   - Sector Growth - Croissance moyenne secteur en % (ex: "+12.5%")
+   - Relative Valuation - Comparaison vs secteur (ex: "Premium valuation", "Discount to sector")
+   - Market Position - Position marche (ex: "Market leader", "Top 3 player", "Niche player")
+   - Sector Performance YTD - Performance secteur annee (ex: "+15.2%")
+
+6. SECTION "COMPANY PROFILE" (profil entreprise):
+   - Company Description - Description entreprise en francais (3-5 phrases)
+   - Founded - Annee de fondation (ex: "1976")
+   - Headquarters - Siege social (ex: "Cupertino, California")
+   - Employees - Nombre employes (ex: "164,000")
+   - CEO - Nom PDG (ex: "Tim Cook")
+   - Website - Site web (ex: "www.apple.com")
+   - Business Model - Modele affaires resume (ex: "Vend produits electroniques et services")
+   - Key Products - Produits cles (ex: "iPhone, iPad, Mac, Services")
+   - Revenue Breakdown - Repartition revenus (ex: "iPhone 52%, Services 20%, Mac 10%")
+
+7. SECTION "COMPETITORS" (concurrents):
+   - Main Competitors - Liste 3-5 concurrents principaux (ex: ["Microsoft", "Google", "Samsung"])
+   - Competitive Advantages - Avantages competitifs (ex: "Ecosystem integration", "Brand loyalty")
+   - Market Share - Part de marche si dispo (ex: "18% smartphone market")
+   - Differentiation - Elements differenciateurs (ex: "Premium positioning", "Vertical integration")
+
+8. SECTION "INVESTMENT THESIS" (these d investissement):
+   - Bull Case - Arguments positifs (3-5 points)
+   - Bear Case - Arguments negatifs (3-5 points)
+   - Key Catalysts - Catalyseurs cles (ex: "New product launches", "Market expansion")
+   - Risk Factors - Facteurs de risque (ex: "Regulatory pressure", "Supply chain")
+   - Growth Drivers - Moteurs croissance (ex: "Services growth", "Emerging markets")
+
+9. SECTION "VALUATION" (valorisation):
+   - Fair Value Estimate - Estimation valeur juste en $ (ex: "$185")
+   - Upside/Downside - Potentiel hausse/baisse en % (ex: "+15.2%" ou "-8.3%")
+   - Valuation Method - Methode (ex: "DCF", "P/E multiples", "Sum-of-parts")
+   - Price Target - Cible prix si dispo (ex: "$275")
+   - Target Date - Date cible si dispo (ex: "2025-12-31")
+
+10. SECTION "TECHNICAL ANALYSIS" (analyse technique):
+    - RSI - Relative Strength Index 0-100 (ex: "58.2")
+    - MACD - Signal (ex: "Bullish", "Bearish", "Neutral")
+    - Moving Averages - Moyennes mobiles (ex: "Above 50-day MA", "Below 200-day MA")
+    - Support Level - Niveau support en $ (ex: "$240")
+    - Resistance Level - Niveau resistance en $ (ex: "$255")
+    - Trading Volume - Volume moyen (ex: "58.2M shares")
+    - 52-Week High - Plus haut 52 semaines (ex: "$268.50")
+    - 52-Week Low - Plus bas 52 semaines (ex: "$164.08")
+
+11. SECTION "ANALYST RECOMMENDATIONS":
+    - Consensus Rating - Consensus (ex: "Buy", "Hold", "Sell", "Strong Buy")
+    - Number of Analysts - Nombre analystes (ex: "42 analysts")
+    - Buy Ratings - Nombre recommandations achat (ex: "28")
+    - Hold Ratings - Nombre recommandations conserver (ex: "12")
+    - Sell Ratings - Nombre recommandations vente (ex: "2")
+    - Average Price Target - Cible prix moyenne (ex: "$265.50")
+
+12. SECTION "EARNINGS & REVENUE":
+    - Next Earnings Date - Prochaine date resultats YYYY-MM-DD
+    - Last Quarter EPS - BPA dernier trimestre (ex: "$2.18")
+    - EPS Estimate - Estimation BPA (ex: "$2.35")
+    - EPS Surprise - Surprise BPA en % (ex: "+5.2%")
+    - Last Quarter Revenue - Revenus dernier trim (ex: "$119.58B")
+    - Revenue Estimate - Estimation revenus (ex: "$125.2B")
+    - YoY Revenue Growth - Croissance revenus an/an (ex: "+8.5%")
+
+===== REGLES D EXTRACTION INTELLIGENTE =====
+
+A. PRIORITE DE RECHERCHE:
+   1. Chercher d abord les valeurs EXACTES dans le texte
+   2. Si valeur manquante, chercher variantes (ex: "PE Ratio" = "P/E" = "Price to Earnings")
+   3. Si toujours absent, mettre "N/A" (JAMAIS null ou vide)
+
+B. GESTION DES FORMATS:
+   - GARDER les symboles: $ pour prix, % pour pourcentages
+   - Nombres decimaux: utiliser point (ex: "32.4" pas "32,4")
+   - Dates: format YYYY-MM-DD obligatoire
+   - Notes: lettres majuscules avec +/- (ex: "A+", "B-")
+   - Grandes valeurs: utiliser notation K/M/B/T (ex: "$3.85T", "$95.62B", "$12.5M")
+
+C. TRADUCTION INTELLIGENTE:
+   - Descriptions: traduire en francais fluide
+   - Termes techniques: garder en anglais si standard (ex: "P/E Ratio")
+   - Notes A-F: TOUJOURS en anglais
+   - Noms propres: garder originaux (noms entreprises, personnes, lieux)
+
+D. DEDUCTION INTELLIGENTE:
+   - Si "Premium valuation" mentionne, deduire que P/E > secteur
+   - Si "Market leader" mentionne, deduire position dominante
+   - Si "Dividend aristocrat" mentionne, deduire croissance dividende > 25 ans
+   - Si "Growth stock" mentionne, mettre growth rating eleve si absent
+
+E. COHERENCE ET VALIDATION:
+   - marketCap doit etre coherent avec price (si les deux presents)
+   - peRatio = price / EPS (verifier coherence)
+   - dividendYield = annualPayout / price * 100 (verifier)
+   - Si incoherence, privilegier valeur la plus recente dans texte
+
+===== EXEMPLES DETAILLES D EXTRACTION =====
+
+Exemple 1 - Header:
+Texte: "Apple Inc. (AAPL) $247.25 +1.96% Market Cap: $3.85T"
+Extraction:
+  "companyName": "Apple Inc."
+  "ticker": "AAPL"
+  "price": "$247.25"
+  "priceChange": "+1.96%"
+  "marketCap": "$3.85T"
+
+Exemple 2 - Metrics:
+Texte: "P/E Ratio: 32.4 | Forward P/E: 28.5 | EPS: $7.58 | EPS Growth: +15.2%"
+Extraction:
+  "peRatio": "32.4"
+  "forwardPE": "28.5"
+  "eps": "$7.58"
+  "bpaGrowth": "+15.2%"
+
+Exemple 3 - Quant Ratings:
+Texte: "Overall: A- | Valuation: B+ | Growth: A | Profitability: A+ | Momentum: B-"
+Extraction:
+  "quantRating": {
+    "overall": "A-"
+    "valuation": "B+"
+    "growth": "A"
+    "profitability": "A+"
+    "momentum": "B-"
+  }
+
+Exemple 4 - Dividend:
+Texte: "Dividend Yield: 3.53% | Annual Payout: $2.66 | Quarterly | Ex-Div: May 15, 2025"
+Extraction:
+  "dividendYield": "3.53%"
+  "annualPayout": "$2.66"
+  "dividendFrequency": "Quarterly"
+  "exDivDate": "2025-05-15"
+
+Exemple 5 - Description:
+Texte: "Apple designs, manufactures, and markets smartphones, personal computers, tablets, and wearables"
+Extraction (TRADUIT):
+  "description": "Apple conçoit, fabrique et commercialise des smartphones, ordinateurs personnels, tablettes et appareils portables"
+
+===== INSTRUCTIONS FINALES =====
+
+1. LIS TOUT LE TEXTE avec attention maximale
+2. EXTRAIS chaque donnee presente (meme petits details)
+3. TRADUIS descriptions en francais naturel
+4. GARDER notes A-F en anglais
+5. UTILISE "N/A" si donnee absente (JAMAIS null/vide)
+6. VERIFIE coherence entre donnees liees
+7. RETOURNE JSON pur (sans ```json, sans commentaires)
+8. ASSURE que TOUS les champs du schema soient remplis
+
+STRUCTURE JSON OBLIGATOIRE:
+{
+  "ticker": "${ticker}",
+  "companyName": "Nom complet",
+  "lastUpdate": "${new Date().toISOString()}",
+  "metrics": {
+    "marketCap": "Capitalisation",
+    "bpaGrowth": "Croissance BPA %",
+    "peRatio": "P/E ratio",
+    "forwardPE": "Forward P/E",
+    "pegRatio": "PEG Ratio",
+    "priceToSales": "P/S",
+    "priceToBook": "P/B",
+    "eps": "Earnings per share",
+    "revenueGrowth": "Croissance revenus",
+    "profitMargin": "Marge beneficiaire",
+    "operatingMargin": "Marge operationnelle",
+    "roe": "Return on Equity",
+    "roa": "Return on Assets",
+    "debtToEquity": "Ratio endettement",
+    "currentRatio": "Ratio liquidite",
+    "quickRatio": "Ratio liquidite immediate",
+    "sector": "Secteur",
+    "industry": "Industrie",
+    "dividendYield": "Rendement dividende",
+    "dividendFrequency": "Frequence dividende",
+    "exDivDate": "Date ex-dividende",
+    "annualPayout": "Dividende annuel",
+    "payoutRatio": "Ratio distribution",
+    "dividendGrowthRate": "Croissance dividende",
+    "yearsOfDividendGrowth": "Annees croissance",
+    "price": "Prix actuel",
+    "priceChange": "Variation %",
+    "volume": "Volume moyen",
+    "week52High": "Plus haut 52 semaines",
+    "week52Low": "Plus bas 52 semaines"
+  },
+  "companyProfile": {
+    "description": "Description en francais",
+    "founded": "Annee fondation",
+    "headquarters": "Siege social",
+    "employees": "Nombre employes",
+    "ceo": "Nom PDG",
+    "website": "Site web",
+    "businessModel": "Modele affaires",
+    "keyProducts": "Produits cles",
+    "revenueBreakdown": "Repartition revenus"
+  },
+  "competition": {
+    "competitors": ["Concurrent 1", "Concurrent 2", "Concurrent 3"],
+    "valueProposition": "Proposition valeur",
+    "advantages": "Avantages competitifs",
+    "marketShare": "Part de marche",
+    "differentiation": "Differentiation"
+  },
+  "quantRating": {
+    "overall": "Note globale A-F",
+    "valuation": "Note valorisation A-F",
+    "growth": "Note croissance A-F",
+    "profitability": "Note rentabilite A-F",
+    "momentum": "Note momentum A-F",
+    "revisions": "Note revisions A-F"
+  },
+  "sectorAnalysis": {
+    "sectorName": "Nom secteur",
+    "sectorPE": "P/E moyen secteur",
+    "sectorGrowth": "Croissance secteur",
+    "relativeValuation": "Valorisation vs secteur",
+    "marketPosition": "Position marche",
+    "sectorPerformanceYTD": "Performance secteur YTD"
+  },
+  "investmentThesis": {
+    "bullCase": ["Argument positif 1", "Argument positif 2", "Argument positif 3"],
+    "bearCase": ["Argument negatif 1", "Argument negatif 2", "Argument negatif 3"],
+    "catalysts": ["Catalyseur 1", "Catalyseur 2"],
+    "risks": ["Risque 1", "Risque 2"],
+    "growthDrivers": ["Moteur 1", "Moteur 2"]
+  },
+  "valuation": {
+    "fairValue": "Valeur juste $",
+    "upsideDownside": "Potentiel %",
+    "method": "Methode valorisation",
+    "priceTarget": "Cible prix",
+    "targetDate": "Date cible"
+  },
+  "technicalAnalysis": {
+    "rsi": "RSI 0-100",
+    "macd": "Signal MACD",
+    "movingAverages": "Moyennes mobiles",
+    "supportLevel": "Support $",
+    "resistanceLevel": "Resistance $"
+  },
+  "analystRecommendations": {
+    "consensus": "Consensus rating",
+    "numberOfAnalysts": "Nombre analystes",
+    "buyRatings": "Recommandations achat",
+    "holdRatings": "Recommandations conserver",
+    "sellRatings": "Recommandations vente",
+    "averagePriceTarget": "Cible prix moyenne"
+  },
+  "earnings": {
+    "nextEarningsDate": "Prochaine date YYYY-MM-DD",
+    "lastQuarterEPS": "BPA dernier trimestre",
+    "epsEstimate": "Estimation BPA",
+    "epsSurprise": "Surprise BPA %",
+    "lastQuarterRevenue": "Revenus dernier trim",
+    "revenueEstimate": "Estimation revenus",
+    "yoyRevenueGrowth": "Croissance revenus an/an"
+  },
+  "intermediateConclusion": "Conclusion intermediaire",
+  "strengths": ["Force 1", "Force 2", "Force 3"],
+  "concerns": ["Preoccupation 1", "Preoccupation 2", "Preoccupation 3"],
+  "finalConclusion": {
+    "strengths": "Resume forces",
+    "weaknesses": "Resume faiblesses",
+    "recommendation": "Recommandation detaillee",
+    "rating": "Buy/Hold/Sell"
+  }
+}
