@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:57:48.022Z",
+  "lastUpdate": "2025-10-17T20:57:58.715Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -344,7 +344,72 @@
         "rating": null
       }
     },
-    "MDT": {},
+    "MDT": {
+      "ticker": "MDT",
+      "companyName": "Medtronic plc",
+      "lastUpdate": "2025-10-17T20:57:49.839Z",
+      "metrics": {
+        "marketCap": "$121.91B",
+        "bpaGrowth": "N/A",
+        "peRatio": "16.90",
+        "sector": "Health Care",
+        "industry": "Health Care Equipment",
+        "dividendYield": "2.99%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-09-26",
+        "annualPayout": "$2.84",
+        "price": "$95.78",
+        "priceChange": "+0.78%"
+      },
+      "companyProfile": {
+        "description": "Medtronic plc développe, fabrique et vend des thérapies médicales basées sur des dispositifs aux systèmes de santé, aux médecins, aux cliniciens et aux patients aux États-Unis, en Irlande et à l'international. La société propose une large gamme de produits, notamment des stimulateurs cardiaques, des défibrillateurs, des produits d'ablation cardiaque, des systèmes de surveillance cardiaque, des valves aortiques, des dispositifs de chirurgie robotique et des pompes à insuline. Medtronic plc a été fondée en 1949 et son siège social est situé à Galway, en Irlande.",
+        "employees": "95,000",
+        "innovation": "Plateforme d'analyse et de vidéo chirurgicale alimentée par l'IA, produits de chirurgie robotique assistée"
+      },
+      "competition": {
+        "competitors": [
+          "ABT",
+          "JNJ",
+          "MRK",
+          "AMGN",
+          "BMY"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "C+",
+        "growth": "F",
+        "profitability": "A+",
+        "momentum": "C+",
+        "revisions": "B+"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "Medtronic est une société établie dans le secteur des équipements de santé, affichant une forte rentabilité mais une croissance plus faible. Les notes de Seeking Alpha indiquent une opinion partagée, avec une note globale de HOLD.",
+      "strengths": [
+        "Forte rentabilité (A+)",
+        "Longue histoire de croissance des dividendes (46 ans)",
+        "Position de leader dans le secteur des dispositifs médicaux"
+      ],
+      "concerns": [
+        "Faible note de croissance (F)",
+        "Valorisation mitigée (C+)",
+        "Ventes d'actions par des initiés"
+      ],
+      "finalConclusion": {
+        "strengths": "Medtronic bénéficie d'une forte rentabilité et d'une position de leader sur le marché des dispositifs médicaux.",
+        "weaknesses": "La croissance de l'entreprise est un sujet de préoccupation, comme en témoigne sa faible note de croissance.",
+        "recommendation": "Compte tenu des forces et des faiblesses de Medtronic, une position neutre (HOLD) semble appropriée. Les investisseurs devraient surveiller de près les initiatives de croissance de l'entreprise et les tendances du secteur.",
+        "rating": "HOLD"
+      }
+    },
     "JNJ": {
       "ticker": "JNJ",
       "companyName": "Johnson & Johnson",
