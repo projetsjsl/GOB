@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:59:26.685Z",
+  "lastUpdate": "2025-10-17T20:59:33.067Z",
   "stocks": {
     "GOOGL": {
       "ticker": "GOOGL",
@@ -1614,6 +1614,69 @@
         "rating": "Hold"
       }
     },
-    "CVS-TEST": {}
+    "CVS-TEST": {
+      "ticker": "CVS-TEST",
+      "companyName": "CVS Health Corporation test data",
+      "lastUpdate": "2025-10-17T20:59:28.612Z",
+      "metrics": {
+        "marketCap": "N/A",
+        "bpaGrowth": "N/A",
+        "peRatio": "N/A",
+        "sector": "N/A",
+        "industry": "N/A",
+        "dividendYield": "N/A",
+        "dividendFrequency": "N/A",
+        "exDivDate": "N/A",
+        "annualPayout": "N/A",
+        "price": "N/A",
+        "priceChange": "N/A"
+      },
+      "companyProfile": {
+        "description": "N/A",
+        "employees": "N/A",
+        "innovation": "N/A"
+      },
+      "competition": {
+        "competitors": [
+          "N/A",
+          "N/A",
+          "N/A"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "N/A",
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "N/A",
+      "strengths": [
+        "N/A",
+        "N/A",
+        "N/A"
+      ],
+      "concerns": [
+        "N/A",
+        "N/A",
+        "N/A"
+      ],
+      "finalConclusion": {
+        "strengths": "N/A",
+        "weaknesses": "N/A",
+        "recommendation": "N/A",
+        "rating": "N/A"
+      }
+    }
   }
 }
