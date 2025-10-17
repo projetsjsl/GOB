@@ -41,7 +41,7 @@ export default async function handler(req, res) {
         let query = supabase
           .from('seeking_alpha_data')
           .select('*')
-          .order('timestamp', { ascending: false }); // Your table uses 'timestamp' not 'scraped_at'
+          .order('scraped_at', { ascending: false });
 
         if (ticker) {
           query = query.eq('ticker', ticker.toUpperCase());
@@ -158,7 +158,8 @@ export default async function handler(req, res) {
             url: url || `https://seekingalpha.com/symbol/${ticker}/virtual_analyst_report`,
             raw_text,
             raw_html: raw_html || null,
-            timestamp: new Date().toISOString(),
+            scraped_at: new Date().toISOString(),
+            scraping_method: 'manual',
             status: status,
             error_message: error_message || null
           })

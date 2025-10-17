@@ -165,7 +165,7 @@ async function processBatch(batch_id, tickers, force_refresh) {
         .from('seeking_alpha_data')
         .select('*')
         .eq('ticker', tickerUpper)
-        .order('timestamp', { ascending: false })
+        .order('scraped_at', { ascending: false })
         .limit(1)
         .single();
 
