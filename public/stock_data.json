@@ -1,7 +1,71 @@
 {
-  "lastUpdate": "2025-10-17T20:59:17.197Z",
+  "lastUpdate": "2025-10-17T20:59:26.685Z",
   "stocks": {
-    "GOOGL": {},
+    "GOOGL": {
+      "ticker": "GOOGL",
+      "companyName": "Alphabet Inc.",
+      "lastUpdate": "2025-10-17T20:38:00.000Z",
+      "metrics": {
+        "marketCap": "$3.04T",
+        "bpaGrowth": "N/A",
+        "peRatio": "25.29",
+        "sector": "Communication Services",
+        "industry": "Interactive Media and Services",
+        "dividendYield": "0.33%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-09-08",
+        "annualPayout": "$0.84",
+        "price": "$253.30",
+        "priceChange": "+0.73%"
+      },
+      "companyProfile": {
+        "description": "Alphabet Inc. propose divers produits et plateformes aux États-Unis, en Europe, au Moyen-Orient, en Afrique, en Asie-Pacifique, au Canada et en Amérique latine. Elle opère à travers les segments Google Services, Google Cloud et Other Bets. Le segment Google Services fournit des produits et services, notamment des publicités, Android, Chrome, des appareils, Gmail, Google Drive, Google Maps, Google Photos, Google Play, Search et YouTube. Elle est également impliquée dans la vente d'applications et d'achats intégrés, de contenu numérique sur Google Play et YouTube, ainsi que d'appareils et dans la fourniture de services d'abonnement grand public YouTube.",
+        "employees": "187,103",
+        "innovation": "Le segment Google Cloud offre une infrastructure d'IA, une plateforme Vertex AI, la cybersécurité, des données et des analyses, et d'autres services. Google Workspace comprend des outils de communication et de collaboration basés sur le cloud pour les entreprises, tels que Calendar, Gmail, Docs, Drive et Meet."
+      },
+      "competition": {
+        "competitors": [
+          "AMZN",
+          "META",
+          "MSFT",
+          "AAPL",
+          "NVDA"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "F",
+        "growth": "B+",
+        "profitability": "A+",
+        "momentum": "A",
+        "revisions": "B+"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "Alphabet Inc. (GOOGL) est actuellement évaluée comme HOLD par l'analyse quantitative de Seeking Alpha. La société affiche de fortes notes de rentabilité et de momentum, mais une faible note de valorisation.",
+      "strengths": [
+        "Forte rentabilité",
+        "Forte croissance",
+        "Fort momentum"
+      ],
+      "concerns": [
+        "Valorisation faible",
+        "Ventes d'actions par les initiés"
+      ],
+      "finalConclusion": {
+        "strengths": "Alphabet possède une forte rentabilité, une croissance solide et un bon momentum boursier.",
+        "weaknesses": "La valorisation est considérée comme faible et il y a eu des ventes d'actions par les initiés.",
+        "recommendation": "En raison de la note HOLD globale, il est recommandé aux investisseurs d'attendre des données supplémentaires avant de prendre une décision d'investissement. Surveiller l'évolution de la valorisation et les perspectives de croissance.",
+        "rating": "HOLD"
+      }
+    },
     "T": {
       "ticker": "T",
       "companyName": "AT&T Inc.",
