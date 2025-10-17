@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:56:44.969Z",
+  "lastUpdate": "2025-10-17T20:56:55.441Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -561,7 +561,70 @@
         "rating": null
       }
     },
-    "NSRGY": {},
+    "NSRGY": {
+      "ticker": "NSRGY",
+      "companyName": "Nestlé S.A.",
+      "lastUpdate": "2025-10-17T20:56:47.028Z",
+      "metrics": {
+        "marketCap": "$270.01B",
+        "bpaGrowth": "1.39%",
+        "peRatio": "19.10",
+        "sector": "Consumer Staples",
+        "industry": "Packaged Foods and Meats",
+        "dividendYield": "3.54%",
+        "dividendFrequency": "Annual",
+        "exDivDate": "2025-04-23",
+        "annualPayout": "$3.68",
+        "price": "$107.40",
+        "priceChange": "+3.33%"
+      },
+      "companyProfile": {
+        "description": "Nestlé S.A., fondée en 1866, est une entreprise mondiale d'alimentation et de boissons basée à Vevey, en Suisse. La société opère à travers divers segments géographiques, notamment la zone Amérique du Nord, la zone Europe, la zone Asie, Océanie et Afrique, la zone Amérique latine et la zone Grande Chine. En outre, Nestlé gère des secteurs spécialisés tels que Nestlé Health Science et Nespresso. Le vaste portefeuille de produits de Nestlé comprend des marques d'eau comme Acqua Panna et Perrier, des produits de chocolat et de confiserie tels que KitKat et Smarties, et des produits de café sous des marques comme Nescafé et Nespresso.",
+        "employees": "255,829",
+        "innovation": "N/A"
+      },
+      "competition": {
+        "competitors": [
+          "Mondelez International, Inc.",
+          "General Mills, Inc.",
+          "The Kraft Heinz Company"
+        ],
+        "valueProposition": "Nestlé se distingue sur le marché par son portefeuille vaste et diversifié de plus de 2 000 marques dans diverses catégories, offrant à l'entreprise un large avantage concurrentiel.",
+        "advantages": "Large portefeuille de marques, présence mondiale étendue, accent mis sur la science de la santé, le café et les soins pour animaux de compagnie."
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "D+",
+        "growth": "D",
+        "profitability": "A+",
+        "momentum": "B+",
+        "revisions": "B-"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "Nestlé est une entreprise mondiale d'alimentation et de boissons avec un portefeuille diversifié et une forte présence mondiale. Les notes quantitatives suggèrent des faiblesses en matière de valorisation et de croissance, mais une forte rentabilité et un bon momentum.",
+      "strengths": [
+        "Portefeuille de marques diversifié",
+        "Forte présence mondiale",
+        "Forte rentabilité"
+      ],
+      "concerns": [
+        "Valorisation faible",
+        "Croissance faible",
+        "Risque de réduction du dividende"
+      ],
+      "finalConclusion": {
+        "strengths": "Nestlé possède un portefeuille de marques diversifié et une forte présence mondiale, ce qui lui confère une certaine résilience. Sa rentabilité est également un atout majeur.",
+        "weaknesses": "Les faiblesses résident dans sa valorisation et sa croissance, qui sont toutes deux notées en dessous de la moyenne. Le risque de réduction du dividende est également une préoccupation.",
+        "recommendation": "Compte tenu des forces et des faiblesses de Nestlé, une position de maintien (HOLD) semble appropriée. Bien que l'entreprise ait une forte rentabilité et une présence mondiale, les préoccupations concernant la valorisation et la croissance doivent être prises en compte.",
+        "rating": "HOLD"
+      }
+    },
     "NKE": {
       "ticker": "NKE",
       "companyName": "NIKE, Inc.",
