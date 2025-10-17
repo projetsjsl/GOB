@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:54:55.941Z",
+  "lastUpdate": "2025-10-17T20:55:04.346Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -734,29 +734,32 @@
     "VZ": {
       "ticker": "VZ",
       "companyName": "Verizon Communications Inc.",
-      "lastUpdate": "2025-10-17T20:42:00.000Z",
+      "lastUpdate": "2025-10-17T20:54:57.454Z",
       "metrics": {
         "marketCap": "$170.17B",
-        "bpaGrowth": null,
+        "bpaGrowth": "N/A",
         "peRatio": "8.60",
-        "sector": null,
-        "industry": null,
+        "sector": "Communication Services",
+        "industry": "Integrated Telecommunication Services",
         "dividendYield": "6.84%",
-        "dividendFrequency": null,
-        "exDivDate": null,
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-10-10",
         "annualPayout": "$2.76",
         "price": "$40.55",
         "priceChange": "+0.47%"
       },
       "companyProfile": {
-        "description": null,
-        "employees": null,
-        "innovation": null
+        "description": "Verizon Communications Inc., à travers ses filiales, fournit des produits et services de communication, de technologie, d'information et de divertissement aux consommateurs, aux entreprises et aux entités gouvernementales dans le monde entier. Elle opère à travers deux segments : Verizon Consumer Group (Consumer) et Verizon Business Group (Business). La société a été fondée en 1983 et son siège social est situé à New York, New York.",
+        "employees": "99,600",
+        "innovation": "N/A"
       },
       "competition": {
-        "competitors": [],
-        "valueProposition": null,
-        "advantages": null
+        "competitors": [
+          "AT&T",
+          "T-Mobile"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
       },
       "quantRating": {
         "overall": "HOLD",
@@ -767,20 +770,28 @@
         "revisions": "B"
       },
       "sectorAnalysis": {
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
-      "intermediateConclusion": null,
-      "strengths": [],
-      "concerns": [],
+      "intermediateConclusion": "Verizon présente un rendement de dividende élevé et une valorisation attractive. Cependant, sa croissance est faible et les ventes d'initiés sont importantes. Les notations des analystes sont mitigées.",
+      "strengths": [
+        "Rendement du dividende élevé",
+        "Forte rentabilité",
+        "Valorisation attractive"
+      ],
+      "concerns": [
+        "Faible croissance",
+        "Ventes d'initiés",
+        "Endettement élevé"
+      ],
       "finalConclusion": {
-        "strengths": null,
-        "weaknesses": null,
-        "recommendation": null,
-        "rating": null
+        "strengths": "Verizon offre un rendement de dividende élevé et une forte rentabilité, ce qui en fait une option intéressante pour les investisseurs axés sur le revenu.",
+        "weaknesses": "La faible croissance et l'endettement élevé sont des préoccupations importantes.",
+        "recommendation": "Compte tenu des forces et des faiblesses, une position neutre (Hold) semble appropriée. Les investisseurs devraient surveiller de près la croissance et la réduction de la dette.",
+        "rating": "Hold"
       }
     },
     "WFC": {
