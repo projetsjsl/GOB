@@ -1,58 +1,72 @@
 {
-  "lastUpdate": "2025-10-17T20:58:56.975Z",
+  "lastUpdate": "2025-10-17T20:59:07.635Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
     "BNS": {
       "ticker": "BNS",
       "companyName": "The Bank of Nova Scotia",
-      "lastUpdate": "2025-10-17T20:31:10.777Z",
+      "lastUpdate": "2025-10-17T20:58:58.897Z",
       "metrics": {
-        "marketCap": null,
-        "bpaGrowth": null,
-        "peRatio": null,
+        "marketCap": "$79.44B",
+        "bpaGrowth": "5.53%",
+        "peRatio": "12.78",
         "sector": "Financials",
-        "industry": null,
-        "dividendYield": null,
-        "dividendFrequency": null,
-        "exDivDate": null,
-        "annualPayout": null,
-        "price": 63.75,
-        "priceChange": -0.36
+        "industry": "Diversified Banks",
+        "dividendYield": "4.90%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-10-07",
+        "annualPayout": "$3.13",
+        "price": "$63.75",
+        "priceChange": "-0.36%"
       },
       "companyProfile": {
-        "description": "La Banque de Nouvelle-Écosse, connue sous le nom de Scotiabank, est l’une des principales institutions financières au Canada. Elle propose des services bancaires, d'investissement et de gestion de patrimoine à l’échelle internationale. La banque est présente dans plusieurs pays et vise à soutenir la croissance économique de ses clients et partenaires. Elle est réputée pour sa solidité et sa longue histoire.",
-        "employees": null,
-        "innovation": null
+        "description": "The Bank of Nova Scotia fournit divers produits et services bancaires au Canada, aux États-Unis, au Mexique, au Pérou, au Chili, en Colombie, dans les Caraïbes et en Amérique centrale, et à l'international. Elle opère à travers les segments suivants : Services bancaires canadiens, Services bancaires internationaux, Gestion globale de patrimoine et Services bancaires et marchés mondiaux. La société offre des conseils et des solutions financières, ainsi que des produits bancaires, y compris des cartes de débit et de crédit, des comptes chèques et d'épargne, des investissements, des prêts hypothécaires, des prêts et des assurances aux particuliers ; et des solutions de financement automobile au détail.",
+        "employees": "87,317",
+        "innovation": "N/A"
       },
       "competition": {
-        "competitors": [],
-        "valueProposition": null,
-        "advantages": null
+        "competitors": [
+          "TD",
+          "BMO",
+          "RY",
+          "CM",
+          "BCE"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
       },
       "quantRating": {
-        "overall": null,
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "overall": "HOLD",
+        "valuation": "B",
+        "growth": "D+",
+        "profitability": "A+",
+        "momentum": "A",
+        "revisions": "B"
       },
       "sectorAnalysis": {
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
-      "intermediateConclusion": null,
-      "strengths": [],
-      "concerns": [],
+      "intermediateConclusion": "La Banque de Nouvelle-Écosse présente une note HOLD selon l'évaluation quantitative de Seeking Alpha. Ses notes de rentabilité et de momentum sont fortes, mais sa croissance et sa valorisation sont plus faibles.",
+      "strengths": [
+        "Forte rentabilité (A+)",
+        "Fort momentum (A)",
+        "Rendement du dividende attractif (4.90%)"
+      ],
+      "concerns": [
+        "Note de croissance faible (D+)",
+        "Note de valorisation moyenne (B)",
+        "Ventes d'initiés (Insider Selling)"
+      ],
       "finalConclusion": {
-        "strengths": null,
-        "weaknesses": null,
-        "recommendation": null,
-        "rating": null
+        "strengths": "BNS a une forte rentabilité et un bon momentum, soutenus par un rendement de dividende élevé.",
+        "weaknesses": "La croissance est un point faible, et la valorisation est seulement moyenne. Les ventes d'initiés pourraient susciter des inquiétudes.",
+        "recommendation": "Compte tenu de la note HOLD globale, une approche prudente est conseillée. Les investisseurs devraient surveiller de près la croissance de l'entreprise et les activités des initiés avant de prendre une décision d'investissement.",
+        "rating": "HOLD"
       }
     },
     "TD": {
