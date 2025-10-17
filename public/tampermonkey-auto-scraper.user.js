@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GOB Seeking Alpha Auto-Scraper
 // @namespace    https://gobapps.com
-// @version      1.0
+// @version      1.1
 // @description  Scrape automatiquement les pages Seeking Alpha Virtual Analyst Report
 // @author       GOB Dashboard
 // @match        https://seekingalpha.com/symbol/*/virtual_analyst_report*
@@ -99,15 +99,14 @@
             updateStatus('Sauvegarde Supabase...', 'yellow');
             console.log('💾 Sauvegarde Supabase...');
 
-            const saveResponse = await fetch('https://gobapps.com/api/seeking-alpha-scraping', {
+            const saveResponse = await fetch('https://gobapps.com/api/seeking-alpha-scraping?type=raw', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ticker: ticker,
                     url: window.location.href,
                     raw_text: fullText,
-                    sections: sections,
-                    timestamp: new Date().toISOString()
+                    status: 'success'
                 })
             });
 
@@ -164,11 +163,10 @@
                 }
 
                 // 3. Sauvegarder l'analyse
-                const analysisSaveResponse = await fetch('https://gobapps.com/api/seeking-alpha-scraping', {
+                const analysisSaveResponse = await fetch('https://gobapps.com/api/seeking-alpha-scraping?type=analysis', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        type: 'analysis',
                         ticker: ticker,
                         ...analysisToSave
                     })
