@@ -6631,12 +6631,45 @@ ${basePrompt}
                             timestamp: new Date().toISOString()
                         }, 'info');
 
-                        // ÉTAPE 0: Intent Analysis
+                        // ÉTAPE 0: Intent Analysis (OPTIMISÉ: Skip pour briefings prédéfinis)
                         setCurrentStep('ÉTAPE 0/4: Analyse de l\'Intent');
-                        setStepDetails('Emma analyse l\'actualité du jour et détecte les sujets importants...');
-                        addLogEntry('STEP_0', 'ÉTAPE 0: Intent Analysis', {}, 'info');
-                        const intentData = await analyzeIntent(type);
-                        setStepDetails(`Intent détecté: ${intentData.intent} (Confiance: ${(intentData.confidence * 100).toFixed(0)}%, Importance: ${intentData.importance_level}/10)`);
+                        let intentData;
+
+                        // OPTIMISATION: Pour briefings prédéfinis, utiliser intent prédéfini (économise 5-15s)
+                        if (['morning', 'noon', 'evening'].includes(type)) {
+                            console.log(`⚡ OPTIMISATION: Intent prédéfini pour ${type} (skip API call)`);
+                            const currentHour = new Date().getHours();
+
+                            // Intent adapté selon l'heure
+                            intentData = {
+                                intent: 'market_overview',
+                                confidence: 1.0,
+                                importance_level: currentHour < 10 ? 6 : currentHour < 16 ? 7 : 6,
+                                trending_topics: [
+                                    type === 'morning' ? 'Ouverture des marchés' :
+                                    type === 'noon' ? 'Mi-journée de trading' :
+                                    'Clôture des marchés'
+                                ],
+                                recommended_tools: ['polygon-stock-price', 'finnhub-news', 'earnings-calendar', 'economic-calendar', 'twelve-data-technical'],
+                                email_style: 'professional',
+                                key_tickers: teamTickers.slice(0, 10), // Top 10 tickers équipe
+                                summary: `Briefing ${type} standard avec données de marché`
+                            };
+
+                            addLogEntry('INTENT_OPTIMIZED', 'Intent prédéfini utilisé (skip analysis)', {
+                                type,
+                                timeSaved: '5-15s',
+                                intentData
+                            }, 'info');
+
+                            setStepDetails(`⚡ Intent prédéfini: ${intentData.intent} (${intentData.importance_level}/10) - Analyse skippée pour rapidité`);
+                        } else {
+                            // Custom briefing: analyse complète nécessaire
+                            setStepDetails('Emma analyse l\'actualité du jour et détecte les sujets importants...');
+                            addLogEntry('STEP_0', 'ÉTAPE 0: Intent Analysis', {}, 'info');
+                            intentData = await analyzeIntent(type);
+                            setStepDetails(`Intent détecté: ${intentData.intent} (Confiance: ${(intentData.confidence * 100).toFixed(0)}%, Importance: ${intentData.importance_level}/10)`);
+                        }
 
                         // ÉTAPE 1: Smart Data Gathering
                         setCurrentStep('ÉTAPE 1/4: Collecte de Données');
