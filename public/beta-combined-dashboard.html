@@ -8776,10 +8776,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                 // Handle prefill message from other tabs
                 React.useEffect(() => {
                     if (prefillMessage && prefillMessage.trim()) {
+                        console.log('📝 Prefill message received:', prefillMessage);
                         setEmmaInput(prefillMessage);
                         setPrefillMessage(''); // Clear the prefill message after using it
                     }
-                }, [prefillMessage, setPrefillMessage]);
+                }, [prefillMessage]);
 
                 const initializeEmma = async () => {
                     try {
@@ -13038,8 +13039,9 @@ console.log('✅ Données hybrides récupérées:', {
                                             <button
                                                 onClick={() => {
                                                     const analysisRequest = `Analyse approfondie de ${selectedStock}: fondamentaux, techniques, actualités et recommandation d'investissement`;
+                                                    // Set prefill message first, then switch tab after a short delay
                                                     setEmmaPrefillMessage(analysisRequest);
-                                                    setActiveTab('ask-emma');
+                                                    setTimeout(() => setActiveTab('ask-emma'), 50);
                                                 }}
                                                 className={`px-2 py-0.5 rounded text-[9px] font-semibold border transition-all hover:scale-105 ${
                                                     isDarkMode
