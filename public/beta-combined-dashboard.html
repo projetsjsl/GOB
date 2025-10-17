@@ -2342,10 +2342,178 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                         </div>
                     </div>
 
+                    {/* Health Check Panel (déplacé depuis Emma En Direct) */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🏥 Diagnostic des APIs</h3>
+                            <button
+                                onClick={runHealthCheck}
+                                disabled={healthCheckLoading}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
+                                    healthCheckLoading
+                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                                }`}
+                            >
+                                {healthCheckLoading ? 'Vérification...' : '🔍 Vérifier APIs'}
+                            </button>
+                        </div>
+
+                        {healthStatus && (
+                            <div className="space-y-4">
+                                {/* Status Global */}
+                                <div className={`p-4 rounded-lg border-2 ${
+                                    healthStatus.overall_status === 'healthy'
+                                        ? 'bg-green-50 border-green-200'
+                                        : healthStatus.overall_status === 'degraded'
+                                        ? 'bg-yellow-50 border-yellow-200'
+                                        : 'bg-red-50 border-red-200'
+                                }`}>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h4 className={`font-bold text-lg ${
+                                                healthStatus.overall_status === 'healthy'
+                                                    ? 'text-green-800'
+                                                    : healthStatus.overall_status === 'degraded'
+                                                    ? 'text-yellow-800'
+                                                    : 'text-red-800'
+                                            }`}>
+                                                {healthStatus.overall_status === 'healthy' ? '🟢' :
+                                                 healthStatus.overall_status === 'degraded' ? '🟡' : '🔴'}
+                                                Status Global: {healthStatus.overall_status.toUpperCase()}
+                                            </h4>
+                                            <p className={`text-sm ${
+                                                healthStatus.overall_status === 'healthy'
+                                                    ? 'text-green-600'
+                                                    : healthStatus.overall_status === 'degraded'
+                                                    ? 'text-yellow-600'
+                                                    : 'text-red-600'
+                                            }`}>
+                                                {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs opérationnelles
+                                                ({Math.round((healthStatus.healthy_apis / healthStatus.total_apis) * 100)}%)
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className={`text-sm font-medium ${
+                                                healthStatus.overall_status === 'healthy'
+                                                    ? 'text-green-600'
+                                                    : healthStatus.overall_status === 'degraded'
+                                                    ? 'text-yellow-600'
+                                                    : 'text-red-600'
+                                            }`}>
+                                                {healthStatus.response_time_ms}ms
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                {new Date(healthStatus.timestamp).toLocaleTimeString('fr-FR')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* APIs Status Grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {Object.entries(healthStatus.apis).map(([name, api]) => (
+                                        <div key={name} className={`p-3 rounded-lg border ${
+                                            api.status === 'healthy'
+                                                ? 'bg-green-50 border-green-200'
+                                                : api.status === 'degraded'
+                                                ? 'bg-yellow-50 border-yellow-200'
+                                                : 'bg-red-50 border-red-200'
+                                        }`}>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h5 className={`font-semibold text-sm ${
+                                                    api.status === 'healthy'
+                                                        ? 'text-green-800'
+                                                        : api.status === 'degraded'
+                                                        ? 'text-yellow-800'
+                                                        : 'text-red-800'
+                                                }`}>
+                                                    {api.status === 'healthy' ? '🟢' :
+                                                     api.status === 'degraded' ? '🟡' : '🔴'}
+                                                    {name.replace(/_/g, ' ').toUpperCase()}
+                                                </h5>
+                                                <span className={`text-xs font-medium ${
+                                                    api.status === 'healthy'
+                                                        ? 'text-green-600'
+                                                        : api.status === 'degraded'
+                                                        ? 'text-yellow-600'
+                                                        : 'text-red-600'
+                                                }`}>
+                                                    {api.response_time_ms}ms
+                                                </span>
+                                            </div>
+
+                                            {api.details && (
+                                                <div className="text-xs text-gray-600 mb-2">
+                                                    <p><strong>Rate Limit:</strong> {api.details.rate_limit}</p>
+                                                    <p><strong>Reliability:</strong> {api.details.reliability}</p>
+                                                </div>
+                                            )}
+
+                                            {api.error && (
+                                                <p className="text-xs text-red-600 font-medium">
+                                                    ❌ {api.error}
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Recommandations */}
+                                {healthStatus.recommendations && healthStatus.recommendations.length > 0 && (
+                                    <div className={`p-4 rounded-lg ${
+                                        isDarkMode ? 'bg-gray-700' : 'bg-blue-50'
+                                    }`}>
+                                        <h4 className={`font-semibold mb-3 ${
+                                            isDarkMode ? 'text-white' : 'text-blue-900'
+                                        }`}>💡 Recommandations</h4>
+                                        <div className="space-y-2">
+                                            {healthStatus.recommendations.map((rec, index) => (
+                                                <div key={index} className={`p-3 rounded-lg ${
+                                                    rec.priority === 'critical' ? 'bg-red-100 border border-red-200' :
+                                                    rec.priority === 'high' ? 'bg-orange-100 border border-orange-200' :
+                                                    'bg-yellow-100 border border-yellow-200'
+                                                }`}>
+                                                    <div className="flex items-start justify-between">
+                                                        <div className="flex-1">
+                                                            <p className={`font-medium text-sm ${
+                                                                rec.priority === 'critical' ? 'text-red-800' :
+                                                                rec.priority === 'high' ? 'text-orange-800' :
+                                                                'text-yellow-800'
+                                                            }`}>
+                                                                {rec.priority === 'critical' ? '🚨' :
+                                                                 rec.priority === 'high' ? '⚠️' : '💡'}
+                                                                {rec.message}
+                                                            </p>
+                                                            <p className="text-xs text-gray-600 mt-1">
+                                                                <strong>Action:</strong> {rec.action}
+                                                            </p>
+                                                        </div>
+                                                        <span className={`text-xs px-2 py-1 rounded ${
+                                                            rec.priority === 'critical' ? 'bg-red-200 text-red-800' :
+                                                            rec.priority === 'high' ? 'bg-orange-200 text-orange-800' :
+                                                            'bg-yellow-200 text-yellow-800'
+                                                        }`}>
+                                                            {rec.priority}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                     {/* Section Configuration */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                        isDarkMode 
-                            ? 'bg-gray-900 border-gray-700' 
+                        isDarkMode
+                            ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
@@ -7288,696 +7456,280 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             </div>
                         </div>
 
-                        {/* Health Check Panel */}
-                        <div className={`p-6 rounded-lg border transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                        }`}>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>🏥 Diagnostic des APIs</h3>
-                                <button
-                                    onClick={runHealthCheck}
-                                    disabled={healthCheckLoading}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
-                                        healthCheckLoading
-                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                                    }`}
-                                >
-                                    {healthCheckLoading ? 'Vérification...' : '🔍 Vérifier APIs'}
-                                </button>
-                            </div>
-                            
-                            {healthStatus && (
-                                <div className="space-y-4">
-                                    {/* Status Global */}
-                                    <div className={`p-4 rounded-lg border-2 ${
-                                        healthStatus.overall_status === 'healthy' 
-                                            ? 'bg-green-50 border-green-200' 
-                                            : healthStatus.overall_status === 'degraded'
-                                            ? 'bg-yellow-50 border-yellow-200'
-                                            : 'bg-red-50 border-red-200'
-                                    }`}>
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h4 className={`font-bold text-lg ${
-                                                    healthStatus.overall_status === 'healthy' 
-                                                        ? 'text-green-800' 
-                                                        : healthStatus.overall_status === 'degraded'
-                                                        ? 'text-yellow-800'
-                                                        : 'text-red-800'
-                                                }`}>
-                                                    {healthStatus.overall_status === 'healthy' ? '🟢' : 
-                                                     healthStatus.overall_status === 'degraded' ? '🟡' : '🔴'} 
-                                                    Status Global: {healthStatus.overall_status.toUpperCase()}
-                                                </h4>
-                                                <p className={`text-sm ${
-                                                    healthStatus.overall_status === 'healthy' 
-                                                        ? 'text-green-600' 
-                                                        : healthStatus.overall_status === 'degraded'
-                                                        ? 'text-yellow-600'
-                                                        : 'text-red-600'
-                                                }`}>
-                                                    {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs opérationnelles 
-                                                    ({Math.round((healthStatus.healthy_apis / healthStatus.total_apis) * 100)}%)
-                                                </p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className={`text-sm font-medium ${
-                                                    healthStatus.overall_status === 'healthy' 
-                                                        ? 'text-green-600' 
-                                                        : healthStatus.overall_status === 'degraded'
-                                                        ? 'text-yellow-600'
-                                                        : 'text-red-600'
-                                                }`}>
-                                                    {healthStatus.response_time_ms}ms
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {new Date(healthStatus.timestamp).toLocaleTimeString('fr-FR')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* APIs Status Grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                        {Object.entries(healthStatus.apis).map(([name, api]) => (
-                                            <div key={name} className={`p-3 rounded-lg border ${
-                                                api.status === 'healthy' 
-                                                    ? 'bg-green-50 border-green-200' 
-                                                    : api.status === 'degraded'
-                                                    ? 'bg-yellow-50 border-yellow-200'
-                                                    : 'bg-red-50 border-red-200'
-                                            }`}>
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h5 className={`font-semibold text-sm ${
-                                                        api.status === 'healthy' 
-                                                            ? 'text-green-800' 
-                                                            : api.status === 'degraded'
-                                                            ? 'text-yellow-800'
-                                                            : 'text-red-800'
-                                                    }`}>
-                                                        {api.status === 'healthy' ? '🟢' : 
-                                                         api.status === 'degraded' ? '🟡' : '🔴'} 
-                                                        {name.replace(/_/g, ' ').toUpperCase()}
-                                                    </h5>
-                                                    <span className={`text-xs font-medium ${
-                                                        api.status === 'healthy' 
-                                                            ? 'text-green-600' 
-                                                            : api.status === 'degraded'
-                                                            ? 'text-yellow-600'
-                                                            : 'text-red-600'
-                                                    }`}>
-                                                        {api.response_time_ms}ms
-                                                    </span>
-                                                </div>
-                                                
-                                                {api.details && (
-                                                    <div className="text-xs text-gray-600 mb-2">
-                                                        <p><strong>Rate Limit:</strong> {api.details.rate_limit}</p>
-                                                        <p><strong>Reliability:</strong> {api.details.reliability}</p>
-                                                    </div>
-                                                )}
-                                                
-                                                {api.error && (
-                                                    <p className="text-xs text-red-600 font-medium">
-                                                        ❌ {api.error}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    
-                                    {/* Recommandations */}
-                                    {healthStatus.recommendations && healthStatus.recommendations.length > 0 && (
-                                        <div className={`p-4 rounded-lg ${
-                                            isDarkMode ? 'bg-gray-700' : 'bg-blue-50'
-                                        }`}>
-                                            <h4 className={`font-semibold mb-3 ${
-                                                isDarkMode ? 'text-white' : 'text-blue-900'
-                                            }`}>💡 Recommandations</h4>
-                                            <div className="space-y-2">
-                                                {healthStatus.recommendations.map((rec, index) => (
-                                                    <div key={index} className={`p-3 rounded-lg ${
-                                                        rec.priority === 'critical' ? 'bg-red-100 border border-red-200' :
-                                                        rec.priority === 'high' ? 'bg-orange-100 border border-orange-200' :
-                                                        'bg-yellow-100 border border-yellow-200'
-                                                    }`}>
-                                                        <div className="flex items-start justify-between">
-                                                            <div className="flex-1">
-                                                                <p className={`font-medium text-sm ${
-                                                                    rec.priority === 'critical' ? 'text-red-800' :
-                                                                    rec.priority === 'high' ? 'text-orange-800' :
-                                                                    'text-yellow-800'
-                                                                }`}>
-                                                                    {rec.priority === 'critical' ? '🚨' :
-                                                                     rec.priority === 'high' ? '⚠️' : '💡'} 
-                                                                    {rec.message}
-                                                                </p>
-                                                                <p className="text-xs text-gray-600 mt-1">
-                                                                    <strong>Action:</strong> {rec.action}
-                                                                </p>
-                                                            </div>
-                                                            <span className={`text-xs px-2 py-1 rounded ${
-                                                                rec.priority === 'critical' ? 'bg-red-200 text-red-800' :
-                                                                rec.priority === 'high' ? 'bg-orange-200 text-orange-800' :
-                                                                'bg-yellow-200 text-yellow-800'
-                                                            }`}>
-                                                                {rec.priority}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Sélecteur détaillé des sources API */}
+                        {/* SECTION 2: AUTOMATION - Configuration des Crons Automatiques */}
                         <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>⚙️ Configuration des Sources API</h3>
-                            
-                            <div className="space-y-6">
-                                {/* Données de Marché */}
-                                <div>
-                                    <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>📊 Données de Marché</h4>
-                                    <div className="space-y-3">
-                                        <div 
-                                            className={`p-3 rounded-lg border-2 transition-all duration-300 ${
-                                                isDarkMode ? 'border-purple-500 bg-purple-900/20' : 'border-purple-500 bg-purple-50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center space-x-2">
-                                                <div className="w-3 h-3 rounded-full border-2 border-purple-500 bg-purple-500"></div>
-                                                <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>Perplexity AI</span>
-                                            </div>
-                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
+                            }`}>⚙️ Briefings Automatiques (Cron Jobs)</h3>
+
+                            <p className={`text-sm mb-6 transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                📅 Envois automatiques quotidiens (Lundi-Vendredi)
+                            </p>
+
+                            <div className="space-y-4">
+                                {/* Cron Matin 7h20 */}
+                                <div className={`p-4 rounded-lg border-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-blue-900/20 border-blue-500/30' : 'bg-blue-50 border-blue-200'
+                                }`}>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h4 className={`font-bold mb-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                🌅 Briefing Matin - 7h20 ET
+                                            </h4>
+                                            <p className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>IA de recherche - Données complètes</p>
+                                            }`}>
+                                                Asie • Futures • Préouverture
+                                            </p>
                                         </div>
-                                        
-                                        <div className="flex items-center space-x-2">
-                                            <input
-                                                type="checkbox"
-                                                id="yahoo-fallback"
-                                                checked={false}
-                                                disabled={true}
-                                                className="w-4 h-4 text-gray-400 rounded focus:ring-gray-300"
-                                            />
-                                            <label 
-                                                htmlFor="yahoo-fallback" 
-                                                className={`text-sm cursor-not-allowed transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                                                }`}
-                                            >
-                                                📊 Yahoo Finance (Désactivé - Mode 100% Perplexity)
-                                            </label>
-                                        </div>
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                                            🟢 ACTIF
+                                        </span>
+                                    </div>
+                                    <div className={`text-sm space-y-1 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
+                                        <p><strong>Horaire UTC:</strong> 11:20 (Lun-Ven)</p>
+                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
                                     </div>
                                 </div>
 
-                                {/* Actualités */}
-                                <div>
-                                    <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>📰 Actualités</h4>
-                                    <div className="space-y-3">
-                                        <div 
-                                            className={`p-3 rounded-lg border-2 transition-all duration-300 ${
-                                                isDarkMode ? 'border-purple-500 bg-purple-900/20' : 'border-purple-500 bg-purple-50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-2">
-                                                    <div className="w-3 h-3 rounded-full border-2 border-purple-500 bg-purple-500"></div>
-                                                    <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                                    }`}>Perplexity AI</span>
-                                                </div>
-                                                <input
-                                                    type="checkbox"
-                                                    id="perplexity-news"
-                                                    checked={perplexityEnabled.news}
-                                                    onChange={(e) => setPerplexityEnabled({...perplexityEnabled, news: e.target.checked})}
-                                                    className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
-                                                />
-                                            </div>
-                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
+                                {/* Cron Midi 11h50 */}
+                                <div className={`p-4 rounded-lg border-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-orange-900/20 border-orange-500/30' : 'bg-orange-50 border-orange-200'
+                                }`}>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h4 className={`font-bold mb-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                ☀️ Briefing Midi - 11h50 ET
+                                            </h4>
+                                            <p className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>IA de recherche - Sources vérifiées</p>
+                                            }`}>
+                                                Wall Street • Clôture Europe
+                                            </p>
                                         </div>
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                                            🟢 ACTIF
+                                        </span>
+                                    </div>
+                                    <div className={`text-sm space-y-1 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
+                                        <p><strong>Horaire UTC:</strong> 15:50 (Lun-Ven)</p>
+                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
                                     </div>
                                 </div>
 
-                                {/* Analyse IA */}
-                                <div>
+                                {/* Cron Soir 16h20 */}
+                                <div className={`p-4 rounded-lg border-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-indigo-900/20 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200'
+                                }`}>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h4 className={`font-bold mb-1 transition-colors duration-300 ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                🌆 Briefing Soir - 16h20 ET
+                                            </h4>
+                                            <p className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>
+                                                Clôture US • Asie Next
+                                            </p>
+                                        </div>
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                                            🟢 ACTIF
+                                        </span>
+                                    </div>
+                                    <div className={`text-sm space-y-1 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
+                                        <p><strong>Horaire UTC:</strong> 20:20 (Lun-Ven)</p>
+                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
+                                    </div>
+                                </div>
+
+                                {/* Configuration globale */}
+                                <div className={`p-4 rounded-lg transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                                }`}>
                                     <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>🤖 Analyse IA</h4>
-                                    <div className="space-y-3">
-                                        <div 
-                                            className={`p-3 rounded-lg border-2 transition-all duration-300 ${
-                                                isDarkMode ? 'border-purple-500 bg-purple-900/20' : 'border-purple-500 bg-purple-50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-2">
-                                                    <div className="w-3 h-3 rounded-full border-2 border-purple-500 bg-purple-500"></div>
-                                                    <span className={`text-sm font-medium transition-colors duration-300 ${
-                                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                                    }`}>Perplexity AI</span>
-                                                </div>
-                                                <input
-                                                    type="checkbox"
-                                                    id="perplexity-analysis"
-                                                    checked={perplexityEnabled.analysis}
-                                                    onChange={(e) => setPerplexityEnabled({...perplexityEnabled, analysis: e.target.checked})}
-                                                    className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
-                                                />
-                                            </div>
-                                            <p className={`text-xs mt-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>Analyse experte - Sonar Pro</p>
-                                        </div>
+                                    }`}>⚙️ Configuration Globale</h4>
+                                    <div className={`text-sm space-y-1 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        <p><strong>Timezone:</strong> Eastern Time (ET)</p>
+                                        <p><strong>Jours actifs:</strong> Lundi-Vendredi</p>
+                                        <p><strong>Statut Vercel Crons:</strong> ✅ Configuré dans vercel.json</p>
+                                        <p><strong>Dernière modification:</strong> 2025-01-16</p>
                                     </div>
+                                </div>
+
+                                {/* Note informative */}
+                                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-blue-900/10 border-blue-500/20' : 'bg-blue-50 border-blue-200'
+                                }`}>
+                                    <p className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-blue-300' : 'text-blue-800'
+                                    }`}>
+                                        💡 <strong>Note:</strong> Les crons sont configurés dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">vercel.json</code>.
+                                        Pour modifier les horaires, utilisez les scripts <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:edt</code> ou
+                                        <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:est</code>.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Bouton Debug */}
-                        <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                        {/* SECTION 3: PERSONNALISÉ - Email Ponctuel avec Prompt Custom */}
+                        <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                         }`}>
-                            <div className="flex items-center justify-between">
-                                <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>🔍 Debug API</h3>
-                                <div className="flex space-x-2">
-                                    <button
-                                        onClick={() => setShowDebug(!showDebug)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
-                                            showDebug 
-                                                ? (isDarkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white')
-                                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                        }`}
-                                    >
-                                        {showDebug ? 'Masquer Debug' : 'Afficher Debug'}
-                                    </button>
-                                    
-                                    <button
-                                        onClick={() => {
-                                            const logWindow = window.open('', '_blank', 'width=1200,height=800');
-                                            
-                                            // Construire le HTML du log
-                                            let logEntries = '';
-                                            processLog.forEach(entry => {
-                                                logEntries += '<div class="log-entry ' + entry.status + '">' +
-                                                    '<div class="timestamp">' + new Date(entry.timestamp).toLocaleString('fr-FR') + '</div>' +
-                                                    '<div class="step">[' + entry.step + ']</div>' +
-                                                    '<div class="type">' + entry.type + '</div>' +
-                                                    '<div class="data">' + entry.data + '</div>' +
-                                                    '<div style="font-size: 0.8em; color: #888;">Taille: ' + entry.size + ' caractères</div>' +
-                                                '</div>';
-                                            });
-                                            
-                                            const logHTML = '<html>' +
-                                                '<head>' +
-                                                    '<title>Log Complet - Briefing Email</title>' +
-                                                    '<style>' +
-                                                        'body { font-family: "Courier New", monospace; margin: 20px; background: #1a1a1a; color: #fff; }' +
-                                                        '.log-entry { margin: 10px 0; padding: 10px; border-left: 4px solid #333; background: #2a2a2a; }' +
-                                                        '.log-entry.success { border-left-color: #10b981; }' +
-                                                        '.log-entry.error { border-left-color: #ef4444; }' +
-                                                        '.log-entry.warning { border-left-color: #f59e0b; }' +
-                                                        '.log-entry.info { border-left-color: #3b82f6; }' +
-                                                        '.timestamp { color: #888; font-size: 0.8em; }' +
-                                                        '.step { font-weight: bold; color: #60a5fa; }' +
-                                                        '.type { color: #fbbf24; }' +
-                                                        '.data { background: #333; padding: 10px; margin: 5px 0; border-radius: 4px; white-space: pre-wrap; }' +
-                                                        '.summary { background: #1e40af; padding: 15px; margin: 20px 0; border-radius: 8px; }' +
-                                                    '</style>' +
-                                                '</head>' +
-                                                '<body>' +
-                                                    '<h1>📋 Log Complet - Processus de Génération Briefing</h1>' +
-                                                    '<div class="summary">' +
-                                                        '<h2>📊 Résumé</h2>' +
-                                                        '<p><strong>Total d\'entrées:</strong> ' + processLog.length + '</p>' +
-                                                        '<p><strong>Dernière mise à jour:</strong> ' + new Date().toLocaleString('fr-FR') + '</p>' +
-                                                        '<p><strong>Statut:</strong> ' + (processLog.length > 0 ? 'Processus en cours ou terminé' : 'Aucun processus') + '</p>' +
-                                                    '</div>' +
-                                                    logEntries +
-                                                '</body>' +
-                                            '</html>';
-                                            
-                                            logWindow.document.write(logHTML);
-                                            
-                                            // Ajouter le script après l'écriture du HTML
-                                            setTimeout(() => {
-                                                if (logWindow && !logWindow.closed) {
-                                                    logWindow.location.reload();
-                                                }
-                                            }, 5000);
-                                        }}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
-                                            isDarkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-500 text-white hover:bg-blue-600'
-                                        }`}
-                                    >
-                                        📋 {showFullLog ? 'Masquer' : 'Voir'} Log Complet
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>✉️ Email Personnalisé Ponctuel</h3>
 
-                        {/* Log Complet dans la page */}
-                        {showFullLog && (
-                            <div className={`p-6 rounded-lg border transition-colors duration-300 ${
-                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                            <p className={`text-sm mb-6 transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
                             }`}>
-                                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>📋 Log Complet - Processus de Génération Briefing</h3>
-                                
-                                <div className={`p-4 rounded-lg border ${
-                                    isDarkMode ? 'bg-gray-900 border-gray-600' : 'bg-gray-50 border-gray-300'
-                                }`}>
-                                    <div className="mb-4">
-                                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
-                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>📊 Résumé</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                            <div className={`p-3 rounded ${
-                                                isDarkMode ? 'bg-gray-800' : 'bg-white'
-                                            }`}>
-                                                <div className="font-medium">Total d'entrées</div>
-                                                <div className={`text-2xl font-bold ${
-                                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
-                                                }`}>{processLog.length}</div>
-                                            </div>
-                                            <div className={`p-3 rounded ${
-                                                isDarkMode ? 'bg-gray-800' : 'bg-white'
-                                            }`}>
-                                                <div className="font-medium">Dernière mise à jour</div>
-                                                <div className={`text-sm ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>{new Date().toLocaleString('fr-FR')}</div>
-                                            </div>
-                                            <div className={`p-3 rounded ${
-                                                isDarkMode ? 'bg-gray-800' : 'bg-white'
-                                            }`}>
-                                                <div className="font-medium">Statut</div>
-                                                <div className={`text-sm ${
-                                                    processLog.length > 0 ? 'text-green-400' : 'text-gray-400'
-                                                }`}>
-                                                    {processLog.length > 0 ? 'Processus en cours ou terminé' : 'Aucun processus'}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                                        {processLog.map((entry, index) => (
-                                            <div key={index} className={`p-4 rounded-lg border-l-4 ${
-                                                entry.status === 'success' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' :
-                                                entry.status === 'error' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
-                                                entry.status === 'warning' ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' :
-                                                'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            }`}>
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <div className={`text-sm font-medium ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>
-                                                        {new Date(entry.timestamp).toLocaleString('fr-FR')}
-                                                    </div>
-                                                    <div className={`px-2 py-1 rounded text-xs font-medium ${
-                                                        entry.status === 'success' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' :
-                                                        entry.status === 'error' ? 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100' :
-                                                        entry.status === 'warning' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' :
-                                                        'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
-                                                    }`}>
-                                                        {entry.status}
-                                                    </div>
-                                                </div>
-                                                <div className={`font-semibold mb-1 ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>
-                                                    [{entry.step}]
-                                                </div>
-                                                <div className={`text-sm mb-2 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>
-                                                    {entry.type}
-                                                </div>
-                                                {entry.data && (
-                                                    <div className={`text-xs p-3 rounded border ${
-                                                        isDarkMode ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-800 border-gray-300'
-                                                    }`}>
-                                                        {typeof entry.data === 'object' ? (
-                                                            <div className="space-y-2">
-                                                                {entry.data.fullPrompt && (
-                                                                    <div>
-                                                                        <div className="font-semibold text-blue-400 mb-2">📝 Prompt Complet:</div>
-                                                                        <div className={`p-2 rounded border ${
-                                                                            isDarkMode ? 'bg-gray-900 border-gray-500' : 'bg-white border-gray-400'
-                                                                        }`}>
-                                                                            <pre className="whitespace-pre-wrap text-xs">{entry.data.fullPrompt}</pre>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                                {entry.data.promptPreview && !entry.data.fullPrompt && (
-                                                                    <div>
-                                                                        <div className="font-semibold text-blue-400 mb-1">📝 Aperçu Prompt:</div>
-                                                                        <div className="italic">{entry.data.promptPreview}</div>
-                                                                    </div>
-                                                                )}
-                                                                {Object.entries(entry.data).map(([key, value]) => {
-                                                                    if (key === 'fullPrompt' || key === 'promptPreview') return null;
-                                                                    return (
-                                                                        <div key={key} className="flex justify-between">
-                                                                            <span className="font-medium">{key}:</span>
-                                                                            <span className="text-right max-w-xs truncate">
-                                                                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                                                                            </span>
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        ) : (
-                                                            <pre className="whitespace-pre-wrap">{entry.data}</pre>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                {entry.size && (
-                                                    <div className={`text-xs mt-2 ${
-                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                    }`}>
-                                                        Taille: {entry.size} caractères
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                        {processLog.length === 0 && (
-                                            <div className={`text-center py-8 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>
-                                                Aucun log disponible. Générez un briefing pour voir les détails.
-                                            </div>
-                                        )}
-                                    </div>
+                                Créez un briefing sur-mesure avec un prompt personnalisé
+                            </p>
+
+                            <div className="space-y-4">
+                                {/* Prompt personnalisé */}
+                                <div>
+                                    <label className={`block text-sm font-semibold mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        📝 Prompt Personnalisé
+                                    </label>
+                                    <textarea
+                                        placeholder="Exemple: Analyse détaillée de Tesla suite à la publication des Q4 earnings. Focus sur les marges et le guidance 2025."
+                                        rows={6}
+                                        className={`w-full px-4 py-3 rounded-lg border transition-colors duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-gray-900 border-gray-600 text-white placeholder-gray-500'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                                        } focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
+                                    ></textarea>
                                 </div>
-                            </div>
-                        )}
 
-                        {/* Panneau Debug */}
-                        {showDebug && (
-                            <div className={`p-6 rounded-lg border transition-colors duration-300 ${
-                                isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                            }`}>
-                                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>📊 Données API en Temps Réel</h3>
-                                
-                                <div className="space-y-4">
-                                    {/* Données de Marché */}
-                                    <div>
-                                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
-                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>📊 Données de Marché ({apiSources.marketData})</h4>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                            <div>
-                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>Requête :</h5>
-                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
-                                                }`}>
-                                                    {debugData.marketData.request ? JSON.stringify(debugData.marketData.request, null, 2) : 'Aucune requête'}
-                                                </pre>
-                                            </div>
-                                            <div>
-                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>Réponse :</h5>
-                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                                    debugData.marketData.error 
-                                                        ? (isDarkMode ? 'bg-red-900/20 text-red-300 border-red-600' : 'bg-red-50 text-red-800 border-red-300')
-                                                        : (isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300')
-                                                }`}>
-                                                    {debugData.marketData.response ? JSON.stringify(debugData.marketData.response, null, 2) : 'Aucune réponse'}
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Actualités */}
-                                    <div>
-                                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
-                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>📰 Actualités ({apiSources.news})</h4>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                            <div>
-                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>Requête :</h5>
-                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
-                                                }`}>
-                                                    {debugData.news.request ? JSON.stringify(debugData.news.request, null, 2) : 'Aucune requête'}
-                                                </pre>
-                                            </div>
-                                            <div>
-                                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>Réponse :</h5>
-                                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                                    debugData.news.error 
-                                                        ? (isDarkMode ? 'bg-red-900/20 text-red-300 border-red-600' : 'bg-red-50 text-red-800 border-red-300')
-                                                        : (isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300')
-                                                }`}>
-                                                    {debugData.news.response ? JSON.stringify(debugData.news.response, null, 2) : 'Aucune réponse'}
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                    {/* Analyse IA */}
-                    <div>
-                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🤖 Analyse IA ({apiSources.analysis})</h4>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <div>
-                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                }`}>Requête :</h5>
-                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
-                                }`}>
-                                    {debugData.analysis.request ? JSON.stringify(debugData.analysis.request, null, 2) : 'Aucune requête'}
-                                </pre>
-                            </div>
-                            <div>
-                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                }`}>Réponse :</h5>
-                                <pre className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                    debugData.analysis.error 
-                                        ? (isDarkMode ? 'bg-red-900/20 text-red-300 border-red-600' : 'bg-red-50 text-red-800 border-red-300')
-                                        : (isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300')
-                                }`}>
-                                    {debugData.analysis.response ? JSON.stringify(debugData.analysis.response, null, 2) : 'Aucune réponse'}
-                                </pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Données Watchlist Enrichies */}
-                    <div>
-                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📊 Données Watchlist Enrichies</h4>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <div>
-                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                }`}>Tickers Suivis :</h5>
-                                <div className={`text-xs p-3 rounded border ${
-                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
-                                }`}>
-                                    {watchlistTickers.join(', ')}
+                                {/* Tickers à analyser */}
+                                <div>
+                                    <label className={`block text-sm font-semibold mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        🎯 Tickers à Analyser (optionnel)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="TSLA, AAPL, GOOGL..."
+                                        className={`w-full px-4 py-2 rounded-lg border transition-colors duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-gray-900 border-gray-600 text-white placeholder-gray-500'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                                        } focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
+                                    />
                                 </div>
-                            </div>
-                            <div>
-                                <h5 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                }`}>Données Enrichies :</h5>
-                                <div className={`text-xs p-3 rounded border overflow-auto max-h-32 ${
-                                    isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
-                                }`}>
-                                    {debugData.marketData.response?.data?.watchlist ? 
-                                        JSON.stringify(debugData.marketData.response.data.watchlist, null, 2) : 
-                                        'Données non encore générées'
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Log en Temps Réel */}
-                    <div>
-                        <h4 className={`font-semibold mb-2 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📋 Log en Temps Réel</h4>
-                        <div className={`text-xs p-3 rounded border overflow-auto max-h-40 ${
-                            isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-600' : 'bg-gray-50 text-gray-800 border-gray-300'
-                        }`}>
-                            {processLog.length === 0 ? (
-                                <div className="text-gray-500 italic">Aucun processus en cours...</div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {processLog.slice(-10).map((entry, index) => (
-                                        <div key={entry.id} className={`p-2 rounded text-xs ${
-                                            entry.status === 'success' ? 'bg-green-100 text-green-800' :
-                                            entry.status === 'error' ? 'bg-red-100 text-red-800' :
-                                            entry.status === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                                            'bg-blue-100 text-blue-800'
+                                {/* Sources de données */}
+                                <div>
+                                    <label className={`block text-sm font-semibold mb-3 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        📊 Sources Prioritaires
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <label className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                                         }`}>
-                                            <div className="font-mono">
-                                                <span className="text-gray-500">[{new Date(entry.timestamp).toLocaleTimeString()}]</span>
-                                                <span className="font-bold"> [{entry.step}]</span>
-                                                <span className="text-orange-600"> {entry.type}</span>
-                                            </div>
-                                            <div className="mt-1 text-xs opacity-75">
-                                                {typeof entry.data === 'string' && entry.data.length > 100 
-                                                    ? entry.data.substring(0, 100) + '...' 
-                                                    : entry.data}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {processLog.length > 10 && (
-                                        <div className="text-center text-gray-500 text-xs">
-                                            ... et {processLog.length - 10} autres entrées
-                                        </div>
-                                    )}
+                                            <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
+                                            <span className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            }`}>📈 Prix & Volumes</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                        }`}>
+                                            <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
+                                            <span className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            }`}>📰 News</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                        }`}>
+                                            <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
+                                            <span className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            }`}>📊 Earnings</span>
+                                        </label>
+                                        <label className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors duration-300 ${
+                                            isDarkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                        }`}>
+                                            <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
+                                            <span className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            }`}>📉 Techniques</span>
+                                        </label>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    </div>
+
+                                {/* Destinataires */}
+                                <div>
+                                    <label className={`block text-sm font-semibold mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        📧 Destinataire(s)
+                                    </label>
+                                    <input
+                                        type="email"
+                                        placeholder="projetsjsl@gmail.com"
+                                        defaultValue="projetsjsl@gmail.com"
+                                        className={`w-full px-4 py-2 rounded-lg border transition-colors duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-gray-900 border-gray-600 text-white placeholder-gray-500'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                                        } focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
+                                    />
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex gap-3 pt-2">
+                                    <button
+                                        className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                                    >
+                                        🔄 Générer Aperçu
+                                    </button>
+                                    <button
+                                        className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                                    >
+                                        📧 Générer & Envoyer Direct
+                                    </button>
+                                </div>
+
+                                {/* Note */}
+                                <div className={`p-3 rounded-lg text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'bg-purple-900/20 text-purple-300' : 'bg-purple-50 text-purple-800'
+                                }`}>
+                                    💡 <strong>Astuce:</strong> Le prompt personnalisé utilise Emma Agent pour générer un briefing sur-mesure. Plus votre demande est précise, meilleur sera le résultat.
                                 </div>
                             </div>
-                        )}
+                        </div>
 
-                        {/* Boutons de génération */}
+                        {/* SECTION 1: GÉNÉRER - Preview Manuel */}
                         <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                         }`}>
