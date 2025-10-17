@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:55:23.699Z",
+  "lastUpdate": "2025-10-17T20:55:24.527Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -57,7 +57,72 @@
     },
     "TD": {},
     "BCE": {},
-    "CNR": {},
+    "CNR": {
+      "ticker": "CNR",
+      "companyName": "Core Natural Resources, Inc.",
+      "lastUpdate": "2025-10-17T20:55:17.212Z",
+      "metrics": {
+        "marketCap": "$4.78B",
+        "bpaGrowth": "-21.64%",
+        "peRatio": "NM",
+        "sector": "Energy",
+        "industry": "Coal and Consumable Fuels",
+        "dividendYield": "0.43%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-08-29",
+        "annualPayout": "$0.40",
+        "price": "$89.82",
+        "priceChange": "-3.30%"
+      },
+      "companyProfile": {
+        "description": "Core Natural Resources, Inc., avec ses filiales, produit, vend et exporte du charbon métallurgique et thermique aux États-Unis et à l'international. Elle opère à travers deux segments, le Pennsylvania Mining Complex (PAMC) et le CONSOL Marine Terminal. Le segment PAMC est impliqué dans l'extraction minière, la préparation et la commercialisation de charbon bitumineux pour les producteurs d'électricité, les utilisateurs finaux industriels et les utilisateurs finaux métallurgiques. Le segment CONSOL Marine Terminal fournit des services de terminal d'exportation de charbon via le port de Baltimore.",
+        "employees": "2,076",
+        "innovation": "N/A"
+      },
+      "competition": {
+        "competitors": [
+          "Peabody Energy Corporation",
+          "Warrior Met Coal, Inc.",
+          "Alpha Metallurgical Resources, Inc.",
+          "CNX Resources Corporation",
+          "Alliance Resource Partners, L.P. Common Units"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "SELL",
+        "valuation": "F",
+        "growth": "C",
+        "profitability": "C-",
+        "momentum": "B+",
+        "revisions": "F"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "CNR présente une note globale de vente (SELL) selon l'évaluation quantitative de Seeking Alpha. Les notes factorielles montrent des faiblesses en valorisation et révisions, mais un momentum relativement fort.",
+      "strengths": [
+        "Forte croissance des revenus (mentionnée dans les analyses)",
+        "Plan de rachat d'actions (mentionné dans les analyses)",
+        "Dividende versé trimestriellement"
+      ],
+      "concerns": [
+        "Marges faibles (mentionnées dans les analyses)",
+        "Risque élevé de mauvaise performance (alerte Seeking Alpha)",
+        "Note de valorisation F"
+      ],
+      "finalConclusion": {
+        "strengths": "CNR démontre une forte croissance des revenus et un plan de rachat d'actions attractif pour les actionnaires.",
+        "weaknesses": "Cependant, les marges faibles et une valorisation médiocre soulèvent des inquiétudes quant à la rentabilité et à la durabilité à long terme.",
+        "recommendation": "Compte tenu des signaux mitigés, une position neutre (Hold) semble appropriée. Il est crucial de surveiller l'évolution des marges et les révisions des analystes.",
+        "rating": "Hold"
+      }
+    },
     "CSCO": {
       "ticker": "CSCO",
       "companyName": "Cisco Systems, Inc.",
