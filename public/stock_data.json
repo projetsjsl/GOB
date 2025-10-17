@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:32:01.675Z",
+  "lastUpdate": "2025-10-17T20:43:45.501Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -643,7 +643,58 @@
     },
     "UL": {},
     "VZ": {},
-    "WFC": {},
+    "WFC": {
+      "ticker": "WFC",
+      "companyName": "Wells Fargo & Company",
+      "lastUpdate": "2025-10-17T20:43:41.238Z",
+      "metrics": {
+        "marketCap": null,
+        "bpaGrowth": null,
+        "peRatio": null,
+        "sector": null,
+        "industry": null,
+        "dividendYield": null,
+        "dividendFrequency": null,
+        "exDivDate": null,
+        "annualPayout": null,
+        "price": "83.28",
+        "priceChange": "-0.86%"
+      },
+      "companyProfile": {
+        "description": null,
+        "employees": null,
+        "innovation": null
+      },
+      "competition": {
+        "competitors": [],
+        "valueProposition": null,
+        "advantages": null
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "D",
+        "growth": "B",
+        "profitability": "F",
+        "momentum": "A-",
+        "revisions": "A+"
+      },
+      "sectorAnalysis": {
+        "valuation": null,
+        "growth": null,
+        "profitability": null,
+        "momentum": null,
+        "revisions": null
+      },
+      "intermediateConclusion": null,
+      "strengths": [],
+      "concerns": [],
+      "finalConclusion": {
+        "strengths": null,
+        "weaknesses": null,
+        "recommendation": null,
+        "rating": null
+      }
+    },
     "CVS-TEST": {}
   }
 }
