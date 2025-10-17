@@ -1372,6 +1372,26 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
             };
 
+            // Pré-chargement de la watchlist pour Dan's Watchlist
+            const preloadWatchlist = async () => {
+                console.log('📊 Pré-chargement de Dan\'s Watchlist...');
+                try {
+                    const res = await fetch('/api/supabase-watchlist');
+                    if (!res.ok) {
+                        console.warn(`⚠️ Watchlist API error: ${res.status}`);
+                        return;
+                    }
+                    const json = await res.json();
+                    const tickers = Array.isArray(json.tickers) ? json.tickers : [];
+
+                    // Cache dans localStorage pour accès rapide par DansWatchlistTab
+                    localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
+                    console.log(`✅ ${tickers.length} tickers de watchlist pré-chargés`);
+                } catch (error) {
+                    console.error('❌ Erreur pré-chargement watchlist:', error);
+                }
+            };
+
             // Chargement initial UNE SEULE FOIS au démarrage avec écran de chargement
             useEffect(() => {
                 if (initialLoadComplete) return; // Éviter les rechargements
@@ -1384,6 +1404,7 @@ const fetchHybridData = async (symbol, dataType) => {
                         // Chargement silencieux en arrière-plan (pas de await pour ne pas bloquer)
                         Promise.all([
                             loadTickersFromSupabase(),
+                            preloadWatchlist(),
                             fetchSeekingAlphaData(),
                             fetchSeekingAlphaStockData(),
                             refreshAllStocks(),
