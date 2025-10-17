@@ -464,6 +464,13 @@ const fetchHybridData = async (symbol, dataType) => {
             const [showTemperatureEditor, setShowTemperatureEditor] = useState(false);
             const [showLengthEditor, setShowLengthEditor] = useState(false);
 
+            // États pour Admin JSLAI (health check, logs, etc.)
+            const [healthStatus, setHealthStatus] = useState(null);
+            const [healthCheckLoading, setHealthCheckLoading] = useState(false);
+            const [processLog, setProcessLog] = useState([]);
+            const [showDebug, setShowDebug] = useState(false);
+            const [showFullLog, setShowFullLog] = useState(false);
+
             // Configuration API
             const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
             
@@ -5916,11 +5923,8 @@ Répondez UNIQUEMENT avec le JSON, sans texte supplémentaire.
                     news: { request: null, response: null, error: null },
                     analysis: { request: null, response: null, error: null }
                 });
-        const [showDebug, setShowDebug] = useState(false);
-        const [showFullLog, setShowFullLog] = useState(false);
-        const [processLog, setProcessLog] = useState([]);
-        const [healthStatus, setHealthStatus] = useState(null);
-        const [healthCheckLoading, setHealthCheckLoading] = useState(false);
+        // NOTE: healthStatus, healthCheckLoading, processLog, showDebug, showFullLog
+        // moved to line ~468 (top of BetaCombinedDashboard for proper scope)
 
                 // Tickers de la watchlist (récupérés depuis Supabase)
                 // Utilise l'état global watchlistTickers chargé depuis Supabase
