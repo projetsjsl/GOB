@@ -10671,11 +10671,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 (recommendation[0].buy + recommendation[0].strongBuy > recommendation[0].sell + recommendation[0].strongSell ? 'Achat' : 
                                                  recommendation[0].sell + recommendation[0].strongSell > recommendation[0].buy + recommendation[0].strongBuy ? 'Vente' : 'Neutre') : 'N/A';
                                             
-                                            // 3 actualités les plus récentes pour ce ticker
+                                            // 2 actualités les plus récentes pour ce ticker
                                             const tickerNews = newsData.filter(article => {
                                                 const text = (article.title + ' ' + article.description).toLowerCase();
                                                 return text.includes(ticker.toLowerCase());
-                                            }).slice(0, 3);
+                                            }).slice(0, 2);
                                             
                                             // Analyse du sentiment
                                             const analyzeSentiment = (title, description) => {
@@ -10757,7 +10757,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             <button
                                                                 onClick={() => {
                                                                     setSelectedStock(ticker);
-                                                                    setActiveTab('jlab');
+                                                                    setActiveTab('intellistocks');
                                                                 }}
                                                                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 hover:scale-[1.02] shadow ${
                                                                     isDarkMode
@@ -14967,7 +14967,7 @@ console.log('✅ Données hybrides récupérées:', {
                 }`}>
                     {/* Intro Emma IA - première visite de session */}
                     {showEmmaIntro && activeTab === 'ask-emma' && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 emma-intro-overlay">
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
                             <div className="text-center">
                                 <div className="mb-6">
                                     <img 
@@ -15008,7 +15008,7 @@ console.log('✅ Données hybrides récupérées:', {
                                         <img
                                             src={isDarkMode ? "/logojslaidark.jpg" : "/logojslailight.jpg"}
                                             alt="JSL AI Logo"
-                                            className="w-10 h-10 object-contain relative z-10"
+                                            className="w-16 h-16 object-contain relative z-10"
                                         />
                                     </div>
 
