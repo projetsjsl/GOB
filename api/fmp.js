@@ -39,35 +39,34 @@ export default async function handler(req, res) {
 
     let fmpUrl;
 
-    // Route based on endpoint type
+    // Route based on endpoint type (Updated to /stable/ endpoints - Aug 2025)
     switch (endpoint) {
       case 'news':
-        // Stock news - general market news
-        const symbolsParam = symbols || ticker || symbol || 'AAPL,MSFT,GOOGL,AMZN,TSLA';
+        // General market news (latest)
         const limitParam = limit || 50;
-        // FMP general news endpoint (no tickers param needed for general market news)
-        fmpUrl = `https://financialmodelingprep.com/api/v3/stock_news?limit=${limitParam}&apikey=${apiKey}`;
+        const pageParam = req.query.page || 0;
+        fmpUrl = `https://financialmodelingprep.com/stable/news/general-latest?page=${pageParam}&limit=${limitParam}&apikey=${apiKey}`;
         break;
 
       case 'ticker-news':
         // Specific ticker news
         const tickerSymbols = symbols || ticker || symbol || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/api/v4/stock_news?tickers=${tickerSymbols}&limit=${limit || 50}&apikey=${apiKey}`;
+        fmpUrl = `https://financialmodelingprep.com/stable/news/stock?symbols=${tickerSymbols}&apikey=${apiKey}`;
         break;
 
       case 'quote':
         const quoteSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/api/v3/quote/${quoteSymbol}?apikey=${apiKey}`;
+        fmpUrl = `https://financialmodelingprep.com/stable/quote?symbol=${quoteSymbol}&apikey=${apiKey}`;
         break;
 
       case 'profile':
         const profileSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/api/v3/profile/${profileSymbol}?apikey=${apiKey}`;
+        fmpUrl = `https://financialmodelingprep.com/stable/profile?symbol=${profileSymbol}&apikey=${apiKey}`;
         break;
 
       case 'fundamentals':
         const fundSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/api/v3/profile/${fundSymbol}?apikey=${apiKey}`;
+        fmpUrl = `https://financialmodelingprep.com/stable/profile?symbol=${fundSymbol}&apikey=${apiKey}`;
         break;
 
       default:
