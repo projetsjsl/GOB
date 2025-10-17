@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:56:18.051Z",
+  "lastUpdate": "2025-10-17T20:56:26.742Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -670,7 +670,7 @@
     "TRP": {
       "ticker": "TRP",
       "companyName": "TC Energy Corporation",
-      "lastUpdate": "2025-10-17T20:54:12.518Z",
+      "lastUpdate": "2025-10-17T20:56:19.727Z",
       "metrics": {
         "marketCap": "$53.53B",
         "bpaGrowth": "-6.64%",
@@ -685,17 +685,17 @@
         "priceChange": "-0.04%"
       },
       "companyProfile": {
-        "description": "TC Energy Corporation, fondée en 1951 et basée à Calgary, Canada, est une entreprise d'infrastructure énergétique en Amérique du Nord. Elle opère à travers quatre segments principaux : les pipelines de gaz naturel canadiens, les pipelines de gaz naturel américains, les pipelines de gaz naturel mexicains et les solutions énergétiques. La société construit et exploite un réseau de 93 700 kilomètres de pipelines de gaz naturel, qui transporte le gaz naturel des bassins d'approvisionnement vers les entreprises de distribution locales, les centrales électriques, les installations industrielles, les pipelines d'interconnexion, les terminaux d'exportation de GNL et d'autres entreprises.",
+        "description": "TC Energy Corporation, fondée en 1951 et basée à Calgary, Canada, opère en tant qu'entreprise d'infrastructure énergétique en Amérique du Nord. La société est impliquée dans quatre segments principaux : les pipelines de gaz naturel canadiens, les pipelines de gaz naturel américains, les pipelines de gaz naturel mexicains et les solutions d'énergie et d'électricité. Elle construit et exploite un réseau de 93 700 kilomètres de pipelines de gaz naturel, qui transporte le gaz naturel des bassins d'approvisionnement vers les entreprises de distribution locales, les centrales électriques, les installations industrielles, les pipelines d'interconnexion, les terminaux d'exportation de GNL et d'autres entreprises.",
         "employees": "6,668",
         "innovation": "N/A"
       },
       "competition": {
         "competitors": [
-          "Pembina Pipeline Corporation",
-          "Enbridge Inc.",
-          "The Williams Companies, Inc.",
-          "Canadian Natural Resources Limited",
-          "Suncor Energy Inc."
+          "PBA",
+          "ENB",
+          "WMB",
+          "CNQ",
+          "SU"
         ],
         "valueProposition": "N/A",
         "advantages": "N/A"
@@ -715,21 +715,21 @@
         "momentum": "N/A",
         "revisions": "N/A"
       },
-      "intermediateConclusion": "TC Energy est une entreprise d'infrastructure énergétique avec une capitalisation boursière importante et un rendement de dividende attractif. Cependant, les notes Quant indiquent des faiblesses en termes de valorisation et de croissance.",
+      "intermediateConclusion": "TC Energy affiche une note globale HOLD selon l'évaluation quantitative de Seeking Alpha. Les notes de facteurs individuels montrent des faiblesses en matière de valorisation et de croissance, mais une rentabilité et un momentum relativement solides.",
       "strengths": [
-        "Infrastructure établie",
-        "Rendement de dividende élevé",
-        "Présence nord-américaine"
+        "Rentabilité (B-)",
+        "Momentum (B)",
+        "Dividende trimestriel"
       ],
       "concerns": [
-        "Valorisation faible",
-        "Croissance limitée",
-        "Ratio de distribution élevé"
+        "Valorisation (D)",
+        "Croissance (D-)",
+        "Ratio de distribution élevé (92.57%)"
       ],
       "finalConclusion": {
-        "strengths": "TC Energy possède une infrastructure solide et offre un rendement de dividende intéressant, ce qui peut attirer les investisseurs axés sur le revenu.",
-        "weaknesses": "La valorisation et la croissance sont des points faibles, et le ratio de distribution élevé pourrait susciter des inquiétudes quant à la durabilité du dividende.",
-        "recommendation": "Compte tenu des forces et des faiblesses, une position de maintien (HOLD) semble appropriée. Les investisseurs devraient surveiller de près la croissance future et la capacité de l'entreprise à maintenir son dividende.",
+        "strengths": "TC Energy présente une bonne rentabilité et un momentum boursier correct, soutenus par un dividende trimestriel.",
+        "weaknesses": "La valorisation est faible et la croissance est préoccupante, avec un ratio de distribution élevé qui pourrait menacer la durabilité du dividende.",
+        "recommendation": "Compte tenu des forces et des faiblesses, une position HOLD semble appropriée. Il est important de surveiller l'évolution de la croissance et la capacité de l'entreprise à maintenir son dividende.",
         "rating": "HOLD"
       }
     },
