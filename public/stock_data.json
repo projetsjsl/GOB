@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:55:14.558Z",
+  "lastUpdate": "2025-10-17T20:55:23.699Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -797,29 +797,35 @@
     "WFC": {
       "ticker": "WFC",
       "companyName": "Wells Fargo & Company",
-      "lastUpdate": "2025-10-17T20:24:00.000Z",
+      "lastUpdate": "2025-10-17T20:55:16.648Z",
       "metrics": {
-        "marketCap": null,
-        "bpaGrowth": null,
-        "peRatio": null,
-        "sector": null,
-        "industry": null,
-        "dividendYield": null,
-        "dividendFrequency": null,
-        "exDivDate": null,
-        "annualPayout": null,
+        "marketCap": "$264.51B",
+        "bpaGrowth": "N/A",
+        "peRatio": "13.84",
+        "sector": "Financials",
+        "industry": "Diversified Banks",
+        "dividendYield": "2.14%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-08-08",
+        "annualPayout": "$1.80",
         "price": "$83.28",
         "priceChange": "-0.86%"
       },
       "companyProfile": {
-        "description": null,
-        "employees": null,
-        "innovation": null
+        "description": "Wells Fargo & Company est une société de services financiers qui propose des produits et services diversifiés dans les domaines de la banque, de l'investissement, de l'hypothèque, ainsi que du financement à la consommation et aux entreprises, aux États-Unis et à l'international. Elle opère à travers quatre segments : Consumer Banking and Lending, Commercial Banking, Corporate and Investment Banking, et Wealth and Investment Management. La société a été fondée en 1852 et son siège social est situé à San Francisco, Californie.",
+        "employees": "210,821",
+        "innovation": "N/A"
       },
       "competition": {
-        "competitors": [],
-        "valueProposition": null,
-        "advantages": null
+        "competitors": [
+          "Bank of America Corporation",
+          "JPMorgan Chase & Co.",
+          "Citigroup Inc.",
+          "The Goldman Sachs Group, Inc.",
+          "Morgan Stanley"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
       },
       "quantRating": {
         "overall": "HOLD",
@@ -830,20 +836,28 @@
         "revisions": "A+"
       },
       "sectorAnalysis": {
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
-      "intermediateConclusion": null,
-      "strengths": [],
-      "concerns": [],
+      "intermediateConclusion": "Wells Fargo présente des notes contrastées selon l'analyse quantitative de Seeking Alpha. La valorisation est faible (D) tandis que le momentum et les révisions des analystes sont très positifs (A- et A+).",
+      "strengths": [
+        "Forte capitalisation boursière",
+        "Momentum boursier élevé",
+        "Révisions de bénéfices positives"
+      ],
+      "concerns": [
+        "Note de rentabilité faible",
+        "Note de valorisation faible",
+        "Ventes d'actions par les initiés"
+      ],
       "finalConclusion": {
-        "strengths": null,
-        "weaknesses": null,
-        "recommendation": null,
-        "rating": null
+        "strengths": "Wells Fargo bénéficie d'une forte capitalisation et d'un momentum positif, soutenu par des révisions de bénéfices à la hausse.",
+        "weaknesses": "La rentabilité et la valorisation sont des points faibles à surveiller.",
+        "recommendation": "L'action est actuellement évaluée comme HOLD par l'analyse quantitative de Seeking Alpha. Il est important de surveiller l'évolution de la rentabilité et de la valorisation avant de prendre une décision d'investissement.",
+        "rating": "Hold"
       }
     },
     "CVS-TEST": {}
