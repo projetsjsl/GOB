@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:57:04.232Z",
+  "lastUpdate": "2025-10-17T20:57:14.192Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -454,60 +454,66 @@
     "MFC": {
       "ticker": "MFC",
       "companyName": "Manulife Financial Corporation",
-      "lastUpdate": "2025-10-17T20:27:53.872Z",
+      "lastUpdate": "2025-10-17T20:57:05.781Z",
       "metrics": {
-        "marketCap": null,
-        "bpaGrowth": null,
-        "peRatio": null,
-        "sector": null,
-        "industry": null,
-        "dividendYield": null,
-        "dividendFrequency": null,
-        "exDivDate": null,
-        "annualPayout": null,
-        "price": 31.64,
-        "priceChange": -0.01,
-        "priceChangePercent": -0.03
+        "marketCap": "$53.51B",
+        "bpaGrowth": "N/A",
+        "peRatio": "11.13",
+        "sector": "Financials",
+        "industry": "Life and Health Insurance",
+        "dividendYield": "3.96%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-08-20",
+        "annualPayout": "$1.25",
+        "price": "$31.64",
+        "priceChange": "-0.03%"
       },
       "companyProfile": {
-        "description": null,
-        "employees": null,
-        "innovation": null
+        "description": "Manulife Financial Corporation, avec ses filiales, fournit des produits et services financiers aux États-Unis, au Canada, en Asie et à l'international. Elle opère à travers les secteurs de la gestion de patrimoine et d'actifs, des produits d'assurance et de rente, et des secteurs corporatifs et autres. La société a été constituée en 1887 et son siège social est situé à Toronto, Canada.",
+        "employees": "37,000",
+        "innovation": "N/A"
       },
       "competition": {
-        "competitors": [],
-        "valueProposition": null,
-        "advantages": null
+        "competitors": [
+          "N/A",
+          "N/A",
+          "N/A"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
       },
       "quantRating": {
-        "overall": null,
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "overall": "HOLD",
+        "valuation": "B",
+        "growth": "C-",
+        "profitability": "A+",
+        "momentum": "B",
+        "revisions": "D"
       },
       "sectorAnalysis": {
-        "valuation": null,
-        "growth": null,
-        "profitability": null,
-        "momentum": null,
-        "revisions": null
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
       },
-      "intermediateConclusion": null,
-      "strengths": [],
-      "concerns": [],
+      "intermediateConclusion": "Manulife présente une forte rentabilité (A+) mais des révisions d'analystes faibles (D). Les notes des analystes de Seeking Alpha et de Wall Street sont positives (BUY), tandis que l'évaluation quantitative est neutre (HOLD). Il est important d'analyser plus en profondeur les raisons de ces divergences.",
+      "strengths": [
+        "Forte rentabilité",
+        "Croissance en Asie",
+        "Dividendes croissants"
+      ],
+      "concerns": [
+        "Révisions d'analystes faibles",
+        "Ventes d'actions par les initiés",
+        "Sensibilité aux taux d'intérêt"
+      ],
       "finalConclusion": {
-        "strengths": null,
-        "weaknesses": null,
-        "recommendation": null,
-        "rating": null
-      },
-      "followers": 38320,
-      "exchange": "NYSE",
-      "currency": "USD",
-      "marketStatus": "Post-Market",
-      "lastTradeTime": "2025-10-17T20:00:00Z"
+        "strengths": "Manulife bénéficie d'une forte rentabilité et d'une croissance en Asie, soutenant des dividendes croissants.",
+        "weaknesses": "Les révisions d'analystes sont faibles et il y a eu des ventes d'actions par les initiés, ce qui pourrait indiquer un manque de confiance interne.",
+        "recommendation": "En raison des signaux mitigés, une position neutre est recommandée. Surveiller les révisions d'analystes et les performances en Asie.",
+        "rating": "Hold"
+      }
     },
     "MU": {
       "ticker": "MU",
