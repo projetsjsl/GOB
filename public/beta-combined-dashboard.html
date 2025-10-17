@@ -12450,39 +12450,12 @@ console.log('✅ Données hybrides récupérées:', {
                     // Chargement uniquement au changement de stock ou manuel
                 }, [selectedStock]);
 
-                // 🔄 AUTO-REFRESH: Actualisation périodique des données (5 min)
-                useEffect(() => {
-                    // Ne pas auto-refresh si pas de stock sélectionné
-                    if (!selectedStock) return;
-
-                    // Définir l'intervalle de refresh (5 minutes = 300000ms)
-                    const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
-
-                    console.log(`🔄 Auto-refresh activé pour ${selectedStock} (intervalle: 5 min)`);
-
-                    const refreshInterval = setInterval(async () => {
-                        try {
-                            console.log(`🔄 Auto-refresh: Actualisation des données pour ${selectedStock}...`);
-
-                            const realData = await fetchRealStockData(selectedStock, timeframe);
-                            if (realData && realData.quote && realData.quote.price > 0) {
-                                setStockDataIntelli(realData);
-                                setConnected(true);
-                                setLastUpdateIntelli(new Date());
-                                console.log('✅ Auto-refresh: Données actualisées avec succès');
-                            }
-                        } catch (error) {
-                            console.warn('⚠️ Auto-refresh: Erreur lors de l\'actualisation:', error?.message);
-                            // Ne pas afficher d'erreur à l'utilisateur pour auto-refresh
-                        }
-                    }, REFRESH_INTERVAL);
-
-                    // Nettoyer l'intervalle quand le composant unmount ou stock change
-                    return () => {
-                        console.log(`🛑 Auto-refresh désactivé pour ${selectedStock}`);
-                        clearInterval(refreshInterval);
-                    };
-                }, [selectedStock, timeframe]);
+                // ⚡ AUTO-REFRESH: Désactivé - Chargement unique à l'arrivée sur la page
+                // L'utilisateur peut actualiser manuellement via le bouton refresh
+                // Les caches API optimisent les appels répétés:
+                // - Quotes: 5 min cache
+                // - Fundamentals: 1h cache
+                // - AI data: 30 min cache
 
                 // Timer (désactivé pour éviter les actualisations inutiles)
                 // useEffect(() => {
