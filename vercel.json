@@ -44,20 +44,7 @@
       "maxDuration": 300
     }
   },
-  "crons": [
-    {
-      "path": "/api/cron-briefings",
-      "schedule": "20 11 * * 1-5"
-    },
-    {
-      "path": "/api/cron-briefings",
-      "schedule": "50 15 * * 1-5"
-    },
-    {
-      "path": "/api/cron-briefings",
-      "schedule": "20 20 * * 1-5"
-    }
-  ],
+  "crons": [],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -74,6 +61,11 @@
   "redirects": [
     {
       "source": "/",
+      "destination": "/beta-combined-dashboard.html",
+      "permanent": false
+    },
+    {
+      "source": "/index.html",
       "destination": "/beta-combined-dashboard.html",
       "permanent": false
     },
