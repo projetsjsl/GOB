@@ -2127,6 +2127,10 @@ STRUCTURE JSON OBLIGATOIRE:
 
                         if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
                             responseText = responseText.substring(firstBrace, lastBrace + 1);
+                        } else {
+                            // Pas de JSON trouvé - Perplexity a retourné du texte pur
+                            addScrapingLog(`⚠️ ${ticker}: Perplexity a retourné du texte au lieu de JSON (données insuffisantes)`, 'warning');
+                            throw new Error('Response contains no valid JSON - possibly insufficient data');
                         }
 
                         // 3. Parser le JSON nettoyé
