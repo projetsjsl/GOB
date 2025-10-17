@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:55:42.725Z",
+  "lastUpdate": "2025-10-17T20:55:43.428Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -56,7 +56,72 @@
       }
     },
     "TD": {},
-    "BCE": {},
+    "BCE": {
+      "ticker": "BCE",
+      "companyName": "BCE Inc.",
+      "lastUpdate": "2025-10-17T20:38:00.000Z",
+      "metrics": {
+        "marketCap": "$22.08B",
+        "bpaGrowth": "-6.95%",
+        "peRatio": "12.39",
+        "sector": "Communication Services",
+        "industry": "Integrated Telecommunication Services",
+        "dividendYield": "5.26%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-09-15",
+        "annualPayout": "$1.25",
+        "price": "$24.26",
+        "priceChange": "+2.41%"
+      },
+      "companyProfile": {
+        "description": "BCE Inc. est une entreprise de communication qui fournit des services sans fil, filaires, internet, de diffusion en continu et de télévision à des clients résidentiels, commerciaux et de gros au Canada. Elle opère à travers deux segments : Bell Communication and Technology Services et Bell Media. La société a été fondée en 1880 et son siège social est situé à Verdun, Canada.",
+        "employees": "40,390",
+        "innovation": "N/A"
+      },
+      "competition": {
+        "competitors": [
+          "TELUS Corporation",
+          "The Bank of Nova Scotia",
+          "The Toronto-Dominion Bank",
+          "Rogers Communications Inc.",
+          "TC Energy Corporation"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "B+",
+        "growth": "F",
+        "profitability": "A",
+        "momentum": "C",
+        "revisions": "C"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "BCE Inc. est une entreprise de télécommunications établie avec une capitalisation boursière importante et un rendement de dividende attractif. Cependant, sa note de croissance est faible et son ratio de distribution est élevé, ce qui pourrait susciter des inquiétudes quant à la durabilité du dividende.",
+      "strengths": [
+        "Forte rentabilité (note A)",
+        "Rendement du dividende élevé (5.26%)",
+        "Note de cohérence du dividende élevée (A-)"
+      ],
+      "concerns": [
+        "Faible croissance (note F)",
+        "Ratio de distribution élevé (114.22%)",
+        "Endettement élevé (Total Debt / Equity (MRQ): 204.38%)"
+      ],
+      "finalConclusion": {
+        "strengths": "BCE présente une forte rentabilité et un rendement de dividende élevé, ce qui en fait une option attrayante pour les investisseurs axés sur le revenu.",
+        "weaknesses": "Cependant, la faible croissance et le ratio de distribution élevé soulèvent des inquiétudes quant à la durabilité du dividende à long terme.",
+        "recommendation": "Compte tenu des forces et des faiblesses, une position de maintien (HOLD) pourrait être appropriée pour les investisseurs existants. Les nouveaux investisseurs devraient examiner attentivement les perspectives de croissance et la durabilité du dividende avant d'investir.",
+        "rating": "Hold"
+      }
+    },
     "CNR": {
       "ticker": "CNR",
       "companyName": "Core Natural Resources, Inc.",
