@@ -164,18 +164,42 @@ OUTILS DISPONIBLES:
 - yahoo-finance: Fallback général
 
 INSTRUCTIONS:
-1. Détermine l'INTENTION principale: stock_price, fundamentals, technical_analysis, news, portfolio_analysis, market_overview, calculation, comparative_analysis
+1. Détermine l'INTENTION principale: stock_price, fundamentals, technical_analysis, news, portfolio_analysis, market_overview, calculation, comparative_analysis, comprehensive_analysis
 2. Extrais les TICKERS mentionnés en utilisant STRICTEMENT le COMPANY NAME TO TICKER MAPPING ci-dessus
 3. Détermine les OUTILS NÉCESSAIRES (1-5 outils max, par ordre de pertinence)
-4. Détecte si CLARIFICATION NÉCESSAIRE (confidence < 0.5 ou paramètres manquants)
+4. DEFAULT TO ACTION: Seulement demander clarification si VRAIMENT ambigu (confidence < 0.3 ET aucun ticker identifié)
 5. Extrais PARAMÈTRES ADDITIONNELS (dates, périodes, types d'analyse)
 
+⚠️ RÈGLE CRITIQUE - DEFAULT TO ACTION:
+- "analyse [ticker]" → confidence HIGH (0.9+), intent: comprehensive_analysis, needs_clarification: false
+- "prix [ticker]" → confidence HIGH (0.95+), intent: stock_price, needs_clarification: false
+- "[ticker]" seul → confidence MEDIUM (0.7+), intent: stock_price + news, needs_clarification: false
+- SEULEMENT clarifier si: (1) aucun ticker ET (2) intention vraiment floue ET (3) confidence < 0.3
+
 EXEMPLES DE MAPPING CORRECT:
-- "Prix d'Apple" → tickers: ["AAPL"]
-- "Analyse Microsoft et Google" → tickers: ["MSFT", "GOOGL"]
-- "Tesla vs Nvidia" → tickers: ["TSLA", "NVDA"]
+- "analyse msft" → tickers: ["MSFT"], intent: "comprehensive_analysis", confidence: 0.95, needs_clarification: false
+- "Prix d'Apple" → tickers: ["AAPL"], intent: "stock_price", confidence: 0.95, needs_clarification: false
+- "Analyse Microsoft et Google" → tickers: ["MSFT", "GOOGL"], intent: "comparative_analysis", confidence: 0.9, needs_clarification: false
+- "Tesla vs Nvidia" → tickers: ["TSLA", "NVDA"], intent: "comparative_analysis", confidence: 0.9, needs_clarification: false
+- "AAPL" seul → tickers: ["AAPL"], intent: "stock_price", confidence: 0.7, needs_clarification: false
 
 RÉPONDS EN JSON UNIQUEMENT (pas de texte avant ou après):
+
+EXEMPLE 1 - Analyse complète:
+{
+  "intent": "comprehensive_analysis",
+  "confidence": 0.95,
+  "tickers": ["MSFT"],
+  "suggested_tools": ["fmp-fundamentals", "polygon-stock-price", "finnhub-news", "twelve-data-technical", "analyst-recommendations"],
+  "parameters": {
+    "analysis_type": "comprehensive"
+  },
+  "needs_clarification": false,
+  "clarification_questions": [],
+  "user_intent_summary": "L'utilisateur veut une analyse complète de Microsoft (fondamentaux, techniques, actualités)"
+}
+
+EXEMPLE 2 - Prix simple:
 {
   "intent": "stock_price",
   "confidence": 0.95,
@@ -677,13 +701,14 @@ ${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n
 QUESTION DE L'UTILISATEUR: ${userMessage}
 
 INSTRUCTIONS:
-1. Réponds de manière CONVERSATIONNELLE et NATURELLE
+1. Réponds de manière CONVERSATIONNELLE et NATURELLE - PAS de questions clarificatrices
 2. Utilise UNIQUEMENT les données fournies par les outils (pas de données fictives)
 3. Cite tes sources (outils utilisés) en fin de réponse
 4. Sois précis mais accessible
 5. Si les données sont insuffisantes, indique-le clairement
 6. Adapte ton ton: professionnel mais chaleureux
-${intentData ? `7. L'intention de l'utilisateur est: ${intentData.intent} - réponds en conséquence` : ''}
+${intentData ? `7. L'intention de l'utilisateur est: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE avec prix, fondamentaux, technique et actualités' : 'réponds en conséquence'}` : ''}
+8. ❌ NE JAMAIS demander de clarifications supplémentaires - fournis directement l'analyse avec les données disponibles
 
 RÉPONSE:`;
     }
