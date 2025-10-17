@@ -1977,10 +1977,9 @@ const fetchHybridData = async (symbol, dataType) => {
                             addScrapingLog(`🔄 Continuation avec le prochain ticker...`, 'info');
                         }
                         
-                        // Pause entre les scrapings pour éviter d'être bloqué
+                        // Pause courte entre les ouvertures pour éviter les blocages du navigateur
                         if (i < tickers.length - 1) {
-                            addScrapingLog('⏸️ Pause de 3 secondes avant le prochain ticker...', 'info');
-                            await wait(3000);
+                            await wait(300); // 300ms seulement - ouverture rapide!
                         }
                     }
                     
@@ -2693,78 +2692,181 @@ STRUCTURE JSON OBLIGATOIRE:
                     </div>
 
                     {/* Section Scraping Seeking Alpha */}
-                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                        isDarkMode 
-                            ? 'bg-gray-900 border-gray-700' 
-                            : 'bg-gray-50 border-gray-200'
-                    }`}>
-                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Scraping Seeking Alpha</h3>
-                        <div className={`mb-3 p-3 rounded text-sm transition-colors duration-300 ${
-                            isDarkMode ? 'bg-yellow-900/30 text-yellow-200 border border-yellow-700' : 'bg-yellow-50 text-yellow-800 border border-yellow-200'
+                    {/* WORKFLOW EN 3 ÉTAPES CLAIRES */}
+                    <div className="space-y-4">
+                        {/* ÉTAPE 1: SCRAPING BATCH */}
+                        <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gradient-to-r from-blue-900/40 to-purple-900/40 border-blue-500/50'
+                                : 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-400/50'
                         }`}>
-                            ⚠️ <strong>Important:</strong> Connectez-vous d'abord à Seeking Alpha avec le bouton "🔐 Se connecter" ci-dessous, sinon les URLs seront bloquées et les données incomplètes.
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>📊 ÉTAPE 1: SCRAPING BATCH (25 tickers)</h3>
+                                <span className={`px-4 py-2 rounded-full text-sm font-bold ${
+                                    scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
+                                    scrapingStatus === 'running' ? 'bg-blue-500 text-white animate-pulse' :
+                                    scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
+                                    'bg-red-500 text-white'
+                                }`}>
+                                    {scrapingStatus === 'idle' ? '⏸️ EN ATTENTE' :
+                                     scrapingStatus === 'running' ? '🔄 SCRAPING...' :
+                                     scrapingStatus === 'completed' ? '✅ TERMINÉ' :
+                                     '❌ ERREUR'}
+                                </span>
+                            </div>
+
+                            {/* Barre de progression */}
+                            {scrapingStatus === 'running' && (
+                                <div className="mb-4">
+                                    <div className="w-full bg-gray-700 rounded-full h-4">
+                                        <div
+                                            className="bg-gradient-to-r from-blue-500 to-purple-500 h-4 rounded-full transition-all duration-300 flex items-center justify-center text-white text-xs font-bold"
+                                            style={{ width: `${scrapingProgress}%` }}
+                                        >
+                                            {scrapingProgress}%
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
+                                isDarkMode ? 'bg-black/30' : 'bg-white/60'
+                            }`}>
+                                <p className={`text-sm mb-3 font-semibold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-yellow-300' : 'text-yellow-800'
+                                }`}>
+                                    ⚠️ IMPORTANT: Connectez-vous AVANT de lancer le scraping!
+                                </p>
+                                <ol className={`text-sm space-y-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    <li><strong>1.</strong> Cliquez "🔐 SE CONNECTER" → Login Seeking Alpha</li>
+                                    <li><strong>2.</strong> Cliquez "🚀 LANCER SCRAPING BATCH" → Toutes les popups s'ouvrent</li>
+                                    <li><strong>3.</strong> Pour CHAQUE popup: F12 → Console → Collez script → Entrée</li>
+                                    <li><strong>4.</strong> Fermez la popup après copie</li>
+                                    <li><strong>5.</strong> Les données sont auto-sauvegardées dans Supabase</li>
+                                </ol>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        addScrapingLog('🔐 Ouverture de la page de connexion Seeking Alpha...', 'info');
+                                        window.open('https://seekingalpha.com/account/login', '_blank');
+                                        addScrapingLog('✅ Connectez-vous, puis revenez ici', 'success');
+                                    }}
+                                    className="flex-1 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-bold text-lg shadow-lg"
+                                >
+                                    🔐 SE CONNECTER À SEEKING ALPHA
+                                </button>
+                                <button
+                                    onClick={runSeekingAlphaScraper}
+                                    disabled={scrapingStatus === 'running'}
+                                    className="flex-1 px-6 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg shadow-lg"
+                                >
+                                    {scrapingStatus === 'running' ? '⏳ SCRAPING EN COURS...' : '🚀 LANCER SCRAPING BATCH'}
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => {
-                                    addScrapingLog('🔐 Ouverture de la page de connexion Seeking Alpha...', 'info');
-                                    window.open('https://seekingalpha.com/account/login', '_blank');
-                                    addScrapingLog('✅ Connectez-vous, puis revenez ici pour lancer le scraper', 'success');
-                                }}
-                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-semibold"
-                            >
-                                🔐 Se connecter à Seeking Alpha
-                            </button>
-                            <button
-                                onClick={runSeekingAlphaScraper}
-                                disabled={scrapingStatus === 'running'}
-                                className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
-                            >
-                                {scrapingStatus === 'running' ? 'Scraping...' : '🚀 Lancer le Scraper'}
-                            </button>
-                            <button
-                                onClick={() => openSeekingAlpha('AAPL')}
-                                className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
-                            >
-                                🌐 Ouvrir Seeking Alpha
-                            </button>
-                            <button
-                                onClick={() => {
-                                    const script = generateScrapingScript('CVS');
-                                    navigator.clipboard.writeText(script).then(() => {
-                                        addScrapingLog('📋 Script de scraping copié dans le presse-papiers', 'success');
-                                        addScrapingLog('💡 Collez-le dans la console F12 de Seeking Alpha', 'info');
-                                    });
-                                }}
-                                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
-                            >
-                                📋 Script F12
-                            </button>
+
+                        {/* ÉTAPE 2: ANALYSE PERPLEXITY */}
+                        <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gradient-to-r from-pink-900/40 to-rose-900/40 border-pink-500/50'
+                                : 'bg-gradient-to-r from-pink-50 to-rose-50 border-pink-400/50'
+                        }`}>
+                            <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🤖 ÉTAPE 2: ANALYSE BATCH PERPLEXITY</h3>
+
+                            <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
+                                isDarkMode ? 'bg-black/30' : 'bg-white/60'
+                            }`}>
+                                <p className={`text-sm mb-3 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    📊 Cliquez pour analyser TOUTES les données scrapées en une seule fois:
+                                </p>
+                                <ul className={`text-sm space-y-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    <li>✓ Récupère tous les raw scrapes depuis Supabase</li>
+                                    <li>✓ Analyse avec Perplexity AI en batch</li>
+                                    <li>✓ Formate en JSON structuré</li>
+                                    <li>✓ Sauvegarde dans seeking_alpha_analysis</li>
+                                    <li>✓ Affiche les résultats dans le tableau ci-dessous</li>
+                                </ul>
+                            </div>
+
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🌐 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
+                                    addScrapingLog('🤖 Démarrage analyse Perplexity BATCH...', 'info');
                                     try {
-                                        for (const ticker of tickers) {
-                                            const existingData = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
-                                            if (existingData) {
-                                                addScrapingLog(`🔄 Analyse de ${ticker} avec Perplexity AI...`, 'info');
+                                        // Récupérer tous les raw scrapes depuis Supabase
+                                        addScrapingLog('📥 Récupération des données depuis Supabase...', 'info');
+                                        const response = await fetch('/api/seeking-alpha-scraping?type=raw&limit=100');
+                                        const data = await response.json();
+
+                                        if (data.success && data.data && data.data.length > 0) {
+                                            addScrapingLog(`✅ ${data.data.length} raw scrapes trouvés`, 'success');
+
+                                            for (const item of data.data) {
+                                                const ticker = item.ticker;
+                                                addScrapingLog(`🔄 Analyse de ${ticker} avec Perplexity...`, 'info');
                                                 await analyzeWithPerplexityAndUpdate(ticker, {
-                                                    fullText: existingData.raw_text,
-                                                    url: existingData.url,
+                                                    fullText: item.raw_text,
+                                                    url: item.url,
                                                     content: {}
                                                 });
                                             }
+                                            addScrapingLog('🎉 Analyse Perplexity terminée pour TOUS les tickers!', 'success');
+                                            addScrapingLog('💾 Résultats sauvegardés dans Supabase', 'success');
+                                        } else {
+                                            addScrapingLog('⚠️ Aucune donnée trouvée dans Supabase', 'warning');
+                                            addScrapingLog('💡 Effectuez d\'abord le scraping (Étape 1)', 'info');
                                         }
-                                        addScrapingLog('🎉 Analyse Perplexity terminée pour tous les tickers', 'success');
                                     } catch (error) {
-                                        addScrapingLog(`❌ Erreur analyse Perplexity: ${error.message}`, 'error');
+                                        addScrapingLog(`❌ Erreur: ${error.message}`, 'error');
                                     }
                                 }}
-                                className="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition-colors"
+                                className="w-full px-6 py-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all font-bold text-lg shadow-lg"
                             >
-                                🌐 Analyser avec Perplexity
+                                🤖 ANALYSER TOUT AVEC PERPLEXITY ({tickers.length} tickers)
+                            </button>
+                        </div>
+
+                        {/* ÉTAPE 3: RÉSULTATS */}
+                        <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-emerald-500/50'
+                                : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-400/50'
+                        }`}>
+                            <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>📊 ÉTAPE 3: RÉSULTATS & AFFICHAGE</h3>
+
+                            <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
+                                isDarkMode ? 'bg-black/30' : 'bg-white/60'
+                            }`}>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    Toutes les analyses apparaissent dans le tableau ci-dessous. Cliquez sur "RAFRAÎCHIR" pour recharger les dernières données depuis Supabase.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={async () => {
+                                    addScrapingLog('🔄 Rafraîchissement des données depuis Supabase...', 'info');
+                                    await fetchSeekingAlphaData();
+                                    await fetchSeekingAlphaStockData();
+                                    addScrapingLog('✅ Données rafraîchies!', 'success');
+                                }}
+                                className="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all font-bold text-lg shadow-lg"
+                            >
+                                🔄 RAFRAÎCHIR LES DONNÉES DU TABLEAU
                             </button>
                         </div>
                     </div>
