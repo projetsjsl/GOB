@@ -747,7 +747,7 @@ RÉPONSE JSON:`;
         const importanceLevel = intentData?.importance_level || context.importance_level || 5;
         const trendingTopics = intentData?.trending_topics || [];
 
-        return `Tu es Emma Financial Analyst. Rédige une analyse approfondie pour un briefing ${briefingType}.
+        return `Tu es Emma Financial Analyst. Rédige une analyse approfondie MULTIMÉDIA pour un briefing ${briefingType}.
 
 DONNÉES DISPONIBLES DES OUTILS:
 ${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n')}
@@ -761,15 +761,45 @@ INTENT DÉTECTÉ:
 
 TYPE DE BRIEFING: ${briefingType}
 
-INSTRUCTIONS:
+INSTRUCTIONS PRINCIPALES:
 1. Rédige une analyse DÉTAILLÉE et PROFESSIONNELLE (1500-2000 mots minimum)
 2. Structure OBLIGATOIRE avec sections claires (##, ###)
 3. Inclure des DONNÉES CHIFFRÉES précises (prix, %, volumes, etc.)
-4. Citer les SOURCES en bas de réponse
-5. Ton: Professionnel institutionnel
-6. Focus sur l'ACTIONNABLE et les INSIGHTS
-7. Format MARKDOWN avec émojis appropriés (📊, 📈, ⚠️, etc.)
-8. Si importance >= 8: commencer par une section BREAKING avec les événements majeurs
+4. Ton: Professionnel institutionnel
+5. Focus sur l'ACTIONNABLE et les INSIGHTS
+6. Format MARKDOWN avec émojis appropriés (📊, 📈, ⚠️, etc.)
+7. Si importance >= 8: commencer par une section BREAKING avec les événements majeurs
+
+🎨 INSTRUCTIONS MULTIMÉDIAS (CRITIQUE):
+
+A) SOURCES WEB CRÉDIBLES - Cherche et inclus des liens vers:
+   - Bloomberg: https://www.bloomberg.com/quote/[TICKER]
+   - La Presse (Canada): https://www.lapresse.ca/affaires/
+   - Financial Times: https://www.ft.com/markets
+   - Reuters: https://www.reuters.com/markets/
+   - Wall Street Journal: https://www.wsj.com/market-data
+   - CNBC: https://www.cnbc.com/quotes/[TICKER]
+   - BNN Bloomberg (Canada): https://www.bnnbloomberg.ca/
+
+B) GRAPHIQUES ET CHARTS - Inclus URLs de graphiques:
+   📈 TradingView: [CHART:TRADINGVIEW:NASDAQ:TICKER]
+   📊 Finviz: [CHART:FINVIZ:TICKER]
+   🌡️ Heatmap sectorielle: [CHART:FINVIZ:SECTORS]
+
+C) TABLEAUX DE DONNÉES - Crée des tableaux HTML pour:
+   - Performance tickers (Prix, Var %, Volume, MarketCap)
+   - Résultats vs attentes (Actuel, Consensus, Surprise %)
+   - Niveaux techniques (Support, Résistance, RSI, MACD)
+
+   Format: [TABLE:NOM_TABLE|Col1,Col2,Col3|Val1,Val2,Val3|Val4,Val5,Val6]
+
+D) IMAGES ET VISUELS:
+   - Logos entreprises: [LOGO:TICKER]
+   - Screenshots charts: [SCREENSHOT:TICKER:TIMEFRAME]
+   - Timeline événements: [TIMELINE:EVENTS]
+
+E) LIENS SOURCES - Pour CHAQUE donnée/affirmation, fournis URL complète
+   Format: [SOURCE:NOM_SOURCE|URL_COMPLETE]
 
 STRUCTURE ATTENDUE:
 
@@ -777,40 +807,58 @@ STRUCTURE ATTENDUE:
 
 **Résumé Exécutif:** [2-3 phrases capturant l'essentiel de l'analyse]
 
+[TABLE:PERFORMANCE_INDICES|Indice,Valeur,Variation %|S&P 500,5825.23,+0.45|NASDAQ,18456.32,+0.82]
+
 ### 📈 Performance du Jour
 [Analyse détaillée des mouvements de prix, volumes, catalyseurs du jour]
-- Indices: S&P 500, NASDAQ, DOW
-- Actions clés: variations, volumes
-- Catalyseurs identifiés
+
+[CHART:FINVIZ:SECTORS]
+
+**Indices majeurs:**
+- S&P 500: [données] ([SOURCE:Bloomberg|https://www.bloomberg.com/quote/SPX:IND])
+- NASDAQ: [données] ([SOURCE:CNBC|https://www.cnbc.com/quotes/.IXIC])
+- DOW: [données]
+
+**Actions clés:**
+[TABLE:TOP_MOVERS|Ticker,Prix,Var %,Volume|AAPL,247.25,-0.84%,58.2M|TSLA,245.67,+2.34%,125.3M]
 
 ### 💼 Analyse Fondamentale
-[Métriques clés: PE, revenus, marges, croissance, valorisation]
-- Résultats trimestriels si disponibles
-- Guidance management
-- Comparaison sectorielle
+[Métriques clés avec tableaux comparatifs]
+
+[TABLE:FUNDAMENTALS|Ticker,PE,EPS,Revenue Growth|AAPL,32.4,7.58,+8.5%|MSFT,38.1,11.24,+12.3%]
+
+[SOURCE:Financial Times|https://www.ft.com/content/...]
 
 ### 📉 Analyse Technique
 [Indicateurs techniques et niveaux clés]
-- RSI, MACD, moyennes mobiles
-- Support et résistance
-- Sentiment technique (bullish/bearish)
+
+[CHART:TRADINGVIEW:NASDAQ:AAPL]
+
+[TABLE:TECHNICAL_LEVELS|Ticker,RSI,MACD,Support,Résistance|AAPL,58.2,Positif,240,255]
 
 ### 📰 Actualités et Catalyseurs
 [News importantes avec impact marché]
-- Événements économiques
-- Annonces entreprises
-- Changements ratings analystes
+
+**Principales actualités:**
+1. [Titre] ([SOURCE:La Presse|https://www.lapresse.ca/affaires/...])
+2. [Titre] ([SOURCE:Reuters|https://www.reuters.com/markets/...])
+3. [Titre] ([SOURCE:BNN Bloomberg|https://www.bnnbloomberg.ca/...])
+
+[TIMELINE:EVENTS]
 
 ### 🎯 Recommandations et Points de Surveillance
-[Insights actionnables et zones à surveiller]
-- Opportunités identifiées
-- Risques à monitorer
-- Niveaux techniques clés
+[Insights actionnables avec niveaux précis]
+
+[TABLE:RECOMMENDATIONS|Action,Entry,Stop Loss,Target,Ratio R/R|AAPL,245-248,240,265,1:3.4]
 
 ---
-**Sources:** [Liste précise des outils/APIs utilisés: Polygon.io, FMP, Finnhub, etc.]
+**Sources Complètes:**
+- Données de marché: Polygon.io, FMP, Finnhub
+- Actualités: [SOURCE:Bloomberg|URL], [SOURCE:Reuters|URL], [SOURCE:La Presse|URL]
+- Charts: TradingView, Finviz
+- Analyses: Emma Agent + Perplexity AI
 
-RÉPONSE MARKDOWN:`;
+RÉPONSE MARKDOWN ENRICHIE:`;
     }
 
     /**
