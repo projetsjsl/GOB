@@ -11592,7 +11592,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 // 🚨 KILLSWITCH: Limite de sécurité pour éviter les coûts excessifs
                 const perplexityCallLog = [];
-                const MAX_PERPLEXITY_CALLS_PER_HOUR = 15; // Maximum 15 appels/heure (~$2/jour)
+                const MAX_PERPLEXITY_CALLS_PER_HOUR = 50; // Maximum 50 appels/heure (~$0.68/hour)
 
                 const canCallPerplexity = () => {
                     const oneHourAgo = Date.now() - (60 * 60 * 1000);
