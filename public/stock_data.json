@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-10-17T20:56:26.742Z",
+  "lastUpdate": "2025-10-17T20:56:35.803Z",
   "stocks": {
     "GOOGL": {},
     "T": {},
@@ -666,7 +666,72 @@
         "rating": null
       }
     },
-    "PFE": {},
+    "PFE": {
+      "ticker": "PFE",
+      "companyName": "Pfizer Inc.",
+      "lastUpdate": "2025-10-17T20:56:28.496Z",
+      "metrics": {
+        "marketCap": "$137.76B",
+        "bpaGrowth": "N/A",
+        "peRatio": "7.93",
+        "sector": "Health Care",
+        "industry": "Pharmaceuticals",
+        "dividendYield": "7.10%",
+        "dividendFrequency": "Quarterly",
+        "exDivDate": "2025-11-07",
+        "annualPayout": "$1.72",
+        "price": "$24.51",
+        "priceChange": "+1.16%"
+      },
+      "companyProfile": {
+        "description": "Pfizer Inc. découvre, développe, fabrique, commercialise et distribue des produits biopharmaceutiques aux États-Unis et à l'international. La société propose des médicaments et des vaccins dans divers domaines thérapeutiques. Elle est impliquée dans le secteur de la fabrication à façon. La société a été fondée en 1849 et son siège social est situé à New York, New York.",
+        "employees": "81,000",
+        "innovation": "Développement de médicaments et vaccins ARNm et antiviraux potentiels sous les marques Comirnaty et Paxlovid."
+      },
+      "competition": {
+        "competitors": [
+          "Viatris Inc.",
+          "Johnson & Johnson",
+          "Merck & Co., Inc.",
+          "AbbVie Inc.",
+          "Bristol-Myers Squibb Company"
+        ],
+        "valueProposition": "N/A",
+        "advantages": "N/A"
+      },
+      "quantRating": {
+        "overall": "HOLD",
+        "valuation": "A",
+        "growth": "D-",
+        "profitability": "A+",
+        "momentum": "C-",
+        "revisions": "B"
+      },
+      "sectorAnalysis": {
+        "valuation": "N/A",
+        "growth": "N/A",
+        "profitability": "N/A",
+        "momentum": "N/A",
+        "revisions": "N/A"
+      },
+      "intermediateConclusion": "Pfizer présente une valorisation attractive avec une note 'A' et un rendement de dividende élevé de 7.10%. Cependant, sa croissance est faible (D-) et son momentum boursier est mitigé (C-). Les analystes de Seeking Alpha et de Wall Street ont une opinion globalement positive sur l'action.",
+      "strengths": [
+        "Forte rentabilité (A+)",
+        "Valorisation attractive (A)",
+        "Rendement de dividende élevé (7.10%)"
+      ],
+      "concerns": [
+        "Faible croissance (D-)",
+        "Momentum boursier faible (C-)",
+        "Ventes d'initiés"
+      ],
+      "finalConclusion": {
+        "strengths": "Pfizer se distingue par sa forte rentabilité et sa valorisation attractive, offrant un rendement de dividende élevé.",
+        "weaknesses": "La faible croissance et le momentum boursier mitigé sont des points de vigilance.",
+        "recommendation": "L'action Pfizer pourrait être intéressante pour les investisseurs axés sur la valeur et le revenu, mais nécessite une surveillance attentive de sa croissance future. Une analyse plus approfondie des catalyseurs potentiels de croissance est recommandée.",
+        "rating": "Hold"
+      }
+    },
     "TRP": {
       "ticker": "TRP",
       "companyName": "TC Energy Corporation",
