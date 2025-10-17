@@ -681,6 +681,14 @@ EXEMPLE 2 - Prix simple:
      * MODE CHAT: Réponse conversationnelle naturelle
      */
     _buildChatPrompt(userMessage, toolsData, conversationContext, intentData) {
+        const currentDate = new Date().toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const currentDateTime = new Date().toISOString();
+
         let intentContext = '';
         if (intentData) {
             intentContext = `\nINTENTION DÉTECTÉE:
@@ -691,6 +699,9 @@ EXEMPLE 2 - Prix simple:
         }
 
         return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.
+
+📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
+⚠️ CRITIQUE: Toutes les données doivent refléter les informations les plus récentes. Si une donnée est datée (ex: "au 8 août"), précise clairement que c'est une donnée ancienne et cherche des informations plus récentes si disponibles.
 
 CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
@@ -703,12 +714,13 @@ QUESTION DE L'UTILISATEUR: ${userMessage}
 INSTRUCTIONS:
 1. Réponds de manière CONVERSATIONNELLE et NATURELLE - PAS de questions clarificatrices
 2. Utilise UNIQUEMENT les données fournies par les outils (pas de données fictives)
-3. Cite tes sources (outils utilisés) en fin de réponse
-4. Sois précis mais accessible
-5. Si les données sont insuffisantes, indique-le clairement
-6. Adapte ton ton: professionnel mais chaleureux
-${intentData ? `7. L'intention de l'utilisateur est: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE avec prix, fondamentaux, technique et actualités' : 'réponds en conséquence'}` : ''}
-8. ❌ NE JAMAIS demander de clarifications supplémentaires - fournis directement l'analyse avec les données disponibles
+3. ⚠️ IMPORTANT: Vérifie les dates des données - signale si les données sont anciennes (ex: plusieurs mois) et mentionne la date actuelle: ${currentDate}
+4. Cite tes sources (outils utilisés) en fin de réponse avec leurs dates
+5. Sois précis mais accessible
+6. Si les données sont insuffisantes ou anciennes, indique-le clairement
+7. Adapte ton ton: professionnel mais chaleureux
+${intentData ? `8. L'intention de l'utilisateur est: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE avec prix, fondamentaux, technique et actualités' : 'réponds en conséquence'}` : ''}
+9. ❌ NE JAMAIS demander de clarifications supplémentaires - fournis directement l'analyse avec les données disponibles
 
 RÉPONSE:`;
     }
@@ -768,11 +780,21 @@ RÉPONSE JSON:`;
      * MODE BRIEFING: Analyse détaillée pour email
      */
     _buildBriefingPrompt(userMessage, toolsData, context, intentData) {
+        const currentDate = new Date().toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const currentDateTime = new Date().toISOString();
         const briefingType = context.briefing_type || context.type || 'general';
         const importanceLevel = intentData?.importance_level || context.importance_level || 5;
         const trendingTopics = intentData?.trending_topics || [];
 
         return `Tu es Emma Financial Analyst. Rédige une analyse approfondie MULTIMÉDIA pour un briefing ${briefingType}.
+
+📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
+⚠️ CRITIQUE: Ce briefing doit refléter les données du ${currentDate}. Toutes les dates mentionnées doivent être vérifiées et corrigées si anciennes.
 
 DONNÉES DISPONIBLES DES OUTILS:
 ${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n')}

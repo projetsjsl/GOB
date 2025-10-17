@@ -238,8 +238,15 @@
             0% { transform: scale(0.85); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+        @keyframes dan-pulse-zoom {
+            0% { transform: scale(0.5) rotate(-5deg); opacity: 0; filter: blur(10px); }
+            50% { transform: scale(1.05) rotate(2deg); filter: blur(0px); }
+            70% { transform: scale(0.98) rotate(-1deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0px); }
+        }
         .emma-intro-overlay { animation: emma-intro-fade 300ms ease-out; }
         .emma-intro-image { animation: emma-zoom-in 800ms ease-out; }
+        .dan-intro-image { animation: dan-pulse-zoom 1200ms cubic-bezier(0.34, 1.56, 0.64, 1); }
     </style>
 </head>
 <body class="min-h-screen">
@@ -2023,36 +2030,56 @@ const fetchHybridData = async (symbol, dataType) => {
                     // Utiliser jusqu'à 15000 caractères pour avoir plus de contexte
                     const textForAnalysis = fullText.substring(0, 15000);
 
-                    const geminiPrompt = `Tu es un extracteur expert de données Seeking Alpha Virtual Analyst Report. Extrais TOUTES les informations disponibles pour ${ticker}.
+                    const geminiPrompt = `EXPERT EXTRACTION - Seeking Alpha Virtual Analyst Report pour ${ticker}
+PRECISION MAXIMALE - Extraire TOUS les champs disponibles
 
-DONNEES SEEKING ALPHA (${ticker}) - ${textForAnalysis.length} caracteres:
+=== DONNEES (${textForAnalysis.length} chars) ===
 ${textForAnalysis}
 
-STRUCTURE DE LA PAGE SEEKING ALPHA:
-Une page Virtual Analyst Report contient typiquement:
-- En-tete: Nom compagnie, ticker, prix, variation, capitalisation boursiere
-- Section Key Metrics: Metriques fondamentales (P/E, croissance BPA, dividende)
-- Section Quant Ratings: Notes A-F pour Valuation, Growth, Profitability, Momentum, Revisions
-- Section Sector Analysis: Comparaison avec le secteur
-- Section Company Profile: Description, industrie, employes
-- Section Investment Thesis ou Analysis: Forces, faiblesses, recommandations
-- Section Competitors ou Peer Comparison: Entreprises concurrentes
+=== SECTIONS A EXTRAIRE ===
 
-INSTRUCTIONS D EXTRACTION:
-1. LIRE ATTENTIVEMENT toutes les donnees ci-dessus
-2. EXTRAIRE chaque metrique, note, et information presente
-3. Si une donnee n est PAS dans le texte: utiliser "N/A" (ne jamais laisser vide ou null)
-4. RESPECTER les formats: garder $ et % dans les valeurs, dates en YYYY-MM-DD
-5. TRADUIRE les descriptions en francais (mais garder les notes A-F en anglais)
-6. RETOURNER UNIQUEMENT du JSON valide sans markdown sans commentaires
+1. HEADER: companyName, ticker, price, priceChange, marketCap, volume, week52High, week52Low
 
-EXEMPLES D EXTRACTION:
-- Si tu vois "Market Cap: $95.62B" alors "marketCap": "$95.62B"
-- Si tu vois "P/E Ratio: 11.84" alors "peRatio": "11.84"
-- Si tu vois "Dividend Yield: 3.53%" alors "dividendYield": "3.53%"
-- Si tu vois "Quant Rating: A-" alors "overall": "A-"
-- Si tu vois "Valuation: B+" alors "valuation": "B+"
-- Si une donnee est absente utiliser "N/A"
+2. KEY METRICS (15+ champs):
+   - Valorisation: peRatio, forwardPE, pegRatio, priceToSales, priceToBook
+   - Rentabilite: eps, bpaGrowth, revenueGrowth, profitMargin, operatingMargin, roe, roa
+   - Sante financiere: debtToEquity, currentRatio, quickRatio
+   - Secteur: sector, industry
+
+3. DIVIDEND (7 champs): dividendYield, annualPayout, payoutRatio, dividendFrequency, exDivDate, dividendGrowthRate, yearsOfDividendGrowth
+
+4. QUANT RATINGS (6 notes A-F): overall, valuation, growth, profitability, momentum, revisions
+
+5. SECTOR ANALYSIS: sectorName, sectorPE, sectorGrowth, relativeValuation, marketPosition, sectorPerformanceYTD
+
+6. COMPANY PROFILE (9 champs): description (francais), founded, headquarters, employees, ceo, website, businessModel, keyProducts, revenueBreakdown
+
+7. COMPETITORS: competitors (array 3-5), valueProposition, advantages, marketShare, differentiation
+
+8. INVESTMENT THESIS: bullCase (array), bearCase (array), catalysts (array), risks (array), growthDrivers (array)
+
+9. VALUATION: fairValue, upsideDownside, method, priceTarget, targetDate
+
+10. TECHNICAL: rsi, macd, movingAverages, supportLevel, resistanceLevel
+
+11. ANALYSTS: consensus, numberOfAnalysts, buyRatings, holdRatings, sellRatings, averagePriceTarget
+
+12. EARNINGS: nextEarningsDate, lastQuarterEPS, epsEstimate, epsSurprise, lastQuarterRevenue, revenueEstimate, yoyRevenueGrowth
+
+=== REGLES CRITIQUES ===
+A. Chercher VARIANTES: "PE Ratio" = "P/E" = "Price to Earnings" = "Price-Earnings"
+B. FORMATS: Garder $ et %, dates YYYY-MM-DD, notes A+ a F, notation K/M/B/T
+C. Si absent: "N/A" (JAMAIS null/vide)
+D. Traduire descriptions en francais, garder notes A-F en anglais
+E. Verifier coherence: peRatio vs price/eps, dividendYield vs payout/price
+
+=== EXEMPLES ===
+"Apple Inc. (AAPL) $247.25 +1.96% Cap: $3.85T" → companyName:"Apple Inc.", price:"$247.25", priceChange:"+1.96%", marketCap:"$3.85T"
+"P/E: 32.4 | Forward P/E: 28.5 | EPS: $7.58" → peRatio:"32.4", forwardPE:"28.5", eps:"$7.58"
+"Overall: A- | Valuation: B+ | Growth: A" → quantRating: {overall:"A-", valuation:"B+", growth:"A"}
+"Dividend: 3.53% | $2.66/year | Quarterly" → dividendYield:"3.53%", annualPayout:"$2.66", dividendFrequency:"Quarterly"
+
+=== RETOURNER JSON PUR (sans markdown) ===
 
 STRUCTURE JSON OBLIGATOIRE:
 {
@@ -2060,51 +2087,62 @@ STRUCTURE JSON OBLIGATOIRE:
   "companyName": "Nom complet de l'entreprise",
   "lastUpdate": "${new Date().toISOString()}",
   "metrics": {
-    "marketCap": "Capitalisation (ex: $95.62B)",
-    "bpaGrowth": "Croissance BPA % (ex: -6.45%)",
-    "peRatio": "P/E ratio (ex: 11.84)",
-    "sector": "Secteur",
-    "industry": "Industrie spécifique",
-    "dividendYield": "Rendement % (ex: 3.53%)",
-    "dividendFrequency": "Quarterly/Annual/etc",
-    "exDivDate": "Date ex-dividende YYYY-MM-DD",
-    "annualPayout": "Paiement annuel $ (ex: 2.66)",
-    "price": "Prix actuel $ (ex: 76.87)",
-    "priceChange": "Variation % (ex: +1.96%)"
+    "marketCap": "N/A", "price": "N/A", "priceChange": "N/A", "volume": "N/A",
+    "week52High": "N/A", "week52Low": "N/A",
+    "peRatio": "N/A", "forwardPE": "N/A", "pegRatio": "N/A",
+    "priceToSales": "N/A", "priceToBook": "N/A",
+    "eps": "N/A", "bpaGrowth": "N/A", "revenueGrowth": "N/A",
+    "profitMargin": "N/A", "operatingMargin": "N/A", "roe": "N/A", "roa": "N/A",
+    "debtToEquity": "N/A", "currentRatio": "N/A", "quickRatio": "N/A",
+    "sector": "N/A", "industry": "N/A",
+    "dividendYield": "N/A", "annualPayout": "N/A", "payoutRatio": "N/A",
+    "dividendFrequency": "N/A", "exDivDate": "N/A",
+    "dividendGrowthRate": "N/A", "yearsOfDividendGrowth": "N/A"
   },
   "companyProfile": {
-    "description": "Description en français (3-4 phrases)",
-    "employees": "Nombre d'employés si dispo",
-    "innovation": "Investissements clés récents"
+    "description": "N/A", "founded": "N/A", "headquarters": "N/A",
+    "employees": "N/A", "ceo": "N/A", "website": "N/A",
+    "businessModel": "N/A", "keyProducts": "N/A", "revenueBreakdown": "N/A"
   },
   "competition": {
-    "competitors": ["Concurrent 1", "Concurrent 2", "Concurrent 3"],
-    "valueProposition": "Proposition de valeur unique",
-    "advantages": "Avantages compétitifs"
+    "competitors": [], "valueProposition": "N/A",
+    "advantages": "N/A", "marketShare": "N/A", "differentiation": "N/A"
   },
   "quantRating": {
-    "overall": "Note globale A-F",
-    "valuation": "Note valorisation A-F",
-    "growth": "Note croissance A-F",
-    "profitability": "Note rentabilité A-F",
-    "momentum": "Note momentum A-F",
-    "revisions": "Note révisions analystes A-F"
+    "overall": "N/A", "valuation": "N/A", "growth": "N/A",
+    "profitability": "N/A", "momentum": "N/A", "revisions": "N/A"
   },
   "sectorAnalysis": {
-    "valuation": "Analyse valorisation vs secteur",
-    "growth": "Analyse croissance vs secteur",
-    "profitability": "Analyse rentabilité",
-    "momentum": "Analyse momentum boursier",
-    "revisions": "Analyse révisions analystes"
+    "sectorName": "N/A", "sectorPE": "N/A", "sectorGrowth": "N/A",
+    "relativeValuation": "N/A", "marketPosition": "N/A", "sectorPerformanceYTD": "N/A"
   },
-  "intermediateConclusion": "Conclusion intermédiaire 2-3 phrases",
-  "strengths": ["Force 1", "Force 2", "Force 3"],
-  "concerns": ["Préoccupation 1", "Préoccupation 2", "Préoccupation 3"],
+  "investmentThesis": {
+    "bullCase": [], "bearCase": [], "catalysts": [],
+    "risks": [], "growthDrivers": []
+  },
+  "valuation": {
+    "fairValue": "N/A", "upsideDownside": "N/A", "method": "N/A",
+    "priceTarget": "N/A", "targetDate": "N/A"
+  },
+  "technicalAnalysis": {
+    "rsi": "N/A", "macd": "N/A", "movingAverages": "N/A",
+    "supportLevel": "N/A", "resistanceLevel": "N/A"
+  },
+  "analystRecommendations": {
+    "consensus": "N/A", "numberOfAnalysts": "N/A", "buyRatings": "N/A",
+    "holdRatings": "N/A", "sellRatings": "N/A", "averagePriceTarget": "N/A"
+  },
+  "earnings": {
+    "nextEarningsDate": "N/A", "lastQuarterEPS": "N/A", "epsEstimate": "N/A",
+    "epsSurprise": "N/A", "lastQuarterRevenue": "N/A",
+    "revenueEstimate": "N/A", "yoyRevenueGrowth": "N/A"
+  },
+  "intermediateConclusion": "N/A",
+  "strengths": [],
+  "concerns": [],
   "finalConclusion": {
-    "strengths": "Résumé forces",
-    "weaknesses": "Résumé faiblesses",
-    "recommendation": "Recommandation détaillée avec rationale",
-    "rating": "Buy/Hold/Sell"
+    "strengths": "N/A", "weaknesses": "N/A",
+    "recommendation": "N/A", "rating": "N/A"
   }
 }`;
 
@@ -9480,9 +9518,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                         if (!hasHistory) {
                             // Aucun historique sauvegardé - ajouter welcome message
-                            const welcomeMessage = useFunctionCalling
-                                ? 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister ?**\n\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières en temps réel\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n- Accès direct aux APIs financières (Finnhub, Alpha Vantage, etc.)\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?'
-                                : 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister ?**\n\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n\n**Exemples de questions :**\n- "Analyse le profil de Microsoft"\n- "Quelles sont les tendances du marché ?"\n- "Explique-moi le ratio P/E"\n- "Comment naviguer dans le dashboard ?"\n\nComment puis-je vous assister aujourd\'hui ?';
+                            const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister aujourd\'hui ?**';
 
                             setEmmaMessages([{
                                 type: 'emma',
@@ -9847,13 +9883,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                 const saveFunctionCalling = () => {
                     localStorage.setItem('emma-function-calling', useFunctionCalling.toString());
-                    
+
                     // Mettre à jour le message de bienvenue si c'est le premier message
                     if (emmaMessages.length === 1 && emmaMessages[0].type === 'emma') {
-                        const welcomeMessage = useFunctionCalling
-                            ? 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister ?**\n\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières en temps réel\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n- Accès direct aux APIs financières (Finnhub, Alpha Vantage, etc.)\n\n**Exemples de questions :**\n- "Quel est le prix actuel d\'AAPL ?"\n- "Récupère les actualités sur Tesla"\n- "Analyse le profil de Microsoft"\n- "Vérifie le statut des APIs"\n\nComment puis-je vous assister avec des données en temps réel ?'
-                            : 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister ?**\n\n- Analyse financière et évaluation d\'entreprises\n- Données de marché et actualités financières\n- Recommandations d\'investissement et stratégies\n- Support technique et navigation dans l\'interface\n\n**Exemples de questions :**\n- "Analyse le profil de Microsoft"\n- "Quelles sont les tendances du marché ?"\n- "Explique-moi le ratio P/E"\n- "Comment naviguer dans le dashboard ?"\n\nComment puis-je vous assister aujourd\'hui ?';
-                        
+                        const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. 🚀\n\n**Comment puis-je vous assister aujourd\'hui ?**';
+
                         setEmmaMessages([{
                             type: 'emma',
                             content: welcomeMessage,
@@ -15660,7 +15694,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     <img
                                         src={`daniel-ouellet.jpg?v=${Date.now()}`}
                                         alt="Daniel Ouellet"
-                                        className="emma-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-blue-500"
+                                        className="dan-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-blue-500"
                                     />
                                 </div>
                                 <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">Dan's Watchlist</h2>
