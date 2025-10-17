@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         GOB Seeking Alpha Auto-Scraper
 // @namespace    https://gobapps.com
-// @version      1.1
-// @description  Scrape automatiquement les pages Seeking Alpha Virtual Analyst Report
+// @version      1.2
+// @description  Scrape automatiquement les pages Seeking Alpha Virtual Analyst Report (BATCH MODE)
 // @author       GOB Dashboard
 // @match        https://seekingalpha.com/symbol/*/virtual_analyst_report*
 // @match        https://www.seekingalpha.com/symbol/*/virtual_analyst_report*
@@ -117,69 +117,10 @@
                 console.warn(`⚠️ Erreur sauvegarde (${saveResponse.status})`);
             }
 
-            // 2. Analyser avec Perplexity
-            updateStatus('Analyse Perplexity...', 'yellow');
-            console.log('🤖 Analyse Perplexity...');
-
-            const textForAnalysis = fullText.substring(0, 15000);
-
-            const analysisResponse = await fetch('https://gobapps.com/api/emma-agent', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: `Analyse ces données Seeking Alpha pour ${ticker} et structure-les selon le schéma seeking_alpha_analysis:\n\n${textForAnalysis}`,
-                    context: {
-                        output_mode: 'data',
-                        ticker: ticker,
-                        task: 'seeking_alpha_analysis'
-                    }
-                })
-            });
-
-            if (analysisResponse.ok) {
-                const analysisData = await analysisResponse.json();
-                console.log(`✅ Analyse Perplexity terminée`);
-
-                // Extraire et parser le JSON
-                let analysisToSave = {};
-
-                if (typeof analysisData.response === 'string') {
-                    let responseText = analysisData.response;
-                    responseText = responseText.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
-
-                    const firstBrace = responseText.indexOf('{');
-                    const lastBrace = responseText.lastIndexOf('}');
-
-                    if (firstBrace !== -1 && lastBrace !== -1) {
-                        responseText = responseText.substring(firstBrace, lastBrace + 1);
-                        try {
-                            analysisToSave = JSON.parse(responseText);
-                        } catch (e) {
-                            console.warn('⚠️ Impossible de parser le JSON');
-                        }
-                    }
-                } else if (typeof analysisData.response === 'object') {
-                    analysisToSave = analysisData.response;
-                }
-
-                // 3. Sauvegarder l'analyse
-                const analysisSaveResponse = await fetch('https://gobapps.com/api/seeking-alpha-scraping?type=analysis', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ticker: ticker,
-                        ...analysisToSave
-                    })
-                });
-
-                if (analysisSaveResponse.ok) {
-                    console.log(`✅ Analyse structurée sauvegardée`);
-                    updateStatus('Analyse sauvegardée ✅', 'lightgreen');
-                }
-            } else {
-                console.warn(`⚠️ Erreur analyse Perplexity`);
-                updateStatus('Analyse échouée ⚠️', 'orange');
-            }
+            // 2. SKIP Perplexity (mode BATCH - on analyse tout à la fin!)
+            console.log('⏭️ Analyse Perplexity sera faite en BATCH plus tard');
+            console.log('💡 Utilisez le bouton "Analyser TOUT avec Perplexity" dans le dashboard');
+            updateStatus('Scraping terminé - Analyse en batch plus tard ⏭️', 'lightgreen');
 
             // SUCCESS!
             console.log(`\n🎉 TRAITEMENT COMPLET POUR ${ticker}!\n`);
