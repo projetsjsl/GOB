@@ -6790,29 +6790,84 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
                         // Appel Emma Agent en MODE BRIEFING
                         console.log('🔄 Appel Emma Agent API en MODE BRIEFING...');
+                        setStepDetails('⏳ Génération du briefing via Emma Agent... (cela peut prendre 2-3 minutes)');
                         addLogEntry('API_CALL_START', 'Début appel Emma Agent API', {
                             endpoint: '/api/emma-agent',
                             mode: 'briefing',
-                            promptLength: briefingMessage.length
+                            promptLength: briefingMessage.length,
+                            timestamp: new Date().toISOString()
                         }, 'info');
 
-                        const analysisResponse = await fetch('/api/emma-agent', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                message: briefingMessage,
-                                context: {
-                                    output_mode: 'briefing',  // ← MODE BRIEFING
-                                    briefing_type: type,
+                        // Timers pour tenir l'utilisateur informé
+                        const startTime = Date.now();
+
+                        // Warning 1: après 60s
+                        const warningTimer1 = setTimeout(() => {
+                            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                            console.log(`⏰ Génération en cours: ${elapsed}s...`);
+                            setStepDetails(`⏳ Analyse en profondeur... ${elapsed}s (Emma collecte et analyse les données)`);
+                        }, 60000);
+
+                        // Warning 2: après 120s
+                        const warningTimer2 = setTimeout(() => {
+                            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                            console.log(`⏰ Génération toujours en cours: ${elapsed}s...`);
+                            setStepDetails(`⏳ Génération complexe... ${elapsed}s (Emma génère le briefing détaillé)`);
+                        }, 120000);
+
+                        // Warning 3: après 180s
+                        const warningTimer3 = setTimeout(() => {
+                            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                            console.log(`⏰ Finalisation: ${elapsed}s...`);
+                            setStepDetails(`⏳ Finalisation imminente... ${elapsed}s (max 300s)`);
+                        }, 180000);
+
+                        let analysisResponse;
+                        try {
+                            analysisResponse = await fetch('/api/emma-agent', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    message: briefingMessage,
+                                    context: {
+                                        output_mode: 'briefing',  // ← MODE BRIEFING
+                                        briefing_type: type,
                                     intent_data: intentData,
-                                    smart_data: smartData,
-                                    tickers: intentData.key_tickers || teamTickers,
-                                    importance_level: intentData.importance_level,
-                                    trending_topics: intentData.trending_topics
-                                }
-                            }),
-                            signal: AbortSignal.timeout(120000)
-                        });
+                                        smart_data: smartData,
+                                        tickers: intentData.key_tickers || teamTickers,
+                                        importance_level: intentData.importance_level,
+                                        trending_topics: intentData.trending_topics
+                                    }
+                                }),
+                                signal: AbortSignal.timeout(300000) // 5 minutes pour briefing complexe
+                            });
+
+                            clearTimeout(warningTimer1);
+                            clearTimeout(warningTimer2);
+                            clearTimeout(warningTimer3);
+                            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                            console.log(`✅ API responded after ${elapsed}s`);
+
+                        } catch (fetchError) {
+                            clearTimeout(warningTimer1);
+                            clearTimeout(warningTimer2);
+                            clearTimeout(warningTimer3);
+                            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+                            console.error('❌ Fetch Error after', elapsed, 's:', fetchError);
+                            addLogEntry('FETCH_ERROR', 'Erreur fetch Emma Agent', {
+                                error: fetchError.message,
+                                name: fetchError.name,
+                                type: fetchError.constructor.name,
+                                elapsed_seconds: elapsed,
+                                isTimeout: fetchError.name === 'TimeoutError' || fetchError.name === 'AbortError'
+                            }, 'error');
+
+                            if (fetchError.name === 'TimeoutError' || fetchError.name === 'AbortError') {
+                                throw new Error(`⏱️ Timeout: L'API n'a pas répondu en 2 minutes. L'analyse est trop complexe. Réessayez plus tard.`);
+                            }
+                            throw new Error(`🌐 Erreur réseau: ${fetchError.message}`);
+                        }
 
                         console.log('📡 Emma Agent Response Status:', analysisResponse.status, analysisResponse.statusText);
                         addLogEntry('API_RESPONSE', 'Réponse Emma Agent reçue', {
