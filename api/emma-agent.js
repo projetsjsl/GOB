@@ -130,6 +130,25 @@ CONTEXTE DISPONIBLE:
 - Tickers d'équipe: ${context.tickers?.join(', ') || 'aucun'}
 - Données en cache: ${Object.keys(context.stockData || {}).join(', ') || 'aucunes'}
 
+COMPANY NAME TO TICKER MAPPING (OBLIGATOIRE):
+Apple → AAPL
+Microsoft → MSFT
+Google/Alphabet → GOOGL
+Amazon → AMZN
+Tesla → TSLA
+Meta/Facebook → META
+Nvidia → NVDA
+AMD → AMD
+Intel → INTC
+Netflix → NFLX
+Disney → DIS
+Coca-Cola → KO
+McDonald's → MCD
+Nike → NKE
+Visa → V
+
+⚠️ CRITIQUE: Utilise UNIQUEMENT ce mapping. Si "Apple" est mentionné, le ticker DOIT être "AAPL", jamais GOOGL!
+
 OUTILS DISPONIBLES:
 - polygon-stock-price: Prix actions temps réel
 - fmp-fundamentals: Données fondamentales (PE, revenus, marges)
@@ -146,10 +165,15 @@ OUTILS DISPONIBLES:
 
 INSTRUCTIONS:
 1. Détermine l'INTENTION principale: stock_price, fundamentals, technical_analysis, news, portfolio_analysis, market_overview, calculation, comparative_analysis
-2. Extrais les TICKERS mentionnés (convertis "Apple" → "AAPL", "Tesla" → "TSLA", "Microsoft" → "MSFT", "Google" → "GOOGL", etc.)
+2. Extrais les TICKERS mentionnés en utilisant STRICTEMENT le COMPANY NAME TO TICKER MAPPING ci-dessus
 3. Détermine les OUTILS NÉCESSAIRES (1-5 outils max, par ordre de pertinence)
 4. Détecte si CLARIFICATION NÉCESSAIRE (confidence < 0.5 ou paramètres manquants)
 5. Extrais PARAMÈTRES ADDITIONNELS (dates, périodes, types d'analyse)
+
+EXEMPLES DE MAPPING CORRECT:
+- "Prix d'Apple" → tickers: ["AAPL"]
+- "Analyse Microsoft et Google" → tickers: ["MSFT", "GOOGL"]
+- "Tesla vs Nvidia" → tickers: ["TSLA", "NVDA"]
 
 RÉPONDS EN JSON UNIQUEMENT (pas de texte avant ou après):
 {
