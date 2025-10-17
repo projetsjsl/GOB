@@ -14385,7 +14385,12 @@ console.log('✅ Données hybrides récupérées:', {
                 const [filterImpact, setFilterImpact] = useState('all'); // all, 1, 2, 3
                 const [filterCurrency, setFilterCurrency] = useState('all');
                 const [filterTicker, setFilterTicker] = useState('all'); // For earnings/dividends
+                const [filterTickerGroup, setFilterTickerGroup] = useState('all'); // all, team, watchlist, both
                 const [dateRange, setDateRange] = useState('week'); // today, week, month
+
+                // Team and Watchlist tickers
+                const [teamTickers, setTeamTickers] = useState([]);
+                const [watchlistTickers, setWatchlistTickers] = useState([]);
 
                 // Helper function for fallback data
                 const getFallbackData = () => {
@@ -14419,11 +14424,52 @@ console.log('✅ Données hybrides récupérées:', {
                 console.log('📊 Données init:', calendarData);
                 console.log('🔧 État du composant:', { activeSubTab, loading, error });
 
+                // Load team and watchlist tickers once on mount
+                React.useEffect(() => {
+                    const loadTickers = async () => {
+                        try {
+                            // Try to fetch from API first
+                            const response = await fetch('/api/tickers-config');
+                            const data = await response.json();
+
+                            if (data.success) {
+                                setTeamTickers(data.team_tickers || []);
+                                console.log(`✅ Team tickers loaded: ${data.team_tickers?.length || 0}`);
+                            }
+                        } catch (error) {
+                            console.error('❌ Error loading team tickers:', error);
+                        }
+
+                        try {
+                            // Load watchlist from Supabase
+                            const response = await fetch('/api/supabase-watchlist');
+                            const data = await response.json();
+
+                            if (data.tickers && Array.isArray(data.tickers)) {
+                                setWatchlistTickers(data.tickers);
+                                console.log(`✅ Watchlist tickers loaded: ${data.tickers.length}`);
+                            }
+                        } catch (error) {
+                            console.error('❌ Error loading watchlist tickers:', error);
+                            // Fallback to localStorage
+                            const savedWatchlist = localStorage.getItem('dans-watchlist');
+                            if (savedWatchlist) {
+                                const tickers = JSON.parse(savedWatchlist);
+                                setWatchlistTickers(tickers);
+                                console.log(`📦 Watchlist loaded from localStorage: ${tickers.length}`);
+                            }
+                        }
+                    };
+
+                    loadTickers();
+                }, []);
+
                 // Charger les données au changement d'onglet
                 React.useEffect(() => {
                     fetchCalendarData();
-                    // Reset ticker filter when switching tabs
+                    // Reset ticker filters when switching tabs
                     setFilterTicker('all');
+                    setFilterTickerGroup('all');
                 }, [activeSubTab]);
 
                 const fetchCalendarData = async () => {
@@ -14547,6 +14593,25 @@ console.log('✅ Données hybrides récupérées:', {
                             }
                         }
 
+                        // Ticker Group filter (Team/Watchlist/Both)
+                        if (filterTickerGroup !== 'all' && (activeSubTab === 'earnings' || activeSubTab === 'dividends')) {
+                            const ticker = extractTicker(event.event);
+                            if (!ticker) return false;
+
+                            const inTeam = teamTickers.includes(ticker);
+                            const inWatchlist = watchlistTickers.includes(ticker);
+
+                            if (filterTickerGroup === 'team' && !inTeam) {
+                                return false;
+                            }
+                            if (filterTickerGroup === 'watchlist' && !inWatchlist) {
+                                return false;
+                            }
+                            if (filterTickerGroup === 'both' && !(inTeam || inWatchlist)) {
+                                return false;
+                            }
+                        }
+
                         return true;
                     });
 
@@ -14596,7 +14661,7 @@ console.log('✅ Données hybrides récupérées:', {
                             <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-4 mb-4`}>
                                 <div className={`grid grid-cols-1 gap-3 ${
                                     activeSubTab === 'earnings' || activeSubTab === 'dividends'
-                                        ? 'md:grid-cols-5'
+                                        ? 'md:grid-cols-6'
                                         : 'md:grid-cols-4'
                                 }`}>
                                     {/* Search Box */}
@@ -14614,19 +14679,48 @@ console.log('✅ Données hybrides récupérées:', {
                                         />
                                     </div>
 
-                                    {/* Ticker Filter - Only for Earnings/Dividends */}
+                                    {/* Ticker Group Filter - Only for Earnings/Dividends */}
                                     {(activeSubTab === 'earnings' || activeSubTab === 'dividends') && (
                                         <div>
                                             <select
-                                                value={filterTicker}
-                                                onChange={(e) => setFilterTicker(e.target.value)}
+                                                value={filterTickerGroup}
+                                                onChange={(e) => {
+                                                    setFilterTickerGroup(e.target.value);
+                                                    // Reset individual ticker filter when changing group
+                                                    if (e.target.value !== 'all') {
+                                                        setFilterTicker('all');
+                                                    }
+                                                }}
                                                 className={`w-full px-3 py-2 rounded-md text-sm ${
                                                     isDarkMode
                                                         ? 'bg-gray-700 text-white border-gray-600'
                                                         : 'bg-white text-gray-900 border-gray-300'
                                                 } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                             >
-                                                <option value="all">All Tickers ({availableTickers.length})</option>
+                                                <option value="all">All Stocks</option>
+                                                <option value="team">👥 Team ({teamTickers.length})</option>
+                                                <option value="watchlist">⭐ Watchlist ({watchlistTickers.length})</option>
+                                                <option value="both">🎯 Team + Watchlist ({teamTickers.length + watchlistTickers.length})</option>
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    {/* Ticker Filter - Only for Earnings/Dividends */}
+                                    {(activeSubTab === 'earnings' || activeSubTab === 'dividends') && (
+                                        <div>
+                                            <select
+                                                value={filterTicker}
+                                                onChange={(e) => setFilterTicker(e.target.value)}
+                                                disabled={filterTickerGroup !== 'all'}
+                                                className={`w-full px-3 py-2 rounded-md text-sm ${
+                                                    isDarkMode
+                                                        ? 'bg-gray-700 text-white border-gray-600'
+                                                        : 'bg-white text-gray-900 border-gray-300'
+                                                } border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                                    filterTickerGroup !== 'all' ? 'opacity-50 cursor-not-allowed' : ''
+                                                }`}
+                                            >
+                                                <option value="all">Specific Ticker ({availableTickers.length})</option>
                                                 {availableTickers.map(ticker => (
                                                     <option key={ticker} value={ticker}>
                                                         {ticker}
@@ -14676,12 +14770,19 @@ console.log('✅ Données hybrides récupérées:', {
                                 </div>
 
                                 {/* Active Filters Display */}
-                                {(searchQuery || filterImpact !== 'all' || filterCurrency !== 'all' || filterTicker !== 'all') && (
+                                {(searchQuery || filterImpact !== 'all' || filterCurrency !== 'all' || filterTicker !== 'all' || filterTickerGroup !== 'all') && (
                                     <div className="flex flex-wrap gap-2 mt-3">
                                         <span className="text-xs text-gray-400">Active filters:</span>
                                         {searchQuery && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
                                                 Search: "{searchQuery}"
+                                            </span>
+                                        )}
+                                        {filterTickerGroup !== 'all' && (
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-cyan-900 text-cyan-200' : 'bg-cyan-100 text-cyan-800'}`}>
+                                                {filterTickerGroup === 'team' ? '👥 Team Tickers' :
+                                                 filterTickerGroup === 'watchlist' ? '⭐ Watchlist Tickers' :
+                                                 '🎯 Team + Watchlist'}
                                             </span>
                                         )}
                                         {filterTicker !== 'all' && (
@@ -14705,6 +14806,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 setFilterImpact('all');
                                                 setFilterCurrency('all');
                                                 setFilterTicker('all');
+                                                setFilterTickerGroup('all');
                                             }}
                                             className="text-xs text-red-400 hover:text-red-300 underline"
                                         >
