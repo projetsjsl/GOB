@@ -11590,6 +11590,26 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 const aiDataCache = new Map();
                 const AI_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
+                // 🚨 KILLSWITCH: Limite de sécurité pour éviter les coûts excessifs
+                const perplexityCallLog = [];
+                const MAX_PERPLEXITY_CALLS_PER_HOUR = 30; // Maximum 30 appels/heure
+
+                const canCallPerplexity = () => {
+                    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+                    const recentCalls = perplexityCallLog.filter(timestamp => timestamp > oneHourAgo);
+
+                    if (recentCalls.length >= MAX_PERPLEXITY_CALLS_PER_HOUR) {
+                        console.error(`🚨 KILLSWITCH ACTIVÉ: ${recentCalls.length} appels Perplexity dans la dernière heure (max: ${MAX_PERPLEXITY_CALLS_PER_HOUR})`);
+                        return false;
+                    }
+                    return true;
+                };
+
+                const logPerplexityCall = () => {
+                    perplexityCallLog.push(Date.now());
+                    console.log(`📊 Appels Perplexity: ${perplexityCallLog.filter(t => t > Date.now() - 3600000).length} dans la dernière heure`);
+                };
+
                 const getCachedAIData = (symbol) => {
                     const cached = aiDataCache.get(symbol);
                     if (cached && (Date.now() - cached.timestamp) < AI_CACHE_TTL) {
@@ -11671,7 +11691,14 @@ Génère une analyse JSON avec EXACTEMENT cette structure (pas de texte avant/ap
                         const cached = getCachedAIData(symbol);
                         if (cached) return cached;
 
+                        // 🚨 KILLSWITCH: Vérifier la limite d'appels
+                        if (!canCallPerplexity()) {
+                            console.error(`🚨 KILLSWITCH: Limite d'appels Perplexity atteinte pour ${symbol}`);
+                            throw new Error('Limite d\'appels Perplexity atteinte (protection coûts)');
+                        }
+
                         console.log(`🤖 Appel Perplexity batch pour ${symbol}...`);
+                        logPerplexityCall(); // Enregistrer l'appel
 
                         const prompt = buildBatchPrompt(symbol, stockData);
 
