@@ -238,44 +238,8 @@
             0% { transform: scale(0.85); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        @keyframes dan-pulse-zoom {
-            0% {
-                transform: scale(0.3) rotate(-15deg) translateY(-50px);
-                opacity: 0;
-                filter: blur(20px) brightness(0.5);
-                box-shadow: 0 0 0 rgba(59, 130, 246, 0);
-            }
-            40% {
-                transform: scale(1.15) rotate(5deg) translateY(0);
-                filter: blur(0px) brightness(1.2);
-                box-shadow: 0 0 80px rgba(59, 130, 246, 0.8);
-            }
-            60% {
-                transform: scale(0.95) rotate(-2deg);
-                filter: brightness(1);
-                box-shadow: 0 0 60px rgba(59, 130, 246, 0.6);
-            }
-            80% {
-                transform: scale(1.03) rotate(1deg);
-                box-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
-            }
-            100% {
-                transform: scale(1) rotate(0deg) translateY(0);
-                opacity: 1;
-                filter: blur(0px) brightness(1);
-                box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-            }
-        }
-        @keyframes dan-glow {
-            0%, 100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
-            50% { box-shadow: 0 0 60px rgba(59, 130, 246, 0.6); }
-        }
         .emma-intro-overlay { animation: emma-intro-fade 300ms ease-out; }
         .emma-intro-image { animation: emma-zoom-in 800ms ease-out; }
-        .dan-intro-image {
-            animation: dan-pulse-zoom 1600ms cubic-bezier(0.34, 1.56, 0.64, 1),
-                       dan-glow 3s ease-in-out infinite 1.6s;
-        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -15721,9 +15685,9 @@ console.log('✅ Données hybrides récupérées:', {
                             <div className="text-center">
                                 <div className="mb-6">
                                     <img
-                                        src={`daniel-ouellet.jpg?v=${Date.now()}`}
+                                        src={`daniel-ouellet2.jpg?v=${Date.now()}`}
                                         alt="Daniel Ouellet"
-                                        className="dan-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-blue-500"
+                                        className="emma-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-blue-500"
                                     />
                                 </div>
                                 <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">Dan's Watchlist</h2>
