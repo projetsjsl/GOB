@@ -20,40 +20,37 @@ export default async function handler(req, res) {
     }
 
     try {
-        console.log('🔄 Récupération du calendrier économique depuis Finviz...');
-        
-        // Headers pour éviter d'être bloqué
-        const headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-        };
+        console.log('🔄 Récupération du calendrier économique depuis FMP...');
 
-        // Récupérer les données depuis Finviz
-        const response = await fetch('https://finviz.com/calendar.ashx', {
-            headers,
-            timeout: 30000
-        });
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP: ${response.status}`);
+        const FMP_API_KEY = process.env.FMP_API_KEY;
+        if (!FMP_API_KEY) {
+            throw new Error('FMP_API_KEY non configurée');
         }
 
-        const htmlContent = await response.text();
-        console.log('✅ Données Finviz récupérées');
+        // Récupérer les événements économiques des 7 prochains jours depuis FMP
+        const from = new Date().toISOString().split('T')[0];
+        const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-        // Parser le HTML pour extraire les événements
-        const events = parseFinvizCalendar(htmlContent);
-        
+        const response = await fetch(
+            `https://financialmodelingprep.com/api/v3/economic_calendar?from=${from}&to=${to}&apikey=${FMP_API_KEY}`
+        );
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP FMP: ${response.status}`);
+        }
+
+        const fmpData = await response.json();
+        console.log('✅ Données FMP récupérées');
+
+        // Convertir le format FMP vers le format attendu
+        const events = parseFMPCalendar(fmpData);
+
         console.log(`📊 ${events.length} jours d'événements trouvés`);
 
         return res.status(200).json({
             success: true,
             data: events,
-            source: 'finviz.com',
+            source: 'fmp',
             timestamp: new Date().toISOString()
         });
 
@@ -73,83 +70,63 @@ export default async function handler(req, res) {
     }
 }
 
-function parseFinvizCalendar(htmlContent) {
-    // Parser simple pour extraire les événements du calendrier Finviz
-    const events = [];
-    
-    // Rechercher les lignes avec des heures
-    const timePattern = /(\d{1,2}:\d{2}\s+(AM|PM))/g;
-    const lines = htmlContent.split('\n');
-    
-    let currentDate = null;
-    
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        
-        // Détecter les lignes de date
-        if (line.match(/[A-Za-z]{3}\s+\d{1,2}/)) {
-            currentDate = line.trim();
-            continue;
+function parseFMPCalendar(fmpData) {
+    // Convertir le format FMP vers le format attendu par le frontend
+    const eventsByDate = {};
+
+    fmpData.forEach(item => {
+        // Formater la date (ex: "2024-10-17" -> "Wed Oct 17")
+        const date = new Date(item.date);
+        const dateStr = date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        // Déterminer l'impact basé sur le nom de l'événement
+        let impact = 2; // Medium par défaut
+        const eventLower = item.event.toLowerCase();
+        if (eventLower.includes('fed') || eventLower.includes('cpi') ||
+            eventLower.includes('nfp') || eventLower.includes('gdp') ||
+            eventLower.includes('interest rate') || eventLower.includes('unemployment')) {
+            impact = 3; // High
+        } else if (eventLower.includes('speech') || eventLower.includes('minutes')) {
+            impact = 1; // Low
         }
-        
-        // Détecter les événements avec heures
-        const timeMatch = line.match(timePattern);
-        if (timeMatch && currentDate) {
-            const time = timeMatch[0];
-            
-            // Extraire le nom de l'événement (simplifié)
-            const eventMatch = line.match(/>\s*\d{1,2}:\d{2}\s+(AM|PM)\s+(.+?)(?:\s+\d|$)/);
-            if (eventMatch) {
-                const eventName = eventMatch[2].trim();
-                
-                // Éviter les doublons et lignes de navigation
-                if (!eventName.includes('Release') && !eventName.includes('Home')) {
-                    // Déterminer la devise
-                    let currency = 'USD';
-                    if (eventName.includes('Eurozone') || eventName.includes('ECB')) {
-                        currency = 'EUR';
-                    } else if (eventName.includes('Bank of England') || eventName.includes('BoE')) {
-                        currency = 'GBP';
-                    }
-                    
-                    // Déterminer l'impact
-                    let impact = 2; // Medium par défaut
-                    if (eventName.includes('Fed') || eventName.includes('CPI') || eventName.includes('NFP')) {
-                        impact = 3; // High
-                    }
-                    
-                    // Ajouter l'événement
-                    const existingDay = events.find(day => day.date === currentDate);
-                    if (existingDay) {
-                        existingDay.events.push({
-                            time,
-                            currency,
-                            impact,
-                            event: eventName,
-                            actual: 'N/A',
-                            forecast: 'N/A',
-                            previous: 'N/A'
-                        });
-                    } else {
-                        events.push({
-                            date: currentDate,
-                            events: [{
-                                time,
-                                currency,
-                                impact,
-                                event: eventName,
-                                actual: 'N/A',
-                                forecast: 'N/A',
-                                previous: 'N/A'
-                            }]
-                        });
-                    }
-                }
-            }
+
+        // Formater l'heure
+        const time = item.date ? new Date(item.date).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        }) : 'TBD';
+
+        const event = {
+            time,
+            currency: item.currency || 'USD',
+            impact,
+            event: item.event,
+            actual: item.actual || 'N/A',
+            forecast: item.estimate || item.forecast || 'N/A',
+            previous: item.previous || 'N/A'
+        };
+
+        if (!eventsByDate[dateStr]) {
+            eventsByDate[dateStr] = {
+                date: dateStr,
+                events: []
+            };
         }
-    }
-    
-    return events;
+
+        eventsByDate[dateStr].events.push(event);
+    });
+
+    // Convertir l'objet en tableau et trier par date
+    return Object.values(eventsByDate).sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+    });
 }
 
 function getFallbackData() {

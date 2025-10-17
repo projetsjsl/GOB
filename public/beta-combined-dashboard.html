@@ -206,8 +206,8 @@ const fetchHybridData = async (symbol, dataType) => {
         apiUrl = `/api/marketdata?endpoint=fundamentals&symbol=${symbol}&source=auto`;
         break;
       case 'news':
-        // Utiliser l'API ai-services pour les news via Perplexity
-        apiUrl = `/api/ai-services`;
+        // Utiliser FMP News API (GRATUIT) au lieu de Perplexity
+        apiUrl = `/api/fmp?endpoint=news&symbols=${symbol}&limit=10`;
         break;
       case 'prices':
         // Utiliser l'API marketdata pour les données intraday (OHLCV 5min)
@@ -227,26 +227,33 @@ const fetchHybridData = async (symbol, dataType) => {
     
     // ERREUR : Pas de fallback - Les cas spéciaux sont gérés par les throw Error ci-dessus
     
-    // Gérer les appels spéciaux
+    // Gérer les appels spéciaux - FMP News (GRATUIT)
     if (dataType === 'news') {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service: 'tickers-news', symbol: symbol })
-      });
+      const response = await fetch(apiUrl);
       if (!response.ok) {
         throw new Error(`API news échouée: ${response.status}`);
       }
       const data = await response.json();
+
+      // Convertir le format FMP vers le format attendu
+      const formattedNews = (data.news || data || []).map(article => ({
+        title: article.title,
+        text: article.text || article.description || '',
+        url: article.url || article.link || '#',
+        publishedDate: article.publishedDate || article.publishedAt || new Date().toISOString(),
+        source: { name: article.site || article.source || 'FMP' },
+        symbol: article.symbol || symbol
+      }));
+
       return {
         success: true,
         symbol,
         dataType,
-        data: data.data || [],
-        source: 'perplexity',
-        fallback: data.fallback || false,
+        news: formattedNews,
+        source: 'fmp',
+        fallback: false,
         metadata: {
-          confidence: data.fallback ? 0.6 : 0.9,
+          confidence: 0.95,
           freshness: 'fresh',
           lastUpdated: new Date().toISOString()
         }
@@ -564,21 +571,13 @@ const fetchHybridData = async (symbol, dataType) => {
                         }
                     }
                     
-                    // Si cache vide ou erreur, fallback vers API directe
-                    console.log('⚠️ Cache vide ou erreur, fallback vers API directe...');
-                    const tickersQuery = tickers.join(' OR ');
-                    console.log(`🔍 Recherche directe pour: ${tickersQuery}`);
-                    
-                    const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            service: 'perplexity',
-                            prompt: `Actualités financières récentes pour: ${tickersQuery}`,
-                            recency: 'day'
-                        })
-                    });
-                    console.log(`📡 Réponse API Directe: ${response.status}`);
+                    // Si cache vide ou erreur, fallback vers FMP News API (GRATUIT)
+                    console.log('⚠️ Cache vide ou erreur, fallback vers FMP News API gratuite...');
+                    const tickersQuery = tickers.slice(0, 5).join(','); // Limiter à 5 tickers max
+                    console.log(`🔍 Recherche FMP News pour: ${tickersQuery}`);
+
+                    const response = await fetch(`${API_BASE_URL}/api/fmp?endpoint=news&symbols=${tickersQuery}&limit=50`);
+                    console.log(`📡 Réponse FMP News: ${response.status}`);
                     
                     if (!response.ok) {
                         console.warn(`⚠️ News API indisponible (${response.status}) - Utilisation des données de démonstration`);
@@ -598,16 +597,23 @@ const fetchHybridData = async (symbol, dataType) => {
                     }
                     
                     const data = await response.json();
-                    console.log('📊 Données API directe reçues:', data);
-                    
-                    setNewsData(data.articles || []);
-                    setFilteredNews(data.articles || []);
-                    
-                    if (data.source === 'demo') {
-                        showMessage('Actualités de démonstration - Configurez NEWSAPI_KEY pour des actualités réelles', 'info');
-                    } else {
-                        showMessage(`${data.articles?.length || 0} actualités chargées (API directe)`, 'success');
-                    }
+                    console.log('📊 Données FMP News reçues:', data);
+
+                    // Convertir le format FMP vers le format attendu
+                    const newsArticles = (data.news || data || []).map(article => ({
+                        title: article.title,
+                        description: article.text || article.description || '',
+                        url: article.url || article.link || '#',
+                        publishedAt: article.publishedDate || article.publishedAt || new Date().toISOString(),
+                        source: { name: article.site || article.source || 'FMP' },
+                        sentiment: article.sentiment || 'neutral',
+                        category: article.symbol || 'general'
+                    }));
+
+                    setNewsData(newsArticles);
+                    setFilteredNews(newsArticles);
+
+                    showMessage(`${newsArticles.length} actualités chargées depuis FMP (gratuit)`, 'success');
                 } catch (error) {
                     console.error('❌ Erreur fetch news:', error?.message || String(error));
                     showMessage('Erreur chargement actualités', 'error');
@@ -11888,10 +11894,7 @@ if (!news) errors.push('News manquant');
 
 if (errors.length > 0) {
   console.warn('⚠️ Données manquantes:', errors);
-  setMessage({
-    text: `Données partielles pour ${symbol}: ${errors.join(', ')}`,
-    type: 'warning'
-  });
+  // setMessage removed - was causing infinite loop due to undefined reference
 }
 
 console.log('✅ Données hybrides récupérées:', { 
@@ -12065,59 +12068,86 @@ console.log('✅ Données hybrides récupérées:', {
 
                         const jslaiScore = calculateJSLAIScore();
 
-                        // 🎯 Appel batch Perplexity pour données IA (Sentiment + Insights + Analyst)
-                        // NON-BLOQUANT: Si l'appel échoue, on continue avec données par défaut
-                        let aiData = null;
-                        try {
-                            console.log('🤖 Tentative d\'appel Perplexity batch...');
-                            aiData = await Promise.race([
-                                fetchAIDataBatch(symbol, {
-                                    quote: {
-                                        price: quote?.c || 0,
-                                        changesPercentage: quote?.dp || 0,
-                                        volume: quote?.volume || 0,
-                                        marketCap: profile?.data?.[0]?.mktCap || profile?.mktCap || 0
-                                    },
-                                    metrics: {
-                                        peRatioTTM: ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null,
-                                        pegRatioTTM: ratios?.data?.[0]?.pegRatioTTM || ratios?.pegRatioTTM || null,
-                                        priceToSalesRatioTTM: ratios?.data?.[0]?.priceToSalesRatioTTM || ratios?.priceToSalesRatioTTM || null,
-                                        dividendYieldTTM: ratios?.data?.[0]?.dividendYieldTTM || ratios?.dividendYieldTTM || null
-                                    },
-                                    ratios: {
-                                        returnOnEquityTTM: ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null,
-                                        returnOnAssetsTTM: ratios?.data?.[0]?.returnOnAssetsTTM || ratios?.returnOnAssetsTTM || null,
-                                        debtEquityRatio: ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null,
-                                        netProfitMarginTTM: ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null
-                                    },
-                                    profile: {
-                                        sector: profile?.data?.[0]?.sector || profile?.sector || 'Unknown',
-                                        industry: profile?.data?.[0]?.industry || profile?.industry || 'Unknown',
-                                        beta: profile?.data?.[0]?.beta || profile?.beta || null
-                                    },
-                                    news: news?.news?.slice(0, 5)?.map(article => ({
-                                        title: article.title,
-                                        source: article.source?.name || 'Unknown'
-                                    })) || []
-                                }),
-                                // Timeout après 15 secondes
-                                new Promise((_, reject) => setTimeout(() => reject(new Error('Perplexity timeout')), 15000))
-                            ]);
-                            console.log('✅ Données IA chargées');
-                        } catch (error) {
-                            console.warn('⚠️ Appel Perplexity échoué/timeout, utilisation données par défaut:', error.message);
-                            // Utiliser données par défaut si Perplexity échoue
-                            aiData = {
-                                sentiment: { overall: 60, news: 65, summary: 'Analyse indisponible' },
-                                insights: {
-                                    catalysts: ['Analyse IA temporairement indisponible'],
-                                    risks: ['Analyse IA temporairement indisponible'],
-                                    consensus: 'neutral',
-                                    reasoning: 'Données IA non disponibles'
-                                },
-                                analyst: null
-                            };
-                        }
+                        // 🎯 Calcul automatique du sentiment et insights basé sur les données réelles
+                        // Plus besoin de Perplexity - on utilise les données gratuites des APIs
+                        console.log('🤖 Calcul du sentiment et insights à partir des données réelles...');
+
+                        // Calculer le sentiment basé sur le changement de prix et les ratios
+                        const priceChange = quote?.dp || 0;
+                        const roe = (ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || 0) * 100;
+                        const pe = ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || 0;
+
+                        // Score basé sur les fondamentaux (0-100)
+                        let fundamentalScore = 50;
+                        if (roe > 20) fundamentalScore += 20;
+                        else if (roe > 15) fundamentalScore += 10;
+                        if (pe > 0 && pe < 15) fundamentalScore += 15;
+                        else if (pe > 0 && pe < 25) fundamentalScore += 5;
+
+                        // Score basé sur le momentum (0-100)
+                        let momentumScore = 60;
+                        if (priceChange > 5) momentumScore = 85;
+                        else if (priceChange > 2) momentumScore = 75;
+                        else if (priceChange > 0) momentumScore = 65;
+                        else if (priceChange > -2) momentumScore = 55;
+                        else if (priceChange > -5) momentumScore = 45;
+                        else momentumScore = 30;
+
+                        // Sentiment global (moyenne pondérée: 60% fondamentaux, 40% momentum)
+                        const overallSentiment = Math.round(fundamentalScore * 0.6 + momentumScore * 0.4);
+
+                        // Générer catalysts basés sur les données
+                        const catalysts = [];
+                        if (roe > 20) catalysts.push(`ROE excellent à ${roe.toFixed(1)}%`);
+                        if (priceChange > 2) catalysts.push(`Forte dynamique haussière (+${priceChange.toFixed(2)}%)`);
+                        if (pe > 0 && pe < 15) catalysts.push(`Valorisation attractive (P/E: ${pe.toFixed(1)})`);
+                        if (catalysts.length === 0) catalysts.push('Fondamentaux stables');
+
+                        // Générer risques basés sur les données
+                        const risks = [];
+                        const debtEquity = ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || 0;
+                        if (debtEquity > 2) risks.push(`Endettement élevé (D/E: ${debtEquity.toFixed(2)})`);
+                        if (priceChange < -5) risks.push('Momentum baissier significatif');
+                        if (pe > 40) risks.push(`Valorisation élevée (P/E: ${pe.toFixed(1)})`);
+                        if (risks.length === 0) risks.push('Volatilité de marché normale');
+
+                        // Déterminer le consensus
+                        let consensus = 'neutral';
+                        if (overallSentiment >= 70) consensus = 'bullish';
+                        else if (overallSentiment <= 45) consensus = 'bearish';
+
+                        // Déterminer la recommandation basée sur le score JSLAI
+                        let recommendation = 'HOLD';
+                        let confidence = overallSentiment;
+                        if (jslaiScore.total >= 75) { recommendation = 'STRONG_BUY'; confidence = Math.min(90, confidence + 10); }
+                        else if (jslaiScore.total >= 65) { recommendation = 'BUY'; confidence = Math.min(85, confidence + 5); }
+                        else if (jslaiScore.total <= 35) { recommendation = 'SELL'; confidence = Math.min(85, confidence); }
+                        else if (jslaiScore.total <= 25) { recommendation = 'STRONG_SELL'; confidence = Math.min(90, confidence); }
+
+                        const aiData = {
+                            sentiment: {
+                                overall: overallSentiment,
+                                news: momentumScore,
+                                summary: `Sentiment ${consensus === 'bullish' ? 'positif' : consensus === 'bearish' ? 'négatif' : 'neutre'} basé sur les fondamentaux et le momentum`
+                            },
+                            insights: {
+                                catalysts,
+                                risks,
+                                consensus,
+                                reasoning: `Score JSLAI™ de ${jslaiScore.total}/100 (${jslaiScore.interpretation}). ${jslaiScore.recommendation}.`
+                            },
+                            analyst: {
+                                recommendation,
+                                confidence,
+                                keyPoints: [
+                                    `Score JSLAI™: ${jslaiScore.total}/100`,
+                                    `Sentiment: ${overallSentiment}/100`,
+                                    `Tendance: ${consensus}`
+                                ]
+                            }
+                        };
+
+                        console.log('✅ Sentiment et insights calculés à partir des données réelles (sans Perplexity)');
 
                         // Construire l'objet de données structuré
                         return {
