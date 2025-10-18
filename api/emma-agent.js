@@ -237,30 +237,37 @@ EXEMPLE 2 - Prix simple:
     }
 
     /**
-     * Appel Perplexity optimisé pour l'analyse d'intention
-     * Utilise le modèle "sonar" (le plus rapide et économique)
+     * Appel au service IA unifié pour l'analyse d'intention
+     * Utilise le service IA unifié avec fallback automatique
      */
     async _call_perplexity_intent(prompt) {
-        const response = await fetch('https://api.perplexity.ai/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'sonar',  // Modèle le plus rapide (pas online search)
-                messages: [{ role: 'user', content: prompt }],
-                max_tokens: 500,  // Court pour intent analysis
-                temperature: 0.1  // Très déterministe pour extraire JSON
-            })
-        });
+        try {
+            // Extraire le message utilisateur du prompt
+            const userMessage = this._extractUserMessageFromPrompt(prompt);
+            
+            // Appel au service IA unifié
+            const response = await this._callInternalAPI('/api/ai-services.js', {
+                message: userMessage,
+                context: {
+                    systemPrompt: 'Tu es un analyseur d\'intention. Extrais les informations demandées en JSON strict.',
+                    temperature: 0.1,  // Très déterministe pour extraire JSON
+                    maxTokens: 500     // Court pour intent analysis
+                },
+                preferred_provider: 'auto', // Fallback automatique
+                use_functions: false,
+                max_retries: 1
+            });
 
-        if (!response.ok) {
-            throw new Error(`Perplexity intent API error: ${response.status}`);
+            if (!response.success) {
+                throw new Error(response.error || 'Erreur du service IA unifié');
+            }
+
+            return response.response;
+
+        } catch (error) {
+            console.error('❌ AI Service intent analysis error:', error);
+            throw new Error(`Erreur de communication avec le service IA: ${error.message}`);
         }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
     }
 
     /**
@@ -566,14 +573,14 @@ EXEMPLE 2 - Prix simple:
     }
 
     /**
-     * Génération de la réponse finale avec Perplexity (avec post-traitement selon mode)
+     * Génération de la réponse finale avec service IA unifié (avec post-traitement selon mode)
      */
     async _generate_response(userMessage, toolResults, context, intentData = null) {
         try {
             const outputMode = context.output_mode || 'chat';
             console.log(`🎯 Generating response for mode: ${outputMode}`);
 
-            // Préparation du contexte pour Perplexity
+            // Préparation du contexte pour le service IA unifié
             const toolsData = toolResults
                 .filter(r => r.success && r.data)
                 .map(r => ({
@@ -583,7 +590,7 @@ EXEMPLE 2 - Prix simple:
 
             const conversationContext = this.conversationHistory.slice(-5); // 5 derniers échanges
 
-            const perplexityPrompt = this._buildPerplexityPrompt(
+            const aiPrompt = this._buildAIPrompt(
                 userMessage,
                 toolsData,
                 conversationContext,
@@ -591,19 +598,19 @@ EXEMPLE 2 - Prix simple:
                 intentData
             );
 
-            // Appel à Perplexity
-            let perplexityResponse = await this._call_perplexity(perplexityPrompt, outputMode);
+            // Appel au service IA unifié avec fallback automatique
+            let aiResponse = await this._call_ai_service(aiPrompt, outputMode, context);
 
             // Post-traitement selon le mode
             if (outputMode === 'data') {
                 // Valider et parser le JSON
-                perplexityResponse = this._validateAndParseJSON(perplexityResponse);
+                aiResponse = this._validateAndParseJSON(aiResponse);
             } else if (outputMode === 'briefing') {
                 // Nettoyer le Markdown (enlever éventuels artifacts)
-                perplexityResponse = this._cleanMarkdown(perplexityResponse);
+                aiResponse = this._cleanMarkdown(aiResponse);
             }
 
-            return perplexityResponse;
+            return aiResponse;
 
         } catch (error) {
             console.error('❌ Response generation failed:', error);
@@ -657,7 +664,7 @@ EXEMPLE 2 - Prix simple:
     /**
      * Construction du prompt pour Perplexity (ROUTER - 3 MODES)
      */
-    _buildPerplexityPrompt(userMessage, toolsData, conversationContext, context, intentData = null) {
+    _buildAIPrompt(userMessage, toolsData, conversationContext, context, intentData = null) {
         const outputMode = context.output_mode || 'chat'; // Default: chat
         console.log(`🎯 Building prompt for mode: ${outputMode}`);
 
@@ -909,9 +916,9 @@ RÉPONSE MARKDOWN ENRICHIE:`;
     }
 
     /**
-     * Appel à l'API Perplexity
+     * Appel au service IA unifié avec fallback automatique
      */
-    async _call_perplexity(prompt, outputMode = 'chat') {
+    async _call_ai_service(prompt, outputMode = 'chat', context = {}) {
         try {
             // Ajuster max_tokens selon le mode
             let maxTokens = 1000;  // Default pour chat
@@ -921,42 +928,85 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 maxTokens = 500;  // JSON structuré: court
             }
 
-            const response = await fetch('https://api.perplexity.ai/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-                    'Content-Type': 'application/json'
+            // Construire le message pour le service IA unifié
+            const message = this._extractUserMessageFromPrompt(prompt);
+            
+            // Appel au service IA unifié
+            const response = await this._callInternalAPI('/api/ai-services.js', {
+                message: message,
+                context: {
+                    ...context,
+                    systemPrompt: this._extractSystemPromptFromPrompt(prompt),
+                    temperature: outputMode === 'briefing' ? 0.5 : 0.7,
+                    maxTokens: maxTokens
                 },
-                body: JSON.stringify({
-                    model: 'sonar-pro',  // Modèle actuel Perplexity (puissant et rapide)
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'Tu es Emma, une assistante financière experte. Réponds toujours en français de manière professionnelle et accessible.'
-                        },
-                        {
-                            role: 'user',
-                            content: prompt
-                        }
-                    ],
-                    max_tokens: maxTokens,
-                    temperature: outputMode === 'briefing' ? 0.5 : 0.7  // Plus déterministe pour briefings
-                })
+                preferred_provider: 'auto', // Fallback automatique
+                use_functions: false, // Pas de function calling pour la génération de réponse
+                max_retries: 2
             });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error('❌ Perplexity API error details:', errorData);
-                throw new Error(`Perplexity API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+            if (!response.success) {
+                throw new Error(response.error || 'Erreur du service IA unifié');
             }
 
-            const data = await response.json();
-            return data.choices[0].message.content;
+            return response.response;
 
         } catch (error) {
-            console.error('❌ Perplexity API error:', error);
-            throw new Error(`Erreur de communication avec Perplexity: ${error.message}`);
+            console.error('❌ AI Service error:', error);
+            throw new Error(`Erreur de communication avec le service IA: ${error.message}`);
         }
+    }
+
+    /**
+     * Appel à une API interne du projet
+     */
+    async _callInternalAPI(endpoint, payload) {
+        const baseUrl = process.env.VERCEL_URL 
+            ? `https://${process.env.VERCEL_URL}` 
+            : 'http://localhost:3000';
+
+        const response = await fetch(`${baseUrl}${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`API ${endpoint} error: ${response.status} - ${errorData.error || response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Extrait le message utilisateur du prompt complet
+     */
+    _extractUserMessageFromPrompt(prompt) {
+        // Chercher la section "QUESTION DE L'UTILISATEUR:" dans le prompt
+        const userMatch = prompt.match(/QUESTION DE L'UTILISATEUR:\s*(.+?)(?:\n\n|$)/s);
+        if (userMatch) {
+            return userMatch[1].trim();
+        }
+        
+        // Fallback: retourner les 200 derniers caractères
+        return prompt.slice(-200).trim();
+    }
+
+    /**
+     * Extrait le prompt système du prompt complet
+     */
+    _extractSystemPromptFromPrompt(prompt) {
+        // Chercher la section système au début du prompt
+        const systemMatch = prompt.match(/^Tu es Emma[^]*?(?=CONTEXTE|DONNÉES|QUESTION)/s);
+        if (systemMatch) {
+            return systemMatch[0].trim();
+        }
+        
+        // Fallback: prompt système par défaut
+        return `Tu es Emma, une assistante financière experte. Réponds toujours en français de manière professionnelle et accessible.`;
     }
 
     /**
