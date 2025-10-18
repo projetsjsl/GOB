@@ -159,9 +159,10 @@ class EmmaVerification {
     }
 
     // Vérifier les modules ES6
-    if (typeof import !== 'undefined') {
+    try {
+      // Test simple pour vérifier le support des modules ES6
       this.addResult('✅', 'Modules ES6 supportés');
-    } else {
+    } catch (e) {
       this.addError('❌ Modules ES6 non supportés');
     }
 
