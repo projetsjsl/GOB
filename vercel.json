@@ -54,12 +54,6 @@
     },
     "api/scrape-seeking-alpha.js": {
       "maxDuration": 60
-    },
-    "api/chatgpt/chat.js": {
-      "maxDuration": 30
-    },
-    "api/chatgpt/tools.js": {
-      "maxDuration": 60
     }
   },
   "crons": [],
