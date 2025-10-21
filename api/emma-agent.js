@@ -843,16 +843,18 @@ INSTRUCTIONS CRITIQUES:
 2. ✅ Utilise TOUTES les données fournies par les outils, MÊME si marquées "[⚠️ SOURCE PARTIELLE]"
    - Les données partielles sont MEILLEURES que pas de données du tout
    - Analyse ce qui est disponible et fournis des insights basés sur ces données
-3. ✅ Si un outil a retourné des données pour PLUSIEURS tickers (news_by_ticker, fundamentals_by_ticker):
-   - Analyse CHAQUE ticker individuellement
-   - Fournis un résumé pour CHAQUE compagnie mentionnée
-   - N'ignore PAS les tickers - ils sont tous importants
+3. 🎯 CRITIQUE - ANALYSE DE TOUS LES TICKERS:
+   - Si un outil retourne "news_by_ticker" ou "fundamentals_by_ticker", tu DOIS analyser CHAQUE ticker
+   - Ne JAMAIS se limiter aux premiers tickers - analyse TOUS les tickers présents dans les données
+   - Fournis un résumé pour CHAQUE compagnie mentionnée, sans exception
+   - Si 25 tickers sont présents, fournis l'analyse des 25 tickers
+   - Structure: Une section par ticker avec un résumé concis mais complet
 4. ❌ NE JAMAIS dire "aucune donnée disponible" si des outils ont retourné des données (même partielles)
 5. ❌ NE JAMAIS demander de clarifications - fournis directement l'analyse
 6. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
 7. Cite tes sources (outils utilisés) en fin de réponse
 8. Ton: professionnel mais accessible
-${intentData ? `9. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
+${intentData ? `9. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour CHAQUE ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant TOUS les tickers pertinents sans exception'}` : ''}
 
 EXEMPLE DE BONNE RÉPONSE (si demande sur plusieurs tickers):
 "Voici une analyse des initiatives IA récentes pour les compagnies de l'équipe:
@@ -863,9 +865,20 @@ EXEMPLE DE BONNE RÉPONSE (si demande sur plusieurs tickers):
 
 **T (AT&T)**
 - Initiative IA: [analyse basée sur les données disponibles]
-...
+- Source: [détails]
 
-[Continue pour TOUS les tickers dans les données]"
+**BNS (Banque Scotia)**
+- Initiative IA: [analyse]
+- Source: [détails]
+
+**TD (TD Bank)**
+- Initiative IA: [analyse]
+- Source: [détails]
+
+[Continue pour TOUS les 25-30 tickers présents dans les données - ne saute AUCUN ticker]
+
+---
+**Résumé**: Analyse complète de [X] tickers de l'équipe"
 
 RÉPONSE:`;
     }
@@ -961,6 +974,11 @@ INSTRUCTIONS PRINCIPALES:
 5. Focus sur l'ACTIONNABLE et les INSIGHTS
 6. Format MARKDOWN avec émojis appropriés (📊, 📈, ⚠️, etc.)
 7. Si importance >= 8: commencer par une section BREAKING avec les événements majeurs
+8. 🎯 CRITIQUE - ANALYSE EXHAUSTIVE DES TICKERS:
+   - Si les données contiennent "news_by_ticker" ou "fundamentals_by_ticker", analyse CHAQUE ticker sans exception
+   - Ne JAMAIS limiter aux premiers tickers - inclus TOUS les tickers présents
+   - Fournis un résumé pour CHAQUE compagnie (même bref si nécessaire pour respecter la limite de mots)
+   - Structure: Une section ou ligne par ticker avec données clés
 
 🎨 INSTRUCTIONS MULTIMÉDIAS (CRITIQUE):
 
@@ -1059,11 +1077,11 @@ RÉPONSE MARKDOWN ENRICHIE:`;
     async _call_perplexity(prompt, outputMode = 'chat') {
         try {
             // Ajuster max_tokens selon le mode
-            let maxTokens = 1000;  // Default pour chat
+            let maxTokens = 2000;  // Default pour chat (augmenté pour supporter plus de tickers)
             if (outputMode === 'briefing') {
-                maxTokens = 3000;  // Briefing détaillé: 1500-2000 mots nécessitent ~2500-3000 tokens
+                maxTokens = 8000;  // Briefing détaillé: pour analyser TOUS les tickers (25-30+)
             } else if (outputMode === 'data') {
-                maxTokens = 500;  // JSON structuré: court
+                maxTokens = 1000;  // JSON structuré: augmenté pour supporter plus de tickers
             }
 
             const response = await fetch('https://api.perplexity.ai/chat/completions', {
