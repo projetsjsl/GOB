@@ -444,30 +444,43 @@ EXEMPLE 2 - Prix simple:
     async _execute_all(selectedTools, userMessage, context) {
         const executionPromises = selectedTools.map(async (tool) => {
             const startTime = Date.now();
-            
+
             try {
                 console.log(`🔧 Executing tool: ${tool.id}`);
-                
+
                 // Import dynamique de l'outil
                 const toolModule = await import(`../lib/tools/${tool.implementation.file}`);
                 const toolInstance = new toolModule.default();
-                
+
                 // Préparation des paramètres
                 const params = this._prepareToolParameters(tool, userMessage, context);
-                
+
+                // Si params est null, skip cet outil (pas de paramètres valides)
+                if (params === null) {
+                    console.log(`⏭️ Skipping tool ${tool.id} - no valid parameters`);
+                    return {
+                        tool_id: tool.id,
+                        success: false,
+                        error: 'Skipped - no valid parameters',
+                        skipped: true,
+                        execution_time_ms: 0,
+                        is_reliable: false
+                    };
+                }
+
                 // Exécution avec timeout
                 const result = await Promise.race([
                     toolInstance.execute(params, context),
-                    new Promise((_, reject) => 
+                    new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('Tool timeout')), this.toolsConfig.config.timeout_ms)
                     )
                 ]);
-                
+
                 const executionTime = Date.now() - startTime;
-                
+
                 // Mise à jour des statistiques
                 this._updateToolStats(tool.id, true, executionTime);
-                
+
                 return {
                     tool_id: tool.id,
                     success: true,
@@ -475,17 +488,17 @@ EXEMPLE 2 - Prix simple:
                     execution_time_ms: executionTime,
                     is_reliable: result && result.is_reliable !== false
                 };
-                
+
             } catch (error) {
                 const executionTime = Date.now() - startTime;
                 console.error(`❌ Tool ${tool.id} failed:`, error.message);
-                
+
                 // Mise à jour des statistiques d'erreur
                 this._updateToolStats(tool.id, false, executionTime, error.message);
-                
+
                 // Tentative de fallback
                 const fallbackResult = await this._tryFallback(tool, userMessage, context);
-                
+
                 return {
                     tool_id: tool.id,
                     success: false,
@@ -497,7 +510,7 @@ EXEMPLE 2 - Prix simple:
                 };
             }
         });
-        
+
         const results = await Promise.allSettled(executionPromises);
         return results.map(r => r.status === 'fulfilled' ? r.value : {
             success: false,
@@ -548,21 +561,128 @@ EXEMPLE 2 - Prix simple:
      */
     _prepareToolParameters(tool, userMessage, context) {
         const params = {};
-        
-        // Extraction des paramètres depuis le message et le contexte
-        if (tool.parameters.ticker && context.tickers) {
-            params.ticker = context.tickers[0]; // Premier ticker par défaut
+
+        // Extraction des tickers depuis le contexte et le message
+        const extractedTickers = this._extractAllTickers(userMessage, context);
+
+        // Pour les outils qui nécessitent un ticker
+        if (tool.parameters.ticker) {
+            if (extractedTickers && extractedTickers.length > 0) {
+                // Si l'outil peut gérer plusieurs tickers, passer tous
+                // Sinon, prendre le premier (pour compatibilité)
+                params.ticker = extractedTickers[0];
+
+                // Ajouter tous les tickers au contexte pour que l'outil puisse les utiliser
+                params.all_tickers = extractedTickers;
+            } else {
+                // Pas de ticker trouvé - l'outil échouera probablement
+                console.warn(`⚠️ Tool ${tool.id} requires ticker but none found`);
+                return null; // Retourner null pour skip cet outil
+            }
         }
-        
-        if (tool.parameters.operation && userMessage.toLowerCase().includes('calcul')) {
-            params.operation = 'pe_ratio'; // Par défaut
+
+        // Pour calculator: NE PAS l'utiliser si pas de données pour calculer
+        if (tool.id === 'calculator') {
+            // Calculator nécessite 'operation' ET 'values'
+            // Si on n'a pas de données à calculer, skip
+            const hasCalculationRequest = userMessage.toLowerCase().match(/calcul|ratio|pe|dividend|market cap|croissance/);
+
+            if (!hasCalculationRequest) {
+                console.log('⏭️ Skipping calculator - no calculation requested');
+                return null; // Skip calculator
+            }
+
+            // Si calcul demandé, essayer d'extraire les paramètres
+            if (userMessage.toLowerCase().includes('pe') || userMessage.toLowerCase().includes('p/e')) {
+                params.operation = 'pe_ratio';
+            } else if (userMessage.toLowerCase().includes('dividend')) {
+                params.operation = 'dividend_yield';
+            } else if (userMessage.toLowerCase().includes('market cap')) {
+                params.operation = 'market_cap';
+            } else {
+                params.operation = 'pe_ratio'; // Défaut
+            }
+
+            // Pour values, on ne peut pas les deviner - skip si pas de données
+            if (!context.stockData || !context.stockData[extractedTickers[0]]) {
+                console.log('⏭️ Skipping calculator - no stock data available for calculation');
+                return null;
+            }
+
+            // Essayer d'extraire les valeurs depuis stockData
+            const stockInfo = context.stockData[extractedTickers[0]];
+            if (params.operation === 'pe_ratio' && stockInfo.price && stockInfo.eps) {
+                params.values = {
+                    price: stockInfo.price,
+                    earnings_per_share: stockInfo.eps
+                };
+            } else {
+                // Pas assez de données pour calculator
+                console.log('⏭️ Skipping calculator - insufficient data for calculation');
+                return null;
+            }
         }
-        
+
+        // Pour les outils qui nécessitent une date
         if (tool.parameters.date) {
             params.date = new Date().toISOString().split('T')[0];
         }
-        
+
         return params;
+    }
+
+    /**
+     * Extraction de TOUS les tickers pertinents depuis le message et le contexte
+     */
+    _extractAllTickers(userMessage, context) {
+        const tickers = new Set();
+
+        // 1. Tickers depuis le contexte (priorité)
+        if (context.extracted_tickers && context.extracted_tickers.length > 0) {
+            // Depuis l'analyse d'intention
+            context.extracted_tickers.forEach(t => tickers.add(t.toUpperCase()));
+        } else if (context.tickers && context.tickers.length > 0) {
+            // Depuis le contexte fourni par le frontend
+            context.tickers.forEach(t => tickers.add(t.toUpperCase()));
+        }
+
+        // 2. Tickers explicitement mentionnés dans le message
+        const tickerPattern = /\b([A-Z]{1,5})\b/g;
+        const matches = userMessage.match(tickerPattern);
+        if (matches) {
+            matches.forEach(match => {
+                // Vérifier si c'est un ticker valide (2-5 lettres)
+                if (match.length >= 2 && match.length <= 5) {
+                    tickers.add(match);
+                }
+            });
+        }
+
+        // 3. Mapping de noms de compagnies vers tickers
+        const companyToTicker = {
+            'apple': 'AAPL',
+            'microsoft': 'MSFT',
+            'google': 'GOOGL',
+            'alphabet': 'GOOGL',
+            'amazon': 'AMZN',
+            'tesla': 'TSLA',
+            'meta': 'META',
+            'facebook': 'META',
+            'nvidia': 'NVDA',
+            'amd': 'AMD',
+            'intel': 'INTC',
+            'netflix': 'NFLX',
+            'disney': 'DIS'
+        };
+
+        const messageLower = userMessage.toLowerCase();
+        Object.entries(companyToTicker).forEach(([company, ticker]) => {
+            if (messageLower.includes(company)) {
+                tickers.add(ticker);
+            }
+        });
+
+        return Array.from(tickers);
     }
 
     /**
@@ -574,11 +694,15 @@ EXEMPLE 2 - Prix simple:
             console.log(`🎯 Generating response for mode: ${outputMode}`);
 
             // Préparation du contexte pour Perplexity
+            // IMPORTANT: Inclure TOUS les outils qui ont retourné des données, même si is_reliable: false
+            // Emma doit voir les données pour pouvoir les analyser et en parler
             const toolsData = toolResults
-                .filter(r => r.success && r.data)
+                .filter(r => r.data && !r.skipped) // Inclure tous les outils avec données (même is_reliable: false)
                 .map(r => ({
                     tool: r.tool_id,
-                    data: r.data
+                    data: r.data,
+                    is_reliable: r.is_reliable,
+                    success: r.success
                 }));
 
             const conversationContext = this.conversationHistory.slice(-5); // 5 derniers échanges
@@ -707,20 +831,41 @@ CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
 ${intentContext}
 DONNÉES DISPONIBLES DES OUTILS:
-${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n')}
+${toolsData.map(t => {
+    const reliabilityNote = t.is_reliable === false ? ' [⚠️ SOURCE PARTIELLE - Utiliser avec prudence]' : '';
+    return `- ${t.tool}${reliabilityNote}: ${JSON.stringify(t.data, null, 2)}`;
+}).join('\n')}
 
 QUESTION DE L'UTILISATEUR: ${userMessage}
 
-INSTRUCTIONS:
-1. Réponds de manière CONVERSATIONNELLE et NATURELLE - PAS de questions clarificatrices
-2. Utilise UNIQUEMENT les données fournies par les outils (pas de données fictives)
-3. ⚠️ IMPORTANT: Vérifie les dates des données - signale si les données sont anciennes (ex: plusieurs mois) et mentionne la date actuelle: ${currentDate}
-4. Cite tes sources (outils utilisés) en fin de réponse avec leurs dates
-5. Sois précis mais accessible
-6. Si les données sont insuffisantes ou anciennes, indique-le clairement
-7. Adapte ton ton: professionnel mais chaleureux
-${intentData ? `8. L'intention de l'utilisateur est: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE avec prix, fondamentaux, technique et actualités' : 'réponds en conséquence'}` : ''}
-9. ❌ NE JAMAIS demander de clarifications supplémentaires - fournis directement l'analyse avec les données disponibles
+INSTRUCTIONS CRITIQUES:
+1. ✅ TOUJOURS fournir une réponse COMPLÈTE et UTILE basée sur les données disponibles
+2. ✅ Utilise TOUTES les données fournies par les outils, MÊME si marquées "[⚠️ SOURCE PARTIELLE]"
+   - Les données partielles sont MEILLEURES que pas de données du tout
+   - Analyse ce qui est disponible et fournis des insights basés sur ces données
+3. ✅ Si un outil a retourné des données pour PLUSIEURS tickers (news_by_ticker, fundamentals_by_ticker):
+   - Analyse CHAQUE ticker individuellement
+   - Fournis un résumé pour CHAQUE compagnie mentionnée
+   - N'ignore PAS les tickers - ils sont tous importants
+4. ❌ NE JAMAIS dire "aucune donnée disponible" si des outils ont retourné des données (même partielles)
+5. ❌ NE JAMAIS demander de clarifications - fournis directement l'analyse
+6. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
+7. Cite tes sources (outils utilisés) en fin de réponse
+8. Ton: professionnel mais accessible
+${intentData ? `9. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
+
+EXEMPLE DE BONNE RÉPONSE (si demande sur plusieurs tickers):
+"Voici une analyse des initiatives IA récentes pour les compagnies de l'équipe:
+
+**GOOGL (Alphabet/Google)**
+- Initiative IA: [analyse basée sur les news récupérées]
+- Source: [détails de la news avec date]
+
+**T (AT&T)**
+- Initiative IA: [analyse basée sur les données disponibles]
+...
+
+[Continue pour TOUS les tickers dans les données]"
 
 RÉPONSE:`;
     }
