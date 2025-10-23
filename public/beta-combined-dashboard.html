@@ -15054,6 +15054,273 @@ console.log('✅ Données hybrides récupérées:', {
                 );
             };
 
+            // Birthday Greeting Tab - Formulaire d'envoi d'emails de bonne fête
+            const BirthdayGreetingTab = () => {
+                const [recipientName, setRecipientName] = useState('');
+                const [recipientEmail, setRecipientEmail] = useState('');
+                const [customMessage, setCustomMessage] = useState('');
+                const [senderName, setSenderName] = useState('');
+                const [loading, setLoading] = useState(false);
+                const [success, setSuccess] = useState(false);
+                const [error, setError] = useState('');
+
+                const handleSubmit = async (e) => {
+                    e.preventDefault();
+                    setLoading(true);
+                    setError('');
+                    setSuccess(false);
+
+                    try {
+                        const response = await fetch('/api/send-birthday-email', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                recipientName,
+                                recipientEmail,
+                                customMessage,
+                                senderName
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Failed to send birthday email');
+                        }
+
+                        setSuccess(true);
+                        // Reset form
+                        setRecipientName('');
+                        setRecipientEmail('');
+                        setCustomMessage('');
+                        setSenderName('');
+
+                        // Clear success message after 5 seconds
+                        setTimeout(() => setSuccess(false), 5000);
+
+                    } catch (err) {
+                        console.error('Error sending birthday email:', err);
+                        setError(err.message || 'Une erreur est survenue lors de l\'envoi de l\'email');
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+
+                return (
+                    <div className={`max-w-4xl mx-auto ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <div className={`rounded-lg shadow-xl overflow-hidden ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            {/* Header */}
+                            <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-8 text-center">
+                                <div className="text-6xl mb-4 animate-bounce">🎂</div>
+                                <h2 className="text-3xl font-bold text-white mb-2">
+                                    Envoi d'Email de Bonne Fête
+                                </h2>
+                                <p className="text-white text-opacity-90">
+                                    Envoyez un message d'anniversaire personnalisé à vos proches
+                                </p>
+                                <div className="mt-4 text-4xl">
+                                    <span className="inline-block animate-bounce" style={{ animationDelay: '0s' }}>🎈</span>
+                                    <span className="inline-block animate-bounce" style={{ animationDelay: '0.1s' }}>🎉</span>
+                                    <span className="inline-block animate-bounce" style={{ animationDelay: '0.2s' }}>🎁</span>
+                                    <span className="inline-block animate-bounce" style={{ animationDelay: '0.3s' }}>✨</span>
+                                </div>
+                            </div>
+
+                            {/* Form */}
+                            <div className="p-8">
+                                {success && (
+                                    <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
+                                        <span className="text-2xl mr-3">✅</span>
+                                        <div>
+                                            <strong>Email envoyé avec succès !</strong>
+                                            <p className="text-sm">Votre message d'anniversaire a été envoyé.</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {error && (
+                                    <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
+                                        <span className="text-2xl mr-3">❌</span>
+                                        <div>
+                                            <strong>Erreur</strong>
+                                            <p className="text-sm">{error}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    {/* Recipient Name */}
+                                    <div>
+                                        <label htmlFor="recipientName" className={`block text-sm font-semibold mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Nom du destinataire <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="recipientName"
+                                            value={recipientName}
+                                            onChange={(e) => setRecipientName(e.target.value)}
+                                            required
+                                            placeholder="Ex: Marie Dupont"
+                                            className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                            }`}
+                                        />
+                                    </div>
+
+                                    {/* Recipient Email */}
+                                    <div>
+                                        <label htmlFor="recipientEmail" className={`block text-sm font-semibold mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Email du destinataire <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="email"
+                                            id="recipientEmail"
+                                            value={recipientEmail}
+                                            onChange={(e) => setRecipientEmail(e.target.value)}
+                                            required
+                                            placeholder="Ex: marie.dupont@example.com"
+                                            className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                            }`}
+                                        />
+                                    </div>
+
+                                    {/* Sender Name */}
+                                    <div>
+                                        <label htmlFor="senderName" className={`block text-sm font-semibold mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Nom de l'expéditeur (optionnel)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="senderName"
+                                            value={senderName}
+                                            onChange={(e) => setSenderName(e.target.value)}
+                                            placeholder="Ex: L'équipe GOB"
+                                            className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                            }`}
+                                        />
+                                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Par défaut: "L'équipe GOB"
+                                        </p>
+                                    </div>
+
+                                    {/* Custom Message */}
+                                    <div>
+                                        <label htmlFor="customMessage" className={`block text-sm font-semibold mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Message personnalisé (optionnel)
+                                        </label>
+                                        <textarea
+                                            id="customMessage"
+                                            value={customMessage}
+                                            onChange={(e) => setCustomMessage(e.target.value)}
+                                            rows="4"
+                                            placeholder="Ex: Nous te souhaitons une merveilleuse journée remplie de joie et de bonheur..."
+                                            className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                            }`}
+                                        />
+                                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Si laissé vide, un message par défaut sera utilisé
+                                        </p>
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <div className="flex items-center justify-between pt-4">
+                                        <button
+                                            type="submit"
+                                            disabled={loading || !recipientName || !recipientEmail}
+                                            className={`flex-1 py-4 px-6 rounded-lg font-bold text-white text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
+                                                loading
+                                                    ? 'bg-gray-400'
+                                                    : 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:shadow-lg'
+                                            }`}
+                                        >
+                                            {loading ? (
+                                                <span className="flex items-center justify-center">
+                                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Envoi en cours...
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center justify-center">
+                                                    🎉 Envoyer l'Email de Bonne Fête 🎂
+                                                </span>
+                                            )}
+                                        </button>
+                                    </div>
+                                </form>
+
+                                {/* Info Box */}
+                                <div className={`mt-8 p-4 rounded-lg border ${
+                                    isDarkMode
+                                        ? 'bg-gray-700 border-gray-600'
+                                        : 'bg-blue-50 border-blue-200'
+                                }`}>
+                                    <div className="flex items-start">
+                                        <span className="text-2xl mr-3">ℹ️</span>
+                                        <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-blue-800'}`}>
+                                            <strong className="block mb-1">Informations:</strong>
+                                            <ul className="list-disc list-inside space-y-1 ml-2">
+                                                <li>L'email sera envoyé avec un template HTML coloré et animé</li>
+                                                <li>Le service d'envoi utilise Resend (configuration requise)</li>
+                                                <li>Les champs marqués d'un * sont obligatoires</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Preview Section */}
+                        <div className={`mt-6 rounded-lg shadow-xl overflow-hidden ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    📧 Aperçu du Template Email
+                                </h3>
+                            </div>
+                            <div className="p-4">
+                                <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    <p>L'email envoyé contiendra:</p>
+                                    <ul className="list-disc list-inside mt-2 space-y-1 ml-4">
+                                        <li>Une belle bannière colorée avec des ballons animés 🎈</li>
+                                        <li>Le message "Joyeux Anniversaire" en grand titre</li>
+                                        <li>Un gâteau d'anniversaire animé 🎂</li>
+                                        <li>Votre message personnalisé dans un cadre élégant</li>
+                                        <li>Des confettis et étoiles ✨</li>
+                                        <li>La signature de l'expéditeur</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
             // Configuration des onglets (après déclaration de TOUS les composants)
             const tabs = [
                 { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
@@ -15064,6 +15331,7 @@ console.log('✅ Données hybrides récupérées:', {
                 { id: 'scrapping-sa', label: '🔍 Seeking Alpha', component: ScrappingSATab },
                 { id: 'seeking-alpha', label: '📈 Stocks News', component: SeekingAlphaTab },
                 { id: 'email-briefings', label: '📡 Emma En Direct', component: EmailBriefingsTab },
+                { id: 'birthday-greeting', label: '🎂 Bonne Fête', component: BirthdayGreetingTab },
                 { id: 'economic-calendar', label: '📅 Calendrier Économique', component: EconomicCalendarTab }
             ];
 
@@ -15391,6 +15659,7 @@ console.log('✅ Données hybrides récupérées:', {
                         {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                         {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                         {activeTab === 'email-briefings' && <EmailBriefingsTab />}
+                        {activeTab === 'birthday-greeting' && <BirthdayGreetingTab />}
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                         {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                     </main>

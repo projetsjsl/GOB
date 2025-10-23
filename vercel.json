@@ -40,6 +40,9 @@
     "api/send-email.js": {
       "maxDuration": 30
     },
+    "api/send-birthday-email.js": {
+      "maxDuration": 30
+    },
     "api/cron-briefings.js": {
       "maxDuration": 300
     },
