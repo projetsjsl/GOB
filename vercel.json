@@ -19,6 +19,9 @@
     "api/marketdata.js": {
       "maxDuration": 10
     },
+    "api/marketdata/batch.js": {
+      "maxDuration": 30
+    },
     "api/supabase-watchlist.js": {
       "maxDuration": 15
     },

@@ -3475,18 +3475,13 @@ STRUCTURE JSON OBLIGATOIRE:
                     loadInitialWatchlist();
                 }, []); // Dépendance vide = une seule fois au montage
 
-                // Charger les données pour les tickers de la watchlist
-                const loadWatchlistData = async (tickers, appendMode = false) => {
-                    if (tickers.length === 0) return;
-                    
-                    setWatchlistLoading(true);
-                    const newData = {};
-                    
+                // Fallback: Individual ticker loading (used when batch fails)
+                const loadWatchlistDataIndividual = async (tickers, dataObject) => {
                     for (const ticker of tickers) {
                         try {
                             const data = await fetchStockData(ticker);
                             if (data && !data.message) {
-                                newData[ticker] = {
+                                dataObject[ticker] = {
                                     ...data,
                                     timestamp: new Date().toISOString()
                                 };
@@ -3495,7 +3490,66 @@ STRUCTURE JSON OBLIGATOIRE:
                             console.error(`Erreur pour ${ticker}:`, error?.message || String(error));
                         }
                     }
-                    
+                };
+
+                // Charger les données pour les tickers de la watchlist (OPTIMIZED WITH BATCHING)
+                const loadWatchlistData = async (tickers, appendMode = false) => {
+                    if (tickers.length === 0) return;
+
+                    setWatchlistLoading(true);
+                    const newData = {};
+
+                    try {
+                        // BATCH OPTIMIZATION: Use batch endpoint for multiple tickers
+                        if (tickers.length > 1) {
+                            console.log(`🚀 Batch loading ${tickers.length} tickers...`);
+                            const symbolsQuery = tickers.join(',');
+                            const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
+
+                            if (batchResponse.ok) {
+                                const batchData = await batchResponse.json();
+                                console.log(`✅ Batch loaded: ${batchData.metadata?.total_data_points || 'N/A'} data points`);
+                                console.log(`💰 API Calls Saved: ${batchData.metadata?.api_calls_saved || 'N/A'}`);
+
+                                // Process batch results
+                                if (batchData.success && batchData.data) {
+                                    const quotes = batchData.data.quote || {};
+                                    const fundamentals = batchData.data.fundamentals || {};
+
+                                    tickers.forEach(ticker => {
+                                        const tickerUpper = ticker.toUpperCase();
+                                        const quote = quotes[tickerUpper];
+                                        const fundamental = fundamentals[tickerUpper];
+
+                                        if (quote || fundamental) {
+                                            newData[ticker] = {
+                                                symbol: tickerUpper,
+                                                price: quote?.c || fundamental?.quote?.price || 0,
+                                                change: quote?.d || fundamental?.quote?.change || 0,
+                                                changePercent: quote?.dp || fundamental?.quote?.changesPercentage || 0,
+                                                profile: fundamental?.profile || null,
+                                                ratios: fundamental?.ratios || null,
+                                                source: quote?.source || fundamental?.source || 'batch',
+                                                timestamp: new Date().toISOString()
+                                            };
+                                        }
+                                    });
+                                }
+                            } else {
+                                console.warn('⚠️ Batch endpoint failed, falling back to individual requests');
+                                // Fallback to individual requests
+                                await loadWatchlistDataIndividual(tickers, newData);
+                            }
+                        } else {
+                            // Single ticker - use regular fetch
+                            await loadWatchlistDataIndividual(tickers, newData);
+                        }
+                    } catch (error) {
+                        console.error('❌ Batch loading error:', error);
+                        // Fallback to individual requests on error
+                        await loadWatchlistDataIndividual(tickers, newData);
+                    }
+
                     // Si appendMode, ajouter aux données existantes au lieu de remplacer
                     if (appendMode) {
                         setWatchlistStockData(prev => ({ ...prev, ...newData }));

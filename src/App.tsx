@@ -243,32 +243,66 @@ const GOB = () => {
     setMarketData(newMarketData);
   };
 
-  // Fonction pour récupérer les données des indices boursiers
+  // Fonction pour récupérer les données des indices boursiers (OPTIMIZED WITH BATCHING)
   const fetchMarketData = async () => {
     try {
       const symbols = ['SPX', 'IXIC', 'DJI', 'TSX', 'EURUSD', 'GOLD', 'OIL', 'BTCUSD'];
       const newMarketData: any = {};
       let hasRealData = false;
-      
-      for (const symbol of symbols) {
-        try {
-          const response = await fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`);
-          const data = await response.json();
-          
-          if (data.c && data.d !== undefined && data.dp !== undefined && data.source === 'finnhub') {
-            newMarketData[symbol] = {
-              symbol: getSymbolName(symbol),
-              price: data.c,
-              change: data.d,
-              changePercent: data.dp
-            };
-            hasRealData = true;
+
+      try {
+        // BATCH OPTIMIZATION: Fetch all symbols at once
+        console.log('🚀 Batch loading market indices...');
+        const symbolsQuery = symbols.join(',');
+        const batchResponse = await fetch(`/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote`);
+
+        if (batchResponse.ok) {
+          const batchData = await batchResponse.json();
+          console.log(`✅ Market indices loaded (batch): ${batchData.metadata?.total_data_points || 'N/A'} data points`);
+
+          if (batchData.success && batchData.data?.quote) {
+            const quotes = batchData.data.quote;
+
+            symbols.forEach(symbol => {
+              const quote = quotes[symbol];
+              if (quote && quote.c !== undefined && quote.d !== undefined && quote.dp !== undefined) {
+                newMarketData[symbol] = {
+                  symbol: getSymbolName(symbol),
+                  price: quote.c,
+                  change: quote.d,
+                  changePercent: quote.dp
+                };
+                hasRealData = true;
+              }
+            });
           }
-        } catch (error) {
-          console.log(`Erreur pour ${symbol}:`, error);
+        } else {
+          console.warn('⚠️ Batch endpoint failed, falling back to individual requests');
+          throw new Error('Batch failed');
+        }
+      } catch (batchError) {
+        // Fallback to individual requests
+        console.log('Falling back to individual symbol requests...');
+        for (const symbol of symbols) {
+          try {
+            const response = await fetch(`/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`);
+            const data = await response.json();
+
+            if (data.c && data.d !== undefined && data.dp !== undefined) {
+              newMarketData[symbol] = {
+                symbol: getSymbolName(symbol),
+                price: data.c,
+                change: data.d,
+                changePercent: data.dp
+              };
+              hasRealData = true;
+            }
+          } catch (error) {
+            console.log(`Erreur pour ${symbol}:`, error);
+          }
         }
       }
-      
+
       if (hasRealData && Object.keys(newMarketData).length > 0) {
         setMarketData(prev => ({ ...prev, ...newMarketData }));
       } else {
