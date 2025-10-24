@@ -15340,7 +15340,7 @@ console.log('✅ Données hybrides récupérées:', {
                         grouping: 'sector',
                         locale: 'fr',
                         symbolUrl: '',
-                        colorTheme: isDarkMode ? 'dark' : 'light',
+                        colorTheme: 'dark',
                         exchanges: [
                             'TSX',
                             'NASDAQ'
@@ -15350,8 +15350,8 @@ console.log('✅ Données hybrides récupérées:', {
                         isZoomEnabled: true,
                         hasSymbolTooltip: true,
                         isMonoSize: true,
-                        width: '100%',
-                        height: '100%'
+                        width: 500,
+                        height: 500
                     });
 
                     container.appendChild(script);
@@ -15361,7 +15361,7 @@ console.log('✅ Données hybrides récupérées:', {
                             container.innerHTML = '';
                         }
                     };
-                }, [isDarkMode]);
+                }, []);
 
                 return (
                     <div className="space-y-6">
@@ -15514,12 +15514,22 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div
-                                className="tradingview-widget-container"
-                                ref={tradingViewHeatmapRef}
-                                style={{ height: '1200px', width: '100%' }}
-                            >
-                                {/* Le widget sera injecté ici par le script */}
+                            <div className="tradingview-widget-container" ref={tradingViewHeatmapRef}>
+                                <div className="tradingview-widget-container__widget"></div>
+                                <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    <a
+                                        href="https://fr.tradingview.com/heatmap/stock/"
+                                        rel="noopener nofollow"
+                                        target="_blank"
+                                        className={`underline transition-colors duration-300 ${
+                                            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                        }`}
+                                    >
+                                        <span className="blue-text">Track all markets on TradingView</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
