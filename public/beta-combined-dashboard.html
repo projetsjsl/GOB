@@ -15271,25 +15271,10 @@ console.log('✅ Données hybrides récupérées:', {
                                     allowTransparency="true"
                                     marginWidth="0"
                                     marginHeight="0"
+                                    sandbox="allow-scripts allow-same-origin allow-forms"
                                     className="relative z-0"
                                     style={{ minWidth: '100%', background: 'transparent' }}
                                 />
-                                <div className={`p-3 text-center text-xs transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                    Calendrier économique fourni par{' '}
-                                    <a
-                                        href="https://fr.investing.com/"
-                                        rel="nofollow"
-                                        target="_blank"
-                                        className={`font-semibold underline transition-colors duration-300 ${
-                                            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                        }`}
-                                    >
-                                        Investing.com France
-                                    </a>
-                                    , portail leader de la bourse.
-                                </div>
                             </div>
                         </div>
 
@@ -15313,21 +15298,6 @@ console.log('✅ Données hybrides récupérées:', {
                             <div className="tradingview-widget-container" ref={tradingViewForexRef}>
                                 {/* Le widget sera injecté ici par le script */}
                             </div>
-
-                            <div className={`mt-3 text-center text-xs transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                <a
-                                    href="https://fr.tradingview.com/markets/currencies/cross-rates-overview-heat-map/"
-                                    rel="noopener nofollow"
-                                    target="_blank"
-                                    className={`underline transition-colors duration-300 ${
-                                        isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                    }`}
-                                >
-                                    Track all markets on TradingView
-                                </a>
-                            </div>
                         </div>
 
                         {/* Widget TradingView Economic Calendar Events */}
@@ -15349,22 +15319,6 @@ console.log('✅ Données hybrides récupérées:', {
 
                             <div className="tradingview-widget-container" ref={tradingViewEventsRef}>
                                 {/* Le widget sera injecté ici par le script */}
-                            </div>
-
-                            <div className={`mt-3 text-center text-xs transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                <a
-                                    href="https://www.tradingview.com/economic-calendar/"
-                                    rel="noopener nofollow"
-                                    target="_blank"
-                                    className={`underline transition-colors duration-300 ${
-                                        isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                    }`}
-                                >
-                                    <span className="blue-text">Economic Calendar</span>
-                                </a>
-                                <span className="trademark"> by TradingView</span>
                             </div>
                         </div>
 
@@ -15388,24 +15342,9 @@ console.log('✅ Données hybrides récupérées:', {
                             <div
                                 className="tradingview-widget-container"
                                 ref={tradingViewChartRef}
-                                style={{ height: '600px', width: '100%' }}
+                                style={{ height: '1200px', width: '100%' }}
                             >
                                 {/* Le widget sera injecté ici par le script */}
-                            </div>
-
-                            <div className={`mt-3 text-center text-xs transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                <a
-                                    href="https://fr.tradingview.com/symbols/NASDAQ-AAPL/"
-                                    rel="noopener nofollow"
-                                    target="_blank"
-                                    className={`underline transition-colors duration-300 ${
-                                        isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                    }`}
-                                >
-                                    <span className="blue-text">Track all markets on TradingView</span>
-                                </a>
                             </div>
                         </div>
                     </div>
