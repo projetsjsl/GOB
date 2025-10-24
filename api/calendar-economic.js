@@ -29,21 +29,26 @@ export default async function handler(req, res) {
     try {
         console.log('🔄 [1/3] Trying FMP...');
         const FMP_API_KEY = process.env.FMP_API_KEY;
+        const fmpUrl = `https://financialmodelingprep.com/api/v3/economic_calendar?from=${from}&to=${to}&apikey=${FMP_API_KEY}`;
+        console.log(`FMP URL: ${fmpUrl.replace(FMP_API_KEY, 'KEY_HIDDEN')}`);
 
         if (FMP_API_KEY) {
-            const response = await fetch(
-                `https://financialmodelingprep.com/api/v3/economic_calendar?from=${from}&to=${to}&apikey=${FMP_API_KEY}`,
-                { timeout: 5000 }
-            );
+            const response = await fetch(fmpUrl, { timeout: 5000 });
+            console.log(`FMP Response Status: ${response.status}`);
 
             if (response.ok) {
                 const fmpData = await response.json();
+                console.log(`FMP Response: ${JSON.stringify(fmpData).substring(0, 200)}`);
                 if (Array.isArray(fmpData) && fmpData.length > 0) {
                     events = parseFMPCalendar(fmpData);
                     source = 'fmp';
                     console.log(`✅ FMP: ${events.length} days of events`);
+                } else {
+                    throw new Error(`Empty or invalid response: ${JSON.stringify(fmpData).substring(0, 100)}`);
                 }
             } else {
+                const errorText = await response.text();
+                console.error(`FMP Error Response: ${errorText.substring(0, 200)}`);
                 throw new Error(`HTTP ${response.status}`);
             }
         } else {
@@ -51,7 +56,7 @@ export default async function handler(req, res) {
         }
     } catch (error) {
         errors.push(`FMP: ${error.message}`);
-        console.log(`⚠️ FMP failed: ${error.message}`);
+        console.error(`⚠️ FMP failed: ${error.message}`);
     }
 
     // Try 2: Alpha Vantage (Fallback)
@@ -59,21 +64,26 @@ export default async function handler(req, res) {
         try {
             console.log('🔄 [2/3] Trying Alpha Vantage...');
             const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
+            const avUrl = `https://www.alphavantage.co/query?function=ECONOMIC_CALENDAR&apikey=${ALPHA_VANTAGE_API_KEY}`;
+            console.log(`AV Key configured: ${!!ALPHA_VANTAGE_API_KEY}`);
 
             if (ALPHA_VANTAGE_API_KEY) {
-                const response = await fetch(
-                    `https://www.alphavantage.co/query?function=ECONOMIC_CALENDAR&apikey=${ALPHA_VANTAGE_API_KEY}`,
-                    { timeout: 5000 }
-                );
+                const response = await fetch(avUrl, { timeout: 5000 });
+                console.log(`AV Response Status: ${response.status}`);
 
                 if (response.ok) {
                     const avData = await response.json();
+                    console.log(`AV Response: ${JSON.stringify(avData).substring(0, 200)}`);
                     if (avData.data && Array.isArray(avData.data) && avData.data.length > 0) {
                         events = parseAlphaVantageCalendar(avData.data);
                         source = 'alpha_vantage';
                         console.log(`✅ Alpha Vantage: ${events.length} days of events`);
+                    } else {
+                        throw new Error(`Empty or invalid response: ${JSON.stringify(avData).substring(0, 100)}`);
                     }
                 } else {
+                    const errorText = await response.text();
+                    console.error(`AV Error Response: ${errorText.substring(0, 200)}`);
                     throw new Error(`HTTP ${response.status}`);
                 }
             } else {
@@ -81,7 +91,7 @@ export default async function handler(req, res) {
             }
         } catch (error) {
             errors.push(`Alpha Vantage: ${error.message}`);
-            console.log(`⚠️ Alpha Vantage failed: ${error.message}`);
+            console.error(`⚠️ Alpha Vantage failed: ${error.message}`);
         }
     }
 
