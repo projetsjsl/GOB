@@ -59,13 +59,16 @@
       "maxDuration": 60
     },
     "api/calendar-economic.js": {
-      "maxDuration": 15
+      "maxDuration": 15,
+      "memory": 1024
     },
     "api/calendar-earnings.js": {
-      "maxDuration": 15
+      "maxDuration": 15,
+      "memory": 1024
     },
     "api/calendar-dividends.js": {
-      "maxDuration": 15
+      "maxDuration": 15,
+      "memory": 1024
     }
   },
   "builds": [
