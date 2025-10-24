@@ -1,9 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": null,
   "functions": {
     "api/ai-services.js": {
       "maxDuration": 120
@@ -61,8 +57,24 @@
     },
     "api/scrape-seeking-alpha.js": {
       "maxDuration": 60
+    },
+    "api/calendar-economic.js": {
+      "maxDuration": 15
+    },
+    "api/calendar-earnings.js": {
+      "maxDuration": 15
+    },
+    "api/calendar-dividends.js": {
+      "maxDuration": 15
     }
   },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
   "crons": [],
   "headers": [
     {
