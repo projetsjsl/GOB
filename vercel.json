@@ -1,14 +1,14 @@
 {
   "version": 2,
   "functions": {
-    "api/ai-services.js": {
-      "maxDuration": 120
-    },
-    "api/health-check-simple.js": {
+    "api/marketdata.js": {
       "maxDuration": 10
     },
-    "api/briefing-cron.js": {
-      "maxDuration": 60
+    "api/marketdata/batch.js": {
+      "maxDuration": 30
+    },
+    "api/gemini/chat.js": {
+      "maxDuration": 30
     },
     "api/emma-agent.js": {
       "maxDuration": 300
@@ -16,47 +16,8 @@
     "api/emma-briefing.js": {
       "maxDuration": 45
     },
-    "api/marketdata.js": {
-      "maxDuration": 10
-    },
-    "api/marketdata/batch.js": {
-      "maxDuration": 30
-    },
     "api/supabase-watchlist.js": {
       "maxDuration": 15
-    },
-    "api/gemini-key.js": {
-      "maxDuration": 10
-    },
-    "api/github-update.js": {
-      "maxDuration": 15
-    },
-    "api/gemini/chat.js": {
-      "maxDuration": 30
-    },
-    "api/gemini/chat-validated.js": {
-      "maxDuration": 30
-    },
-    "api/gemini/tools.js": {
-      "maxDuration": 20
-    },
-    "api/send-email.js": {
-      "maxDuration": 30
-    },
-    "api/cron-briefings.js": {
-      "maxDuration": 300
-    },
-    "api/seeking-alpha-tickers.js": {
-      "maxDuration": 15
-    },
-    "api/seeking-alpha-scraping.js": {
-      "maxDuration": 30
-    },
-    "api/seeking-alpha-batch.js": {
-      "maxDuration": 300
-    },
-    "api/scrape-seeking-alpha.js": {
-      "maxDuration": 60
     },
     "api/calendar-economic.js": {
       "maxDuration": 15,
@@ -69,6 +30,12 @@
     "api/calendar-dividends.js": {
       "maxDuration": 15,
       "memory": 1024
+    },
+    "api/ai-services.js": {
+      "maxDuration": 120
+    },
+    "api/fmp.js": {
+      "maxDuration": 10
     }
   },
   "builds": [
