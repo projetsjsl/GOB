@@ -460,6 +460,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const clickSoundRef = useRef(null);
             const tabSoundRef = useRef(null);
             const audioCtxRef = useRef(null);
+            const tickerTapeRef = useRef(null);
 
             // États pour Emma (partagés entre AskEmmaTab et AdminJSLaiTab)
             const [emmaConnected, setEmmaConnected] = useState(false);
@@ -1789,6 +1790,49 @@ const fetchHybridData = async (symbol, dataType) => {
             useEffect(() => {
                 setFilteredNews(newsData);
             }, [newsData]);
+
+            // Charger le widget TradingView Ticker Tape
+            useEffect(() => {
+                const container = tickerTapeRef.current;
+                if (!container) return;
+
+                container.innerHTML = '';
+
+                const script = document.createElement('script');
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+                script.type = 'text/javascript';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    symbols: [
+                        {
+                            proName: 'FOREXCOM:SPXUSD',
+                            title: 'S&P 500 Index'
+                        },
+                        {
+                            proName: 'FOREXCOM:NSXUSD',
+                            title: 'US 100 Cash CFD'
+                        },
+                        {
+                            proName: 'BITSTAMP:BTCUSD',
+                            title: 'Bitcoin'
+                        }
+                    ],
+                    colorTheme: isDarkMode ? 'dark' : 'light',
+                    locale: 'fr',
+                    largeChartUrl: '',
+                    isTransparent: false,
+                    showSymbolLogo: true,
+                    displayMode: 'adaptive'
+                });
+
+                container.appendChild(script);
+
+                return () => {
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+                };
+            }, [isDarkMode]);
 
             // Fonctions de scraping
             const addScrapingLog = (message, type = 'info') => {
@@ -15116,6 +15160,8 @@ console.log('✅ Données hybrides récupérées:', {
                 const tradingViewForexRef = useRef(null);
                 const tradingViewEventsRef = useRef(null);
                 const tradingViewChartRef = useRef(null);
+                const tradingViewCrossRatesRef = useRef(null);
+                const tradingViewHeatmapRef = useRef(null);
 
                 // Charger le script TradingView Forex Heat Map
                 useEffect(() => {
@@ -15236,6 +15282,87 @@ console.log('✅ Données hybrides récupérées:', {
                     };
                 }, [isDarkMode]);
 
+                // Charger le script TradingView Forex Cross Rates
+                useEffect(() => {
+                    const container = tradingViewCrossRatesRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        colorTheme: isDarkMode ? 'dark' : 'light',
+                        isTransparent: false,
+                        locale: 'fr',
+                        currencies: [
+                            'EUR',
+                            'USD',
+                            'JPY',
+                            'GBP',
+                            'CHF',
+                            'AUD',
+                            'CAD',
+                            'NZD',
+                            'CNY'
+                        ],
+                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                        width: '100%',
+                        height: 400
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, [isDarkMode]);
+
+                // Charger le script TradingView Stock Heatmap
+                useEffect(() => {
+                    const container = tradingViewHeatmapRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        dataSource: 'SPX500',
+                        blockSize: 'market_cap_basic',
+                        blockColor: 'change',
+                        grouping: 'sector',
+                        locale: 'fr',
+                        symbolUrl: '',
+                        colorTheme: isDarkMode ? 'dark' : 'light',
+                        exchanges: [
+                            'TSX',
+                            'NASDAQ'
+                        ],
+                        hasTopBar: true,
+                        isDataSetEnabled: true,
+                        isZoomEnabled: true,
+                        hasSymbolTooltip: true,
+                        isMonoSize: true,
+                        width: '100%',
+                        height: '100%'
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, [isDarkMode]);
+
                 return (
                     <div className="space-y-6">
                         {/* Calendrier Économique Investing.com */}
@@ -15343,6 +15470,54 @@ console.log('✅ Données hybrides récupérées:', {
                                 className="tradingview-widget-container"
                                 ref={tradingViewChartRef}
                                 style={{ height: '1200px', width: '100%' }}
+                            >
+                                {/* Le widget sera injecté ici par le script */}
+                            </div>
+                        </div>
+
+                        {/* Widget TradingView Forex Cross Rates */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    💱 Forex Cross Rates
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Taux de change croisés pour 9 devises majeures (EUR, USD, JPY, GBP, CHF, AUD, CAD, NZD, CNY)
+                                </p>
+                            </div>
+
+                            <div className="tradingview-widget-container" ref={tradingViewCrossRatesRef}>
+                                {/* Le widget sera injecté ici par le script */}
+                            </div>
+                        </div>
+
+                        {/* Widget TradingView Stock Heatmap */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    🗺️ Stock Heatmap S&P 500
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Carte thermique du S&P 500 avec TSX et NASDAQ - Performance par secteur et capitalisation
+                                </p>
+                            </div>
+
+                            <div
+                                className="tradingview-widget-container"
+                                ref={tradingViewHeatmapRef}
+                                style={{ height: '600px', width: '100%' }}
                             >
                                 {/* Le widget sera injecté ici par le script */}
                             </div>
@@ -15504,44 +15679,10 @@ console.log('✅ Données hybrides récupérées:', {
                         <div className="h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"></div>
                     </header>
 
-                    {/* Ticker Banner - Données boursières en temps réel */}
-                    {tickerData.length > 0 && (
-                        <div className="relative bg-black border-b border-gray-800 overflow-hidden">
-                            <style>{`
-                                @keyframes ticker-scroll {
-                                    0% { transform: translateX(0); }
-                                    100% { transform: translateX(-50%); }
-                                }
-                                .ticker-content {
-                                    display: flex;
-                                    animation: ticker-scroll 60s linear infinite;
-                                }
-                                .ticker-content:hover {
-                                    animation-play-state: paused;
-                                }
-                            `}</style>
-                            <div className="ticker-content whitespace-nowrap">
-                                {tickerData.concat(tickerData).map((item, index) => (
-                                    <div key={`${item.symbol}-${index}`} className="inline-flex items-center px-6 py-2 border-r border-gray-800">
-                                        <span className="text-gray-400 text-xs font-semibold mr-2">{item.name}</span>
-                                        <span className="text-white text-sm font-bold mr-2">
-                                            {item.type === 'bond' ? `${(item.price || 0).toFixed(2)}%` : (item.price || 0).toFixed(2)}
-                                        </span>
-                                        <span className={`text-xs font-semibold ${item.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                            {item.change >= 0 ? '▲' : '▼'} {Math.abs(item.change || 0).toFixed(2)} ({Math.abs(item.changePercent || 0).toFixed(2)}%)
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                            <button
-                                onClick={fetchTickerData}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
-                                title="Actualiser les données"
-                            >
-                                🔄 Actualiser
-                            </button>
-                        </div>
-                    )}
+                    {/* TradingView Ticker Tape Widget - Bandeau de cotations */}
+                    <div className="tradingview-widget-container" ref={tickerTapeRef}>
+                        <div className="tradingview-widget-container__widget"></div>
+                    </div>
 
                     {/* Navigation par onglets - Bloomberg Style */}
                     <nav className={`relative backdrop-blur-sm transition-all duration-300 ${
