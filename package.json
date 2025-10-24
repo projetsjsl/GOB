@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
+    "test:calendar": "node test-calendar-apis.js",
     "cron:edt": "bash scripts/change-cron-timezone.sh edt",
     "cron:est": "bash scripts/change-cron-timezone.sh est"
   },
