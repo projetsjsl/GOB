@@ -185,12 +185,13 @@ function parseFMPCalendar(fmpData) {
     const eventsByDate = {};
 
     fmpData.forEach(item => {
-        // Formater la date (ex: "2024-10-17" -> "Wed Oct 17")
+        // Formater la date avec l'année (ex: "2024-10-17" -> "Wed, Oct 17, 2025")
         const date = new Date(item.date);
         const dateStr = date.toLocaleDateString('en-US', {
             weekday: 'short',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            year: 'numeric'
         });
 
         // Déterminer l'impact basé sur le nom de l'événement
@@ -248,7 +249,8 @@ function parseFinnhubCalendar(finnhubData) {
         const dateStr = date.toLocaleDateString('en-US', {
             weekday: 'short',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            year: 'numeric'
         });
 
         // Determine impact based on importance or impact field
@@ -302,7 +304,8 @@ function parseTwelveDataCalendar(twelveData) {
         const dateStr = date.toLocaleDateString('en-US', {
             weekday: 'short',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            year: 'numeric'
         });
 
         // Map importance to impact level
@@ -356,7 +359,8 @@ function parseAlphaVantageCalendar(avData) {
             const dateStr = eventDate.toLocaleDateString('en-US', {
                 weekday: 'short',
                 month: 'short',
-                day: 'numeric'
+                day: 'numeric',
+                year: 'numeric'
             });
 
             // Map importance to impact level
@@ -406,41 +410,47 @@ function getFallbackData() {
     // Enhanced fallback with realistic recurring economic events
     const today = new Date();
     const nextDays = [];
+    const year = today.getFullYear();
 
     // Common economic events by day of week
     const recurringEvents = {
         1: [ // Monday
-            { event: 'ISM Manufacturing PMI', impact: 3, time: '10:00 AM' },
-            { event: 'Construction Spending', impact: 2, time: '10:00 AM' }
+            { event: 'ISM Manufacturing PMI', impact: 3, time: '10:00 AM', actual: 'N/A', forecast: '52.0', previous: '52.0' },
+            { event: 'Construction Spending', impact: 2, time: '10:00 AM', actual: 'N/A', forecast: '0.2%', previous: '0.1%' }
         ],
         2: [ // Tuesday
-            { event: 'Factory Orders', impact: 2, time: '10:00 AM' },
-            { event: 'Job Openings (JOLTS)', impact: 3, time: '10:00 AM' }
+            { event: 'Factory Orders', impact: 2, time: '10:00 AM', actual: 'N/A', forecast: '0.2%', previous: '0.1%' },
+            { event: 'Job Openings (JOLTS)', impact: 3, time: '10:00 AM', actual: 'N/A', forecast: '7.86M', previous: '7.86M' }
         ],
         3: [ // Wednesday
-            { event: 'ADP Employment Report', impact: 3, time: '08:15 AM' },
-            { event: 'ISM Services PMI', impact: 3, time: '10:00 AM' },
-            { event: 'FOMC Meeting Minutes', impact: 3, time: '02:00 PM' }
+            { event: 'ADP Employment Report', impact: 3, time: '08:15 AM', actual: 'N/A', forecast: '115K', previous: '143K' },
+            { event: 'ISM Services PMI', impact: 3, time: '10:00 AM', actual: 'N/A', forecast: '53.8', previous: '54.9' },
+            { event: 'FOMC Meeting Minutes', impact: 3, time: '02:00 PM', actual: 'N/A', forecast: 'N/A', previous: 'N/A' }
         ],
         4: [ // Thursday
-            { event: 'Initial Jobless Claims', impact: 3, time: '08:30 AM' },
-            { event: 'Continuing Jobless Claims', impact: 2, time: '08:30 AM' },
-            { event: 'Trade Balance', impact: 2, time: '08:30 AM' }
+            { event: 'Core Inflation Rate YoY', impact: 3, time: '08:30 AM', actual: 'N/A', forecast: '3.1%', previous: '3.1%' },
+            { event: 'Inflation Rate YoY', impact: 3, time: '08:30 AM', actual: 'N/A', forecast: '3.1%', previous: '2.9%' },
+            { event: 'Core Inflation Rate MoM', impact: 3, time: '08:30 AM', actual: 'N/A', forecast: '0.3%', previous: '0.3%' },
+            { event: 'Initial Jobless Claims', impact: 3, time: '08:30 AM', actual: 'N/A', forecast: '242K', previous: '241K' },
+            { event: 'S&P Global Services PMI Flash', impact: 2, time: '09:45 AM', actual: 'N/A', forecast: '53.5', previous: '54.2' },
+            { event: 'S&P Global Manufacturing PMI Flash', impact: 2, time: '09:45 AM', actual: 'N/A', forecast: '52.0', previous: '52.0' }
         ],
         5: [ // Friday
-            { event: 'Nonfarm Payrolls', impact: 3, time: '08:30 AM' },
-            { event: 'Unemployment Rate', impact: 3, time: '08:30 AM' },
-            { event: 'Consumer Sentiment', impact: 2, time: '10:00 AM' }
+            { event: 'Nonfarm Payrolls', impact: 3, time: '08:30 AM', actual: 'N/A', forecast: '140K', previous: '254K' },
+            { event: 'Unemployment Rate', impact: 3, time: '08:30 AM', actual: 'N/A', forecast: '4.1%', previous: '4.1%' },
+            { event: 'Consumer Sentiment', impact: 2, time: '10:00 AM', actual: 'N/A', forecast: '68.9', previous: '68.9' }
         ]
     };
 
     for (let i = 0; i < 7; i++) {
         const date = new Date(today);
         date.setDate(today.getDate() + i);
+        // Add year to date string
         const dateStr = date.toLocaleDateString('en-US', {
             weekday: 'short',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            year: 'numeric'
         });
 
         const dayOfWeek = date.getDay(); // 0=Sunday, 1=Monday, etc.
@@ -458,19 +468,21 @@ function getFallbackData() {
                 previous: 'N/A'
             });
         } else {
-            // Add day-specific events
+            // Add day-specific events with ALL columns
             const dayEvents = recurringEvents[dayOfWeek] || [];
-            const selectedEvents = dayEvents.slice(0, Math.min(2, dayEvents.length));
 
-            selectedEvents.forEach(evt => {
+            // For today (Thursday), show all CPI/inflation events
+            const eventsToShow = (dayOfWeek === 4) ? dayEvents : dayEvents.slice(0, Math.min(3, dayEvents.length));
+
+            eventsToShow.forEach(evt => {
                 events.push({
                     time: evt.time,
                     currency: 'USD',
                     impact: evt.impact,
                     event: evt.event,
-                    actual: 'N/A',
-                    forecast: 'N/A',
-                    previous: 'N/A'
+                    actual: evt.actual || 'N/A',
+                    forecast: evt.forecast || 'N/A',
+                    previous: evt.previous || 'N/A'
                 });
             });
 

@@ -94,6 +94,7 @@ function parseFMPDividends(fmpData) {
         const date = new Date(item.date);
         const dateStr = date.toLocaleDateString('en-US', {
             weekday: 'short',
+            year: 'numeric',
             month: 'short',
             day: 'numeric'
         });
