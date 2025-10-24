@@ -15115,6 +15115,7 @@ console.log('✅ Données hybrides récupérées:', {
                 // Refs pour les widgets TradingView
                 const tradingViewForexRef = useRef(null);
                 const tradingViewEventsRef = useRef(null);
+                const tradingViewChartRef = useRef(null);
 
                 // Charger le script TradingView Forex Heat Map
                 useEffect(() => {
@@ -15185,6 +15186,55 @@ console.log('✅ Données hybrides récupérées:', {
                         }
                     };
                 }, []);
+
+                // Charger le script TradingView Advanced Chart
+                useEffect(() => {
+                    const container = tradingViewChartRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        autosize: true,
+                        symbol: 'NASDAQ:AAPL',
+                        interval: 'D',
+                        timezone: 'America/Toronto',
+                        theme: isDarkMode ? 'dark' : 'light',
+                        style: '1',
+                        locale: 'fr',
+                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                        gridColor: isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(46, 46, 46, 0.06)',
+                        allow_symbol_change: true,
+                        calendar: false,
+                        details: true,
+                        hide_side_toolbar: false,
+                        hide_top_toolbar: false,
+                        hide_legend: false,
+                        hide_volume: false,
+                        hotlist: true,
+                        save_image: true,
+                        watchlist: [],
+                        withdateranges: true,
+                        range: 'YTD',
+                        compareSymbols: [],
+                        show_popup_button: true,
+                        popup_height: '650',
+                        popup_width: '1000',
+                        studies: []
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, [isDarkMode]);
 
                 return (
                     <div className="space-y-6">
@@ -15315,6 +15365,47 @@ console.log('✅ Données hybrides récupérées:', {
                                     <span className="blue-text">Economic Calendar</span>
                                 </a>
                                 <span className="trademark"> by TradingView</span>
+                            </div>
+                        </div>
+
+                        {/* Widget TradingView Advanced Chart */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📈 Graphique Avancé (Advanced Chart)
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Graphique de trading avancé avec analyses techniques et indicateurs (NASDAQ:AAPL par défaut)
+                                </p>
+                            </div>
+
+                            <div
+                                className="tradingview-widget-container"
+                                ref={tradingViewChartRef}
+                                style={{ height: '600px', width: '100%' }}
+                            >
+                                {/* Le widget sera injecté ici par le script */}
+                            </div>
+
+                            <div className={`mt-3 text-center text-xs transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                <a
+                                    href="https://fr.tradingview.com/symbols/NASDAQ-AAPL/"
+                                    rel="noopener nofollow"
+                                    target="_blank"
+                                    className={`underline transition-colors duration-300 ${
+                                        isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                    }`}
+                                >
+                                    <span className="blue-text">Track all markets on TradingView</span>
+                                </a>
                             </div>
                         </div>
                     </div>
