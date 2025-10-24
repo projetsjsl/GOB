@@ -14584,50 +14584,50 @@ console.log('✅ Données hybrides récupérées:', {
 
                     try {
                         if (activeSubTab === 'earnings') {
-                            // Use FMP earnings-calendar endpoint
-                            const today = new Date();
-                            const futureDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-                            const from = today.toISOString().split('T')[0];
-                            const to = futureDate.toISOString().split('T')[0];
-
-                            const response = await fetch(`/api/fmp?endpoint=earnings-calendar&from=${from}&to=${to}`);
+                            // Connect to dedicated Earnings Calendar API with fallback chain
+                            const response = await fetch('/api/calendar-earnings');
                             const result = await response.json();
 
                             if (result.success && result.data) {
-                                // Transform FMP earnings data to calendar format
-                                const groupedByDate = {};
-                                result.data.forEach(earning => {
-                                    const date = earning.date;
-                                    if (!groupedByDate[date]) {
-                                        groupedByDate[date] = {
-                                            date: new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-                                            events: []
-                                        };
-                                    }
-                                    groupedByDate[date].events.push({
-                                        time: 'Market Close',
-                                        ticker: earning.symbol,
-                                        event: `${earning.symbol} Earnings`,
-                                        epsActual: earning.epsActual || 'N/A',
-                                        epsEstimated: earning.epsEstimated || 'N/A',
-                                        revenueActual: earning.revenueActual ? `$${(earning.revenueActual / 1e9).toFixed(2)}B` : 'N/A',
-                                        revenueEstimated: earning.revenueEstimated ? `$${(earning.revenueEstimated / 1e9).toFixed(2)}B` : 'N/A'
-                                    });
-                                });
-                                setCalendarData(Object.values(groupedByDate));
-                                console.log(`✅ ${result.data.length} earnings events loaded`);
+                                setCalendarData(result.data);
+                                console.log(`✅ ${result.data.length} earnings calendar days loaded from ${result.source}`);
+                                if (result.fallback_tried) {
+                                    console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                                }
                             } else {
-                                setError('Aucune donnée disponible');
+                                setError('Aucune donnée d\'earnings disponible');
                                 setCalendarData(getFallbackData());
                             }
                         } else if (activeSubTab === 'economic') {
-                            // Economic calendar requires paid FMP plan - show info message
-                            setError('📊 Le calendrier économique nécessite un abonnement FMP payant');
-                            setCalendarData(getFallbackData());
+                            // Connect to dedicated Economic Calendar API with fallback chain
+                            const response = await fetch('/api/calendar-economic');
+                            const result = await response.json();
+
+                            if (result.success && result.data) {
+                                setCalendarData(result.data);
+                                console.log(`✅ ${result.data.length} economic calendar days loaded from ${result.source}`);
+                                if (result.fallback_tried) {
+                                    console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                                }
+                            } else {
+                                setError('Aucune donnée économique disponible');
+                                setCalendarData(getFallbackData());
+                            }
                         } else if (activeSubTab === 'dividends') {
-                            // Dividends calendar not implemented yet
-                            setError('📊 Calendrier des dividendes à venir prochainement');
-                            setCalendarData(getFallbackData());
+                            // Connect to dedicated Dividends Calendar API
+                            const response = await fetch('/api/calendar-dividends');
+                            const result = await response.json();
+
+                            if (result.success && result.data) {
+                                setCalendarData(result.data);
+                                console.log(`✅ ${result.data.length} dividend events loaded from ${result.source}`);
+                                if (result.fallback_tried) {
+                                    console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                                }
+                            } else {
+                                setError('Aucune donnée de dividendes disponible');
+                                setCalendarData(getFallbackData());
+                            }
                         } else {
                             setCalendarData(getFallbackData());
                         }
