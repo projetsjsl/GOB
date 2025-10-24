@@ -20,14 +20,14 @@ export default async function handler(req, res) {
     const from = new Date().toISOString().split('T')[0];
     const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    // Cascade fallback: FMP → Twelve Data → Static fallback
+    // Cascade fallback: FMP → Alpha Vantage → Twelve Data → Static fallback
     let events = null;
     let source = 'fallback';
     let errors = [];
 
     // Try 1: FMP (Primary)
     try {
-        console.log('🔄 [1/2] Trying FMP...');
+        console.log('🔄 [1/3] Trying FMP...');
         const FMP_API_KEY = process.env.FMP_API_KEY;
 
         if (FMP_API_KEY) {
@@ -54,10 +54,41 @@ export default async function handler(req, res) {
         console.log(`⚠️ FMP failed: ${error.message}`);
     }
 
-    // Try 2: Twelve Data (Fallback)
+    // Try 2: Alpha Vantage (Fallback)
     if (!events) {
         try {
-            console.log('🔄 [2/2] Trying Twelve Data...');
+            console.log('🔄 [2/3] Trying Alpha Vantage...');
+            const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
+
+            if (ALPHA_VANTAGE_API_KEY) {
+                const response = await fetch(
+                    `https://www.alphavantage.co/query?function=ECONOMIC_CALENDAR&apikey=${ALPHA_VANTAGE_API_KEY}`,
+                    { timeout: 5000 }
+                );
+
+                if (response.ok) {
+                    const avData = await response.json();
+                    if (avData.data && Array.isArray(avData.data) && avData.data.length > 0) {
+                        events = parseAlphaVantageCalendar(avData.data);
+                        source = 'alpha_vantage';
+                        console.log(`✅ Alpha Vantage: ${events.length} days of events`);
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } else {
+                throw new Error('ALPHA_VANTAGE_API_KEY not configured');
+            }
+        } catch (error) {
+            errors.push(`Alpha Vantage: ${error.message}`);
+            console.log(`⚠️ Alpha Vantage failed: ${error.message}`);
+        }
+    }
+
+    // Try 3: Twelve Data (Fallback)
+    if (!events) {
+        try {
+            console.log('🔄 [3/3] Trying Twelve Data...');
             const TWELVE_API_KEY = process.env.TWELVE_DATA_API_KEY;
 
             if (TWELVE_API_KEY) {
@@ -209,39 +240,95 @@ function parseTwelveDataCalendar(twelveData) {
     });
 }
 
+function parseAlphaVantageCalendar(avData) {
+    // Convert Alpha Vantage format to expected frontend format
+    const eventsByDate = {};
+    const now = new Date();
+    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    avData.forEach(item => {
+        const eventDate = new Date(item.date || item.time);
+
+        // Only include events in next 7 days
+        if (eventDate >= now && eventDate <= nextWeek) {
+            const dateStr = eventDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            // Map importance to impact level
+            let impact = 2; // Medium default
+            const importance = item.importance || item.impact;
+            if (importance === 'High' || importance === '3' || importance === 'high') {
+                impact = 3;
+            } else if (importance === 'Low' || importance === '1' || importance === 'low') {
+                impact = 1;
+            }
+
+            const time = eventDate.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            const event = {
+                time,
+                currency: item.currency || 'USD',
+                impact,
+                event: item.event || item.name,
+                actual: item.actual || 'N/A',
+                forecast: item.forecast || item.estimate || 'N/A',
+                previous: item.previous || 'N/A'
+            };
+
+            if (!eventsByDate[dateStr]) {
+                eventsByDate[dateStr] = {
+                    date: dateStr,
+                    events: []
+                };
+            }
+
+            eventsByDate[dateStr].events.push(event);
+        }
+    });
+
+    return Object.values(eventsByDate).sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+    });
+}
+
 function getFallbackData() {
-    return [
-        {
-            date: 'Mon Oct 16',
+    // Updated fallback data - current week economic events
+    const today = new Date();
+    const nextDays = [];
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        const dateStr = date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        nextDays.push({
+            date: dateStr,
             events: [
                 {
                     time: '08:30 AM',
                     currency: 'USD',
-                    impact: 3,
-                    event: 'NY Empire State Manufacturing Index',
-                    actual: '10.70',
-                    forecast: '-1.00',
-                    previous: '-8.70'
-                },
-                {
-                    time: '08:30 AM',
-                    currency: 'USD',
-                    impact: 3,
-                    event: 'Inflation Rate MoM',
-                    actual: 'N/A',
-                    forecast: '0.3%',
-                    previous: '0.4%'
-                },
-                {
-                    time: '12:55 PM',
-                    currency: 'USD',
-                    impact: 1,
-                    event: 'Fed Paulson Speech',
+                    impact: 2,
+                    event: 'Economic Data Release',
                     actual: 'N/A',
                     forecast: 'N/A',
                     previous: 'N/A'
                 }
             ]
-        }
-    ];
+        });
+    }
+
+    return nextDays;
 }
