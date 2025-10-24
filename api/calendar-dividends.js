@@ -145,30 +145,32 @@ function parseFMPDividends(fmpData) {
 }
 
 function getFallbackDividendsData() {
+    const year = new Date().getFullYear();
+    const nextYear = year + 1;
     // Team tickers avec dividendes estimés (trimestres à venir)
     const teamDividends = [
-        { symbol: 'JNJ', date: 'Mon Nov 25', type: 'Ex-Date', amount: '$1.24', prev: '$1.19', yield: '3.2%' },
-        { symbol: 'JPM', date: 'Fri Jan 3', type: 'Ex-Date', amount: '$1.25', prev: '$1.15', yield: '2.1%' },
-        { symbol: 'UNH', date: 'Fri Dec 13', type: 'Ex-Date', amount: '$2.10', prev: '$1.88', yield: '1.3%' },
-        { symbol: 'WFC', date: 'Fri Dec 6', type: 'Ex-Date', amount: '$0.40', prev: '$0.35', yield: '2.3%' },
-        { symbol: 'CVS', date: 'Fri Nov 1', type: 'Ex-Date', amount: '$0.67', prev: '$0.66', yield: '4.8%' },
-        { symbol: 'PFE', date: 'Fri Nov 8', type: 'Ex-Date', amount: '$0.42', prev: '$0.42', yield: '6.5%' },
-        { symbol: 'CSCO', date: 'Fri Jan 3', type: 'Ex-Date', amount: '$0.40', prev: '$0.39', yield: '2.9%' },
-        { symbol: 'T', date: 'Fri Jan 10', type: 'Ex-Date', amount: '$0.2775', prev: '$0.2775', yield: '6.2%' },
-        { symbol: 'VZ', date: 'Fri Jan 10', type: 'Ex-Date', amount: '$0.6775', prev: '$0.665', yield: '6.4%' },
-        { symbol: 'MDT', date: 'Fri Jan 10', type: 'Ex-Date', amount: '$0.70', prev: '$0.69', yield: '3.1%' },
-        { symbol: 'BNS', date: 'Tue Jan 7', type: 'Ex-Date', amount: 'C$1.06', prev: 'C$1.06', yield: '5.8%' },
-        { symbol: 'TD', date: 'Fri Jan 10', type: 'Ex-Date', amount: 'C$1.02', prev: 'C$0.96', yield: '4.9%' },
-        { symbol: 'BCE', date: 'Fri Dec 13', type: 'Ex-Date', amount: 'C$0.9675', prev: 'C$0.9675', yield: '8.5%' },
-        { symbol: 'CNR', date: 'Fri Dec 27', type: 'Ex-Date', amount: 'C$0.8375', prev: 'C$0.7875', yield: '2.0%' },
-        { symbol: 'MFC', date: 'Tue Dec 3', type: 'Ex-Date', amount: 'C$0.38', prev: 'C$0.38', yield: '4.2%' },
-        { symbol: 'TRP', date: 'Fri Dec 20', type: 'Ex-Date', amount: 'C$0.99', prev: 'C$0.96', yield: '6.8%' },
-        { symbol: 'NTR', date: 'Fri Dec 27', type: 'Ex-Date', amount: '$0.52', prev: '$0.52', yield: '4.1%' },
-        { symbol: 'DEO', date: 'Thu Nov 14', type: 'Ex-Date', amount: '£0.4285', prev: '£0.4107', yield: '2.4%' },
-        { symbol: 'UL', date: 'Thu Nov 7', type: 'Ex-Date', amount: '€0.4268', prev: '€0.4108', yield: '3.8%' },
-        { symbol: 'LVMHF', date: 'Thu Dec 5', type: 'Ex-Date', amount: '€6.00', prev: '€5.00', yield: '1.8%' },
-        { symbol: 'NSRGY', date: 'Fri Apr 18', type: 'Ex-Date', amount: 'CHF 1.50', prev: 'CHF 1.42', yield: '3.1%' },
-        { symbol: 'MG', date: 'Fri Dec 13', type: 'Ex-Date', amount: 'C$0.105', prev: 'C$0.10', yield: '4.5%' }
+        { symbol: 'JNJ', date: `Mon, Nov 25, ${year}`, type: 'Ex-Date', amount: '$1.24', prev: '$1.19', yield: '3.2%' },
+        { symbol: 'JPM', date: `Fri, Jan 3, ${nextYear}`, type: 'Ex-Date', amount: '$1.25', prev: '$1.15', yield: '2.1%' },
+        { symbol: 'UNH', date: `Fri, Dec 13, ${year}`, type: 'Ex-Date', amount: '$2.10', prev: '$1.88', yield: '1.3%' },
+        { symbol: 'WFC', date: `Fri, Dec 6, ${year}`, type: 'Ex-Date', amount: '$0.40', prev: '$0.35', yield: '2.3%' },
+        { symbol: 'CVS', date: `Fri, Nov 1, ${year}`, type: 'Ex-Date', amount: '$0.67', prev: '$0.66', yield: '4.8%' },
+        { symbol: 'PFE', date: `Fri, Nov 8, ${year}`, type: 'Ex-Date', amount: '$0.42', prev: '$0.42', yield: '6.5%' },
+        { symbol: 'CSCO', date: `Fri, Jan 3, ${nextYear}`, type: 'Ex-Date', amount: '$0.40', prev: '$0.39', yield: '2.9%' },
+        { symbol: 'T', date: `Fri, Jan 10, ${nextYear}`, type: 'Ex-Date', amount: '$0.2775', prev: '$0.2775', yield: '6.2%' },
+        { symbol: 'VZ', date: `Fri, Jan 10, ${nextYear}`, type: 'Ex-Date', amount: '$0.6775', prev: '$0.665', yield: '6.4%' },
+        { symbol: 'MDT', date: `Fri, Jan 10, ${nextYear}`, type: 'Ex-Date', amount: '$0.70', prev: '$0.69', yield: '3.1%' },
+        { symbol: 'BNS', date: `Tue, Jan 7, ${nextYear}`, type: 'Ex-Date', amount: 'C$1.06', prev: 'C$1.06', yield: '5.8%' },
+        { symbol: 'TD', date: `Fri, Jan 10, ${nextYear}`, type: 'Ex-Date', amount: 'C$1.02', prev: 'C$0.96', yield: '4.9%' },
+        { symbol: 'BCE', date: `Fri, Dec 13, ${year}`, type: 'Ex-Date', amount: 'C$0.9675', prev: 'C$0.9675', yield: '8.5%' },
+        { symbol: 'CNR', date: `Fri, Dec 27, ${year}`, type: 'Ex-Date', amount: 'C$0.8375', prev: 'C$0.7875', yield: '2.0%' },
+        { symbol: 'MFC', date: `Tue, Dec 3, ${year}`, type: 'Ex-Date', amount: 'C$0.38', prev: 'C$0.38', yield: '4.2%' },
+        { symbol: 'TRP', date: `Fri, Dec 20, ${year}`, type: 'Ex-Date', amount: 'C$0.99', prev: 'C$0.96', yield: '6.8%' },
+        { symbol: 'NTR', date: `Fri, Dec 27, ${year}`, type: 'Ex-Date', amount: '$0.52', prev: '$0.52', yield: '4.1%' },
+        { symbol: 'DEO', date: `Thu, Nov 14, ${year}`, type: 'Ex-Date', amount: '£0.4285', prev: '£0.4107', yield: '2.4%' },
+        { symbol: 'UL', date: `Thu, Nov 7, ${year}`, type: 'Ex-Date', amount: '€0.4268', prev: '€0.4108', yield: '3.8%' },
+        { symbol: 'LVMHF', date: `Thu, Dec 5, ${year}`, type: 'Ex-Date', amount: '€6.00', prev: '€5.00', yield: '1.8%' },
+        { symbol: 'NSRGY', date: `Fri, Apr 18, ${nextYear}`, type: 'Ex-Date', amount: 'CHF 1.50', prev: 'CHF 1.42', yield: '3.1%' },
+        { symbol: 'MG', date: `Fri, Dec 13, ${year}`, type: 'Ex-Date', amount: 'C$0.105', prev: 'C$0.10', yield: '4.5%' }
     ];
 
     // Grouper par date

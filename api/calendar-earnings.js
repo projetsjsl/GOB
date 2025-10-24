@@ -143,33 +143,34 @@ function parseFMPEarnings(fmpData) {
 }
 
 function getFallbackEarningsData() {
+    const year = new Date().getFullYear();
     // Team tickers avec dates d'earnings estimées
     const teamEarnings = [
-        { symbol: 'GOOGL', date: 'Tue Oct 29', time: 'After Market', eps: '$1.55', prevEps: '$1.44', impact: 3 },
-        { symbol: 'JPM', date: 'Fri Oct 11', time: 'Before Market', eps: '$4.10', prevEps: '$4.33', impact: 3 },
-        { symbol: 'JNJ', date: 'Tue Oct 15', time: 'Before Market', eps: '$2.68', prevEps: '$2.80', impact: 3 },
-        { symbol: 'UNH', date: 'Fri Oct 18', time: 'Before Market', eps: '$6.80', prevEps: '$6.16', impact: 3 },
-        { symbol: 'WFC', date: 'Fri Oct 11', time: 'Before Market', eps: '$1.28', prevEps: '$1.48', impact: 2 },
-        { symbol: 'CVS', date: 'Wed Nov 6', time: 'Before Market', eps: '$1.65', prevEps: '$2.21', impact: 2 },
-        { symbol: 'PFE', date: 'Tue Oct 29', time: 'Before Market', eps: '$0.62', prevEps: '$0.67', impact: 2 },
-        { symbol: 'CSCO', date: 'Wed Nov 13', time: 'After Market', eps: '$0.87', prevEps: '$1.11', impact: 2 },
-        { symbol: 'T', date: 'Wed Oct 23', time: 'Before Market', eps: '$0.60', prevEps: '$0.64', impact: 2 },
-        { symbol: 'VZ', date: 'Fri Oct 25', time: 'Before Market', eps: '$1.19', prevEps: '$1.22', impact: 2 },
-        { symbol: 'NKE', date: 'Thu Dec 19', time: 'After Market', eps: '$0.84', prevEps: '$1.03', impact: 2 },
-        { symbol: 'MDT', date: 'Tue Nov 19', time: 'Before Market', eps: '$1.32', prevEps: '$1.31', impact: 2 },
-        { symbol: 'MU', date: 'Wed Dec 18', time: 'After Market', eps: '$1.74', prevEps: '$1.18', impact: 2 },
-        { symbol: 'BNS', date: 'Tue Nov 26', time: 'Before Market', eps: 'C$1.72', prevEps: 'C$1.62', impact: 2 },
-        { symbol: 'TD', date: 'Thu Nov 28', time: 'Before Market', eps: 'C$2.05', prevEps: 'C$1.99', impact: 2 },
-        { symbol: 'BCE', date: 'Thu Nov 7', time: 'Before Market', eps: 'C$0.70', prevEps: 'C$0.75', impact: 1 },
-        { symbol: 'CNR', date: 'Tue Oct 22', time: 'Before Market', eps: 'C$1.72', prevEps: 'C$1.69', impact: 2 },
-        { symbol: 'MFC', date: 'Wed Nov 6', time: 'After Market', eps: 'C$0.85', prevEps: 'C$0.78', impact: 1 },
-        { symbol: 'TRP', date: 'Fri Nov 1', time: 'Before Market', eps: 'C$0.78', prevEps: 'C$0.71', impact: 1 },
-        { symbol: 'NTR', date: 'Fri Nov 1', time: 'Before Market', eps: '$0.55', prevEps: '$0.39', impact: 1 },
-        { symbol: 'DEO', date: 'Thu Jan 30', time: 'Before Market', eps: '£0.85', prevEps: '£0.82', impact: 1 },
-        { symbol: 'UL', date: 'Thu Feb 13', time: 'Before Market', eps: '€0.68', prevEps: '€0.65', impact: 1 },
-        { symbol: 'LVMHF', date: 'Tue Jan 28', time: 'Before Market', eps: '€12.50', prevEps: '€14.03', impact: 2 },
-        { symbol: 'NSRGY', date: 'Thu Feb 13', time: 'Before Market', eps: 'CHF 1.20', prevEps: 'CHF 1.15', impact: 1 },
-        { symbol: 'MG', date: 'Mon Nov 25', time: 'Before Market', eps: 'C$0.45', prevEps: 'C$0.42', impact: 1 }
+        { symbol: 'GOOGL', date: `Tue, Oct 29, ${year}`, time: 'After Market', eps: '$1.55', prevEps: '$1.44', impact: 3 },
+        { symbol: 'JPM', date: `Fri, Oct 11, ${year}`, time: 'Before Market', eps: '$4.10', prevEps: '$4.33', impact: 3 },
+        { symbol: 'JNJ', date: `Tue, Oct 15, ${year}`, time: 'Before Market', eps: '$2.68', prevEps: '$2.80', impact: 3 },
+        { symbol: 'UNH', date: `Fri, Oct 18, ${year}`, time: 'Before Market', eps: '$6.80', prevEps: '$6.16', impact: 3 },
+        { symbol: 'WFC', date: `Fri, Oct 11, ${year}`, time: 'Before Market', eps: '$1.28', prevEps: '$1.48', impact: 2 },
+        { symbol: 'CVS', date: `Wed, Nov 6, ${year}`, time: 'Before Market', eps: '$1.65', prevEps: '$2.21', impact: 2 },
+        { symbol: 'PFE', date: `Tue, Oct 29, ${year}`, time: 'Before Market', eps: '$0.62', prevEps: '$0.67', impact: 2 },
+        { symbol: 'CSCO', date: `Wed, Nov 13, ${year}`, time: 'After Market', eps: '$0.87', prevEps: '$1.11', impact: 2 },
+        { symbol: 'T', date: `Wed, Oct 23, ${year}`, time: 'Before Market', eps: '$0.60', prevEps: '$0.64', impact: 2 },
+        { symbol: 'VZ', date: `Fri, Oct 25, ${year}`, time: 'Before Market', eps: '$1.19', prevEps: '$1.22', impact: 2 },
+        { symbol: 'NKE', date: `Thu, Dec 19, ${year}`, time: 'After Market', eps: '$0.84', prevEps: '$1.03', impact: 2 },
+        { symbol: 'MDT', date: `Tue, Nov 19, ${year}`, time: 'Before Market', eps: '$1.32', prevEps: '$1.31', impact: 2 },
+        { symbol: 'MU', date: `Wed, Dec 18, ${year}`, time: 'After Market', eps: '$1.74', prevEps: '$1.18', impact: 2 },
+        { symbol: 'BNS', date: `Tue, Nov 26, ${year}`, time: 'Before Market', eps: 'C$1.72', prevEps: 'C$1.62', impact: 2 },
+        { symbol: 'TD', date: `Thu, Nov 28, ${year}`, time: 'Before Market', eps: 'C$2.05', prevEps: 'C$1.99', impact: 2 },
+        { symbol: 'BCE', date: `Thu, Nov 7, ${year}`, time: 'Before Market', eps: 'C$0.70', prevEps: 'C$0.75', impact: 1 },
+        { symbol: 'CNR', date: `Tue, Oct 22, ${year}`, time: 'Before Market', eps: 'C$1.72', prevEps: 'C$1.69', impact: 2 },
+        { symbol: 'MFC', date: `Wed, Nov 6, ${year}`, time: 'After Market', eps: 'C$0.85', prevEps: 'C$0.78', impact: 1 },
+        { symbol: 'TRP', date: `Fri, Nov 1, ${year}`, time: 'Before Market', eps: 'C$0.78', prevEps: 'C$0.71', impact: 1 },
+        { symbol: 'NTR', date: `Fri, Nov 1, ${year}`, time: 'Before Market', eps: '$0.55', prevEps: '$0.39', impact: 1 },
+        { symbol: 'DEO', date: `Thu, Jan 30, ${year + 1}`, time: 'Before Market', eps: '£0.85', prevEps: '£0.82', impact: 1 },
+        { symbol: 'UL', date: `Thu, Feb 13, ${year + 1}`, time: 'Before Market', eps: '€0.68', prevEps: '€0.65', impact: 1 },
+        { symbol: 'LVMHF', date: `Tue, Jan 28, ${year + 1}`, time: 'Before Market', eps: '€12.50', prevEps: '€14.03', impact: 2 },
+        { symbol: 'NSRGY', date: `Thu, Feb 13, ${year + 1}`, time: 'Before Market', eps: 'CHF 1.20', prevEps: 'CHF 1.15', impact: 1 },
+        { symbol: 'MG', date: `Mon, Nov 25, ${year}`, time: 'Before Market', eps: 'C$0.45', prevEps: 'C$0.42', impact: 1 }
     ];
 
     // Grouper par date
