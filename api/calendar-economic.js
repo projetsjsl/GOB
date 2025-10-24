@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const from = new Date().toISOString().split('T')[0];
     const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    // Cascade fallback: FMP → Alpha Vantage → Twelve Data → Static fallback
+    // Cascade fallback: FMP → Finnhub → Alpha Vantage → Twelve Data → Enhanced Static
     let events = null;
     let source = 'fallback';
     let errors = [];
@@ -59,10 +59,48 @@ export default async function handler(req, res) {
         console.error(`⚠️ FMP failed: ${error.message}`);
     }
 
-    // Try 2: Alpha Vantage (Fallback)
+    // Try 2: Finnhub (Free API Fallback)
     if (!events) {
         try {
-            console.log('🔄 [2/3] Trying Alpha Vantage...');
+            console.log('🔄 [2/4] Trying Finnhub...');
+            const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
+
+            if (FINNHUB_API_KEY) {
+                const fromTimestamp = Math.floor(new Date(from).getTime() / 1000);
+                const toTimestamp = Math.floor(new Date(to).getTime() / 1000);
+                const finnhubUrl = `https://finnhub.io/api/v1/calendar/economic?from=${from}&to=${to}&token=${FINNHUB_API_KEY}`;
+
+                const response = await fetch(finnhubUrl, { timeout: 5000 });
+                console.log(`Finnhub Response Status: ${response.status}`);
+
+                if (response.ok) {
+                    const finnhubData = await response.json();
+                    console.log(`Finnhub Response: ${JSON.stringify(finnhubData).substring(0, 200)}`);
+                    if (finnhubData.economicCalendar && Array.isArray(finnhubData.economicCalendar) && finnhubData.economicCalendar.length > 0) {
+                        events = parseFinnhubCalendar(finnhubData.economicCalendar);
+                        source = 'finnhub';
+                        console.log(`✅ Finnhub: ${events.length} days of events`);
+                    } else {
+                        throw new Error(`Empty or invalid response: ${JSON.stringify(finnhubData).substring(0, 100)}`);
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error(`Finnhub Error Response: ${errorText.substring(0, 200)}`);
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } else {
+                throw new Error('FINNHUB_API_KEY not configured');
+            }
+        } catch (error) {
+            errors.push(`Finnhub: ${error.message}`);
+            console.error(`⚠️ Finnhub failed: ${error.message}`);
+        }
+    }
+
+    // Try 3: Alpha Vantage (Fallback)
+    if (!events) {
+        try {
+            console.log('🔄 [3/4] Trying Alpha Vantage...');
             const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
             const avUrl = `https://www.alphavantage.co/query?function=ECONOMIC_CALENDAR&apikey=${ALPHA_VANTAGE_API_KEY}`;
             console.log(`AV Key configured: ${!!ALPHA_VANTAGE_API_KEY}`);
@@ -95,10 +133,10 @@ export default async function handler(req, res) {
         }
     }
 
-    // Try 3: Twelve Data (Fallback)
+    // Try 4: Twelve Data (Fallback)
     if (!events) {
         try {
-            console.log('🔄 [3/3] Trying Twelve Data...');
+            console.log('🔄 [4/4] Trying Twelve Data...');
             const TWELVE_API_KEY = process.env.TWELVE_DATA_API_KEY;
 
             if (TWELVE_API_KEY) {
@@ -194,6 +232,60 @@ function parseFMPCalendar(fmpData) {
     });
 
     // Convertir l'objet en tableau et trier par date
+    return Object.values(eventsByDate).sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+    });
+}
+
+function parseFinnhubCalendar(finnhubData) {
+    // Convert Finnhub economic calendar format to expected frontend format
+    const eventsByDate = {};
+
+    finnhubData.forEach(item => {
+        const date = new Date(item.time);
+        const dateStr = date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        // Determine impact based on importance or impact field
+        let impact = 2; // Medium default
+        const importance = item.impact || item.importance;
+        if (importance === 'high' || importance === 'High' || importance === 3) {
+            impact = 3;
+        } else if (importance === 'low' || importance === 'Low' || importance === 1) {
+            impact = 1;
+        }
+
+        const time = date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+
+        const event = {
+            time,
+            currency: item.country || 'USD',
+            impact,
+            event: item.event || item.name,
+            actual: item.actual || 'N/A',
+            forecast: item.estimate || item.forecast || 'N/A',
+            previous: item.previous || 'N/A'
+        };
+
+        if (!eventsByDate[dateStr]) {
+            eventsByDate[dateStr] = {
+                date: dateStr,
+                events: []
+            };
+        }
+
+        eventsByDate[dateStr].events.push(event);
+    });
+
     return Object.values(eventsByDate).sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
@@ -311,9 +403,36 @@ function parseAlphaVantageCalendar(avData) {
 }
 
 function getFallbackData() {
-    // Updated fallback data - current week economic events
+    // Enhanced fallback with realistic recurring economic events
     const today = new Date();
     const nextDays = [];
+
+    // Common economic events by day of week
+    const recurringEvents = {
+        1: [ // Monday
+            { event: 'ISM Manufacturing PMI', impact: 3, time: '10:00 AM' },
+            { event: 'Construction Spending', impact: 2, time: '10:00 AM' }
+        ],
+        2: [ // Tuesday
+            { event: 'Factory Orders', impact: 2, time: '10:00 AM' },
+            { event: 'Job Openings (JOLTS)', impact: 3, time: '10:00 AM' }
+        ],
+        3: [ // Wednesday
+            { event: 'ADP Employment Report', impact: 3, time: '08:15 AM' },
+            { event: 'ISM Services PMI', impact: 3, time: '10:00 AM' },
+            { event: 'FOMC Meeting Minutes', impact: 3, time: '02:00 PM' }
+        ],
+        4: [ // Thursday
+            { event: 'Initial Jobless Claims', impact: 3, time: '08:30 AM' },
+            { event: 'Continuing Jobless Claims', impact: 2, time: '08:30 AM' },
+            { event: 'Trade Balance', impact: 2, time: '08:30 AM' }
+        ],
+        5: [ // Friday
+            { event: 'Nonfarm Payrolls', impact: 3, time: '08:30 AM' },
+            { event: 'Unemployment Rate', impact: 3, time: '08:30 AM' },
+            { event: 'Consumer Sentiment', impact: 2, time: '10:00 AM' }
+        ]
+    };
 
     for (let i = 0; i < 7; i++) {
         const date = new Date(today);
@@ -324,10 +443,40 @@ function getFallbackData() {
             day: 'numeric'
         });
 
-        nextDays.push({
-            date: dateStr,
-            events: [
-                {
+        const dayOfWeek = date.getDay(); // 0=Sunday, 1=Monday, etc.
+        const events = [];
+
+        // Skip weekends or add minimal events
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            events.push({
+                time: 'All Day',
+                currency: 'USD',
+                impact: 1,
+                event: 'Markets Closed',
+                actual: 'N/A',
+                forecast: 'N/A',
+                previous: 'N/A'
+            });
+        } else {
+            // Add day-specific events
+            const dayEvents = recurringEvents[dayOfWeek] || [];
+            const selectedEvents = dayEvents.slice(0, Math.min(2, dayEvents.length));
+
+            selectedEvents.forEach(evt => {
+                events.push({
+                    time: evt.time,
+                    currency: 'USD',
+                    impact: evt.impact,
+                    event: evt.event,
+                    actual: 'N/A',
+                    forecast: 'N/A',
+                    previous: 'N/A'
+                });
+            });
+
+            // Add at least one event if none selected
+            if (events.length === 0) {
+                events.push({
                     time: '08:30 AM',
                     currency: 'USD',
                     impact: 2,
@@ -335,8 +484,13 @@ function getFallbackData() {
                     actual: 'N/A',
                     forecast: 'N/A',
                     previous: 'N/A'
-                }
-            ]
+                });
+            }
+        }
+
+        nextDays.push({
+            date: dateStr,
+            events: events
         });
     }
 
