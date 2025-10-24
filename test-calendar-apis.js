@@ -25,7 +25,7 @@ async function testCalendarAPI(endpoint, name) {
 
     return new Promise((resolve) => {
         const options = {
-            hostname: 'gob.vercel.app',
+            hostname: 'gobapps.com',
             path: `/api/${endpoint}`,
             method: 'GET',
             headers: {
