@@ -17435,19 +17435,17 @@ console.log('✅ Données hybrides récupérées:', {
             const tabs = [
                 { id: 'stocks-news', label: '📊 Titres & nouvelles', icon: '📊', component: StocksNewsTab },
                 { id: 'intellistocks', label: '📈 JLab™', icon: '📈', component: IntelliStocksTab },
-                { id: 'jlab-v2', label: '🚀 JLab V2™', icon: '🚀', component: JLabV2Tab },
                 { id: 'ask-emma', label: '💬 Emma IA™', icon: '💬', component: AskEmmaTab },
                 { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', icon: '⚙️', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', icon: '⭐', component: DansWatchlistTab },
                 { id: 'scrapping-sa', label: '🔍 Seeking Alpha', icon: '🔍', component: ScrappingSATab },
-                { id: 'seeking-alpha', label: '📈 Stocks News', icon: '📰', component: SeekingAlphaTab },
                 { id: 'email-briefings', label: '📡 Emma En Direct', icon: '📡', component: EmailBriefingsTab },
                 { id: 'economic-calendar', label: '📅 Calendrier Économique', icon: '📅', component: EconomicCalendarTab },
                 { id: 'investing-calendar', label: 'TESTS JS', icon: '🧪', component: InvestingCalendarTab }
             ];
 
             // Tabs principaux pour la bottom bar mobile (4 + menu)
-            const primaryMobileTabs = ['stocks-news', 'jlab-v2', 'ask-emma', 'economic-calendar'];
+            const primaryMobileTabs = ['stocks-news', 'ask-emma', 'economic-calendar'];
 
             return (
                 <div className={`min-h-screen transition-colors duration-300 ${
@@ -17853,7 +17851,6 @@ console.log('✅ Données hybrides récupérées:', {
                     }`}>
                         {activeTab === 'stocks-news' && <StocksNewsTab />}
                         {activeTab === 'intellistocks' && <IntelliStocksTab />}
-                        {activeTab === 'jlab-v2' && <JLabV2Tab />}
                         {activeTab === 'ask-emma' && <AskEmmaTab
                             prefillMessage={emmaPrefillMessage}
                             setPrefillMessage={setEmmaPrefillMessage}
@@ -17879,7 +17876,6 @@ console.log('✅ Données hybrides récupérées:', {
                         {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                         {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                         {activeTab === 'email-briefings' && <EmailBriefingsTab />}
-                        {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                         {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                         {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
                     </main>
