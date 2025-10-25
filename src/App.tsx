@@ -225,7 +225,7 @@ const GOB = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [isProfessionalMode, setIsProfessionalMode] = useState(true); // Professional icons by default
+  const isProfessionalMode = true; // Always use professional mode with Lucide icons
   const [isMarketOpen, setIsMarketOpen] = useState(false);
   const [marketData, setMarketData] = useState({
     'SPX': { symbol: 'S&P 500', price: 4567.89, change: 0.85, changePercent: 0.85 },
@@ -442,18 +442,6 @@ const GOB = () => {
     const storedDarkMode = localStorage.getItem('gobapps-dark-mode');
     if (storedDarkMode !== null) {
       setIsDarkMode(storedDarkMode === 'true');
-    }
-  }, []);
-
-  // Load professional mode preference
-  useEffect(() => {
-    const storedProfessionalMode = localStorage.getItem('gobapps-professional-mode');
-    if (storedProfessionalMode !== null) {
-      setIsProfessionalMode(storedProfessionalMode === 'true');
-    } else {
-      // Default to professional mode
-      setIsProfessionalMode(true);
-      localStorage.setItem('gobapps-professional-mode', 'true');
     }
   }, []);
 
@@ -715,12 +703,6 @@ const GOB = () => {
     }
   };
 
-  const toggleProfessionalMode = () => {
-    const newProfessionalMode = !isProfessionalMode;
-    setIsProfessionalMode(newProfessionalMode);
-    localStorage.setItem('gobapps-professional-mode', newProfessionalMode.toString());
-  };
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -900,18 +882,6 @@ const GOB = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <button
-                  onClick={toggleProfessionalMode}
-                  className={`w-10 h-10 backdrop-blur-md rounded-xl transition-all flex items-center justify-center border shadow-lg ${
-                    isDarkMode
-                      ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white border-gray-700/50'
-                      : 'bg-white/50 hover:bg-gray-100/50 text-gray-700 border-gray-300/50'
-                  } ${isProfessionalMode ? 'ring-2 ring-green-500/50' : ''}`}
-                  title={isProfessionalMode ? 'Mode Professionnel (cliquez pour Mode Fun)' : 'Mode Fun (cliquez pour Mode Professionnel)'}
-                >
-                  {isProfessionalMode ? <Briefcase size={18} /> : <span className="text-lg">😀</span>}
-                </button>
-
                 <button
                   onClick={toggleDarkMode}
                   className={`w-10 h-10 backdrop-blur-md rounded-xl transition-all flex items-center justify-center border shadow-lg ${
