@@ -15213,6 +15213,9 @@ console.log('✅ Données hybrides récupérées:', {
                 const tradingViewFinancialsRef = useRef(null);
                 const tradingViewTechnicalAnalysisRef = useRef(null);
 
+                // State pour les symboles configurables
+                const [timelineSymbol, setTimelineSymbol] = useState('BITSTAMP:BTCUSD');
+
                 // Charger le script TradingView Forex Heat Map
                 useEffect(() => {
                     // Créer le conteneur du widget
@@ -15564,7 +15567,7 @@ console.log('✅ Données hybrides récupérées:', {
                     };
                 }, []);
 
-                // Charger le script TradingView Timeline
+                // Charger le script TradingView Timeline (configurable)
                 useEffect(() => {
                     const container = tradingViewTimelineRef.current;
                     if (!container) return;
@@ -15577,7 +15580,7 @@ console.log('✅ Données hybrides récupérées:', {
                     script.async = true;
                     script.innerHTML = JSON.stringify({
                         feedMode: 'symbol',
-                        symbol: 'BITSTAMP:BTCUSD',
+                        symbol: timelineSymbol,
                         colorTheme: 'dark',
                         isTransparent: false,
                         displayMode: 'regular',
@@ -15593,7 +15596,7 @@ console.log('✅ Données hybrides récupérées:', {
                             container.innerHTML = '';
                         }
                     };
-                }, []);
+                }, [timelineSymbol]);
 
                 // Charger le script TradingView Screener
                 useEffect(() => {
@@ -16147,20 +16150,62 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
                         </div>
 
-                        {/* Widget TradingView Timeline - Bitcoin */}
+                        {/* Widget TradingView Timeline - Configurable */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                    ₿ Bitcoin (BTC/USD) Timeline
-                                </h2>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        📰 Timeline - Fil d'Actualité
+                                    </h2>
+                                    <div className="flex items-center gap-3">
+                                        <label className={`text-sm font-medium transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Symbole:
+                                        </label>
+                                        <select
+                                            value={timelineSymbol}
+                                            onChange={(e) => setTimelineSymbol(e.target.value)}
+                                            className={`px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white hover:border-blue-500 focus:border-blue-500'
+                                                    : 'bg-white border-gray-300 text-gray-900 hover:border-blue-500 focus:border-blue-500'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+                                        >
+                                            <optgroup label="📈 Indices">
+                                                <option value="FOREXCOM:SPXUSD">SPY - S&P 500</option>
+                                                <option value="FOREXCOM:NSXUSD">QQQ - Nasdaq 100</option>
+                                                <option value="FOREXCOM:DJI">DJI - Dow Jones</option>
+                                            </optgroup>
+                                            <optgroup label="🍎 Tech">
+                                                <option value="NASDAQ:AAPL">AAPL - Apple</option>
+                                                <option value="NASDAQ:MSFT">MSFT - Microsoft</option>
+                                                <option value="NASDAQ:GOOGL">GOOGL - Google</option>
+                                                <option value="NASDAQ:AMZN">AMZN - Amazon</option>
+                                                <option value="NASDAQ:NVDA">NVDA - NVIDIA</option>
+                                                <option value="NASDAQ:TSLA">TSLA - Tesla</option>
+                                                <option value="NASDAQ:META">META - Meta</option>
+                                            </optgroup>
+                                            <optgroup label="₿ Crypto">
+                                                <option value="BITSTAMP:BTCUSD">BTC - Bitcoin</option>
+                                                <option value="BITSTAMP:ETHUSD">ETH - Ethereum</option>
+                                            </optgroup>
+                                            <optgroup label="🏦 Finance">
+                                                <option value="NYSE:JPM">JPM - JPMorgan</option>
+                                                <option value="NYSE:BAC">BAC - Bank of America</option>
+                                                <option value="NYSE:GS">GS - Goldman Sachs</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                </div>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    Fil d'actualité et événements en temps réel pour Bitcoin sur Bitstamp (BTC/USD)
+                                    Fil d'actualité et événements en temps réel pour {timelineSymbol.split(':')[1] || 'le symbole sélectionné'}
                                 </p>
                             </div>
 
