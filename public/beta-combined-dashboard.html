@@ -15507,7 +15507,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="rounded-lg overflow-hidden relative" style={{ minHeight: '500px', background: 'transparent' }}>
+                            <div className="rounded-lg overflow-hidden relative h-[400px] md:h-[450px] lg:h-[500px]" style={{ background: 'transparent' }}>
                                 {/* Overlay pour masquer le logo (coin supérieur gauche) */}
                                 <div
                                     className={`absolute top-0 left-0 z-10 ${
@@ -15518,7 +15518,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 <iframe
                                     src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
                                     width="100%"
-                                    height="467"
+                                    height="100%"
                                     frameBorder="0"
                                     allowTransparency="true"
                                     marginWidth="0"
@@ -15547,8 +15547,10 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="tradingview-widget-container" ref={tradingViewForexRef}>
-                                {/* Le widget sera injecté ici par le script */}
+                            <div className="h-[350px] md:h-[400px] lg:h-[450px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewForexRef}>
+                                    {/* Le widget sera injecté ici par le script */}
+                                </div>
                             </div>
                         </div>
 
@@ -15569,8 +15571,10 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="tradingview-widget-container" ref={tradingViewEventsRef}>
-                                {/* Le widget sera injecté ici par le script */}
+                            <div className="h-[400px] md:h-[500px] lg:h-[600px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewEventsRef}>
+                                    {/* Le widget sera injecté ici par le script */}
+                                </div>
                             </div>
                         </div>
 
@@ -15591,8 +15595,10 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="tradingview-widget-container" ref={tradingViewCrossRatesRef}>
-                                {/* Le widget sera injecté ici par le script */}
+                            <div className="h-[350px] md:h-[400px] lg:h-[450px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewCrossRatesRef}>
+                                    {/* Le widget sera injecté ici par le script */}
+                                </div>
                             </div>
                         </div>
 
@@ -15613,21 +15619,23 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="tradingview-widget-container" ref={tradingViewHeatmapRef}>
-                                <div className="tradingview-widget-container__widget"></div>
-                                <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                    <a
-                                        href="https://fr.tradingview.com/heatmap/stock/"
-                                        rel="noopener nofollow"
-                                        target="_blank"
-                                        className={`underline transition-colors duration-300 ${
-                                            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                        }`}
-                                    >
-                                        <span className="blue-text">Track all markets on TradingView</span>
-                                    </a>
+                            <div className="h-[500px] md:h-[700px] lg:h-[900px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/heatmap/stock/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -15649,21 +15657,23 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="tradingview-widget-container" ref={tradingViewHeatmapTSXRef}>
-                                <div className="tradingview-widget-container__widget"></div>
-                                <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                    <a
-                                        href="https://fr.tradingview.com/heatmap/stock/"
-                                        rel="noopener nofollow"
-                                        target="_blank"
-                                        className={`underline transition-colors duration-300 ${
-                                            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                        }`}
-                                    >
-                                        <span className="blue-text">Track all markets on TradingView</span>
-                                    </a>
+                            <div className="h-[500px] md:h-[700px] lg:h-[900px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapTSXRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/heatmap/stock/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -15685,21 +15695,23 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="tradingview-widget-container" ref={tradingViewChartSPYRef}>
-                                <div className="tradingview-widget-container__widget"></div>
-                                <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                    <a
-                                        href="https://fr.tradingview.com/symbols/AMEX-SPY/"
-                                        rel="noopener nofollow"
-                                        target="_blank"
-                                        className={`underline transition-colors duration-300 ${
-                                            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                        }`}
-                                    >
-                                        <span className="blue-text">Track all markets on TradingView</span>
-                                    </a>
+                            <div className="h-[600px] md:h-[800px] lg:h-[1000px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/symbols/AMEX-SPY/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -15721,21 +15733,23 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="tradingview-widget-container" ref={tradingViewMarketQuotesRef}>
-                                <div className="tradingview-widget-container__widget"></div>
-                                <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                    <a
-                                        href="https://fr.tradingview.com/markets/"
-                                        rel="noopener nofollow"
-                                        target="_blank"
-                                        className={`underline transition-colors duration-300 ${
-                                            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                        }`}
-                                    >
-                                        <span className="blue-text">Track all markets on TradingView</span>
-                                    </a>
+                            <div className="h-[600px] md:h-[700px] lg:h-[850px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewMarketQuotesRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/markets/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
