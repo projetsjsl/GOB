@@ -11758,6 +11758,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     container.innerHTML = '';
 
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
+                    container.appendChild(widgetDiv);
+
                     const script = document.createElement('script');
                     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
                     script.type = 'text/javascript';
