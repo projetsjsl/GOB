@@ -4340,6 +4340,20 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         </div>
                                                     </div>
                                                 )}
+
+                                                {/* Lien vers Seeking Alpha */}
+                                                {seekingAlphaItem?.url && (
+                                                    <div className="text-center pt-4 border-t">
+                                                        <a
+                                                            href={seekingAlphaItem.url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                                        >
+                                                            Lire l'analyse complète sur Seeking Alpha →
+                                                        </a>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     );
@@ -4485,9 +4499,22 @@ STRUCTURE JSON OBLIGATOIRE:
                                                                 </span>
                                                             </td>
                                                             <td className="py-3">
-                                                                <button className="text-blue-300 hover:text-blue-200 text-xs">
-                                                                    Voir fiche →
-                                                                </button>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <button className="text-blue-300 hover:text-blue-200 text-xs">
+                                                                        Voir fiche →
+                                                                    </button>
+                                                                    {stock.url && (
+                                                                        <a
+                                                                            href={stock.url}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            className="text-green-300 hover:text-green-200 text-xs"
+                                                                        >
+                                                                            📰 SA Article
+                                                                        </a>
+                                                                    )}
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     );
@@ -4585,6 +4612,21 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         })}
                                                     </div>
                                                 </div>
+                                            </div>
+                                        )}
+
+                                        {/* Lien vers Seeking Alpha */}
+                                        {stock.url && (
+                                            <div className="mb-4">
+                                                <a
+                                                    href={stock.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="block w-full px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors text-center"
+                                                >
+                                                    📰 Lire sur Seeking Alpha →
+                                                </a>
                                             </div>
                                         )}
 
