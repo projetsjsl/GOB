@@ -15791,12 +15791,12 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
 
                             <div className="rounded-lg overflow-hidden relative h-[400px] md:h-[450px] lg:h-[500px]" style={{ background: 'transparent' }}>
-                                {/* Overlay pour masquer le logo (coin supérieur gauche) */}
+                                {/* Overlay pour masquer le logo (toute la largeur) */}
                                 <div
                                     className={`absolute top-0 left-0 z-10 ${
                                         isDarkMode ? 'bg-gray-800' : 'bg-white'
                                     }`}
-                                    style={{ width: '150px', height: '40px' }}
+                                    style={{ width: '100%', height: '40px' }}
                                 />
                                 <iframe
                                     src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&importance=1,2,3&features=datepicker,timezone,timeselector,filters&countries=6,5&calType=day&timeZone=8&lang=5&transparentBackground=1"
