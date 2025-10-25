@@ -15860,7 +15860,7 @@ console.log('✅ Données hybrides récupérées:', {
                     };
                 }, []);
 
-                // Charger le script TradingView Advanced Chart SPY
+                // Charger le script TradingView Advanced Chart (synchronisé)
                 useEffect(() => {
                     const container = tradingViewChartSPYRef.current;
                     if (!container) return;
@@ -15884,17 +15884,27 @@ console.log('✅ Données hybrides récupérées:', {
                         locale: 'fr',
                         save_image: true,
                         style: '3',
-                        symbol: 'AMEX:SPY',
+                        symbol: timelineSymbol,
                         theme: 'dark',
                         timezone: 'America/Toronto',
                         backgroundColor: '#0F0F0F',
                         gridColor: 'rgba(242, 242, 242, 0.06)',
                         watchlist: [
-                            'FRED:SP500',
-                            'NASDAQ:NDX',
-                            'DJ:DJI',
-                            'CBOEFTSE:RUT',
-                            'TSX:TSX'
+                            'FOREXCOM:SPXUSD',
+                            'FOREXCOM:NSXUSD',
+                            'FOREXCOM:DJI',
+                            'NASDAQ:AAPL',
+                            'NASDAQ:MSFT',
+                            'NASDAQ:GOOGL',
+                            'NASDAQ:AMZN',
+                            'NASDAQ:NVDA',
+                            'NASDAQ:TSLA',
+                            'NASDAQ:META',
+                            'BITSTAMP:BTCUSD',
+                            'BITSTAMP:ETHUSD',
+                            'NYSE:JPM',
+                            'NYSE:BAC',
+                            'NYSE:GS'
                         ],
                         withdateranges: true,
                         range: 'YTD',
@@ -15917,7 +15927,7 @@ console.log('✅ Données hybrides récupérées:', {
                             container.innerHTML = '';
                         }
                     };
-                }, []);
+                }, [timelineSymbol]);
 
                 // Charger le script TradingView Market Quotes
                 useEffect(() => {
@@ -16449,59 +16459,6 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
                         </div>
 
-                        {/* ========================================== */}
-                        {/* SECTION 4: 📈 ANALYSE SPY (S&P 500)        */}
-                        {/* ========================================== */}
-                        <div className="mb-4">
-                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
-                                isDarkMode ? 'border-yellow-500' : 'border-yellow-600'
-                            }`}>
-                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-yellow-400' : 'text-yellow-600'
-                                }`}>
-                                    📈 Analyse SPY (S&P 500 ETF)
-                                </h3>
-                            </div>
-                        </div>
-
-                        {/* Widget TradingView Advanced Chart SPY */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                    📊 SPY - S&P 500 ETF Trust
-                                </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                    Graphique avancé SPY avec watchlist (S&P500, NASDAQ, DOW, Russell 2000, TSX) et indicateurs techniques (SMA, RSI)
-                                </p>
-                            </div>
-
-                            <div className="h-[600px] md:h-[800px] lg:h-[1000px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}>
-                                    <div className="tradingview-widget-container__widget"></div>
-                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                        <a
-                                            href="https://fr.tradingview.com/symbols/AMEX-SPY/"
-                                            rel="noopener nofollow"
-                                            target="_blank"
-                                            className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                            }`}
-                                        >
-                                            <span className="blue-text">Track all markets on TradingView</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         {/* Widget TradingView Market Quotes */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
@@ -16556,7 +16513,7 @@ console.log('✅ Données hybrides récupérées:', {
                             <p className={`text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
                             }`}>
-                                Les 4 widgets ci-dessous se synchronisent automatiquement avec le symbole sélectionné dans le Timeline
+                                Les 5 widgets ci-dessous se synchronisent automatiquement avec le symbole sélectionné dans le Timeline. Utilisez le sélecteur ou cliquez sur un symbole dans la watchlist du graphique avancé.
                             </p>
                         </div>
 
@@ -16718,6 +16675,44 @@ console.log('✅ Données hybrides récupérées:', {
                                     }`}>
                                         <a
                                             href="https://fr.tradingview.com/screener/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Widget TradingView Advanced Chart - Synchronisé */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Graphique avancé de {timelineSymbol} avec watchlist complète (15 symboles), indicateurs techniques (SMA, RSI) et outils de trading professionnels. Cliquez sur un symbole dans la watchlist pour changer l'affichage de tous les widgets.
+                                </p>
+                            </div>
+
+                            <div className="h-[600px] md:h-[800px] lg:h-[1000px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href={`https://fr.tradingview.com/symbols/${timelineSymbol.replace(':', '-')}/`}
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
