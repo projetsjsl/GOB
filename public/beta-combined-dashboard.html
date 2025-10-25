@@ -597,7 +597,7 @@ const fetchHybridData = async (symbol, dataType) => {
                     if (saved === 'dark') return true;
                     if (saved === 'light') return false;
                 } catch (_) {}
-                return false; // défaut: clair
+                return true; // défaut: sombre
             });
             const [showEmmaIntro, setShowEmmaIntro] = useState(false);
             const [showDanIntro, setShowDanIntro] = useState(false);
@@ -2650,7 +2650,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>🔍 Debug des Données</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                <div className="text-blue-600 font-medium mb-2">📊 Stock Data</div>
+                                <div className="text-gray-900 font-medium mb-2">📊 Stock Data</div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Tickers: {tickers.length} ({tickers.join(', ')})
                                 </div>
@@ -2828,8 +2828,8 @@ STRUCTURE JSON OBLIGATOIRE:
                                 onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
                                 className={`px-4 py-2 rounded transition-colors ${
                                     isDarkMode
-                                        ? 'bg-blue-800 hover:bg-blue-700 text-white'
-                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        ? 'bg-gray-950 hover:bg-gray-900 text-white'
+                                        : 'bg-gray-900 hover:bg-gray-900 text-white'
                                 }`}
                             >
                                 🌡️ Température
@@ -2882,8 +2882,8 @@ STRUCTURE JSON OBLIGATOIRE:
                         {/* ÉTAPE 1: SCRAPING BATCH */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
                             isDarkMode
-                                ? 'bg-gradient-to-r from-blue-900/40 to-purple-900/40 border-blue-500/50'
-                                : 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-400/50'
+                                ? 'bg-gradient-to-r from-gray-950/40 to-purple-900/40 border-gray-800/50'
+                                : 'bg-gradient-to-r from-gray-900 to-purple-50 border-gray-700/50'
                         }`}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
@@ -2891,7 +2891,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 }`}>📊 ÉTAPE 1: SCRAPING BATCH (25 tickers)</h3>
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold ${
                                     scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
-                                    scrapingStatus === 'running' ? 'bg-blue-500 text-white animate-pulse' :
+                                    scrapingStatus === 'running' ? 'bg-gray-800 text-white animate-pulse' :
                                     scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
                                     'bg-red-500 text-white'
                                 }`}>
@@ -2907,7 +2907,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <div className="mb-4">
                                     <div className="w-full bg-gray-700 rounded-full h-4">
                                         <div
-                                            className="bg-gradient-to-r from-blue-500 to-purple-500 h-4 rounded-full transition-all duration-300 flex items-center justify-center text-white text-xs font-bold"
+                                            className="bg-gradient-to-r from-gray-800 to-purple-500 h-4 rounded-full transition-all duration-300 flex items-center justify-center text-white text-xs font-bold"
                                             style={{ width: `${scrapingProgress}%` }}
                                         >
                                             {scrapingProgress}%
@@ -3074,7 +3074,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                         log.type === 'error' ? 'bg-red-100 text-red-800' :
                                         log.type === 'success' ? 'bg-green-100 text-green-800' :
                                         log.type === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-blue-100 text-blue-800'
+                                        'bg-gray-800 text-gray-950'
                                     }`}>
                                         <span className="font-mono text-xs opacity-70">
                                             {new Date(log.timestamp).toLocaleTimeString()}
@@ -3121,7 +3121,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         <div className="flex gap-2 mt-4">
                             <button
                                 onClick={checkApiStatus}
-                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                className="flex-1 px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-900 transition-colors"
                             >
                                 🔄 Vérifier
                             </button>
@@ -3157,7 +3157,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                                     isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
-                                    <div className="text-blue-600 font-medium mb-2">📧 Briefings</div>
+                                    <div className="text-gray-900 font-medium mb-2">📧 Briefings</div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
@@ -3224,7 +3224,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                             showMessage('❌ Erreur connexion Emma Briefing', 'error');
                                         });
                                     }}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                    className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-900 transition-colors"
                                 >
                                     📧 Tester Briefing
                                 </button>
@@ -3336,7 +3336,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
                                     healthCheckLoading
                                         ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                                        : 'bg-gray-900 text-white hover:bg-gray-900'
                                 }`}
                             >
                                 {healthCheckLoading ? 'Vérification...' : '🔍 Vérifier APIs'}
@@ -3446,10 +3446,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 {/* Recommandations */}
                                 {healthStatus.recommendations && healthStatus.recommendations.length > 0 && (
                                     <div className={`p-4 rounded-lg ${
-                                        isDarkMode ? 'bg-gray-700' : 'bg-blue-50'
+                                        isDarkMode ? 'bg-gray-700' : 'bg-gray-900'
                                     }`}>
                                         <h4 className={`font-semibold mb-3 ${
-                                            isDarkMode ? 'text-white' : 'text-blue-900'
+                                            isDarkMode ? 'text-white' : 'text-gray-950'
                                         }`}>💡 Recommandations</h4>
                                         <div className="space-y-2">
                                             {healthStatus.recommendations.map((rec, index) => (
@@ -3521,7 +3521,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setShowSettings(!showSettings)}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                    className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-900 transition-colors"
                                 >
                                     {showSettings ? 'Masquer' : 'Afficher'} les paramètres
                                 </button>
@@ -3619,18 +3619,18 @@ STRUCTURE JSON OBLIGATOIRE:
                         case 'PE':
                             if (v < 0) return 'text-red-500';
                             if (v < 15) return 'text-emerald-500';
-                            if (v < 25) return 'text-blue-500';
+                            if (v < 25) return 'text-gray-800';
                             if (v < 35) return 'text-yellow-500';
                             return 'text-red-500';
                         case 'ROE':
                             if (v < 0) return 'text-red-500';
                             if (v < 10) return 'text-green-500';
                             if (v < 15) return 'text-yellow-500';
-                            if (v < 20) return 'text-blue-500';
+                            if (v < 20) return 'text-gray-800';
                             return 'text-emerald-500';
                         case 'DE':
                             if (v < 0.3) return 'text-emerald-500';
-                            if (v < 0.7) return 'text-blue-500';
+                            if (v < 0.7) return 'text-gray-800';
                             if (v < 1.5) return 'text-yellow-500';
                             if (v < 2.5) return 'text-green-500';
                             return 'text-red-500';
@@ -4019,7 +4019,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                     className={`w-full py-2 rounded text-sm font-semibold transition-colors ${
                                         loadingScreener
                                             ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                            : 'bg-gray-900 hover:bg-gray-900 text-white'
                                     }`}
                                 >
                                     {loadingScreener ? '⏳ Analyse en cours...' : `🔍 Analyser ma Watchlist (${watchlistTickers.length} titres)`}
@@ -4101,7 +4101,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                     onClick={() => setShowScreener(!showScreener)}
                                     className={`px-4 py-2 rounded transition-colors ${
                                         showScreener
-                                            ? 'bg-blue-600 text-white'
+                                            ? 'bg-gray-900 text-white'
                                             : (isDarkMode 
                                                 ? 'bg-gray-700 hover:bg-gray-600 text-white' 
                                                 : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
@@ -4112,7 +4112,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <button
                                     onClick={refreshWatchlist}
                                     disabled={watchlistLoading || watchlistTickers.length === 0}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                    className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-900 disabled:opacity-50 transition-colors"
                                 >
                                     {watchlistLoading ? 'Actualisation...' : '🔄 Actualiser'}
                                 </button>
@@ -4191,8 +4191,8 @@ STRUCTURE JSON OBLIGATOIRE:
                                         return (
                                             <div key={ticker} className={`rounded-lg p-4 border transition-colors duration-300 ${
                                                 isDarkMode 
-                                                    ? 'bg-gray-800 border-gray-600 hover:border-blue-400/50' 
-                                                    : 'bg-white border-gray-300 hover:border-blue-300'
+                                                    ? 'bg-gray-800 border-gray-600 hover:border-gray-700/50' 
+                                                    : 'bg-white border-gray-300 hover:border-gray-700'
                                             }`}>
                                                 <div className="flex justify-between items-start mb-3">
                                                     <div className="flex items-center gap-2">
@@ -4324,7 +4324,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
                                 <button
                                     onClick={() => setSelectedStock(null)}
-                                    className="text-blue-400 hover:text-blue-300"
+                                    className="text-gray-700 hover:text-gray-700"
                                 >
                                     ✕ Fermer
                                 </button>
@@ -4340,11 +4340,11 @@ STRUCTURE JSON OBLIGATOIRE:
                                     return (
                                         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
                                             {/* Header avec gradient bleu */}
-                                            <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+                                            <div className="bg-gradient-to-r from-gray-900 to-gray-950 p-6">
                                                 <div className="flex justify-between items-center">
                                                     <div>
                                                         <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
-                                                        <p className="text-blue-100 text-sm">
+                                                        <p className="text-gray-800 text-sm">
                                                             {claudeData?.companyName || parsedData?.companyName || 'N/A'}
                                                         </p>
                                                     </div>
@@ -4400,7 +4400,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         </div>
                                                         <div className="bg-gray-50 rounded-lg p-4">
                                                             <div className="text-gray-600 text-sm">Prix Actuel</div>
-                                                            <div className="text-blue-600 font-bold text-lg">{claudeData?.metrics?.price || 'N/A'}</div>
+                                                            <div className="text-gray-900 font-bold text-lg">{claudeData?.metrics?.price || 'N/A'}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -4442,7 +4442,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             <div className="w-1 h-6 bg-green-600 mr-3"></div>
                                                             Analyse Sectorielle
                                                         </h4>
-                                                        <div className="bg-blue-50 rounded-lg p-4">
+                                                        <div className="bg-gray-900 rounded-lg p-4">
                                                             <div className="text-gray-700 leading-relaxed">
                                                                 {typeof claudeData.sectorAnalysis === 'string' 
                                                                     ? cleanText(claudeData.sectorAnalysis)
@@ -4495,7 +4495,7 @@ STRUCTURE JSON OBLIGATOIRE:
 
                                                 {/* Conclusion Finale */}
                                                 {claudeData?.finalConclusion && (
-                                                    <div className="bg-blue-600 rounded-lg p-6 text-white">
+                                                    <div className="bg-gray-900 rounded-lg p-6 text-white">
                                                         <h4 className="text-xl font-bold mb-4">Conclusion Finale</h4>
                                                         <div className="bg-white rounded-lg p-4 text-gray-800">
                                                             <div className="flex items-center justify-between mb-3">
@@ -4518,7 +4518,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             href={seekingAlphaItem.url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                                            className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-900 transition-colors"
                                                         >
                                                             Lire l'analyse complète sur Seeking Alpha →
                                                         </a>
@@ -4547,7 +4547,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                 href={seekingAlphaItem.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline"
+                                                className="inline-block mt-2 text-gray-700 hover:text-gray-800 underline"
                                             >
                                                 Lire l'analyse complète sur Seeking Alpha →
                                             </a>
@@ -4563,15 +4563,15 @@ STRUCTURE JSON OBLIGATOIRE:
                                     <h4 className="text-lg font-semibold text-white mb-2">📊 Données Temps Réel</h4>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                                         <div>
-                                            <span className="text-blue-200">Ouverture:</span>
+                                            <span className="text-gray-800">Ouverture:</span>
                                             <span className="text-white ml-2">${stockData[selectedStock].o?.toFixed(2) || 'N/A'}</span>
                                         </div>
                                         <div>
-                                            <span className="text-blue-200">Plus haut:</span>
+                                            <span className="text-gray-800">Plus haut:</span>
                                             <span className="text-white ml-2">${stockData[selectedStock].h?.toFixed(2) || 'N/A'}</span>
                                         </div>
                                         <div>
-                                            <span className="text-blue-200">Plus bas:</span>
+                                            <span className="text-gray-800">Plus bas:</span>
                                             <span className="text-white ml-2">${stockData[selectedStock].l?.toFixed(2) || 'N/A'}</span>
                                         </div>
                                     </div>
@@ -4590,7 +4590,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                         onClick={() => setSeekingAlphaViewMode('list')}
                                         className={`px-3 py-1 rounded text-sm transition-colors ${
                                             seekingAlphaViewMode === 'list' 
-                                                ? 'bg-blue-600 text-white' 
+                                                ? 'bg-gray-900 text-white' 
                                                 : 'text-gray-300 hover:text-white'
                                         }`}
                                     >
@@ -4600,7 +4600,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                         onClick={() => setSeekingAlphaViewMode('cards')}
                                         className={`px-3 py-1 rounded text-sm transition-colors ${
                                             seekingAlphaViewMode === 'cards' 
-                                                ? 'bg-blue-600 text-white' 
+                                                ? 'bg-gray-900 text-white' 
                                                 : 'text-gray-300 hover:text-white'
                                         }`}
                                     >
@@ -4670,7 +4670,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             </td>
                                                             <td className="py-3">
                                                                 <div className="flex flex-col gap-1">
-                                                                    <button className="text-blue-300 hover:text-blue-200 text-xs">
+                                                                    <button className="text-gray-700 hover:text-gray-800 text-xs">
                                                                         Voir fiche →
                                                                     </button>
                                                                     {stock.url && (
@@ -4703,7 +4703,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                         const parsedData = stock.parsedData;
                                         
                                         return (
-                                            <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-blue-300/40 transition-all cursor-pointer"
+                                            <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-700/40 transition-all cursor-pointer"
                                                  onClick={() => setSelectedStock(stock.ticker)}>
                                                 
                                         {/* Header avec ticker et rating */}
@@ -4735,7 +4735,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                 {claudeData?.metrics?.price || parsedData?.price || 'N/A'}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                                                <div className="w-4 h-4 bg-gray-800 rounded"></div>
                                                 <span className={`text-sm font-medium ${claudeData?.metrics?.priceChange?.includes('+') ? 'text-green-400' : 'text-red-400'}`}>
                                                     {claudeData?.metrics?.priceChange || parsedData?.change || 'N/A'}
                                                 </span>
@@ -4793,7 +4793,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="block w-full px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors text-center"
+                                                    className="block w-full px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-900 transition-colors text-center"
                                                 >
                                                     📰 Lire sur Seeking Alpha →
                                                 </a>
@@ -4833,7 +4833,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 }`}>Statut:</span>
                                 <span className={`px-3 py-1 rounded text-sm font-bold ${
                                     scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
-                                    scrapingStatus === 'running' ? 'bg-blue-500 text-white' :
+                                    scrapingStatus === 'running' ? 'bg-gray-800 text-white' :
                                     scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
                                     'bg-red-500 text-white'
                                 }`}>
@@ -4848,7 +4848,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             {scrapingStatus === 'running' && (
                                 <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
                                     <div 
-                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                        className="bg-gray-800 h-2 rounded-full transition-all duration-300"
                                         style={{ width: `${scrapingProgress}%` }}
                                     ></div>
                                 </div>
@@ -4864,14 +4864,14 @@ STRUCTURE JSON OBLIGATOIRE:
                         {/* Instructions de scraping */}
                         <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
                             isDarkMode 
-                                ? 'bg-blue-900/30' 
-                                : 'bg-blue-100/80'
+                                ? 'bg-gray-950/30' 
+                                : 'bg-gray-800/80'
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>📖 Instructions de Scraping</h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                                isDarkMode ? 'text-gray-800' : 'text-gray-950'
                             }`}>
                                 <div>• <strong>Méthode 1:</strong> Cliquez sur "🚀 Lancer le Scraper" pour ouvrir les pages</div>
                                 <div>• <strong>Méthode 2:</strong> Cliquez sur "📋 Script F12" pour copier un script</div>
@@ -4938,7 +4938,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                             log.type === 'error' ? 'bg-red-900/50 text-red-300' :
                                             log.type === 'success' ? 'bg-green-900/50 text-green-300' :
                                             log.type === 'warning' ? 'bg-yellow-900/50 text-yellow-300' :
-                                            'bg-blue-900/50 text-blue-300'
+                                            'bg-gray-950/50 text-gray-700'
                                         }`}>
                                             <span className="text-gray-400">[{log.timestamp}]</span> {log.message}
                                     </div>
@@ -5025,7 +5025,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
                                 <button
                                     onClick={() => setSelectedStock(null)}
-                                    className="text-blue-400 hover:text-blue-300"
+                                    className="text-gray-700 hover:text-gray-700"
                                 >
                                     ✕ Fermer
                                 </button>
@@ -5041,11 +5041,11 @@ STRUCTURE JSON OBLIGATOIRE:
                                     return (
                                         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
                                             {/* Header avec gradient bleu */}
-                                            <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+                                            <div className="bg-gradient-to-r from-gray-900 to-gray-950 p-6">
                                                 <div className="flex justify-between items-center">
                                                     <div>
                                                         <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
-                                                        <p className="text-blue-100 text-sm">
+                                                        <p className="text-gray-800 text-sm">
                                                             {claudeData?.companyName || parsedData?.companyName || 'N/A'}
                                                         </p>
                                                     </div>
@@ -5101,7 +5101,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         </div>
                                                         <div className="bg-gray-50 rounded-lg p-4">
                                                             <div className="text-gray-600 text-sm">Prix Actuel</div>
-                                                            <div className="text-blue-600 font-bold text-lg">{claudeData?.metrics?.price || 'N/A'}</div>
+                                                            <div className="text-gray-900 font-bold text-lg">{claudeData?.metrics?.price || 'N/A'}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -5143,7 +5143,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             <div className="w-1 h-6 bg-green-600 mr-3"></div>
                                                             Analyse Sectorielle
                                                         </h4>
-                                                        <div className="bg-blue-50 rounded-lg p-4">
+                                                        <div className="bg-gray-900 rounded-lg p-4">
                                                             <div className="text-gray-700 leading-relaxed">
                                                                 {typeof claudeData.sectorAnalysis === 'string' 
                                                                     ? cleanText(claudeData.sectorAnalysis)
@@ -5197,12 +5197,12 @@ STRUCTURE JSON OBLIGATOIRE:
                                                 {(claudeData?.recommendation || claudeData?.finalConclusion?.recommendation) && 
                                                  !claudeData?.recommendation?.includes('En attente') && 
                                                  !claudeData?.finalConclusion?.recommendation?.includes('En attente') && (
-                                                    <div className="bg-blue-50 rounded-lg p-4">
-                                                        <h4 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
+                                                    <div className="bg-gray-900 rounded-lg p-4">
+                                                        <h4 className="text-lg font-bold text-gray-950 mb-4 flex items-center">
                                                             <span className="mr-2">💡</span>
                                                             Recommandation
                                                         </h4>
-                                                        <div className="text-blue-700 leading-relaxed">
+                                                        <div className="text-gray-900 leading-relaxed">
                                                             {cleanText(claudeData?.recommendation || claudeData?.finalConclusion?.recommendation)}
                                                         </div>
                                                     </div>
@@ -5224,8 +5224,8 @@ STRUCTURE JSON OBLIGATOIRE:
                                                                 <li>Cliquez sur "🤖 Analyser avec Claude" pour traiter les données</li>
                                                                 <li>Les métriques détaillées seront extraites et affichées ici</li>
                                                             </ol>
-                                                            <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
-                                                                <p className="text-sm text-blue-800">
+                                                            <div className="mt-4 p-3 bg-gray-900 rounded border border-gray-800">
+                                                                <p className="text-sm text-gray-950">
                                                                     💡 <strong>Astuce :</strong> Les données parsées automatiquement sont affichées ci-dessus. 
                                                                     Pour une analyse plus approfondie avec insights IA, utilisez l'API Claude.
                                                                 </p>
@@ -5241,7 +5241,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             href={seekingAlphaItem.url} 
                                                             target="_blank" 
                                                             rel="noopener noreferrer"
-                                                            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                                            className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-900 transition-colors"
                                                         >
                                                             Lire l'analyse complète sur Seeking Alpha →
                                                         </a>
@@ -5271,7 +5271,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 </p>
                                 <button
                                     onClick={() => setActiveTab('admin-jsla')}
-                                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-900 transition-colors"
                                 >
                                     Aller à Admin-JSLAI →
                                 </button>
@@ -5294,7 +5294,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                             <h3 className="text-xl font-bold text-white">{stock.ticker}</h3>
                                             <button
                                                 onClick={() => setSelectedStock(stock.ticker)}
-                                                className="text-blue-400 hover:text-blue-300 text-sm"
+                                                className="text-gray-700 hover:text-gray-700 text-sm"
                                             >
                                                 Voir détail
                                             </button>
@@ -5304,19 +5304,19 @@ STRUCTURE JSON OBLIGATOIRE:
                                         <div className="space-y-3 mb-4">
                                             {claudeData?.metrics?.marketCap && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-blue-200">Capitalisation:</span>
+                                                    <span className="text-gray-800">Capitalisation:</span>
                                                     <span className="text-white font-semibold">{claudeData.metrics.marketCap}</span>
                                                 </div>
                                             )}
                                             {claudeData?.metrics?.peRatio && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-blue-200">P/E:</span>
+                                                    <span className="text-gray-800">P/E:</span>
                                                     <span className="text-white font-semibold">{claudeData.metrics.peRatio}</span>
                                                 </div>
                                             )}
                                             {claudeData?.metrics?.dividendYield && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-blue-200">Dividende:</span>
+                                                    <span className="text-gray-800">Dividende:</span>
                                                     <span className="text-green-300 font-semibold">{claudeData.metrics.dividendYield}</span>
                                                 </div>
                                             )}
@@ -5326,7 +5326,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                         {claudeData?.quantRating?.overall && (
                                             <div className="mb-4">
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-blue-200">Rating Quantitatif:</span>
+                                                    <span className="text-gray-800">Rating Quantitatif:</span>
                                                     <span className={`px-3 py-1 rounded text-sm font-bold ${getGradeColor(claudeData.quantRating.overall)}`}>
                                                         {claudeData.quantRating.overall}
                                                     </span>
@@ -5336,7 +5336,7 @@ STRUCTURE JSON OBLIGATOIRE:
 
                                         {/* Recommandation courte */}
                                         {claudeData?.recommendation && (
-                                            <div className="text-blue-100 text-sm line-clamp-3">
+                                            <div className="text-gray-800 text-sm line-clamp-3">
                                                 {cleanText(claudeData.recommendation).substring(0, 150)}...
                                             </div>
                                         )}
@@ -5348,7 +5348,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                     href={stock.url} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer"
-                                                    className="text-blue-300 hover:text-blue-200 text-sm"
+                                                    className="text-gray-700 hover:text-gray-800 text-sm"
                                                 >
                                                     Lire l'analyse complète →
                                                 </a>
@@ -5378,7 +5378,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                 <h4 className="text-lg font-bold text-gray-800">{ticker}</h4>
                                                 <button
                                                     onClick={() => setSelectedStock(ticker)}
-                                                    className="text-blue-600 hover:text-blue-700 text-sm"
+                                                    className="text-gray-900 hover:text-gray-900 text-sm"
                                                 >
                                                     Voir détail
                                                 </button>
@@ -5428,7 +5428,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         href={seekingAlphaItem.url} 
                                                         target="_blank" 
                                                         rel="noopener noreferrer"
-                                                        className="text-blue-600 hover:text-blue-700 text-sm"
+                                                        className="text-gray-900 hover:text-gray-900 text-sm"
                                                     >
                                                         Lire l'analyse complète sur Seeking Alpha →
                                                     </a>
@@ -8452,8 +8452,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         {/* En-tête amélioré */}
                         <div className={`p-6 rounded-xl border-2 transition-all duration-300 ${
                             isDarkMode
-                                ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 border-blue-500/30'
-                                : 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200'
+                                ? 'bg-gradient-to-r from-gray-950/30 to-purple-900/30 border-gray-800/30'
+                                : 'bg-gradient-to-r from-gray-900 to-purple-50 border-gray-800'
                         }`}>
                             <div className="flex justify-between items-start">
                                 <div>
@@ -8507,7 +8507,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             <div className="space-y-4">
                                 {/* Cron Matin 7h20 */}
                                 <div className={`p-4 rounded-lg border-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-blue-900/20 border-blue-500/30' : 'bg-blue-50 border-blue-200'
+                                    isDarkMode ? 'bg-gray-950/20 border-gray-800/30' : 'bg-gray-900 border-gray-800'
                                 }`}>
                                     <div className="flex justify-between items-start mb-3">
                                         <div>
@@ -8614,10 +8614,10 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
                                 {/* Note informative */}
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-blue-900/10 border-blue-500/20' : 'bg-blue-50 border-blue-200'
+                                    isDarkMode ? 'bg-gray-950/10 border-gray-800/20' : 'bg-gray-900 border-gray-800'
                                 }`}>
                                     <p className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-blue-300' : 'text-blue-800'
+                                        isDarkMode ? 'text-gray-700' : 'text-gray-950'
                                     }`}>
                                         💡 <strong>Note:</strong> Les crons sont configurés dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">vercel.json</code>.
                                         Pour modifier les horaires, utilisez les scripts <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:edt</code> ou
@@ -8781,8 +8781,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             : 'hover:shadow-xl hover:-translate-y-1 cursor-pointer'
                                     } ${
                                         isDarkMode
-                                            ? 'bg-blue-900/30 border-blue-500/50 hover:border-blue-400'
-                                            : 'bg-blue-50 border-blue-200 hover:border-blue-400'
+                                            ? 'bg-gray-950/30 border-gray-800/50 hover:border-gray-700'
+                                            : 'bg-gray-900 border-gray-800 hover:border-gray-700'
                                     }`}
                                 >
                                     <div className="text-4xl mb-3">🌅</div>
@@ -8797,7 +8797,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         Asie • Futures • Préouverture
                                     </div>
                                     <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                                        isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                        isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                     }`}>
                                         →
                                     </div>
@@ -8868,15 +8868,15 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
                             {loading && (
                                 <div className={`mt-4 p-4 rounded-lg border-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-blue-900/20 border-blue-500/30' : 'bg-blue-50 border-blue-200'
+                                    isDarkMode ? 'bg-gray-950/20 border-gray-800/30' : 'bg-gray-900 border-gray-800'
                                 }`}>
                                     <div className="flex items-start space-x-3">
                                         <div className="flex-shrink-0 mt-1">
-                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-800"></div>
                                         </div>
                                         <div className="flex-1">
                                             <div className={`font-semibold mb-1 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>
                                                 {currentStep || 'Génération en cours...'}
                                             </div>
@@ -8957,8 +8957,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                     onClick={sendBriefingEmailQuick}
                                                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                                                         isDarkMode
-                                                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                            ? 'bg-gray-900 hover:bg-gray-900 text-white'
+                                                            : 'bg-gray-800 hover:bg-gray-900 text-white'
                                                     }`}
                                                 >
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -9001,7 +9001,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         {/* Badges Metadata */}
                                         <div className="flex flex-wrap gap-2 mb-3">
                                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                                isDarkMode ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30' : 'bg-blue-100 text-blue-700 border border-blue-300'
+                                                isDarkMode ? 'bg-gray-900/20 text-gray-700 border border-gray-800/30' : 'bg-gray-800 text-gray-900 border border-gray-700'
                                             }`}>
                                                 Intent: {currentBriefing.intentData.intent}
                                             </span>
@@ -9101,7 +9101,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         <button
                                             onClick={sendEmail}
                                             disabled={!recipients.trim()}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             📧 Envoyer
                                         </button>
@@ -9145,8 +9145,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                     disabled={!previewHtml}
                                                     className={`inline-flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-all ${
                                                         isDarkMode
-                                                            ? 'bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-700 disabled:text-gray-500'
-                                                            : 'bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-200 disabled:text-gray-400'
+                                                            ? 'bg-gray-900 hover:bg-gray-900 text-white disabled:bg-gray-700 disabled:text-gray-500'
+                                                            : 'bg-gray-800 hover:bg-gray-900 text-white disabled:bg-gray-200 disabled:text-gray-400'
                                                     } disabled:cursor-not-allowed`}
                                                 >
                                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -9237,7 +9237,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                                 analysis: briefing.analysis
                                                             });
                                                         }}
-                                                        className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                                        className="px-3 py-1 text-sm bg-gray-900 text-white rounded hover:bg-gray-900 transition-colors"
                                                     >
                                                         👁️ Voir
                                                     </button>
@@ -10750,7 +10750,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     // Linkification d'URLs
                     t = t.replace(/((https?:\/\/|www\.)[\w.-]+(?:\/[\w\-._~:/?#[\]@!$&'()*+,;=%]*)?)/g, (url) => {
                         const href = url.startsWith('http') ? url : `http://${url}`;
-                        return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`;
+                        return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-gray-900 underline">${url}</a>`;
                     });
 
                     // Réinsertion des blocs de code protégés
@@ -10821,7 +10821,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     💡 Emma peut faire des requêtes en temps réel pour n'importe quel symbole
                                 </p>
                                 <p className={`text-xs transition-colors duration-300 ${
-                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                    isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                 }`}>
                                     ⚙️ Température: {emmaTemperature} • Longueur: {emmaMaxTokens} tokens
                                 </p>
@@ -10895,9 +10895,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                         }`}>
                                             <div className="flex gap-1">
-                                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{animationDelay: '0ms'}}></div>
-                                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{animationDelay: '150ms'}}></div>
-                                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{animationDelay: '300ms'}}></div>
+                                                <div className="w-2 h-2 rounded-full bg-gray-800 animate-bounce" style={{animationDelay: '0ms'}}></div>
+                                                <div className="w-2 h-2 rounded-full bg-gray-800 animate-bounce" style={{animationDelay: '150ms'}}></div>
+                                                <div className="w-2 h-2 rounded-full bg-gray-800 animate-bounce" style={{animationDelay: '300ms'}}></div>
                                             </div>
                                             <p className="text-sm">Chargement de votre historique...</p>
                                         </div>
@@ -10953,7 +10953,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 )}
                                                 <div className={`max-w-xl px-4 py-3 rounded-lg shadow ${
                                                     message.type === 'user' 
-                                                        ? 'bg-blue-600 text-white shadow-blue-500/20' 
+                                                        ? 'bg-gray-900 text-white shadow-gray-800/20' 
                                                         : message.type === 'error'
                                                         ? 'bg-red-600 text-white shadow-red-500/20'
                                                         : message.type === 'system'
@@ -10964,7 +10964,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 }`}>
                                                     <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formatMessageText(message.content) }} />
                                                     <div className={`text-xs mt-1 ${
-                                                        message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
+                                                        message.type === 'user' ? 'text-gray-800' : 'text-gray-400'
                                                     }`}>
                                                         {message.timestamp}
                                                     </div>
@@ -10977,7 +10977,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 <span className="font-medium">⚙️ Paramètres:</span>
                                                                 <span className={`px-1.5 py-0.5 rounded text-xs ${
                                                                     emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
-                                                                    emmaTemperature <= 0.5 ? 'bg-blue-100 text-blue-700' :
+                                                                    emmaTemperature <= 0.5 ? 'bg-gray-800 text-gray-900' :
                                                                     emmaTemperature <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
                                                                     'bg-green-100 text-green-700'
                                                                 }`}>
@@ -11020,7 +11020,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             <span className="font-medium">⚙️ Utilise:</span>
                                                             <span className={`px-1.5 py-0.5 rounded text-xs ${
                                                                 emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
-                                                                emmaTemperature <= 0.5 ? 'bg-blue-100 text-blue-700' :
+                                                                emmaTemperature <= 0.5 ? 'bg-gray-800 text-gray-900' :
                                                                 emmaTemperature <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
                                                                 'bg-green-100 text-green-700'
                                                             }`}>
@@ -11048,8 +11048,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         onClick={scrollToBottom}
                                         className={`absolute bottom-6 right-6 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
                                             isDarkMode 
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                ? 'bg-gray-900 hover:bg-gray-900 text-white' 
+                                                : 'bg-gray-800 hover:bg-gray-900 text-white'
                                         }`}
                                         title="Aller en bas"
                                     >
@@ -11086,7 +11086,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${
                                         emmaLoading || !emmaInput.trim()
                                             ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                                            : 'bg-gray-900 text-white hover:bg-gray-900'
                                     }`}
                                 >
                                     {emmaLoading ? '⏳' : '📤'}
@@ -11294,7 +11294,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 onClick={() => setEmmaTemperature(0.1)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${
                                                     emmaTemperature === 0.1 
-                                                        ? 'bg-blue-600 text-white' 
+                                                        ? 'bg-gray-900 text-white' 
                                                         : isDarkMode 
                                                             ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -11307,7 +11307,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 onClick={() => setEmmaTemperature(0.3)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${
                                                     emmaTemperature === 0.3 
-                                                        ? 'bg-blue-600 text-white' 
+                                                        ? 'bg-gray-900 text-white' 
                                                         : isDarkMode 
                                                             ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -11320,7 +11320,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 onClick={() => setEmmaTemperature(0.5)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${
                                                     emmaTemperature === 0.5 
-                                                        ? 'bg-blue-600 text-white' 
+                                                        ? 'bg-gray-900 text-white' 
                                                         : isDarkMode 
                                                             ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -11333,7 +11333,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 onClick={() => setEmmaTemperature(0.7)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${
                                                     emmaTemperature === 0.7 
-                                                        ? 'bg-blue-600 text-white' 
+                                                        ? 'bg-gray-900 text-white' 
                                                         : isDarkMode 
                                                             ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -11346,7 +11346,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 onClick={() => setEmmaTemperature(0.9)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${
                                                     emmaTemperature === 0.9 
-                                                        ? 'bg-blue-600 text-white' 
+                                                        ? 'bg-gray-900 text-white' 
                                                         : isDarkMode 
                                                             ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -11512,14 +11512,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {/* Aide contextuelle */}
                         <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
                             isDarkMode 
-                                ? 'bg-blue-900/30 border-blue-600' 
-                                : 'bg-blue-100/80 border-blue-300'
+                                ? 'bg-gray-950/30 border-gray-900' 
+                                : 'bg-gray-800/80 border-gray-700'
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>ℹ️ À propos d'Emma</h3>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                                isDarkMode ? 'text-gray-800' : 'text-gray-950'
                             }`}>
                                 <div>• <strong>Navigation :</strong> Emma vous guide dans l'interface</div>
                                 <div>• <strong>Interprétation :</strong> Explique les données financières</div>
@@ -11547,8 +11547,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 disabled={loading}
                                 className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${
                                     isDarkMode
-                                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                        ? 'bg-gray-900 hover:bg-gray-900 text-white'
+                                        : 'bg-gray-800 hover:bg-gray-900 text-white'
                                 }`}
                             >
                                 {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
@@ -11568,8 +11568,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className="mt-8">
                         <div className={`backdrop-blur-sm rounded-2xl p-8 border-2 shadow-2xl transition-colors duration-300 ${
                             isDarkMode 
-                                ? 'bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-blue-500/30 shadow-blue-500/10' 
-                                : 'bg-gradient-to-br from-white/95 to-gray-50/95 border-blue-400/40 shadow-blue-400/10'
+                                ? 'bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-gray-800/30 shadow-gray-800/10' 
+                                : 'bg-gradient-to-br from-white/95 to-gray-50/95 border-gray-700/40 shadow-gray-700/10'
                         }`}>
                             <div className="text-center mb-6">
                                 <h2 className={`text-2xl font-bold mb-3 transition-colors duration-300 ${
@@ -11579,8 +11579,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </h2>
                                 <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${
                                     isDarkMode 
-                                        ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30' 
-                                        : 'bg-blue-100/80 text-blue-700 border border-blue-300/50'
+                                        ? 'bg-gray-900/20 text-gray-700 border border-gray-800/30' 
+                                        : 'bg-gray-800/80 text-gray-900 border border-gray-700/50'
                                 }`}>
                                     <span className="mr-2">🔗</span>
                                     Source: Finnhub API
@@ -11595,34 +11595,34 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className={`border-b-2 transition-colors duration-300 ${
-                                            isDarkMode ? 'border-blue-500/50 bg-gray-900' : 'border-blue-400/50 bg-gray-100'
+                                            isDarkMode ? 'border-gray-800/50 bg-gray-900' : 'border-gray-700/50 bg-gray-100'
                                         }`}>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>📈 Ticker</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>💰 Prix</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>📊 Change</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>📈 P/E</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>💎 Dividende</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>🏢 Secteur</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>⭐ Rating</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>😊 Sentiment</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                                isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                             }`}>⚡ Actions</th>
                                         </tr>
                                     </thead>
@@ -11679,8 +11679,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     {/* Ligne principale - STYLE PRINCIPAL */}
                                                     <tr className={`border-b-2 transition-all duration-300 hover:scale-[1.02] ${
                                                         isDarkMode 
-                                                            ? 'border-gray-600/50 hover:bg-gradient-to-r hover:from-gray-800/80 hover:to-gray-700/80 hover:shadow-lg hover:shadow-blue-500/10' 
-                                                            : 'border-gray-300/50 hover:bg-gradient-to-r hover:from-gray-50/80 hover:to-white/80 hover:shadow-lg hover:shadow-blue-400/10'
+                                                            ? 'border-gray-600/50 hover:bg-gradient-to-r hover:from-gray-800/80 hover:to-gray-700/80 hover:shadow-lg hover:shadow-gray-800/10' 
+                                                            : 'border-gray-300/50 hover:bg-gradient-to-r hover:from-gray-50/80 hover:to-white/80 hover:shadow-lg hover:shadow-gray-700/10'
                                                     }`}>
                                                         <td className="py-4 px-3">
                                                             <div className="flex items-center gap-3">
@@ -11742,8 +11742,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 }}
                                                                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 hover:scale-[1.02] shadow ${
                                                                     isDarkMode
-                                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-blue-500/25'
-                                                                        : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white shadow-blue-400/25'
+                                                                        ? 'bg-gradient-to-r from-gray-900 to-gray-900 hover:from-gray-800 hover:to-gray-900 text-white shadow-gray-800/25'
+                                                                        : 'bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white shadow-gray-700/25'
                                                                 }`}
                                                             >
                                                                 📊 Voir dans JLab
@@ -11764,7 +11764,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 }`}>
                                                                     <div className="flex items-start gap-4">
                                                                         <div className={`p-3 rounded-full transition-colors duration-300 ${
-                                                                            isDarkMode ? 'bg-blue-600/20 text-blue-300' : 'bg-blue-100 text-blue-600'
+                                                                            isDarkMode ? 'bg-gray-900/20 text-gray-700' : 'bg-gray-800 text-gray-900'
                                                                         }`}>
                                                                             <span className="text-2xl">📰</span>
                                                                         </div>
@@ -11779,8 +11779,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                                         rel="noopener noreferrer"
                                                                                         className={`hover:underline transition-colors duration-300 ${
                                                                                             isDarkMode 
-                                                                                                ? 'text-blue-300 hover:text-blue-200' 
-                                                                                                : 'text-blue-600 hover:text-blue-700'
+                                                                                                ? 'text-gray-700 hover:text-gray-800' 
+                                                                                                : 'text-gray-900 hover:text-gray-900'
                                                                                         }`}
                                                                                     >
                                                                                         {cleanText(news.title)}
@@ -11820,8 +11820,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                                         rel="noopener noreferrer"
                                                                                         className={`px-4 py-2 rounded-full font-semibold transition-all duration-300 hover:scale-105 ${
                                                                                             isDarkMode 
-                                                                                                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/25' 
-                                                                                                : 'bg-blue-500 hover:bg-blue-400 text-white shadow-lg shadow-blue-400/25'
+                                                                                                ? 'bg-gray-900 hover:bg-gray-800 text-white shadow-lg shadow-gray-800/25' 
+                                                                                                : 'bg-gray-800 hover:bg-gray-700 text-white shadow-lg shadow-gray-700/25'
                                                                                         }`}
                                                                                     >
                                                                                         📖 Lire l'article
@@ -11842,11 +11842,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
                             <div className={`text-center mt-8 p-6 rounded-xl transition-colors duration-300 ${
                                 isDarkMode 
-                                    ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/20' 
-                                    : 'bg-gradient-to-r from-blue-100/80 to-purple-100/80 border border-blue-300/30'
+                                    ? 'bg-gradient-to-r from-gray-950/30 to-purple-900/30 border border-gray-800/20' 
+                                    : 'bg-gradient-to-r from-gray-800/80 to-purple-100/80 border border-gray-700/30'
                             }`}>
                                 <div className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                                    isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                 }`}>
                                     📜 Section Principale - Données Financières
                                 </div>
@@ -12961,7 +12961,7 @@ console.log('✅ Données hybrides récupérées:', {
                             // Source: Investopedia, Morningstar
                             if (v < 0) return 'text-red-500'; // Négatif = pertes
                             if (v < 15) return 'text-emerald-500'; // Sous-évalué / Excellent
-                            if (v < 25) return 'text-blue-500'; // Juste valorisé / Bon
+                            if (v < 25) return 'text-gray-800'; // Juste valorisé / Bon
                             if (v < 35) return 'text-yellow-500'; // Légèrement surévalué / Attention
                             return 'text-red-500'; // Surévalué / Risque élevé
                             
@@ -12971,7 +12971,7 @@ console.log('✅ Données hybrides récupérées:', {
                             // Source: "One Up on Wall Street" par Peter Lynch
                             if (v < 0) return 'text-red-500'; // Invalide
                             if (v < 1) return 'text-emerald-500'; // Sous-évalué / Excellent achat
-                            if (v < 1.5) return 'text-blue-500'; // Juste valorisé / Bon
+                            if (v < 1.5) return 'text-gray-800'; // Juste valorisé / Bon
                             if (v < 2) return 'text-yellow-500'; // Légèrement cher / Attention
                             return 'text-green-500'; // Surévalué / Éviter
                             
@@ -12979,7 +12979,7 @@ console.log('✅ Données hybrides récupérées:', {
                             // P/S Ratio (Price to Sales)
                             // Standards varient par secteur, Tech: 2-5, Retail: 0.5-2
                             if (v < 1) return 'text-emerald-500'; // Sous-évalué
-                            if (v < 3) return 'text-blue-500'; // Raisonnable
+                            if (v < 3) return 'text-gray-800'; // Raisonnable
                             if (v < 5) return 'text-yellow-500'; // Élevé
                             return 'text-green-500'; // Très élevé
                             
@@ -12990,7 +12990,7 @@ console.log('✅ Données hybrides récupérées:', {
                             if (v < 0) return 'text-red-500'; // Perte / Très mauvais
                             if (v < 10) return 'text-green-500'; // Faible / Mauvais
                             if (v < 15) return 'text-yellow-500'; // Moyen / Acceptable
-                            if (v < 20) return 'text-blue-500'; // Bon / Au-dessus moyenne
+                            if (v < 20) return 'text-gray-800'; // Bon / Au-dessus moyenne
                             return 'text-emerald-500'; // Excellent / Supérieur
                             
                         case 'ROA':
@@ -12999,7 +12999,7 @@ console.log('✅ Données hybrides récupérées:', {
                             // Source: Corporate Finance Institute
                             if (v < 0) return 'text-red-500'; // Perte
                             if (v < 5) return 'text-green-500'; // Faible utilisation des actifs
-                            if (v < 10) return 'text-blue-500'; // Bon
+                            if (v < 10) return 'text-gray-800'; // Bon
                             if (v < 15) return 'text-emerald-500'; // Très bon
                             return 'text-emerald-400'; // Exceptionnel
                             
@@ -13008,7 +13008,7 @@ console.log('✅ Données hybrides récupérées:', {
                             // Standard: <1 sain, >2 risqué (varie selon secteur)
                             // Source: Financial Times, Wall Street Journal
                             if (v < 0.3) return 'text-emerald-500'; // Très faible endettement / Excellent
-                            if (v < 0.7) return 'text-blue-500'; // Endettement sain / Bon
+                            if (v < 0.7) return 'text-gray-800'; // Endettement sain / Bon
                             if (v < 1.5) return 'text-yellow-500'; // Endettement modéré / Attention
                             if (v < 2.5) return 'text-green-500'; // Endettement élevé / Risque
                             return 'text-red-500'; // Endettement très élevé / Danger
@@ -13020,7 +13020,7 @@ console.log('✅ Données hybrides récupérées:', {
                             if (v < 0) return 'text-red-500'; // Pertes
                             if (v < 5) return 'text-green-500'; // Faible rentabilité
                             if (v < 10) return 'text-yellow-500'; // Rentabilité modérée
-                            if (v < 20) return 'text-blue-500'; // Bonne rentabilité
+                            if (v < 20) return 'text-gray-800'; // Bonne rentabilité
                             return 'text-emerald-500'; // Excellente rentabilité
                             
                         case 'Beta':
@@ -13029,7 +13029,7 @@ console.log('✅ Données hybrides récupérées:', {
                             // Source: Modern Portfolio Theory - Markowitz
                             if (v < 0) return 'text-purple-500'; // Inverse du marché / Rare
                             if (v < 0.8) return 'text-emerald-500'; // Très défensif / Faible volatilité
-                            if (v < 1) return 'text-blue-500'; // Défensif / Stable
+                            if (v < 1) return 'text-gray-800'; // Défensif / Stable
                             if (v < 1.3) return 'text-yellow-500'; // Légèrement volatile
                             if (v < 1.7) return 'text-green-500'; // Volatile
                             return 'text-red-500'; // Très volatile / Risque élevé
@@ -13039,8 +13039,8 @@ console.log('✅ Données hybrides récupérées:', {
                             // Standard: 2-5% sain, >7% potentiellement insoutenable
                             // Source: Dividend Aristocrats criteria
                             if (v < 1) return 'text-gray-400'; // Faible/Pas de dividende
-                            if (v < 2) return 'text-blue-400'; // Dividende modeste
-                            if (v < 4) return 'text-blue-500'; // Bon dividende
+                            if (v < 2) return 'text-gray-700'; // Dividende modeste
+                            if (v < 4) return 'text-gray-800'; // Bon dividende
                             if (v < 6) return 'text-emerald-500'; // Excellent dividende
                             if (v < 8) return 'text-yellow-500'; // Élevé - vérifier soutenabilité
                             return 'text-green-500'; // Très élevé - risque de coupure
@@ -13051,7 +13051,7 @@ console.log('✅ Données hybrides récupérées:', {
                             if (v < 1) return 'text-red-500'; // Problème de liquidité
                             if (v < 1.5) return 'text-green-500'; // Liquidité juste
                             if (v < 2.5) return 'text-emerald-500'; // Liquidité saine
-                            if (v < 3.5) return 'text-blue-500'; // Bonne liquidité
+                            if (v < 3.5) return 'text-gray-800'; // Bonne liquidité
                             return 'text-yellow-500'; // Trop de liquidité non utilisée
                             
                         case 'QuickRatio':
@@ -13059,7 +13059,7 @@ console.log('✅ Données hybrides récupérées:', {
                             // Standard: >1 bon, >1.5 excellent
                             if (v < 0.5) return 'text-red-500'; // Problème majeur
                             if (v < 1) return 'text-green-500'; // Risque de liquidité
-                            if (v < 1.5) return 'text-blue-500'; // Acceptable
+                            if (v < 1.5) return 'text-gray-800'; // Acceptable
                             return 'text-emerald-500'; // Excellent
                             
                         case 'EPS':
@@ -13067,7 +13067,7 @@ console.log('✅ Données hybrides récupérées:', {
                             // Analyser la tendance plutôt que la valeur absolue
                             if (v < 0) return 'text-red-500'; // Pertes
                             if (v < 1) return 'text-green-500'; // Faible
-                            if (v < 3) return 'text-blue-500'; // Moyen
+                            if (v < 3) return 'text-gray-800'; // Moyen
                             return 'text-emerald-500'; // Fort
                             
                         default:
@@ -13235,7 +13235,7 @@ console.log('✅ Données hybrides récupérées:', {
                             }`}>
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2">
-                                        <LucideIcon name="Filter" className="w-4 h-4 text-blue-500" />
+                                        <LucideIcon name="Filter" className="w-4 h-4 text-gray-800" />
                                         <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             🔍 Screener de Titres
                                         </h3>
@@ -13329,7 +13329,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     className={`w-full py-2 rounded text-sm font-semibold transition-colors ${
                                         loadingScreener
                                             ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                            : 'bg-gray-900 hover:bg-gray-900 text-white'
                                     }`}
                                 >
                                     {loadingScreener ? '⏳ Analyse en cours...' : '🔍 Lancer le Screener'}
@@ -13399,7 +13399,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                                         setSelectedStock(stock.symbol);
                                                                         setShowScreener(false);
                                                                     }}
-                                                                    className="px-2 py-1 bg-blue-600 text-white rounded text-[9px] hover:bg-blue-700 transition-colors"
+                                                                    className="px-2 py-1 bg-gray-900 text-white rounded text-[9px] hover:bg-gray-900 transition-colors"
                                                                 >
                                                                     Voir
                                                                 </button>
@@ -13437,7 +13437,7 @@ console.log('✅ Données hybrides récupérées:', {
                                             {stockDataIntelli?.jslaiScore && (
                                                 <div className={`px-4 py-1.5 rounded text-sm font-bold border-2 ${
                                                     stockDataIntelli.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600' :
-                                                    stockDataIntelli.jslaiScore.total >= 65 ? 'bg-blue-900/30 text-blue-400 border-blue-600' :
+                                                    stockDataIntelli.jslaiScore.total >= 65 ? 'bg-gray-950/30 text-gray-700 border-gray-900' :
                                                     stockDataIntelli.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
                                                     'bg-red-900/30 text-red-400 border-red-600'
                                                 }`}>
@@ -13591,7 +13591,7 @@ console.log('✅ Données hybrides récupérées:', {
                                             onClick={() => setShowScreener(!showScreener)}
                                             className={`p-1.5 border rounded-md transition-all ${
                                                 showScreener
-                                                    ? 'bg-blue-600 border-blue-600'
+                                                    ? 'bg-gray-900 border-gray-900'
                                                     : (isDarkMode 
                                                         ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800' 
                                                         : 'bg-white hover:bg-gray-100 border-gray-300')
@@ -13646,7 +13646,7 @@ console.log('✅ Données hybrides récupérées:', {
                                             }`}>
                                                 <div className={`p-3 border-b flex items-center justify-between gap-2 ${isDarkMode ? 'border-neutral-800' : 'border-gray-200'}`}>
                                                     <div className="flex items-center gap-2">
-                                                        <LucideIcon name="LifeBuoy" className="w-4 h-4 text-blue-500" />
+                                                        <LucideIcon name="LifeBuoy" className="w-4 h-4 text-gray-800" />
                                                         <div>
                                                             <div className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Aide & diagnostics IntelliStocks</div>
                                                             <div className="text-[10px] text-gray-500">Mode Démo Hybride • FMP + Perplexity</div>
@@ -13697,7 +13697,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                     <span>Excellent / Sous-évalué</span>
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                    <div className="w-2 h-2 rounded-full bg-gray-800"></div>
                                                     <span>Bon / Juste valorisé</span>
                                                 </div>
                                                 <div className="flex items-center gap-1">
@@ -14020,7 +14020,7 @@ console.log('✅ Données hybrides récupérées:', {
                                         movingAverages.interpretation?.trend?.includes('Haussier fort') 
                                             ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-800' : 'bg-emerald-50 border-emerald-200')
                                             : movingAverages.interpretation?.trend?.includes('Haussier') 
-                                            ? (isDarkMode ? 'bg-blue-900/30 border-blue-800' : 'bg-blue-50 border-blue-200')
+                                            ? (isDarkMode ? 'bg-gray-950/30 border-gray-950' : 'bg-gray-900 border-gray-800')
                                             : movingAverages.interpretation?.trend?.includes('Baissier fort')
                                             ? (isDarkMode ? 'bg-red-900/30 border-red-800' : 'bg-red-50 border-red-200')
                                             : movingAverages.interpretation?.trend?.includes('Baissier')
@@ -14060,7 +14060,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 <div className={`text-xs font-bold ${
                                                     Math.abs(movingAverages.sma20?.diff || 0) > 5 
                                                         ? (movingAverages.sma20?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
-                                                        : 'text-blue-500'
+                                                        : 'text-gray-800'
                                                 }`}>
                                                     {movingAverages.sma20?.diff > 0 ? '+' : ''}{movingAverages.sma20?.diff?.toFixed(2) || 0}%
                                                 </div>
@@ -14098,7 +14098,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 <div className={`text-xs font-bold ${
                                                     Math.abs(movingAverages.sma50?.diff || 0) > 5 
                                                         ? (movingAverages.sma50?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
-                                                        : 'text-blue-500'
+                                                        : 'text-gray-800'
                                                 }`}>
                                                     {movingAverages.sma50?.diff > 0 ? '+' : ''}{movingAverages.sma50?.diff?.toFixed(2) || 0}%
                                                 </div>
@@ -14134,7 +14134,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 <div className={`text-xs font-bold ${
                                                     Math.abs(movingAverages.sma200?.diff || 0) > 10 
                                                         ? (movingAverages.sma200?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
-                                                        : 'text-blue-500'
+                                                        : 'text-gray-800'
                                                 }`}>
                                                     {movingAverages.sma200?.diff > 0 ? '+' : ''}{movingAverages.sma200?.diff?.toFixed(2) || 0}%
                                                 </div>
@@ -14187,7 +14187,7 @@ console.log('✅ Données hybrides récupérées:', {
                                             const signalColor = value.signal === 'Achat' || value.signal === 'Bullish' || value.signal === 'Au-dessus'
                                                 ? 'text-emerald-500'
                                                 : value.signal === 'Neutre'
-                                                ? 'text-blue-500'
+                                                ? 'text-gray-800'
                                                 : 'text-red-500';
                                             
                                             return (
@@ -14910,7 +14910,7 @@ console.log('✅ Données hybrides récupérées:', {
                     <div className="space-y-6 p-6">
                         {/* En-tête JLab V2 */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
+                            isDarkMode ? 'bg-gradient-to-r from-gray-950 to-purple-900' : 'bg-gradient-to-r from-gray-800 to-purple-100'
                         }`}>
                             <div className="mb-2">
                                 <h2 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
@@ -14919,7 +14919,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     📈 JLab V2™ - Analyse Financière Avancée
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
-                                    isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                                    isDarkMode ? 'text-gray-800' : 'text-gray-950'
                                 }`}>
                                     5 widgets TradingView synchronisés pour une analyse complète de n'importe quel symbole
                                 </p>
@@ -14953,12 +14953,12 @@ console.log('✅ Données hybrides récupérées:', {
                                                 placeholder="Search symbols... (e.g., AAPL, BTC)"
                                                 className={`w-64 px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
                                                     isDarkMode
-                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 hover:border-blue-500 focus:border-blue-500'
-                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-blue-500 focus:border-blue-500'
-                                                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 hover:border-gray-800 focus:border-gray-800'
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-gray-800 focus:border-gray-800'
+                                                } focus:outline-none focus:ring-2 focus:ring-gray-800 focus:ring-opacity-50`}
                                             />
                                             <div className={`text-xs px-2 py-1 rounded font-mono ${
-                                                isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
+                                                isDarkMode ? 'bg-gray-950 text-gray-800' : 'bg-gray-800 text-gray-950'
                                             }`}>
                                                 {timelineSymbol.split(':')[1]}
                                             </div>
@@ -15063,10 +15063,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -15101,10 +15101,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -15139,10 +15139,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -15177,10 +15177,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -15215,10 +15215,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -15553,7 +15553,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
                                         loading || isRefreshing
                                             ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                            : 'bg-gray-900 hover:bg-gray-900 text-white'
                                     }`}
                                 >
                                     <div className={`w-4 h-4 ${loading || isRefreshing ? 'animate-spin' : ''}`}>
@@ -15581,7 +15581,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 isDarkMode
                                                     ? 'bg-gray-700 text-white border-gray-600'
                                                     : 'bg-white text-gray-900 border-gray-300'
-                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                            } border focus:outline-none focus:ring-2 focus:ring-gray-800`}
                                         />
                                     </div>
 
@@ -15601,7 +15601,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                     isDarkMode
                                                         ? 'bg-gray-700 text-white border-gray-600'
                                                         : 'bg-white text-gray-900 border-gray-300'
-                                                } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                                } border focus:outline-none focus:ring-2 focus:ring-gray-800`}
                                             >
                                                 <option value="all">All Stocks</option>
                                                 <option value="team">👥 Team ({teamTickers.length})</option>
@@ -15622,7 +15622,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                     isDarkMode
                                                         ? 'bg-gray-700 text-white border-gray-600'
                                                         : 'bg-white text-gray-900 border-gray-300'
-                                                } border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                                } border focus:outline-none focus:ring-2 focus:ring-gray-800 ${
                                                     filterTickerGroup !== 'all' ? 'opacity-50 cursor-not-allowed' : ''
                                                 }`}
                                             >
@@ -15645,7 +15645,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 isDarkMode
                                                     ? 'bg-gray-700 text-white border-gray-600'
                                                     : 'bg-white text-gray-900 border-gray-300'
-                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                            } border focus:outline-none focus:ring-2 focus:ring-gray-800`}
                                         >
                                             <option value="all">All Impact</option>
                                             <option value="3">🔴 High Impact</option>
@@ -15663,7 +15663,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 isDarkMode
                                                     ? 'bg-gray-700 text-white border-gray-600'
                                                     : 'bg-white text-gray-900 border-gray-300'
-                                            } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                            } border focus:outline-none focus:ring-2 focus:ring-gray-800`}
                                         >
                                             <option value="all">All Currencies</option>
                                             {availableCurrencies.map(curr => (
@@ -15680,7 +15680,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     <div className="flex flex-wrap gap-2 mt-3">
                                         <span className="text-xs text-gray-400">Active filters:</span>
                                         {searchQuery && (
-                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-gray-950 text-gray-800' : 'bg-gray-800 text-gray-950'}`}>
                                                 Search: "{searchQuery}"
                                             </span>
                                         )}
@@ -15735,7 +15735,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     onClick={() => setActiveSubTab('economic')}
                                     className={`px-4 py-2 font-medium transition-colors text-sm ${
                                         activeSubTab === 'economic'
-                                            ? 'bg-blue-600 text-white'
+                                            ? 'bg-gray-900 text-white'
                                             : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
                                     }`}
                                 >
@@ -15745,7 +15745,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     onClick={() => setActiveSubTab('earnings')}
                                     className={`px-4 py-2 font-medium transition-colors text-sm ${
                                         activeSubTab === 'earnings'
-                                            ? 'bg-blue-600 text-white'
+                                            ? 'bg-gray-900 text-white'
                                             : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
                                     }`}
                                 >
@@ -15755,7 +15755,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     onClick={() => setActiveSubTab('dividends')}
                                     className={`px-4 py-2 font-medium transition-colors text-sm ${
                                         activeSubTab === 'dividends'
-                                            ? 'bg-blue-600 text-white'
+                                            ? 'bg-gray-900 text-white'
                                             : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
                                     }`}
                                 >
@@ -15766,7 +15766,7 @@ console.log('✅ Données hybrides récupérées:', {
                             {/* Contenu */}
                             {loading ? (
                                 <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-8 text-center`}>
-                                    <div className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3">🔄</div>
+                                    <div className="w-8 h-8 text-gray-800 animate-spin mx-auto mb-3">🔄</div>
                                     <p className="text-gray-400 text-sm">Loading data...</p>
                                 </div>
                             ) : filteredCalendarData.length === 0 ? (
@@ -15781,7 +15781,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 setFilterImpact('all');
                                                 setFilterCurrency('all');
                                             }}
-                                            className="mt-3 text-blue-400 hover:text-blue-300 underline text-sm"
+                                            className="mt-3 text-gray-700 hover:text-gray-700 underline text-sm"
                                         >
                                             Clear filters
                                         </button>
@@ -16488,7 +16488,7 @@ console.log('✅ Données hybrides récupérées:', {
                     <div className="space-y-6">
                         {/* En-tête principal TESTS JS */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
+                            isDarkMode ? 'bg-gradient-to-r from-gray-950 to-purple-900' : 'bg-gradient-to-r from-gray-800 to-purple-100'
                         }`}>
                             <div className="mb-2">
                                 <h2 className={`text-xl md:text-3xl font-bold mb-2 transition-colors duration-300 ${
@@ -16497,7 +16497,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     🧪 TESTS JS - Widgets Financiers
                                 </h2>
                                 <p className={`text-xs md:text-sm transition-colors duration-300 ${
-                                    isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                                    isDarkMode ? 'text-gray-800' : 'text-gray-950'
                                 }`}>
                                     Collection complète de 14 widgets TradingView et outils d'analyse financière organisés par catégorie
                                 </p>
@@ -16509,10 +16509,10 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* ========================================== */}
                         <div className="mb-4">
                             <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
-                                isDarkMode ? 'border-blue-500' : 'border-blue-600'
+                                isDarkMode ? 'border-gray-800' : 'border-gray-900'
                             }`}>
                                 <h3 className={`text-base md:text-xl font-bold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                    isDarkMode ? 'text-gray-700' : 'text-gray-900'
                                 }`}>
                                     📅 Calendriers & Événements Économiques
                                 </h3>
@@ -16689,10 +16689,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -16727,10 +16727,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -16765,10 +16765,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -16823,10 +16823,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -16875,12 +16875,12 @@ console.log('✅ Données hybrides récupérées:', {
                                                 placeholder="Search symbols... (e.g., AAPL, BTC)"
                                                 className={`w-64 px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
                                                     isDarkMode
-                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 hover:border-blue-500 focus:border-blue-500'
-                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-blue-500 focus:border-blue-500'
-                                                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 hover:border-gray-800 focus:border-gray-800'
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-gray-800 focus:border-gray-800'
+                                                } focus:outline-none focus:ring-2 focus:ring-gray-800 focus:ring-opacity-50`}
                                             />
                                             <div className={`text-xs px-2 py-1 rounded font-mono ${
-                                                isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
+                                                isDarkMode ? 'bg-gray-950 text-gray-800' : 'bg-gray-800 text-gray-950'
                                             }`}>
                                                 {timelineSymbol.split(':')[1]}
                                             </div>
@@ -16985,10 +16985,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -17023,10 +17023,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -17061,10 +17061,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -17099,10 +17099,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -17137,10 +17137,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -17175,10 +17175,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                                isDarkMode ? 'text-gray-700 hover:text-gray-700' : 'text-gray-900 hover:text-gray-950'
                                             }`}
                                         >
-                                            <span className="blue-text">Track all markets on TradingView</span>
+                                            <span className="gray-text">Track all markets on TradingView</span>
                                         </a>
                                     </div>
                                 </div>
@@ -17478,11 +17478,11 @@ console.log('✅ Données hybrides récupérées:', {
                                     <img
                                         src={`images/daniel-ouellet2.jpg?v=${Date.now()}`}
                                         alt="Daniel Ouellet"
-                                        className="emma-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-blue-500"
+                                        className="emma-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-gray-800"
                                     />
                                 </div>
                                 <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">Dan's Watchlist</h2>
-                                <p className="text-blue-300 text-lg">Watchlist Daniel Ouellet • GOB</p>
+                                <p className="text-gray-700 text-lg">Watchlist Daniel Ouellet • GOB</p>
                             </div>
                         </div>
                     )}
@@ -17822,7 +17822,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 <div className="mb-8">
                                     <div className={`w-16 h-16 mx-auto mb-4 rounded-full border-4 ${
                                         isDarkMode ? 'border-gray-600' : 'border-gray-300'
-                                    } border-t-blue-600 animate-spin`}></div>
+                                    } border-t-gray-900 animate-spin`}></div>
                                     <h2 className={`text-2xl font-bold mb-2 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
@@ -17884,7 +17884,7 @@ console.log('✅ Données hybrides récupérées:', {
                     {message && (
                         <div className={`fixed top-4 right-4 p-4 rounded-lg z-50 ${
                             message.type === 'error' ? 'bg-red-500' : 
-                            message.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                            message.type === 'success' ? 'bg-green-500' : 'bg-gray-800'
                         } text-white`}>
                             {message.text}
                         </div>
