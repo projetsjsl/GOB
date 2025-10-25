@@ -159,11 +159,12 @@ class EmmaVerification {
     }
 
     // Vérifier les modules ES6
-    if (typeof import !== 'undefined') {
-      this.addResult('✅', 'Modules ES6 supportés');
-    } else {
-      this.addError('❌ Modules ES6 non supportés');
-    }
+    // Note: import is a keyword and cannot be checked with typeof
+    // if (typeof import !== 'undefined') {
+    //   this.addResult('✅', 'Modules ES6 supportés');
+    // } else {
+    //   this.addError('❌ Modules ES6 non supportés');
+    // }
 
     // Vérifier les Promises
     if (typeof Promise !== 'undefined') {
