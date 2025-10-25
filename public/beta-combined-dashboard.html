@@ -14539,6 +14539,460 @@ console.log('✅ Données hybrides récupérées:', {
             // ============================================================================
 
             // ============================================================================
+            // COMPOSANT JLAB V2 - WIDGETS SYNCHRONISÉS
+            // ============================================================================
+            const JLabV2Tab = () => {
+                // State pour le symbole configurable
+                const [timelineSymbol, setTimelineSymbol] = useState('BITSTAMP:BTCUSD');
+                const [loading, setLoading] = useState(true);
+
+                // Refs pour les widgets TradingView
+                const tradingViewTimelineRef = useRef(null);
+                const tradingViewSymbolInfoRef = useRef(null);
+                const tradingViewSymbolProfileRef = useRef(null);
+                const tradingViewFinancialsRef = useRef(null);
+                const tradingViewTechnicalAnalysisRef = useRef(null);
+
+                // Simuler le chargement initial
+                useEffect(() => {
+                    const timer = setTimeout(() => setLoading(false), 800);
+                    return () => clearTimeout(timer);
+                }, []);
+
+                // Animation de chargement (de JLab original)
+                if (loading) {
+                    return (
+                        <div className={`min-h-screen p-2 flex items-center justify-center transition-colors duration-300 ${
+                            isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
+                        }`}>
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto mb-4"></div>
+                                <div className="text-sm text-gray-400">Chargement JLab V2…</div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                // Charger le script TradingView Timeline (configurable)
+                useEffect(() => {
+                    const container = tradingViewTimelineRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        feedMode: 'symbol',
+                        symbol: timelineSymbol,
+                        colorTheme: 'dark',
+                        isTransparent: false,
+                        displayMode: 'regular',
+                        locale: 'fr',
+                        width: '100%',
+                        height: '100%'
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, [timelineSymbol]);
+
+                // Charger le script TradingView Symbol Info (synchronisé)
+                useEffect(() => {
+                    const container = tradingViewSymbolInfoRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        symbol: timelineSymbol,
+                        colorTheme: 'dark',
+                        isTransparent: false,
+                        locale: 'fr',
+                        width: '100%'
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, [timelineSymbol]);
+
+                // Charger le script TradingView Symbol Profile (synchronisé)
+                useEffect(() => {
+                    const container = tradingViewSymbolProfileRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
+                    container.appendChild(widgetDiv);
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        symbol: timelineSymbol,
+                        colorTheme: 'dark',
+                        isTransparent: false,
+                        locale: 'fr',
+                        width: '100%',
+                        height: '100%'
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, [timelineSymbol]);
+
+                // Charger le script TradingView Financials (synchronisé)
+                useEffect(() => {
+                    const container = tradingViewFinancialsRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
+                    container.appendChild(widgetDiv);
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        symbol: timelineSymbol,
+                        colorTheme: 'dark',
+                        displayMode: 'regular',
+                        isTransparent: false,
+                        locale: 'fr',
+                        width: '100%',
+                        height: '100%'
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, [timelineSymbol]);
+
+                // Charger le script TradingView Technical Analysis (synchronisé)
+                useEffect(() => {
+                    const container = tradingViewTechnicalAnalysisRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
+                    container.appendChild(widgetDiv);
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        colorTheme: 'dark',
+                        displayMode: 'multiple',
+                        isTransparent: false,
+                        locale: 'fr',
+                        interval: '1M',
+                        disableInterval: false,
+                        width: '100%',
+                        height: '100%',
+                        symbol: timelineSymbol,
+                        showIntervalTabs: true
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, [timelineSymbol]);
+
+                return (
+                    <div className="space-y-6 p-6">
+                        {/* En-tête JLab V2 */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
+                        }`}>
+                            <div className="mb-2">
+                                <h2 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📈 JLab V2™ - Analyse Financière Avancée
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                                }`}>
+                                    5 widgets TradingView synchronisés pour une analyse complète de n'importe quel symbole
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Widget 1: Timeline - Fil d'Actualité avec Sélecteur de Symbole */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        📰 Timeline - Fil d'Actualité
+                                    </h2>
+                                    <div className="flex items-center gap-3">
+                                        <label className={`text-sm font-medium transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Symbole:
+                                        </label>
+                                        <select
+                                            value={timelineSymbol}
+                                            onChange={(e) => setTimelineSymbol(e.target.value)}
+                                            className={`px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white hover:border-blue-500 focus:border-blue-500'
+                                                    : 'bg-white border-gray-300 text-gray-900 hover:border-blue-500 focus:border-blue-500'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+                                        >
+                                            <optgroup label="📈 Indices">
+                                                <option value="FOREXCOM:SPXUSD">SPY - S&P 500</option>
+                                                <option value="FOREXCOM:NSXUSD">QQQ - Nasdaq 100</option>
+                                                <option value="FOREXCOM:DJI">DJI - Dow Jones</option>
+                                            </optgroup>
+                                            <optgroup label="🍎 Tech">
+                                                <option value="NASDAQ:AAPL">AAPL - Apple</option>
+                                                <option value="NASDAQ:MSFT">MSFT - Microsoft</option>
+                                                <option value="NASDAQ:GOOGL">GOOGL - Google</option>
+                                                <option value="NASDAQ:AMZN">AMZN - Amazon</option>
+                                                <option value="NASDAQ:NVDA">NVDA - NVIDIA</option>
+                                                <option value="NASDAQ:TSLA">TSLA - Tesla</option>
+                                                <option value="NASDAQ:META">META - Meta</option>
+                                            </optgroup>
+                                            <optgroup label="₿ Crypto">
+                                                <option value="BITSTAMP:BTCUSD">BTC - Bitcoin</option>
+                                                <option value="BITSTAMP:ETHUSD">ETH - Ethereum</option>
+                                            </optgroup>
+                                            <optgroup label="🏦 Finance">
+                                                <option value="NYSE:JPM">JPM - JPMorgan</option>
+                                                <option value="NYSE:BAC">BAC - Bank of America</option>
+                                                <option value="NYSE:GS">GS - Goldman Sachs</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                </div>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Fil d'actualité et événements en temps réel pour {timelineSymbol.split(':')[1] || 'le symbole sélectionné'}
+                                </p>
+                            </div>
+
+                            <div className="h-[500px] md:h-[600px] lg:h-[700px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/symbols/BTCUSD/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Widget 2: Symbol Info */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📊 {timelineSymbol.split(':')[1]} - Symbol Info
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Informations détaillées sur {timelineSymbol} avec données en temps réel
+                                </p>
+                            </div>
+
+                            <div className="h-[300px] md:h-[350px] lg:h-[400px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/symbols/NASDAQ-AAPL/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Widget 3: Symbol Profile */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📊 {timelineSymbol.split(':')[1]} - Profil de l'Entreprise
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Profil détaillé de {timelineSymbol} avec informations financières et description complète
+                                </p>
+                            </div>
+
+                            <div className="h-[500px] md:h-[600px] lg:h-[700px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/symbols/NASDAQ-AAPL/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Widget 4: Financials */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    💰 {timelineSymbol.split(':')[1]} - États Financiers
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Données financières complètes de {timelineSymbol} - Revenus, bénéfices, bilans et flux de trésorerie
+                                </p>
+                            </div>
+
+                            <div className="h-[600px] md:h-[700px] lg:h-[800px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/symbols/NASDAQ-AAPL/financials-overview/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Widget 5: Technical Analysis */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📈 {timelineSymbol.split(':')[1]} - Analyse Technique
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Analyse technique complète de {timelineSymbol} - Indicateurs, oscillateurs et résumés par intervalles de temps
+                                </p>
+                            </div>
+
+                            <div className="h-[600px] md:h-[700px] lg:h-[800px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/symbols/NASDAQ-AAPL/technicals/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                );
+            };
+
+            // ============================================================================
             // COMPOSANT CALENDRIER ÉCONOMIQUE AMÉLIORÉ
             // ============================================================================
             const EconomicCalendarTab = () => {
@@ -16394,6 +16848,7 @@ console.log('✅ Données hybrides récupérées:', {
             const tabs = [
                 { id: 'stocks-news', label: '📊 Titres & nouvelles', component: StocksNewsTab },
                 { id: 'intellistocks', label: '📈 JLab™', component: IntelliStocksTab },
+                { id: 'jlab-v2', label: '🚀 JLab V2™', component: JLabV2Tab },
                 { id: 'ask-emma', label: '💬 Emma IA™', component: AskEmmaTab },
                 { id: 'admin-jsla', label: '⚙️ Admin-JSLAI', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: '⭐ Dan\'s Watchlist', component: DansWatchlistTab },
