@@ -15539,7 +15539,7 @@ console.log('✅ Données hybrides récupérées:', {
                     };
                 }, []);
 
-                // Charger le script TradingView Symbol Info
+                // Charger le script TradingView Symbol Info (synchronisé)
                 useEffect(() => {
                     const container = tradingViewSymbolInfoRef.current;
                     if (!container) return;
@@ -15551,7 +15551,7 @@ console.log('✅ Données hybrides récupérées:', {
                     script.type = 'text/javascript';
                     script.async = true;
                     script.innerHTML = JSON.stringify({
-                        symbol: 'NASDAQ:AAPL',
+                        symbol: timelineSymbol,
                         colorTheme: 'dark',
                         isTransparent: false,
                         locale: 'fr',
@@ -15565,7 +15565,7 @@ console.log('✅ Données hybrides récupérées:', {
                             container.innerHTML = '';
                         }
                     };
-                }, []);
+                }, [timelineSymbol]);
 
                 // Charger le script TradingView Timeline (configurable)
                 useEffect(() => {
@@ -15634,7 +15634,7 @@ console.log('✅ Données hybrides récupérées:', {
                     };
                 }, []);
 
-                // Charger le script TradingView Symbol Profile
+                // Charger le script TradingView Symbol Profile (synchronisé)
                 useEffect(() => {
                     const container = tradingViewSymbolProfileRef.current;
                     if (!container) return;
@@ -15650,7 +15650,7 @@ console.log('✅ Données hybrides récupérées:', {
                     script.type = 'text/javascript';
                     script.async = true;
                     script.innerHTML = JSON.stringify({
-                        symbol: 'NASDAQ:AAPL',
+                        symbol: timelineSymbol,
                         colorTheme: 'dark',
                         isTransparent: false,
                         locale: 'fr',
@@ -15665,9 +15665,9 @@ console.log('✅ Données hybrides récupérées:', {
                             container.innerHTML = '';
                         }
                     };
-                }, []);
+                }, [timelineSymbol]);
 
-                // Charger le script TradingView Financials
+                // Charger le script TradingView Financials (synchronisé)
                 useEffect(() => {
                     const container = tradingViewFinancialsRef.current;
                     if (!container) return;
@@ -15683,7 +15683,7 @@ console.log('✅ Données hybrides récupérées:', {
                     script.type = 'text/javascript';
                     script.async = true;
                     script.innerHTML = JSON.stringify({
-                        symbol: 'NASDAQ:AAPL',
+                        symbol: timelineSymbol,
                         colorTheme: 'dark',
                         displayMode: 'regular',
                         isTransparent: false,
@@ -15699,9 +15699,9 @@ console.log('✅ Données hybrides récupérées:', {
                             container.innerHTML = '';
                         }
                     };
-                }, []);
+                }, [timelineSymbol]);
 
-                // Charger le script TradingView Technical Analysis
+                // Charger le script TradingView Technical Analysis (synchronisé)
                 useEffect(() => {
                     const container = tradingViewTechnicalAnalysisRef.current;
                     if (!container) return;
@@ -15725,7 +15725,7 @@ console.log('✅ Données hybrides récupérées:', {
                         disableInterval: false,
                         width: '100%',
                         height: '100%',
-                        symbol: 'NASDAQ:AAPL',
+                        symbol: timelineSymbol,
                         showIntervalTabs: true
                     });
 
@@ -15736,7 +15736,7 @@ console.log('✅ Données hybrides récupérées:', {
                             container.innerHTML = '';
                         }
                     };
-                }, []);
+                }, [timelineSymbol]);
 
                 return (
                     <div className="space-y-6">
@@ -16083,7 +16083,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* ========================================== */}
-                        {/* SECTION 5: 🍎 ANALYSE COMPLÈTE AAPL       */}
+                        {/* SECTION 5: 📊 ANALYSE COMPLÈTE DU TITRE   */}
                         {/* ========================================== */}
                         <div className="mb-4">
                             <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
@@ -16092,9 +16092,14 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-red-400' : 'text-red-600'
                                 }`}>
-                                    🍎 Analyse Complète AAPL (Apple Inc.)
+                                    📊 Analyse Complète - {timelineSymbol.split(':')[1] || timelineSymbol}
                                 </h3>
                             </div>
+                            <p className={`text-sm transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                Les 4 widgets ci-dessous se synchronisent automatiquement avec le symbole sélectionné dans le Timeline
+                            </p>
                         </div>
 
                         {/* Widget TradingView Symbol Info */}
@@ -16105,12 +16110,12 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    📊 AAPL - Apple Inc. Symbol Info
+                                    📊 {timelineSymbol.split(':')[1]} - Symbol Info
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    Informations détaillées sur NASDAQ:AAPL (Apple Inc.) avec données en temps réel
+                                    Informations détaillées sur {timelineSymbol} avec données en temps réel
                                 </p>
                             </div>
 
@@ -16276,12 +16281,12 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    📊 AAPL - Profil de l'Entreprise
+                                    📊 {timelineSymbol.split(':')[1]} - Profil de l'Entreprise
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    Profil détaillé d'Apple Inc. (NASDAQ:AAPL) avec informations financières et description complète
+                                    Profil détaillé de {timelineSymbol} avec informations financières et description complète
                                 </p>
                             </div>
 
@@ -16314,12 +16319,12 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    💰 AAPL - États Financiers
+                                    💰 {timelineSymbol.split(':')[1]} - États Financiers
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    Données financières complètes d'Apple Inc. (NASDAQ:AAPL) - Revenus, bénéfices, bilans et flux de trésorerie
+                                    Données financières complètes de {timelineSymbol} - Revenus, bénéfices, bilans et flux de trésorerie
                                 </p>
                             </div>
 
@@ -16352,12 +16357,12 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    📈 AAPL - Analyse Technique
+                                    📈 {timelineSymbol.split(':')[1]} - Analyse Technique
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    Analyse technique complète d'Apple Inc. (NASDAQ:AAPL) - Indicateurs, oscillateurs et résumés par intervalles de temps
+                                    Analyse technique complète de {timelineSymbol} - Indicateurs, oscillateurs et résumés par intervalles de temps
                                 </p>
                             </div>
 
