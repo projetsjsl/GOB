@@ -15162,6 +15162,7 @@ console.log('✅ Données hybrides récupérées:', {
                 const tradingViewChartRef = useRef(null);
                 const tradingViewCrossRatesRef = useRef(null);
                 const tradingViewHeatmapRef = useRef(null);
+                const tradingViewHeatmapTSXRef = useRef(null);
 
                 // Charger le script TradingView Forex Heat Map
                 useEffect(() => {
@@ -15363,6 +15364,44 @@ console.log('✅ Données hybrides récupérées:', {
                     };
                 }, []);
 
+                // Charger le script TradingView Stock Heatmap TSX
+                useEffect(() => {
+                    const container = tradingViewHeatmapTSXRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        dataSource: 'TSX',
+                        blockSize: 'market_cap_basic',
+                        blockColor: 'change',
+                        grouping: 'sector',
+                        locale: 'fr',
+                        symbolUrl: '',
+                        colorTheme: 'dark',
+                        exchanges: [],
+                        hasTopBar: true,
+                        isDataSetEnabled: true,
+                        isZoomEnabled: true,
+                        hasSymbolTooltip: true,
+                        isMonoSize: false,
+                        width: '100%',
+                        height: '100%'
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, []);
+
                 return (
                     <div className="space-y-6">
                         {/* Calendrier Économique Investing.com */}
@@ -15515,6 +15554,42 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
 
                             <div className="tradingview-widget-container" ref={tradingViewHeatmapRef}>
+                                <div className="tradingview-widget-container__widget"></div>
+                                <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    <a
+                                        href="https://fr.tradingview.com/heatmap/stock/"
+                                        rel="noopener nofollow"
+                                        target="_blank"
+                                        className={`underline transition-colors duration-300 ${
+                                            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                        }`}
+                                    >
+                                        <span className="blue-text">Track all markets on TradingView</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Widget TradingView Stock Heatmap TSX */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    🇨🇦 Stock Heatmap TSX
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Carte thermique du Toronto Stock Exchange (TSX) - Performance par secteur et capitalisation
+                                </p>
+                            </div>
+
+                            <div className="tradingview-widget-container" ref={tradingViewHeatmapTSXRef}>
                                 <div className="tradingview-widget-container__widget"></div>
                                 <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
