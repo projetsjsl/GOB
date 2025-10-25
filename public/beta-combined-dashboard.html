@@ -11729,8 +11729,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 const [violations, setViolations] = useState([]);
                 // Screener visibility
                 const [showScreener, setShowScreener] = useState(false);
-                // TradingView Screener widget ref
-                const tradingViewScreenerRef = useRef(null);
                 
                 // 🎯 Configuration du Score JSLAI™ (pondérations)
                 const [jslaiConfig, setJslaiConfig] = useState(() => {
@@ -11750,42 +11748,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 useEffect(() => {
                     localStorage.setItem('jslaiConfig', JSON.stringify(jslaiConfig));
                 }, [jslaiConfig]);
-
-                // Charger le script TradingView Screener
-                useEffect(() => {
-                    const container = tradingViewScreenerRef.current;
-                    if (!container) return;
-
-                    container.innerHTML = '';
-
-                    const widgetDiv = document.createElement('div');
-                    widgetDiv.className = 'tradingview-widget-container__widget';
-                    container.appendChild(widgetDiv);
-
-                    const script = document.createElement('script');
-                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
-                    script.type = 'text/javascript';
-                    script.async = true;
-                    script.innerHTML = JSON.stringify({
-                        market: 'america',
-                        showToolbar: true,
-                        defaultColumn: 'overview',
-                        defaultScreen: 'most_capitalized',
-                        isTransparent: false,
-                        locale: 'fr',
-                        colorTheme: 'dark',
-                        width: '100%',
-                        height: '100%'
-                    });
-
-                    container.appendChild(script);
-
-                    return () => {
-                        if (container) {
-                            container.innerHTML = '';
-                        }
-                    };
-                }, []);
 
                 // Génération de données mock
                 const generateMockData = (symbol) => {
@@ -14546,44 +14508,6 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
                         </div>
 
-                        {/* Widget TradingView Screener */}
-                        <div className={`mt-4 p-6 rounded-lg transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                    🔍 Screener de Titres
-                                </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                    Outil de filtrage et d'analyse des actions du marché américain avec critères personnalisables
-                                </p>
-                            </div>
-
-                            <div className="h-[500px] md:h-[600px] lg:h-[700px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewScreenerRef}>
-                                    <div className="tradingview-widget-container__widget"></div>
-                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                        <a
-                                            href="https://fr.tradingview.com/screener/"
-                                            rel="noopener nofollow"
-                                            target="_blank"
-                                            className={`underline transition-colors duration-300 ${
-                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                            }`}
-                                        >
-                                            <span className="blue-text">Track all markets on TradingView</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         {/* Footer */}
                         <div className={`mt-2 p-1.5 border rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
@@ -15284,6 +15208,7 @@ console.log('✅ Données hybrides récupérées:', {
                 const tradingViewMarketQuotesRef = useRef(null);
                 const tradingViewSymbolInfoRef = useRef(null);
                 const tradingViewTimelineRef = useRef(null);
+                const tradingViewScreenerRef = useRef(null);
 
                 // Charger le script TradingView Forex Heat Map
                 useEffect(() => {
@@ -15667,6 +15592,42 @@ console.log('✅ Données hybrides récupérées:', {
                     };
                 }, []);
 
+                // Charger le script TradingView Screener
+                useEffect(() => {
+                    const container = tradingViewScreenerRef.current;
+                    if (!container) return;
+
+                    container.innerHTML = '';
+
+                    const widgetDiv = document.createElement('div');
+                    widgetDiv.className = 'tradingview-widget-container__widget';
+                    container.appendChild(widgetDiv);
+
+                    const script = document.createElement('script');
+                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.innerHTML = JSON.stringify({
+                        market: 'america',
+                        showToolbar: true,
+                        defaultColumn: 'overview',
+                        defaultScreen: 'most_capitalized',
+                        isTransparent: false,
+                        locale: 'fr',
+                        colorTheme: 'dark',
+                        width: '100%',
+                        height: '100%'
+                    });
+
+                    container.appendChild(script);
+
+                    return () => {
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+                    };
+                }, []);
+
                 return (
                     <div className="space-y-6">
                         {/* Calendrier Économique Investing.com */}
@@ -15996,6 +15957,44 @@ console.log('✅ Données hybrides récupérées:', {
                                     }`}>
                                         <a
                                             href="https://fr.tradingview.com/symbols/BTCUSD/"
+                                            rel="noopener nofollow"
+                                            target="_blank"
+                                            className={`underline transition-colors duration-300 ${
+                                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                                            }`}
+                                        >
+                                            <span className="blue-text">Track all markets on TradingView</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Widget TradingView Screener */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-6">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    🔍 Screener de Titres
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Outil de filtrage et d'analyse des actions du marché américain avec critères personnalisables
+                                </p>
+                            </div>
+
+                            <div className="h-[600px] md:h-[700px] lg:h-[800px]">
+                                <div className="tradingview-widget-container h-full" ref={tradingViewScreenerRef}>
+                                    <div className="tradingview-widget-container__widget"></div>
+                                    <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}>
+                                        <a
+                                            href="https://fr.tradingview.com/screener/"
                                             rel="noopener nofollow"
                                             target="_blank"
                                             className={`underline transition-colors duration-300 ${
