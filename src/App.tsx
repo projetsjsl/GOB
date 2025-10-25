@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon, Briefcase, Globe, Landmark, Smartphone, Calendar, Mail, BarChart3, TrendingUp, Building2, Rocket, Bot, DollarSign, PieChart, LineChart, Activity, Target, Shield, Zap, Code, Database, FileText, FolderOpen, Users, Award, Gift } from 'lucide-react';
+import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon, Briefcase, Globe, Landmark, Smartphone, Calendar, Mail, BarChart3, TrendingUp, Building2, Rocket, Bot, DollarSign, PieChart, LineChart, Activity, Target, Shield, Zap, Code, Database, FileText, FolderOpen, Users, Award, Gift, LucideIcon } from 'lucide-react';
 
 // Les logos seront chargés dynamiquement via les chemins publics
 
@@ -13,7 +13,7 @@ const popularEmojis = [
 ];
 
 // Professional icons mapping (for Professional Mode)
-const iconComponents = {
+const iconComponents: { [key: string]: LucideIcon } = {
   'Globe': Globe, 'Smartphone': Smartphone, 'Briefcase': Briefcase, 'Mail': Mail,
   'Calendar': Calendar, 'FileText': FileText, 'Users': Users, 'Activity': Activity,
   'Code': Code, 'Database': Database, 'Building2': Building2, 'Landmark': Landmark,
