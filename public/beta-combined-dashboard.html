@@ -19,6 +19,9 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+
+    <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
+    <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
     <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16840,6 +16843,249 @@ console.log('✅ Données hybrides récupérées:', {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* ========================================== */}
+                        {/* SECTION 7: 📊 GRAPHIQUES PERSONNALISÉS     */}
+                        {/* ========================================== */}
+                        <div className="mb-4">
+                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                                isDarkMode ? 'border-indigo-500' : 'border-indigo-600'
+                            }`}>
+                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
+                                }`}>
+                                    📊 Graphiques Personnalisés - Lightweight Charts
+                                </h3>
+                            </div>
+                            <p className={`text-sm mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                Graphiques interactifs ultra-légers créés avec la bibliothèque officielle TradingView Lightweight Charts. Performances optimales pour le web.
+                            </p>
+                        </div>
+
+                        {/* Graphiques Lightweight Charts */}
+                        <LightweightChartsSection isDarkMode={isDarkMode} />
+
+                    </div>
+                );
+            };
+
+            // ============================================================================
+            // COMPOSANT LIGHTWEIGHT CHARTS
+            // ============================================================================
+            const LightweightChartsSection = ({ isDarkMode }) => {
+                const candlestickChartRef = useRef(null);
+                const lineChartRef = useRef(null);
+                const areaChartRef = useRef(null);
+
+                useEffect(() => {
+                    if (!window.LightweightCharts) {
+                        console.error('Lightweight Charts library not loaded');
+                        return;
+                    }
+
+                    // Candlestick Chart
+                    if (candlestickChartRef.current) {
+                        const candleChart = window.LightweightCharts.createChart(candlestickChartRef.current, {
+                            width: candlestickChartRef.current.clientWidth,
+                            height: 400,
+                            layout: {
+                                background: { color: isDarkMode ? '#1f2937' : '#ffffff' },
+                                textColor: isDarkMode ? '#d1d5db' : '#374151',
+                            },
+                            grid: {
+                                vertLines: { color: isDarkMode ? '#374151' : '#e5e7eb' },
+                                horzLines: { color: isDarkMode ? '#374151' : '#e5e7eb' },
+                            },
+                            timeScale: {
+                                borderColor: isDarkMode ? '#4b5563' : '#d1d5db',
+                            },
+                        });
+
+                        const candleSeries = candleChart.addCandlestickSeries({
+                            upColor: '#22c55e',
+                            downColor: '#ef4444',
+                            borderVisible: false,
+                            wickUpColor: '#22c55e',
+                            wickDownColor: '#ef4444',
+                        });
+
+                        // Données de démonstration (candlestick data)
+                        const candleData = [
+                            { time: '2024-01-01', open: 170, high: 175, low: 168, close: 173 },
+                            { time: '2024-01-02', open: 173, high: 178, low: 172, close: 176 },
+                            { time: '2024-01-03', open: 176, high: 180, low: 174, close: 175 },
+                            { time: '2024-01-04', open: 175, high: 177, low: 170, close: 171 },
+                            { time: '2024-01-05', open: 171, high: 174, low: 169, close: 172 },
+                            { time: '2024-01-08', open: 172, high: 179, low: 171, close: 178 },
+                            { time: '2024-01-09', open: 178, high: 182, low: 177, close: 181 },
+                            { time: '2024-01-10', open: 181, high: 184, low: 179, close: 180 },
+                            { time: '2024-01-11', open: 180, high: 183, low: 178, close: 182 },
+                            { time: '2024-01-12', open: 182, high: 186, low: 181, close: 185 },
+                        ];
+
+                        candleSeries.setData(candleData);
+                        candleChart.timeScale().fitContent();
+
+                        return () => candleChart.remove();
+                    }
+                }, [isDarkMode]);
+
+                useEffect(() => {
+                    if (!window.LightweightCharts) return;
+
+                    // Line Chart
+                    if (lineChartRef.current) {
+                        const lineChartInstance = window.LightweightCharts.createChart(lineChartRef.current, {
+                            width: lineChartRef.current.clientWidth,
+                            height: 300,
+                            layout: {
+                                background: { color: isDarkMode ? '#1f2937' : '#ffffff' },
+                                textColor: isDarkMode ? '#d1d5db' : '#374151',
+                            },
+                            grid: {
+                                vertLines: { color: isDarkMode ? '#374151' : '#e5e7eb' },
+                                horzLines: { color: isDarkMode ? '#374151' : '#e5e7eb' },
+                            },
+                            timeScale: {
+                                borderColor: isDarkMode ? '#4b5563' : '#d1d5db',
+                            },
+                        });
+
+                        const lineSeries = lineChartInstance.addLineSeries({
+                            color: '#3b82f6',
+                            lineWidth: 2,
+                        });
+
+                        // Données de démonstration (line data)
+                        const lineData = [
+                            { time: '2024-01-01', value: 170 },
+                            { time: '2024-01-02', value: 176 },
+                            { time: '2024-01-03', value: 175 },
+                            { time: '2024-01-04', value: 171 },
+                            { time: '2024-01-05', value: 172 },
+                            { time: '2024-01-08', value: 178 },
+                            { time: '2024-01-09', value: 181 },
+                            { time: '2024-01-10', value: 180 },
+                            { time: '2024-01-11', value: 182 },
+                            { time: '2024-01-12', value: 185 },
+                        ];
+
+                        lineSeries.setData(lineData);
+                        lineChartInstance.timeScale().fitContent();
+
+                        return () => lineChartInstance.remove();
+                    }
+                }, [isDarkMode]);
+
+                useEffect(() => {
+                    if (!window.LightweightCharts) return;
+
+                    // Area Chart
+                    if (areaChartRef.current) {
+                        const areaChartInstance = window.LightweightCharts.createChart(areaChartRef.current, {
+                            width: areaChartRef.current.clientWidth,
+                            height: 300,
+                            layout: {
+                                background: { color: isDarkMode ? '#1f2937' : '#ffffff' },
+                                textColor: isDarkMode ? '#d1d5db' : '#374151',
+                            },
+                            grid: {
+                                vertLines: { color: isDarkMode ? '#374151' : '#e5e7eb' },
+                                horzLines: { color: isDarkMode ? '#374151' : '#e5e7eb' },
+                            },
+                            timeScale: {
+                                borderColor: isDarkMode ? '#4b5563' : '#d1d5db',
+                            },
+                        });
+
+                        const areaSeries = areaChartInstance.addAreaSeries({
+                            topColor: 'rgba(139, 92, 246, 0.4)',
+                            bottomColor: 'rgba(139, 92, 246, 0.0)',
+                            lineColor: '#8b5cf6',
+                            lineWidth: 2,
+                        });
+
+                        // Données de démonstration (area data - volume)
+                        const areaData = [
+                            { time: '2024-01-01', value: 15000000 },
+                            { time: '2024-01-02', value: 18000000 },
+                            { time: '2024-01-03', value: 16000000 },
+                            { time: '2024-01-04', value: 20000000 },
+                            { time: '2024-01-05', value: 14000000 },
+                            { time: '2024-01-08', value: 22000000 },
+                            { time: '2024-01-09', value: 19000000 },
+                            { time: '2024-01-10', value: 17000000 },
+                            { time: '2024-01-11', value: 21000000 },
+                            { time: '2024-01-12', value: 23000000 },
+                        ];
+
+                        areaSeries.setData(areaData);
+                        areaChartInstance.timeScale().fitContent();
+
+                        return () => areaChartInstance.remove();
+                    }
+                }, [isDarkMode]);
+
+                return (
+                    <div className="space-y-6">
+                        {/* Candlestick Chart */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-4">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    🕯️ Candlestick Chart - AAPL (Demo)
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Graphique en bougies japonaises avec données OHLC (Open, High, Low, Close)
+                                </p>
+                            </div>
+                            <div ref={candlestickChartRef} className="w-full"></div>
+                        </div>
+
+                        {/* Line Chart */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-4">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📈 Line Chart - Prix de Clôture
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Graphique linéaire simple pour suivi de prix en temps réel
+                                </p>
+                            </div>
+                            <div ref={lineChartRef} className="w-full"></div>
+                        </div>
+
+                        {/* Area Chart */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-4">
+                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📊 Area Chart - Volume de Trading
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Graphique en zone remplie pour visualiser le volume de transactions
+                                </p>
+                            </div>
+                            <div ref={areaChartRef} className="w-full"></div>
                         </div>
                     </div>
                 );
