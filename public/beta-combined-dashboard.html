@@ -29,22 +29,109 @@
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
     <!-- Heroicons pour les icônes (remplace lucide-react) -->
     <script src="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/24/outline/index.js"></script>
+    <!-- Lucide Icons for Professional Mode -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     
     <!-- Script pour exposer les bibliothèques globalement -->
         <script>
             // Exposer Recharts globalement
             window.Recharts = window.Recharts || {};
-            
+
             // Exposer Heroicons globalement
             window.Heroicons = window.Heroicons || {};
-            
+
+            // ========================================================================
+            // PROFESSIONAL MODE SYSTEM - Global Toggle for Emojis vs Icons
+            // ========================================================================
+            window.ProfessionalModeSystem = {
+                // Get current mode from localStorage
+                isEnabled: function() {
+                    const stored = localStorage.getItem('gobapps-professional-mode');
+                    return stored === 'true' || stored === null; // Default to professional
+                },
+
+                // Toggle the mode
+                toggle: function() {
+                    const newMode = !this.isEnabled();
+                    localStorage.setItem('gobapps-professional-mode', newMode.toString());
+                    // Trigger a re-render by dispatching custom event
+                    window.dispatchEvent(new CustomEvent('professional-mode-changed', { detail: { enabled: newMode } }));
+                    return newMode;
+                },
+
+                // Emoji to Lucide icon mapping
+                emojiToIcon: {
+                    '📡': 'Radio',
+                    '⚙️': 'Settings',
+                    '📅': 'Calendar',
+                    '🌅': 'Sunrise',
+                    '☀️': 'Sun',
+                    '🌆': 'Building2',
+                    '📊': 'BarChart3',
+                    '📈': 'TrendingUp',
+                    '📉': 'TrendingDown',
+                    '🤖': 'Bot',
+                    '💬': 'MessageSquare',
+                    '🔍': 'Search',
+                    '📝': 'FileText',
+                    '🎯': 'Target',
+                    '💼': 'Briefcase',
+                    '🌐': 'Globe',
+                    '💰': 'DollarSign',
+                    '🏢': 'Building2',
+                    '📧': 'Mail',
+                    '🔔': 'Bell',
+                    '⏰': 'Clock',
+                    '✅': 'CheckCircle',
+                    '❌': 'XCircle',
+                    '⚠️': 'AlertTriangle',
+                    '🚀': 'Rocket',
+                    '🔥': 'Flame',
+                    '💡': 'Lightbulb',
+                    '🧠': 'Brain'
+                },
+
+                // Render icon based on mode - returns HTML string
+                renderIcon: function(emoji, size = 24, className = '') {
+                    if (!this.isEnabled()) {
+                        // Fun mode - return emoji
+                        return `<span class="inline-block">${emoji}</span>`;
+                    }
+
+                    // Professional mode - return Lucide icon
+                    const iconName = this.emojiToIcon[emoji];
+                    if (iconName && window.lucide) {
+                        const iconColor = className.includes('text-') ? '' : 'currentColor';
+                        return `<i data-lucide="${iconName.toLowerCase()}" class="${className}" style="width: ${size}px; height: ${size}px; ${iconColor ? `color: ${iconColor}` : ''}"></i>`;
+                    }
+
+                    // Fallback to emoji if icon not found
+                    return `<span class="inline-block">${emoji}</span>`;
+                },
+
+                // Initialize Lucide icons after rendering
+                initIcons: function() {
+                    if (window.lucide && window.lucide.createIcons) {
+                        window.lucide.createIcons();
+                    }
+                }
+            };
+
             // Vérifier le chargement des bibliothèques
             window.addEventListener('load', function() {
                 console.log('📚 Vérification des bibliothèques:');
                 console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
                 console.log('Heroicons disponible:', typeof window.Heroicons !== 'undefined');
                 console.log('LucideIcon disponible:', typeof window.LucideIcon !== 'undefined');
-                
+                console.log('Lucide disponible:', typeof window.lucide !== 'undefined');
+                console.log('Professional Mode:', window.ProfessionalModeSystem.isEnabled() ? 'Enabled' : 'Disabled');
+
+                // Initialize Lucide icons
+                if (window.lucide && window.lucide.createIcons) {
+                    window.lucide.createIcons();
+                    console.log('✅ Lucide icons initialized');
+                }
+
                 // Message informatif sur les avertissements de production
                 console.log('ℹ️ Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
                 console.log('ℹ️ Ce fichier utilise intentionnellement des CDN pour la portabilité');

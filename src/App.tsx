@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon } from 'lucide-react';
+import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon, Briefcase, Globe, Landmark, Smartphone, Calendar, Mail, BarChart3, TrendingUp, Building2, Rocket, Bot, DollarSign, PieChart, LineChart, Activity, Target, Shield, Zap, Code, Database, FileText, FolderOpen, Users, Award, Gift } from 'lucide-react';
 
 // Les logos seront chargés dynamiquement via les chemins publics
 
@@ -11,6 +11,40 @@ const popularEmojis = [
   '❤️', '🔥', '✅', '🎉', '🚀', '👍', '📦', '🛒', '🏪', '🎓',
   '🔔', '📍', '🌟', '💻', '⌨️', '🖥️', '📞', '🎤', '🎧', '🎸'
 ];
+
+// Professional icons mapping (for Professional Mode)
+const iconComponents = {
+  'Globe': Globe, 'Smartphone': Smartphone, 'Briefcase': Briefcase, 'Mail': Mail,
+  'Calendar': Calendar, 'FileText': FileText, 'Users': Users, 'Activity': Activity,
+  'Code': Code, 'Database': Database, 'Building2': Building2, 'Landmark': Landmark,
+  'DollarSign': DollarSign, 'BarChart3': BarChart3, 'TrendingUp': TrendingUp, 'PieChart': PieChart,
+  'LineChart': LineChart, 'Target': Target, 'Award': Award, 'Shield': Shield,
+  'Zap': Zap, 'Settings': Settings, 'Rocket': Rocket, 'Bot': Bot,
+  'FolderOpen': FolderOpen, 'Gift': Gift
+};
+
+const professionalIcons = [
+  'Globe', 'Smartphone', 'Briefcase', 'Mail', 'Calendar', 'FileText', 'Users', 'Activity',
+  'Code', 'Database', 'Building2', 'Landmark', 'DollarSign', 'BarChart3', 'TrendingUp', 'PieChart',
+  'LineChart', 'Target', 'Award', 'Shield', 'Zap', 'Settings', 'Rocket', 'Bot',
+  'FolderOpen', 'Gift'
+];
+
+// Emoji to Professional Icon mapping for default apps
+const emojiToIconMap: { [key: string]: string } = {
+  '📈': 'TrendingUp',
+  '📊': 'BarChart3',
+  '🚀': 'Rocket',
+  '🤖': 'Bot',
+  '📱': 'Smartphone',
+  '💼': 'Briefcase',
+  '🌐': 'Globe',
+  '📧': 'Mail',
+  '📅': 'Calendar',
+  '💰': 'DollarSign',
+  '🏢': 'Building2',
+  '🏦': 'Landmark'
+};
 
 // Types
 interface App {
@@ -191,6 +225,7 @@ const GOB = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isProfessionalMode, setIsProfessionalMode] = useState(true); // Professional icons by default
   const [isMarketOpen, setIsMarketOpen] = useState(false);
   const [marketData, setMarketData] = useState({
     'SPX': { symbol: 'S&P 500', price: 4567.89, change: 0.85, changePercent: 0.85 },
@@ -410,6 +445,18 @@ const GOB = () => {
     }
   }, []);
 
+  // Load professional mode preference
+  useEffect(() => {
+    const storedProfessionalMode = localStorage.getItem('gobapps-professional-mode');
+    if (storedProfessionalMode !== null) {
+      setIsProfessionalMode(storedProfessionalMode === 'true');
+    } else {
+      // Default to professional mode
+      setIsProfessionalMode(true);
+      localStorage.setItem('gobapps-professional-mode', 'true');
+    }
+  }, []);
+
   useEffect(() => {
     if (apps.length > 0) {
       localStorage.setItem('gobapps', JSON.stringify(apps));
@@ -447,9 +494,15 @@ const GOB = () => {
     if (!formName || !formUrl) return;
 
     let logo = '';
-    
+
     if (useEmoji) {
-      logo = selectedEmoji;
+      // Check if it's a professional icon name or an emoji
+      if (isProfessionalMode && professionalIcons.includes(selectedEmoji)) {
+        // Store as icon: prefix to distinguish from emojis
+        logo = `icon:${selectedEmoji}`;
+      } else {
+        logo = selectedEmoji;
+      }
     } else if (formLogo) {
       logo = formLogo;
     } else {
@@ -464,8 +517,8 @@ const GOB = () => {
     }
 
     if (editingApp) {
-      setApps(apps.map(app => 
-        app.id === editingApp.id 
+      setApps(apps.map(app =>
+        app.id === editingApp.id
           ? { ...app, name: formName, url: formUrl, logo }
           : app
       ));
@@ -536,6 +589,70 @@ const GOB = () => {
     }
   };
 
+  // Helper to render app icon (emoji or professional icon)
+  const renderAppIcon = (logo: string, appName: string) => {
+    // Check if it's a stored professional icon (icon: prefix)
+    if (logo && logo.startsWith('icon:')) {
+      const iconName = logo.replace('icon:', '');
+      const IconComponent = iconComponents[iconName];
+      return IconComponent ? (
+        <IconComponent size={32} className="text-green-500" />
+      ) : (
+        <div className="text-2xl sm:text-3xl">?</div>
+      );
+    }
+
+    // Check if it's an emoji
+    const isEmoji = logo && logo.length <= 4 && /\p{Emoji}/u.test(logo);
+
+    if (isEmoji && isProfessionalMode && emojiToIconMap[logo]) {
+      // Render professional icon mapped from emoji
+      const IconComponent = iconComponents[emojiToIconMap[logo]];
+      return IconComponent ? (
+        <IconComponent size={32} className="text-green-500" />
+      ) : (
+        <div className="text-2xl sm:text-3xl">{logo}</div>
+      );
+    } else if (isEmoji) {
+      // Render emoji
+      return <div className="text-2xl sm:text-3xl">{logo}</div>;
+    } else if (logo) {
+      // Render image URL
+      return (
+        <img
+          src={logo}
+          alt={appName}
+          className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            const parent = e.currentTarget.parentElement;
+            if (parent && !parent.querySelector('.fallback-initial')) {
+              const fallback = document.createElement('div');
+              fallback.className = `fallback-initial w-10 h-10 flex items-center justify-center text-white font-bold text-lg rounded ${
+                isDarkMode
+                  ? 'bg-gradient-to-br from-gray-500 to-gray-600'
+                  : 'bg-gradient-to-br from-gray-400 to-gray-500'
+              }`;
+              fallback.textContent = appName.charAt(0).toUpperCase();
+              parent.appendChild(fallback);
+            }
+          }}
+        />
+      );
+    } else {
+      // Render initials
+      return (
+        <div className={`w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-white font-bold text-sm sm:text-lg rounded ${
+          isDarkMode
+            ? 'bg-gradient-to-br from-gray-500 to-gray-600'
+            : 'bg-gradient-to-br from-gray-400 to-gray-500'
+        }`}>
+          {appName.charAt(0).toUpperCase()}
+        </div>
+      );
+    }
+  };
+
   const toggleAppSelection = (id: string) => {
     const newSelection = new Set(selectedApps);
     if (newSelection.has(id)) {
@@ -581,7 +698,7 @@ const GOB = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
     localStorage.setItem('gobapps-dark-mode', newDarkMode.toString());
-    
+
     // Changer automatiquement le thème selon le mode
     if (newDarkMode) {
       const darkTheme = themes.find(t => t.id === 'finance-dark');
@@ -596,6 +713,12 @@ const GOB = () => {
         localStorage.setItem('gobapps-theme', 'finance-light');
       }
     }
+  };
+
+  const toggleProfessionalMode = () => {
+    const newProfessionalMode = !isProfessionalMode;
+    setIsProfessionalMode(newProfessionalMode);
+    localStorage.setItem('gobapps-professional-mode', newProfessionalMode.toString());
   };
 
   useEffect(() => {
@@ -627,13 +750,15 @@ const GOB = () => {
               onError={(e) => {
                 const fallback = document.createElement('div');
                 fallback.className = `w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br ${
-                  isDarkMode 
-                    ? 'from-green-500/20 to-blue-500/20' 
+                  isDarkMode
+                    ? 'from-green-500/20 to-blue-500/20'
                     : 'from-blue-500/20 to-purple-500/20'
                 } rounded-full flex items-center justify-center ${
                   isDarkMode ? 'text-white' : 'text-gray-600'
                 } text-6xl sm:text-8xl font-bold`;
-                fallback.textContent = '🤖';
+                fallback.innerHTML = isProfessionalMode
+                  ? `<svg class="w-48 h-48 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`
+                  : '🤖';
                 e.currentTarget.parentElement?.appendChild(fallback);
               }}
             />
@@ -757,7 +882,9 @@ const GOB = () => {
                         e.currentTarget.style.display = 'none';
                         const fallback = document.createElement('div');
                         fallback.className = 'w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center text-2xl sm:text-3xl';
-                        fallback.textContent = '🤖';
+                        fallback.innerHTML = isProfessionalMode
+                          ? '<svg class="w-10 h-10 sm:w-14 sm:h-14 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>'
+                          : '🤖';
                         e.currentTarget.parentElement?.appendChild(fallback);
                       }}
                     />
@@ -774,22 +901,34 @@ const GOB = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <button
+                  onClick={toggleProfessionalMode}
+                  className={`w-10 h-10 backdrop-blur-md rounded-xl transition-all flex items-center justify-center border shadow-lg ${
+                    isDarkMode
+                      ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white border-gray-700/50'
+                      : 'bg-white/50 hover:bg-gray-100/50 text-gray-700 border-gray-300/50'
+                  } ${isProfessionalMode ? 'ring-2 ring-green-500/50' : ''}`}
+                  title={isProfessionalMode ? 'Mode Professionnel (cliquez pour Mode Fun)' : 'Mode Fun (cliquez pour Mode Professionnel)'}
+                >
+                  {isProfessionalMode ? <Briefcase size={18} /> : <span className="text-lg">😀</span>}
+                </button>
+
+                <button
                   onClick={toggleDarkMode}
                   className={`w-10 h-10 backdrop-blur-md rounded-xl transition-all flex items-center justify-center border shadow-lg ${
-                    isDarkMode 
-                      ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white border-gray-700/50' 
+                    isDarkMode
+                      ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white border-gray-700/50'
                       : 'bg-white/50 hover:bg-gray-100/50 text-gray-700 border-gray-300/50'
                   }`}
                   title={isDarkMode ? 'Passer en mode clair' : 'Passer en mode sombre'}
                 >
                   {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
-                
+
                 <button
                   onClick={() => setShowThemeModal(true)}
                   className={`w-10 h-10 backdrop-blur-md rounded-xl transition-all flex items-center justify-center border shadow-lg ${
-                    isDarkMode 
-                      ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white border-gray-700/50' 
+                    isDarkMode
+                      ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white border-gray-700/50'
                       : 'bg-white/50 hover:bg-gray-100/50 text-gray-700 border-gray-300/50'
                   }`}
                   title="Changer le thème"
@@ -859,7 +998,11 @@ const GOB = () => {
           <h3 className={`text-base sm:text-lg font-semibold mb-4 flex items-center space-x-2 ${
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>
-            <span>📱</span>
+            {isProfessionalMode ? (
+              <Smartphone size={20} className="text-green-500" />
+            ) : (
+              <span>📱</span>
+            )}
             <span>Applications financières</span>
           </h3>
         </div>
@@ -897,37 +1040,7 @@ const GOB = () => {
                       : 'bg-gradient-to-br from-white/90 to-gray-100/90 border-gray-400/50'
                   }`}>
                     <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
-                      {app.logo && app.logo.length <= 4 && /\p{Emoji}/u.test(app.logo) ? (
-                        <div className="text-2xl sm:text-3xl">{app.logo}</div>
-                      ) : app.logo ? (
-                        <img 
-                          src={app.logo} 
-                          alt={app.name} 
-                          className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const parent = e.currentTarget.parentElement;
-                            if (parent && !parent.querySelector('.fallback-initial')) {
-                              const fallback = document.createElement('div');
-                              fallback.className = `fallback-initial w-10 h-10 flex items-center justify-center text-white font-bold text-lg rounded ${
-                                isDarkMode 
-                                  ? 'bg-gradient-to-br from-gray-500 to-gray-600' 
-                                  : 'bg-gradient-to-br from-gray-400 to-gray-500'
-                              }`;
-                              fallback.textContent = app.name.charAt(0).toUpperCase();
-                              parent.appendChild(fallback);
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className={`w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-white font-bold text-sm sm:text-lg rounded ${
-                          isDarkMode 
-                            ? 'bg-gradient-to-br from-gray-500 to-gray-600' 
-                            : 'bg-gradient-to-br from-gray-400 to-gray-500'
-                        }`}>
-                          {app.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
+                      {renderAppIcon(app.logo, app.name)}
                     </div>
                     <div className="financial-indicator financial-indicator-1"></div>
                     <div className="financial-indicator financial-indicator-2"></div>
@@ -1043,45 +1156,55 @@ const GOB = () => {
                   <button
                     type="button"
                     onClick={() => setUseEmoji(true)}
-                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-                      useEmoji 
-                        ? 'bg-green-600 text-white' 
+                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 ${
+                      useEmoji
+                        ? 'bg-green-600 text-white'
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
-                    😀 Emoji
+                    {isProfessionalMode ? <Briefcase size={16} /> : <span>😀</span>}
+                    <span>{isProfessionalMode ? 'Icône' : 'Emoji'}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setUseEmoji(false)}
-                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-                      !useEmoji 
-                        ? 'bg-green-600 text-white' 
+                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 ${
+                      !useEmoji
+                        ? 'bg-green-600 text-white'
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
-                    🔗 URL
+                    {isProfessionalMode ? <Globe size={16} /> : <span>🔗</span>}
+                    <span>URL</span>
                   </button>
                 </div>
 
                 {useEmoji ? (
                   <div>
                     <div className="flex items-center justify-center mb-3 p-4 bg-slate-50 rounded-xl">
-                      <div className="text-6xl">{selectedEmoji}</div>
+                      {isProfessionalMode && professionalIcons.includes(selectedEmoji) ? (
+                        React.createElement(iconComponents[selectedEmoji], { size: 64, className: "text-green-600" })
+                      ) : (
+                        <div className="text-6xl">{selectedEmoji}</div>
+                      )}
                     </div>
-                    <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto p-2 bg-slate-50 rounded-xl">
-                      {popularEmojis.map((emoji) => (
+                    <div className="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 bg-slate-50 rounded-xl scrollbar-thin">
+                      {(isProfessionalMode ? professionalIcons : popularEmojis).map((icon) => (
                         <button
-                          key={emoji}
+                          key={icon}
                           type="button"
-                          onClick={() => setSelectedEmoji(emoji)}
-                          className={`text-2xl p-2 rounded-lg transition-all hover:scale-110 ${
-                            selectedEmoji === emoji 
-                              ? 'bg-blue-200 ring-2 ring-blue-500' 
+                          onClick={() => setSelectedEmoji(icon)}
+                          className={`p-2 rounded-lg transition-all hover:scale-110 flex items-center justify-center ${
+                            selectedEmoji === icon
+                              ? 'bg-green-200 ring-2 ring-green-500'
                               : 'hover:bg-slate-200'
                           }`}
                         >
-                          {emoji}
+                          {isProfessionalMode && professionalIcons.includes(icon) ? (
+                            React.createElement(iconComponents[icon], { size: 24, className: "text-gray-700" })
+                          ) : (
+                            <span className="text-2xl">{icon}</span>
+                          )}
                         </button>
                       ))}
                     </div>
