@@ -15737,6 +15737,39 @@ console.log('✅ Données hybrides récupérées:', {
 
                 return (
                     <div className="space-y-6">
+                        {/* En-tête principal TESTS JS */}
+                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
+                        }`}>
+                            <div className="mb-2">
+                                <h2 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    🧪 TESTS JS - Widgets Financiers
+                                </h2>
+                                <p className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-blue-200' : 'text-blue-800'
+                                }`}>
+                                    Collection complète de 14 widgets TradingView et outils d'analyse financière organisés par catégorie
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* ========================================== */}
+                        {/* SECTION 1: 📅 CALENDRIERS & ÉVÉNEMENTS    */}
+                        {/* ========================================== */}
+                        <div className="mb-4">
+                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                                isDarkMode ? 'border-blue-500' : 'border-blue-600'
+                            }`}>
+                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                }`}>
+                                    📅 Calendriers & Événements Économiques
+                                </h3>
+                            </div>
+                        </div>
+
                         {/* Calendrier Économique Investing.com */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
@@ -15745,12 +15778,12 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    TESTS JS
+                                    📊 Calendrier Économique
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    Widgets de test TradingView et Investing.com
+                                    Calendrier économique complet avec événements majeurs et données en temps réel
                                 </p>
                             </div>
 
@@ -15774,6 +15807,21 @@ console.log('✅ Données hybrides récupérées:', {
                                     className="relative z-0"
                                     style={{ minWidth: '100%', background: 'transparent' }}
                                 />
+                            </div>
+                        </div>
+
+                        {/* ========================================== */}
+                        {/* SECTION 2: 💱 MARCHÉS FOREX                */}
+                        {/* ========================================== */}
+                        <div className="mb-4">
+                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                                isDarkMode ? 'border-green-500' : 'border-green-600'
+                            }`}>
+                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-green-400' : 'text-green-600'
+                                }`}>
+                                    💱 Marchés Forex
+                                </h3>
                             </div>
                         </div>
 
@@ -15846,6 +15894,21 @@ console.log('✅ Données hybrides récupérées:', {
                                 <div className="tradingview-widget-container h-full" ref={tradingViewCrossRatesRef}>
                                     {/* Le widget sera injecté ici par le script */}
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* ========================================== */}
+                        {/* SECTION 3: 📊 MARCHÉS BOURSIERS            */}
+                        {/* ========================================== */}
+                        <div className="mb-4">
+                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                                isDarkMode ? 'border-purple-500' : 'border-purple-600'
+                            }`}>
+                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-purple-400' : 'text-purple-600'
+                                }`}>
+                                    📊 Marchés Boursiers - Vues Globales
+                                </h3>
                             </div>
                         </div>
 
@@ -15925,6 +15988,21 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
                         </div>
 
+                        {/* ========================================== */}
+                        {/* SECTION 4: 📈 ANALYSE SPY (S&P 500)        */}
+                        {/* ========================================== */}
+                        <div className="mb-4">
+                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                                isDarkMode ? 'border-yellow-500' : 'border-yellow-600'
+                            }`}>
+                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-yellow-400' : 'text-yellow-600'
+                                }`}>
+                                    📈 Analyse SPY (S&P 500 ETF)
+                                </h3>
+                            </div>
+                        </div>
+
                         {/* Widget TradingView Advanced Chart SPY */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
@@ -16001,6 +16079,21 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
                         </div>
 
+                        {/* ========================================== */}
+                        {/* SECTION 5: 🍎 ANALYSE COMPLÈTE AAPL       */}
+                        {/* ========================================== */}
+                        <div className="mb-4">
+                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                                isDarkMode ? 'border-red-500' : 'border-red-600'
+                            }`}>
+                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-red-400' : 'text-red-600'
+                                }`}>
+                                    🍎 Analyse Complète AAPL (Apple Inc.)
+                                </h3>
+                            </div>
+                        </div>
+
                         {/* Widget TradingView Symbol Info */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
@@ -16036,6 +16129,21 @@ console.log('✅ Données hybrides récupérées:', {
                                         </a>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* ========================================== */}
+                        {/* SECTION 6: ₿ CRYPTO - BITCOIN              */}
+                        {/* ========================================== */}
+                        <div className="mb-4">
+                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                                isDarkMode ? 'border-orange-500' : 'border-orange-600'
+                            }`}>
+                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-orange-400' : 'text-orange-600'
+                                }`}>
+                                    ₿ Crypto - Bitcoin (BTC/USD)
+                                </h3>
                             </div>
                         </div>
 
