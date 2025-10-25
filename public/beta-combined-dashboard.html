@@ -14886,8 +14886,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}>
+                            <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewTimelineRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -14924,8 +14924,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[300px] md:h-[350px] lg:h-[400px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}>
+                            <div className="h-[300px] sm:h-[300px] md:h-[350px] lg:h-[400px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewSymbolInfoRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -14962,8 +14962,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[500px] md:h-[600px] lg:h-[700px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}>
+                            <div className="h-[500px] sm:h-[500px] md:h-[600px] lg:h-[700px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewSymbolProfileRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -15000,8 +15000,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[600px] md:h-[700px] lg:h-[800px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}>
+                            <div className="h-[600px] sm:h-[600px] md:h-[700px] lg:h-[800px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewFinancialsRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -15038,8 +15038,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[600px] md:h-[700px] lg:h-[800px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}>
+                            <div className="h-[600px] sm:h-[600px] md:h-[700px] lg:h-[800px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewTechnicalAnalysisRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16319,7 +16319,7 @@ console.log('✅ Données hybrides récupérées:', {
                 }, [timelineSymbol]);
 
                 return (
-                    <div className="space-y-4 sm:space-y-6">
+                    <div className="space-y-4 sm:space-y-6 overflow-x-hidden w-full max-w-full">
                         {/* En-tête principal TESTS JS */}
                         <div className={`p-4 sm:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
@@ -16354,7 +16354,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Calendrier Économique Investing.com */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16370,7 +16370,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="rounded-lg overflow-hidden relative h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px]" style={{ background: 'transparent' }}>
+                            <div className="rounded-lg overflow-hidden relative h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] w-full max-w-full" style={{ background: 'transparent' }}>
                                 {/* Overlay pour masquer le logo (toute la largeur) */}
                                 <div
                                     className={`absolute top-0 left-0 z-10 ${
@@ -16387,8 +16387,8 @@ console.log('✅ Données hybrides récupérées:', {
                                     marginWidth="0"
                                     marginHeight="0"
                                     sandbox="allow-scripts allow-same-origin allow-forms"
-                                    className="relative z-0"
-                                    style={{ minWidth: '100%', background: 'transparent' }}
+                                    className="relative z-0 w-full max-w-full"
+                                    style={{ background: 'transparent' }}
                                 />
                             </div>
                         </div>
@@ -16409,7 +16409,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Forex Heat Map */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16425,15 +16425,15 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewForexRef}>
+                            <div className="h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewForexRef}>
                                     {/* Le widget sera injecté ici par le script */}
                                 </div>
                             </div>
                         </div>
 
                         {/* Widget TradingView Economic Calendar Events */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16449,15 +16449,15 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewEventsRef}>
+                            <div className="h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewEventsRef}>
                                     {/* Le widget sera injecté ici par le script */}
                                 </div>
                             </div>
                         </div>
 
                         {/* Widget TradingView Forex Cross Rates */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16473,8 +16473,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewCrossRatesRef}>
+                            <div className="h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewCrossRatesRef}>
                                     {/* Le widget sera injecté ici par le script */}
                                 </div>
                             </div>
@@ -16496,7 +16496,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Stock Heatmap */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16512,8 +16512,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[400px] sm:h-[500px] md:h-[700px] lg:h-[900px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapRef}>
+                            <div className="h-[400px] sm:h-[500px] md:h-[700px] lg:h-[900px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewHeatmapRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16534,7 +16534,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Stock Heatmap TSX */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16550,8 +16550,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[400px] sm:h-[500px] md:h-[700px] lg:h-[900px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapTSXRef}>
+                            <div className="h-[400px] sm:h-[500px] md:h-[700px] lg:h-[900px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewHeatmapTSXRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16572,7 +16572,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Market Quotes */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16588,8 +16588,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[450px] sm:h-[600px] md:h-[700px] lg:h-[850px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewMarketQuotesRef}>
+                            <div className="h-[450px] sm:h-[600px] md:h-[700px] lg:h-[850px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewMarketQuotesRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16630,7 +16630,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Symbol Info */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16646,8 +16646,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}>
+                            <div className="h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewSymbolInfoRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16683,7 +16683,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Timeline - Configurable */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16808,8 +16808,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}>
+                            <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewTimelineRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16830,7 +16830,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Screener */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16846,8 +16846,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[450px] sm:h-[600px] md:h-[700px] lg:h-[800px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewScreenerRef}>
+                            <div className="h-[450px] sm:h-[600px] md:h-[700px] lg:h-[800px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewScreenerRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16868,7 +16868,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Advanced Chart - Synchronisé */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16884,8 +16884,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[450px] sm:h-[600px] md:h-[800px] lg:h-[1000px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}>
+                            <div className="h-[450px] sm:h-[600px] md:h-[800px] lg:h-[1000px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewChartSPYRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16906,7 +16906,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Symbol Profile - AAPL */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16922,8 +16922,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}>
+                            <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewSymbolProfileRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16944,7 +16944,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Financials - AAPL */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16960,8 +16960,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[450px] sm:h-[600px] md:h-[700px] lg:h-[800px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}>
+                            <div className="h-[450px] sm:h-[600px] md:h-[700px] lg:h-[800px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewFinancialsRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -16982,7 +16982,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Technical Analysis - AAPL */}
-                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 sm:p-4 md:p-6 rounded-lg transition-colors duration-300 w-full max-w-full ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="mb-4 sm:mb-6">
@@ -16998,8 +16998,8 @@ console.log('✅ Données hybrides récupérées:', {
                                 </p>
                             </div>
 
-                            <div className="h-[450px] sm:h-[600px] md:h-[700px] lg:h-[800px]">
-                                <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}>
+                            <div className="h-[450px] sm:h-[600px] md:h-[700px] lg:h-[800px] w-full max-w-full overflow-hidden">
+                                <div className="tradingview-widget-container h-full w-full" ref={tradingViewTechnicalAnalysisRef}>
                                     <div className="tradingview-widget-container__widget"></div>
                                     <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
