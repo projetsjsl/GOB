@@ -14771,45 +14771,112 @@ console.log('✅ Données hybrides récupérées:', {
                                     }`}>
                                         📰 Timeline - Fil d'Actualité
                                     </h2>
-                                    <div className="flex items-center gap-3">
-                                        <label className={`text-sm font-medium transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>
-                                            Symbole:
-                                        </label>
-                                        <select
-                                            value={timelineSymbol}
-                                            onChange={(e) => setTimelineSymbol(e.target.value)}
-                                            className={`px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                                    <div className="relative">
+                                        {/* Search Input - Style TradingView */}
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                ref={searchInputRef}
+                                                type="text"
+                                                value={searchQuery || timelineSymbol.split(':')[1] || ''}
+                                                onChange={(e) => {
+                                                    setSearchQuery(e.target.value);
+                                                    setShowSearchResults(true);
+                                                }}
+                                                onFocus={() => setShowSearchResults(true)}
+                                                onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                                                placeholder="Search symbols... (e.g., AAPL, BTC)"
+                                                className={`w-64 px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                                                    isDarkMode
+                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 hover:border-blue-500 focus:border-blue-500'
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-blue-500 focus:border-blue-500'
+                                                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+                                            />
+                                            <div className={`text-xs px-2 py-1 rounded font-mono ${
+                                                isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
+                                            }`}>
+                                                {timelineSymbol.split(':')[1]}
+                                            </div>
+                                        </div>
+
+                                        {/* Autocomplete Results - Style TradingView */}
+                                        {showSearchResults && searchQuery && (
+                                            <div className={`absolute top-full left-0 mt-2 w-80 max-h-96 overflow-y-auto rounded-lg border-2 shadow-2xl z-50 ${
                                                 isDarkMode
-                                                    ? 'bg-gray-700 border-gray-600 text-white hover:border-blue-500 focus:border-blue-500'
-                                                    : 'bg-white border-gray-300 text-gray-900 hover:border-blue-500 focus:border-blue-500'
-                                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
-                                        >
-                                            <optgroup label="📈 Indices">
-                                                <option value="FOREXCOM:SPXUSD">SPY - S&P 500</option>
-                                                <option value="FOREXCOM:NSXUSD">QQQ - Nasdaq 100</option>
-                                                <option value="FOREXCOM:DJI">DJI - Dow Jones</option>
-                                            </optgroup>
-                                            <optgroup label="🍎 Tech">
-                                                <option value="NASDAQ:AAPL">AAPL - Apple</option>
-                                                <option value="NASDAQ:MSFT">MSFT - Microsoft</option>
-                                                <option value="NASDAQ:GOOGL">GOOGL - Google</option>
-                                                <option value="NASDAQ:AMZN">AMZN - Amazon</option>
-                                                <option value="NASDAQ:NVDA">NVDA - NVIDIA</option>
-                                                <option value="NASDAQ:TSLA">TSLA - Tesla</option>
-                                                <option value="NASDAQ:META">META - Meta</option>
-                                            </optgroup>
-                                            <optgroup label="₿ Crypto">
-                                                <option value="BITSTAMP:BTCUSD">BTC - Bitcoin</option>
-                                                <option value="BITSTAMP:ETHUSD">ETH - Ethereum</option>
-                                            </optgroup>
-                                            <optgroup label="🏦 Finance">
-                                                <option value="NYSE:JPM">JPM - JPMorgan</option>
-                                                <option value="NYSE:BAC">BAC - Bank of America</option>
-                                                <option value="NYSE:GS">GS - Goldman Sachs</option>
-                                            </optgroup>
-                                        </select>
+                                                    ? 'bg-gray-800 border-gray-600'
+                                                    : 'bg-white border-gray-300'
+                                            }`}>
+                                                {(() => {
+                                                    const symbols = [
+                                                        { symbol: 'FOREXCOM:SPXUSD', name: 'SPY - S&P 500', category: '📈 Indices' },
+                                                        { symbol: 'FOREXCOM:NSXUSD', name: 'QQQ - Nasdaq 100', category: '📈 Indices' },
+                                                        { symbol: 'FOREXCOM:DJI', name: 'DJI - Dow Jones', category: '📈 Indices' },
+                                                        { symbol: 'NASDAQ:AAPL', name: 'AAPL - Apple', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:MSFT', name: 'MSFT - Microsoft', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:GOOGL', name: 'GOOGL - Google', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:AMZN', name: 'AMZN - Amazon', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:NVDA', name: 'NVDA - NVIDIA', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:TSLA', name: 'TSLA - Tesla', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:META', name: 'META - Meta', category: '🍎 Tech' },
+                                                        { symbol: 'BITSTAMP:BTCUSD', name: 'BTC - Bitcoin', category: '₿ Crypto' },
+                                                        { symbol: 'BITSTAMP:ETHUSD', name: 'ETH - Ethereum', category: '₿ Crypto' },
+                                                        { symbol: 'NYSE:JPM', name: 'JPM - JPMorgan', category: '🏦 Finance' },
+                                                        { symbol: 'NYSE:BAC', name: 'BAC - Bank of America', category: '🏦 Finance' },
+                                                        { symbol: 'NYSE:GS', name: 'GS - Goldman Sachs', category: '🏦 Finance' }
+                                                    ];
+
+                                                    const filtered = symbols.filter(s =>
+                                                        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                                        s.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+                                                    );
+
+                                                    if (filtered.length === 0) {
+                                                        return (
+                                                            <div className={`px-4 py-3 text-sm ${
+                                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                            }`}>
+                                                                No symbols found for "{searchQuery}"
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    return filtered.map((item, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            onClick={() => {
+                                                                setTimelineSymbol(item.symbol);
+                                                                setSearchQuery('');
+                                                                setShowSearchResults(false);
+                                                            }}
+                                                            className={`px-4 py-3 cursor-pointer transition-colors ${
+                                                                isDarkMode
+                                                                    ? 'hover:bg-gray-700 border-b border-gray-700'
+                                                                    : 'hover:bg-gray-100 border-b border-gray-200'
+                                                            } last:border-b-0`}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <div className={`font-semibold ${
+                                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                    }`}>
+                                                                        {item.symbol.split(':')[1]}
+                                                                    </div>
+                                                                    <div className={`text-xs ${
+                                                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                                    }`}>
+                                                                        {item.name.split(' - ')[1]}
+                                                                    </div>
+                                                                </div>
+                                                                <div className={`text-xs ${
+                                                                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                                                                }`}>
+                                                                    {item.category}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <p className={`text-sm transition-colors duration-300 ${
@@ -15673,6 +15740,9 @@ console.log('✅ Données hybrides récupérées:', {
 
                 // State pour les symboles configurables
                 const [timelineSymbol, setTimelineSymbol] = useState('BITSTAMP:BTCUSD');
+                const [searchQuery, setSearchQuery] = useState('');
+                const [showSearchResults, setShowSearchResults] = useState(false);
+                const searchInputRef = useRef(null);
 
                 // Écouter les changements de symbole depuis l'Advanced Chart (TradingView iframe)
                 useEffect(() => {
@@ -16623,45 +16693,112 @@ console.log('✅ Données hybrides récupérées:', {
                                     }`}>
                                         📰 Timeline - Fil d'Actualité
                                     </h2>
-                                    <div className="flex items-center gap-3">
-                                        <label className={`text-sm font-medium transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>
-                                            Symbole:
-                                        </label>
-                                        <select
-                                            value={timelineSymbol}
-                                            onChange={(e) => setTimelineSymbol(e.target.value)}
-                                            className={`px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                                    <div className="relative">
+                                        {/* Search Input - Style TradingView */}
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                ref={searchInputRef}
+                                                type="text"
+                                                value={searchQuery || timelineSymbol.split(':')[1] || ''}
+                                                onChange={(e) => {
+                                                    setSearchQuery(e.target.value);
+                                                    setShowSearchResults(true);
+                                                }}
+                                                onFocus={() => setShowSearchResults(true)}
+                                                onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                                                placeholder="Search symbols... (e.g., AAPL, BTC)"
+                                                className={`w-64 px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                                                    isDarkMode
+                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 hover:border-blue-500 focus:border-blue-500'
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-blue-500 focus:border-blue-500'
+                                                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+                                            />
+                                            <div className={`text-xs px-2 py-1 rounded font-mono ${
+                                                isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
+                                            }`}>
+                                                {timelineSymbol.split(':')[1]}
+                                            </div>
+                                        </div>
+
+                                        {/* Autocomplete Results - Style TradingView */}
+                                        {showSearchResults && searchQuery && (
+                                            <div className={`absolute top-full left-0 mt-2 w-80 max-h-96 overflow-y-auto rounded-lg border-2 shadow-2xl z-50 ${
                                                 isDarkMode
-                                                    ? 'bg-gray-700 border-gray-600 text-white hover:border-blue-500 focus:border-blue-500'
-                                                    : 'bg-white border-gray-300 text-gray-900 hover:border-blue-500 focus:border-blue-500'
-                                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
-                                        >
-                                            <optgroup label="📈 Indices">
-                                                <option value="FOREXCOM:SPXUSD">SPY - S&P 500</option>
-                                                <option value="FOREXCOM:NSXUSD">QQQ - Nasdaq 100</option>
-                                                <option value="FOREXCOM:DJI">DJI - Dow Jones</option>
-                                            </optgroup>
-                                            <optgroup label="🍎 Tech">
-                                                <option value="NASDAQ:AAPL">AAPL - Apple</option>
-                                                <option value="NASDAQ:MSFT">MSFT - Microsoft</option>
-                                                <option value="NASDAQ:GOOGL">GOOGL - Google</option>
-                                                <option value="NASDAQ:AMZN">AMZN - Amazon</option>
-                                                <option value="NASDAQ:NVDA">NVDA - NVIDIA</option>
-                                                <option value="NASDAQ:TSLA">TSLA - Tesla</option>
-                                                <option value="NASDAQ:META">META - Meta</option>
-                                            </optgroup>
-                                            <optgroup label="₿ Crypto">
-                                                <option value="BITSTAMP:BTCUSD">BTC - Bitcoin</option>
-                                                <option value="BITSTAMP:ETHUSD">ETH - Ethereum</option>
-                                            </optgroup>
-                                            <optgroup label="🏦 Finance">
-                                                <option value="NYSE:JPM">JPM - JPMorgan</option>
-                                                <option value="NYSE:BAC">BAC - Bank of America</option>
-                                                <option value="NYSE:GS">GS - Goldman Sachs</option>
-                                            </optgroup>
-                                        </select>
+                                                    ? 'bg-gray-800 border-gray-600'
+                                                    : 'bg-white border-gray-300'
+                                            }`}>
+                                                {(() => {
+                                                    const symbols = [
+                                                        { symbol: 'FOREXCOM:SPXUSD', name: 'SPY - S&P 500', category: '📈 Indices' },
+                                                        { symbol: 'FOREXCOM:NSXUSD', name: 'QQQ - Nasdaq 100', category: '📈 Indices' },
+                                                        { symbol: 'FOREXCOM:DJI', name: 'DJI - Dow Jones', category: '📈 Indices' },
+                                                        { symbol: 'NASDAQ:AAPL', name: 'AAPL - Apple', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:MSFT', name: 'MSFT - Microsoft', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:GOOGL', name: 'GOOGL - Google', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:AMZN', name: 'AMZN - Amazon', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:NVDA', name: 'NVDA - NVIDIA', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:TSLA', name: 'TSLA - Tesla', category: '🍎 Tech' },
+                                                        { symbol: 'NASDAQ:META', name: 'META - Meta', category: '🍎 Tech' },
+                                                        { symbol: 'BITSTAMP:BTCUSD', name: 'BTC - Bitcoin', category: '₿ Crypto' },
+                                                        { symbol: 'BITSTAMP:ETHUSD', name: 'ETH - Ethereum', category: '₿ Crypto' },
+                                                        { symbol: 'NYSE:JPM', name: 'JPM - JPMorgan', category: '🏦 Finance' },
+                                                        { symbol: 'NYSE:BAC', name: 'BAC - Bank of America', category: '🏦 Finance' },
+                                                        { symbol: 'NYSE:GS', name: 'GS - Goldman Sachs', category: '🏦 Finance' }
+                                                    ];
+
+                                                    const filtered = symbols.filter(s =>
+                                                        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                                        s.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+                                                    );
+
+                                                    if (filtered.length === 0) {
+                                                        return (
+                                                            <div className={`px-4 py-3 text-sm ${
+                                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                            }`}>
+                                                                No symbols found for "{searchQuery}"
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    return filtered.map((item, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            onClick={() => {
+                                                                setTimelineSymbol(item.symbol);
+                                                                setSearchQuery('');
+                                                                setShowSearchResults(false);
+                                                            }}
+                                                            className={`px-4 py-3 cursor-pointer transition-colors ${
+                                                                isDarkMode
+                                                                    ? 'hover:bg-gray-700 border-b border-gray-700'
+                                                                    : 'hover:bg-gray-100 border-b border-gray-200'
+                                                            } last:border-b-0`}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <div className={`font-semibold ${
+                                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                    }`}>
+                                                                        {item.symbol.split(':')[1]}
+                                                                    </div>
+                                                                    <div className={`text-xs ${
+                                                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                                    }`}>
+                                                                        {item.name.split(' - ')[1]}
+                                                                    </div>
+                                                                </div>
+                                                                <div className={`text-xs ${
+                                                                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                                                                }`}>
+                                                                    {item.category}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <p className={`text-sm transition-colors duration-300 ${
