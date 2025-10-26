@@ -16744,33 +16744,13 @@ console.log('✅ Données hybrides récupérées:', {
                                 </div>
                             </div>
 
-                            {/* Corps du Bloc - Widgets en Grille */}
-                            <div className="p-4">
-                                {/* Widget Principal: Advanced Chart - Pleine Largeur */}
-                                <div className={`mb-4 rounded-lg p-4 transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
-                                }`}>
-                                    <h3 className={`text-lg font-bold mb-2 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                        📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
-                                    </h3>
-                                    <p className={`text-xs mb-3 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                        Cliquez sur un symbole dans la watchlist pour changer tous les widgets
-                                    </p>
-                                    <div className="h-[600px] md:h-[700px] lg:h-[800px]">
-                                        <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}>
-                                            <div className="tradingview-widget-container__widget"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                            {/* Corps du Bloc - Layout Style TradingView */}
+                            <div className="p-8" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                                {/* Grille CSS avec gap de 32px (style TradingView) */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                                {/* Grille 2x2 pour Symbol Info, Timeline, Profile, Financials */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                                    {/* Widget: Symbol Info */}
-                                    <div className={`rounded-lg p-4 transition-colors duration-300 ${
+                                    {/* 1. Symbol Info - PLEINE LARGEUR */}
+                                    <div className={`rounded-lg p-4 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
                                         <h3 className={`text-lg font-bold mb-2 transition-colors duration-300 ${
@@ -16778,30 +16758,35 @@ console.log('✅ Données hybrides récupérées:', {
                                         }`}>
                                             📊 Symbol Info
                                         </h3>
-                                        <div className="h-[350px]">
+                                        <div className="h-[400px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}>
                                                 <div className="tradingview-widget-container__widget"></div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Widget: Timeline */}
-                                    <div className={`rounded-lg p-4 transition-colors duration-300 ${
+                                    {/* 2. Advanced Chart - PLEINE LARGEUR */}
+                                    <div className={`rounded-lg p-4 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
                                         <h3 className={`text-lg font-bold mb-2 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
-                                            📰 Timeline - Fil d'Actualité
+                                            📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
                                         </h3>
-                                        <div className="h-[350px]">
-                                            <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}>
+                                        <p className={`text-xs mb-3 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        }`}>
+                                            Cliquez sur un symbole dans la watchlist pour changer tous les widgets
+                                        </p>
+                                        <div className="h-[600px] md:h-[700px] lg:h-[800px]">
+                                            <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}>
                                                 <div className="tradingview-widget-container__widget"></div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Widget: Symbol Profile */}
+                                    {/* 3. Symbol Profile - 1 COLONNE */}
                                     <div className={`rounded-lg p-4 transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
@@ -16810,15 +16795,31 @@ console.log('✅ Données hybrides récupérées:', {
                                         }`}>
                                             🏢 Profil de l'Entreprise
                                         </h3>
-                                        <div className="h-[500px]">
+                                        <div className="h-[425px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}>
                                                 <div className="tradingview-widget-container__widget"></div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Widget: Financials */}
+                                    {/* 4. Timeline - 1 COLONNE */}
                                     <div className={`rounded-lg p-4 transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
+                                    }`}>
+                                        <h3 className={`text-lg font-bold mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>
+                                            📰 Timeline - Fil d'Actualité
+                                        </h3>
+                                        <div className="h-[425px]">
+                                            <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}>
+                                                <div className="tradingview-widget-container__widget"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* 5. Financials - PLEINE LARGEUR */}
+                                    <div className={`rounded-lg p-4 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
                                         <h3 className={`text-lg font-bold mb-2 transition-colors duration-300 ${
@@ -16826,28 +16827,29 @@ console.log('✅ Données hybrides récupérées:', {
                                         }`}>
                                             💰 États Financiers
                                         </h3>
-                                        <div className="h-[500px]">
+                                        <div className="h-[490px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}>
                                                 <div className="tradingview-widget-container__widget"></div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Widget Final: Technical Analysis - Pleine Largeur */}
-                                <div className={`rounded-lg p-4 transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
-                                }`}>
-                                    <h3 className={`text-lg font-bold mb-2 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    {/* 6. Technical Analysis - PLEINE LARGEUR */}
+                                    <div className={`rounded-lg p-4 transition-colors duration-300 lg:col-span-2 ${
+                                        isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        📈 Analyse Technique
-                                    </h3>
-                                    <div className="h-[500px]">
-                                        <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}>
-                                            <div className="tradingview-widget-container__widget"></div>
+                                        <h3 className={`text-lg font-bold mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>
+                                            📈 Analyse Technique
+                                        </h3>
+                                        <div className="h-[425px]">
+                                            <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}>
+                                                <div className="tradingview-widget-container__widget"></div>
+                                            </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
