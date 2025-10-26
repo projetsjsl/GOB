@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, EditPencil, Xmark, Download, Upload, Settings, Palette, Check, Trash, List, SunLight, HalfMoon, Bag, Globe, Building, Phone, Calendar, Mail, GraphUp, Rocket, Brain, Dollar, Activity, Archery, Shield, Flash, Code, Database, Page, Folder, Group, Medal, Gift } from 'iconoir-react';
+import { Plus, EditPencil, Xmark, Download, Upload, Settings, Palette, Check, Trash, SunLight, HalfMoon, Bag, Globe, Building, Phone, Calendar, Mail, GraphUp, Rocket, Brain, Dollar, Activity, Archery, Shield, Flash, Code, Database, Page, Folder, Group, Medal, Gift } from 'iconoir-react';
 
 // Les logos seront chargés dynamiquement via les chemins publics
 
@@ -955,7 +955,7 @@ const GOB = () => {
                           }}
                           className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl transition-all shadow-lg shadow-green-500/30 flex items-center space-x-2 text-sm font-semibold active:scale-95"
                         >
-                          <List width={18} height={18} />
+                          <Group width={18} height={18} />
                           <span>Gérer les apps</span>
                         </button>
                         <button
@@ -999,9 +999,9 @@ const GOB = () => {
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>
             {isProfessionalMode ? (
-              <Phone width={20} height={20} className="text-green-500" />
+              <Building width={20} height={20} className="text-green-500" />
             ) : (
-              <span>📱</span>
+              <span>🏢</span>
             )}
             <span>Applications financières</span>
           </h3>
@@ -1101,13 +1101,13 @@ const GOB = () => {
       <footer className="fixed bottom-0 left-0 right-0 pointer-events-none z-50">
         <div className="max-w-md mx-auto px-4">
           <div className={`backdrop-blur-3xl rounded-t-[2.5rem] shadow-2xl px-6 py-4 border-t ${
-            isDarkMode 
-              ? 'bg-gray-800/90 border-gray-700/50' 
-              : 'bg-white/90 border-gray-300/50'
+            isDarkMode
+              ? 'bg-white/90 border-gray-300/50'
+              : 'bg-gray-800/90 border-gray-700/50'
           }`}>
             <div className="flex justify-center">
               <div className={`w-32 h-1.5 rounded-full ${
-                isDarkMode ? 'bg-green-500/40' : 'bg-blue-500/40'
+                isDarkMode ? 'bg-gray-800/40' : 'bg-gray-300/40'
               }`}></div>
             </div>
           </div>
