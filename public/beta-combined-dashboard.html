@@ -9224,6 +9224,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                 const [useFunctionCalling, setUseFunctionCalling] = useState(true); // Utiliser function calling par défaut
                 const [useValidatedMode, setUseValidatedMode] = useState(false); // Mode validation en 3 étapes
                 const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Bouton scroll vers le bas
+                const [typingMessageId, setTypingMessageId] = useState(null); // ID du message en cours de typing
+                const typingIntervalRef = useRef(null); // Référence pour l'intervalle de typing
                 const [emmaPrompt, setEmmaPrompt] = useState(`<system_identity>
 Vous êtes Emma — Economic & Market Monitoring Assistant, un assistant IA de niveau expert en analyse financière.
 Version : 2.0 Advanced
@@ -9803,14 +9805,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         // Utiliser l'API Perplexity avec les données fraîches
                         const response = await generatePerplexityResponse(emmaInput);
-                        
+
+                        const messageId = Date.now() + 1;
                         const emmaResponse = {
-                            id: Date.now() + 1,
+                            id: messageId,
                             type: 'emma',
-                            content: response,
+                            content: '', // Contenu vide au départ pour l'effet de typing
+                            fullContent: response, // Contenu complet stocké séparément
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
-                        
+
                         setEmmaMessages(prev => {
                             // Supprimer le message de confirmation temporaire
                             const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
@@ -9818,7 +9822,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             // Sauvegarde automatique via useEffect
                             return newMessages;
                         });
-                        
+
+                        // Démarrer l'effet de typing progressif
+                        startTypingEffect(messageId, response);
+
                         // Confirmation de réception
                         console.log('✅ Réponse d\'Emma reçue:', response.length, 'caractères');
                     } catch (error) {
@@ -10634,6 +10641,53 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     return `<div class="leading-relaxed text-sm">${t}</div>`;
                 };
 
+                // --------- Effet de typing progressif ---------
+                const startTypingEffect = (messageId, fullContent) => {
+                    // Nettoyer l'intervalle précédent si existant
+                    if (typingIntervalRef.current) {
+                        clearInterval(typingIntervalRef.current);
+                    }
+
+                    setTypingMessageId(messageId);
+
+                    let currentIndex = 0;
+                    const typingSpeed = 15; // ms par caractère (plus petit = plus rapide)
+
+                    typingIntervalRef.current = setInterval(() => {
+                        if (currentIndex < fullContent.length) {
+                            // Afficher les caractères par petits groupes pour un effet plus fluide
+                            const chunkSize = Math.floor(Math.random() * 3) + 1; // 1-3 caractères à la fois
+                            currentIndex += chunkSize;
+
+                            // Mettre à jour le message avec le contenu partiel
+                            setEmmaMessages(prev => prev.map(msg =>
+                                msg.id === messageId
+                                    ? { ...msg, content: fullContent.slice(0, currentIndex) }
+                                    : msg
+                            ));
+                        } else {
+                            // Typing terminé - afficher le contenu complet
+                            setEmmaMessages(prev => prev.map(msg =>
+                                msg.id === messageId
+                                    ? { ...msg, content: fullContent }
+                                    : msg
+                            ));
+                            clearInterval(typingIntervalRef.current);
+                            typingIntervalRef.current = null;
+                            setTypingMessageId(null);
+                        }
+                    }, typingSpeed);
+                };
+
+                // Nettoyer l'intervalle lors du démontage
+                useEffect(() => {
+                    return () => {
+                        if (typingIntervalRef.current) {
+                            clearInterval(typingIntervalRef.current);
+                        }
+                    };
+                }, []);
+
                 // --------- Email: exporter la conversation ---------
                 const [showEmailModal, setShowEmailModal] = useState(false);
                 const [emailTo, setEmailTo] = useState('');
@@ -10825,11 +10879,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? 'bg-red-600 text-white shadow-red-500/20'
                                                         : message.type === 'system'
                                                         ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
-                                                        : isDarkMode 
-                                                            ? 'bg-gray-800 text-white border border-gray-700' 
+                                                        : isDarkMode
+                                                            ? 'bg-gray-800 text-white border border-gray-700'
                                                             : 'bg-white text-gray-900 border border-gray-200'
                                                 }`}>
-                                                    <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formatMessageText(message.content) }} />
+                                                    <div className="prose prose-sm max-w-none">
+                                                        <div dangerouslySetInnerHTML={{ __html: formatMessageText(message.content) }} />
+                                                        {typingMessageId === message.id && (
+                                                            <span className="inline-block w-2 h-4 ml-0.5 bg-blue-500 animate-pulse"></span>
+                                                        )}
+                                                    </div>
                                                     <div className={`text-xs mt-1 ${
                                                         message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
                                                     }`}>
@@ -10865,10 +10924,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         ))}
                                         {emmaLoading && (
                                             <div className="flex gap-3 justify-start">
-                                                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                                                    <img 
-                                                        src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
-                                                        alt="Emma" 
+                                                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 animate-pulse">
+                                                    <img
+                                                        src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
+                                                        alt="Emma"
                                                         className="w-full h-full object-cover"
                                                     />
                                                 </div>
@@ -10876,8 +10935,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-900'
                                                 }`}>
                                                     <div className="flex items-center gap-2">
-                                                        <div className="animate-spin w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                                                        <span>Emma réfléchit...</span>
+                                                        <div className="flex gap-1">
+                                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                                                        </div>
+                                                        <span className="ml-1">Emma analyse...</span>
                                                     </div>
                                                     {/* Indicateur de paramètres pendant le chargement */}
                                                     <div className={`text-xs mt-2 px-2 py-1 rounded ${
