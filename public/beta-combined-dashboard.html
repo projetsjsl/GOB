@@ -77,11 +77,44 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
+
+        /* 🔒 Prévention du scroll horizontal sur tous les appareils */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+            position: relative;
+        }
+
+        html {
+            width: 100%;
+        }
+
+        body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Empêcher tout débordement des éléments enfants */
+        #root {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         /* 📱 MOBILE - COMPACT VIEW for Global Overview */
         @media (max-width: 768px) {
             /* Compact global scaling for dashboard view */
-            html { font-size: 55%; }
-            body { padding: 6px; }
+            html {
+                font-size: 55%;
+                overflow-x: hidden;
+                max-width: 100vw;
+            }
+            body {
+                padding: 6px;
+                overflow-x: hidden;
+                max-width: 100vw;
+                width: 100%;
+            }
 
             /* Compact header */
             header { padding: 10px !important; }

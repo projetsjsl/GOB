@@ -98,21 +98,48 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 🔒 Prévention du scroll horizontal sur tous les appareils */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+}
+
+html {
+  width: 100%;
+}
+
 body {
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  width: 100%;
+  padding: 0;
 }
 
 #root {
   width: 100%;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* Réduction globale pour mobile: police et espacements à 50% */
 @media (max-width: 768px) {
   html {
     font-size: 50%;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  #root {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 }
