@@ -29,7 +29,10 @@
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
     <!-- Heroicons pour les icônes (remplace lucide-react) -->
     <script src="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/24/outline/index.js"></script>
-    
+
+    <!-- Iconoir - Beautiful open source icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+
     <!-- Script pour exposer les bibliothèques globalement -->
         <script>
             // Exposer Recharts globalement
@@ -70,6 +73,55 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+
+        /* 🎨 Animations pour la bottom bar avec icônes Iconoir */
+        @keyframes slide-down {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes icon-pop {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .animate-slide-down {
+            animation: slide-down 0.3s ease-out;
+        }
+
+        /* Effet de glow sur l'icône active */
+        nav button:has(i.scale-110) i {
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        /* Transition fluide pour toutes les icônes */
+        nav button i {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Effet hover sur les boutons de navigation */
+        nav button:hover:not(:active) i {
+            transform: translateY(-2px);
+        }
+
+        /* Effet de press */
+        nav button:active i {
+            transform: scale(0.9);
+        }
+
         .stock-card {
             transition: all 0.3s ease;
         }
@@ -1813,6 +1865,24 @@ const fetchHybridData = async (symbol, dataType) => {
                 if (old) old.remove();
                 target.appendChild(circle);
                 ensureAudioReady();
+            };
+
+            // Mapping des icônes Iconoir pour chaque onglet
+            const getTabIcon = (tabId) => {
+                const iconMap = {
+                    'stocks-news': 'iconoir-chart-line',
+                    'intellistocks': 'iconoir-trending-up',
+                    'jlab-v2': 'iconoir-rocket',
+                    'ask-emma': 'iconoir-chat-bubble',
+                    'admin-jsla': 'iconoir-settings',
+                    'dans-watchlist': 'iconoir-star',
+                    'scrapping-sa': 'iconoir-search',
+                    'seeking-alpha': 'iconoir-graph-up',
+                    'email-briefings': 'iconoir-antenna-signal',
+                    'economic-calendar': 'iconoir-calendar',
+                    'investing-calendar': 'iconoir-flask'
+                };
+                return iconMap[tabId] || 'iconoir-graph-up';
             };
 
             // Volume: baisser le son général et couper le son du ripple/clic
@@ -17467,7 +17537,7 @@ console.log('✅ Données hybrides récupérées:', {
                     } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                         <div className="flex items-center justify-around px-2 pb-safe">
                             {tabs.slice(0, 5).map(tab => {
-                                const icon = tab.label.match(/[\u{1F300}-\u{1F9FF}]/u)?.[0] || '📊';
+                                const iconClass = getTabIcon(tab.id);
                                 return (
                                     <button
                                         key={tab.id}
@@ -17487,11 +17557,13 @@ console.log('✅ Données hybrides récupérées:', {
                                         {activeTab === tab.id && (
                                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-b ${
                                                 isDarkMode ? 'bg-green-500' : 'bg-green-600'
-                                            }`}></div>
+                                            } animate-slide-down`}></div>
                                         )}
 
-                                        {/* Icon */}
-                                        <span className="text-xl mb-1">{icon}</span>
+                                        {/* Icon with Iconoir */}
+                                        <i className={`${iconClass} text-2xl mb-1 transition-transform duration-200 ${
+                                            activeTab === tab.id ? 'scale-110' : 'scale-100'
+                                        }`}></i>
 
                                         {/* Label */}
                                         <span className={`text-xs font-medium text-center leading-tight ${
@@ -17522,7 +17594,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}
                             >
-                                <span className="text-xl mb-1">⋯</span>
+                                <i className="iconoir-menu text-2xl mb-1"></i>
                                 <span className="text-xs font-medium">Plus</span>
                             </button>
                         </div>
