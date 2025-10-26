@@ -17227,7 +17227,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
                     )}
                     {/* Header - Bloomberg Style - Always Dark */}
-                    <header className="relative overflow-hidden bg-gradient-to-r from-black via-gray-900 to-black border-b border-green-500/20">
+                    <header className="relative overflow-hidden bg-gradient-to-r from-black via-gray-900 to-black border-b border-green-500/20 md:ml-20">
                         {/* Bloomberg-style animated background pattern */}
                         <div className="absolute inset-0 opacity-5">
                             <div className="absolute inset-0" style={{
@@ -17293,27 +17293,37 @@ console.log('✅ Données hybrides récupérées:', {
                     </header>
 
                     {/* TradingView Ticker Tape Widget - Bandeau de cotations */}
-                    <div className="tradingview-widget-container" ref={tickerTapeRef}>
+                    <div className="tradingview-widget-container md:ml-20" ref={tickerTapeRef}>
                         <div className="tradingview-widget-container__widget"></div>
                     </div>
 
-                    {/* Navigation par onglets - Bloomberg Style */}
-                    <nav className={`relative backdrop-blur-sm transition-all duration-300 ${
+                    {/* Desktop Sidebar Navigation */}
+                    <aside className={`hidden md:flex fixed left-0 top-0 h-full w-20 flex-col backdrop-blur-sm transition-all duration-300 z-40 ${
                         isDarkMode
-                            ? 'bg-black/95 border-b border-green-500/10'
-                            : 'bg-white/95 border-b-2 border-gray-200'
+                            ? 'bg-black/95 border-r border-green-500/10'
+                            : 'bg-white/95 border-r-2 border-gray-200'
                     } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                        {/* Subtle top border accent */}
-                        <div className={`absolute top-0 left-0 right-0 h-px ${isDarkMode ? 'bg-gradient-to-r from-transparent via-green-500/20 to-transparent' : 'bg-gradient-to-r from-transparent via-green-400/20 to-transparent'}`}></div>
+                        {/* Logo section */}
+                        <div className={`flex items-center justify-center h-20 border-b ${
+                            isDarkMode ? 'border-green-500/10' : 'border-gray-200'
+                        }`}>
+                            <img
+                                src="/logojslaidark.jpg"
+                                alt="JSL AI"
+                                className="w-12 h-12 object-contain"
+                            />
+                        </div>
 
-                        <div className="max-w-7xl mx-auto px-6">
-                            <div className="hidden md:flex items-center gap-0.5 -mb-px">
-                                {tabs.map(tab => (
+                        {/* Navigation Items */}
+                        <nav className="flex-1 overflow-y-auto py-4">
+                            {tabs.map(tab => {
+                                const icon = tab.label.match(/[\u{1F300}-\u{1F9FF}]/u)?.[0] || '📊';
+                                return (
                                     <button
                                         key={tab.id}
                                         onMouseDown={withRipple}
                                         onClick={() => handleTabChange(tab.id)}
-                                        className={`tab-button btn-ripple relative px-5 py-3.5 font-semibold text-xs tracking-wider uppercase transition-all duration-200 ${
+                                        className={`w-full flex flex-col items-center justify-center py-4 px-2 btn-ripple relative transition-all duration-200 group ${
                                             activeTab === tab.id
                                                 ? (isDarkMode
                                                     ? 'text-green-400 bg-gray-900/50'
@@ -17322,57 +17332,104 @@ console.log('✅ Données hybrides récupérées:', {
                                                     ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-900/30'
                                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50')
                                         }`}
+                                        title={tab.label}
                                     >
-                                        {/* Active tab indicator - Bloomberg orange bar */}
+                                        {/* Active indicator - left bar */}
                                         {activeTab === tab.id && (
-                                            <>
-                                                <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${
-                                                    isDarkMode ? 'bg-green-500' : 'bg-green-600'
-                                                }`}></div>
-                                                <div className={`absolute bottom-0 left-0 right-0 h-0.5 ${
-                                                    isDarkMode ? 'bg-green-500' : 'bg-green-600'
-                                                } animate-pulse`}></div>
-                                            </>
+                                            <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r ${
+                                                isDarkMode ? 'bg-green-500' : 'bg-green-600'
+                                            }`}></div>
                                         )}
 
-                                        {/* Tab label */}
-                                        <span className="relative z-10 flex items-center gap-2">
-                                            {tab.label}
-                                            {activeTab === tab.id && (
-                                                <span className={`w-1.5 h-1.5 rounded-full ${isDarkMode ? 'bg-green-400' : 'bg-green-600'} animate-pulse`}></span>
-                                            )}
+                                        {/* Icon */}
+                                        <span className="text-2xl mb-1">{icon}</span>
+
+                                        {/* Label (shown on hover) */}
+                                        <span className={`text-xs font-medium text-center leading-tight opacity-0 group-hover:opacity-100 transition-opacity ${
+                                            activeTab === tab.id ? 'opacity-100' : ''
+                                        }`}>
+                                            {tab.label.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim()}
                                         </span>
 
-                                        {/* Hover effect */}
-                                        <div className={`absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-200 ${
-                                            isDarkMode
-                                                ? 'bg-gradient-to-b from-green-500/5 to-transparent'
-                                                : 'bg-gradient-to-b from-green-400/10 to-transparent'
-                                        }`}></div>
+                                        {/* Active dot indicator */}
+                                        {activeTab === tab.id && (
+                                            <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${
+                                                isDarkMode ? 'bg-green-400' : 'bg-green-600'
+                                            } animate-pulse`}></span>
+                                        )}
                                     </button>
-                                ))}
-                            </div>
+                                );
+                            })}
+                        </nav>
+                    </aside>
 
-                            {/* Mobile dropdown - Bloomberg style */}
-                            <div className="md:hidden p-3">
-                                <select
-                                    value={activeTab}
-                                    onChange={(e) => setActiveTab(e.target.value)}
-                                    className={`w-full rounded-md px-4 py-3 font-semibold text-sm border transition-all ${
-                                        isDarkMode
-                                            ? 'bg-gray-900 text-green-400 border-green-500/30 focus:border-green-500 focus:ring-2 focus:ring-green-500/20'
-                                            : 'bg-white text-green-600 border-green-200 focus:border-green-400 focus:ring-2 focus:ring-green-400/20'
-                                    }`}
-                                >
-                                    {tabs.map(tab => (
-                                        <option key={tab.id} value={tab.id}>{tab.label}</option>
-                                    ))}
-                                </select>
-                            </div>
+                    {/* Mobile Bottom Navigation Bar */}
+                    <nav className={`md:hidden fixed bottom-0 left-0 right-0 backdrop-blur-sm transition-all duration-300 z-40 ${
+                        isDarkMode
+                            ? 'bg-black/95 border-t border-green-500/10'
+                            : 'bg-white/95 border-t-2 border-gray-200'
+                    } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                        <div className="flex items-center justify-around px-2 pb-safe">
+                            {tabs.slice(0, 5).map(tab => {
+                                const icon = tab.label.match(/[\u{1F300}-\u{1F9FF}]/u)?.[0] || '📊';
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onMouseDown={withRipple}
+                                        onClick={() => handleTabChange(tab.id)}
+                                        className={`flex-1 flex flex-col items-center justify-center py-3 px-1 btn-ripple relative transition-all duration-200 ${
+                                            activeTab === tab.id
+                                                ? (isDarkMode
+                                                    ? 'text-green-400'
+                                                    : 'text-green-600')
+                                                : (isDarkMode
+                                                    ? 'text-gray-400'
+                                                    : 'text-gray-600')
+                                        }`}
+                                    >
+                                        {/* Active indicator - top bar */}
+                                        {activeTab === tab.id && (
+                                            <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-b ${
+                                                isDarkMode ? 'bg-green-500' : 'bg-green-600'
+                                            }`}></div>
+                                        )}
+
+                                        {/* Icon */}
+                                        <span className="text-xl mb-1">{icon}</span>
+
+                                        {/* Label */}
+                                        <span className={`text-xs font-medium text-center leading-tight ${
+                                            activeTab === tab.id ? 'font-bold' : ''
+                                        }`}>
+                                            {tab.label.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim().split(' ')[0]}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+
+                            {/* Menu button for additional tabs */}
+                            <button
+                                onClick={() => {
+                                    const moreTabs = tabs.slice(5);
+                                    if (moreTabs.length > 0) {
+                                        const selection = prompt(
+                                            'Sélectionnez un onglet:\n' +
+                                            moreTabs.map((t, i) => `${i + 1}. ${t.label}`).join('\n')
+                                        );
+                                        const index = parseInt(selection) - 1;
+                                        if (index >= 0 && index < moreTabs.length) {
+                                            handleTabChange(moreTabs[index].id);
+                                        }
+                                    }
+                                }}
+                                className={`flex-1 flex flex-col items-center justify-center py-3 px-1 btn-ripple relative transition-all duration-200 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}
+                            >
+                                <span className="text-xl mb-1">⋯</span>
+                                <span className="text-xs font-medium">Plus</span>
+                            </button>
                         </div>
-
-                        {/* Bottom shadow effect */}
-                        <div className={`absolute bottom-0 left-0 right-0 h-px ${isDarkMode ? 'bg-gradient-to-r from-transparent via-gray-800 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-200 to-transparent'}`}></div>
                     </nav>
                     {/* Audio UI feedback (désactivé par défaut jusqu'au premier geste utilisateur) */}
                     <audio ref={tabSoundRef} preload="auto" className="hidden">
@@ -17413,7 +17470,7 @@ console.log('✅ Données hybrides récupérées:', {
                     )}
 
                     {/* Contenu principal */}
-                    <main className={`max-w-7xl mx-auto p-6 transition-opacity duration-500 ${
+                    <main className={`max-w-7xl mx-auto p-6 md:ml-20 pb-24 md:pb-6 transition-opacity duration-500 ${
                         showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
                     }`}>
                         {activeTab === 'stocks-news' && <StocksNewsTab />}
