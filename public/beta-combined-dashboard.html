@@ -27,9 +27,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Recharts pour IntelliStocks -->
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
-    <!-- Heroicons pour les icônes (remplace lucide-react) -->
-    <script src="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/24/outline/index.js"></script>
-
     <!-- Iconoir - Beautiful open source icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
 
@@ -37,17 +34,13 @@
         <script>
             // Exposer Recharts globalement
             window.Recharts = window.Recharts || {};
-            
-            // Exposer Heroicons globalement
-            window.Heroicons = window.Heroicons || {};
-            
+
             // Vérifier le chargement des bibliothèques
             window.addEventListener('load', function() {
                 console.log('📚 Vérification des bibliothèques:');
                 console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
-                console.log('Heroicons disponible:', typeof window.Heroicons !== 'undefined');
-                console.log('LucideIcon disponible:', typeof window.LucideIcon !== 'undefined');
-                
+                console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
+
                 // Message informatif sur les avertissements de production
                 console.log('ℹ️ Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
                 console.log('ℹ️ Ce fichier utilise intentionnellement des CDN pour la portabilité');

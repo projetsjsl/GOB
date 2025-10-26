@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit3, X, Download, Upload, Settings, Palette, Check, Trash2, List, Sun, Moon, Briefcase, Globe, Landmark, Smartphone, Calendar, Mail, BarChart3, TrendingUp, Building2, Rocket, Bot, DollarSign, PieChart, LineChart, Activity, Target, Shield, Zap, Code, Database, FileText, FolderOpen, Users, Award, Gift, LucideIcon } from 'lucide-react';
+import { Plus, EditPencil, Xmark, Download, Upload, Settings, Palette, Check, Trash, List, SunLight, HalfMoon, Bag, Globe, Building, Phone, Calendar, Mail, GraphUp, Rocket, Brain, Dollar, Activity, Archery, Shield, Flash, Code, Database, Page, Folder, Group, Medal, Gift } from 'iconoir-react';
 
 // Les logos seront chargés dynamiquement via les chemins publics
 
@@ -13,37 +13,37 @@ const popularEmojis = [
 ];
 
 // Professional icons mapping (for Professional Mode)
-const iconComponents: { [key: string]: LucideIcon } = {
-  'Globe': Globe, 'Smartphone': Smartphone, 'Briefcase': Briefcase, 'Mail': Mail,
-  'Calendar': Calendar, 'FileText': FileText, 'Users': Users, 'Activity': Activity,
-  'Code': Code, 'Database': Database, 'Building2': Building2, 'Landmark': Landmark,
-  'DollarSign': DollarSign, 'BarChart3': BarChart3, 'TrendingUp': TrendingUp, 'PieChart': PieChart,
-  'LineChart': LineChart, 'Target': Target, 'Award': Award, 'Shield': Shield,
-  'Zap': Zap, 'Settings': Settings, 'Rocket': Rocket, 'Bot': Bot,
-  'FolderOpen': FolderOpen, 'Gift': Gift
+const iconComponents: { [key: string]: React.ComponentType<any> } = {
+  'Globe': Globe, 'Phone': Phone, 'Bag': Bag, 'Mail': Mail,
+  'Calendar': Calendar, 'Page': Page, 'Group': Group, 'Activity': Activity,
+  'Code': Code, 'Database': Database, 'Building': Building,
+  'Dollar': Dollar, 'GraphUp': GraphUp,
+  'Archery': Archery, 'Medal': Medal, 'Shield': Shield,
+  'Flash': Flash, 'Settings': Settings, 'Rocket': Rocket, 'Brain': Brain,
+  'Folder': Folder, 'Gift': Gift
 };
 
 const professionalIcons = [
-  'Globe', 'Smartphone', 'Briefcase', 'Mail', 'Calendar', 'FileText', 'Users', 'Activity',
-  'Code', 'Database', 'Building2', 'Landmark', 'DollarSign', 'BarChart3', 'TrendingUp', 'PieChart',
-  'LineChart', 'Target', 'Award', 'Shield', 'Zap', 'Settings', 'Rocket', 'Bot',
-  'FolderOpen', 'Gift'
+  'Globe', 'Phone', 'Bag', 'Mail', 'Calendar', 'Page', 'Group', 'Activity',
+  'Code', 'Database', 'Building', 'Dollar', 'GraphUp',
+  'Archery', 'Medal', 'Shield', 'Flash', 'Settings', 'Rocket', 'Brain',
+  'Folder', 'Gift'
 ];
 
 // Emoji to Professional Icon mapping for default apps
 const emojiToIconMap: { [key: string]: string } = {
-  '📈': 'TrendingUp',
-  '📊': 'BarChart3',
+  '📈': 'GraphUp',
+  '📊': 'GraphUp',
   '🚀': 'Rocket',
-  '🤖': 'Bot',
-  '📱': 'Smartphone',
-  '💼': 'Briefcase',
+  '🤖': 'Brain',
+  '📱': 'Phone',
+  '💼': 'Bag',
   '🌐': 'Globe',
   '📧': 'Mail',
   '📅': 'Calendar',
-  '💰': 'DollarSign',
-  '🏢': 'Building2',
-  '🏦': 'Landmark'
+  '💰': 'Dollar',
+  '🏢': 'Building',
+  '🏦': 'Building'
 };
 
 // Types
@@ -596,7 +596,7 @@ const GOB = () => {
       const iconName = logo.replace('icon:', '');
       const IconComponent = iconComponents[iconName];
       return IconComponent ? (
-        <IconComponent size={32} className="text-green-500" />
+        <IconComponent width={32} height={32} className="text-green-500" />
       ) : (
         <div className="text-2xl sm:text-3xl">?</div>
       );
@@ -609,7 +609,7 @@ const GOB = () => {
       // Render professional icon mapped from emoji
       const IconComponent = iconComponents[emojiToIconMap[logo]];
       return IconComponent ? (
-        <IconComponent size={32} className="text-green-500" />
+        <IconComponent width={32} height={32} className="text-green-500" />
       ) : (
         <div className="text-2xl sm:text-3xl">{logo}</div>
       );
@@ -909,7 +909,7 @@ const GOB = () => {
                   } ${isProfessionalMode ? 'ring-2 ring-green-500/50' : ''}`}
                   title={isProfessionalMode ? 'Mode Professionnel (cliquez pour Mode Fun)' : 'Mode Fun (cliquez pour Mode Professionnel)'}
                 >
-                  {isProfessionalMode ? <Briefcase size={18} /> : <span className="text-lg">😀</span>}
+                  {isProfessionalMode ? <Bag width={18} height={18} /> : <span className="text-lg">😀</span>}
                 </button>
 
                 <button
@@ -921,7 +921,7 @@ const GOB = () => {
                   }`}
                   title={isDarkMode ? 'Passer en mode clair' : 'Passer en mode sombre'}
                 >
-                  {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                  {isDarkMode ? <SunLight width={18} height={18} /> : <HalfMoon width={18} height={18} />}
                 </button>
 
                 <button
@@ -933,7 +933,7 @@ const GOB = () => {
                   }`}
                   title="Changer le thème"
                 >
-                  <Palette size={18} />
+                  <Palette width={18} height={18} />
                 </button>
                 
                 <div className="relative admin-menu-container">
@@ -942,7 +942,7 @@ const GOB = () => {
                     className="w-10 h-10 bg-gray-800/50 backdrop-blur-md hover:bg-gray-700/50 text-white rounded-xl transition-all flex items-center justify-center border border-gray-700/50 shadow-lg"
                     title="Administration"
                   >
-                    <Settings size={18} />
+                    <Settings width={18} height={18} />
                   </button>
                   
                   {showAdminMenu && (
@@ -955,7 +955,7 @@ const GOB = () => {
                           }}
                           className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl transition-all shadow-lg shadow-green-500/30 flex items-center space-x-2 text-sm font-semibold active:scale-95"
                         >
-                          <List size={18} />
+                          <List width={18} height={18} />
                           <span>Gérer les apps</span>
                         </button>
                         <button
@@ -965,11 +965,11 @@ const GOB = () => {
                           }}
                           className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all shadow-lg shadow-blue-500/30 flex items-center space-x-2 text-sm font-semibold active:scale-95"
                         >
-                          <Download size={18} />
+                          <Download width={18} height={18} />
                           <span>Exporter</span>
                         </button>
                         <label className="w-full px-4 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-xl transition-all shadow-lg shadow-gray-500/30 flex items-center space-x-2 cursor-pointer text-sm font-semibold block active:scale-95">
-                          <Upload size={18} />
+                          <Upload width={18} height={18} />
                           <span>Importer</span>
                           <input 
                             type="file" 
@@ -999,7 +999,7 @@ const GOB = () => {
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>
             {isProfessionalMode ? (
-              <Smartphone size={20} className="text-green-500" />
+              <Phone width={20} height={20} className="text-green-500" />
             ) : (
               <span>📱</span>
             )}
@@ -1071,7 +1071,7 @@ const GOB = () => {
                   ? 'bg-gradient-to-br from-gray-700/70 to-gray-800/50 border-gray-600/60 hover:border-green-400/60' 
                   : 'bg-gradient-to-br from-gray-200/70 to-gray-300/50 border-gray-400/60 hover:border-blue-400/60'
               }`}>
-                <Plus size={28} className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} />
+                <Plus width={28} height={28} className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} />
               </div>
               <p className={`text-[10px] font-semibold mt-2 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -1094,7 +1094,7 @@ const GOB = () => {
                 }`
           }`}
         >
-          {isEditing ? <Check size={28} /> : <Edit3 size={24} />}
+          {isEditing ? <Check width={28} height={28} /> : <EditPencil width={24} height={24} />}
         </button>
       </div>
 
@@ -1162,7 +1162,7 @@ const GOB = () => {
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
-                    {isProfessionalMode ? <Briefcase size={16} /> : <span>😀</span>}
+                    {isProfessionalMode ? <Bag width={16} height={16} /> : <span>😀</span>}
                     <span>{isProfessionalMode ? 'Icône' : 'Emoji'}</span>
                   </button>
                   <button
@@ -1174,7 +1174,7 @@ const GOB = () => {
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
-                    {isProfessionalMode ? <Globe size={16} /> : <span>🔗</span>}
+                    {isProfessionalMode ? <Globe width={16} height={16} /> : <span>🔗</span>}
                     <span>URL</span>
                   </button>
                 </div>
@@ -1230,13 +1230,13 @@ const GOB = () => {
                 onClick={handleSave}
                 className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-2xl font-semibold transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center active:scale-95"
               >
-                <Check size={20} />
+                <Check width={20} height={20} />
               </button>
               <button
                 onClick={() => setShowModal(false)}
                 className="flex-1 px-4 py-3 bg-slate-200/80 hover:bg-slate-300/80 text-slate-700 rounded-2xl font-semibold transition-all backdrop-blur-xl flex items-center justify-center active:scale-95"
               >
-                <X size={20} />
+                <Xmark width={20} height={20} />
               </button>
             </div>
           </div>
@@ -1265,10 +1265,10 @@ const GOB = () => {
                 }}
                 className="w-10 h-10 bg-slate-100/80 hover:bg-slate-200/80 backdrop-blur-xl rounded-full flex items-center justify-center transition-all active:scale-95"
               >
-                <X size={20} />
+                <Xmark width={20} height={20} />
               </button>
             </div>
-            
+
             <div className="overflow-y-auto p-6 flex-1">
               {apps.length === 0 ? (
                 <div className="text-center py-12 text-slate-500">
@@ -1294,7 +1294,7 @@ const GOB = () => {
                         onClick={handleShowDeleteConfirm}
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center space-x-2"
                       >
-                        <Trash2 size={16} />
+                        <Trash width={16} height={16} />
                         <span>Supprimer ({selectedApps.size})</span>
                       </button>
                     )}
@@ -1318,7 +1318,7 @@ const GOB = () => {
                           onClick={handleConfirmDelete}
                           className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
                         >
-                          <Trash2 size={18} />
+                          <Trash width={18} height={18} />
                           <span>Oui, supprimer</span>
                         </button>
                         <button
@@ -1368,7 +1368,7 @@ const GOB = () => {
                           }}
                           className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-1"
                         >
-                          <Edit3 size={16} />
+                          <EditPencil width={16} height={16} />
                         </button>
                       </div>
                     ))}
@@ -1387,7 +1387,7 @@ const GOB = () => {
                 }}
                 className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-2xl font-semibold transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center space-x-2 active:scale-95"
               >
-                <Plus size={20} />
+                <Plus width={20} height={20} />
                 <span>Ajouter une application</span>
               </button>
             </div>
@@ -1407,10 +1407,10 @@ const GOB = () => {
                 onClick={() => setShowThemeModal(false)}
                 className="w-10 h-10 bg-slate-100/80 hover:bg-slate-200/80 backdrop-blur-xl rounded-full flex items-center justify-center transition-all active:scale-95"
               >
-                <X size={20} />
+                <Xmark width={20} height={20} />
               </button>
             </div>
-            
+
             <div className="overflow-y-auto p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {themes.map(theme => (
