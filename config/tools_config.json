@@ -1,11 +1,34 @@
 {
   "tools": [
     {
-      "id": "polygon-stock-price",
-      "name": "Polygon Stock Price",
-      "description": "Récupère les prix en temps réel des actions via Polygon.io",
+      "id": "fmp-quote",
+      "name": "FMP Stock Quote",
+      "description": "Prix et quotes en temps réel via FMP (300 calls/min, plan Starter)",
       "category": "financial_data",
       "priority": 1,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action (ex: AAPL, GOOGL)"
+        }
+      },
+      "implementation": {
+        "file": "fmp-quote-tool.js",
+        "endpoint": "/api/fmp?endpoint=quote&symbol={ticker}",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": ["polygon-stock-price", "yahoo-finance"],
+      "usage_context": ["price", "quote", "stock", "ticker", "prix", "cours"],
+      "keywords": ["price", "quote", "stock", "ticker", "prix", "cours", "real-time", "temps réel", "cotation"]
+    },
+    {
+      "id": "polygon-stock-price",
+      "name": "Polygon Stock Price",
+      "description": "Récupère les prix en temps réel des actions via Polygon.io (fallback)",
+      "category": "financial_data",
+      "priority": 2,
       "enabled": true,
       "parameters": {
         "ticker": {
@@ -28,7 +51,7 @@
       "name": "FMP Fundamentals",
       "description": "Données fondamentales des entreprises via Financial Modeling Prep",
       "category": "financial_data",
-      "priority": 2,
+      "priority": 3,
       "enabled": true,
       "parameters": {
         "ticker": {
@@ -39,7 +62,7 @@
       },
       "implementation": {
         "file": "fmp-fundamentals-tool.js",
-        "endpoint": "https://financialmodelingprep.com/api/v3/profile/{ticker}",
+        "endpoint": "/api/fmp?endpoint=profile&symbol={ticker}",
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": ["alpha-vantage-ratios"],
@@ -47,11 +70,103 @@
       "keywords": ["fundamentals", "company", "profile", "fundamentaux", "entreprise", "financials", "financier"]
     },
     {
+      "id": "fmp-ratios",
+      "name": "FMP Financial Ratios",
+      "description": "Ratios financiers complets (P/E, P/B, ROE, ROA, Debt/Equity, Current Ratio) - Plan Starter",
+      "category": "financial_data",
+      "priority": 4,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        }
+      },
+      "implementation": {
+        "file": "fmp-ratios-tool.js",
+        "endpoint": "/api/fmp?endpoint=ratios&symbol={ticker}",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": ["alpha-vantage-ratios"],
+      "usage_context": ["ratios", "financial", "metrics", "ratios", "financier", "métriques", "valuation"],
+      "keywords": ["ratios", "pe", "pb", "roe", "roa", "debt", "equity", "current ratio", "valorisation", "valuation"]
+    },
+    {
+      "id": "fmp-key-metrics",
+      "name": "FMP Key Metrics",
+      "description": "Métriques clés d'entreprise (Revenue, Net Income, EPS, Free Cash Flow, Market Cap) - Plan Starter",
+      "category": "financial_data",
+      "priority": 5,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        }
+      },
+      "implementation": {
+        "file": "fmp-key-metrics-tool.js",
+        "endpoint": "/api/fmp?endpoint=key-metrics&symbol={ticker}",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": ["fmp-fundamentals"],
+      "usage_context": ["metrics", "revenue", "earnings", "cash flow", "market cap", "métriques", "revenus", "bénéfices"],
+      "keywords": ["metrics", "revenue", "earnings", "eps", "cash flow", "market cap", "métriques", "revenus", "bénéfices"]
+    },
+    {
+      "id": "fmp-ratings",
+      "name": "FMP Company Ratings",
+      "description": "Notes et consensus d'entreprise (FMP ratings snapshot) - Plan Starter",
+      "category": "analyst_data",
+      "priority": 6,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        }
+      },
+      "implementation": {
+        "file": "fmp-ratings-tool.js",
+        "endpoint": "/api/fmp?endpoint=ratings&symbol={ticker}",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": [],
+      "usage_context": ["ratings", "grade", "consensus", "note", "évaluation"],
+      "keywords": ["ratings", "grade", "consensus", "note", "évaluation", "recommendation"]
+    },
+    {
+      "id": "fmp-ticker-news",
+      "name": "FMP Ticker News",
+      "description": "Actualités spécifiques à un ticker via FMP - Plan Starter",
+      "category": "news",
+      "priority": 7,
+      "enabled": true,
+      "parameters": {
+        "ticker": {
+          "type": "string",
+          "required": true,
+          "description": "Symbole de l'action"
+        }
+      },
+      "implementation": {
+        "file": "fmp-ticker-news-tool.js",
+        "endpoint": "/api/fmp?endpoint=ticker-news&symbols={ticker}",
+        "api_key_env": "FMP_API_KEY"
+      },
+      "fallback_tools": ["finnhub-news"],
+      "usage_context": ["news", "actualités", "ticker news", "company news", "nouvelles entreprise"],
+      "keywords": ["news", "actualités", "ticker", "company", "entreprise", "nouvelles", "information"]
+    },
+    {
       "id": "calculator",
       "name": "Financial Calculator",
       "description": "Calculs financiers (ratios, valorisation, métriques)",
       "category": "calculation",
-      "priority": 3,
+      "priority": 8,
       "enabled": true,
       "parameters": {
         "operation": {
@@ -78,7 +193,7 @@
       "name": "Twelve Data Technical",
       "description": "Indicateurs techniques et analyses via Twelve Data",
       "category": "technical_analysis",
-      "priority": 4,
+      "priority": 9,
       "enabled": true,
       "parameters": {
         "ticker": {
@@ -104,9 +219,9 @@
     {
       "id": "alpha-vantage-ratios",
       "name": "Alpha Vantage Ratios",
-      "description": "Ratios financiers avancés via Alpha Vantage",
+      "description": "Ratios financiers avancés via Alpha Vantage (fallback)",
       "category": "financial_data",
-      "priority": 5,
+      "priority": 10,
       "enabled": true,
       "parameters": {
         "ticker": {
@@ -127,9 +242,9 @@
     {
       "id": "finnhub-news",
       "name": "Finnhub News",
-      "description": "Actualités financières en temps réel via Finnhub",
+      "description": "Actualités financières en temps réel via Finnhub (fallback)",
       "category": "news",
-      "priority": 6,
+      "priority": 11,
       "enabled": true,
       "parameters": {
         "ticker": {
@@ -152,7 +267,7 @@
       "name": "Supabase Watchlist",
       "description": "Lecture de la watchlist Dan depuis Supabase",
       "category": "data_source",
-      "priority": 7,
+      "priority": 12,
       "enabled": true,
       "parameters": {},
       "implementation": {
@@ -169,7 +284,7 @@
       "name": "Team Tickers",
       "description": "Lecture des tickers d'équipe depuis Supabase",
       "category": "data_source",
-      "priority": 8,
+      "priority": 13,
       "enabled": true,
       "parameters": {},
       "implementation": {
@@ -184,9 +299,9 @@
     {
       "id": "economic-calendar",
       "name": "Economic Calendar",
-      "description": "Calendrier économique et événements macro",
+      "description": "Calendrier économique et événements macro (FMP Starter)",
       "category": "macro_data",
-      "priority": 9,
+      "priority": 14,
       "enabled": true,
       "parameters": {
         "date": {
@@ -197,7 +312,7 @@
       },
       "implementation": {
         "file": "economic-calendar-tool.js",
-        "endpoint": "https://financialmodelingprep.com/api/v3/economic_calendar",
+        "endpoint": "/api/fmp?endpoint=economic-calendar",
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": [],
@@ -207,9 +322,9 @@
     {
       "id": "earnings-calendar",
       "name": "Earnings Calendar",
-      "description": "Calendrier des résultats d'entreprises",
+      "description": "Calendrier des résultats d'entreprises (FMP Starter)",
       "category": "earnings",
-      "priority": 10,
+      "priority": 15,
       "enabled": true,
       "parameters": {
         "date": {
@@ -220,7 +335,7 @@
       },
       "implementation": {
         "file": "earnings-calendar-tool.js",
-        "endpoint": "https://financialmodelingprep.com/api/v3/earning_calendar",
+        "endpoint": "/api/fmp?endpoint=earnings-calendar",
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": [],
@@ -230,9 +345,9 @@
     {
       "id": "analyst-recommendations",
       "name": "Analyst Recommendations",
-      "description": "Recommandations d'analystes financiers",
+      "description": "Recommandations d'analystes financiers (FMP Starter)",
       "category": "analyst_data",
-      "priority": 11,
+      "priority": 16,
       "enabled": true,
       "parameters": {
         "ticker": {
@@ -243,7 +358,7 @@
       },
       "implementation": {
         "file": "analyst-recommendations-tool.js",
-        "endpoint": "https://financialmodelingprep.com/api/v3/grade/{ticker}",
+        "endpoint": "/api/fmp?endpoint=ratings&symbol={ticker}",
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": [],
@@ -255,7 +370,7 @@
       "name": "Yahoo Finance",
       "description": "Données Yahoo Finance (fallback général)",
       "category": "financial_data",
-      "priority": 12,
+      "priority": 17,
       "enabled": true,
       "parameters": {
         "ticker": {

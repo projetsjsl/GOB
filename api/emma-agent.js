@@ -82,16 +82,23 @@ class SmartAgent {
 
             // Mapping des IDs techniques vers des noms lisibles
             const nameMapping = {
+                'fmp-quote': 'Prix actions (FMP)',
                 'polygon-stock-price': 'Prix actions (Polygon)',
                 'fmp-fundamentals': 'Données fondamentales (FMP)',
+                'fmp-ratios': 'Ratios financiers (FMP)',
+                'fmp-key-metrics': 'Métriques clés (FMP)',
+                'fmp-ratings': 'Ratings entreprises (FMP)',
+                'fmp-ticker-news': 'Actualités ticker (FMP)',
                 'finnhub-news': 'Actualités (Finnhub)',
                 'twelve-data-technical': 'Indicateurs techniques',
-                'alpha-vantage-ratios': 'Ratios financiers',
+                'alpha-vantage-ratios': 'Ratios financiers (Alpha Vantage)',
                 'yahoo-finance': 'Yahoo Finance',
                 'supabase-watchlist': 'Watchlist',
-                'economic-calendar': 'Calendrier économique',
-                'earnings-calendar': 'Calendrier résultats',
-                'analyst-recommendations': 'Recommandations analystes'
+                'team-tickers': 'Tickers équipe',
+                'economic-calendar': 'Calendrier économique (FMP)',
+                'earnings-calendar': 'Calendrier résultats (FMP)',
+                'analyst-recommendations': 'Recommandations analystes (FMP)',
+                'calculator': 'Calculatrice financière'
             };
 
             const unavailableSources = failedToolsData.map(toolData => {
