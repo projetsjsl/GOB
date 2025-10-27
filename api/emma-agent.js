@@ -10,12 +10,14 @@
 
 import fs from 'fs';
 import path from 'path';
+import { HybridIntentAnalyzer } from '../lib/intent-analyzer.js';
 
 class SmartAgent {
     constructor() {
         this.toolsConfig = this._loadToolsConfig();
         this.usageStats = this._loadUsageStats();
         this.conversationHistory = [];
+        this.intentAnalyzer = new HybridIntentAnalyzer();
     }
 
     /**
@@ -50,8 +52,17 @@ class SmartAgent {
             console.log('⚡ Tool execution completed');
 
             // 3. Génération de la réponse finale
-            const finalResponse = await this._generate_response(userMessage, toolResults, context, intentData);
+            const responseData = await this._generate_response(userMessage, toolResults, context, intentData);
             console.log('✨ Final response generated');
+
+            // Extraire réponse et validation si objet retourné
+            let finalResponse = responseData;
+            let dataValidation = null;
+
+            if (typeof responseData === 'object' && responseData.response) {
+                finalResponse = responseData.response;
+                dataValidation = responseData.validation;
+            }
 
             // 4. Mise à jour de l'historique
             this._updateConversationHistory(userMessage, finalResponse, toolResults);
@@ -88,6 +99,11 @@ class SmartAgent {
                 return `${readableName} (${toolData.error})`;
             });
 
+            // Calculer score de confiance global
+            const intentConfidence = intentData?.confidence || 0.7;
+            const dataConfidence = dataValidation?.confidence || 0.7;
+            const globalConfidence = (intentConfidence + dataConfidence) / 2;
+
             return {
                 success: true,
                 response: finalResponse,
@@ -95,11 +111,15 @@ class SmartAgent {
                 failed_tools: failedTools,
                 unavailable_sources: unavailableSources,
                 intent: intentData ? intentData.intent : 'unknown',
-                confidence: intentData ? intentData.confidence : null,
+                confidence: globalConfidence, // Score de confiance global (0-1)
+                intent_confidence: intentConfidence,
+                data_confidence: dataConfidence,
+                has_sources: dataValidation?.passed || false,
+                source_types: dataValidation?.source_types_found || 0,
                 output_mode: context.output_mode || 'chat',
                 execution_time_ms: Date.now() - (context.start_time || Date.now()),
                 conversation_length: this.conversationHistory.length,
-                is_reliable: toolResults.every(r => r.is_reliable)
+                is_reliable: toolResults.every(r => r.is_reliable) && (dataValidation?.passed !== false)
             };
 
         } catch (error) {
@@ -115,117 +135,17 @@ class SmartAgent {
 
     /**
      * COGNITIVE SCAFFOLDING LAYER
-     * Analyse d'intention avec Perplexity pour comprendre la demande
+     * Analyse d'intention HYBRIDE (local + LLM) pour optimiser performances et coûts
      */
     async _analyzeIntent(userMessage, context) {
         try {
-            console.log('🧠 Starting intent analysis...');
+            console.log('🧠 Starting HYBRID intent analysis...');
 
-            // Construire le prompt d'analyse d'intention
-            const intentPrompt = `Analyse cette demande utilisateur et extrais les informations suivantes en JSON strict:
+            // Utiliser le HybridIntentAnalyzer
+            const intentData = await this.intentAnalyzer.analyze(userMessage, context);
 
-DEMANDE: "${userMessage}"
-
-CONTEXTE DISPONIBLE:
-- Tickers d'équipe: ${context.tickers?.join(', ') || 'aucun'}
-- Données en cache: ${Object.keys(context.stockData || {}).join(', ') || 'aucunes'}
-
-COMPANY NAME TO TICKER MAPPING (OBLIGATOIRE):
-Apple → AAPL
-Microsoft → MSFT
-Google/Alphabet → GOOGL
-Amazon → AMZN
-Tesla → TSLA
-Meta/Facebook → META
-Nvidia → NVDA
-AMD → AMD
-Intel → INTC
-Netflix → NFLX
-Disney → DIS
-Coca-Cola → KO
-McDonald's → MCD
-Nike → NKE
-Visa → V
-
-⚠️ CRITIQUE: Utilise UNIQUEMENT ce mapping. Si "Apple" est mentionné, le ticker DOIT être "AAPL", jamais GOOGL!
-
-OUTILS DISPONIBLES:
-- polygon-stock-price: Prix actions temps réel
-- fmp-fundamentals: Données fondamentales (PE, revenus, marges)
-- calculator: Calculs financiers (ratios, moyennes)
-- twelve-data-technical: Indicateurs techniques (RSI, MACD, SMA)
-- alpha-vantage-ratios: Ratios financiers avancés
-- finnhub-news: Actualités financières
-- supabase-watchlist: Watchlist Dan
-- team-tickers: Tickers de l'équipe
-- economic-calendar: Calendrier économique
-- earnings-calendar: Calendrier des résultats
-- analyst-recommendations: Recommandations d'analystes
-- yahoo-finance: Fallback général
-
-INSTRUCTIONS:
-1. Détermine l'INTENTION principale: stock_price, fundamentals, technical_analysis, news, portfolio_analysis, market_overview, calculation, comparative_analysis, comprehensive_analysis
-2. Extrais les TICKERS mentionnés en utilisant STRICTEMENT le COMPANY NAME TO TICKER MAPPING ci-dessus
-3. Détermine les OUTILS NÉCESSAIRES (1-5 outils max, par ordre de pertinence)
-4. DEFAULT TO ACTION: Seulement demander clarification si VRAIMENT ambigu (confidence < 0.3 ET aucun ticker identifié)
-5. Extrais PARAMÈTRES ADDITIONNELS (dates, périodes, types d'analyse)
-
-⚠️ RÈGLE CRITIQUE - DEFAULT TO ACTION:
-- "analyse [ticker]" → confidence HIGH (0.9+), intent: comprehensive_analysis, needs_clarification: false
-- "prix [ticker]" → confidence HIGH (0.95+), intent: stock_price, needs_clarification: false
-- "[ticker]" seul → confidence MEDIUM (0.7+), intent: stock_price + news, needs_clarification: false
-- SEULEMENT clarifier si: (1) aucun ticker ET (2) intention vraiment floue ET (3) confidence < 0.3
-
-EXEMPLES DE MAPPING CORRECT:
-- "analyse msft" → tickers: ["MSFT"], intent: "comprehensive_analysis", confidence: 0.95, needs_clarification: false
-- "Prix d'Apple" → tickers: ["AAPL"], intent: "stock_price", confidence: 0.95, needs_clarification: false
-- "Analyse Microsoft et Google" → tickers: ["MSFT", "GOOGL"], intent: "comparative_analysis", confidence: 0.9, needs_clarification: false
-- "Tesla vs Nvidia" → tickers: ["TSLA", "NVDA"], intent: "comparative_analysis", confidence: 0.9, needs_clarification: false
-- "AAPL" seul → tickers: ["AAPL"], intent: "stock_price", confidence: 0.7, needs_clarification: false
-
-RÉPONDS EN JSON UNIQUEMENT (pas de texte avant ou après):
-
-EXEMPLE 1 - Analyse complète:
-{
-  "intent": "comprehensive_analysis",
-  "confidence": 0.95,
-  "tickers": ["MSFT"],
-  "suggested_tools": ["fmp-fundamentals", "polygon-stock-price", "finnhub-news", "twelve-data-technical", "analyst-recommendations"],
-  "parameters": {
-    "analysis_type": "comprehensive"
-  },
-  "needs_clarification": false,
-  "clarification_questions": [],
-  "user_intent_summary": "L'utilisateur veut une analyse complète de Microsoft (fondamentaux, techniques, actualités)"
-}
-
-EXEMPLE 2 - Prix simple:
-{
-  "intent": "stock_price",
-  "confidence": 0.95,
-  "tickers": ["AAPL"],
-  "suggested_tools": ["polygon-stock-price", "finnhub-news"],
-  "parameters": {
-    "timeframe": "realtime",
-    "analysis_type": "quick"
-  },
-  "needs_clarification": false,
-  "clarification_questions": [],
-  "user_intent_summary": "L'utilisateur veut le prix actuel d'Apple"
-}`;
-
-            // Appel Perplexity léger (sonar - rapide et économique)
-            const response = await this._call_perplexity_intent(intentPrompt);
-
-            // Parser le JSON (extraire le JSON de la réponse)
-            const jsonMatch = response.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) {
-                console.warn('⚠️ Intent analysis: No JSON found in response');
-                return null;
-            }
-
-            const intentData = JSON.parse(jsonMatch[0]);
             console.log('✅ Intent analyzed:', intentData);
+            console.log(`⚡ Method: ${intentData.analysis_method}, Time: ${intentData.execution_time_ms}ms`);
 
             return intentData;
 
@@ -236,32 +156,6 @@ EXEMPLE 2 - Prix simple:
         }
     }
 
-    /**
-     * Appel Perplexity optimisé pour l'analyse d'intention
-     * Utilise le modèle "sonar" (le plus rapide et économique)
-     */
-    async _call_perplexity_intent(prompt) {
-        const response = await fetch('https://api.perplexity.ai/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'sonar',  // Modèle le plus rapide (pas online search)
-                messages: [{ role: 'user', content: prompt }],
-                max_tokens: 500,  // Court pour intent analysis
-                temperature: 0.1  // Très déterministe pour extraire JSON
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Perplexity intent API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
-    }
 
     /**
      * Gère les clarifications quand l'intention est ambiguë
@@ -297,6 +191,87 @@ EXEMPLE 2 - Prix simple:
             confidence: intentData.confidence,
             tools_used: [],
             is_reliable: true
+        };
+    }
+
+    /**
+     * SMART ROUTER - Sélectionne le meilleur modèle selon le type de requête
+     *
+     * Stratégie optimisée coût/performance:
+     * - Perplexity (80%): Données factuelles avec sources (stock prices, news, fundamentals)
+     * - Gemini (15%): Questions conceptuelles/éducatives (gratuit)
+     * - Claude (5%): Rédaction premium (briefings, lettres clients)
+     */
+    _selectModel(intentData, outputMode, toolsData) {
+        console.log('🎯 SmartRouter: Selecting optimal model...');
+
+        // BRIEFING MODE: Toujours Claude pour qualité premium
+        if (outputMode === 'briefing') {
+            console.log('📝 Briefing detected → Using CLAUDE (premium writing)');
+            return {
+                model: 'claude',
+                reason: 'Briefing requires premium writing quality',
+                recency: intentData?.recency_filter || 'month'
+            };
+        }
+
+        // DATA MODE: Perplexity pour extraire données structurées
+        if (outputMode === 'data') {
+            console.log('📊 Data extraction → Using PERPLEXITY (structured data)');
+            return {
+                model: 'perplexity',
+                reason: 'Data extraction requires factual accuracy',
+                recency: intentData?.recency_filter || 'month'
+            };
+        }
+
+        // CHAT MODE: Router intelligemment selon l'intention
+        const intent = intentData?.intent || 'unknown';
+        const hasTickers = intentData?.tickers && intentData.tickers.length > 0;
+        const hasToolData = toolsData && toolsData.length > 0;
+
+        // PERPLEXITY: Requêtes factuelles avec sources
+        const factualIntents = [
+            'stock_price',
+            'fundamentals',
+            'news',
+            'comprehensive_analysis',
+            'comparative_analysis',
+            'earnings',
+            'market_overview',
+            'recommendation'
+        ];
+
+        if (factualIntents.includes(intent) || hasTickers || hasToolData) {
+            console.log(`💎 Factual query (${intent}) → Using PERPLEXITY (with sources)`);
+            return {
+                model: 'perplexity',
+                reason: `Factual data required for ${intent}`,
+                recency: intentData?.recency_filter || 'day'
+            };
+        }
+
+        // GEMINI: Questions conceptuelles/éducatives (gratuit)
+        const conceptualIntents = [
+            'portfolio',
+            'technical_analysis' // Si pas de ticker spécifique = explication théorique
+        ];
+
+        if (conceptualIntents.includes(intent) && !hasTickers) {
+            console.log(`💭 Conceptual query (${intent}) → Using GEMINI (free, educational)`);
+            return {
+                model: 'gemini',
+                reason: `Educational/conceptual question about ${intent}`,
+                recency: null // Pas de recency pour conceptuel
+            };
+        }
+
+        // DEFAULT: Perplexity pour sécurité
+        console.log('🔄 Default fallback → Using PERPLEXITY');
+        return {
+            model: 'perplexity',
+            reason: 'Default fallback for reliability',
+            recency: 'month'
         };
     }
 
@@ -686,14 +661,14 @@ EXEMPLE 2 - Prix simple:
     }
 
     /**
-     * Génération de la réponse finale avec Perplexity (avec post-traitement selon mode)
+     * Génération de la réponse finale avec SMART ROUTING (Perplexity/Gemini/Claude)
      */
     async _generate_response(userMessage, toolResults, context, intentData = null) {
         try {
             const outputMode = context.output_mode || 'chat';
             console.log(`🎯 Generating response for mode: ${outputMode}`);
 
-            // Préparation du contexte pour Perplexity
+            // Préparation du contexte
             // IMPORTANT: Inclure TOUS les outils qui ont retourné des données, même si is_reliable: false
             // Emma doit voir les données pour pouvoir les analyser et en parler
             const toolsData = toolResults
@@ -707,7 +682,12 @@ EXEMPLE 2 - Prix simple:
 
             const conversationContext = this.conversationHistory.slice(-5); // 5 derniers échanges
 
-            const perplexityPrompt = this._buildPerplexityPrompt(
+            // 🎯 SMART ROUTER: Sélectionner le meilleur modèle
+            const modelSelection = this._selectModel(intentData, outputMode, toolsData);
+            console.log(`🤖 Selected model: ${modelSelection.model} (${modelSelection.reason})`);
+
+            // Construire le prompt approprié
+            const prompt = this._buildPerplexityPrompt(
                 userMessage,
                 toolsData,
                 conversationContext,
@@ -715,26 +695,126 @@ EXEMPLE 2 - Prix simple:
                 intentData
             );
 
-            // Appel à Perplexity
-            let perplexityResponse = await this._call_perplexity(perplexityPrompt, outputMode);
+            let response;
+
+            // Router vers le bon modèle
+            if (modelSelection.model === 'claude') {
+                // CLAUDE: Briefings premium
+                response = await this._call_claude(prompt, outputMode);
+            } else if (modelSelection.model === 'gemini') {
+                // GEMINI: Questions conceptuelles (gratuit)
+                response = await this._call_gemini(prompt, outputMode);
+            } else {
+                // PERPLEXITY: Données factuelles avec sources (default)
+                response = await this._call_perplexity(prompt, outputMode, modelSelection.recency);
+            }
 
             // Post-traitement selon le mode
             if (outputMode === 'data') {
                 // Valider et parser le JSON
-                perplexityResponse = this._validateAndParseJSON(perplexityResponse);
+                response = this._validateAndParseJSON(response);
             } else if (outputMode === 'briefing') {
                 // Nettoyer le Markdown (enlever éventuels artifacts)
-                perplexityResponse = this._cleanMarkdown(perplexityResponse);
+                response = this._cleanMarkdown(response);
             }
 
-            return perplexityResponse;
+            // 🛡️ FRESH DATA GUARD: Valider que les données factuelles ont des sources
+            let validation = null;
+            if (outputMode === 'chat' && modelSelection.model === 'perplexity') {
+                validation = this._validateFreshData(response, intentData);
+                console.log(`🛡️ FreshDataGuard: Confidence ${(validation.confidence * 100).toFixed(0)}%, Sources: ${validation.source_types_found}`);
+
+                if (!validation.passed) {
+                    console.warn('⚠️ FreshDataGuard: Response lacks sources, retrying...');
+                    // Retry avec prompt renforcé
+                    const reinforcedPrompt = `${prompt}\n\n⚠️ CRITICAL: You MUST include sources for all factual claims. Do not provide generic answers without sources.`;
+                    response = await this._call_perplexity(reinforcedPrompt, outputMode, modelSelection.recency);
+                    // Re-valider
+                    validation = this._validateFreshData(response, intentData);
+                    console.log(`🛡️ FreshDataGuard (retry): Confidence ${(validation.confidence * 100).toFixed(0)}%, Sources: ${validation.source_types_found}`);
+                }
+            }
+
+            // Retourner réponse avec validation (pour scoring de confiance)
+            return {
+                response,
+                validation
+            };
 
         } catch (error) {
             console.error('❌ Response generation failed:', error);
 
             // Réponse de fallback basée sur les données des outils
-            return this._generateFallbackResponse(userMessage, toolResults, context.output_mode);
+            const fallbackResponse = this._generateFallbackResponse(userMessage, toolResults, context.output_mode);
+            return {
+                response: fallbackResponse,
+                validation: { passed: false, confidence: 0.3, reason: 'Fallback response' }
+            };
         }
+    }
+
+    /**
+     * 🛡️ FRESH DATA GUARD - Valide la présence de sources pour données factuelles
+     * Garantit la fiabilité et la transparence des réponses d'Emma
+     */
+    _validateFreshData(response, intentData) {
+        // Intents qui NÉCESSITENT des sources
+        const needsSourcesIntents = [
+            'stock_price',
+            'fundamentals',
+            'news',
+            'comprehensive_analysis',
+            'comparative_analysis',
+            'earnings',
+            'market_overview',
+            'recommendation'
+        ];
+
+        const intent = intentData?.intent || 'unknown';
+
+        // Si intent ne nécessite pas de sources, passer
+        if (!needsSourcesIntents.includes(intent)) {
+            return {
+                passed: true,
+                confidence: 0.7,
+                reason: 'Intent does not require sources'
+            };
+        }
+
+        // Vérifier la présence de sources dans la réponse
+        const hasSourcePatterns = [
+            /\[SOURCE:/i,
+            /\[CHART:/i,
+            /\[TABLE:/i,
+            /\(https?:\/\//i, // URLs
+            /Bloomberg|Reuters|La Presse|BNN|CNBC|Financial Times|Wall Street Journal/i,
+            /Données de marché:|Sources:/i
+        ];
+
+        const hasSources = hasSourcePatterns.some(pattern => pattern.test(response));
+
+        // Calculer score de confiance
+        let confidence = 0.5; // Base
+
+        if (hasSources) {
+            confidence = 0.9; // Haute confiance si sources présentes
+
+            // Bonus: Plusieurs types de sources
+            const sourceTypeCount = hasSourcePatterns.filter(pattern => pattern.test(response)).length;
+            if (sourceTypeCount >= 3) confidence = 0.95;
+            if (sourceTypeCount >= 5) confidence = 0.98;
+        }
+
+        // Vérifier dates récentes (bonus confiance)
+        const hasRecentDate = /202[4-5]|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre/i.test(response);
+        if (hasRecentDate) confidence += 0.02;
+
+        return {
+            passed: hasSources,
+            confidence: Math.min(1.0, confidence),
+            reason: hasSources ? 'Sources verified' : 'Missing sources for factual data',
+            source_types_found: hasSourcePatterns.filter(pattern => pattern.test(response)).length
+        };
     }
 
     /**
@@ -1054,9 +1134,9 @@ RÉPONSE MARKDOWN ENRICHIE:`;
     }
 
     /**
-     * Appel à l'API Perplexity
+     * Appel à l'API Perplexity (avec recency filter)
      */
-    async _call_perplexity(prompt, outputMode = 'chat') {
+    async _call_perplexity(prompt, outputMode = 'chat', recency = 'month') {
         try {
             // Ajuster max_tokens selon le mode
             let maxTokens = 1000;  // Default pour chat
@@ -1066,27 +1146,35 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 maxTokens = 500;  // JSON structuré: court
             }
 
+            const requestBody = {
+                model: 'sonar-pro',  // Modèle actuel Perplexity (puissant et rapide)
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Tu es Emma, une assistante financière experte. Réponds toujours en français de manière professionnelle et accessible.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: maxTokens,
+                temperature: outputMode === 'briefing' ? 0.5 : 0.7  // Plus déterministe pour briefings
+            };
+
+            // Ajouter recency filter si disponible
+            if (recency) {
+                requestBody.search_recency_filter = recency; // hour, day, week, month, year
+                console.log(`🕐 Using recency filter: ${recency}`);
+            }
+
             const response = await fetch('https://api.perplexity.ai/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    model: 'sonar-pro',  // Modèle actuel Perplexity (puissant et rapide)
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'Tu es Emma, une assistante financière experte. Réponds toujours en français de manière professionnelle et accessible.'
-                        },
-                        {
-                            role: 'user',
-                            content: prompt
-                        }
-                    ],
-                    max_tokens: maxTokens,
-                    temperature: outputMode === 'briefing' ? 0.5 : 0.7  // Plus déterministe pour briefings
-                })
+                body: JSON.stringify(requestBody)
             });
 
             if (!response.ok) {
@@ -1101,6 +1189,100 @@ RÉPONSE MARKDOWN ENRICHIE:`;
         } catch (error) {
             console.error('❌ Perplexity API error:', error);
             throw new Error(`Erreur de communication avec Perplexity: ${error.message}`);
+        }
+    }
+
+    /**
+     * Appel à Gemini (gratuit) pour questions conceptuelles
+     */
+    async _call_gemini(prompt, outputMode = 'chat') {
+        try {
+            if (!process.env.GEMINI_API_KEY) {
+                throw new Error('GEMINI_API_KEY not configured');
+            }
+
+            const maxTokens = outputMode === 'data' ? 500 : 1000;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: maxTokens,
+                        candidateCount: 1
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+            }
+
+            const data = await response.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+            if (!text) {
+                throw new Error('No response from Gemini');
+            }
+
+            return text;
+
+        } catch (error) {
+            console.error('❌ Gemini API error:', error);
+            throw new Error(`Erreur de communication avec Gemini: ${error.message}`);
+        }
+    }
+
+    /**
+     * Appel à Claude (premium) pour briefings et rédaction
+     */
+    async _call_claude(prompt, outputMode = 'briefing') {
+        try {
+            if (!process.env.ANTHROPIC_API_KEY) {
+                throw new Error('ANTHROPIC_API_KEY not configured');
+            }
+
+            const maxTokens = outputMode === 'briefing' ? 4000 : 1000;
+
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: {
+                    'x-api-key': process.env.ANTHROPIC_API_KEY,
+                    'anthropic-version': '2023-06-01',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'claude-3-5-sonnet-20241022',
+                    max_tokens: maxTokens,
+                    temperature: 0.5, // Déterministe pour écriture professionnelle
+                    messages: [
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`Claude API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+            }
+
+            const data = await response.json();
+            return data.content[0].text;
+
+        } catch (error) {
+            console.error('❌ Claude API error:', error);
+            throw new Error(`Erreur de communication avec Claude: ${error.message}`);
         }
     }
 
