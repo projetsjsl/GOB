@@ -659,6 +659,50 @@ const fetchHybridData = async (symbol, dataType) => {
                 return { icon: 'Newspaper', color: 'text-gray-500' };
             };
 
+            // Fonction pour évaluer la crédibilité d'une source de nouvelles
+            const getSourceCredibility = (sourceName) => {
+                if (!sourceName) return 0;
+
+                const source = sourceName.toLowerCase();
+
+                // Tier 1: Sources premium (100-90)
+                const tier1 = ['bloomberg', 'reuters', 'wall street journal', 'wsj', 'financial times', 'ft'];
+                if (tier1.some(s => source.includes(s))) return 100;
+
+                // Tier 2: Sources institutionnelles (89-80)
+                const tier2 = ['cnbc', 'marketwatch', 'barron', 'forbes', 'economist', 'la presse', 'les affaires'];
+                if (tier2.some(s => source.includes(s))) return 85;
+
+                // Tier 3: Sources établies (79-70)
+                const tier3 = ['yahoo finance', 'seeking alpha', 'business insider', 'benzinga', 'investopedia'];
+                if (tier3.some(s => source.includes(s))) return 75;
+
+                // Tier 4: Agrégateurs et PR (69-60)
+                const tier4 = ['pr newswire', 'business wire', 'globe newswire', 'accesswire', 'fmp', 'finnhub'];
+                if (tier4.some(s => source.includes(s))) return 65;
+
+                // Tier 5: Sources inconnues (50)
+                return 50;
+            };
+
+            // Fonction pour trier les nouvelles par crédibilité puis par date
+            const sortNewsByCredibility = (newsArray) => {
+                return [...newsArray].sort((a, b) => {
+                    // 1. Trier par crédibilité de la source
+                    const credibilityA = getSourceCredibility(a.source?.name);
+                    const credibilityB = getSourceCredibility(b.source?.name);
+
+                    if (credibilityB !== credibilityA) {
+                        return credibilityB - credibilityA; // Descendant (plus crédible en premier)
+                    }
+
+                    // 2. Si même crédibilité, trier par date (plus récent en premier)
+                    const dateA = new Date(a.publishedAt || a.publishedDate || 0);
+                    const dateB = new Date(b.publishedAt || b.publishedDate || 0);
+                    return dateB - dateA;
+                });
+            };
+
             // Fonction pour extraire le logo depuis les données de scraping
             const getCompanyLogo = (ticker) => {
                 try {
@@ -915,9 +959,10 @@ const fetchHybridData = async (symbol, dataType) => {
                             }));
 
                             if (newsArticles.length > 0) {
-                                setNewsData(newsArticles);
-                                setFilteredNews(newsArticles);
-                                addLog(`✅ ${newsArticles.length} actualités chargées depuis FMP`, 'success');
+                                const sortedNews = sortNewsByCredibility(newsArticles);
+                                setNewsData(sortedNews);
+                                setFilteredNews(sortedNews);
+                                addLog(`✅ ${newsArticles.length} actualités chargées depuis FMP (triées par crédibilité)`, 'success');
                                 return;
                             }
                         }
@@ -949,9 +994,10 @@ const fetchHybridData = async (symbol, dataType) => {
                             }));
 
                             if (newsArticles.length > 0) {
-                                setNewsData(newsArticles);
-                                setFilteredNews(newsArticles);
-                                addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub`, 'success');
+                                const sortedNews = sortNewsByCredibility(newsArticles);
+                                setNewsData(sortedNews);
+                                setFilteredNews(sortedNews);
+                                addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub (triées par crédibilité)`, 'success');
                                 return;
                             }
                         }
@@ -978,9 +1024,10 @@ const fetchHybridData = async (symbol, dataType) => {
                             }));
 
                             if (newsArticles.length > 0) {
-                                setNewsData(newsArticles);
-                                setFilteredNews(newsArticles);
-                                addLog(`✅ ${newsArticles.length} actualités générales chargées`, 'success');
+                                const sortedNews = sortNewsByCredibility(newsArticles);
+                                setNewsData(sortedNews);
+                                setFilteredNews(sortedNews);
+                                addLog(`✅ ${newsArticles.length} actualités générales chargées (triées par crédibilité)`, 'success');
                                 return;
                             }
                         }
@@ -1389,13 +1436,15 @@ const fetchHybridData = async (symbol, dataType) => {
             const filterNews = (filterValue) => {
                 setNewsFilter(filterValue);
                 if (filterValue === 'all') {
+                    // newsData est déjà trié par crédibilité
                     setFilteredNews(newsData);
                 } else {
                     const filtered = newsData.filter(article => {
                         const text = (article.title + ' ' + article.description).toLowerCase();
                         return text.includes(filterValue.toLowerCase());
                     });
-                    setFilteredNews(filtered);
+                    // Maintenir le tri par crédibilité après filtrage
+                    setFilteredNews(sortNewsByCredibility(filtered));
                 }
             };
 
@@ -11885,11 +11934,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 (recommendation[0].buy + recommendation[0].strongBuy > recommendation[0].sell + recommendation[0].strongSell ? 'Achat' : 
                                                  recommendation[0].sell + recommendation[0].strongSell > recommendation[0].buy + recommendation[0].strongBuy ? 'Vente' : 'Neutre') : 'N/A';
                                             
-                                            // 2 actualités les plus récentes pour ce ticker
-                                            const tickerNews = newsData.filter(article => {
-                                                const text = (article.title + ' ' + article.description).toLowerCase();
-                                                return text.includes(ticker.toLowerCase());
-                                            }).slice(0, 2);
+                                            // 2 actualités les plus crédibles pour ce ticker
+                                            const tickerNews = sortNewsByCredibility(
+                                                newsData.filter(article => {
+                                                    const text = (article.title + ' ' + article.description).toLowerCase();
+                                                    return text.includes(ticker.toLowerCase());
+                                                })
+                                            ).slice(0, 2);
                                             
                                             // Analyse du sentiment
                                             const analyzeSentiment = (title, description) => {
