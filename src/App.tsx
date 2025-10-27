@@ -993,7 +993,7 @@ const GOB = () => {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 relative z-10 pb-32">
 
-        {/* Applications financières */}
+        {/* Applications financières - Optimisé avec icône Building pour mode professionnel */}
         <div className="mb-6">
           <h3 className={`text-base sm:text-lg font-semibold mb-4 flex items-center space-x-2 ${
             isDarkMode ? 'text-white' : 'text-gray-900'
