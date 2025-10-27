@@ -539,6 +539,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const [emmaPrefillMessage, setEmmaPrefillMessage] = useState('');
             const [tickerData, setTickerData] = useState([]);
             const [tabsVisitedThisSession, setTabsVisitedThisSession] = useState({});
+            const [showMoreTabsOverlay, setShowMoreTabsOverlay] = useState(false);
             const clickSoundRef = useRef(null);
             const tabSoundRef = useRef(null);
             const audioCtxRef = useRef(null);
@@ -17573,25 +17574,124 @@ console.log('✅ Données hybrides récupérées:', {
                                 onClick={() => {
                                     const moreTabs = tabs.slice(5);
                                     if (moreTabs.length > 0) {
-                                        const selection = prompt(
-                                            'Sélectionnez un onglet:\n' +
-                                            moreTabs.map((t, i) => `${i + 1}. ${t.label}`).join('\n')
-                                        );
-                                        const index = parseInt(selection) - 1;
-                                        if (index >= 0 && index < moreTabs.length) {
-                                            handleTabChange(moreTabs[index].id);
-                                        }
+                                        setShowMoreTabsOverlay(!showMoreTabsOverlay);
                                     }
                                 }}
                                 className={`flex-1 flex flex-col items-center justify-center py-3 px-1 btn-ripple relative transition-all duration-200 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}
+                                } ${showMoreTabsOverlay ? 'bg-opacity-10 bg-blue-500' : ''}`}
                             >
                                 <i className="iconoir-menu text-2xl mb-1"></i>
                                 <span className="text-xs font-medium">Plus</span>
                             </button>
                         </div>
                     </nav>
+
+                    {/* Overlay pour les onglets supplémentaires */}
+                    {showMoreTabsOverlay && (
+                        <>
+                            {/* Backdrop */}
+                            <div
+                                className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+                                onClick={() => setShowMoreTabsOverlay(false)}
+                            ></div>
+
+                            {/* Overlay Panel */}
+                            <div className={`fixed bottom-0 left-0 right-0 z-50 transform transition-transform duration-300 ease-out ${
+                                showMoreTabsOverlay ? 'translate-y-0' : 'translate-y-full'
+                            }`}>
+                                <div className={`rounded-t-2xl shadow-2xl max-h-96 overflow-y-auto ${
+                                    isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                }`}>
+                                    {/* Header */}
+                                    <div className={`sticky top-0 px-6 py-4 border-b ${
+                                        isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                                    }`}>
+                                        <div className="flex items-center justify-between">
+                                            <h3 className={`text-lg font-semibold ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                📱 Autres onglets
+                                            </h3>
+                                            <button
+                                                onClick={() => setShowMoreTabsOverlay(false)}
+                                                className={`p-2 rounded-full transition-colors ${
+                                                    isDarkMode
+                                                        ? 'hover:bg-gray-700 text-gray-400'
+                                                        : 'hover:bg-gray-100 text-gray-600'
+                                                }`}
+                                            >
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Tabs List */}
+                                    <div className="p-4">
+                                        {tabs.slice(5).map((tab) => {
+                                            // Déterminer l'icône
+                                            let iconClass = 'iconoir-view-grid';
+                                            if (tab.id.includes('emma')) iconClass = 'iconoir-chat-bubble';
+                                            else if (tab.id.includes('watchlist')) iconClass = 'iconoir-star';
+                                            else if (tab.id.includes('calendar')) iconClass = 'iconoir-calendar';
+                                            else if (tab.id.includes('market')) iconClass = 'iconoir-graph-up';
+                                            else if (tab.id.includes('jlab')) iconClass = 'iconoir-lightbulb';
+                                            else if (tab.id.includes('admin')) iconClass = 'iconoir-settings';
+                                            else if (tab.id.includes('seeking')) iconClass = 'iconoir-search';
+                                            else if (tab.id.includes('team')) iconClass = 'iconoir-group';
+                                            else if (tab.id.includes('dan')) iconClass = 'iconoir-brain';
+
+                                            const isActive = activeTab === tab.id;
+
+                                            return (
+                                                <button
+                                                    key={tab.id}
+                                                    onClick={() => {
+                                                        handleTabChange(tab.id);
+                                                        setShowMoreTabsOverlay(false);
+                                                    }}
+                                                    className={`w-full flex items-center gap-4 p-4 rounded-lg mb-2 transition-all duration-200 ${
+                                                        isActive
+                                                            ? isDarkMode
+                                                                ? 'bg-green-900 bg-opacity-30 border-2 border-green-500'
+                                                                : 'bg-green-50 border-2 border-green-500'
+                                                            : isDarkMode
+                                                                ? 'bg-gray-700 hover:bg-gray-650 border-2 border-transparent'
+                                                                : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
+                                                    }`}
+                                                >
+                                                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${
+                                                        isActive
+                                                            ? 'bg-green-500 text-white'
+                                                            : isDarkMode
+                                                                ? 'bg-gray-600 text-gray-300'
+                                                                : 'bg-gray-200 text-gray-600'
+                                                    }`}>
+                                                        <i className={`${iconClass} text-2xl`}></i>
+                                                    </div>
+                                                    <div className="flex-1 text-left">
+                                                        <div className={`font-semibold ${
+                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}>
+                                                            {tab.label}
+                                                        </div>
+                                                    </div>
+                                                    {isActive && (
+                                                        <div className="flex items-center justify-center">
+                                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                                        </div>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
                     {/* Audio UI feedback (désactivé par défaut jusqu'au premier geste utilisateur) */}
                     <audio ref={tabSoundRef} preload="auto" className="hidden">
                         <source src="https://assets.mixkit.co/active_storage/sfx/2005/2005-preview.mp3" type="audio/mpeg" />
