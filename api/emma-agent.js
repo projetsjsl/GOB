@@ -1280,6 +1280,22 @@ RÈGLES CRITIQUES:
 
             const maxTokens = outputMode === 'briefing' ? 4000 : 1000;
 
+            // System prompt pour Claude
+            const systemPrompt = outputMode === 'data'
+                ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide, pas de texte explicatif.'
+                : `Tu es Emma, analyste financière experte et rédactrice professionnelle.
+
+RÈGLES CRITIQUES:
+- ❌ NE JAMAIS retourner du JSON brut ou du code dans tes réponses
+- ✅ TOUJOURS analyser et interpréter les données de manière conversationnelle
+- ✅ TU ES UNE ANALYSTE qui RÉDIGE des briefings professionnels, pas un robot
+- ✅ Utilise un ton institutionnel, professionnel et accessible
+- ✅ Structure avec Markdown (##, ###, bullet points, tableaux)
+- ✅ Inclus des données chiffrées précises et contextualisées
+- ✅ Fournis des insights actionnables et des recommandations
+
+Tu es utilisée principalement pour rédiger des briefings quotidiens de haute qualité.`;
+
             const response = await fetch('https://api.anthropic.com/v1/messages', {
                 method: 'POST',
                 headers: {
@@ -1291,6 +1307,7 @@ RÈGLES CRITIQUES:
                     model: 'claude-3-5-sonnet-20241022',
                     max_tokens: maxTokens,
                     temperature: 0.5, // Déterministe pour écriture professionnelle
+                    system: systemPrompt,
                     messages: [
                         {
                             role: 'user',
