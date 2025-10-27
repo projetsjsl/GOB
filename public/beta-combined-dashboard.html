@@ -512,7 +512,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const [showAdmin, setShowAdmin] = useState(false);
             const [apiStatus, setApiStatus] = useState({});
             const [viewMode, setViewMode] = useState('cards');
-            const [seekingAlphaViewMode, setSeekingAlphaViewMode] = useState('cards');
+            const [seekingAlphaViewMode, setSeekingAlphaViewMode] = useState('list'); // list par défaut
             const [newsFilter, setNewsFilter] = useState('all'); // Filtre pour les actualités
             const [filteredNews, setFilteredNews] = useState([]); // Actualités filtrées
             const [frenchOnly, setFrenchOnly] = useState(false); // Filtre pour nouvelles en français
@@ -11808,7 +11808,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Composant onglet Stocks & News
             const StocksNewsTab = () => {
-                const [stocksViewMode, setStocksViewMode] = useState('list'); // list, cards, table
+                const [stocksViewMode, setStocksViewMode] = useState('table'); // table par défaut (list/cards pas encore implémentés)
                 const [expandedStock, setExpandedStock] = useState(null);
 
                 return (
