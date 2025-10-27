@@ -597,6 +597,68 @@ const fetchHybridData = async (symbol, dataType) => {
                     .replace(/â€"/g, '—');
             };
 
+            // Fonction pour déterminer l'icône et la couleur d'une nouvelle
+            const getNewsIcon = (title, description, sentiment) => {
+                const text = ((title || '') + ' ' + (description || '')).toLowerCase();
+
+                // Catégories avec mots-clés (français et anglais)
+                const categories = {
+                    earnings: {
+                        keywords: ['earnings', 'résultats', 'profit', 'bénéfice', 'trimestre', 'quarterly', 'revenue', 'chiffre d\'affaires'],
+                        icon: 'DollarSign',
+                        color: 'text-green-500'
+                    },
+                    merger: {
+                        keywords: ['merger', 'acquisition', 'fusionner', 'racheter', 'acquérir', 'deal', 'accord'],
+                        icon: 'Briefcase',
+                        color: 'text-purple-500'
+                    },
+                    growth: {
+                        keywords: ['croissance', 'expansion', 'growth', 'augmente', 'monte', 'hausse', 'rally', 'surge', 'gain'],
+                        icon: 'TrendingUp',
+                        color: 'text-green-500'
+                    },
+                    decline: {
+                        keywords: ['baisse', 'chute', 'decline', 'drop', 'fall', 'perte', 'loss', 'diminue'],
+                        icon: 'TrendingDown',
+                        color: 'text-red-500'
+                    },
+                    regulation: {
+                        keywords: ['régulation', 'regulation', 'law', 'loi', 'sec', 'fda', 'gouvernement', 'government'],
+                        icon: 'Shield',
+                        color: 'text-blue-500'
+                    },
+                    target: {
+                        keywords: ['target', 'objectif', 'forecast', 'prévision', 'outlook', 'guidance'],
+                        icon: 'Target',
+                        color: 'text-indigo-500'
+                    },
+                    market: {
+                        keywords: ['market', 'marché', 'index', 'indice', 's&p', 'dow', 'nasdaq', 'bourse'],
+                        icon: 'BarChart3',
+                        color: 'text-blue-500'
+                    }
+                };
+
+                // Vérifier chaque catégorie
+                for (const [key, category] of Object.entries(categories)) {
+                    if (category.keywords.some(keyword => text.includes(keyword))) {
+                        return { icon: category.icon, color: category.color };
+                    }
+                }
+
+                // Par défaut: icône basée sur le sentiment
+                if (sentiment === 'positive' || text.includes('positif') || text.includes('success') || text.includes('succès')) {
+                    return { icon: 'TrendingUp', color: 'text-green-500' };
+                }
+                if (sentiment === 'negative' || text.includes('négatif') || text.includes('risk') || text.includes('risque')) {
+                    return { icon: 'TrendingDown', color: 'text-red-500' };
+                }
+
+                // Fallback: icône de journal
+                return { icon: 'Newspaper', color: 'text-gray-500' };
+            };
+
             // Fonction pour extraire le logo depuis les données de scraping
             const getCompanyLogo = (ticker) => {
                 try {
@@ -11613,13 +11675,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
                         }`}>
                             <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                🔥 Top Movers du Jour
+                                <LucideIcon name="Fire" className="w-6 h-6 text-orange-500" />
+                                Top Movers du Jour
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Top Gainers */}
                                 <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
                                     <h4 className={`text-sm font-bold mb-3 flex items-center gap-2 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
-                                        🟢 Top Gainers
+                                        <LucideIcon name="TrendingUp" className="w-5 h-5" />
+                                        Top Gainers
                                     </h4>
                                     <div className="space-y-2">
                                         {tickers
@@ -11643,7 +11707,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     }}
                                                 >
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-lg">{['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'][idx]}</span>
+                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                            isDarkMode ? 'bg-green-500/30 text-green-300' : 'bg-green-100 text-green-700'
+                                                        }`}>
+                                                            {idx + 1}
+                                                        </div>
                                                         <img
                                                             src={getCompanyLogo(item.ticker)}
                                                             alt={item.ticker}
@@ -11670,7 +11738,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 {/* Top Losers */}
                                 <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-red-500/10 border border-red-500/30' : 'bg-red-50 border border-red-200'}`}>
                                     <h4 className={`text-sm font-bold mb-3 flex items-center gap-2 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
-                                        🔴 Top Losers
+                                        <LucideIcon name="TrendingDown" className="w-5 h-5" />
+                                        Top Losers
                                     </h4>
                                     <div className="space-y-2">
                                         {tickers
@@ -11694,7 +11763,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     }}
                                                 >
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-lg">{['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'][idx]}</span>
+                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                            isDarkMode ? 'bg-red-500/30 text-red-300' : 'bg-red-100 text-red-700'
+                                                        }`}>
+                                                            {idx + 1}
+                                                        </div>
                                                         <img
                                                             src={getCompanyLogo(item.ticker)}
                                                             alt={item.ticker}
@@ -11923,11 +11996,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                     isDarkMode ? 'text-gray-200' : 'text-gray-700'
                                                                 }`}>
                                                                     <div className="flex items-start gap-4">
-                                                                        <div className={`p-3 rounded-full transition-colors duration-300 ${
-                                                                            isDarkMode ? 'bg-gray-600/20 text-gray-300' : 'bg-gray-700 text-gray-200'
-                                                                        }`}>
-                                                                            <span className="text-2xl">📰</span>
-                                                                        </div>
+                                                                        {(() => {
+                                                                            const newsIconData = getNewsIcon(news.title, news.description, news.sentiment);
+                                                                            return (
+                                                                                <div className={`p-3 rounded-full transition-colors duration-300 ${
+                                                                                    isDarkMode ? 'bg-gray-600/20' : 'bg-gray-200/60'
+                                                                                }`}>
+                                                                                    <LucideIcon name={newsIconData.icon} className={`w-6 h-6 ${newsIconData.color}`} />
+                                                                                </div>
+                                                                            );
+                                                                        })()}
                                                                         <div className="flex-1">
                                                                             <h5 className={`font-bold text-lg mb-3 transition-colors duration-300 ${
                                                                                 isDarkMode ? 'text-white' : 'text-gray-900'
