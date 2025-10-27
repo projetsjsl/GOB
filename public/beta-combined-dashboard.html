@@ -1021,8 +1021,42 @@ const fetchHybridData = async (symbol, dataType) => {
                 const tickersQuery = availableTickers.slice(0, 5).join(',');
 
                 try {
-                    // SOURCE 1: Finnhub Market News (Primary - FREE & RELIABLE)
-                    addLog('🔍 Tentative Finnhub Market News (General)...', 'info');
+                    // SOURCE 1: FMP General News (Primary - STARTER PLAN avec 300 calls/min)
+                    addLog('🔍 Tentative FMP General News (Primary)...', 'info');
+                    try {
+                        const fmpNewsResponse = await fetch(
+                            `${API_BASE_URL}/api/fmp?endpoint=news&limit=100`
+                        );
+
+                        if (fmpNewsResponse.ok) {
+                            const fmpNewsResult = await fmpNewsResponse.json();
+                            const fmpNewsData = fmpNewsResult.data || fmpNewsResult.news || [];
+                            const newsArticles = (fmpNewsData || []).slice(0, 100).map(article => ({
+                                title: article.title,
+                                description: article.text || '',
+                                url: article.url || article.link || '#',
+                                publishedAt: article.publishedDate || new Date().toISOString(),
+                                source: { name: article.site || 'FMP' },
+                                sentiment: article.sentiment || 'neutral',
+                                category: 'general',
+                                image: article.image || null
+                            }));
+
+                            if (newsArticles.length > 0) {
+                                const sortedNews = sortNewsByCredibility(newsArticles);
+                                setNewsData(sortedNews);
+                                setFilteredNews(sortedNews);
+                                addLog(`✅ ${newsArticles.length} actualités chargées depuis FMP (triées par crédibilité)`, 'success');
+                                return;
+                            }
+                        }
+                        addLog('⚠️ FMP General News: réponse vide ou erreur', 'warning');
+                    } catch (fmpNewsError) {
+                        addLog(`❌ FMP General News erreur: ${fmpNewsError.message}`, 'error');
+                    }
+
+                    // SOURCE 2: Finnhub Market News (Fallback - General Market)
+                    addLog('🔄 Tentative Finnhub Market News (Fallback)...', 'info');
                     try {
                         const finnhubMarketResponse = await fetch(
                             `${API_BASE_URL}/api/finnhub?endpoint=market-news&category=general`
@@ -1053,19 +1087,19 @@ const fetchHybridData = async (symbol, dataType) => {
                         addLog(`❌ Finnhub Market News erreur: ${finnhubMarketError.message}`, 'error');
                     }
 
-                    // SOURCE 2: Finnhub Company News (Fallback pour tickers spécifiques)
-                    addLog('🔄 Tentative Finnhub News...', 'info');
+                    // SOURCE 3: Finnhub Company News (Last Resort - ticker-specific)
+                    addLog('🔄 Tentative Finnhub Company News (Last Resort)...', 'info');
                     try {
                         const today = new Date().toISOString().split('T')[0];
                         const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
 
-                        const finnhubResponse = await fetch(
+                        const finnhubCompanyResponse = await fetch(
                             `${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${availableTickers[0]}&from=${weekAgo}&to=${today}`
                         );
 
-                        if (finnhubResponse.ok) {
-                            const finnhubData = await finnhubResponse.json();
-                            const newsArticles = (finnhubData || []).slice(0, 50).map(article => ({
+                        if (finnhubCompanyResponse.ok) {
+                            const finnhubCompanyData = await finnhubCompanyResponse.json();
+                            const newsArticles = (finnhubCompanyData || []).slice(0, 50).map(article => ({
                                 title: article.headline,
                                 description: article.summary || '',
                                 url: article.url || '#',
@@ -1079,20 +1113,17 @@ const fetchHybridData = async (symbol, dataType) => {
                                 const sortedNews = sortNewsByCredibility(newsArticles);
                                 setNewsData(sortedNews);
                                 setFilteredNews(sortedNews);
-                                addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub (triées par crédibilité)`, 'success');
+                                addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub Company News (triées par crédibilité)`, 'success');
                                 return;
                             }
                         }
-                        addLog('⚠️ Finnhub News: réponse vide ou erreur', 'warning');
-                    } catch (finnhubError) {
-                        addLog(`❌ Finnhub News erreur: ${finnhubError.message}`, 'error');
+                        addLog('⚠️ Finnhub Company News: réponse vide ou erreur', 'warning');
+                    } catch (finnhubCompanyError) {
+                        addLog(`❌ Finnhub Company News erreur: ${finnhubCompanyError.message}`, 'error');
                     }
 
-                    // NOTE: FMP news endpoint is RESTRICTED on free plan
-                    // SOURCE 3 removed - using only Finnhub sources (market-news + company-news)
-
                     // Toutes les sources ont échoué - pas de données disponibles
-                    addLog('⚠️ Toutes les sources Finnhub ont échoué - aucune actualité disponible', 'warning');
+                    addLog('⚠️ Toutes les sources d\'actualités ont échoué', 'warning');
                     throw new Error('Aucune source d\'actualités disponible');
 
                 } catch (error) {
