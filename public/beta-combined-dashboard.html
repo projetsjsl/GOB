@@ -551,6 +551,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const [showJLabIntro, setShowJLabIntro] = useState(false);
             const [showSeekingAlphaIntro, setShowSeekingAlphaIntro] = useState(false);
             const [emmaPrefillMessage, setEmmaPrefillMessage] = useState('');
+            const [emmaAutoSend, setEmmaAutoSend] = useState(false); // Auto-send prefilled message
             const [tickerData, setTickerData] = useState([]);
             const [tabsVisitedThisSession, setTabsVisitedThisSession] = useState({});
             const [showMoreTabsOverlay, setShowMoreTabsOverlay] = useState(false);
@@ -735,6 +736,16 @@ const fetchHybridData = async (symbol, dataType) => {
 
                 // Si 3+ mots-clés français, considérer comme article français
                 return frenchWordCount >= 3;
+            };
+
+            // Fonction pour résumer un article avec Emma IA
+            const summarizeWithEmma = (articleUrl, articleTitle) => {
+                const prompt = `📰 Résume cet article et donne-moi les points clés:\n\nTitre: ${articleTitle}\nURL: ${articleUrl}\n\nMerci de fournir:\n1. Résumé en 3-4 points\n2. Impact potentiel sur les marchés\n3. Éléments à surveiller`;
+
+                console.log('📝 Redirecting to Emma with article:', articleTitle);
+                setEmmaPrefillMessage(prompt);
+                setEmmaAutoSend(true);
+                setActiveTab('ask-emma');
             };
 
             // Fonction pour extraire le logo depuis les données de scraping
@@ -9504,6 +9515,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
             const AskEmmaTab = React.memo(({
                 prefillMessage = '',
                 setPrefillMessage = () => {},
+                autoSend = false,
+                setAutoSend = () => {},
                 emmaConnected,
                 setEmmaConnected,
                 showPromptEditor,
@@ -9996,8 +10009,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         console.log('📝 Prefill message received:', prefillMessage);
                         setEmmaInput(prefillMessage);
                         setPrefillMessage(''); // Clear the prefill message after using it
+
+                        // If autoSend is true, trigger send after input is set
+                        if (autoSend) {
+                            console.log('🚀 Auto-send enabled, will send message');
+                            // Use setTimeout to ensure state is updated
+                            setTimeout(() => {
+                                const sendButton = document.querySelector('[data-emma-send-button]');
+                                if (sendButton) {
+                                    sendButton.click();
+                                }
+                            }, 100);
+                            setAutoSend(false); // Reset after triggering
+                        }
                     }
-                }, [prefillMessage, setPrefillMessage]);
+                }, [prefillMessage, setPrefillMessage, autoSend, setAutoSend]);
 
                 const initializeEmma = async () => {
                     try {
@@ -11321,6 +11347,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     disabled={emmaLoading}
                                 />
                                 <button
+                                    data-emma-send-button
                                     onClick={() => {
                                         console.log('🔘 Bouton Envoyer cliqué !');
                                         console.log('📝 Contenu de emmaInput:', emmaInput);
@@ -18049,6 +18076,23 @@ console.log('✅ Données hybrides récupérées:', {
                                                                 🇫🇷 FR
                                                             </span>
                                                         )}
+
+                                                        {/* Bouton Résumé avec Emma */}
+                                                        {article.url && (
+                                                            <button
+                                                                onClick={() => summarizeWithEmma(article.url, article.title)}
+                                                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
+                                                                    isDarkMode
+                                                                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white'
+                                                                        : 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white'
+                                                                }`}
+                                                            >
+                                                                <span className="flex items-center gap-1">
+                                                                    <LucideIcon name="Brain" className="w-3 h-3" />
+                                                                    Résumé avec Emma
+                                                                </span>
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -18504,6 +18548,8 @@ console.log('✅ Données hybrides récupérées:', {
                         {activeTab === 'ask-emma' && <AskEmmaTab
                             prefillMessage={emmaPrefillMessage}
                             setPrefillMessage={setEmmaPrefillMessage}
+                            autoSend={emmaAutoSend}
+                            setAutoSend={setEmmaAutoSend}
                             emmaConnected={emmaConnected}
                             setEmmaConnected={setEmmaConnected}
                             showPromptEditor={showPromptEditor}
