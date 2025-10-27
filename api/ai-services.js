@@ -223,14 +223,14 @@ async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency =
   const config = MODEL_CONFIG[section] || MODEL_CONFIG['analysis'];
   const models = config.models;
   const maxTokensList = config.max_tokens;
-  
+
   for (let i = 0; i < models.length; i++) {
     const model = models[i];
     const maxTokens = maxTokensList[i];
-    
+
     try {
       console.log(`Tentative avec ${model} (${config.description})`);
-      
+
       const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: {
@@ -246,7 +246,7 @@ async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency =
           search_domain_filter: ['finance.yahoo.com', 'bloomberg.com', 'reuters.com', 'marketwatch.com', 'cnbc.com', 'wsj.com', 'ft.com']
         })
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         return {
@@ -257,21 +257,38 @@ async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency =
           attempt: i + 1,
           totalAttempts: models.length
         };
+      } else if (response.status === 401) {
+        // API key invalide ou manquante - ne pas réessayer
+        console.error(`❌ Erreur 401: Clé API Perplexity invalide ou manquante`);
+        throw new Error('PERPLEXITY_API_KEY_INVALID');
       } else if (response.status === 429) {
-        console.log(`Quota dépassé pour ${model}, tentative suivante...`);
+        console.log(`⚠️ Quota dépassé pour ${model}, tentative avec le modèle suivant...`);
         continue; // Essayer le modèle suivant
       } else {
-        throw new Error(`Erreur ${response.status} avec ${model}`);
+        const errorText = await response.text();
+        console.error(`❌ Erreur ${response.status} avec ${model}: ${errorText}`);
+
+        // Pour les autres erreurs, essayer le modèle suivant
+        if (i < models.length - 1) {
+          console.log(`Tentative avec le modèle de secours...`);
+          continue;
+        }
+        throw new Error(`Erreur ${response.status} avec ${model}: ${errorText}`);
       }
     } catch (error) {
-      console.log(`Erreur avec ${model}: ${error.message}`);
+      // Si c'est une erreur d'authentification, ne pas réessayer
+      if (error.message === 'PERPLEXITY_API_KEY_INVALID') {
+        throw error;
+      }
+
+      console.log(`⚠️ Erreur avec ${model}: ${error.message}`);
       if (i === models.length - 1) {
         throw error; // Dernière tentative échouée
       }
       continue; // Essayer le modèle suivant
     }
   }
-  
+
   throw new Error('Tous les modèles Perplexity ont échoué');
 }
 
@@ -368,9 +385,24 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
 
   } catch (error) {
     console.error('Erreur Perplexity:', error);
+
+    // Gérer les erreurs d'authentification de manière spécifique
+    if (error.message === 'PERPLEXITY_API_KEY_INVALID') {
+      return res.status(401).json({
+        success: false,
+        error: 'Clé API Perplexity invalide ou expirée.',
+        details: 'Vérifiez que PERPLEXITY_API_KEY est correctement configurée dans les variables d\'environnement Vercel.',
+        model: 'error',
+        fallback: false,
+        fix: 'Configurez une clé API Perplexity valide dans Vercel: https://vercel.com/dashboard/settings/environment-variables'
+      });
+    }
+
+    // Autres erreurs
     return res.status(500).json({
       success: false,
-      error: `Erreur API Perplexity: ${error.message}. Vérifiez votre clé API PERPLEXITY_API_KEY.`,
+      error: `Erreur API Perplexity: ${error.message}`,
+      details: 'Une erreur s\'est produite lors de l\'appel à l\'API Perplexity.',
       model: 'error',
       fallback: false
     });

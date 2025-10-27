@@ -138,13 +138,31 @@ export default async function handler(req, res) {
     if (!fmpResponse.ok) {
       // Try to get error details from FMP response
       let errorDetails = `${fmpResponse.status} ${fmpResponse.statusText}`;
+      let errorBody = '';
       try {
-        const errorBody = await fmpResponse.text();
+        errorBody = await fmpResponse.text();
         console.error(`❌ FMP Error Response: ${errorBody}`);
         errorDetails += ` - ${errorBody}`;
       } catch (e) {
         // Ignore parse error
       }
+
+      // Handle 402 Payment Required specifically
+      if (fmpResponse.status === 402) {
+        console.error(`❌ FMP API: Endpoint ${endpoint} requires a paid subscription`);
+        return res.status(402).json({
+          success: false,
+          error: 'FMP API endpoint restricted',
+          message: `This endpoint (${endpoint}) is not available under your current FMP subscription.`,
+          details: errorBody || 'Upgrade required',
+          endpoint,
+          upgradeUrl: 'https://financialmodelingprep.com/developer/docs/pricing',
+          fallback: true,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Handle other HTTP errors
       throw new Error(`FMP API error: ${errorDetails}`);
     }
 
