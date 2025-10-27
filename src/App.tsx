@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, EditPencil, Xmark, Download, Upload, Settings, Palette, Check, Trash, SunLight, HalfMoon, Bag, Globe, Building, Phone, Calendar, Mail, GraphUp, Rocket, Brain, Dollar, Activity, Archery, Shield, Flash, Code, Database, Page, Folder, Group, Medal, Gift } from 'iconoir-react';
+import { Plus, EditPencil, Xmark, Download, Upload, Settings, Palette, Check, Trash, SunLight, HalfMoon, Bag, Globe, Building, Phone, Calendar, Mail, GraphUp, Rocket, Brain, Dollar, Activity, Archery, Shield, Flash, Code, Database, Page, Folder, Group, Medal, Gift, Computer } from 'iconoir-react';
 
 // Les logos seront chargés dynamiquement via les chemins publics
 
@@ -20,14 +20,14 @@ const iconComponents: { [key: string]: React.ComponentType<any> } = {
   'Dollar': Dollar, 'GraphUp': GraphUp,
   'Archery': Archery, 'Medal': Medal, 'Shield': Shield,
   'Flash': Flash, 'Settings': Settings, 'Rocket': Rocket, 'Brain': Brain,
-  'Folder': Folder, 'Gift': Gift
+  'Folder': Folder, 'Gift': Gift, 'Computer': Computer
 };
 
 const professionalIcons = [
   'Globe', 'Phone', 'Bag', 'Mail', 'Calendar', 'Page', 'Group', 'Activity',
   'Code', 'Database', 'Building', 'Dollar', 'GraphUp',
   'Archery', 'Medal', 'Shield', 'Flash', 'Settings', 'Rocket', 'Brain',
-  'Folder', 'Gift'
+  'Folder', 'Gift', 'Computer'
 ];
 
 // Emoji to Professional Icon mapping for default apps
@@ -43,7 +43,9 @@ const emojiToIconMap: { [key: string]: string } = {
   '📅': 'Calendar',
   '💰': 'Dollar',
   '🏢': 'Building',
-  '🏦': 'Building'
+  '🏦': 'Building',
+  '💻': 'Computer',
+  '🖥️': 'Computer'
 };
 
 // Types
