@@ -18036,7 +18036,15 @@ console.log('✅ Données hybrides récupérées:', {
             // ============================================================================
             const MarketsEconomyTab = () => {
                 const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
+                const [selectedSource, setSelectedSource] = useState('all'); // Filtre source
+                const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
+                const [selectedTheme, setSelectedTheme] = useState('all'); // Filtre thème
                 const [localFilteredNews, setLocalFilteredNews] = useState([]);
+
+                // Listes de filtres
+                const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
+                const markets = ['US', 'Canada', 'Europe', 'Asie'];
+                const themes = ['Tech', 'Finance', 'Énergie', 'Santé', 'Crypto', 'IA'];
 
                 // Filtrer les nouvelles à l'affichage
                 React.useEffect(() => {
@@ -18047,8 +18055,45 @@ console.log('✅ Données hybrides récupérées:', {
                         filtered = filtered.filter(article => isFrenchArticle(article));
                     }
 
+                    // Appliquer le filtre source
+                    if (selectedSource !== 'all') {
+                        filtered = filtered.filter(article =>
+                            article.source?.name?.toLowerCase().includes(selectedSource.toLowerCase())
+                        );
+                    }
+
+                    // Appliquer le filtre marché (basé sur mots-clés)
+                    if (selectedMarket !== 'all') {
+                        const marketKeywords = {
+                            'US': ['u.s.', 'united states', 'american', 'wall street', 'nasdaq', 'dow', 'federal reserve', 'fed', 'sec'],
+                            'Canada': ['canada', 'canadian', 'toronto', 'tsx', 'montreal', 'quebec', 'ontario'],
+                            'Europe': ['europe', 'european', 'eu', 'ecb', 'london', 'frankfurt', 'paris', 'ftse', 'dax'],
+                            'Asie': ['asia', 'asian', 'china', 'japan', 'tokyo', 'shanghai', 'hong kong', 'nikkei']
+                        };
+                        filtered = filtered.filter(article => {
+                            const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                            return marketKeywords[selectedMarket]?.some(keyword => text.includes(keyword));
+                        });
+                    }
+
+                    // Appliquer le filtre thème
+                    if (selectedTheme !== 'all') {
+                        const themeKeywords = {
+                            'Tech': ['tech', 'technology', 'software', 'cloud', 'apple', 'google', 'microsoft', 'amazon', 'meta', 'tesla'],
+                            'Finance': ['bank', 'banque', 'finance', 'trading', 'investment', 'credit', 'loan', 'mortgage'],
+                            'Énergie': ['energy', 'oil', 'gas', 'renewable', 'solar', 'wind', 'nuclear', 'exxon', 'chevron'],
+                            'Santé': ['health', 'healthcare', 'pharma', 'medical', 'drug', 'vaccine', 'hospital', 'medicare'],
+                            'Crypto': ['crypto', 'bitcoin', 'ethereum', 'blockchain', 'btc', 'coinbase', 'binance'],
+                            'IA': ['ai', 'artificial intelligence', 'machine learning', 'chatgpt', 'openai', 'nvidia']
+                        };
+                        filtered = filtered.filter(article => {
+                            const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                            return themeKeywords[selectedTheme]?.some(keyword => text.includes(keyword));
+                        });
+                    }
+
                     setLocalFilteredNews(filtered);
-                }, [newsData, localFrenchOnly]);
+                }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
 
                 return (
                     <div className="space-y-6">
@@ -18103,10 +18148,117 @@ console.log('✅ Données hybrides récupérées:', {
                                         {localFilteredNews.length}
                                     </div>
                                     <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        {localFrenchOnly ? 'Articles en français' : 'Articles disponibles'}
+                                        Articles filtrés
                                     </div>
                                 </div>
                                 <LucideIcon name="Newspaper" className={`w-12 h-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
+                            </div>
+                        </div>
+
+                        {/* Filtres */}
+                        <div className={`p-6 rounded-xl transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                                : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                🔍 Filtres
+                            </h3>
+
+                            {/* Filtre Source */}
+                            <div className="mb-4">
+                                <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    📰 Source
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        onClick={() => setSelectedSource('all')}
+                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                            selectedSource === 'all'
+                                                ? 'bg-blue-600 text-white'
+                                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                        }`}
+                                    >
+                                        Toutes
+                                    </button>
+                                    {sources.map(source => (
+                                        <button
+                                            key={source}
+                                            onClick={() => setSelectedSource(source)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                                selectedSource === source
+                                                    ? 'bg-blue-600 text-white'
+                                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                            }`}
+                                        >
+                                            {source}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Filtre Marché */}
+                            <div className="mb-4">
+                                <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    🌍 Marché
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        onClick={() => setSelectedMarket('all')}
+                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                            selectedMarket === 'all'
+                                                ? 'bg-green-600 text-white'
+                                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                        }`}
+                                    >
+                                        Tous
+                                    </button>
+                                    {markets.map(market => (
+                                        <button
+                                            key={market}
+                                            onClick={() => setSelectedMarket(market)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                                selectedMarket === market
+                                                    ? 'bg-green-600 text-white'
+                                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                            }`}
+                                        >
+                                            {market}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Filtre Thème */}
+                            <div>
+                                <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    🏷️ Thématique
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        onClick={() => setSelectedTheme('all')}
+                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                            selectedTheme === 'all'
+                                                ? 'bg-purple-600 text-white'
+                                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                        }`}
+                                    >
+                                        Toutes
+                                    </button>
+                                    {themes.map(theme => (
+                                        <button
+                                            key={theme}
+                                            onClick={() => setSelectedTheme(theme)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                                selectedTheme === theme
+                                                    ? 'bg-purple-600 text-white'
+                                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                            }`}
+                                        >
+                                            {theme}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
