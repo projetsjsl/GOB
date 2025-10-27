@@ -11937,7 +11937,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Composant onglet Stocks & News
             const StocksNewsTab = () => {
-                const [stocksViewMode, setStocksViewMode] = useState('table'); // table par défaut (list/cards pas encore implémentés)
+                const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
                 const [expandedStock, setExpandedStock] = useState(null);
 
                 return (
