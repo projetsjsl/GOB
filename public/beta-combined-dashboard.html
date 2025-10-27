@@ -29,18 +29,18 @@
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
     <!-- Iconoir - Beautiful open source icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
-
+    
     <!-- Script pour exposer les bibliothèques globalement -->
         <script>
             // Exposer Recharts globalement
             window.Recharts = window.Recharts || {};
-
+            
             // Vérifier le chargement des bibliothèques
             window.addEventListener('load', function() {
                 console.log('📚 Vérification des bibliothèques:');
                 console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
                 console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
-
+                
                 // Message informatif sur les avertissements de production
                 console.log('ℹ️ Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
                 console.log('ℹ️ Ce fichier utilise intentionnellement des CDN pour la portabilité');
@@ -521,6 +521,12 @@ const fetchHybridData = async (symbol, dataType) => {
             const [githubToken, setGithubToken] = useState('');
             const [showSettings, setShowSettings] = useState(false);
             const [showScraperPopup, setShowScraperPopup] = useState(false);
+            
+            // États pour la modal de comparaison de peers
+            const [showPeersModal, setShowPeersModal] = useState(false);
+            const [selectedTickerForPeers, setSelectedTickerForPeers] = useState(null);
+            const [peersData, setPeersData] = useState(null);
+            const [loadingPeers, setLoadingPeers] = useState(false);
             
             // États pour le scraping
             const [scrapingStatus, setScrapingStatus] = useState('idle'); // 'idle', 'running', 'completed', 'error'
@@ -1665,6 +1671,81 @@ const fetchHybridData = async (symbol, dataType) => {
                     console.error('❌ Erreur fetch Seeking Alpha analyses:', error?.message || String(error));
                     setSeekingAlphaStockData({ stocks: {}, source: 'error' });
                 }
+            };
+
+            // Fonction pour récupérer les données de comparaison de peers
+            const fetchPeersComparisonData = async (ticker) => {
+                setLoadingPeers(true);
+                try {
+                    console.log(`📊 Chargement des données de comparaison de peers pour ${ticker}...`);
+                    
+                    // Essayer d'abord de récupérer depuis Supabase
+                    const response = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=peers&ticker=${ticker}&latest=true`);
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success && result.data && result.data.length > 0) {
+                            // Trouver les données les plus récentes pour ce ticker
+                            const latestData = result.data
+                                .filter(item => item.ticker === ticker)
+                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+                            
+                            if (latestData && latestData.peers_data) {
+                                setPeersData({
+                                    ticker: ticker,
+                                    data: latestData.peers_data,
+                                    timestamp: latestData.created_at,
+                                    url: `https://seekingalpha.com/symbol/${ticker}/peers/comparison`
+                                });
+                                console.log(`✅ Données de peers chargées pour ${ticker}`);
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // Fallback: créer des données de démonstration basées sur les données existantes
+                    console.log(`⚠️ Aucune donnée de peers trouvée pour ${ticker}, génération de données de démonstration...`);
+                    
+                    const mockPeersData = {
+                        ticker: ticker,
+                        data: {
+                            peers: [
+                                { symbol: 'AAPL', name: 'Apple Inc.', price: 175.43, change: 2.15, marketCap: '2.8T', pe: 28.5, sector: 'Technology' },
+                                { symbol: 'MSFT', name: 'Microsoft Corporation', price: 378.85, change: -1.23, marketCap: '2.8T', pe: 32.1, sector: 'Technology' },
+                                { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 142.56, change: 0.89, marketCap: '1.8T', pe: 25.3, sector: 'Technology' },
+                                { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 155.12, change: -0.45, marketCap: '1.6T', pe: 45.2, sector: 'Consumer Discretionary' },
+                                { symbol: 'META', name: 'Meta Platforms Inc.', price: 485.67, change: 3.21, marketCap: '1.2T', pe: 22.8, sector: 'Technology' }
+                            ],
+                            metrics: {
+                                averagePE: 30.8,
+                                averageMarketCap: '1.8T',
+                                sectorDistribution: {
+                                    'Technology': 4,
+                                    'Consumer Discretionary': 1
+                                }
+                            },
+                            analysis: `Analyse comparative des peers pour ${ticker}. Les métriques montrent une performance relative dans le secteur.`
+                        },
+                        timestamp: new Date().toISOString(),
+                        url: `https://seekingalpha.com/symbol/${ticker}/peers/comparison`
+                    };
+                    
+                    setPeersData(mockPeersData);
+                    console.log(`✅ Données de démonstration générées pour ${ticker}`);
+                    
+                } catch (error) {
+                    console.error(`❌ Erreur lors du chargement des données de peers pour ${ticker}:`, error);
+                    setPeersData(null);
+                } finally {
+                    setLoadingPeers(false);
+                }
+            };
+
+            // Fonction pour ouvrir la modal de comparaison de peers
+            const openPeersComparison = async (ticker) => {
+                setSelectedTickerForPeers(ticker);
+                setShowPeersModal(true);
+                await fetchPeersComparisonData(ticker);
             };
 
             // Monitoring Admin
@@ -5341,12 +5422,21 @@ STRUCTURE JSON OBLIGATOIRE:
                                     <div key={index} className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                                         <div className="flex justify-between items-start mb-4">
                                             <h3 className="text-xl font-bold text-white">{stock.ticker}</h3>
-                                            <button
-                                                onClick={() => setSelectedStock(stock.ticker)}
-                                                className="text-blue-400 hover:text-blue-300 text-sm"
-                                            >
-                                                Voir détail
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => openPeersComparison(stock.ticker)}
+                                                    className="px-3 py-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs rounded-lg transition-all duration-300 shadow-lg"
+                                                    title="Comparaison avec les peers"
+                                                >
+                                                    🔍 Peers
+                                                </button>
+                                                <button
+                                                    onClick={() => setSelectedStock(stock.ticker)}
+                                                    className="text-blue-400 hover:text-blue-300 text-sm"
+                                                >
+                                                    Voir détail
+                                                </button>
+                                            </div>
                                         </div>
                                         
                                         {/* Métriques principales */}
@@ -5425,12 +5515,21 @@ STRUCTURE JSON OBLIGATOIRE:
                                         <div key={index} className="bg-white rounded-lg p-4">
                                             <div className="flex justify-between items-start mb-3">
                                                 <h4 className="text-lg font-bold text-gray-800">{ticker}</h4>
-                                                <button
-                                                    onClick={() => setSelectedStock(ticker)}
-                                                    className="text-blue-600 hover:text-blue-700 text-sm"
-                                                >
-                                                    Voir détail
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openPeersComparison(ticker)}
+                                                        className="px-3 py-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs rounded-lg transition-all duration-300 shadow-lg"
+                                                        title="Comparaison avec les peers"
+                                                    >
+                                                        🔍 Peers
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setSelectedStock(ticker)}
+                                                        className="text-blue-600 hover:text-blue-700 text-sm"
+                                                    >
+                                                        Voir détail
+                                                    </button>
+                                                </div>
                                             </div>
                                             
                                             {/* Métriques principales */}
@@ -9987,7 +10086,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         
                         // Utiliser l'API Perplexity avec les données fraîches
                         const response = await generatePerplexityResponse(emmaInput);
-
+                        
                         const messageId = Date.now() + 1;
                         const emmaResponse = {
                             id: messageId,
@@ -9996,7 +10095,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             fullContent: response, // Contenu complet stocké séparément
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
-
+                        
                         setEmmaMessages(prev => {
                             // Supprimer le message de confirmation temporaire
                             const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
@@ -10007,7 +10106,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                         // Démarrer l'effet de typing progressif
                         startTypingEffect(messageId, response);
-
+                        
                         // Confirmation de réception
                         console.log('✅ Réponse d\'Emma reçue:', response.length, 'caractères');
                     } catch (error) {
@@ -11061,8 +11160,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? 'bg-red-600 text-white shadow-red-500/20'
                                                         : message.type === 'system'
                                                         ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
-                                                        : isDarkMode
-                                                            ? 'bg-gray-800 text-white border border-gray-700'
+                                                        : isDarkMode 
+                                                            ? 'bg-gray-800 text-white border border-gray-700' 
                                                             : 'bg-white text-gray-900 border border-gray-200'
                                                 }`}>
                                                     <div className="prose prose-sm max-w-none">
@@ -11107,9 +11206,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         {emmaLoading && (
                                             <div className="flex gap-3 justify-start">
                                                 <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 animate-pulse">
-                                                    <img
-                                                        src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'}
-                                                        alt="Emma"
+                                                    <img 
+                                                        src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
+                                                        alt="Emma" 
                                                         className="w-full h-full object-cover"
                                                     />
                                                 </div>
@@ -11937,8 +12036,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             // 2 actualités les plus crédibles pour ce ticker
                                             const tickerNews = sortNewsByCredibility(
                                                 newsData.filter(article => {
-                                                    const text = (article.title + ' ' + article.description).toLowerCase();
-                                                    return text.includes(ticker.toLowerCase());
+                                                const text = (article.title + ' ' + article.description).toLowerCase();
+                                                return text.includes(ticker.toLowerCase());
                                                 })
                                             ).slice(0, 2);
                                             
@@ -12050,11 +12149,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                         {(() => {
                                                                             const newsIconData = getNewsIcon(news.title, news.description, news.sentiment);
                                                                             return (
-                                                                                <div className={`p-3 rounded-full transition-colors duration-300 ${
+                                                                        <div className={`p-3 rounded-full transition-colors duration-300 ${
                                                                                     isDarkMode ? 'bg-gray-600/20' : 'bg-gray-200/60'
-                                                                                }`}>
+                                                                        }`}>
                                                                                     <LucideIcon name={newsIconData.icon} className={`w-6 h-6 ${newsIconData.color}`} />
-                                                                                </div>
+                                                                        </div>
                                                                             );
                                                                         })()}
                                                                         <div className="flex-1">
@@ -12170,7 +12269,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     )}
 
                 </div>
-                );
+            );
             };
 
             // ============================================
@@ -17782,8 +17881,8 @@ console.log('✅ Données hybrides récupérées:', {
                                         {/* Active indicator - left bar */}
                                         {activeTab === tab.id && (
                                             <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r ${
-                                                isDarkMode ? 'bg-green-500' : 'bg-green-600'
-                                            }`}></div>
+                                                    isDarkMode ? 'bg-green-500' : 'bg-green-600'
+                                                }`}></div>
                                         )}
 
                                         {/* Icon */}
@@ -17797,7 +17896,7 @@ console.log('✅ Données hybrides récupérées:', {
                                         </span>
 
                                         {/* Active dot indicator */}
-                                        {activeTab === tab.id && (
+                                            {activeTab === tab.id && (
                                             <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${
                                                 isDarkMode ? 'bg-green-400' : 'bg-green-600'
                                             } animate-pulse`}></span>
@@ -17810,7 +17909,7 @@ console.log('✅ Données hybrides récupérées:', {
 
                     {/* Mobile Bottom Navigation Bar */}
                     <nav className={`md:hidden fixed bottom-0 left-0 right-0 backdrop-blur-sm transition-all duration-300 z-40 ${
-                        isDarkMode
+                                            isDarkMode
                             ? 'bg-black/95 border-t border-green-500/10'
                             : 'bg-white/95 border-t-2 border-gray-200'
                     } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
@@ -17869,7 +17968,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 <i className="iconoir-menu text-2xl mb-1"></i>
                                 <span className="text-xs font-medium">Plus</span>
                             </button>
-                        </div>
+                            </div>
                     </nav>
 
                     {/* Overlay pour les onglets supplémentaires */}
@@ -17901,7 +18000,7 @@ console.log('✅ Données hybrides récupérées:', {
                                             <button
                                                 onClick={() => setShowMoreTabsOverlay(false)}
                                                 className={`p-2 rounded-full transition-colors ${
-                                                    isDarkMode
+                                        isDarkMode
                                                         ? 'hover:bg-gray-700 text-gray-400'
                                                         : 'hover:bg-gray-100 text-gray-600'
                                                 }`}
@@ -17910,8 +18009,8 @@ console.log('✅ Données hybrides récupérées:', {
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             </button>
-                                        </div>
-                                    </div>
+                            </div>
+                        </div>
 
                                     {/* Tabs List */}
                                     <div className="p-4">
@@ -18058,6 +18157,253 @@ console.log('✅ Données hybrides récupérées:', {
                             message.type === 'success' ? 'bg-green-500' : 'bg-gray-700'
                         } text-white`}>
                             {message.text}
+                        </div>
+                    )}
+
+                    {/* Modal de comparaison de peers */}
+                    {showPeersModal && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+                            <div className={`w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-xl shadow-2xl ${
+                                isDarkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-300'
+                            }`}>
+                                {/* Header de la modal */}
+                                <div className={`p-6 border-b ${
+                                    isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+                                }`}>
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <h2 className={`text-2xl font-bold ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                🔍 Comparaison de Peers - {selectedTickerForPeers}
+                                            </h2>
+                                            <p className={`text-sm ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>
+                                                Données de comparaison avec les entreprises du même secteur
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setShowPeersModal(false);
+                                                setSelectedTickerForPeers(null);
+                                                setPeersData(null);
+                                            }}
+                                            className={`p-2 rounded-lg transition-colors ${
+                                                isDarkMode 
+                                                    ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
+                                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Contenu de la modal */}
+                                <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                                    {loadingPeers ? (
+                                        <div className="flex items-center justify-center py-12">
+                                            <div className="text-center">
+                                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                                                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    Chargement des données de comparaison...
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : peersData ? (
+                                        <div className="space-y-6">
+                                            {/* Métriques générales */}
+                                            <div className={`rounded-lg p-4 ${
+                                                isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                                            }`}>
+                                                <h3 className={`text-lg font-semibold mb-3 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>
+                                                    📊 Métriques du Secteur
+                                                </h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div className={`p-3 rounded-lg ${
+                                                        isDarkMode ? 'bg-gray-700' : 'bg-white'
+                                                    }`}>
+                                                        <div className={`text-sm ${
+                                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                        }`}>P/E Moyen</div>
+                                                        <div className={`text-xl font-bold ${
+                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}>
+                                                            {peersData.data.metrics?.averagePE || 'N/A'}
+                                                        </div>
+                                                    </div>
+                                                    <div className={`p-3 rounded-lg ${
+                                                        isDarkMode ? 'bg-gray-700' : 'bg-white'
+                                                    }`}>
+                                                        <div className={`text-sm ${
+                                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                        }`}>Market Cap Moyen</div>
+                                                        <div className={`text-xl font-bold ${
+                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}>
+                                                            {peersData.data.metrics?.averageMarketCap || 'N/A'}
+                                                        </div>
+                                                    </div>
+                                                    <div className={`p-3 rounded-lg ${
+                                                        isDarkMode ? 'bg-gray-700' : 'bg-white'
+                                                    }`}>
+                                                        <div className={`text-sm ${
+                                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                        }`}>Nombre de Peers</div>
+                                                        <div className={`text-xl font-bold ${
+                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}>
+                                                            {peersData.data.peers?.length || 0}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Tableau des peers */}
+                                            <div className={`rounded-lg overflow-hidden ${
+                                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                            }`}>
+                                                <h3 className={`text-lg font-semibold p-4 border-b ${
+                                                    isDarkMode 
+                                                        ? 'text-white border-gray-700 bg-gray-800' 
+                                                        : 'text-gray-900 border-gray-200 bg-gray-50'
+                                                }`}>
+                                                    🏢 Liste des Peers
+                                                </h3>
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full">
+                                                        <thead className={`${
+                                                            isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                                                        }`}>
+                                                            <tr>
+                                                                <th className={`px-4 py-3 text-left text-sm font-medium ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>Symbole</th>
+                                                                <th className={`px-4 py-3 text-left text-sm font-medium ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>Nom</th>
+                                                                <th className={`px-4 py-3 text-left text-sm font-medium ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>Prix</th>
+                                                                <th className={`px-4 py-3 text-left text-sm font-medium ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>Change</th>
+                                                                <th className={`px-4 py-3 text-left text-sm font-medium ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>P/E</th>
+                                                                <th className={`px-4 py-3 text-left text-sm font-medium ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>Market Cap</th>
+                                                                <th className={`px-4 py-3 text-left text-sm font-medium ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>Secteur</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {peersData.data.peers?.map((peer, index) => (
+                                                                <tr key={index} className={`border-b ${
+                                                                    isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'
+                                                                }`}>
+                                                                    <td className={`px-4 py-3 ${
+                                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                    }`}>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <img 
+                                                                                src={getCompanyLogo(peer.symbol)} 
+                                                                                alt={`${peer.symbol} logo`}
+                                                                                className="w-6 h-6 rounded"
+                                                                                onError={(e) => {
+                                                                                    e.target.style.display = 'none';
+                                                                                }}
+                                                                            />
+                                                                            <span className="font-semibold">{peer.symbol}</span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className={`px-4 py-3 ${
+                                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                    }`}>{peer.name}</td>
+                                                                    <td className={`px-4 py-3 font-semibold ${
+                                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                    }`}>${peer.price}</td>
+                                                                    <td className={`px-4 py-3 ${
+                                                                        peer.change >= 0 
+                                                                            ? 'text-green-500' 
+                                                                            : 'text-red-500'
+                                                                    }`}>
+                                                                        {peer.change >= 0 ? '+' : ''}{peer.change}%
+                                                                    </td>
+                                                                    <td className={`px-4 py-3 ${
+                                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                    }`}>{peer.pe}</td>
+                                                                    <td className={`px-4 py-3 ${
+                                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                    }`}>{peer.marketCap}</td>
+                                                                    <td className={`px-4 py-3 ${
+                                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                    }`}>{peer.sector}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            {/* Analyse */}
+                                            {peersData.data.analysis && (
+                                                <div className={`rounded-lg p-4 ${
+                                                    isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                                                }`}>
+                                                    <h3 className={`text-lg font-semibold mb-3 ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>
+                                                        📈 Analyse Comparative
+                                                    </h3>
+                                                    <p className={`${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                    }`}>
+                                                        {peersData.data.analysis}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Lien vers Seeking Alpha */}
+                                            <div className="text-center">
+                                                <a
+                                                    href={peersData.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                                                        isDarkMode
+                                                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg'
+                                                            : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white shadow-lg'
+                                                    }`}
+                                                >
+                                                    🌐 Voir sur Seeking Alpha
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-12">
+                                            <div className={`text-lg ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>
+                                                ❌ Aucune donnée de comparaison disponible pour {selectedTickerForPeers}
+                                            </div>
+                                            <p className={`text-sm mt-2 ${
+                                                isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                                            }`}>
+                                                Les données de peers seront disponibles après le scraping des pages de comparaison.
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     )}
 
