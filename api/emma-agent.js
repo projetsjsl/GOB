@@ -919,19 +919,30 @@ ${toolsData.map(t => {
 QUESTION DE L'UTILISATEUR: ${userMessage}
 
 INSTRUCTIONS CRITIQUES:
-1. ✅ TOUJOURS fournir une réponse COMPLÈTE et UTILE basée sur les données disponibles
-2. ✅ Utilise TOUTES les données fournies par les outils, MÊME si marquées "[⚠️ SOURCE PARTIELLE]"
+1. ❌ ❌ ❌ NE JAMAIS COPIER DU JSON BRUT DANS TA RÉPONSE ❌ ❌ ❌
+   - Les données JSON ci-dessus sont pour TON analyse SEULEMENT
+   - Tu dois TOUJOURS transformer ces données en texte conversationnel français
+   - Exemple INTERDIT: "{\\"price\\": 245.67}"
+   - Exemple CORRECT: "Le prix actuel est de 245,67$"
+
+2. ✅ TU ES UNE ANALYSTE, PAS UN ROBOT QUI AFFICHE DES DONNÉES
+   - INTERPRÈTE les chiffres, ne les affiche pas juste
+   - EXPLIQUE ce que signifient les données
+   - DONNE des insights et du contexte
+
+3. ✅ TOUJOURS fournir une réponse COMPLÈTE et UTILE basée sur les données disponibles
+4. ✅ Utilise TOUTES les données fournies par les outils, MÊME si marquées "[⚠️ SOURCE PARTIELLE]"
    - Les données partielles sont MEILLEURES que pas de données du tout
    - Analyse ce qui est disponible et fournis des insights basés sur ces données
-3. ✅ Si un outil a retourné des données pour PLUSIEURS tickers (news_by_ticker, fundamentals_by_ticker):
+5. ✅ Si un outil a retourné des données pour PLUSIEURS tickers (news_by_ticker, fundamentals_by_ticker):
    - Analyse CHAQUE ticker individuellement
    - Fournis un résumé pour CHAQUE compagnie mentionnée
    - N'ignore PAS les tickers - ils sont tous importants
-4. ❌ NE JAMAIS dire "aucune donnée disponible" si des outils ont retourné des données (même partielles)
-5. ❌ NE JAMAIS demander de clarifications - fournis directement l'analyse
-6. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
-7. Cite tes sources (outils utilisés) en fin de réponse
-8. Ton: professionnel mais accessible
+6. ❌ NE JAMAIS dire "aucune donnée disponible" si des outils ont retourné des données (même partielles)
+7. ❌ NE JAMAIS demander de clarifications - fournis directement l'analyse
+8. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
+9. Cite tes sources (outils utilisés) en fin de réponse
+10. Ton: professionnel mais accessible, comme une vraie analyste financière
 ${intentData ? `9. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
 
 EXEMPLE DE BONNE RÉPONSE (si demande sur plusieurs tickers):
@@ -1151,7 +1162,9 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 messages: [
                     {
                         role: 'system',
-                        content: 'Tu es Emma, une assistante financière experte. Réponds toujours en français de manière professionnelle et accessible.'
+                        content: outputMode === 'data'
+                            ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide, pas de texte explicatif.'
+                            : 'Tu es Emma, une assistante financière experte et analyste professionnelle.\n\nRÈGLES CRITIQUES:\n1. ❌ NE JAMAIS retourner du JSON brut ou du code dans tes réponses\n2. ✅ TOUJOURS analyser et expliquer les données de manière conversationnelle en français\n3. ✅ TOUJOURS agir en tant qu\'analyste financière qui INTERPRÈTE les données, pas juste les affiche\n4. ✅ Ton style: professionnel, accessible, pédagogique\n5. ✅ Structure tes réponses avec des paragraphes, des bullet points, et des insights\n6. ❌ Si tu vois du JSON dans le prompt, c\'est pour TON analyse - ne le copie JAMAIS tel quel dans ta réponse\n\nExemple CORRECT: "Apple (AAPL) affiche une performance solide avec un prix de 245,67$, en hausse de 2,36% aujourd\'hui..."\n\nExemple INCORRECT: "{\\"AAPL\\": {\\"price\\": 245.67, \\"change\\": 5.67}}"'
                     },
                     {
                         role: 'user',
@@ -1204,6 +1217,21 @@ RÉPONSE MARKDOWN ENRICHIE:`;
             const maxTokens = outputMode === 'data' ? 500 : 1000;
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
+            // Ajouter instructions système pour mode conversationnel
+            const systemInstructions = outputMode === 'data'
+                ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide.'
+                : `Tu es Emma, analyste financière experte.
+
+RÈGLES CRITIQUES:
+- ❌ NE JAMAIS retourner du JSON brut ou du code
+- ✅ TOUJOURS être conversationnelle et analyser les données
+- ✅ Tu es une ANALYSTE qui INTERPRÈTE, pas un robot qui affiche des données
+- ✅ Réponds en français professionnel et accessible
+
+`;
+
+            const fullPrompt = systemInstructions + prompt;
+
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -1211,7 +1239,7 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 },
                 body: JSON.stringify({
                     contents: [{
-                        parts: [{ text: prompt }]
+                        parts: [{ text: fullPrompt }]
                     }],
                     generationConfig: {
                         temperature: 0.7,

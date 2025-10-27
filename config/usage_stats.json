@@ -1,20 +1,20 @@
 {
   "polygon-stock-price": {
-    "total_calls": 0,
-    "successful_calls": 0,
+    "total_calls": 2,
+    "successful_calls": 2,
     "failed_calls": 0,
-    "average_response_time_ms": 0,
-    "last_used": null,
-    "success_rate": 0,
+    "average_response_time_ms": 11,
+    "last_used": "2025-10-27T13:13:07.882Z",
+    "success_rate": 100,
     "error_history": []
   },
   "fmp-fundamentals": {
-    "total_calls": 0,
-    "successful_calls": 0,
+    "total_calls": 2,
+    "successful_calls": 2,
     "failed_calls": 0,
-    "average_response_time_ms": 0,
-    "last_used": null,
-    "success_rate": 0,
+    "average_response_time_ms": 10,
+    "last_used": "2025-10-27T13:13:07.882Z",
+    "success_rate": 100,
     "error_history": []
   },
   "calculator": {
@@ -27,21 +27,21 @@
     "error_history": []
   },
   "twelve-data-technical": {
-    "total_calls": 0,
-    "successful_calls": 0,
+    "total_calls": 2,
+    "successful_calls": 2,
     "failed_calls": 0,
-    "average_response_time_ms": 0,
-    "last_used": null,
-    "success_rate": 0,
+    "average_response_time_ms": 12,
+    "last_used": "2025-10-27T13:13:07.882Z",
+    "success_rate": 100,
     "error_history": []
   },
   "alpha-vantage-ratios": {
-    "total_calls": 0,
-    "successful_calls": 0,
+    "total_calls": 2,
+    "successful_calls": 2,
     "failed_calls": 0,
-    "average_response_time_ms": 0,
-    "last_used": null,
-    "success_rate": 0,
+    "average_response_time_ms": 9,
+    "last_used": "2025-10-27T13:13:07.882Z",
+    "success_rate": 100,
     "error_history": []
   },
   "finnhub-news": {
