@@ -39,6 +39,9 @@
     },
     "api/fmp.js": {
       "maxDuration": 10
+    },
+    "api/finviz-news.js": {
+      "maxDuration": 15
     }
   },
   "crons": [],
