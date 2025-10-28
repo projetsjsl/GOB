@@ -5,10 +5,18 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+// Initialize Supabase client only if credentials are available
+let supabase = null;
+try {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
+    supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY
+    );
+  }
+} catch (error) {
+  console.error('Failed to initialize Supabase client:', error);
+}
 
 /**
  * Configuration des utilisateurs et permissions
@@ -67,22 +75,21 @@ const USER_ROLES = {
 };
 
 export default async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
-  }
-
-  const { action, username, password } = req.body;
-
   try {
+    // CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Méthode non autorisée' });
+    }
+
+    const { action, username, password } = req.body;
 
     // ============================================================
     // ACTION: LOGIN
@@ -110,6 +117,21 @@ export default async function handler(req, res) {
         return res.status(401).json({
           success: false,
           error: 'Mot de passe incorrect'
+        });
+      }
+
+      // If Supabase is not configured, skip database operations
+      if (!supabase) {
+        console.warn('Supabase not configured - skipping database operations');
+        return res.status(200).json({
+          success: true,
+          message: 'Connexion réussie (mode sans base de données)',
+          user: {
+            username: normalizedUsername,
+            display_name: USER_ROLES[normalizedUsername].display_name,
+            role: normalizedUsername,
+            permissions: USER_ROLES[normalizedUsername].permissions
+          }
         });
       }
 
