@@ -22,14 +22,18 @@ The main schema file (`supabase-auth-setup.sql`) has been updated with the corre
 Run this migration script in your Supabase SQL Editor:
 
 ```sql
--- Add missing INSERT policy
-CREATE POLICY IF NOT EXISTS "Service role can insert users"
+-- Drop existing policies if they exist (to avoid duplicates)
+DROP POLICY IF EXISTS "Service role can insert users" ON users;
+DROP POLICY IF EXISTS "Service role can update users" ON users;
+
+-- Create INSERT policy
+CREATE POLICY "Service role can insert users"
   ON users
   FOR INSERT
   WITH CHECK (true);
 
--- Add missing UPDATE policy
-CREATE POLICY IF NOT EXISTS "Service role can update users"
+-- Create UPDATE policy
+CREATE POLICY "Service role can update users"
   ON users
   FOR UPDATE
   USING (true)
