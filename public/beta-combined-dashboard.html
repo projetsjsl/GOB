@@ -4710,7 +4710,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             <div className="w-1 h-6 bg-green-600 mr-3"></div>
                                                             Analyse Sectorielle
                                                         </h4>
-                                                        <div className="bg-gray-800 rounded-lg p-4">
+                                                        <div className="bg-gray-50 rounded-lg p-4">
                                                             <div className="text-gray-700 leading-relaxed">
                                                                 {typeof claudeData.sectorAnalysis === 'string' 
                                                                     ? cleanText(claudeData.sectorAnalysis)
@@ -5450,7 +5450,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             <div className="w-1 h-6 bg-green-600 mr-3"></div>
                                                             Analyse Sectorielle
                                                         </h4>
-                                                        <div className="bg-gray-800 rounded-lg p-4">
+                                                        <div className="bg-gray-50 rounded-lg p-4">
                                                             <div className="text-gray-700 leading-relaxed">
                                                                 {typeof claudeData.sectorAnalysis === 'string' 
                                                                     ? cleanText(claudeData.sectorAnalysis)
@@ -5501,10 +5501,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                                 )}
 
                                                 {/* Recommandation */}
-                                                {(claudeData?.recommendation || claudeData?.finalConclusion?.recommendation) && 
-                                                 !claudeData?.recommendation?.includes('En attente') && 
+                                                {(claudeData?.recommendation || claudeData?.finalConclusion?.recommendation) &&
+                                                 !claudeData?.recommendation?.includes('En attente') &&
                                                  !claudeData?.finalConclusion?.recommendation?.includes('En attente') && (
-                                                    <div className="bg-gray-800 rounded-lg p-4">
+                                                    <div className="bg-blue-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
                                                             <span className="mr-2">💡</span>
                                                             Recommandation
@@ -5531,7 +5531,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                                 <li>Cliquez sur "🤖 Analyser avec Claude" pour traiter les données</li>
                                                                 <li>Les métriques détaillées seront extraites et affichées ici</li>
                                                             </ol>
-                                                            <div className="mt-4 p-3 bg-gray-800 rounded border border-gray-700">
+                                                            <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
                                                                 <p className="text-sm text-blue-800">
                                                                     💡 <strong>Astuce :</strong> Les données parsées automatiquement sont affichées ci-dessus. 
                                                                     Pour une analyse plus approfondie avec insights IA, utilisez l'API Claude.
