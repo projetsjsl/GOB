@@ -136,22 +136,62 @@ export default async function handler(req, res) {
           .single();
 
         if (insertError) {
-          console.error('Erreur création utilisateur:', insertError);
-          throw new Error('Erreur lors de la création de l\'utilisateur');
+          console.error('Erreur création utilisateur:', {
+            code: insertError.code,
+            message: insertError.message,
+            details: insertError.details,
+            hint: insertError.hint,
+            username: normalizedUsername,
+            role: normalizedUsername
+          });
+
+          // Provide more specific error message based on the error
+          if (insertError.message && insertError.message.includes('pattern')) {
+            throw new Error(`Erreur de validation: ${insertError.message}. Vérifiez la configuration de la base de données.`);
+          } else if (insertError.message && insertError.message.includes('policy')) {
+            throw new Error('Erreur de permissions: Exécutez le script supabase-auth-migration.sql dans votre base de données.');
+          } else {
+            throw new Error(`Erreur lors de la création de l'utilisateur: ${insertError.message || 'Erreur inconnue'}`);
+          }
         }
 
         userData = newUser;
       } else if (existingUser) {
         // Mettre à jour le last_login
-        const { data: updatedUser } = await supabase
+        const { data: updatedUser, error: updateError } = await supabase
           .from('users')
           .update({ last_login: new Date().toISOString() })
           .eq('username', normalizedUsername)
           .select()
           .single();
 
+        if (updateError) {
+          console.error('Erreur mise à jour utilisateur:', {
+            code: updateError.code,
+            message: updateError.message,
+            details: updateError.details,
+            hint: updateError.hint,
+            username: normalizedUsername
+          });
+
+          // Provide more specific error message
+          if (updateError.message && updateError.message.includes('policy')) {
+            throw new Error('Erreur de permissions: Exécutez le script supabase-auth-migration.sql dans votre base de données.');
+          } else if (updateError.message && updateError.message.includes('pattern')) {
+            throw new Error(`Erreur de validation: ${updateError.message}. Vérifiez la configuration de la base de données.`);
+          }
+          // If update fails, we can still continue with existing user data
+          console.warn('Continuing with existing user data despite update error');
+        }
+
         userData = updatedUser || existingUser;
       } else {
+        console.error('Erreur récupération utilisateur:', {
+          code: fetchError?.code,
+          message: fetchError?.message,
+          details: fetchError?.details,
+          username: normalizedUsername
+        });
         throw fetchError;
       }
 
