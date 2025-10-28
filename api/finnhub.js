@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         message: 'Finnhub API opérationnel',
         apiKey: apiKey ? 'Configurée' : 'Manquante',
         timestamp: new Date().toISOString(),
-        availableEndpoints: ['quote', 'news', 'company-news', 'basic-financials'],
+        availableEndpoints: ['quote', 'news', 'market-news', 'company-news', 'basic-financials', 'profile'],
         documentation: 'https://finnhub.io/docs/api'
       });
     }
@@ -61,7 +61,8 @@ export default async function handler(req, res) {
         break;
 
       case 'news':
-        // General market news
+      case 'market-news':
+        // General market news (support both 'news' and 'market-news' for backward compatibility)
         const category = req.query.category || 'general';
         finnhubUrl = `https://finnhub.io/api/v1/news?category=${category}&token=${apiKey}`;
         break;
@@ -87,7 +88,7 @@ export default async function handler(req, res) {
       default:
         return res.status(400).json({
           error: 'Invalid endpoint',
-          supported: ['quote', 'news', 'company-news', 'basic-financials', 'profile'],
+          supported: ['quote', 'news', 'market-news', 'company-news', 'basic-financials', 'profile'],
           message: `L'endpoint "${endpoint}" n'est pas supporté`,
           example: '/api/finnhub?endpoint=quote&symbol=AAPL'
         });

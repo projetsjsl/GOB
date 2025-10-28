@@ -11922,6 +11922,35 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 );
             });
 
+            // Helper functions for news credibility scoring
+            const getNewsCredibilityScore = (sourceName) => {
+                if (!sourceName) return 50;
+
+                const source = sourceName.toLowerCase();
+
+                // Premium sources (90-100)
+                const premiumSources = ['bloomberg', 'reuters', 'wall street journal', 'wsj', 'financial times', 'ft'];
+                if (premiumSources.some(s => source.includes(s))) return 95;
+
+                // High credibility (75-89)
+                const highSources = ['cnbc', 'marketwatch', 'barron', 'seeking alpha', 'yahoo finance', 'morningstar', 'the economist'];
+                if (highSources.some(s => source.includes(s))) return 82;
+
+                // Medium credibility (50-74)
+                const mediumSources = ['forbes', 'benzinga', 'investor', 'zacks', 'motley fool', 'nasdaq', 'business insider'];
+                if (mediumSources.some(s => source.includes(s))) return 65;
+
+                // Low credibility (below 50)
+                return 40;
+            };
+
+            const getCredibilityTier = (score) => {
+                if (score >= 90) return 'premium';
+                if (score >= 75) return 'high';
+                if (score >= 50) return 'medium';
+                return 'low';
+            };
+
             // Composant onglet Stocks & News
             const StocksNewsTab = () => {
                 const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
