@@ -5592,8 +5592,10 @@ STRUCTURE JSON OBLIGATOIRE:
                             {seekingAlphaData.stocks.map((stock, index) => {
                                 const claudeData = seekingAlphaStockData.stocks?.[stock.ticker];
                                 const parsedData = stock.parsedData;
-                                
-                                if (!claudeData && !parsedData) return null;
+
+                                // Afficher la carte même sans données complètes
+                                // mais vérifier qu'il y a au moins un ticker
+                                if (!stock.ticker) return null;
                                 
                                 return (
                                     <div key={index} className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
