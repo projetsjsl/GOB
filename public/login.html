@@ -78,6 +78,12 @@
         />
       </div>
 
+      <!-- Avertissement Caps Lock -->
+      <div id="caps-lock-warning" class="hidden bg-blue-50 border border-blue-300 text-blue-800 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+        <span class="text-lg">ℹ️</span>
+        <span><strong>Caps Lock activé!</strong> Pas d'inquiétude, la conversion en minuscules est automatique.</span>
+      </div>
+
       <!-- Message d'erreur -->
       <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
       </div>
@@ -110,7 +116,7 @@
         <span class="px-2 py-1 bg-purple-100 rounded">Admin</span>
       </div>
       <p class="text-xs text-gray-400 mt-2">
-        💡 Astuce: Mot de passe = nom d'utilisateur
+        💡 Astuce: Mot de passe = nom d'utilisateur (minuscules)
       </p>
     </div>
 
@@ -121,6 +127,7 @@
     const loginBtn = document.getElementById('login-btn');
     const errorMessage = document.getElementById('error-message');
     const successMessage = document.getElementById('success-message');
+    const capsLockWarning = document.getElementById('caps-lock-warning');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
 
@@ -131,6 +138,30 @@
         // Déjà connecté, rediriger
         window.location.href = '/beta-combined-dashboard.html';
       }
+    });
+
+    // Détection Caps Lock
+    function checkCapsLock(event) {
+      const isCapsLockOn = event.getModifierState && event.getModifierState('CapsLock');
+      if (isCapsLockOn) {
+        capsLockWarning.classList.remove('hidden');
+      } else {
+        capsLockWarning.classList.add('hidden');
+      }
+    }
+
+    // Ajouter la détection sur les deux champs
+    usernameInput.addEventListener('keyup', checkCapsLock);
+    passwordInput.addEventListener('keyup', checkCapsLock);
+    usernameInput.addEventListener('keydown', checkCapsLock);
+    passwordInput.addEventListener('keydown', checkCapsLock);
+
+    // Auto-conversion en minuscules pour éviter les problèmes
+    usernameInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.toLowerCase();
+    });
+    passwordInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.toLowerCase();
     });
 
     // Gestion de la soumission du formulaire

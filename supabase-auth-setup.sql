@@ -61,6 +61,19 @@ CREATE POLICY "Users can view themselves"
   FOR SELECT
   USING (true); -- Pour l'instant, on permet à tous de voir tous les users (pour admin)
 
+-- Politique pour users: Permettre l'insertion (via service role key)
+CREATE POLICY "Service role can insert users"
+  ON users
+  FOR INSERT
+  WITH CHECK (true); -- Le service role key bypass RLS, mais définissons la policy pour clarté
+
+-- Politique pour users: Permettre la mise à jour (via service role key)
+CREATE POLICY "Service role can update users"
+  ON users
+  FOR UPDATE
+  USING (true)
+  WITH CHECK (true);
+
 -- Politique pour conversation_history: Voir ses propres conversations
 CREATE POLICY "Users can view their own conversations"
   ON conversation_history

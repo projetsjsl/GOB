@@ -58,10 +58,20 @@ class EmmaMultiUser {
   }
 
   /**
-   * Génère un ID de session unique
+   * Génère un ID de session unique (UUID valide)
    */
   generateSessionId() {
-    return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // Utiliser crypto.randomUUID() pour générer un UUID v4 valide
+    // Compatible avec le type UUID de PostgreSQL/Supabase
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    // Fallback pour les anciens navigateurs (génère un UUID v4 manuellement)
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   /**
