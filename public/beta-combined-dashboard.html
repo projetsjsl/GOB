@@ -3186,10 +3186,16 @@ STRUCTURE JSON OBLIGATOIRE:
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
-                        <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>🔍 Debug des Données</h3>
+                        <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            <Icon emoji="🔍" size={20} />
+                            Debug des Données
+                        </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                <div className="text-blue-600 font-medium mb-2">📊 Stock Data</div>
+                                <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
+                                    <Icon emoji="📊" size={18} />
+                                    Stock Data
+                                </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Tickers: {tickers.length} ({tickers.join(', ')})
                                 </div>
@@ -3201,7 +3207,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 </div>
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                <div className="text-emerald-600 font-medium mb-2">📰 News Data</div>
+                                <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
+                                    <Icon emoji="📰" size={18} />
+                                    News Data
+                                </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Articles: {newsData.length}
                                 </div>
@@ -3210,7 +3219,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 </div>
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                <div className="text-violet-600 font-medium mb-2">🎯 Seeking Alpha</div>
+                                <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
+                                    <Icon emoji="🎯" size={18} />
+                                    Seeking Alpha
+                                </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Stocks: {seekingAlphaData.stocks?.length || 0}
                                 </div>
@@ -3226,7 +3238,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>📋 Logs Système</h3>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <Icon emoji="📋" size={20} />
+                                Logs Système
+                            </h3>
                             <button
                                 onClick={() => setSystemLogs([])}
                                 className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
@@ -3266,14 +3281,20 @@ STRUCTURE JSON OBLIGATOIRE:
                         isDarkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>🧠 Deep Think</h3>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
+                                <Icon emoji="🧠" size={20} />
+                                Deep Think
+                            </h3>
                             <span className={`px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
                                 AI Analysis System
                             </span>
                         </div>
                         <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <div className="font-semibold mb-1">🎯 Statut du système</div>
+                                <div className="font-semibold mb-1 flex items-center gap-2">
+                                    <Icon emoji="🎯" size={16} />
+                                    Statut du système
+                                </div>
                                 <div className="text-xs space-y-1">
                                     <div>• Gemini API: {typeof window !== 'undefined' ? '✅ Actif' : '⚠️ Vérification...'}</div>
                                     <div>• Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? '✅ Opérationnel' : '⏸️ En attente'}</div>
