@@ -1165,7 +1165,7 @@ RÉPONSE MARKDOWN ENRICHIE:`;
             }
 
             const requestBody = {
-                model: 'sonar',  // Dernier modèle Perplexity (Jan 2025) - Recherche temps réel + sources web optimisées
+                model: 'sonar-pro',  // Modèle premium Perplexity (Jan 2025) - Meilleure qualité, plus de citations, recherche approfondie
                 messages: [
                     {
                         role: 'system',
