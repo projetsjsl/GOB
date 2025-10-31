@@ -11476,6 +11476,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         return `@@IMAGE_TAG_${idx}@@`;
                     });
 
+                    // [STOCKCARD:TICKER] - Perplexity Finance-style stock card
+                    t = t.replace(/\[STOCKCARD:([A-Z\.]+)\]/g, (_m, ticker) => {
+                        const idx = imageTags.length;
+                        imageTags.push({
+                            type: 'stockcard',
+                            ticker: ticker
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [RATIO_CHART:TICKER:METRIC] - Macrotrends-style historical ratio chart
+                    t = t.replace(/\[RATIO_CHART:([A-Z\.]+):([A-Z_]+)\]/g, (_m, ticker, metric) => {
+                        const idx = imageTags.length;
+                        imageTags.push({
+                            type: 'ratio_chart',
+                            ticker: ticker,
+                            metric: metric
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
                     // Gras / italique basiques (type Markdown)
                     t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                     t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -11649,6 +11670,182 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             Voir le graphique sur TradingView →
                                         </a>
                                     </div>
+                                </div>`;
+                                break;
+
+                            case 'stockcard':
+                                // Perplexity Finance-style stock card
+                                const cleanTicker = tag.ticker.replace(/\.(TO|V)$/, '');
+                                const logoStockUrl = `https://logo.clearbit.com/${cleanTicker.toLowerCase()}.com`;
+                                html = `<div class="my-4 w-full max-w-md mx-auto">
+                                    <div class="rounded-xl border-2 ${isDarkMode ? 'border-blue-500/30 bg-gradient-to-br from-gray-900/80 to-gray-800/80' : 'border-blue-200 bg-gradient-to-br from-white to-blue-50'} p-5 shadow-xl hover-lift">
+                                        <!-- Header avec logo et ticker -->
+                                        <div class="flex items-center gap-3 mb-4 pb-3 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
+                                            <img
+                                                src="${logoStockUrl}"
+                                                alt="${tag.ticker} Logo"
+                                                class="h-12 w-12 rounded-lg shadow-md"
+                                                loading="lazy"
+                                                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect width=%2248%22 height=%2248%22 fill=%22%234299e1%22/%3E%3Ctext x=%2224%22 y=%2230%22 font-family=%22Arial%22 font-size=%2220%22 fill=%22white%22 text-anchor=%22middle%22%3E${tag.ticker.charAt(0)}%3C/text%3E%3C/svg%3E'"
+                                            />
+                                            <div class="flex-1">
+                                                <div class="font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}">${tag.ticker}</div>
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}" id="stockcard-${tag.ticker}-name">Chargement...</div>
+                                            </div>
+                                            <a href="https://finance.yahoo.com/quote/${tag.ticker}" target="_blank" class="text-blue-500 hover:text-blue-600 text-xs">↗</a>
+                                        </div>
+
+                                        <!-- Prix et variation -->
+                                        <div class="mb-4">
+                                            <div class="flex items-baseline gap-2 mb-1">
+                                                <span class="text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-price">--</span>
+                                                <span class="text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}">USD</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 rounded-md text-sm font-semibold" id="stockcard-${tag.ticker}-change">--</span>
+                                                <span class="text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}" id="stockcard-${tag.ticker}-time">--</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Métriques clés (2x2 grid) -->
+                                        <div class="grid grid-cols-2 gap-3 mb-4">
+                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">Cap. boursière</div>
+                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-mktcap">--</div>
+                                            </div>
+                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">Volume</div>
+                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-volume">--</div>
+                                            </div>
+                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">P/E Ratio</div>
+                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-pe">--</div>
+                                            </div>
+                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">52W Range</div>
+                                                <div class="text-xs font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-52w">--</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Mini chart -->
+                                        <div class="rounded-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
+                                            <img
+                                                src="https://finviz.com/chart.ashx?t=${tag.ticker}&ty=c&ta=0&p=d&s=l"
+                                                alt="${tag.ticker} Mini Chart"
+                                                class="w-full h-auto"
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    </div>
+                                    <script>
+                                    (async () => {
+                                        try {
+                                            const resp = await fetch('/api/marketdata?ticker=${tag.ticker}');
+                                            const data = await resp.json();
+                                            if (data.success && data.data) {
+                                                const d = data.data;
+                                                document.getElementById('stockcard-${tag.ticker}-name').textContent = d.name || '${tag.ticker}';
+                                                document.getElementById('stockcard-${tag.ticker}-price').textContent = d.price ? '$' + d.price.toFixed(2) : '--';
+
+                                                const changePercent = d.changesPercentage || 0;
+                                                const changeValue = d.change || 0;
+                                                const changeColor = changePercent >= 0 ? 'bg-green-500 text-white' : 'bg-red-500 text-white';
+                                                const changeSign = changePercent >= 0 ? '+' : '';
+                                                document.getElementById('stockcard-${tag.ticker}-change').textContent = changeSign + changePercent.toFixed(2) + '% (' + changeSign + changeValue.toFixed(2) + ')';
+                                                document.getElementById('stockcard-${tag.ticker}-change').className = 'px-2 py-1 rounded-md text-sm font-semibold ' + changeColor;
+
+                                                document.getElementById('stockcard-${tag.ticker}-time').textContent = d.timestamp ? new Date(d.timestamp * 1000).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) : 'Temps réel';
+                                                document.getElementById('stockcard-${tag.ticker}-mktcap').textContent = d.marketCap ? (d.marketCap / 1e9).toFixed(2) + 'B' : '--';
+                                                document.getElementById('stockcard-${tag.ticker}-volume').textContent = d.volume ? (d.volume / 1e6).toFixed(1) + 'M' : '--';
+                                                document.getElementById('stockcard-${tag.ticker}-pe').textContent = d.pe ? d.pe.toFixed(2) : '--';
+                                                document.getElementById('stockcard-${tag.ticker}-52w').textContent = (d.yearLow && d.yearHigh) ? '$' + d.yearLow.toFixed(2) + ' - $' + d.yearHigh.toFixed(2) : '--';
+                                            }
+                                        } catch (err) {
+                                            console.error('Erreur StockCard ${tag.ticker}:', err);
+                                        }
+                                    })();
+                                    </script>
+                                </div>`;
+                                break;
+
+                            case 'ratio_chart':
+                                // Macrotrends-style historical ratio chart
+                                const metricLabels = {
+                                    'PE': 'P/E Ratio',
+                                    'PB': 'P/B Ratio',
+                                    'PS': 'P/S Ratio',
+                                    'PROFIT_MARGIN': 'Marge bénéficiaire',
+                                    'ROE': 'Return on Equity',
+                                    'ROA': 'Return on Assets',
+                                    'DEBT_EQUITY': 'Dette/Capitaux propres',
+                                    'CURRENT_RATIO': 'Ratio de liquidité',
+                                    'REVENUE_GROWTH': 'Croissance du CA',
+                                    'EARNINGS_GROWTH': 'Croissance des bénéfices'
+                                };
+                                const metricLabel = metricLabels[tag.metric] || tag.metric;
+                                html = `<div class="my-4 w-full max-w-3xl mx-auto">
+                                    <div class="rounded-xl border ${isDarkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-white'} p-5 shadow-lg">
+                                        <!-- Header -->
+                                        <div class="flex items-center justify-between mb-4 pb-3 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
+                                            <div>
+                                                <div class="font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}">${metricLabel}</div>
+                                                <div class="text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}">${tag.ticker} • Historique 5 ans</div>
+                                            </div>
+                                            <span class="px-3 py-1 rounded-lg text-xs font-semibold ${isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-700'}">
+                                                📊 Analyse fondamentale
+                                            </span>
+                                        </div>
+
+                                        <!-- Chart placeholder - TradingView fundamentals or fallback to table -->
+                                        <div class="rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-800/30' : 'bg-gray-50'} p-4 min-h-[300px]">
+                                            <div class="text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} py-8" id="ratio-chart-${tag.ticker}-${tag.metric}">
+                                                <div class="animate-pulse mb-2">📈</div>
+                                                <div class="text-sm">Chargement des données historiques...</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Link to detailed analysis -->
+                                        <div class="mt-4 flex items-center justify-between text-xs">
+                                            <span class="${isDarkMode ? 'text-gray-500' : 'text-gray-600'}">Source: FMP Financial Data</span>
+                                            <a href="https://www.macrotrends.net/stocks/charts/${tag.ticker.toLowerCase()}/${tag.ticker.toLowerCase()}/${tag.metric.toLowerCase().replace(/_/g, '-')}"
+                                               target="_blank"
+                                               class="text-blue-500 hover:text-blue-600 flex items-center gap-1">
+                                                Voir sur Macrotrends ↗
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <script>
+                                    (async () => {
+                                        try {
+                                            // Attempt to fetch historical ratio data from our API
+                                            const resp = await fetch('/api/fmp?endpoint=ratios&ticker=${tag.ticker}&period=annual&limit=5');
+                                            const data = await resp.json();
+
+                                            const container = document.getElementById('ratio-chart-${tag.ticker}-${tag.metric}');
+
+                                            if (data.success && data.data && data.data.length > 0) {
+                                                // Simple table display for now (can be upgraded to Chart.js later)
+                                                const ratioData = data.data.reverse(); // Oldest to newest
+                                                let tableHtml = '<table class="w-full text-sm"><thead><tr class="${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}"><th class="p-2 text-left">Année</th><th class="p-2 text-right">Valeur</th></tr></thead><tbody>';
+
+                                                ratioData.forEach((year, i) => {
+                                                    const value = year['${tag.metric.toLowerCase()}'] || '--';
+                                                    const displayValue = typeof value === 'number' ? value.toFixed(2) : value;
+                                                    const rowClass = i % 2 === 0 ? (isDarkMode ? 'bg-gray-900/30' : 'bg-white') : '';
+                                                    tableHtml += '<tr class="' + rowClass + '"><td class="p-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}">' + (year.date || year.year) + '</td><td class="p-2 text-right font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}">' + displayValue + '</td></tr>';
+                                                });
+
+                                                tableHtml += '</tbody></table>';
+                                                container.innerHTML = tableHtml;
+                                            } else {
+                                                container.innerHTML = '<div class="text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} py-8"><div class="mb-2">📊</div><div class="text-sm">Données non disponibles pour ce ratio.</div><div class="text-xs mt-2">Consultez Macrotrends pour l\\'historique complet.</div></div>';
+                                            }
+                                        } catch (err) {
+                                            console.error('Erreur RatioChart ${tag.ticker}:${tag.metric}:', err);
+                                            document.getElementById('ratio-chart-${tag.ticker}-${tag.metric}').innerHTML = '<div class="text-center ${isDarkMode ? 'text-gray-500' : 'text-gray-600'} py-8">⚠️ Erreur de chargement</div>';
+                                        }
+                                    })();
+                                    </script>
                                 </div>`;
                                 break;
 
