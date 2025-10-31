@@ -208,6 +208,83 @@ class SmartAgent {
     }
 
     /**
+     * 🧠 INTELLIGENT COMPLEXITY DETECTION - Détecte automatiquement le mode optimal
+     * Ajuste outputMode selon la complexité et l'intention détectées
+     */
+    _detectComplexity(userMessage, intentData, context) {
+        // Indicateurs de complexité haute → mode expert
+        const complexityIndicators = {
+            // Mots-clés indiquant analyse approfondie
+            deepAnalysisKeywords: ['analyse approfondie', 'analyse complète', 'analyse détaillée', 'comprehensive',
+                'en profondeur', 'exhaustive', 'toutes les données', 'tous les aspects', 'comparaison détaillée'],
+
+            // Requêtes multi-tickers (> 3)
+            multipleTickersThreshold: 3,
+
+            // Intentions complexes nécessitant expertise
+            complexIntents: ['comprehensive_analysis', 'portfolio_analysis', 'sector_comparison',
+                'fundamental_analysis', 'technical_deep_dive'],
+
+            // Longueur de message indiquant détails souhaités
+            longMessageThreshold: 150, // caractères
+        };
+
+        let complexityScore = 0;
+        let reasons = [];
+
+        // 1. Analyser les mots-clés
+        const messageLower = userMessage.toLowerCase();
+        if (complexityIndicators.deepAnalysisKeywords.some(keyword => messageLower.includes(keyword))) {
+            complexityScore += 3;
+            reasons.push('deep analysis keywords');
+        }
+
+        // 2. Compter les tickers mentionnés
+        const tickerCount = intentData?.tickers?.length || 0;
+        if (tickerCount >= complexityIndicators.multipleTickersThreshold) {
+            complexityScore += 2;
+            reasons.push(`${tickerCount} tickers`);
+        }
+
+        // 3. Vérifier l'intention
+        if (intentData && complexityIndicators.complexIntents.includes(intentData.intent)) {
+            complexityScore += 2;
+            reasons.push(`complex intent: ${intentData.intent}`);
+        }
+
+        // 4. Longueur du message
+        if (userMessage.length > complexityIndicators.longMessageThreshold) {
+            complexityScore += 1;
+            reasons.push('detailed query');
+        }
+
+        // 5. Confiance faible = besoin de plus de contexte/explications
+        if (intentData && intentData.confidence < 0.6) {
+            complexityScore += 1;
+            reasons.push('low confidence, need detail');
+        }
+
+        // 6. Mots-clés spécifiques indiquant mode briefing
+        const briefingKeywords = ['briefing', 'résumé quotidien', 'daily', 'newsletter', 'rapport'];
+        if (briefingKeywords.some(k => messageLower.includes(k))) {
+            console.log(`🧠 Detected briefing mode: ${reasons.join(', ')}`);
+            return 'briefing';
+        }
+
+        // Décision basée sur le score
+        if (complexityScore >= 4) {
+            console.log(`🧠 High complexity (${complexityScore}): ${reasons.join(', ')} → expert mode`);
+            return 'expert';
+        } else if (complexityScore >= 2) {
+            console.log(`🧠 Medium complexity (${complexityScore}): ${reasons.join(', ')} → comprehensive mode`);
+            return 'comprehensive';
+        }
+
+        // Pas de changement de mode
+        return null;
+    }
+
+    /**
      * SMART ROUTER - Sélectionne le meilleur modèle selon le type de requête
      *
      * Stratégie optimisée coût/performance:
@@ -694,6 +771,13 @@ class SmartAgent {
                 }));
 
             const conversationContext = this.conversationHistory.slice(-5); // 5 derniers échanges
+
+            // 🧠 INTELLIGENT MODE DETECTION: Ajuster outputMode selon complexité
+            const detectedMode = this._detectComplexity(userMessage, intentData, context);
+            if (detectedMode && detectedMode !== outputMode) {
+                console.log(`🧠 Intelligence: ${outputMode} → ${detectedMode} (auto-détecté)`);
+                outputMode = detectedMode;
+            }
 
             // 🎯 SMART ROUTER: Sélectionner le meilleur modèle
             const modelSelection = this._selectModel(intentData, outputMode, toolsData);
