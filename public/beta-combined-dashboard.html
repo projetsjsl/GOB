@@ -11041,6 +11041,62 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         return `@@CODE_BLOCK_${idx}@@`;
                     });
 
+                    // 🎨 NOUVEAU: Extraire et parser les tags d'images/charts
+                    const imageTags = [];
+
+                    // [CHART:TRADINGVIEW:EXCHANGE:TICKER] ou [CHART:TRADINGVIEW:TICKER]
+                    t = t.replace(/\[CHART:TRADINGVIEW:([A-Z]+):([A-Z]+)\]/g, (_m, exchangeOrTicker, ticker) => {
+                        const idx = imageTags.length;
+                        const actualExchange = ticker ? exchangeOrTicker : 'NASDAQ';
+                        const actualTicker = ticker || exchangeOrTicker;
+                        imageTags.push({
+                            type: 'tradingview',
+                            ticker: actualTicker,
+                            exchange: actualExchange
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [CHART:FINVIZ:TICKER] - Finviz chart
+                    t = t.replace(/\[CHART:FINVIZ:([A-Z]+)\]/g, (_m, ticker) => {
+                        const idx = imageTags.length;
+                        imageTags.push({
+                            type: 'finviz',
+                            ticker: ticker
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [CHART:FINVIZ:SECTORS] - Finviz sector heatmap
+                    t = t.replace(/\[CHART:FINVIZ:SECTORS\]/g, (_m) => {
+                        const idx = imageTags.length;
+                        imageTags.push({
+                            type: 'finviz-sectors'
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [LOGO:TICKER] - Company logo
+                    t = t.replace(/\[LOGO:([A-Z]+)\]/g, (_m, ticker) => {
+                        const idx = imageTags.length;
+                        imageTags.push({
+                            type: 'logo',
+                            ticker: ticker
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [SCREENSHOT:TICKER:TIMEFRAME] - Chart screenshot
+                    t = t.replace(/\[SCREENSHOT:([A-Z]+):([A-Z0-9]+)\]/g, (_m, ticker, timeframe) => {
+                        const idx = imageTags.length;
+                        imageTags.push({
+                            type: 'screenshot',
+                            ticker: ticker,
+                            timeframe: timeframe
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
                     // Gras / italique basiques (type Markdown)
                     t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                     t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -11110,6 +11166,118 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         const langLabel = block.lang ? `<div class="text-xs opacity-70 mb-1">${block.lang}</div>` : '';
                         const codeSafe = block.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                         return `<div class="my-2"><div class="rounded-md border border-gray-200 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'} p-3 overflow-auto">${langLabel}<pre class="m-0"><code>${codeSafe}</code></pre></div></div>`;
+                    });
+
+                    // 🎨 NOUVEAU: Réinsertion des tags d'images convertis en HTML
+                    t = t.replace(/@@IMAGE_TAG_(\d+)@@/g, (_m, idxStr) => {
+                        const idx = parseInt(idxStr, 10);
+                        const tag = imageTags[idx];
+                        if (!tag) return '';
+
+                        let html = '';
+
+                        switch (tag.type) {
+                            case 'tradingview':
+                                // TradingView widget embed (interactive chart)
+                                const tvSymbol = `${tag.exchange}:${tag.ticker}`;
+                                html = `<div class="my-3 w-full max-w-2xl mx-auto">
+                                    <div class="rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden">
+                                        <div class="text-xs px-2 py-1 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}">
+                                            📈 TradingView Chart: ${tag.ticker}
+                                        </div>
+                                        <div class="tradingview-widget-container" style="height:400px;width:100%;">
+                                            <iframe
+                                                src="https://www.tradingview.com/widgetembed/?symbol=${tvSymbol}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=${isDarkMode ? 'dark' : 'light'}&style=1&timezone=America%2FNew_York&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=fr"
+                                                style="width:100%;height:100%;border:0;"
+                                                frameborder="0"
+                                                allowtransparency="true"
+                                                scrolling="no"
+                                                allowfullscreen>
+                                            </iframe>
+                                        </div>
+                                    </div>
+                                </div>`;
+                                break;
+
+                            case 'finviz':
+                                // Finviz chart (static image)
+                                const finvizUrl = `https://finviz.com/chart.ashx?t=${tag.ticker}&ty=c&ta=1&p=d&s=l`;
+                                html = `<div class="my-3 w-full max-w-2xl mx-auto">
+                                    <div class="rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden">
+                                        <div class="text-xs px-2 py-1 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}">
+                                            📊 Finviz Chart: ${tag.ticker}
+                                        </div>
+                                        <a href="https://finviz.com/quote.ashx?t=${tag.ticker}" target="_blank" rel="noopener noreferrer">
+                                            <img
+                                                src="${finvizUrl}"
+                                                alt="${tag.ticker} Chart"
+                                                class="w-full h-auto"
+                                                loading="lazy"
+                                                onerror="this.parentElement.parentElement.innerHTML='<div class=\\'p-4 text-center text-gray-500\\'>Graphique non disponible pour ${tag.ticker}</div>'"
+                                            />
+                                        </a>
+                                    </div>
+                                </div>`;
+                                break;
+
+                            case 'finviz-sectors':
+                                // Finviz sector heatmap
+                                const heatmapUrl = 'https://finviz.com/grp_image.ashx?bar_sector_t.png';
+                                html = `<div class="my-3 w-full max-w-3xl mx-auto">
+                                    <div class="rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden">
+                                        <div class="text-xs px-2 py-1 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}">
+                                            🌡️ Finviz Sector Heatmap
+                                        </div>
+                                        <a href="https://finviz.com/groups.ashx" target="_blank" rel="noopener noreferrer">
+                                            <img
+                                                src="${heatmapUrl}"
+                                                alt="Sector Performance Heatmap"
+                                                class="w-full h-auto"
+                                                loading="lazy"
+                                                onerror="this.parentElement.parentElement.innerHTML='<div class=\\'p-4 text-center text-gray-500\\'>Heatmap sectorielle non disponible</div>'"
+                                            />
+                                        </a>
+                                    </div>
+                                </div>`;
+                                break;
+
+                            case 'logo':
+                                // Company logo via Clearbit or fallback
+                                const logoUrl = `https://logo.clearbit.com/${tag.ticker.toLowerCase()}.com`;
+                                html = `<div class="inline-block my-2 mx-1">
+                                    <img
+                                        src="${logoUrl}"
+                                        alt="${tag.ticker} Logo"
+                                        class="h-8 w-8 rounded-md inline-block"
+                                        loading="lazy"
+                                        onerror="this.style.display='none'"
+                                    />
+                                </div>`;
+                                break;
+
+                            case 'screenshot':
+                                // Screenshot of chart (link to TradingView)
+                                const screenshotUrl = `https://www.tradingview.com/x/${tag.ticker}/${tag.timeframe}/`;
+                                html = `<div class="my-3 w-full max-w-2xl mx-auto">
+                                    <div class="rounded-lg border ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'} p-4 text-center">
+                                        <div class="text-sm mb-2">📸 Chart Screenshot: ${tag.ticker} (${tag.timeframe})</div>
+                                        <a
+                                            href="${screenshotUrl}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-blue-600 hover:text-blue-700 underline"
+                                        >
+                                            Voir le graphique sur TradingView →
+                                        </a>
+                                    </div>
+                                </div>`;
+                                break;
+
+                            default:
+                                html = '';
+                        }
+
+                        return html;
                     });
 
                     // Conteneur final
