@@ -123,6 +123,134 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
+        /* 💎 VAGUES 3+4 - Finance Pro UI Effects */
+
+        /* 🌫️ Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card-light {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        /* ⬆️ Hover Lift Effect (-4px translateY) */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        /* ✨ Shine Effect (horizontal sweep) */
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+
+        .shine-effect:hover::before {
+            left: 100%;
+        }
+
+        /* 🌟 Glow Animation for Important Metrics */
+        .glow-pulse {
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(74, 222, 128, 0.5),
+                            0 0 10px rgba(74, 222, 128, 0.3),
+                            0 0 15px rgba(74, 222, 128, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(74, 222, 128, 0.8),
+                            0 0 20px rgba(74, 222, 128, 0.6),
+                            0 0 30px rgba(74, 222, 128, 0.4);
+            }
+        }
+
+        .glow-pulse-red {
+            animation: glow-pulse-red 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.5),
+                            0 0 10px rgba(239, 68, 68, 0.3),
+                            0 0 15px rgba(239, 68, 68, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.8),
+                            0 0 20px rgba(239, 68, 68, 0.6),
+                            0 0 30px rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        .glow-pulse-blue {
+            animation: glow-pulse-blue 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-blue {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(59, 130, 246, 0.5),
+                            0 0 10px rgba(59, 130, 246, 0.3),
+                            0 0 15px rgba(59, 130, 246, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(59, 130, 246, 0.8),
+                            0 0 20px rgba(59, 130, 246, 0.6),
+                            0 0 30px rgba(59, 130, 246, 0.4);
+            }
+        }
+
+        /* 💫 Shimmer Effect for Loading States */
+        .shimmer {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.05) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
         /* 🔒 Prévention du scroll horizontal sur tous les appareils */
         html, body {
             overflow-x: hidden;
@@ -4183,8 +4311,60 @@ STRUCTURE JSON OBLIGATOIRE:
                     }
                 };
 
+                // Effet pour initialiser le TradingView Ticker Tape avec les tickers de la watchlist
+                useEffect(() => {
+                    if (watchlistTickers.length > 0) {
+                        // Supprimer le widget existant s'il existe
+                        const existingWidget = document.getElementById('tradingview-ticker-dan-watchlist');
+                        if (existingWidget) {
+                            existingWidget.innerHTML = '';
+                        }
+
+                        // Créer les symboles formatés pour TradingView (EXCHANGE:TICKER)
+                        // Par défaut, on assume que les tickers US sont sur NASDAQ ou NYSE
+                        const tvSymbols = watchlistTickers.map(ticker => {
+                            // Détecter les tickers canadiens (qui se terminent souvent par .TO, .V, etc.)
+                            if (ticker.includes('.TO') || ticker.includes('.V')) {
+                                return { "proName": `TSX:${ticker.replace(/\.(TO|V)/, '')}`, "title": ticker };
+                            }
+                            // Par défaut, utiliser NASDAQ pour les tickers US
+                            return { "proName": `NASDAQ:${ticker}`, "title": ticker };
+                        });
+
+                        // Créer le script TradingView
+                        const script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+                        script.async = true;
+                        script.innerHTML = JSON.stringify({
+                            "symbols": tvSymbols.slice(0, 20), // Limiter à 20 symboles pour performance
+                            "showSymbolLogo": true,
+                            "isTransparent": isDarkMode,
+                            "displayMode": "adaptive",
+                            "colorTheme": isDarkMode ? "dark" : "light",
+                            "locale": "fr"
+                        });
+
+                        const widgetContainer = document.getElementById('tradingview-ticker-dan-watchlist');
+                        if (widgetContainer) {
+                            widgetContainer.appendChild(script);
+                        }
+                    }
+                }, [watchlistTickers, isDarkMode]);
+
                 return (
                     <div className="space-y-6">
+                        {/* TradingView Ticker Tape - VAGUE 2: Quick Wins */}
+                        {watchlistTickers.length > 0 && (
+                            <div className={`rounded-lg overflow-hidden border transition-colors duration-300 ${
+                                isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'
+                            }`}>
+                                <div className="tradingview-widget-container" style={{ height: '62px' }}>
+                                    <div id="tradingview-ticker-dan-watchlist" style={{ height: '100%' }}></div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Screener pour Dan's Watchlist - Identique à celui d'IntelliStocks */}
                         {showScreener && (
                             <div className={`border rounded-lg p-3 transition-colors duration-300 ${
@@ -14198,6 +14378,34 @@ console.log('✅ Données hybrides récupérées:', {
                     // Chargement uniquement au changement de stock ou manuel
                 }, [selectedStock]);
 
+                // 🔄 Rechargement du TradingView Mini Chart quand le ticker change - VAGUE 2
+                useEffect(() => {
+                    const container = document.getElementById('tradingview-mini-chart-jlab');
+                    if (container) {
+                        // Supprimer l'ancien widget
+                        container.innerHTML = '';
+
+                        // Créer le nouveau script avec le ticker mis à jour
+                        const script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+                        script.async = true;
+                        script.innerHTML = JSON.stringify({
+                            "symbol": `NASDAQ:${selectedStock}`,
+                            "width": "100%",
+                            "height": "100%",
+                            "locale": "fr",
+                            "dateRange": "1D",
+                            "colorTheme": isDarkMode ? "dark" : "light",
+                            "isTransparent": false,
+                            "autosize": true,
+                            "largeChartUrl": ""
+                        });
+                        container.appendChild(script);
+                        console.log(`📊 TradingView Mini Chart rechargé pour ${selectedStock}`);
+                    }
+                }, [selectedStock, isDarkMode]);
+
                 // ⚡ AUTO-REFRESH: Désactivé - Chargement unique à l'arrivée sur la page
                 // L'utilisateur peut actualiser manuellement via le bouton refresh
                 // Les caches API optimisent les appels répétés:
@@ -14762,13 +14970,13 @@ console.log('✅ Données hybrides récupérées:', {
                                             ) : (
                                                 <LucideIcon name="WifiOff" className="w-3 h-3 text-red-500" />
                                             )}
-                                            {/* 🎯 Badge Score JSLAI™ */}
+                                            {/* 🎯 Badge Score JSLAI™ avec Glow Animation - VAGUE 3+4 */}
                                             {stockDataIntelli?.jslaiScore && (
                                                 <div className={`px-4 py-1.5 rounded text-sm font-bold border-2 ${
-                                                    stockDataIntelli.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600' :
+                                                    stockDataIntelli.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600 glow-pulse' :
                                                     stockDataIntelli.jslaiScore.total >= 65 ? 'bg-gray-900/30 text-gray-400 border-gray-600' :
                                                     stockDataIntelli.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
-                                                    'bg-red-900/30 text-red-400 border-red-600'
+                                                    'bg-red-900/30 text-red-400 border-red-600 glow-pulse-red'
                                                 }`}>
                                                     🎯 JSLAI™ {stockDataIntelli.jslaiScore.total}/100
                                                 </div>
@@ -15075,8 +15283,8 @@ console.log('✅ Données hybrides récupérées:', {
                             {/* Colonne gauche */}
                             <div className="col-span-8 space-y-2">
                                 
-                                {/* Graphique principal */}
-                                <div className={`border rounded-lg p-2 transition-colors duration-300 ${
+                                {/* Graphique principal - VAGUE 3+4: Modern Effects */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 hover-lift shine-effect ${
                                     isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
                                 }`}>
                                     <div className="flex items-center justify-between mb-2">
@@ -15332,6 +15540,44 @@ console.log('✅ Données hybrides récupérées:', {
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+
+                                {/* TradingView Mini Chart - VAGUE 2: Quick Wins + VAGUE 3+4: Modern Effects */}
+                                <div className={`border rounded-lg p-2 transition-colors duration-300 hover-lift shine-effect ${
+                                    isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
+                                }`}>
+                                    <h3 className="text-[10px] font-bold mb-2 flex items-center gap-1 text-gray-400">
+                                        <LucideIcon name="LineChart" className="w-3 h-3 text-gray-500" />
+                                        TradingView Mini Chart
+                                    </h3>
+                                    <div style={{ height: '250px' }}>
+                                        <div
+                                            id="tradingview-mini-chart-jlab"
+                                            className="tradingview-widget-container"
+                                            style={{ height: '100%', width: '100%' }}
+                                            ref={(container) => {
+                                                if (container && !container.hasChildNodes()) {
+                                                    // Créer le script TradingView
+                                                    const script = document.createElement('script');
+                                                    script.type = 'text/javascript';
+                                                    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+                                                    script.async = true;
+                                                    script.innerHTML = JSON.stringify({
+                                                        "symbol": `NASDAQ:${selectedStock}`,
+                                                        "width": "100%",
+                                                        "height": "100%",
+                                                        "locale": "fr",
+                                                        "dateRange": "1D",
+                                                        "colorTheme": isDarkMode ? "dark" : "light",
+                                                        "isTransparent": false,
+                                                        "autosize": true,
+                                                        "largeChartUrl": ""
+                                                    });
+                                                    container.appendChild(script);
+                                                }
+                                            }}
+                                        ></div>
                                     </div>
                                 </div>
 
