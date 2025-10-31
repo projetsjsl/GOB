@@ -49,7 +49,7 @@
 | 18 | Responsive tablet | ⏳ TESTING | Viewport 768px |
 | 19 | Responsive desktop | ✅ PASS | Viewport 1920px |
 | 20 | Transitions fluides | ✅ PASS | Animations CSS OK |
-| 21 | Icônes s'affichent | ✅ PASS | Lucide icons OK |
+| 21 | Icônes s'affichent | ✅ PASS | Iconoir icons OK |
 | 22 | Tooltips | ⏳ TESTING | title attributes |
 | 23 | Scrolling fluide | ✅ PASS | Smooth scroll OK |
 | 24 | Pas de layout shift | ✅ PASS | CLS = 0 |
