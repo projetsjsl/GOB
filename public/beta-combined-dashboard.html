@@ -673,6 +673,119 @@ const fetchHybridData = async (symbol, dataType) => {
             // Backward compatibility - redirect LucideIcon to IconoirIcon
             window.LucideIcon = window.IconoirIcon;
 
+            // Professional Mode System - Toggle entre emojis et icônes Iconoir
+            window.ProfessionalModeSystem = {
+                isEnabled: function() {
+                    const stored = localStorage.getItem('gobapps-professional-mode');
+                    return stored === 'true' || stored === null; // Default: Professional Mode ON
+                },
+
+                toggle: function() {
+                    const newMode = !this.isEnabled();
+                    localStorage.setItem('gobapps-professional-mode', newMode.toString());
+                    window.dispatchEvent(new CustomEvent('professional-mode-changed', {
+                        detail: { enabled: newMode }
+                    }));
+                    return newMode;
+                },
+
+                // Mapping emoji → icône Iconoir
+                emojiToIcon: {
+                    '📡': 'antenna-signal',
+                    '⚙️': 'settings',
+                    '📅': 'calendar',
+                    '🌅': 'sun-light',
+                    '☀️': 'sun-light',
+                    '🌆': 'building',
+                    '📊': 'stat-up',
+                    '📈': 'trending-up',
+                    '📉': 'trending-down',
+                    '🤖': 'brain',
+                    '💬': 'chat-bubble',
+                    '🔍': 'search',
+                    '📝': 'page',
+                    '🎯': 'target',
+                    '💼': 'briefcase',
+                    '🌐': 'globe',
+                    '💰': 'dollar',
+                    '🏢': 'building',
+                    '📧': 'mail',
+                    '🔔': 'bell',
+                    '⏰': 'clock',
+                    '✅': 'check-circle',
+                    '❌': 'xmark-circle',
+                    '⚠️': 'warning-triangle',
+                    '🚀': 'rocket',
+                    '🔥': 'sparks',
+                    '💡': 'light-bulb',
+                    '🧠': 'brain',
+                    '📰': 'newspaper',
+                    '💵': 'dollar',
+                    '📲': 'smartphone-device',
+                    '🎨': 'palette',
+                    '🔒': 'lock',
+                    '🔓': 'lock-unlock',
+                    '👤': 'user',
+                    '👥': 'group',
+                    '⭐': 'star',
+                    '🏆': 'trophy',
+                    '📌': 'pin',
+                    '🔗': 'link',
+                    '🖼️': 'media-image',
+                    '📸': 'camera',
+                    '🎬': 'movie',
+                    '🎵': 'music-note',
+                    '📁': 'folder',
+                    '📄': 'page',
+                    '💻': 'laptop',
+                    '⌨️': 'keyboard',
+                    '🖱️': 'mouse-button-right',
+                    '🖥️': 'pc-monitor',
+                    '📱': 'smartphone-device',
+                    '🔋': 'battery-charging',
+                    '🔌': 'plug',
+                    '🛠️': 'tools',
+                    '🎓': 'graduation-cap',
+                    '📚': 'book-stack',
+                    '📖': 'book',
+                    '✏️': 'edit-pencil',
+                    '🖊️': 'pen',
+                    '📎': 'attachment',
+                    '📍': 'pin-alt',
+                    '🧭': 'compass',
+                    '🗺️': 'map',
+                    '🏠': 'home',
+                    '🏪': 'shop',
+                    '🏬': 'city',
+                    '🏭': 'industry',
+                    '⚡': 'flash',
+                    '🌟': 'star-solid',
+                    '💎': 'gem-stone',
+                    '🎁': 'gift',
+                    '🛒': 'cart',
+                    '💳': 'credit-card',
+                    '🎉': 'party',
+                    '🎊': 'gift',
+                    '🔐': 'lock',
+                    '🎮': 'gamepad',
+                    '🎲': 'dice'
+                },
+
+                // Rendu conditionnel emoji ou icône
+                renderIcon: function(emoji, size = 24, className = '') {
+                    if (!this.isEnabled()) {
+                        return `<span class="inline-block">${emoji}</span>`;
+                    }
+
+                    const iconClass = this.emojiToIcon[emoji];
+                    if (iconClass) {
+                        return `<i class="iconoir-${iconClass} ${className}" style="font-size: ${size}px;"></i>`;
+                    }
+
+                    return `<span class="inline-block">${emoji}</span>`;
+                }
+            };
+
         const BetaCombinedDashboard = () => {
             // États principaux
             const [activeTab, setActiveTab] = useState('stocks-news');
@@ -728,6 +841,12 @@ const fetchHybridData = async (symbol, dataType) => {
                 } catch (_) {}
                 return true; // défaut: dark
             });
+
+            // Professional Mode State
+            const [isProfessionalMode, setIsProfessionalMode] = useState(() => {
+                return window.ProfessionalModeSystem.isEnabled();
+            });
+
             const [showEmmaIntro, setShowEmmaIntro] = useState(false);
             const [showDanIntro, setShowDanIntro] = useState(false);
             const [showJLabIntro, setShowJLabIntro] = useState(false);
@@ -2344,12 +2463,36 @@ const fetchHybridData = async (symbol, dataType) => {
                 return iconMap[tabId] || 'iconoir-graph-up';
             };
 
+            // Icon Component - Rendu conditionnel emoji ou icône Iconoir
+            const Icon = ({ emoji, size = 20, className = '' }) => {
+                if (!isProfessionalMode) {
+                    return <span className="inline-block">{emoji}</span>;
+                }
+
+                const iconClass = window.ProfessionalModeSystem.emojiToIcon[emoji];
+                if (iconClass) {
+                    return <i className={`iconoir-${iconClass} ${className}`} style={{ fontSize: `${size}px` }}></i>;
+                }
+
+                return <span className="inline-block">{emoji}</span>;
+            };
+
             // Volume: baisser le son général et couper le son du ripple/clic
             useEffect(() => {
                 try {
                     if (tabSoundRef.current) tabSoundRef.current.volume = 0.0; // aucun son d'onglet
                     if (clickSoundRef.current) clickSoundRef.current.volume = 0.30; // clic/ripple 30%
                 } catch(_) {}
+            }, []);
+
+            // Listen for Professional Mode changes
+            useEffect(() => {
+                const handleModeChange = (e) => {
+                    setIsProfessionalMode(e.detail.enabled);
+                };
+
+                window.addEventListener('professional-mode-changed', handleModeChange);
+                return () => window.removeEventListener('professional-mode-changed', handleModeChange);
             }, []);
 
             // Mettre à jour les actualités filtrées quand les actualités changent
@@ -19827,10 +19970,38 @@ console.log('✅ Données hybrides récupérées:', {
 
             return (
                 <div className={`min-h-screen transition-colors duration-300 ${
-                    isDarkMode 
-                        ? 'bg-black' 
+                    isDarkMode
+                        ? 'bg-black'
                         : 'bg-white'
                 }`}>
+                    {/* Professional/Fun Mode Toggle Button */}
+                    <button
+                        onClick={() => {
+                            const newMode = window.ProfessionalModeSystem.toggle();
+                            setIsProfessionalMode(newMode);
+                        }}
+                        className={`fixed top-4 right-4 z-[60] p-3 rounded-lg shadow-lg transition-all duration-300 border-2 ${
+                            isProfessionalMode
+                                ? 'bg-gradient-to-br from-blue-600 to-blue-700 border-blue-400 text-white hover:from-blue-700 hover:to-blue-800'
+                                : 'bg-gradient-to-br from-purple-600 to-pink-600 border-purple-400 text-white hover:from-purple-700 hover:to-pink-700'
+                        }`}
+                        title={isProfessionalMode ? 'Mode Professionnel (clic pour Mode Fun 🎉)' : 'Mode Fun (clic pour Mode Professionnel 💼)'}
+                    >
+                        <div className="flex items-center gap-2">
+                            {isProfessionalMode ? (
+                                <>
+                                    <i className="iconoir-briefcase text-xl"></i>
+                                    <span className="hidden sm:inline text-sm font-semibold">PRO</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="text-xl">🎉</span>
+                                    <span className="hidden sm:inline text-sm font-semibold">FUN</span>
+                                </>
+                            )}
+                        </div>
+                    </button>
+
                     {/* Intro Emma IA - première visite de session */}
                     {showEmmaIntro && activeTab === 'ask-emma' && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
@@ -20120,10 +20291,11 @@ console.log('✅ Données hybrides récupérées:', {
                                         isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                                     }`}>
                                         <div className="flex items-center justify-between">
-                                            <h3 className={`text-lg font-semibold ${
+                                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
                                             }`}>
-                                                📱 Autres onglets
+                                                <Icon emoji="📱" size={20} />
+                                                Autres onglets
                                             </h3>
                                             <button
                                                 onClick={() => setShowMoreTabsOverlay(false)}
