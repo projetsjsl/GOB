@@ -210,9 +210,59 @@ class SmartAgent {
     /**
      * 🧠 INTELLIGENT COMPLEXITY DETECTION - Détecte automatiquement le mode optimal
      * Ajuste outputMode selon la complexité et l'intention détectées
+     * Optimise aussi les tokens pour les questions SIMPLES
      */
     _detectComplexity(userMessage, intentData, context) {
-        // Indicateurs de complexité haute → mode expert
+        const messageLower = userMessage.toLowerCase();
+
+        // 🔍 DÉTECTION DE SIMPLICITÉ (questions précises et courtes)
+        const simplicityIndicators = {
+            // Mots-clés indiquant requête simple et précise
+            simpleKeywords: ['prix', 'price', 'cours', 'combien', 'quel est', 'what is', 'quand', 'when'],
+
+            // Intentions simples nécessitant réponse courte
+            simpleIntents: ['stock_price', 'quick_fact', 'definition', 'simple_query'],
+
+            // Requête très courte
+            shortMessageThreshold: 50, // caractères
+        };
+
+        // Score de simplicité (inverse de complexité)
+        let simplicityScore = 0;
+        let simplicityReasons = [];
+
+        // 1. Message très court
+        if (userMessage.length < simplicityIndicators.shortMessageThreshold) {
+            simplicityScore += 2;
+            simplicityReasons.push('short message');
+        }
+
+        // 2. Mots-clés de requête simple
+        if (simplicityIndicators.simpleKeywords.some(keyword => messageLower.includes(keyword))) {
+            simplicityScore += 2;
+            simplicityReasons.push('simple query keywords');
+        }
+
+        // 3. Intention simple
+        if (intentData && simplicityIndicators.simpleIntents.includes(intentData.intent)) {
+            simplicityScore += 2;
+            simplicityReasons.push(`simple intent: ${intentData.intent}`);
+        }
+
+        // 4. Un seul ticker + confiance élevée = requête précise
+        const tickerCount = intentData?.tickers?.length || 0;
+        if (tickerCount === 1 && intentData?.confidence > 0.8) {
+            simplicityScore += 1;
+            simplicityReasons.push('single ticker, high confidence');
+        }
+
+        // 🎯 SI REQUÊTE SIMPLE → Mode simple avec tokens réduits
+        if (simplicityScore >= 3) {
+            console.log(`🧠 Simple query (${simplicityScore}): ${simplicityReasons.join(', ')} → simple mode`);
+            return 'simple';
+        }
+
+        // 📊 DÉTECTION DE COMPLEXITÉ (analyses approfondies)
         const complexityIndicators = {
             // Mots-clés indiquant analyse approfondie
             deepAnalysisKeywords: ['analyse approfondie', 'analyse complète', 'analyse détaillée', 'comprehensive',
@@ -230,57 +280,55 @@ class SmartAgent {
         };
 
         let complexityScore = 0;
-        let reasons = [];
+        let complexityReasons = [];
 
-        // 1. Analyser les mots-clés
-        const messageLower = userMessage.toLowerCase();
+        // 1. Analyser les mots-clés de complexité
         if (complexityIndicators.deepAnalysisKeywords.some(keyword => messageLower.includes(keyword))) {
             complexityScore += 3;
-            reasons.push('deep analysis keywords');
+            complexityReasons.push('deep analysis keywords');
         }
 
         // 2. Compter les tickers mentionnés
-        const tickerCount = intentData?.tickers?.length || 0;
         if (tickerCount >= complexityIndicators.multipleTickersThreshold) {
             complexityScore += 2;
-            reasons.push(`${tickerCount} tickers`);
+            complexityReasons.push(`${tickerCount} tickers`);
         }
 
         // 3. Vérifier l'intention
         if (intentData && complexityIndicators.complexIntents.includes(intentData.intent)) {
             complexityScore += 2;
-            reasons.push(`complex intent: ${intentData.intent}`);
+            complexityReasons.push(`complex intent: ${intentData.intent}`);
         }
 
         // 4. Longueur du message
         if (userMessage.length > complexityIndicators.longMessageThreshold) {
             complexityScore += 1;
-            reasons.push('detailed query');
+            complexityReasons.push('detailed query');
         }
 
         // 5. Confiance faible = besoin de plus de contexte/explications
         if (intentData && intentData.confidence < 0.6) {
             complexityScore += 1;
-            reasons.push('low confidence, need detail');
+            complexityReasons.push('low confidence, need detail');
         }
 
         // 6. Mots-clés spécifiques indiquant mode briefing
         const briefingKeywords = ['briefing', 'résumé quotidien', 'daily', 'newsletter', 'rapport'];
         if (briefingKeywords.some(k => messageLower.includes(k))) {
-            console.log(`🧠 Detected briefing mode: ${reasons.join(', ')}`);
+            console.log(`🧠 Detected briefing mode: ${complexityReasons.join(', ')}`);
             return 'briefing';
         }
 
-        // Décision basée sur le score
+        // 🎯 DÉCISION FINALE basée sur le score
         if (complexityScore >= 4) {
-            console.log(`🧠 High complexity (${complexityScore}): ${reasons.join(', ')} → expert mode`);
+            console.log(`🧠 High complexity (${complexityScore}): ${complexityReasons.join(', ')} → expert mode`);
             return 'expert';
         } else if (complexityScore >= 2) {
-            console.log(`🧠 Medium complexity (${complexityScore}): ${reasons.join(', ')} → comprehensive mode`);
+            console.log(`🧠 Medium complexity (${complexityScore}): ${complexityReasons.join(', ')} → comprehensive mode`);
             return 'comprehensive';
         }
 
-        // Pas de changement de mode
+        // Pas de changement de mode (default 4000 tokens)
         return null;
     }
 
@@ -1350,15 +1398,19 @@ RÉPONSE MARKDOWN ENRICHIE:`;
      */
     async _call_perplexity(prompt, outputMode = 'chat', recency = 'month') {
         try {
-            // 🎓 TOUS LES UTILISATEURS SONT EXPERTS: Paramètres généreux par défaut
-            let maxTokens = 4000;  // Default généreux pour utilisateurs experts (était 1000)
+            // 🎓 ADAPTATION INTELLIGENTE: Tokens selon complexité détectée
+            let maxTokens = 4000;  // Default généreux pour utilisateurs experts
             let temperature = 0.7; // Default créatif et flexible
 
-            if (outputMode === 'briefing') {
+            if (outputMode === 'simple') {
+                // 🔍 Requête simple et précise
+                maxTokens = 800;  // Réponse courte et précise
+                temperature = 0.4; // Plus déterministe
+            } else if (outputMode === 'briefing') {
                 maxTokens = 6000;  // Briefings très détaillés
                 temperature = 0.6; // Équilibré: détail + créativité
             } else if (outputMode === 'data') {
-                maxTokens = 2000;  // JSON complexe avec contexte (était 500)
+                maxTokens = 2000;  // JSON complexe avec contexte
                 temperature = 0.3; // Déterministe pour données structurées
             } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
                 // Mode analyse approfondie maximale
@@ -1423,12 +1475,16 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 throw new Error('GEMINI_API_KEY not configured');
             }
 
-            // 🎓 TOUS LES UTILISATEURS SONT EXPERTS: Paramètres généreux par défaut
-            let maxTokens = 4000; // Default généreux pour utilisateurs experts (était 1000)
+            // 🎓 ADAPTATION INTELLIGENTE: Tokens selon complexité détectée
+            let maxTokens = 4000; // Default généreux pour utilisateurs experts
             let temperature = 0.7; // Default créatif et flexible
 
-            if (outputMode === 'data') {
-                maxTokens = 2000; // JSON complexe avec contexte (était 500)
+            if (outputMode === 'simple') {
+                // 🔍 Requête simple et précise
+                maxTokens = 800;  // Réponse courte et précise
+                temperature = 0.4; // Plus déterministe
+            } else if (outputMode === 'data') {
+                maxTokens = 2000; // JSON complexe avec contexte
                 temperature = 0.3; // Déterministe pour données structurées
             } else if (outputMode === 'briefing') {
                 maxTokens = 6000; // Briefings très détaillés
@@ -1501,15 +1557,19 @@ RÈGLES CRITIQUES:
                 throw new Error('ANTHROPIC_API_KEY not configured');
             }
 
-            // 🎓 TOUS LES UTILISATEURS SONT EXPERTS: Paramètres généreux par défaut
-            let maxTokens = 4000; // Default généreux pour utilisateurs experts (était 1000)
+            // 🎓 ADAPTATION INTELLIGENTE: Tokens selon complexité détectée
+            let maxTokens = 4000; // Default généreux pour utilisateurs experts
             let temperature = 0.6; // Default équilibré
 
-            if (outputMode === 'briefing') {
+            if (outputMode === 'simple') {
+                // 🔍 Requête simple et précise
+                maxTokens = 800;  // Réponse courte et précise
+                temperature = 0.4; // Plus déterministe
+            } else if (outputMode === 'briefing') {
                 maxTokens = 6000; // Briefings très détaillés
                 temperature = 0.5; // Déterministe pour écriture professionnelle
             } else if (outputMode === 'data') {
-                maxTokens = 2000; // JSON complexe avec contexte (était 500)
+                maxTokens = 2000; // JSON complexe avec contexte
                 temperature = 0.3; // Très déterministe
             } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
                 maxTokens = 8000; // Mode analyse approfondie maximale
