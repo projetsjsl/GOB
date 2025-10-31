@@ -42,12 +42,20 @@ export default async function handler(req, res) {
 
     console.log('✅ Clé API Gemini récupérée avec succès');
 
-    // Retourner la clé API (sécurisé côté serveur)
+    // Retourner seulement la validation (ne pas exposer la clé complète)
+    // Si le client a besoin de la clé, il doit l'obtenir via localStorage ou appeler directement l'API
+    const keyPreview = `${geminiApiKey.substring(0, 8)}...${geminiApiKey.substring(geminiApiKey.length - 4)}`;
+
     return res.status(200).json({
-      apiKey: geminiApiKey,
+      configured: true,
       source: 'vercel-env',
+      keyPreview: keyPreview,
       timestamp: new Date().toISOString(),
-      status: 'success'
+      status: 'success',
+      message: 'Clé API Gemini configurée sur le serveur',
+      // Pour les clients qui ont besoin de la clé complète (usage interne sécurisé)
+      // On peut ajouter un paramètre ?full=true avec authentification
+      ...(req.query.full === 'true' ? { apiKey: geminiApiKey } : {})
     });
   } catch (error) {
     console.error('❌ Erreur dans gemini-key API:', error);

@@ -394,8 +394,140 @@ class EmmaMultiUser {
    * Affiche le modal d'historique
    */
   async showHistoryModal() {
-    // TODO: Implémenter modal avec liste des conversations
-    alert('Fonctionnalité d\'historique - À implémenter');
+    const histories = await this.loadAllHistories();
+
+    // Créer modal HTML
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50';
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+        <div class="flex items-center justify-between p-6 border-b">
+          <h2 class="text-2xl font-bold text-gray-900">Historique des Conversations</h2>
+          <button class="close-modal w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+            <span class="text-xl text-gray-600">×</span>
+          </button>
+        </div>
+        <div class="overflow-y-auto p-6 flex-1">
+          ${histories.length === 0 ? '<p class="text-center text-gray-500 py-8">Aucune conversation enregistrée</p>' : ''}
+          <div class="space-y-3">
+            ${histories.map(h => `
+              <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors" data-convo-id="${h.id}">
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <h3 class="font-semibold text-gray-900">${h.title || 'Conversation sans titre'}</h3>
+                    <p class="text-sm text-gray-500 mt-1">${new Date(h.timestamp).toLocaleString('fr-CA', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                    ${h.userId ? `<p class="text-xs text-blue-600 mt-1">Utilisateur: ${h.userId}</p>` : ''}
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${h.messages?.length || 0} messages</span>
+                    <button class="delete-convo px-2 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded text-xs" data-convo-id="${h.id}">
+                      Supprimer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Event listeners
+    modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+
+    // Charger une conversation au clic
+    modal.querySelectorAll('[data-convo-id]:not(.delete-convo)').forEach(el => {
+      el.addEventListener('click', async () => {
+        const convoId = el.dataset.convoId;
+        await this.loadConversation(convoId);
+        modal.remove();
+      });
+    });
+
+    // Supprimer une conversation
+    modal.querySelectorAll('.delete-convo').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const convoId = btn.dataset.convoId;
+        if (confirm('Supprimer cette conversation ?')) {
+          await this.deleteConversation(convoId);
+          modal.remove();
+          this.showHistoryModal();
+        }
+      });
+    });
+  }
+
+  /**
+   * Charge toutes les conversations disponibles
+   */
+  async loadAllHistories() {
+    try {
+      const keys = Object.keys(localStorage).filter(key => key.startsWith('emma-history-'));
+      const histories = [];
+
+      for (const key of keys) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          if (data && data.messages) {
+            histories.push({
+              id: key.replace('emma-history-', ''),
+              ...data
+            });
+          }
+        } catch (error) {
+          console.error(`Erreur lors du chargement de ${key}:`, error);
+        }
+      }
+
+      return histories.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    } catch (error) {
+      console.error('Erreur lors du chargement des historiques:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Charge une conversation spécifique
+   */
+  async loadConversation(convoId) {
+    try {
+      const key = `emma-history-${convoId}`;
+      const data = localStorage.getItem(key);
+      if (data) {
+        const conversation = JSON.parse(data);
+        this.currentHistory = conversation.messages || [];
+        this.renderConversationHistory();
+        console.log(`✅ Conversation ${convoId} chargée`);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de la conversation:', error);
+    }
+  }
+
+  /**
+   * Supprime une conversation
+   */
+  async deleteConversation(convoId) {
+    try {
+      const key = `emma-history-${convoId}`;
+      localStorage.removeItem(key);
+      console.log(`✅ Conversation ${convoId} supprimée`);
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+    }
+  }
+
+  /**
+   * Affiche l'historique de conversation dans l'interface
+   */
+  renderConversationHistory() {
+    console.log('Affichage de l\'historique:', this.currentHistory);
   }
 
   /**
