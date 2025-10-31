@@ -200,7 +200,35 @@
      */
     logout() {
       console.log('👋 Déconnexion...');
+
+      // ✅ SÉCURITÉ: Vider tous les storages Emma pour éviter les fuites de données
+      // entre utilisateurs (admin → gob, etc.)
+      console.log('🧹 Nettoyage des données Emma...');
+
+      // 1. Vider sessionStorage Emma
+      sessionStorage.removeItem('emma-chat-history');
+      sessionStorage.removeItem('emma-intro-shown');
+
+      // 2. Vider localStorage Emma et données user-specific
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        // Supprimer toutes les clés Emma et watchlist (données user-specific)
+        if (key && (key.startsWith('emma-') || key.startsWith('dans-') || key.startsWith('jslai'))) {
+          keysToRemove.push(key);
+        }
+      }
+
+      keysToRemove.forEach(key => {
+        console.log(`  🗑️ Suppression: ${key}`);
+        localStorage.removeItem(key);
+      });
+
+      console.log(`✅ ${keysToRemove.length} clés nettoyées`);
+
+      // 3. Supprimer la session user
       sessionStorage.removeItem(AUTH_STORAGE_KEY);
+
       this.redirectToLogin();
     }
 
