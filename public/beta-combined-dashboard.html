@@ -19121,7 +19121,7 @@ console.log('✅ Données hybrides récupérées:', {
             // ============================================================================
             // 🎨 TEST EMMA IMAGES TAB - Test du système d'affichage d'images
             // ============================================================================
-            const TestEmmaImagesTab = () => {
+            const TestEmmaImagesTab = React.memo(() => {
                 const [testResult, setTestResult] = React.useState(null);
                 const [loading, setLoading] = React.useState(false);
 
@@ -19246,12 +19246,12 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
                     </div>
                 );
-            };
+            });
 
             // ============================================================================
             // 🔬 PERPLEXITY LABS TAB - Suite de tests pour explorer les capacités
             // ============================================================================
-            const PerplexityLabsTab = () => {
+            const PerplexityLabsTab = React.memo(() => {
                 const [testResults, setTestResults] = React.useState(null);
                 const [loading, setLoading] = React.useState(false);
                 const [ticker, setTicker] = React.useState('AAPL');
@@ -19533,7 +19533,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
                     </div>
                 );
-            };
+            });
 
             // Configuration des onglets (après déclaration de TOUS les composants)
             // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()

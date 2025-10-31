@@ -55,13 +55,17 @@ class SmartAgent {
             const responseData = await this._generate_response(userMessage, toolResults, context, intentData);
             console.log('✨ Final response generated');
 
-            // Extraire réponse et validation si objet retourné
+            // Extraire réponse, validation et modèle si objet retourné
             let finalResponse = responseData;
             let dataValidation = null;
+            let modelUsed = null;
+            let modelReason = null;
 
             if (typeof responseData === 'object' && responseData.response) {
                 finalResponse = responseData.response;
                 dataValidation = responseData.validation;
+                modelUsed = responseData.model;
+                modelReason = responseData.model_reason;
             }
 
             // 4. Mise à jour de l'historique
@@ -126,7 +130,9 @@ class SmartAgent {
                 output_mode: context.output_mode || 'chat',
                 execution_time_ms: Date.now() - (context.start_time || Date.now()),
                 conversation_length: this.conversationHistory.length,
-                is_reliable: toolResults.every(r => r.is_reliable) && (dataValidation?.passed !== false)
+                is_reliable: toolResults.every(r => r.is_reliable) && (dataValidation?.passed !== false),
+                model: modelUsed || 'unknown',  // Modèle utilisé pour générer la réponse
+                model_reason: modelReason || 'Unknown reason'  // Raison du choix du modèle
             };
 
         } catch (error) {
@@ -742,10 +748,12 @@ class SmartAgent {
                 }
             }
 
-            // Retourner réponse avec validation (pour scoring de confiance)
+            // Retourner réponse avec validation et modèle utilisé
             return {
                 response,
-                validation
+                validation,
+                model: modelSelection.model,  // Ajout du modèle pour affichage dans l'UI
+                model_reason: modelSelection.reason
             };
 
         } catch (error) {
@@ -950,7 +958,37 @@ INSTRUCTIONS CRITIQUES:
 8. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
 9. Cite tes sources (outils utilisés) en fin de réponse
 10. Ton: professionnel mais accessible, comme une vraie analyste financière
-${intentData ? `9. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
+${intentData ? `11. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
+
+📊 GRAPHIQUES ET VISUALISATIONS - IMPORTANT:
+Si l'utilisateur demande des graphiques, images, charts ou visualisations, tu DOIS inclure ces tags dans ta réponse:
+
+**Tags disponibles:**
+- [CHART:FINVIZ:TICKER] → Graphique technique Finviz (ex: [CHART:FINVIZ:AAPL])
+- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Widget TradingView interactif (ex: [CHART:TRADINGVIEW:NASDAQ:MSFT])
+- [CHART:FINVIZ:SECTORS] → Heatmap sectorielle de performance
+- [LOGO:TICKER] → Logo de l'entreprise (ex: [LOGO:GOOGL])
+
+**Règles d'utilisation:**
+✅ TOUJOURS ajouter au moins un tag [CHART:...] si l'utilisateur mentionne "graphique", "chart", "image", "visualisation", "graphe"
+✅ Placer les tags DANS le texte là où le graphique serait logique (pas seulement à la fin)
+✅ Utiliser [CHART:FINVIZ:TICKER] par défaut (simple et efficace)
+✅ Combiner avec du texte explicatif autour
+
+**Exemples d'intégration:**
+"Voici l'analyse de Apple (AAPL) :
+
+Le titre se négocie actuellement à 245,67$ (+2,34%).
+
+[CHART:FINVIZ:AAPL]
+
+Le graphique montre une tendance haussière avec des volumes élevés..."
+
+"Performance des secteurs aujourd'hui:
+
+[CHART:FINVIZ:SECTORS]
+
+Le secteur technologique domine avec +1,2%..."
 
 EXEMPLE DE BONNE RÉPONSE (si demande sur plusieurs tickers):
 "Voici une analyse des initiatives IA récentes pour les compagnies de l'équipe:
