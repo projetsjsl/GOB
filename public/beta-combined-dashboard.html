@@ -11051,6 +11051,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         return `@@CODE_BLOCK_${idx}@@`;
                     });
 
+                    // 📊 NOUVEAU: Extraire et parser les tableaux Markdown
+                    const tables = [];
+                    t = t.replace(/(?:^|\n)((?:\|.+\|[ ]*\n)+)/gm, (tableText) => {
+                        const idx = tables.length;
+                        const lines = tableText.trim().split('\n').filter(l => l.trim());
+
+                        if (lines.length < 2) return tableText; // Pas assez de lignes pour un tableau
+
+                        // Première ligne = headers
+                        const headers = lines[0].split('|').filter(h => h.trim()).map(h => h.trim());
+
+                        // Deuxième ligne = séparateur (ignorée)
+                        // Lignes suivantes = données
+                        const rows = lines.slice(2).map(line =>
+                            line.split('|').filter(c => c.trim()).map(c => c.trim())
+                        );
+
+                        tables.push({ headers, rows });
+                        return `@@TABLE_${idx}@@`;
+                    });
+
                     // 🎨 NOUVEAU: Extraire et parser les tags d'images/charts
                     const imageTags = [];
 
@@ -11176,6 +11197,32 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         const langLabel = block.lang ? `<div class="text-xs opacity-70 mb-1">${block.lang}</div>` : '';
                         const codeSafe = block.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                         return `<div class="my-2"><div class="rounded-md border border-gray-200 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'} p-3 overflow-auto">${langLabel}<pre class="m-0"><code>${codeSafe}</code></pre></div></div>`;
+                    });
+
+                    // 📊 Réinsertion des tableaux Markdown en HTML stylisé
+                    t = t.replace(/@@TABLE_(\d+)@@/g, (_m, idxStr) => {
+                        const idx = parseInt(idxStr, 10);
+                        const table = tables[idx];
+                        if (!table) return '';
+
+                        const { headers, rows } = table;
+
+                        return `<div class="my-4 overflow-x-auto">
+                            <table class="min-w-full border-collapse ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}">
+                                <thead>
+                                    <tr class="${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}">
+                                        ${headers.map(h => `<th class="px-4 py-2 text-left font-semibold border ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}">${h}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rows.map((row, rIdx) => `
+                                        <tr class="${rIdx % 2 === 0 ? (isDarkMode ? 'bg-gray-900' : 'bg-white') : (isDarkMode ? 'bg-gray-850' : 'bg-gray-50')}">
+                                            ${row.map(cell => `<td class="px-4 py-2 border ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}">${cell}</td>`).join('')}
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>`;
                     });
 
                     // 🎨 NOUVEAU: Réinsertion des tags d'images convertis en HTML
@@ -20017,6 +20064,9 @@ console.log('✅ Données hybrides récupérées:', {
                             showLengthEditor={showLengthEditor}
                             setShowLengthEditor={setShowLengthEditor}
                         />}
+                        {activeTab === 'test-emma-images' && <TestEmmaImagesTab />}
+                        {activeTab === 'perplexity-labs' && <PerplexityLabsTab />}
+                        {activeTab === 'jlab-v2' && <JLabV2Tab />}
                         {activeTab === 'admin-jsla' && <AdminJSLaiTab
                             emmaConnected={emmaConnected}
                             setEmmaConnected={setEmmaConnected}
