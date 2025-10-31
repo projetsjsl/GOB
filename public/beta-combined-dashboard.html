@@ -325,6 +325,103 @@
         }
         .emma-intro-overlay { animation: emma-intro-fade 300ms ease-out; }
         .emma-intro-image { animation: emma-zoom-in 800ms ease-out; }
+
+        /* 🎨 VAGUE 3: Finance Pro Styles - Glassmorphism & Modern UI */
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .glass-card-dark {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Gradient Cards Finance Pro */
+        .finance-card-gradient {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+        }
+
+        .finance-card-glow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Hover Lift Effect */
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Shine Effect on Hover */
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .shine-effect:hover::before {
+            left: 100%;
+        }
+
+        /* Smooth Scale Animation */
+        @keyframes smooth-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .animate-smooth-scale {
+            animation: smooth-scale 2s ease-in-out infinite;
+        }
+
+        /* Glow Pulse for Important Metrics */
+        @keyframes glow-pulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+            }
+        }
+
+        .glow-pulse-green {
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        .glow-pulse-red {
+            animation: glow-pulse 2s ease-in-out infinite;
+            animation-name: glow-pulse-red;
+        }
+
+        @keyframes glow-pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            }
+        }
     </style>
 
     <!-- 🔐 Auth Guard - Protection du Dashboard -->
@@ -4478,9 +4575,9 @@ STRUCTURE JSON OBLIGATOIRE:
                             </div>
                         </div>
 
-                        {/* 🆕 VAGUE 2: Ticker Tape avec tous les tickers de la watchlist */}
+                        {/* 🆕 VAGUE 2+3: Ticker Tape avec style Finance Pro */}
                         {watchlistTickers.length > 0 && (
-                            <div className={`rounded-lg border overflow-hidden transition-colors duration-300 ${
+                            <div className={`rounded-lg border overflow-hidden transition-colors duration-300 glass-card-dark hover-lift ${
                                 isDarkMode ? 'border-gray-700' : 'border-gray-200'
                             }`}>
                                 <div className={`text-xs px-2 py-1 ${
@@ -4555,9 +4652,9 @@ STRUCTURE JSON OBLIGATOIRE:
                                         const changeBgColor = data?.dp >= 0 ? 'bg-green-500' : 'bg-red-500';
                                         
                                         return (
-                                            <div key={ticker} className={`rounded-lg p-4 border transition-colors duration-300 ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-800 border-gray-600 hover:border-blue-400/50' 
+                                            <div key={ticker} className={`rounded-lg p-4 border transition-colors duration-300 hover-lift shine-effect ${
+                                                isDarkMode
+                                                    ? 'bg-gray-800 border-gray-600 hover:border-blue-400/50'
                                                     : 'bg-white border-gray-300 hover:border-blue-300'
                                             }`}>
                                                 <div className="flex justify-between items-start mb-3">
