@@ -1407,7 +1407,7 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 maxTokens = 800;  // Réponse courte et précise
                 temperature = 0.4; // Plus déterministe
             } else if (outputMode === 'briefing') {
-                maxTokens = 6000;  // Briefings très détaillés
+                maxTokens = 8000;  // Briefings TRÈS LONGS et exhaustifs (maximum)
                 temperature = 0.6; // Équilibré: détail + créativité
             } else if (outputMode === 'data') {
                 maxTokens = 2000;  // JSON complexe avec contexte
@@ -1487,7 +1487,7 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 maxTokens = 2000; // JSON complexe avec contexte
                 temperature = 0.3; // Déterministe pour données structurées
             } else if (outputMode === 'briefing') {
-                maxTokens = 6000; // Briefings très détaillés
+                maxTokens = 8000; // Briefings TRÈS LONGS et exhaustifs (maximum)
                 temperature = 0.6; // Équilibré
             } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
                 maxTokens = 8000; // Mode analyse approfondie maximale
@@ -1566,7 +1566,7 @@ RÈGLES CRITIQUES:
                 maxTokens = 800;  // Réponse courte et précise
                 temperature = 0.4; // Plus déterministe
             } else if (outputMode === 'briefing') {
-                maxTokens = 6000; // Briefings très détaillés
+                maxTokens = 8000; // Briefings TRÈS LONGS et exhaustifs (maximum)
                 temperature = 0.5; // Déterministe pour écriture professionnelle
             } else if (outputMode === 'data') {
                 maxTokens = 2000; // JSON complexe avec contexte
