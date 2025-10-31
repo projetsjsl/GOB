@@ -19,7 +19,7 @@ import {
   BarChart3, TrendingUp, Building2, Rocket, Bot, DollarSign,
   PieChart, LineChart, Activity, Target, Shield, Zap, Code,
   Database, FileText, FolderOpen, Users, Award, Gift
-} from 'lucide-react';
+} from 'iconoir-react';
 ```
 
 #### Mapping Emoji → Icône
@@ -52,21 +52,21 @@ Situé dans le header principal à gauche du bouton Dark/Light:
 Fonction `renderAppIcon(logo, appName)`:
 1. Détecte si c'est une icône stockée (`icon:IconName`)
 2. Détecte si c'est un emoji
-3. En mode pro + emoji mappé → affiche l'icône Lucide
+3. En mode pro + emoji mappé → affiche l'icône Iconoir
 4. Sinon → affiche l'emoji ou l'image URL
 
 #### Modal d'Édition
 - Labels dynamiques: "Icône" vs "Emoji", "URL" avec icônes conditionnelles
-- Grille adaptative: affiche icônes Lucide en mode pro, emojis en mode fun
+- Grille adaptative: affiche icônes Iconoir en mode pro, emojis en mode fun
 - Preview grande taille avec rendu correct
 
 ---
 
 ### 2. **public/beta-combined-dashboard.html** (Système Global)
 
-#### CDN Lucide Icons
+#### CDN Iconoir Icons
 ```html
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
 ```
 
 #### Système Global
@@ -123,19 +123,17 @@ window.ProfessionalModeSystem = {
     }
 
     const iconName = this.emojiToIcon[emoji];
-    if (iconName && window.lucide) {
-      return `<i data-lucide="${iconName.toLowerCase()}"
-                 class="${className}"
-                 style="width: ${size}px; height: ${size}px;"></i>`;
+    if (iconName) {
+      return `<i class="iconoir-${iconName.toLowerCase()} ${className}"
+                 style="font-size: ${size}px;"></i>`;
     }
 
     return `<span class="inline-block">${emoji}</span>`;
   },
 
   initIcons: function() {
-    if (window.lucide && window.lucide.createIcons) {
-      window.lucide.createIcons();
-    }
+    // Iconoir uses CSS classes, no initialization needed
+    console.log('Iconoir icons ready');
   }
 };
 ```
@@ -165,9 +163,9 @@ window.ProfessionalModeSystem.isEnabled(); // true or false
 
 ### A. Ajouter de nouveaux emojis → icônes dans App.tsx
 
-#### 1. Importer l'icône Lucide
+#### 1. Importer l'icône Iconoir
 ```tsx
-import { NouvelleIcone } from 'lucide-react';
+import { NouvelleIcone } from 'iconoir-react';
 ```
 
 #### 2. Ajouter au mapping
@@ -205,7 +203,7 @@ window.ProfessionalModeSystem = {
 #### Après (Mode dynamique):
 ```jsx
 {isProfessionalMode ? (
-  <i data-lucide="radio" className="w-6 h-6 text-green-500"></i>
+  <i className="iconoir-antenna-signal w-6 h-6 text-green-500"></i>
 ) : (
   <span>📡</span>
 )} Emma En Direct
@@ -230,8 +228,7 @@ const [isProfessionalMode, setIsProfessionalMode] = useState(
 useEffect(() => {
   const handleModeChange = (e) => {
     setIsProfessionalMode(e.detail.enabled);
-    // Re-initialiser les icônes Lucide
-    window.ProfessionalModeSystem.initIcons();
+    // Iconoir utilise des classes CSS, pas besoin de réinitialisation
   };
 
   window.addEventListener('professional-mode-changed', handleModeChange);
@@ -243,7 +240,7 @@ useEffect(() => {
 ```jsx
 <h2>
   {isProfessionalMode ? (
-    <i data-lucide="radio" className="w-6 h-6 inline-block mr-2"></i>
+    <i className="iconoir-antenna-signal w-6 h-6 inline-block mr-2"></i>
   ) : (
     <span>📡</span>
   )}
@@ -251,11 +248,12 @@ useEffect(() => {
 </h2>
 ```
 
-#### 4. Après le rendu, initialiser les icônes
-```javascript
-useEffect(() => {
-  window.ProfessionalModeSystem.initIcons();
-}, [isProfessionalMode]);
+#### 4. Styling des icônes
+```css
+/* Iconoir utilise des classes CSS directement */
+i[class*="iconoir-"] {
+  transition: all 0.3s ease;
+}
 ```
 
 ---
@@ -264,12 +262,12 @@ useEffect(() => {
 
 Quand vous créez un nouveau composant avec des icônes:
 
-- [ ] Importer les icônes Lucide nécessaires (App.tsx)
+- [ ] Importer les icônes Iconoir nécessaires (App.tsx)
 - [ ] Ajouter le mapping emoji → icône
 - [ ] Ajouter le composant dans `iconComponents`
 - [ ] Créer un état `isProfessionalMode` avec le hook localStorage
 - [ ] Utiliser un rendu conditionnel pour emoji vs icône
-- [ ] Appeler `window.ProfessionalModeSystem.initIcons()` après le rendu (HTML)
+- [ ] Vérifier que le CSS Iconoir est chargé
 - [ ] Tester le toggle en mode dev
 
 ---
@@ -311,18 +309,20 @@ Classe Tailwind par défaut recommandée : `text-green-500`
 
 ## 🐛 Dépannage
 
-### Les icônes Lucide ne s'affichent pas
+### Les icônes Iconoir ne s'affichent pas
 
-**Problème**: Les icônes apparaissent comme `[object Object]` ou ne se chargent pas.
+**Problème**: Les icônes n'apparaissent pas ou sont invisibles.
 
 **Solution**:
 ```javascript
-// Après chaque changement de mode ou re-render:
-useEffect(() => {
-  if (window.lucide && window.lucide.createIcons) {
-    window.lucide.createIcons();
-  }
-}, [isProfessionalMode]);
+// Vérifier que le CSS Iconoir est chargé
+const iconoirLoaded = document.querySelector('link[href*="iconoir"]');
+if (!iconoirLoaded) {
+  console.error('Iconoir CSS not loaded');
+}
+
+// Les icônes Iconoir utilisent des classes CSS directement
+// Pas besoin d'initialisation JavaScript
 ```
 
 ### Le toggle ne fonctionne pas
@@ -346,7 +346,7 @@ localStorage.getItem('gobapps-professional-mode') === 'true' // ou 'false'
 ## 📊 Statistiques d'Implémentation
 
 ### App.tsx
-- **30+** icônes Lucide importées
+- **30+** icônes Iconoir importées
 - **12** mappings emoji → icône
 - **6** emojis UI remplacés
 - **3** fonctions helpers créées
@@ -355,7 +355,7 @@ localStorage.getItem('gobapps-professional-mode') === 'true' // ou 'false'
 ### beta-combined-dashboard.html
 - **30** mappings emoji → icône
 - **1** système global créé
-- **CDN** Lucide Icons ajouté
+- **CDN** Iconoir Icons ajouté
 - **Event system** pour synchronisation
 
 ---
@@ -380,9 +380,8 @@ Si vous souhaitez étendre davantage le système:
      const iconName = window.ProfessionalModeSystem.emojiToIcon[emoji];
 
      if (isPro && iconName) {
-       return <i data-lucide={iconName.toLowerCase()}
-                 className={className}
-                 style={{ width: size, height: size }} />;
+       return <i className={`iconoir-${iconName.toLowerCase()} ${className}`}
+                 style={{ fontSize: size }} />;
      }
      return <span>{emoji}</span>;
    };
@@ -390,7 +389,7 @@ Si vous souhaitez étendre davantage le système:
 
 4. **Ajouter des animations de transition**
    ```css
-   i[data-lucide] {
+   i[class*="iconoir-"] {
      transition: all 0.3s ease;
    }
    ```
@@ -399,8 +398,9 @@ Si vous souhaitez étendre davantage le système:
 
 ## 📚 Ressources
 
-- **Lucide Icons**: https://lucide.dev/icons/
-- **React Lucide**: https://lucide.dev/guide/packages/lucide-react
+- **Iconoir Icons**: https://iconoir.com/
+- **Iconoir Documentation**: https://iconoir.com/docs/introduction
+- **Iconoir React**: https://iconoir.com/docs/packages/iconoir-react
 - **Tailwind CSS**: https://tailwindcss.com/docs/text-color
 
 ---
@@ -410,7 +410,7 @@ Si vous souhaitez étendre davantage le système:
 Vous disposez maintenant d'un système complet et fonctionnel pour:
 - ✅ Basculer entre Mode Professionnel et Mode Fun
 - ✅ Persistance localStorage synchronisée
-- ✅ 30+ mappings emoji → icône Lucide
+- ✅ 30+ mappings emoji → icône Iconoir
 - ✅ Bouton toggle dans le header (App.tsx)
 - ✅ Système global pour beta-combined-dashboard.html
 - ✅ Rendu conditionnel automatique
