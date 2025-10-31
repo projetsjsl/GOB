@@ -55,8 +55,16 @@ export default async function handler(req, res) {
         break;
 
       case 'quote':
-        const quoteSymbol = symbol || ticker || 'AAPL';
+        // Support both single and batch quotes (comma-separated symbols)
+        const quoteSymbol = symbol || ticker || symbols || 'AAPL';
         fmpUrl = `https://financialmodelingprep.com/stable/quote?symbol=${quoteSymbol}&apikey=${apiKey}`;
+        break;
+
+      case 'batch-quotes':
+        // Optimized batch quotes endpoint
+        const batchSymbols = symbols || 'AAPL,MSFT,GOOGL';
+        // FMP allows up to 100 symbols per batch request
+        fmpUrl = `https://financialmodelingprep.com/stable/quote?symbol=${batchSymbols}&apikey=${apiKey}`;
         break;
 
       case 'profile':
@@ -120,7 +128,7 @@ export default async function handler(req, res) {
       default:
         return res.status(400).json({
           error: 'Invalid endpoint',
-          supported: ['news', 'ticker-news', 'quote', 'profile', 'fundamentals', 'ratios', 'key-metrics', 'ratings', 'earnings-calendar', 'economic-calendar']
+          supported: ['news', 'ticker-news', 'quote', 'batch-quotes', 'profile', 'fundamentals', 'ratios', 'key-metrics', 'ratings', 'earnings-calendar', 'economic-calendar']
         });
     }
 

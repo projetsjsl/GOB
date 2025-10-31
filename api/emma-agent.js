@@ -965,9 +965,20 @@ ${intentData ? `11. L'intention détectée: ${intentData.intent} - ${intentData.
 ⚠️ CRITIQUE: Si l'utilisateur demande des graphiques, images, charts, visualisations OU mentionne "en images", tu DOIS utiliser les TAGS EXACTS ci-dessous.
 
 **Tags disponibles (FORMAT EXACT OBLIGATOIRE):**
+
+**Graphiques Finviz:**
 - [CHART:FINVIZ:TICKER] → Graphique Finviz (ex: [CHART:FINVIZ:AAPL])
-- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Widget TradingView (ex: [CHART:TRADINGVIEW:NASDAQ:MSFT])
 - [CHART:FINVIZ:SECTORS] → Heatmap sectorielle
+
+**Widgets TradingView:**
+- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Graphique complet interactif (ex: [CHART:TRADINGVIEW:NASDAQ:MSFT])
+- [MINI:TRADINGVIEW:TICKER] → Mini-graphique compact (ex: [MINI:TRADINGVIEW:AAPL])
+- [TECHNICAL:TRADINGVIEW:TICKER] → Analyse technique avec signal achat/vente (ex: [TECHNICAL:TRADINGVIEW:AAPL])
+- [QUOTE:TRADINGVIEW:TICKER] → Citation simple avec prix actuel (ex: [QUOTE:TRADINGVIEW:AAPL])
+- [TAPE:TRADINGVIEW:TICKER1,TICKER2,TICKER3] → Bandeau watchlist temps réel (ex: [TAPE:TRADINGVIEW:AAPL,MSFT,GOOGL])
+- [OVERVIEW:TRADINGVIEW] → Vue d'ensemble multi-marchés (indices, forex, crypto)
+
+**Autres:**
 - [LOGO:TICKER] → Logo entreprise (ex: [LOGO:AAPL])
 
 **❌ ❌ ❌ FORMATS INTERDITS - NE JAMAIS UTILISER:**
@@ -980,7 +991,11 @@ ${intentData ? `11. L'intention détectée: ${intentData.intent} - ${intentData.
 
 **✅ ✅ ✅ FORMAT CORRECT - TOUJOURS UTILISER:**
 ✅ [CHART:FINVIZ:AAPL]
-✅ [CHART:FINVIZ:MSFT]
+✅ [MINI:TRADINGVIEW:AAPL]
+✅ [TECHNICAL:TRADINGVIEW:AAPL]
+✅ [QUOTE:TRADINGVIEW:MSFT]
+✅ [TAPE:TRADINGVIEW:AAPL,MSFT,GOOGL]
+✅ [OVERVIEW:TRADINGVIEW]
 ✅ [CHART:FINVIZ:SECTORS]
 ✅ [LOGO:AAPL]
 
@@ -1021,7 +1036,31 @@ EXEMPLE 3 - Heatmap sectorielle:
 
 Le secteur tech domine avec +1,2%..."
 
-⚠️ RAPPEL FINAL: Si "graphique", "image", "chart", "visualisation" ou "en images" est mentionné, tu DOIS inclure AU MOINS UN tag [CHART:...] dans ta réponse. C'est OBLIGATOIRE.
+EXEMPLE 4 - Analyse technique rapide:
+"Signal technique pour Microsoft:
+
+[QUOTE:TRADINGVIEW:MSFT]
+
+[TECHNICAL:TRADINGVIEW:MSFT]
+
+L'analyse technique montre un signal d'achat modéré..."
+
+EXEMPLE 5 - Vue d'ensemble du marché:
+"Contexte des marchés aujourd'hui:
+
+[OVERVIEW:TRADINGVIEW]
+
+Les indices américains sont en hausse..."
+
+EXEMPLE 6 - Watchlist multiple:
+"Voici votre watchlist en temps réel:
+
+[TAPE:TRADINGVIEW:AAPL,MSFT,GOOGL,AMZN,TSLA]
+
+Détails pour Apple:
+[MINI:TRADINGVIEW:AAPL]"
+
+⚠️ RAPPEL FINAL: Si "graphique", "image", "chart", "visualisation" ou "en images" est mentionné, tu DOIS inclure AU MOINS UN tag [CHART:...] ou widget TradingView dans ta réponse. C'est OBLIGATOIRE.
 
 EXEMPLE DE BONNE RÉPONSE (si demande sur plusieurs tickers):
 "Voici une analyse des initiatives IA récentes pour les compagnies de l'équipe:

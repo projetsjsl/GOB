@@ -922,7 +922,99 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
             };
 
-            // Fonction pour charger les données du ticker (sans auto-refresh)
+            // 🚀 NOUVELLE FONCTION: Batch fetch optimisé pour multiples symboles
+            // Réduit les coûts API en récupérant plusieurs actions en une seule requête
+            const fetchBatchQuotes = async (symbols) => {
+                try {
+                    // Séparer les actions standard des symboles spéciaux (indices, forex)
+                    const regularSymbols = symbols.filter(s => !s.symbol.includes('^') && !s.symbol.includes('=X'));
+                    const specialSymbols = symbols.filter(s => s.symbol.includes('^') || s.symbol.includes('=X'));
+
+                    const results = [];
+
+                    // Batch fetch pour les actions standard (si présentes)
+                    if (regularSymbols.length > 0) {
+                        const symbolsParam = regularSymbols.map(s => s.symbol).join(',');
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/batch-market-data?symbols=${symbolsParam}`);
+                            if (response.ok) {
+                                const data = await response.json();
+                                if (data.success && data.data) {
+                                    // Map batch results back to our format
+                                    data.data.forEach(quote => {
+                                        const meta = regularSymbols.find(s => s.symbol === quote.symbol);
+                                        results.push({
+                                            symbol: quote.symbol,
+                                            name: meta?.name || quote.name,
+                                            type: meta?.type || 'stock',
+                                            price: quote.price,
+                                            change: quote.change,
+                                            changePercent: quote.changePercent,
+                                            volume: quote.volume,
+                                            marketCap: quote.marketCap,
+                                            trend: quote.trend
+                                        });
+                                    });
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('Batch fetch failed, falling back to individual calls:', err);
+                            // Fallback: fetch individually
+                            for (const item of regularSymbols) {
+                                try {
+                                    const response = await fetch(`${API_BASE_URL}/api/marketdata?symbol=${item.symbol}`);
+                                    if (response.ok) {
+                                        const data = await response.json();
+                                        if (data.success && data.data) {
+                                            const quote = data.data;
+                                            results.push({
+                                                symbol: item.symbol,
+                                                name: item.name,
+                                                type: item.type,
+                                                price: quote.c || quote.price || 0,
+                                                change: quote.d || quote.change || 0,
+                                                changePercent: quote.dp || quote.changePercent || 0
+                                            });
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error(`Error fetching ${item.symbol}:`, e);
+                                }
+                            }
+                        }
+                    }
+
+                    // Fetch individuel pour symboles spéciaux (indices, forex, bonds)
+                    for (const item of specialSymbols) {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/marketdata?symbol=${encodeURIComponent(item.symbol)}`);
+                            if (response.ok) {
+                                const data = await response.json();
+                                if (data.success && data.data) {
+                                    const quote = data.data;
+                                    results.push({
+                                        symbol: item.symbol,
+                                        name: item.name,
+                                        type: item.type,
+                                        price: quote.c || quote.price || 0,
+                                        change: quote.d || quote.change || 0,
+                                        changePercent: quote.dp || quote.changePercent || 0
+                                    });
+                                }
+                            }
+                        } catch (err) {
+                            console.error(`Erreur chargement ${item.symbol}:`, err);
+                        }
+                    }
+
+                    return results;
+                } catch (error) {
+                    console.error('Error in fetchBatchQuotes:', error);
+                    return [];
+                }
+            };
+
+            // Fonction pour charger les données du ticker (OPTIMISÉ avec batch fetch)
             const fetchTickerData = async () => {
                 try {
                     const symbols = [
@@ -941,30 +1033,11 @@ const fetchHybridData = async (symbol, dataType) => {
                         { symbol: '^FVX', name: 'US 5Y', type: 'bond' }
                     ];
 
-                    const tickerResults = [];
-                    for (const item of symbols) {
-                        try {
-                            const response = await fetch(`${API_BASE_URL}/api/marketdata?symbol=${encodeURIComponent(item.symbol)}`);
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.success && data.data) {
-                                    const quote = data.data;
-                                    tickerResults.push({
-                                        symbol: item.symbol,
-                                        name: item.name,
-                                        type: item.type,
-                                        price: quote.c || quote.price || 0,
-                                        change: quote.d || quote.change || 0,
-                                        changePercent: quote.dp || quote.changePercent || 0
-                                    });
-                                }
-                            }
-                        } catch (err) {
-                            console.error(`Erreur chargement ${item.symbol}:`, err);
-                        }
-                    }
+                    // 🚀 OPTIMISÉ: Utilise batch fetch au lieu de boucle individuelle
+                    const tickerResults = await fetchBatchQuotes(symbols);
+
                     setTickerData(tickerResults);
-                    addLog(`✅ Ticker chargé: ${tickerResults.length} instruments`, 'success');
+                    addLog(`✅ Ticker chargé: ${tickerResults.length} instruments (batch optimized)`, 'success');
                 } catch (error) {
                     console.error('Erreur fetchTickerData:', error);
                     addLog(`❌ Erreur ticker: ${error.message}`, 'error');
@@ -3982,39 +4055,44 @@ STRUCTURE JSON OBLIGATOIRE:
                     const newData = {};
 
                     try {
-                        // BATCH OPTIMIZATION: Use batch endpoint for multiple tickers
+                        // 🚀 BATCH OPTIMIZATION: Utilise le nouvel endpoint batch-market-data
                         if (tickers.length > 1) {
-                            console.log(`🚀 Batch loading ${tickers.length} tickers...`);
+                            console.log(`🚀 Batch loading ${tickers.length} tickers avec cache...`);
                             const symbolsQuery = tickers.join(',');
-                            const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
+                            const batchResponse = await fetch(`${API_BASE_URL}/api/batch-market-data?symbols=${symbolsQuery}`);
 
                             if (batchResponse.ok) {
                                 const batchData = await batchResponse.json();
-                                console.log(`✅ Batch loaded: ${batchData.metadata?.total_data_points || 'N/A'} data points`);
-                                console.log(`💰 API Calls Saved: ${batchData.metadata?.api_calls_saved || 'N/A'}`);
+                                console.log(`✅ Batch loaded: ${batchData.count} tickers in ${batchData.fetchTime}ms`);
+                                if (batchData.cached) {
+                                    console.log(`📦 Données en cache (${batchData.cacheAge}s)`);
+                                }
 
-                                // Process batch results
+                                // Process batch results avec données enrichies
                                 if (batchData.success && batchData.data) {
-                                    const quotes = batchData.data.quote || {};
-                                    const fundamentals = batchData.data.fundamentals || {};
-
-                                    tickers.forEach(ticker => {
-                                        const tickerUpper = ticker.toUpperCase();
-                                        const quote = quotes[tickerUpper];
-                                        const fundamental = fundamentals[tickerUpper];
-
-                                        if (quote || fundamental) {
-                                            newData[ticker] = {
-                                                symbol: tickerUpper,
-                                                price: quote?.c || fundamental?.quote?.price || 0,
-                                                change: quote?.d || fundamental?.quote?.change || 0,
-                                                changePercent: quote?.dp || fundamental?.quote?.changesPercentage || 0,
-                                                profile: fundamental?.profile || null,
-                                                ratios: fundamental?.ratios || null,
-                                                source: quote?.source || fundamental?.source || 'batch',
-                                                timestamp: new Date().toISOString()
-                                            };
-                                        }
+                                    batchData.data.forEach(quote => {
+                                        const ticker = quote.symbol;
+                                        newData[ticker] = {
+                                            symbol: quote.symbol,
+                                            name: quote.name,
+                                            price: quote.price,
+                                            change: quote.change,
+                                            changePercent: quote.changePercent,
+                                            volume: quote.volume,
+                                            volumeRatio: quote.volumeRatio,
+                                            marketCap: quote.marketCap,
+                                            pe: quote.pe,
+                                            dayLow: quote.dayLow,
+                                            dayHigh: quote.dayHigh,
+                                            yearLow: quote.yearLow,
+                                            yearHigh: quote.yearHigh,
+                                            trend: quote.trend,
+                                            volumeStrength: quote.volumeStrength,
+                                            dayRange: quote.dayRange,
+                                            yearRange: quote.yearRange,
+                                            source: 'batch-fmp',
+                                            timestamp: batchData.timestamp
+                                        };
                                     });
                                 }
                             } else {
@@ -11128,6 +11206,43 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         return `@@IMAGE_TAG_${idx}@@`;
                     });
 
+                    // 🆕 WIDGETS TRADINGVIEW SUPPLÉMENTAIRES
+
+                    // [MINI:TRADINGVIEW:TICKER] - Mini chart compact
+                    t = t.replace(/\[MINI:TRADINGVIEW:([A-Z]+)\]/g, (_m, ticker) => {
+                        const idx = imageTags.length;
+                        imageTags.push({ type: 'tradingview-mini', ticker });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [TECHNICAL:TRADINGVIEW:TICKER] - Analyse technique
+                    t = t.replace(/\[TECHNICAL:TRADINGVIEW:([A-Z]+)\]/g, (_m, ticker) => {
+                        const idx = imageTags.length;
+                        imageTags.push({ type: 'tradingview-technical', ticker });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [OVERVIEW:TRADINGVIEW] - Vue d'ensemble marchés
+                    t = t.replace(/\[OVERVIEW:TRADINGVIEW\]/g, (_m) => {
+                        const idx = imageTags.length;
+                        imageTags.push({ type: 'tradingview-overview' });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [TAPE:TRADINGVIEW:TICKERS] - Bandeau ticker tape
+                    t = t.replace(/\[TAPE:TRADINGVIEW:([A-Z,]+)\]/g, (_m, tickers) => {
+                        const idx = imageTags.length;
+                        imageTags.push({ type: 'tradingview-tape', tickers });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [QUOTE:TRADINGVIEW:TICKER] - Citation simple
+                    t = t.replace(/\[QUOTE:TRADINGVIEW:([A-Z]+)\]/g, (_m, ticker) => {
+                        const idx = imageTags.length;
+                        imageTags.push({ type: 'tradingview-quote', ticker });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
                     // Gras / italique basiques (type Markdown)
                     t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                     t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -11327,6 +11442,56 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             Voir le graphique sur TradingView →
                                         </a>
                                     </div>
+                                </div>`;
+                                break;
+
+                            case 'tradingview-mini':
+                                // Mini Chart TradingView (compact)
+                                html = `<div class="my-3 w-full max-w-xl mx-auto">
+                                    <div class="rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden">
+                                        <div class="text-xs px-2 py-1 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}">
+                                            📊 Mini Chart: ${tag.ticker}
+                                        </div>
+                                        <iframe src="https://www.tradingview.com/embed-widget/symbol-overview/?locale=fr&symbol=${tag.ticker}&theme=${isDarkMode ? 'dark' : 'light'}&style=1&withdateranges=false&showvolume=false&showma=false&width=100%&height=220" style="width:100%;height:220px;border:0;" frameborder="0"></iframe>
+                                    </div>
+                                </div>`;
+                                break;
+
+                            case 'tradingview-technical':
+                                // Technical Analysis TradingView
+                                html = `<div class="my-3 w-full max-w-md mx-auto">
+                                    <div class="rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden">
+                                        <div class="text-xs px-2 py-1 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}">
+                                            🎯 Analyse Technique: ${tag.ticker}
+                                        </div>
+                                        <iframe src="https://www.tradingview.com/embed-widget/technical-analysis/?locale=fr&symbol=${tag.ticker}&interval=1D&theme=${isDarkMode ? 'dark' : 'light'}&width=100%&height=200" style="width:100%;height:200px;border:0;" frameborder="0"></iframe>
+                                    </div>
+                                </div>`;
+                                break;
+
+                            case 'tradingview-overview':
+                                // Market Overview TradingView (multi-marchés)
+                                html = `<div class="my-3 w-full mx-auto">
+                                    <div class="rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden">
+                                        <div class="text-xs px-2 py-1 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}">
+                                            🌐 Market Overview
+                                        </div>
+                                        <iframe src="https://www.tradingview.com/embed-widget/market-overview/?locale=fr&theme=${isDarkMode ? 'dark' : 'light'}&showChart=true&width=100%&height=400&tabs=indices,forex,crypto,futures" style="width:100%;height:400px;border:0;" frameborder="0"></iframe>
+                                    </div>
+                                </div>`;
+                                break;
+
+                            case 'tradingview-tape':
+                                // Ticker Tape TradingView (bandeau défilant)
+                                html = `<div class="my-3 w-full mx-auto">
+                                    <iframe src="https://www.tradingview.com/embed-widget/ticker-tape/?locale=fr&symbols=${tag.tickers}&theme=${isDarkMode ? 'dark' : 'light'}&isTransparent=false&displayMode=adaptive&width=100%&height=46" style="width:100%;height:46px;border:0;" frameborder="0"></iframe>
+                                </div>`;
+                                break;
+
+                            case 'tradingview-quote':
+                                // Single Quote TradingView (citation simple)
+                                html = `<div class="my-3 w-full max-w-xs mx-auto">
+                                    <iframe src="https://www.tradingview.com/embed-widget/single-quote/?locale=fr&symbol=${tag.ticker}&theme=${isDarkMode ? 'dark' : 'light'}&width=100%&height=58" style="width:100%;height:58px;border:0;" frameborder="0"></iframe>
                                 </div>`;
                                 break;
 
