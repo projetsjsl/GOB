@@ -10279,15 +10279,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         console.log('✅ Utilisation des données existantes du dashboard');
                         
                         // Utiliser l'API Perplexity avec les données fraîches
-                        const response = await generatePerplexityResponse(emmaInput);
-                        
+                        const responseData = await generatePerplexityResponse(emmaInput);
+                        const response = typeof responseData === 'string' ? responseData : responseData.text;
+                        const model = typeof responseData === 'object' ? responseData.model : null;
+                        const modelReason = typeof responseData === 'object' ? responseData.modelReason : null;
+
                         const messageId = Date.now() + 1;
                         const emmaResponse = {
                             id: messageId,
                             type: 'emma',
                             content: '', // Contenu vide au départ pour l'effet de typing
                             fullContent: response, // Contenu complet stocké séparément
-                            timestamp: new Date().toLocaleTimeString('fr-FR')
+                            timestamp: new Date().toLocaleTimeString('fr-FR'),
+                            model: model,  // Stocker le modèle utilisé
+                            modelReason: modelReason  // Stocker la raison du choix
                         };
                         
                         setEmmaMessages(prev => {
@@ -10447,7 +10452,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             console.warn('⚠️ Réponse très courte, possible troncature');
                         }
 
-                        return responseText;
+                        // Retourner le texte avec les métadonnées du modèle
+                        return {
+                            text: responseText,
+                            model: data.model || 'unknown',
+                            modelReason: data.model_reason || 'Unknown reason'
+                        };
                     } catch (error) {
                         console.error('Erreur Emma Agent:', error?.message || String(error));
                         throw error;
@@ -11526,8 +11536,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     {/* Indicateur de paramètres pour les messages d'Emma */}
                                                     {message.type === 'emma' && (
                                                         <div className="text-xs mt-2 px-2 py-1 rounded bg-gray-100 text-gray-600">
-                                                            <div className="flex items-center gap-2">
+                                                            <div className="flex items-center gap-2 flex-wrap">
                                                                 <span className="font-medium">⚙️ Paramètres:</span>
+                                                                {message.model && (
+                                                                    <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${
+                                                                        message.model === 'sonar-pro' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
+                                                                        message.model === 'claude' ? 'bg-purple-100 text-purple-700 border border-purple-300' :
+                                                                        message.model === 'gemini' ? 'bg-green-100 text-green-700 border border-green-300' :
+                                                                        'bg-gray-200 text-gray-700'
+                                                                    }`}>
+                                                                        🤖 {message.model === 'sonar-pro' ? 'Sonar Pro' : message.model === 'claude' ? 'Claude' : message.model === 'gemini' ? 'Gemini' : message.model}
+                                                                    </span>
+                                                                )}
                                                                 <span className={`px-1.5 py-0.5 rounded text-xs ${
                                                                     emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
                                                                     emmaTemperature <= 0.5 ? 'bg-gray-700 text-gray-200' :
@@ -11544,6 +11564,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                     Longueur: {emmaMaxTokens} ({emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'})
                                                                 </span>
                                                             </div>
+                                                            {message.modelReason && (
+                                                                <div className="text-xs mt-1 text-gray-500 italic">
+                                                                    💡 {message.modelReason}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
