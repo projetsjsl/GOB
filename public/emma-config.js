@@ -14,7 +14,7 @@ export const emmaConfig = {
 
   // Configuration Gemini
   gemini: {
-    model: 'gemini-pro',
+    model: 'gemini-2.0-flash-exp',
     temperature: 0.7,
     topK: 40,
     topP: 0.95,
