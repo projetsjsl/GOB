@@ -3418,7 +3418,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📊 Gestion des Stocks</h3>
+                        }`}>
+                        <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                        Gestion des Stocks
+                    </h3>
                         <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={refreshAllStocks}
@@ -3448,7 +3451,10 @@ STRUCTURE JSON OBLIGATOIRE:
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>📊 ÉTAPE 1: SCRAPING BATCH (25 tickers)</h3>
+                                }`}>
+                                <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                                ÉTAPE 1: SCRAPING BATCH (25 tickers)
+                            </h3>
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold ${
                                     scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
                                     scrapingStatus === 'running' ? 'bg-gray-700 text-white animate-pulse' :
@@ -3524,7 +3530,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         }`}>
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🤖 ÉTAPE 2: ANALYSE BATCH PERPLEXITY</h3>
+                            }`}>
+                            <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                            ÉTAPE 2: ANALYSE BATCH PERPLEXITY
+                        </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
                                 isDarkMode ? 'bg-black/30' : 'bg-white/60'
@@ -3590,7 +3599,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         }`}>
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📊 ÉTAPE 3: RÉSULTATS & AFFICHAGE</h3>
+                            }`}>
+                            <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                            ÉTAPE 3: RÉSULTATS & AFFICHAGE
+                        </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
                                 isDarkMode ? 'bg-black/30' : 'bg-white/60'
@@ -3696,7 +3708,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🤖 Monitoring Emma AI</h3>
+                        }`}>
+                        <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                        Monitoring Emma AI
+                    </h3>
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
@@ -3808,7 +3823,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 }`}>
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>📊 Outils Financiers</h4>
+                                    }`}>
+                                    <Icon emoji="📊" size={18} className="mr-2 inline-block" />
+                                    Outils Financiers
+                                </h4>
                                     <div className="space-y-1 text-sm">
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -4010,7 +4028,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                     }`}>
                                         <h4 className={`font-semibold mb-3 ${
                                             isDarkMode ? 'text-white' : 'text-blue-900'
-                                        }`}>💡 Recommandations</h4>
+                                        }`}>
+                                        <Icon emoji="💡" size={18} className="mr-2 inline-block" />
+                                        Recommandations
+                                    </h4>
                                         <div className="space-y-2">
                                             {healthStatus.recommendations.map((rec, index) => (
                                                 <div key={index} className={`p-3 rounded-lg ${
@@ -4058,7 +4079,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>⚙️ Configuration</h3>
+                        }`}>
+                        <Icon emoji="⚙️" size={20} className="mr-2 inline-block" />
+                        Configuration
+                    </h3>
                         <div className="space-y-4">
                             <div>
                                 <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
@@ -5558,7 +5582,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🤖 Configuration des API</h4>
+                            }`}>
+                            <Icon emoji="🤖" size={18} className="mr-2 inline-block" />
+                            Configuration des API
+                        </h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-green-200' : 'text-green-800'
                             }`}>
@@ -5607,7 +5634,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📈 Analyses Seeking Alpha</h2>
+                        }`}>
+                        <Icon emoji="📈" size={24} className="mr-2 inline-block" />
+                        Analyses Seeking Alpha
+                    </h2>
                         <div className="flex gap-2">
                             <button
                                 onClick={refreshAllStocks}
