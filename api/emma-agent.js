@@ -713,13 +713,13 @@ class SmartAgent {
             // Router vers le bon modèle
             if (modelSelection.model === 'claude') {
                 // CLAUDE: Briefings premium
-                response = await this._call_claude(prompt, outputMode);
+                response = await this._call_claude(prompt, outputMode, userMessage, intentData, toolResults);
             } else if (modelSelection.model === 'gemini') {
                 // GEMINI: Questions conceptuelles (gratuit)
                 response = await this._call_gemini(prompt, outputMode);
             } else {
                 // PERPLEXITY: Données factuelles avec sources (default)
-                response = await this._call_perplexity(prompt, outputMode, modelSelection.recency);
+                response = await this._call_perplexity(prompt, outputMode, modelSelection.recency, userMessage, intentData, toolResults);
             }
 
             // Post-traitement selon le mode
@@ -1192,14 +1192,77 @@ RÉPONSE MARKDOWN ENRICHIE:`;
     /**
      * Appel à l'API Perplexity (avec recency filter)
      */
-    async _call_perplexity(prompt, outputMode = 'chat', recency = 'month') {
+    /**
+     * 🧠 Détecte la complexité d'une question pour ajuster automatiquement les tokens
+     * Simple: 800 tokens, Moyenne: 2000-4000, Complexe: 6000-8000
+     */
+    _detectComplexity(userMessage, intentData, toolResults) {
+        let complexityScore = 0;
+
+        // 1. Nombre de tickers mentionnés (multi-ticker = plus complexe)
+        const tickers = intentData?.tickers || [];
+        if (tickers.length >= 5) complexityScore += 3;
+        else if (tickers.length >= 3) complexityScore += 2;
+        else if (tickers.length >= 2) complexityScore += 1;
+
+        // 2. Mots-clés de complexité dans la question
+        const complexKeywords = [
+            'analyse approfondie', 'détaillée', 'complète', 'comparaison', 'compare',
+            'fondamentaux', 'technique', 'actualités', 'earnings', 'rapports',
+            'tous', 'plusieurs', 'et', 'ainsi que', 'également',
+            'pourquoi', 'comment', 'expliquer', 'analyser'
+        ];
+        const matchedKeywords = complexKeywords.filter(kw =>
+            userMessage.toLowerCase().includes(kw)
+        );
+        complexityScore += matchedKeywords.length;
+
+        // 3. Type d'intent (certains intents nécessitent plus de détails)
+        const complexIntents = [
+            'comprehensive_analysis', 'comparative_analysis',
+            'earnings', 'recommendation', 'fundamental_analysis'
+        ];
+        if (intentData && complexIntents.includes(intentData.intent)) {
+            complexityScore += 2;
+        }
+
+        // 4. Nombre d'outils utilisés (plus d'outils = plus de données à synthétiser)
+        const toolCount = toolResults?.length || 0;
+        if (toolCount >= 5) complexityScore += 2;
+        else if (toolCount >= 3) complexityScore += 1;
+
+        // 5. Longueur de la question (questions longues = réponse détaillée attendue)
+        if (userMessage.length > 200) complexityScore += 2;
+        else if (userMessage.length > 100) complexityScore += 1;
+
+        // Déterminer le niveau de complexité et les tokens appropriés
+        if (complexityScore <= 2) {
+            return { level: 'simple', tokens: 800, description: 'Question simple et directe' };
+        } else if (complexityScore <= 5) {
+            return { level: 'moyenne', tokens: 2000, description: 'Question modérément complexe' };
+        } else if (complexityScore <= 8) {
+            return { level: 'complexe', tokens: 4000, description: 'Analyse détaillée nécessaire' };
+        } else {
+            return { level: 'très_complexe', tokens: 8000, description: 'Analyse exhaustive multi-dimensionnelle' };
+        }
+    }
+
+    async _call_perplexity(prompt, outputMode = 'chat', recency = 'month', userMessage = '', intentData = null, toolResults = []) {
         try {
-            // Ajuster max_tokens selon le mode
+            // Ajuster max_tokens selon le mode ET la complexité
             let maxTokens = 1000;  // Default pour chat
+            let complexityInfo = null;
+
             if (outputMode === 'briefing') {
-                maxTokens = 3000;  // Briefing détaillé: 1500-2000 mots nécessitent ~2500-3000 tokens
+                maxTokens = 8000;  // 🚀 Briefing TRÈS détaillé (maximum exhaustif)
+                console.log('📊 Briefing mode: 8000 tokens (maximum exhaustif)');
             } else if (outputMode === 'data') {
                 maxTokens = 500;  // JSON structuré: court
+            } else if (outputMode === 'chat') {
+                // 🧠 Détection automatique de complexité pour ajustement intelligent
+                complexityInfo = this._detectComplexity(userMessage, intentData, toolResults);
+                maxTokens = complexityInfo.tokens;
+                console.log(`🧠 Complexité détectée: ${complexityInfo.level} → ${maxTokens} tokens (${complexityInfo.description})`);
             }
 
             const requestBody = {
@@ -1317,13 +1380,26 @@ RÈGLES CRITIQUES:
     /**
      * Appel à Claude (premium) pour briefings et rédaction
      */
-    async _call_claude(prompt, outputMode = 'briefing') {
+    async _call_claude(prompt, outputMode = 'briefing', userMessage = '', intentData = null, toolResults = []) {
         try {
             if (!process.env.ANTHROPIC_API_KEY) {
                 throw new Error('ANTHROPIC_API_KEY not configured');
             }
 
-            const maxTokens = outputMode === 'briefing' ? 4000 : 1000;
+            // Ajuster max_tokens selon le mode ET la complexité
+            let maxTokens = 1000;  // Default
+
+            if (outputMode === 'briefing') {
+                maxTokens = 8000;  // 🚀 Briefing TRÈS détaillé (maximum exhaustif)
+                console.log('📊 Claude Briefing mode: 8000 tokens (maximum exhaustif)');
+            } else if (outputMode === 'data') {
+                maxTokens = 500;
+            } else if (outputMode === 'chat') {
+                // 🧠 Détection automatique de complexité
+                const complexityInfo = this._detectComplexity(userMessage, intentData, toolResults);
+                maxTokens = complexityInfo.tokens;
+                console.log(`🧠 Claude - Complexité détectée: ${complexityInfo.level} → ${maxTokens} tokens`);
+            }
 
             // System prompt pour Claude
             const systemPrompt = outputMode === 'data'
