@@ -1266,19 +1266,19 @@ RÉPONSE MARKDOWN ENRICHIE:`;
      */
     async _call_perplexity(prompt, outputMode = 'chat', recency = 'month') {
         try {
-            // 🚀 AJUSTER max_tokens et temperature selon le mode (GÉNÉREUX pour utilisateurs experts)
-            let maxTokens = 2000;  // Augmenté: default pour chat (était 1000)
-            let temperature = 0.7; // Default flexible
+            // 🎓 TOUS LES UTILISATEURS SONT EXPERTS: Paramètres généreux par défaut
+            let maxTokens = 4000;  // Default généreux pour utilisateurs experts (était 1000)
+            let temperature = 0.7; // Default créatif et flexible
 
             if (outputMode === 'briefing') {
-                maxTokens = 4000;  // Augmenté: Briefing détaillé (était 3000)
+                maxTokens = 6000;  // Briefings très détaillés
                 temperature = 0.6; // Équilibré: détail + créativité
             } else if (outputMode === 'data') {
-                maxTokens = 1000;  // Augmenté pour JSON complexe (était 500)
+                maxTokens = 2000;  // JSON complexe avec contexte (était 500)
                 temperature = 0.3; // Déterministe pour données structurées
             } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
-                // 🎓 MODE EXPERT: Aucune contrainte
-                maxTokens = 8000;  // Maximum pour analyses approfondies
+                // Mode analyse approfondie maximale
+                maxTokens = 8000;  // Maximum pour analyses exhaustives
                 temperature = 0.8; // Plus créatif et exploratoire
             }
 
@@ -1339,18 +1339,18 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 throw new Error('GEMINI_API_KEY not configured');
             }
 
-            // 🚀 Max tokens et temperature généreux pour utilisateurs experts
-            let maxTokens = 2000; // Augmenté: default (était 1000)
-            let temperature = 0.7; // Default flexible
+            // 🎓 TOUS LES UTILISATEURS SONT EXPERTS: Paramètres généreux par défaut
+            let maxTokens = 4000; // Default généreux pour utilisateurs experts (était 1000)
+            let temperature = 0.7; // Default créatif et flexible
 
             if (outputMode === 'data') {
-                maxTokens = 1000; // Augmenté pour JSON (était 500)
+                maxTokens = 2000; // JSON complexe avec contexte (était 500)
                 temperature = 0.3; // Déterministe pour données structurées
             } else if (outputMode === 'briefing') {
-                maxTokens = 4000; // Briefing détaillé
+                maxTokens = 6000; // Briefings très détaillés
                 temperature = 0.6; // Équilibré
             } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
-                maxTokens = 8000; // Mode expert: aucune contrainte
+                maxTokens = 8000; // Mode analyse approfondie maximale
                 temperature = 0.8; // Plus créatif
             }
 
@@ -1417,18 +1417,18 @@ RÈGLES CRITIQUES:
                 throw new Error('ANTHROPIC_API_KEY not configured');
             }
 
-            // 🚀 Max tokens et temperature généreux pour utilisateurs experts
-            let maxTokens = 2000; // Augmenté: default (était 1000)
+            // 🎓 TOUS LES UTILISATEURS SONT EXPERTS: Paramètres généreux par défaut
+            let maxTokens = 4000; // Default généreux pour utilisateurs experts (était 1000)
             let temperature = 0.6; // Default équilibré
 
             if (outputMode === 'briefing') {
-                maxTokens = 4000; // Briefing détaillé
+                maxTokens = 6000; // Briefings très détaillés
                 temperature = 0.5; // Déterministe pour écriture professionnelle
             } else if (outputMode === 'data') {
-                maxTokens = 1000; // JSON structuré
+                maxTokens = 2000; // JSON complexe avec contexte (était 500)
                 temperature = 0.3; // Très déterministe
             } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
-                maxTokens = 8000; // Mode expert: aucune contrainte
+                maxTokens = 8000; // Mode analyse approfondie maximale
                 temperature = 0.7; // Plus créatif et nuancé
             }
 
