@@ -19118,6 +19118,423 @@ console.log('✅ Données hybrides récupérées:', {
                 );
             };
 
+            // ============================================================================
+            // 🎨 TEST EMMA IMAGES TAB - Test du système d'affichage d'images
+            // ============================================================================
+            const TestEmmaImagesTab = () => {
+                const [testResult, setTestResult] = React.useState(null);
+                const [loading, setLoading] = React.useState(false);
+
+                const exampleTests = [
+                    {
+                        title: "Graphique Finviz simple",
+                        description: "Affiche un graphique technique Finviz",
+                        text: "Voici le graphique technique de Apple:\n\n[CHART:FINVIZ:AAPL]\n\nLe graphique montre la performance récente du titre.",
+                        tags: ["[CHART:FINVIZ:AAPL]"]
+                    },
+                    {
+                        title: "Widget TradingView interactif",
+                        description: "Affiche un widget TradingView complet",
+                        text: "Voici le widget TradingView pour Microsoft:\n\n[CHART:TRADINGVIEW:NASDAQ:MSFT]\n\nVous pouvez interagir avec ce graphique.",
+                        tags: ["[CHART:TRADINGVIEW:NASDAQ:MSFT]"]
+                    },
+                    {
+                        title: "Heatmap sectorielle",
+                        description: "Affiche la heatmap de performance des secteurs",
+                        text: "Voici la performance des secteurs aujourd'hui:\n\n[CHART:FINVIZ:SECTORS]\n\nLes secteurs en vert surperforment le marché.",
+                        tags: ["[CHART:FINVIZ:SECTORS]"]
+                    },
+                    {
+                        title: "Logo + Graphique",
+                        description: "Combine logo et graphique",
+                        text: "Analyse de [LOGO:AAPL] Apple Inc.:\n\nPrix actuel: $247.25\n\n[CHART:FINVIZ:AAPL]\n\nPerformance solide ce trimestre.",
+                        tags: ["[LOGO:AAPL]", "[CHART:FINVIZ:AAPL]"]
+                    },
+                    {
+                        title: "Analyse multi-tickers",
+                        description: "Plusieurs graphiques dans une même réponse",
+                        text: "Comparaison FAANG:\n\n[LOGO:META] Meta: [CHART:FINVIZ:META]\n\n[LOGO:AAPL] Apple: [CHART:FINVIZ:AAPL]\n\n[LOGO:AMZN] Amazon: [CHART:FINVIZ:AMZN]",
+                        tags: ["[LOGO:META]", "[CHART:FINVIZ:META]", "[LOGO:AAPL]", "[CHART:FINVIZ:AAPL]", "[LOGO:AMZN]", "[CHART:FINVIZ:AMZN]"]
+                    }
+                ];
+
+                const runTest = (test) => {
+                    setLoading(true);
+                    setTestResult({
+                        title: test.title,
+                        description: test.description,
+                        text: test.text,
+                        tags: test.tags,
+                        timestamp: new Date().toISOString()
+                    });
+                    setLoading(false);
+                };
+
+                return (
+                    <div className={`p-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <div className="max-w-6xl mx-auto">
+                            {/* Header */}
+                            <div className={`mb-6 p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+                                <h1 className="text-3xl font-bold mb-2">🎨 Test Emma - Affichage d'images</h1>
+                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+                                    Testez le système de parsing et d'affichage des tags d'images dans Emma
+                                </p>
+                            </div>
+
+                            {/* Tests disponibles */}
+                            <div className={`mb-6 p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+                                <h2 className="text-xl font-bold mb-4">Tests disponibles</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {exampleTests.map((test, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => runTest(test)}
+                                            className={`p-4 rounded-lg text-left transition-all hover:scale-105 ${
+                                                isDarkMode
+                                                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                            }`}
+                                        >
+                                            <div className="font-bold mb-1">{test.title}</div>
+                                            <div className="text-sm opacity-90">{test.description}</div>
+                                            <div className="text-xs mt-2 opacity-75">
+                                                Tags: {test.tags.join(', ')}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Résultat du test */}
+                            {testResult && (
+                                <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-xl font-bold">Résultat: {testResult.title}</h2>
+                                        <span className="text-sm opacity-75">
+                                            {new Date(testResult.timestamp).toLocaleTimeString('fr-FR')}
+                                        </span>
+                                    </div>
+
+                                    <div className={`p-4 rounded-lg mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                        <h3 className="font-semibold mb-2">Tags détectés:</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {testResult.tags.map((tag, idx) => (
+                                                <span key={idx} className="px-2 py-1 rounded bg-purple-500/20 text-purple-500 font-mono text-sm">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className={`border-l-4 border-blue-500 pl-4 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} p-4 rounded`}>
+                                        <h3 className="font-semibold mb-2">Rendu avec le parser Emma:</h3>
+                                        <div dangerouslySetInnerHTML={{ __html: formatMessageText(testResult.text) }} />
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Info */}
+                            <div className={`mt-6 p-4 rounded-lg ${isDarkMode ? 'bg-blue-900/20 border-blue-500' : 'bg-blue-50 border-blue-200'} border`}>
+                                <h3 className="font-semibold mb-2">ℹ️ Comment ça marche</h3>
+                                <ul className="list-disc list-inside space-y-1 text-sm">
+                                    <li>Emma (via Perplexity) retourne des tags dans ses réponses</li>
+                                    <li>Le parser frontend convertit automatiquement les tags en images/iframes</li>
+                                    <li>Support: TradingView, Finviz, logos, screenshots</li>
+                                    <li>Styling automatique selon le mode clair/sombre</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            // ============================================================================
+            // 🔬 PERPLEXITY LABS TAB - Suite de tests pour explorer les capacités
+            // ============================================================================
+            const PerplexityLabsTab = () => {
+                const [testResults, setTestResults] = React.useState(null);
+                const [loading, setLoading] = React.useState(false);
+                const [ticker, setTicker] = React.useState('AAPL');
+                const [model, setModel] = React.useState('sonar-pro');
+
+                const runTest = async (testType) => {
+                    setLoading(true);
+                    setTestResults(null);
+
+                    try {
+                        let url = `/api/test-perplexity-labs?test=${testType}`;
+
+                        if (testType === 'financial' || testType === 'images' || testType === 'compare') {
+                            url += `&ticker=${ticker}`;
+                        }
+
+                        if (testType === 'financial' || testType === 'images') {
+                            url += `&model=${model}`;
+                        }
+
+                        const response = await fetch(url);
+                        const data = await response.json();
+
+                        setTestResults({ type: testType, data });
+                    } catch (error) {
+                        setTestResults({ error: error.message });
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+
+                const renderResults = () => {
+                    if (!testResults) return null;
+                    if (testResults.error) {
+                        return (
+                            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                                <h3 className="font-bold text-red-800">Erreur</h3>
+                                <p className="text-red-700">{testResults.error}</p>
+                            </div>
+                        );
+                    }
+
+                    const { type, data } = testResults;
+
+                    if (type === 'availability') {
+                        return (
+                            <div>
+                                <h3 className="text-xl font-bold mb-4">Disponibilité des modèles</h3>
+                                <div className="space-y-2">
+                                    {data.results.map((result, idx) => (
+                                        <div key={idx} className={`flex items-center justify-between p-3 rounded-lg ${
+                                            isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+                                        }`}>
+                                            <span className="font-medium">{result.model}</span>
+                                            <span className={result.available ? 'text-green-500' : 'text-red-500'}>
+                                                {result.available ? '✅ ' + result.status : '❌ ' + result.status}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    if (type === 'financial') {
+                        return (
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-bold">Requête financière: {data.ticker}</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                        <div className="text-sm opacity-75">Modèle</div>
+                                        <div className="font-bold">{data.model}</div>
+                                    </div>
+                                    <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                        <div className="text-sm opacity-75">Temps de réponse</div>
+                                        <div className="font-bold">{data.responseTime}ms</div>
+                                    </div>
+                                </div>
+                                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                                    <h4 className="font-semibold mb-2">Réponse:</h4>
+                                    <div className="whitespace-pre-wrap">{data.content}</div>
+                                </div>
+                                {data.citations && data.citations.length > 0 && (
+                                    <div>
+                                        <h4 className="font-semibold mb-2">Citations ({data.citations.length}):</h4>
+                                        <ul className="list-disc list-inside space-y-1 text-sm">
+                                            {data.citations.map((c, idx) => (
+                                                <li key={idx} className="text-blue-500">{c}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    }
+
+                    if (type === 'images') {
+                        return (
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-bold">Test Tags d'images: {data.ticker}</h3>
+                                {data.imageTags && data.imageTags.length > 0 && (
+                                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-purple-900/20 border-purple-500' : 'bg-purple-50 border-purple-200'} border`}>
+                                        <h4 className="font-semibold mb-2">🎨 Tags détectés ({data.imageTags.length}):</h4>
+                                        <div className="space-y-2">
+                                            {data.imageTags.map((tag, idx) => (
+                                                <div key={idx} className={`p-2 rounded font-mono text-sm ${
+                                                    isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                                }`}>
+                                                    {tag}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                                    <h4 className="font-semibold mb-2">Réponse complète:</h4>
+                                    <div className="whitespace-pre-wrap">{data.content}</div>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    if (type === 'compare') {
+                        return (
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-bold">Comparaison: {data.ticker}</h3>
+                                {data.results.map((result, idx) => (
+                                    <div key={idx} className={`p-4 rounded-lg border ${
+                                        result.success
+                                            ? (isDarkMode ? 'bg-green-900/20 border-green-500' : 'bg-green-50 border-green-200')
+                                            : (isDarkMode ? 'bg-red-900/20 border-red-500' : 'bg-red-50 border-red-200')
+                                    }`}>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h4 className="font-bold">{result.model}</h4>
+                                            <span className={result.success ? 'text-green-500' : 'text-red-500'}>
+                                                {result.success ? '✅ Succès' : '❌ Échec'}
+                                            </span>
+                                        </div>
+                                        {result.success && (
+                                            <>
+                                                <div className="grid grid-cols-3 gap-2 mb-3 text-sm">
+                                                    <div>Temps: <span className="font-medium">{result.responseTime}ms</span></div>
+                                                    <div>Citations: <span className="font-medium">{result.citations}</span></div>
+                                                    <div>Tokens: <span className="font-medium">{result.tokens}</span></div>
+                                                </div>
+                                                <div className={`p-3 rounded text-sm whitespace-pre-wrap ${
+                                                    isDarkMode ? 'bg-gray-900' : 'bg-white'
+                                                }`}>
+                                                    {result.content}
+                                                </div>
+                                            </>
+                                        )}
+                                        {!result.success && (
+                                            <p className="text-sm">Erreur: {result.error}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    }
+
+                    return null;
+                };
+
+                return (
+                    <div className={`p-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <div className="max-w-6xl mx-auto">
+                            {/* Header */}
+                            <div className={`mb-6 p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+                                <h1 className="text-3xl font-bold mb-2">🔬 Perplexity Labs - Test Suite</h1>
+                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+                                    Testez les capacités avancées de Perplexity pour données financières
+                                </p>
+                            </div>
+
+                            {/* Test Selector */}
+                            <div className={`mb-6 p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+                                <h2 className="text-xl font-bold mb-4">Sélectionnez un test</h2>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <button
+                                        onClick={() => runTest('availability')}
+                                        disabled={loading}
+                                        className={`p-4 rounded-lg text-left transition-all hover:scale-105 ${
+                                            isDarkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-600'
+                                        } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    >
+                                        <div className="font-bold text-lg mb-2">✅ Test de disponibilité</div>
+                                        <div className="text-sm opacity-90">Vérifie quels modèles sont accessibles</div>
+                                    </button>
+
+                                    <button
+                                        onClick={() => runTest('financial')}
+                                        disabled={loading}
+                                        className={`p-4 rounded-lg text-left transition-all hover:scale-105 ${
+                                            isDarkMode ? 'bg-green-600 hover:bg-green-500' : 'bg-green-500 hover:bg-green-600'
+                                        } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    >
+                                        <div className="font-bold text-lg mb-2">📊 Requête financière</div>
+                                        <div className="text-sm opacity-90">Teste l'extraction de données de marché</div>
+                                    </button>
+
+                                    <button
+                                        onClick={() => runTest('images')}
+                                        disabled={loading}
+                                        className={`p-4 rounded-lg text-left transition-all hover:scale-105 ${
+                                            isDarkMode ? 'bg-purple-600 hover:bg-purple-500' : 'bg-purple-500 hover:bg-purple-600'
+                                        } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    >
+                                        <div className="font-bold text-lg mb-2">🎨 Tags d'images</div>
+                                        <div className="text-sm opacity-90">Vérifie la génération de tags [CHART:...]</div>
+                                    </button>
+
+                                    <button
+                                        onClick={() => runTest('compare')}
+                                        disabled={loading}
+                                        className={`p-4 rounded-lg text-left transition-all hover:scale-105 ${
+                                            isDarkMode ? 'bg-orange-600 hover:bg-orange-500' : 'bg-orange-500 hover:bg-orange-600'
+                                        } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    >
+                                        <div className="font-bold text-lg mb-2">⚖️ Comparaison modèles</div>
+                                        <div className="text-sm opacity-90">Compare sonar vs sonar-pro</div>
+                                    </button>
+                                </div>
+
+                                {/* Configuration */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">Ticker</label>
+                                        <input
+                                            type="text"
+                                            value={ticker}
+                                            onChange={(e) => setTicker(e.target.value.toUpperCase())}
+                                            className={`w-full px-4 py-2 rounded-lg ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white'
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                            } border focus:ring-2 focus:ring-blue-500`}
+                                            placeholder="AAPL"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">Modèle</label>
+                                        <select
+                                            value={model}
+                                            onChange={(e) => setModel(e.target.value)}
+                                            className={`w-full px-4 py-2 rounded-lg ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white'
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                            } border focus:ring-2 focus:ring-blue-500`}
+                                        >
+                                            <option value="sonar">sonar (base)</option>
+                                            <option value="sonar-pro">sonar-pro (recommandé)</option>
+                                            <option value="sonar-reasoning">sonar-reasoning (expérimental)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Loading */}
+                            {loading && (
+                                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-blue-900/20 border-blue-500' : 'bg-blue-50 border-blue-200'} border flex items-center mb-6`}>
+                                    <svg className="animate-spin h-5 w-5 mr-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span className="font-medium">Test en cours...</span>
+                                </div>
+                            )}
+
+                            {/* Results */}
+                            {testResults && (
+                                <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
+                                    {renderResults()}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            };
+
             // Configuration des onglets (après déclaration de TOUS les composants)
             // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
             const tabs = [
@@ -19126,6 +19543,8 @@ console.log('✅ Données hybrides récupérées:', {
                 { id: 'intellistocks', label: 'JLab™', component: IntelliStocksTab },
                 { id: 'jlab-v2', label: 'JLab V2™', component: JLabV2Tab },
                 { id: 'ask-emma', label: 'Emma IA™', component: AskEmmaTab },
+                { id: 'test-emma-images', label: '🎨 Test Images', component: TestEmmaImagesTab },
+                { id: 'perplexity-labs', label: '🔬 Perplexity Labs', component: PerplexityLabsTab },
                 { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab },
                 { id: 'scrapping-sa', label: 'Seeking Alpha', component: ScrappingSATab },
