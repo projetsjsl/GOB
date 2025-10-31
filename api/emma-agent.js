@@ -1266,12 +1266,20 @@ RÉPONSE MARKDOWN ENRICHIE:`;
      */
     async _call_perplexity(prompt, outputMode = 'chat', recency = 'month') {
         try {
-            // Ajuster max_tokens selon le mode
-            let maxTokens = 1000;  // Default pour chat
+            // 🚀 AJUSTER max_tokens et temperature selon le mode (GÉNÉREUX pour utilisateurs experts)
+            let maxTokens = 2000;  // Augmenté: default pour chat (était 1000)
+            let temperature = 0.7; // Default flexible
+
             if (outputMode === 'briefing') {
-                maxTokens = 3000;  // Briefing détaillé: 1500-2000 mots nécessitent ~2500-3000 tokens
+                maxTokens = 4000;  // Augmenté: Briefing détaillé (était 3000)
+                temperature = 0.6; // Équilibré: détail + créativité
             } else if (outputMode === 'data') {
-                maxTokens = 500;  // JSON structuré: court
+                maxTokens = 1000;  // Augmenté pour JSON complexe (était 500)
+                temperature = 0.3; // Déterministe pour données structurées
+            } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
+                // 🎓 MODE EXPERT: Aucune contrainte
+                maxTokens = 8000;  // Maximum pour analyses approfondies
+                temperature = 0.8; // Plus créatif et exploratoire
             }
 
             const requestBody = {
@@ -1289,7 +1297,7 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                     }
                 ],
                 max_tokens: maxTokens,
-                temperature: outputMode === 'briefing' ? 0.5 : 0.7  // Plus déterministe pour briefings
+                temperature: temperature
             };
 
             // Ajouter recency filter si disponible
@@ -1331,7 +1339,21 @@ RÉPONSE MARKDOWN ENRICHIE:`;
                 throw new Error('GEMINI_API_KEY not configured');
             }
 
-            const maxTokens = outputMode === 'data' ? 500 : 1000;
+            // 🚀 Max tokens et temperature généreux pour utilisateurs experts
+            let maxTokens = 2000; // Augmenté: default (était 1000)
+            let temperature = 0.7; // Default flexible
+
+            if (outputMode === 'data') {
+                maxTokens = 1000; // Augmenté pour JSON (était 500)
+                temperature = 0.3; // Déterministe pour données structurées
+            } else if (outputMode === 'briefing') {
+                maxTokens = 4000; // Briefing détaillé
+                temperature = 0.6; // Équilibré
+            } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
+                maxTokens = 8000; // Mode expert: aucune contrainte
+                temperature = 0.8; // Plus créatif
+            }
+
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
             // Ajouter instructions système pour mode conversationnel
@@ -1359,7 +1381,7 @@ RÈGLES CRITIQUES:
                         parts: [{ text: fullPrompt }]
                     }],
                     generationConfig: {
-                        temperature: 0.7,
+                        temperature: temperature,
                         maxOutputTokens: maxTokens,
                         candidateCount: 1
                     }
@@ -1395,7 +1417,20 @@ RÈGLES CRITIQUES:
                 throw new Error('ANTHROPIC_API_KEY not configured');
             }
 
-            const maxTokens = outputMode === 'briefing' ? 4000 : 1000;
+            // 🚀 Max tokens et temperature généreux pour utilisateurs experts
+            let maxTokens = 2000; // Augmenté: default (était 1000)
+            let temperature = 0.6; // Default équilibré
+
+            if (outputMode === 'briefing') {
+                maxTokens = 4000; // Briefing détaillé
+                temperature = 0.5; // Déterministe pour écriture professionnelle
+            } else if (outputMode === 'data') {
+                maxTokens = 1000; // JSON structuré
+                temperature = 0.3; // Très déterministe
+            } else if (outputMode === 'comprehensive' || outputMode === 'expert') {
+                maxTokens = 8000; // Mode expert: aucune contrainte
+                temperature = 0.7; // Plus créatif et nuancé
+            }
 
             // System prompt pour Claude
             const systemPrompt = outputMode === 'data'
@@ -1423,7 +1458,7 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
                 body: JSON.stringify({
                     model: 'claude-3-5-sonnet-20241022',
                     max_tokens: maxTokens,
-                    temperature: 0.5, // Déterministe pour écriture professionnelle
+                    temperature: temperature,
                     system: systemPrompt,
                     messages: [
                         {
