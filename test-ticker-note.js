@@ -5,6 +5,8 @@
  * pour un ticker boursier spécifique via Emma Agent.
  */
 
+import fs from 'fs';
+
 const VERCEL_URL = process.env.VERCEL_URL || 'http://localhost:3000';
 
 /**
@@ -83,7 +85,6 @@ async function testTickerNote(ticker) {
         });
 
         // Sauvegarder la note complète dans un fichier
-        const fs = require('fs');
         const filename = `ticker-note-${ticker}-${Date.now()}.md`;
         fs.writeFileSync(filename, data.response);
         console.log(`\n💾 Note complète sauvegardée dans: ${filename}`);
@@ -232,28 +233,26 @@ async function runMultipleTests() {
 }
 
 // Exécution
-if (require.main === module) {
-    const args = process.argv.slice(2);
+const args = process.argv.slice(2);
 
-    if (args.length === 0) {
-        console.log('Usage:');
-        console.log('  node test-ticker-note.js <TICKER>   # Test un ticker spécifique');
-        console.log('  node test-ticker-note.js --multiple # Test plusieurs tickers');
-        process.exit(1);
-    }
-
-    if (args[0] === '--multiple') {
-        runMultipleTests().catch(error => {
-            console.error('Erreur fatale:', error);
-            process.exit(1);
-        });
-    } else {
-        const ticker = args[0].toUpperCase();
-        testTickerNote(ticker).catch(error => {
-            console.error('Erreur fatale:', error);
-            process.exit(1);
-        });
-    }
+if (args.length === 0) {
+    console.log('Usage:');
+    console.log('  node test-ticker-note.js <TICKER>   # Test un ticker spécifique');
+    console.log('  node test-ticker-note.js --multiple # Test plusieurs tickers');
+    process.exit(1);
 }
 
-module.exports = { testTickerNote, runMultipleTests };
+if (args[0] === '--multiple') {
+    runMultipleTests().catch(error => {
+        console.error('Erreur fatale:', error);
+        process.exit(1);
+    });
+} else {
+    const ticker = args[0].toUpperCase();
+    testTickerNote(ticker).catch(error => {
+        console.error('Erreur fatale:', error);
+        process.exit(1);
+    });
+}
+
+export { testTickerNote, runMultipleTests };
