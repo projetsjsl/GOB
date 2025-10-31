@@ -3302,7 +3302,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 </div>
                             </div>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <div className="font-semibold mb-1">📊 Métriques</div>
+                                <div className="font-semibold mb-1 flex items-center gap-2">
+                                    <Icon emoji="📊" size={16} />
+                                    Métriques
+                                </div>
                                 <div className="text-xs space-y-1">
                                     <div>• Analyses effectuées: {systemLogs.filter(l => l.type === 'success').length}</div>
                                     <div>• Requêtes API: {systemLogs.length}</div>
@@ -3364,7 +3367,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         isDarkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>🤖 Configuration Emma IA</h3>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
+                                <Icon emoji="🤖" size={20} />
+                                Configuration Emma IA
+                            </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
                                 emmaConnected
                                     ? isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
@@ -3717,7 +3723,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                                     isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
-                                    <div className="text-purple-600 font-medium mb-2">🧠 Emma Agent</div>
+                                    <div className="text-purple-600 font-medium mb-2 flex items-center gap-2">
+                                        <Icon emoji="🧠" size={18} />
+                                        Emma Agent
+                                    </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
@@ -5175,7 +5184,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 if (parsedData?.analysis) {
                                     return (
                                         <div className="mb-4">
-                                            <h4 className="text-lg font-semibold text-white mb-2">📈 Analyse Seeking Alpha</h4>
+                                            <h4 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                                                <Icon emoji="📈" size={20} />
+                                                Analyse Seeking Alpha
+                                            </h4>
                                             <div className="text-gray-200 text-sm leading-relaxed">
                                                 {parsedData.analysis}
                                             </div>
@@ -5196,7 +5208,10 @@ STRUCTURE JSON OBLIGATOIRE:
                             {/* Données en temps réel */}
                             {stockData[selectedStock] && (
                                 <div className="mb-4">
-                                    <h4 className="text-lg font-semibold text-white mb-2">📊 Données Temps Réel</h4>
+                                    <h4 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                                        <Icon emoji="📊" size={20} />
+                                        Données Temps Réel
+                                    </h4>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                                         <div>
                                             <span className="text-blue-200">Ouverture:</span>
@@ -5220,7 +5235,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     {!selectedStock && seekingAlphaData.stocks && (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-semibold text-white">📈 Analyses Complètes</h3>
+                            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                <Icon emoji="📈" size={20} />
+                                Analyses Complètes
+                            </h3>
                                 <div className="flex bg-gray-700 rounded-lg p-1">
                                     <button
                                         onClick={() => setSeekingAlphaViewMode('list')}
@@ -5943,7 +5961,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             isDarkMode ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-300'
                         }`}>
                             <div className="text-center">
-                                <div className="text-5xl mb-4">📊</div>
+                                <div className="text-5xl mb-4"><Icon emoji="📊" size={48} /></div>
                                 <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-yellow-200' : 'text-yellow-800'}`}>
                                     Aucune donnée Seeking Alpha disponible
                                 </h3>
@@ -9691,7 +9709,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         isDarkMode ? 'bg-gray-700/50 border-purple-500/30' : 'bg-purple-50 border-purple-200'
                                     }`}>
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-xl">🧠</span>
+                                            <span className="text-xl"><Icon emoji="🧠" size={24} /></span>
                                             <h4 className={`font-semibold transition-colors duration-300 ${
                                                 isDarkMode ? 'text-purple-300' : 'text-purple-700'
                                             }`}>
@@ -12257,7 +12275,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium">📊 Très Précis</div>
+                                                <div className="font-medium flex items-center gap-2">
+                                                    <Icon emoji="📊" size={16} />
+                                                    Très Précis
+                                                </div>
                                                 <div className="text-xs opacity-75">Analyses factuelles</div>
                                             </button>
                                             <button
@@ -12270,7 +12291,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium">📈 Financier</div>
+                                                <div className="font-medium flex items-center gap-2">
+                                                    <Icon emoji="📈" size={16} />
+                                                    Financier
+                                                </div>
                                                 <div className="text-xs opacity-75">Analyses professionnelles</div>
                                             </button>
                                             <button
