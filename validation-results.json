@@ -1,0 +1,204 @@
+{
+  "passed": 38,
+  "failed": 1,
+  "total": 39,
+  "success": false,
+  "checks": [
+    {
+      "name": "Fichier api/emma-agent.js existe",
+      "passed": true,
+      "details": "Taille: 75.48 KB"
+    },
+    {
+      "name": "Fichier docs/TICKER_NOTE_MODE.md existe",
+      "passed": true,
+      "details": "Taille: 10.68 KB"
+    },
+    {
+      "name": "Fichier test-ticker-note.js existe",
+      "passed": true,
+      "details": "Taille: 9.36 KB"
+    },
+    {
+      "name": "Fichier TICKER_NOTE_README.md existe",
+      "passed": true,
+      "details": "Taille: 11.08 KB"
+    },
+    {
+      "name": "Fichier examples/ticker-note-integration-example.html existe",
+      "passed": true,
+      "details": "Taille: 15.40 KB"
+    },
+    {
+      "name": "SmartRouter configure ticker_note",
+      "passed": true,
+      "details": "Détecté dans _selectModel()"
+    },
+    {
+      "name": "Méthode _buildTickerNotePrompt existe",
+      "passed": true,
+      "details": "Méthode définie et appelée"
+    },
+    {
+      "name": "Router principal supporte ticker_note",
+      "passed": true,
+      "details": "Case dans _buildPerplexityPrompt()"
+    },
+    {
+      "name": "Post-traitement pour ticker_note",
+      "passed": true,
+      "details": "Nettoyage Markdown activé"
+    },
+    {
+      "name": "Max tokens configuré pour ticker_note",
+      "passed": true,
+      "details": "6000 tokens pour notes détaillées"
+    },
+    {
+      "name": "Prompt contient [TICKER] au début",
+      "passed": true,
+      "details": "Ticker placé en en-tête"
+    },
+    {
+      "name": "Prompt demande comparaison consensus",
+      "passed": true,
+      "details": "Section consensus présente"
+    },
+    {
+      "name": "Prompt inclut tags multimédias",
+      "passed": true,
+      "details": "Tags STOCKCARD et RATIO_CHART présents"
+    },
+    {
+      "name": "Prompt exige sources systématiques",
+      "passed": true,
+      "details": "Sources obligatoires"
+    },
+    {
+      "name": "Prompt interdit données simulées",
+      "passed": true,
+      "details": "Règle de sécurité présente"
+    },
+    {
+      "name": "PERPLEXITY_API_KEY requise pour ticker_note",
+      "passed": true,
+      "details": "Mode ticker_note utilise Perplexity Sonar Pro"
+    },
+    {
+      "name": "GEMINI_API_KEY disponible comme fallback",
+      "passed": true,
+      "details": "Fallback configuré"
+    },
+    {
+      "name": "ANTHROPIC_API_KEY disponible pour briefings",
+      "passed": true,
+      "details": "Claude disponible"
+    },
+    {
+      "name": "TICKER_NOTE_README.md contient \"output_mode\"",
+      "passed": true,
+      "details": "Mot-clé trouvé"
+    },
+    {
+      "name": "TICKER_NOTE_README.md contient \"ticker_note\"",
+      "passed": true,
+      "details": "Mot-clé trouvé"
+    },
+    {
+      "name": "TICKER_NOTE_README.md contient \"STOCKCARD\"",
+      "passed": true,
+      "details": "Mot-clé trouvé"
+    },
+    {
+      "name": "TICKER_NOTE_README.md contient \"Utilisation\"",
+      "passed": false,
+      "details": "Mot-clé trouvé"
+    },
+    {
+      "name": "docs/TICKER_NOTE_MODE.md contient \"API Request\"",
+      "passed": true,
+      "details": "Mot-clé trouvé"
+    },
+    {
+      "name": "docs/TICKER_NOTE_MODE.md contient \"Tags multimédias\"",
+      "passed": true,
+      "details": "Mot-clé trouvé"
+    },
+    {
+      "name": "docs/TICKER_NOTE_MODE.md contient \"Validation\"",
+      "passed": true,
+      "details": "Mot-clé trouvé"
+    },
+    {
+      "name": "docs/TICKER_NOTE_MODE.md contient \"Troubleshooting\"",
+      "passed": true,
+      "details": "Mot-clé trouvé"
+    },
+    {
+      "name": "Exemple HTML contient appel API",
+      "passed": true,
+      "details": "Code d'exemple correct"
+    },
+    {
+      "name": "Exemple HTML affiche métadonnées",
+      "passed": true,
+      "details": "Affichage des métriques"
+    },
+    {
+      "name": "Exemple HTML convertit Markdown",
+      "passed": true,
+      "details": "Conversion Markdown→HTML"
+    },
+    {
+      "name": "Test script utilise ES modules",
+      "passed": true,
+      "details": "Syntaxe ES module correcte"
+    },
+    {
+      "name": "Test script appelle /api/emma-agent",
+      "passed": true,
+      "details": "Endpoint correct"
+    },
+    {
+      "name": "Test script valide la qualité",
+      "passed": true,
+      "details": "Validation automatique présente"
+    },
+    {
+      "name": "Test script sauvegarde les résultats",
+      "passed": true,
+      "details": "Sauvegarde des notes générées"
+    },
+    {
+      "name": "Timeout emma-agent configuré",
+      "passed": true,
+      "details": "Timeout: 300s"
+    },
+    {
+      "name": "Timeout suffisant pour ticker_note",
+      "passed": true,
+      "details": "300s >= 60s (recommandé pour ticker_note)"
+    },
+    {
+      "name": "Outil \"fmp-quote\" configuré",
+      "passed": true,
+      "details": "Présent dans tools_config.json"
+    },
+    {
+      "name": "Outil \"fmp-fundamentals\" configuré",
+      "passed": true,
+      "details": "Présent dans tools_config.json"
+    },
+    {
+      "name": "Outil \"fmp-ticker-news\" configuré",
+      "passed": true,
+      "details": "Présent dans tools_config.json"
+    },
+    {
+      "name": "Outil \"analyst-recommendations\" configuré",
+      "passed": true,
+      "details": "Présent dans tools_config.json"
+    }
+  ],
+  "timestamp": "2025-10-31T13:36:50.581Z"
+}
