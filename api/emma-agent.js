@@ -228,6 +228,16 @@ class SmartAgent {
             };
         }
 
+        // TICKER_NOTE MODE: Perplexity pour notes professionnelles avec sources
+        if (outputMode === 'ticker_note') {
+            console.log('📋 Ticker note detected → Using PERPLEXITY (professional note with sources)');
+            return {
+                model: 'perplexity',
+                reason: 'Professional ticker note requires real-time data and sources',
+                recency: 'day' // Données les plus récentes pour notes professionnelles
+            };
+        }
+
         // DATA MODE: Perplexity pour extraire données structurées
         if (outputMode === 'data') {
             console.log('📊 Data extraction → Using PERPLEXITY (structured data)');
@@ -726,7 +736,7 @@ class SmartAgent {
             if (outputMode === 'data') {
                 // Valider et parser le JSON
                 response = this._validateAndParseJSON(response);
-            } else if (outputMode === 'briefing') {
+            } else if (outputMode === 'briefing' || outputMode === 'ticker_note') {
                 // Nettoyer le Markdown (enlever éventuels artifacts)
                 response = this._cleanMarkdown(response);
             }
@@ -874,7 +884,7 @@ class SmartAgent {
     }
 
     /**
-     * Construction du prompt pour Perplexity (ROUTER - 3 MODES)
+     * Construction du prompt pour Perplexity (ROUTER - 4 MODES)
      */
     _buildPerplexityPrompt(userMessage, toolsData, conversationContext, context, intentData = null) {
         const outputMode = context.output_mode || 'chat'; // Default: chat
@@ -889,6 +899,9 @@ class SmartAgent {
 
             case 'briefing':
                 return this._buildBriefingPrompt(userMessage, toolsData, context, intentData);
+
+            case 'ticker_note':
+                return this._buildTickerNotePrompt(userMessage, toolsData, context, intentData);
 
             default:
                 console.warn(`⚠️ Unknown output_mode: ${outputMode}, fallback to chat`);
@@ -1206,6 +1219,169 @@ RÉPONSE MARKDOWN ENRICHIE:`;
     }
 
     /**
+     * MODE TICKER_NOTE: Note professionnelle complète pour un ticker spécifique
+     * Format email-ready avec graphiques, tableaux, carte boursière et sources
+     */
+    _buildTickerNotePrompt(userMessage, toolsData, context, intentData) {
+        const currentDate = new Date().toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const currentDateTime = new Date().toISOString();
+
+        // Extraire le ticker principal
+        const ticker = context.ticker || intentData?.tickers?.[0] || context.extracted_tickers?.[0] || 'N/A';
+
+        return `Tu es Emma Financial Analyst. Génère une note professionnelle complète pour le ticker **${ticker}** selon les instructions ci-dessous.
+
+📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
+⚠️ CRITIQUE: Utilise UNIQUEMENT des données réelles les plus récentes du ${currentDate}. JAMAIS de données simulées.
+
+DONNÉES DISPONIBLES DES OUTILS:
+${toolsData.map(t => `- ${t.tool}: ${JSON.stringify(t.data, null, 2)}`).join('\n')}
+
+CONTEXTE: ${userMessage}
+
+TICKER: **${ticker}**
+
+═══════════════════════════════════════════════════════════
+INSTRUCTIONS DÉTAILLÉES POUR LA NOTE PROFESSIONNELLE
+═══════════════════════════════════════════════════════════
+
+## 📋 STRUCTURE OBLIGATOIRE
+
+### 1. EN-TÊTE
+**[${ticker}] - Analyse Professionnelle**
+Date: ${currentDate}
+
+### 2. SYNTHÈSE EXÉCUTIVE
+Rédige une synthèse structurée et concise en français, adaptée à un email professionnel.
+- Utilise des bullet points pour les points clés
+- Mets en évidence les éléments importants
+- Ton professionnel mais accessible
+
+### 3. COMPARAISON AVEC CONSENSUS ANALYSTES
+⚠️ CRITIQUE: Compare SYSTÉMATIQUEMENT chaque chiffre-clé avec le consensus:
+- Résultat net (vs. consensus)
+- BPA - Bénéfice Par Action (vs. consensus)
+- Chiffre d'affaires (vs. consensus)
+- Indique EXPLICITEMENT les écarts en % et en valeur absolue
+
+### 4. TABLEAU RÉCAPITULATIF OBLIGATOIRE
+Crée un tableau avec cette structure:
+
+[TABLE:RESULTATS_VS_CONSENSUS|Métrique,Résultat Actuel,Consensus,Écart,Source|
+Résultat Net,[valeur],[consensus],[écart %],[source]|
+BPA,[valeur],[consensus],[écart %],[source]|
+Chiffre d'affaires,[valeur],[consensus],[écart %],[source]]
+
+### 5. CARTE BOURSIÈRE PERPLEXITY-STYLE
+Intègre la carte boursière pour ce ticker:
+[STOCKCARD:${ticker}]
+
+Cette carte affiche automatiquement:
+- Prix en temps réel
+- Variation % du jour
+- Métriques clés (P/E, Market Cap, Volume)
+- 52-Week Range
+- Mini-graphique d'évolution
+
+### 6. GRAPHIQUES DE RATIOS HISTORIQUES (5 ANS)
+Ajoute des graphiques d'évolution des ratios clés:
+[RATIO_CHART:${ticker}:PE] → Évolution du P/E Ratio
+[RATIO_CHART:${ticker}:PROFIT_MARGIN] → Marge bénéficiaire
+[RATIO_CHART:${ticker}:ROE] → Return on Equity
+
+Autres ratios disponibles si pertinents:
+- PB (Price-to-Book)
+- PS (Price-to-Sales)
+- ROA (Return on Assets)
+- DEBT_EQUITY (Ratio dette/équité)
+- CURRENT_RATIO (Ratio de liquidité)
+- REVENUE_GROWTH (Croissance revenus)
+- EARNINGS_GROWTH (Croissance bénéfices)
+
+### 7. GRAPHIQUE BOURSIER DU MOIS
+Génère un graphique technique détaillé:
+[CHART:FINVIZ:${ticker}]
+
+Titre: **Évolution du cours ${ticker} – ${new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}**
+
+### 8. GRAPHIQUE CHIFFRÉ (ÉVOLUTION TRIMESTRIELLE)
+Si disponible, ajoute:
+[CHART:TRADINGVIEW:NASDAQ:${ticker}]
+
+Ou crée un tableau d'évolution trimestrielle:
+[TABLE:EVOLUTION_TRIMESTRIELLE|Trimestre,Résultat Net,CA,BPA|
+Q1 2024,[valeur],[valeur],[valeur]|
+Q2 2024,[valeur],[valeur],[valeur]|
+Q3 2024,[valeur],[valeur],[valeur]|
+Q4 2024,[valeur],[valeur],[valeur]]
+
+### 9. ACTUALITÉS ET CATALYSEURS
+Liste les actualités récentes pertinentes avec dates et sources:
+
+**Actualités récentes:**
+1. [Titre de l'actualité] - [Date] ([SOURCE:Nom|URL])
+2. [Titre de l'actualité] - [Date] ([SOURCE:Nom|URL])
+3. [Titre de l'actualité] - [Date] ([SOURCE:Nom|URL])
+
+### 10. SIGNATURE ET SOURCES
+Termine par:
+
+---
+**📊 Analyse générée par Emma IA™**
+Propulsée par JSL AI 🌱
+
+**Sources consultées:**
+- Données de marché: [SOURCE:FMP|URL], [SOURCE:Polygon|URL]
+- Actualités: [SOURCE:Bloomberg|URL], [SOURCE:Reuters|URL]
+- Analyses: [SOURCE:Perplexity|URL]
+- Consensus analystes: [SOURCE:Source|URL]
+- Date de génération: ${currentDate}
+
+═══════════════════════════════════════════════════════════
+RÈGLES CRITIQUES À RESPECTER
+═══════════════════════════════════════════════════════════
+
+✅ OBLIGATIONS:
+1. Utiliser UNIQUEMENT des données réelles les plus récentes
+2. Comparer TOUS les chiffres-clés avec le consensus des analystes
+3. Indiquer EXPLICITEMENT les sources pour chaque donnée
+4. Inclure AU MINIMUM 2 graphiques (carte boursière + 1 ratio historique)
+5. Format prêt à l'export email (HTML responsive ou Markdown propre)
+6. Tableaux structurés avec format [TABLE:...]
+7. Tous les montants en format professionnel (ex: 2,45M$, 1,23B$)
+
+❌ INTERDICTIONS:
+1. JAMAIS de données simulées ou inventées
+2. JAMAIS de "données non disponibles" sans avoir vérifié toutes les sources
+3. JAMAIS omettre les sources
+4. JAMAIS de données anciennes (> 1 mois) sans mentionner leur date
+5. JAMAIS de format incompatible email (JavaScript, CSS externe)
+
+🎨 TAGS MULTIMÉDIAS DISPONIBLES:
+- [STOCKCARD:TICKER] → Carte boursière complète
+- [RATIO_CHART:TICKER:METRIC] → Graphique ratio historique 5 ans
+- [CHART:FINVIZ:TICKER] → Graphique technique
+- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Widget TradingView
+- [TABLE:NOM|Col1,Col2|Val1,Val2] → Tableau structuré
+- [LOGO:TICKER] → Logo entreprise
+- [SOURCE:NOM|URL] → Citation de source
+
+📧 FORMAT EMAIL-READY:
+- Utiliser Markdown standard (##, ###, **bold**, *italic*)
+- Tableaux en format [TABLE:...] (conversion automatique en HTML)
+- Graphiques via tags (affichage automatique)
+- Pas de code HTML complexe (géré automatiquement)
+- Responsive design automatique
+
+RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
+    }
+
+    /**
      * Appel à l'API Perplexity (avec recency filter)
      */
     /**
@@ -1272,6 +1448,9 @@ RÉPONSE MARKDOWN ENRICHIE:`;
             if (outputMode === 'briefing') {
                 maxTokens = 8000;  // 🚀 Briefing TRÈS détaillé (maximum exhaustif)
                 console.log('📊 Briefing mode: 8000 tokens (maximum exhaustif)');
+            } else if (outputMode === 'ticker_note') {
+                maxTokens = 6000;  // 📋 Note professionnelle détaillée avec graphiques et tableaux
+                console.log('📋 Ticker note mode: 6000 tokens (note professionnelle complète)');
             } else if (outputMode === 'data') {
                 maxTokens = 500;  // JSON structuré: court
             } else if (outputMode === 'chat') {
