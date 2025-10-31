@@ -55,6 +55,11 @@ EXECUTE FUNCTION update_updated_at_column();
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversation_history ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (to avoid duplicates on re-run)
+DROP POLICY IF EXISTS "Users can view themselves" ON users;
+DROP POLICY IF EXISTS "Service role can insert users" ON users;
+DROP POLICY IF EXISTS "Service role can update users" ON users;
+
 -- Politique pour users: Tous peuvent se voir eux-mêmes
 CREATE POLICY "Users can view themselves"
   ON users
@@ -73,6 +78,11 @@ CREATE POLICY "Service role can update users"
   FOR UPDATE
   USING (true)
   WITH CHECK (true);
+
+-- Drop existing conversation_history policies if they exist (to avoid duplicates on re-run)
+DROP POLICY IF EXISTS "Users can view their own conversations" ON conversation_history;
+DROP POLICY IF EXISTS "Users can insert their own conversations" ON conversation_history;
+DROP POLICY IF EXISTS "Users can update their own conversations" ON conversation_history;
 
 -- Politique pour conversation_history: Voir ses propres conversations
 CREATE POLICY "Users can view their own conversations"

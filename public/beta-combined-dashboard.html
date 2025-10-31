@@ -673,6 +673,119 @@ const fetchHybridData = async (symbol, dataType) => {
             // Backward compatibility - redirect LucideIcon to IconoirIcon
             window.LucideIcon = window.IconoirIcon;
 
+            // Professional Mode System - Toggle entre emojis et icônes Iconoir
+            window.ProfessionalModeSystem = {
+                isEnabled: function() {
+                    const stored = localStorage.getItem('gobapps-professional-mode');
+                    return stored === 'true' || stored === null; // Default: Professional Mode ON
+                },
+
+                toggle: function() {
+                    const newMode = !this.isEnabled();
+                    localStorage.setItem('gobapps-professional-mode', newMode.toString());
+                    window.dispatchEvent(new CustomEvent('professional-mode-changed', {
+                        detail: { enabled: newMode }
+                    }));
+                    return newMode;
+                },
+
+                // Mapping emoji → icône Iconoir
+                emojiToIcon: {
+                    '📡': 'antenna-signal',
+                    '⚙️': 'settings',
+                    '📅': 'calendar',
+                    '🌅': 'sun-light',
+                    '☀️': 'sun-light',
+                    '🌆': 'building',
+                    '📊': 'stat-up',
+                    '📈': 'trending-up',
+                    '📉': 'trending-down',
+                    '🤖': 'brain',
+                    '💬': 'chat-bubble',
+                    '🔍': 'search',
+                    '📝': 'page',
+                    '🎯': 'target',
+                    '💼': 'briefcase',
+                    '🌐': 'globe',
+                    '💰': 'dollar',
+                    '🏢': 'building',
+                    '📧': 'mail',
+                    '🔔': 'bell',
+                    '⏰': 'clock',
+                    '✅': 'check-circle',
+                    '❌': 'xmark-circle',
+                    '⚠️': 'warning-triangle',
+                    '🚀': 'rocket',
+                    '🔥': 'sparks',
+                    '💡': 'light-bulb',
+                    '🧠': 'brain',
+                    '📰': 'newspaper',
+                    '💵': 'dollar',
+                    '📲': 'smartphone-device',
+                    '🎨': 'palette',
+                    '🔒': 'lock',
+                    '🔓': 'lock-unlock',
+                    '👤': 'user',
+                    '👥': 'group',
+                    '⭐': 'star',
+                    '🏆': 'trophy',
+                    '📌': 'pin',
+                    '🔗': 'link',
+                    '🖼️': 'media-image',
+                    '📸': 'camera',
+                    '🎬': 'movie',
+                    '🎵': 'music-note',
+                    '📁': 'folder',
+                    '📄': 'page',
+                    '💻': 'laptop',
+                    '⌨️': 'keyboard',
+                    '🖱️': 'mouse-button-right',
+                    '🖥️': 'pc-monitor',
+                    '📱': 'smartphone-device',
+                    '🔋': 'battery-charging',
+                    '🔌': 'plug',
+                    '🛠️': 'tools',
+                    '🎓': 'graduation-cap',
+                    '📚': 'book-stack',
+                    '📖': 'book',
+                    '✏️': 'edit-pencil',
+                    '🖊️': 'pen',
+                    '📎': 'attachment',
+                    '📍': 'pin-alt',
+                    '🧭': 'compass',
+                    '🗺️': 'map',
+                    '🏠': 'home',
+                    '🏪': 'shop',
+                    '🏬': 'city',
+                    '🏭': 'industry',
+                    '⚡': 'flash',
+                    '🌟': 'star-solid',
+                    '💎': 'gem-stone',
+                    '🎁': 'gift',
+                    '🛒': 'cart',
+                    '💳': 'credit-card',
+                    '🎉': 'party',
+                    '🎊': 'gift',
+                    '🔐': 'lock',
+                    '🎮': 'gamepad',
+                    '🎲': 'dice'
+                },
+
+                // Rendu conditionnel emoji ou icône
+                renderIcon: function(emoji, size = 24, className = '') {
+                    if (!this.isEnabled()) {
+                        return `<span class="inline-block">${emoji}</span>`;
+                    }
+
+                    const iconClass = this.emojiToIcon[emoji];
+                    if (iconClass) {
+                        return `<i class="iconoir-${iconClass} ${className}" style="font-size: ${size}px;"></i>`;
+                    }
+
+                    return `<span class="inline-block">${emoji}</span>`;
+                }
+            };
+
         const BetaCombinedDashboard = () => {
             // États principaux
             const [activeTab, setActiveTab] = useState('stocks-news');
@@ -728,6 +841,12 @@ const fetchHybridData = async (symbol, dataType) => {
                 } catch (_) {}
                 return true; // défaut: dark
             });
+
+            // Professional Mode State
+            const [isProfessionalMode, setIsProfessionalMode] = useState(() => {
+                return window.ProfessionalModeSystem.isEnabled();
+            });
+
             const [showEmmaIntro, setShowEmmaIntro] = useState(false);
             const [showDanIntro, setShowDanIntro] = useState(false);
             const [showJLabIntro, setShowJLabIntro] = useState(false);
@@ -2344,12 +2463,36 @@ const fetchHybridData = async (symbol, dataType) => {
                 return iconMap[tabId] || 'iconoir-graph-up';
             };
 
+            // Icon Component - Rendu conditionnel emoji ou icône Iconoir
+            const Icon = ({ emoji, size = 20, className = '' }) => {
+                if (!isProfessionalMode) {
+                    return <span className="inline-block">{emoji}</span>;
+                }
+
+                const iconClass = window.ProfessionalModeSystem.emojiToIcon[emoji];
+                if (iconClass) {
+                    return <i className={`iconoir-${iconClass} ${className}`} style={{ fontSize: `${size}px` }}></i>;
+                }
+
+                return <span className="inline-block">{emoji}</span>;
+            };
+
             // Volume: baisser le son général et couper le son du ripple/clic
             useEffect(() => {
                 try {
                     if (tabSoundRef.current) tabSoundRef.current.volume = 0.0; // aucun son d'onglet
                     if (clickSoundRef.current) clickSoundRef.current.volume = 0.30; // clic/ripple 30%
                 } catch(_) {}
+            }, []);
+
+            // Listen for Professional Mode changes
+            useEffect(() => {
+                const handleModeChange = (e) => {
+                    setIsProfessionalMode(e.detail.enabled);
+                };
+
+                window.addEventListener('professional-mode-changed', handleModeChange);
+                return () => window.removeEventListener('professional-mode-changed', handleModeChange);
             }, []);
 
             // Mettre à jour les actualités filtrées quand les actualités changent
@@ -3043,10 +3186,16 @@ STRUCTURE JSON OBLIGATOIRE:
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
-                        <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>🔍 Debug des Données</h3>
+                        <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            <Icon emoji="🔍" size={20} />
+                            Debug des Données
+                        </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                <div className="text-blue-600 font-medium mb-2">📊 Stock Data</div>
+                                <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
+                                    <Icon emoji="📊" size={18} />
+                                    Stock Data
+                                </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Tickers: {tickers.length} ({tickers.join(', ')})
                                 </div>
@@ -3058,7 +3207,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 </div>
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                <div className="text-emerald-600 font-medium mb-2">📰 News Data</div>
+                                <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
+                                    <Icon emoji="📰" size={18} />
+                                    News Data
+                                </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Articles: {newsData.length}
                                 </div>
@@ -3067,7 +3219,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 </div>
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                <div className="text-violet-600 font-medium mb-2">🎯 Seeking Alpha</div>
+                                <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
+                                    <Icon emoji="🎯" size={18} />
+                                    Seeking Alpha
+                                </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Stocks: {seekingAlphaData.stocks?.length || 0}
                                 </div>
@@ -3083,7 +3238,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>📋 Logs Système</h3>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <Icon emoji="📋" size={20} />
+                                Logs Système
+                            </h3>
                             <button
                                 onClick={() => setSystemLogs([])}
                                 className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
@@ -3123,14 +3281,20 @@ STRUCTURE JSON OBLIGATOIRE:
                         isDarkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>🧠 Deep Think</h3>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
+                                <Icon emoji="🧠" size={20} />
+                                Deep Think
+                            </h3>
                             <span className={`px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
                                 AI Analysis System
                             </span>
                         </div>
                         <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <div className="font-semibold mb-1">🎯 Statut du système</div>
+                                <div className="font-semibold mb-1 flex items-center gap-2">
+                                    <Icon emoji="🎯" size={16} />
+                                    Statut du système
+                                </div>
                                 <div className="text-xs space-y-1">
                                     <div>• Gemini API: {typeof window !== 'undefined' ? '✅ Actif' : '⚠️ Vérification...'}</div>
                                     <div>• Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? '✅ Opérationnel' : '⏸️ En attente'}</div>
@@ -3138,7 +3302,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 </div>
                             </div>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <div className="font-semibold mb-1">📊 Métriques</div>
+                                <div className="font-semibold mb-1 flex items-center gap-2">
+                                    <Icon emoji="📊" size={16} />
+                                    Métriques
+                                </div>
                                 <div className="text-xs space-y-1">
                                     <div>• Analyses effectuées: {systemLogs.filter(l => l.type === 'success').length}</div>
                                     <div>• Requêtes API: {systemLogs.length}</div>
@@ -3153,7 +3320,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         isDarkMode ? 'bg-gradient-to-br from-red-900/20 to-gray-900 border-red-700' : 'bg-gradient-to-br from-red-50 to-gray-50 border-red-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-red-300' : 'text-red-900'}`}>⚠️ Violations</h3>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-red-300' : 'text-red-900'}`}>
+                                <Icon emoji="⚠️" size={20} />
+                                Violations
+                            </h3>
                             <span className={`px-2 py-1 text-xs rounded ${
                                 systemLogs.filter(l => l.type === 'error').length > 0
                                     ? 'bg-red-500 text-white'
@@ -3200,7 +3370,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         isDarkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>🤖 Configuration Emma IA</h3>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
+                                <Icon emoji="🤖" size={20} />
+                                Configuration Emma IA
+                            </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
                                 emmaConnected
                                     ? isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
@@ -3254,7 +3427,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📊 Gestion des Stocks</h3>
+                        }`}>
+                        <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                        Gestion des Stocks
+                    </h3>
                         <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={refreshAllStocks}
@@ -3284,7 +3460,10 @@ STRUCTURE JSON OBLIGATOIRE:
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>📊 ÉTAPE 1: SCRAPING BATCH (25 tickers)</h3>
+                                }`}>
+                                <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                                ÉTAPE 1: SCRAPING BATCH (25 tickers)
+                            </h3>
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold ${
                                     scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
                                     scrapingStatus === 'running' ? 'bg-gray-700 text-white animate-pulse' :
@@ -3360,7 +3539,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         }`}>
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🤖 ÉTAPE 2: ANALYSE BATCH PERPLEXITY</h3>
+                            }`}>
+                            <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                            ÉTAPE 2: ANALYSE BATCH PERPLEXITY
+                        </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
                                 isDarkMode ? 'bg-black/30' : 'bg-white/60'
@@ -3426,7 +3608,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         }`}>
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📊 ÉTAPE 3: RÉSULTATS & AFFICHAGE</h3>
+                            }`}>
+                            <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                            ÉTAPE 3: RÉSULTATS & AFFICHAGE
+                        </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
                                 isDarkMode ? 'bg-black/30' : 'bg-white/60'
@@ -3532,13 +3717,19 @@ STRUCTURE JSON OBLIGATOIRE:
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🤖 Monitoring Emma AI</h3>
+                        }`}>
+                        <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                        Monitoring Emma AI
+                    </h3>
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                                     isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
-                                    <div className="text-purple-600 font-medium mb-2">🧠 Emma Agent</div>
+                                    <div className="text-purple-600 font-medium mb-2 flex items-center gap-2">
+                                        <Icon emoji="🧠" size={18} />
+                                        Emma Agent
+                                    </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
@@ -3644,7 +3835,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 }`}>
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>📊 Outils Financiers</h4>
+                                    }`}>
+                                    <Icon emoji="📊" size={18} className="mr-2 inline-block" />
+                                    Outils Financiers
+                                </h4>
                                     <div className="space-y-1 text-sm">
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -3846,7 +4040,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                     }`}>
                                         <h4 className={`font-semibold mb-3 ${
                                             isDarkMode ? 'text-white' : 'text-blue-900'
-                                        }`}>💡 Recommandations</h4>
+                                        }`}>
+                                        <Icon emoji="💡" size={18} className="mr-2 inline-block" />
+                                        Recommandations
+                                    </h4>
                                         <div className="space-y-2">
                                             {healthStatus.recommendations.map((rec, index) => (
                                                 <div key={index} className={`p-3 rounded-lg ${
@@ -3894,7 +4091,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>⚙️ Configuration</h3>
+                        }`}>
+                        <Icon emoji="⚙️" size={20} className="mr-2 inline-block" />
+                        Configuration
+                    </h3>
                         <div className="space-y-4">
                             <div>
                                 <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
@@ -4987,7 +5187,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                 if (parsedData?.analysis) {
                                     return (
                                         <div className="mb-4">
-                                            <h4 className="text-lg font-semibold text-white mb-2">📈 Analyse Seeking Alpha</h4>
+                                            <h4 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                                                <Icon emoji="📈" size={20} />
+                                                Analyse Seeking Alpha
+                                            </h4>
                                             <div className="text-gray-200 text-sm leading-relaxed">
                                                 {parsedData.analysis}
                                             </div>
@@ -5008,7 +5211,10 @@ STRUCTURE JSON OBLIGATOIRE:
                             {/* Données en temps réel */}
                             {stockData[selectedStock] && (
                                 <div className="mb-4">
-                                    <h4 className="text-lg font-semibold text-white mb-2">📊 Données Temps Réel</h4>
+                                    <h4 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                                        <Icon emoji="📊" size={20} />
+                                        Données Temps Réel
+                                    </h4>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                                         <div>
                                             <span className="text-blue-200">Ouverture:</span>
@@ -5032,7 +5238,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     {!selectedStock && seekingAlphaData.stocks && (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-semibold text-white">📈 Analyses Complètes</h3>
+                            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                                <Icon emoji="📈" size={20} />
+                                Analyses Complètes
+                            </h3>
                                 <div className="flex bg-gray-700 rounded-lg p-1">
                                     <button
                                         onClick={() => setSeekingAlphaViewMode('list')}
@@ -5060,7 +5269,10 @@ STRUCTURE JSON OBLIGATOIRE:
                             {/* Vue en liste compacte pour Seeking Alpha */}
                             {seekingAlphaViewMode === 'list' && (
                                 <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                                    <h4 className="text-lg font-semibold text-white mb-4">📋 Vue Liste - Analyses</h4>
+                                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                        <Icon emoji="📋" size={20} />
+                                        Vue Liste - Analyses
+                                    </h4>
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <thead>
@@ -5394,7 +5606,10 @@ STRUCTURE JSON OBLIGATOIRE:
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🤖 Configuration des API</h4>
+                            }`}>
+                            <Icon emoji="🤖" size={18} className="mr-2 inline-block" />
+                            Configuration des API
+                        </h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-green-200' : 'text-green-800'
                             }`}>
@@ -5443,7 +5658,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📈 Analyses Seeking Alpha</h2>
+                        }`}>
+                        <Icon emoji="📈" size={24} className="mr-2 inline-block" />
+                        Analyses Seeking Alpha
+                    </h2>
                         <div className="flex gap-2">
                             <button
                                 onClick={refreshAllStocks}
@@ -5749,7 +5967,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             isDarkMode ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-300'
                         }`}>
                             <div className="text-center">
-                                <div className="text-5xl mb-4">📊</div>
+                                <div className="text-5xl mb-4"><Icon emoji="📊" size={48} /></div>
                                 <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-yellow-200' : 'text-yellow-800'}`}>
                                     Aucune donnée Seeking Alpha disponible
                                 </h3>
@@ -5861,7 +6079,10 @@ STRUCTURE JSON OBLIGATOIRE:
                     {/* Affichage en  liste si pas de cartes */}
                     {(!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && (
                         <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
-                            <h3 className="text-xl font-bold text-white mb-4">📋 Analyses Seeking Alpha</h3>
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <Icon emoji="📋" size={24} />
+                                Analyses Seeking Alpha
+                            </h3>
                             <div className="space-y-4">
                                 {tickers.map((ticker, index) => {
                                     const claudeData = seekingAlphaStockData.stocks?.[ticker];
@@ -9497,7 +9718,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         isDarkMode ? 'bg-gray-700/50 border-purple-500/30' : 'bg-purple-50 border-purple-200'
                                     }`}>
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-xl">🧠</span>
+                                            <span className="text-xl"><Icon emoji="🧠" size={24} /></span>
                                             <h4 className={`font-semibold transition-colors duration-300 ${
                                                 isDarkMode ? 'text-purple-300' : 'text-purple-700'
                                             }`}>
@@ -9826,195 +10047,6 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
             // Composant onglet Ask Emma avec intégration Gemini
             // Isolé avec React.memo pour éviter les re-renders causés par les mises à jour de marché
-            // ============================================================================
-            // 💡 EMMA SUGGESTIONS - Prompts intelligents pour guider l'utilisateur
-            // ============================================================================
-            const EmmaSuggestions = ({ setEmmaInput, isDarkMode }) => {
-                const [selectedCategory, setSelectedCategory] = useState(null);
-                const [isExpanded, setIsExpanded] = useState(true);
-
-                const categories = [
-                    { id: 'quick', label: 'Analyse rapide', icon: '📊' },
-                    { id: 'deep', label: 'Analyse approfondie', icon: '🔬' },
-                    { id: 'charts', label: 'Graphiques', icon: '📈' },
-                    { id: 'compare', label: 'Comparaisons', icon: '⚖️' },
-                    { id: 'portfolio', label: 'Portefeuille', icon: '💼' },
-                    { id: 'news', label: 'Actualités', icon: '📰' },
-                    { id: 'scoring', label: 'Scoring', icon: '🎯' },
-                    { id: 'sectors', label: 'Secteurs', icon: '🌍' }
-                ];
-
-                const suggestions = {
-                    quick: [
-                        "Quel est le prix actuel de [TICKER] ?",
-                        "Performance de [TICKER] aujourd'hui",
-                        "Résumé rapide de [TICKER]",
-                        "[TICKER] est-il suracheté ou survendu ?"
-                    ],
-                    deep: [
-                        "Analyse approfondie de [TICKER] : fondamentaux, technique, actualités et recommandation",
-                        "Évalue [TICKER] selon les critères de Warren Buffett",
-                        "Force et faiblesses de [TICKER] par rapport à ses concurrents",
-                        "Analyse complète du bilan de [TICKER]"
-                    ],
-                    charts: [
-                        "Montre-moi le graphique technique de [TICKER]",
-                        "Visualise la performance de [TICKER] avec chart",
-                        "Heatmap des secteurs du marché aujourd'hui",
-                        "Compare [ACTION1] et [ACTION2] avec graphiques"
-                    ],
-                    compare: [
-                        "Compare [ACTION1], [ACTION2] et [ACTION3] : valorisation, croissance et dividendes",
-                        "Qui est le meilleur entre [ACTION1] et [ACTION2] ?",
-                        "Range [ACTION1], [ACTION2], [ACTION3] du meilleur au pire selon le P/E",
-                        "Quelle action offre le meilleur potentiel : [ACTION1], [ACTION2] ou [ACTION3] ?"
-                    ],
-                    portfolio: [
-                        "Mon portefeuille contient [ACTION1], [ACTION2], [ACTION3]. Que dois-je surveiller ?",
-                        "Analyse les risques de mon portefeuille : [ACTION1], [ACTION2], [ACTION3]",
-                        "Suggère des actions pour diversifier un portefeuille tech ([ACTION1], [ACTION2])",
-                        "Mon portefeuille [ACTION1], [ACTION2], [ACTION3] est-il trop concentré ?"
-                    ],
-                    news: [
-                        "Quelles sont les dernières actualités importantes sur [TICKER] ?",
-                        "Y a-t-il des catalyseurs à venir pour [TICKER] ?",
-                        "Résumé des résultats trimestriels de [TICKER]",
-                        "Calendrier des événements importants pour [TICKER] cette semaine"
-                    ],
-                    scoring: [
-                        "Calcule le score JSLAI™ de [TICKER] et explique-le",
-                        "[TICKER] est-il un achat, une conservation ou une vente ?",
-                        "Note [TICKER] sur 10 selon les critères de Peter Lynch",
-                        "Quel est le fair value de [TICKER] ?"
-                    ],
-                    sectors: [
-                        "Quel est le meilleur secteur à investir en ce moment ?",
-                        "Performance du secteur technologique vs secteur financier",
-                        "Quelles actions profitent de la tendance IA ?",
-                        "Analyse macro-économique et implications pour mon portefeuille"
-                    ]
-                };
-
-                const handleSuggestionClick = (text) => {
-                    setEmmaInput(text);
-                    setSelectedCategory(null);
-
-                    // Auto-focus sur l'input après insertion
-                    setTimeout(() => {
-                        const input = document.querySelector('input[placeholder*="Emma"]');
-                        if (input) {
-                            input.focus();
-
-                            // Sélectionner le premier placeholder [TICKER] ou [ACTION1]
-                            const firstPlaceholder = text.match(/\[([^\]]+)\]/);
-                            if (firstPlaceholder) {
-                                const start = text.indexOf(firstPlaceholder[0]);
-                                const end = start + firstPlaceholder[0].length;
-                                input.setSelectionRange(start, end);
-                            }
-                        }
-                    }, 100);
-                };
-
-                if (!isExpanded) {
-                    return (
-                        <div className="mt-2">
-                            <button
-                                onClick={() => setIsExpanded(true)}
-                                className={`text-sm px-3 py-1 rounded-lg transition-all ${
-                                    isDarkMode
-                                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                                }`}
-                            >
-                                💡 Afficher les suggestions
-                            </button>
-                        </div>
-                    );
-                }
-
-                return (
-                    <div className={`mt-3 p-4 rounded-lg border transition-colors duration-300 ${
-                        isDarkMode
-                            ? 'bg-gray-800/50 border-gray-700'
-                            : 'bg-blue-50 border-blue-200'
-                    }`}>
-                        <div className="flex items-center justify-between mb-3">
-                            <div className={`text-sm font-semibold ${isDarkMode ? 'text-blue-300' : 'text-blue-700'}`}>
-                                💡 Suggestions de prompts
-                            </div>
-                            <button
-                                onClick={() => setIsExpanded(false)}
-                                className={`text-xs px-2 py-1 rounded transition-colors ${
-                                    isDarkMode
-                                        ? 'hover:bg-gray-700 text-gray-400'
-                                        : 'hover:bg-gray-200 text-gray-500'
-                                }`}
-                            >
-                                Masquer
-                            </button>
-                        </div>
-
-                        {/* Grille de catégories */}
-                        <div className="grid grid-cols-4 gap-2 mb-3">
-                            {categories.map(cat => (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                                        selectedCategory === cat.id
-                                            ? (isDarkMode
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-blue-500 text-white')
-                                            : (isDarkMode
-                                                ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                                                : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200')
-                                    }`}
-                                >
-                                    <div>{cat.icon}</div>
-                                    <div className="mt-1">{cat.label}</div>
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Dropdown de suggestions */}
-                        {selectedCategory && (
-                            <div className={`p-3 rounded-lg ${
-                                isDarkMode ? 'bg-gray-900/50' : 'bg-white'
-                            }`}>
-                                <div className={`text-xs font-medium mb-2 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                    Cliquez sur une suggestion pour l'insérer :
-                                </div>
-                                <div className="space-y-2">
-                                    {suggestions[selectedCategory].map((text, i) => (
-                                        <div
-                                            key={i}
-                                            onClick={() => handleSuggestionClick(text)}
-                                            className={`px-3 py-2 rounded-lg cursor-pointer transition-all text-sm ${
-                                                isDarkMode
-                                                    ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:border-l-4 hover:border-blue-500'
-                                                    : 'bg-gray-50 hover:bg-blue-50 text-gray-700 hover:border-l-4 hover:border-blue-500'
-                                            }`}
-                                        >
-                                            {text}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                            💡 Astuce : Remplacez [TICKER], [ACTION1], etc. par vos valeurs
-                        </div>
-                    </div>
-                );
-            };
-
-            // ============================================================================
-            // ASK EMMA TAB - Onglet principal du chatbot Emma IA
-            // ============================================================================
             const AskEmmaTab = React.memo(({
                 prefillMessage = '',
                 setPrefillMessage = () => {},
@@ -11476,27 +11508,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         return `@@IMAGE_TAG_${idx}@@`;
                     });
 
-                    // [STOCKCARD:TICKER] - Perplexity Finance-style stock card
-                    t = t.replace(/\[STOCKCARD:([A-Z\.]+)\]/g, (_m, ticker) => {
-                        const idx = imageTags.length;
-                        imageTags.push({
-                            type: 'stockcard',
-                            ticker: ticker
-                        });
-                        return `@@IMAGE_TAG_${idx}@@`;
-                    });
-
-                    // [RATIO_CHART:TICKER:METRIC] - Macrotrends-style historical ratio chart
-                    t = t.replace(/\[RATIO_CHART:([A-Z\.]+):([A-Z_]+)\]/g, (_m, ticker, metric) => {
-                        const idx = imageTags.length;
-                        imageTags.push({
-                            type: 'ratio_chart',
-                            ticker: ticker,
-                            metric: metric
-                        });
-                        return `@@IMAGE_TAG_${idx}@@`;
-                    });
-
                     // Gras / italique basiques (type Markdown)
                     t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                     t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -11670,182 +11681,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             Voir le graphique sur TradingView →
                                         </a>
                                     </div>
-                                </div>`;
-                                break;
-
-                            case 'stockcard':
-                                // Perplexity Finance-style stock card
-                                const cleanTicker = tag.ticker.replace(/\.(TO|V)$/, '');
-                                const logoStockUrl = `https://logo.clearbit.com/${cleanTicker.toLowerCase()}.com`;
-                                html = `<div class="my-4 w-full max-w-md mx-auto">
-                                    <div class="rounded-xl border-2 ${isDarkMode ? 'border-blue-500/30 bg-gradient-to-br from-gray-900/80 to-gray-800/80' : 'border-blue-200 bg-gradient-to-br from-white to-blue-50'} p-5 shadow-xl hover-lift">
-                                        <!-- Header avec logo et ticker -->
-                                        <div class="flex items-center gap-3 mb-4 pb-3 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
-                                            <img
-                                                src="${logoStockUrl}"
-                                                alt="${tag.ticker} Logo"
-                                                class="h-12 w-12 rounded-lg shadow-md"
-                                                loading="lazy"
-                                                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect width=%2248%22 height=%2248%22 fill=%22%234299e1%22/%3E%3Ctext x=%2224%22 y=%2230%22 font-family=%22Arial%22 font-size=%2220%22 fill=%22white%22 text-anchor=%22middle%22%3E${tag.ticker.charAt(0)}%3C/text%3E%3C/svg%3E'"
-                                            />
-                                            <div class="flex-1">
-                                                <div class="font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}">${tag.ticker}</div>
-                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}" id="stockcard-${tag.ticker}-name">Chargement...</div>
-                                            </div>
-                                            <a href="https://finance.yahoo.com/quote/${tag.ticker}" target="_blank" class="text-blue-500 hover:text-blue-600 text-xs">↗</a>
-                                        </div>
-
-                                        <!-- Prix et variation -->
-                                        <div class="mb-4">
-                                            <div class="flex items-baseline gap-2 mb-1">
-                                                <span class="text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-price">--</span>
-                                                <span class="text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}">USD</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="px-2 py-1 rounded-md text-sm font-semibold" id="stockcard-${tag.ticker}-change">--</span>
-                                                <span class="text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}" id="stockcard-${tag.ticker}-time">--</span>
-                                            </div>
-                                        </div>
-
-                                        <!-- Métriques clés (2x2 grid) -->
-                                        <div class="grid grid-cols-2 gap-3 mb-4">
-                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
-                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">Cap. boursière</div>
-                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-mktcap">--</div>
-                                            </div>
-                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
-                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">Volume</div>
-                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-volume">--</div>
-                                            </div>
-                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
-                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">P/E Ratio</div>
-                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-pe">--</div>
-                                            </div>
-                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
-                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">52W Range</div>
-                                                <div class="text-xs font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-52w">--</div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Mini chart -->
-                                        <div class="rounded-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
-                                            <img
-                                                src="https://finviz.com/chart.ashx?t=${tag.ticker}&ty=c&ta=0&p=d&s=l"
-                                                alt="${tag.ticker} Mini Chart"
-                                                class="w-full h-auto"
-                                                loading="lazy"
-                                            />
-                                        </div>
-                                    </div>
-                                    <script>
-                                    (async () => {
-                                        try {
-                                            const resp = await fetch('/api/marketdata?ticker=${tag.ticker}');
-                                            const data = await resp.json();
-                                            if (data.success && data.data) {
-                                                const d = data.data;
-                                                document.getElementById('stockcard-${tag.ticker}-name').textContent = d.name || '${tag.ticker}';
-                                                document.getElementById('stockcard-${tag.ticker}-price').textContent = d.price ? '$' + d.price.toFixed(2) : '--';
-
-                                                const changePercent = d.changesPercentage || 0;
-                                                const changeValue = d.change || 0;
-                                                const changeColor = changePercent >= 0 ? 'bg-green-500 text-white' : 'bg-red-500 text-white';
-                                                const changeSign = changePercent >= 0 ? '+' : '';
-                                                document.getElementById('stockcard-${tag.ticker}-change').textContent = changeSign + changePercent.toFixed(2) + '% (' + changeSign + changeValue.toFixed(2) + ')';
-                                                document.getElementById('stockcard-${tag.ticker}-change').className = 'px-2 py-1 rounded-md text-sm font-semibold ' + changeColor;
-
-                                                document.getElementById('stockcard-${tag.ticker}-time').textContent = d.timestamp ? new Date(d.timestamp * 1000).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) : 'Temps réel';
-                                                document.getElementById('stockcard-${tag.ticker}-mktcap').textContent = d.marketCap ? (d.marketCap / 1e9).toFixed(2) + 'B' : '--';
-                                                document.getElementById('stockcard-${tag.ticker}-volume').textContent = d.volume ? (d.volume / 1e6).toFixed(1) + 'M' : '--';
-                                                document.getElementById('stockcard-${tag.ticker}-pe').textContent = d.pe ? d.pe.toFixed(2) : '--';
-                                                document.getElementById('stockcard-${tag.ticker}-52w').textContent = (d.yearLow && d.yearHigh) ? '$' + d.yearLow.toFixed(2) + ' - $' + d.yearHigh.toFixed(2) : '--';
-                                            }
-                                        } catch (err) {
-                                            console.error('Erreur StockCard ${tag.ticker}:', err);
-                                        }
-                                    })();
-                                    </script>
-                                </div>`;
-                                break;
-
-                            case 'ratio_chart':
-                                // Macrotrends-style historical ratio chart
-                                const metricLabels = {
-                                    'PE': 'P/E Ratio',
-                                    'PB': 'P/B Ratio',
-                                    'PS': 'P/S Ratio',
-                                    'PROFIT_MARGIN': 'Marge bénéficiaire',
-                                    'ROE': 'Return on Equity',
-                                    'ROA': 'Return on Assets',
-                                    'DEBT_EQUITY': 'Dette/Capitaux propres',
-                                    'CURRENT_RATIO': 'Ratio de liquidité',
-                                    'REVENUE_GROWTH': 'Croissance du CA',
-                                    'EARNINGS_GROWTH': 'Croissance des bénéfices'
-                                };
-                                const metricLabel = metricLabels[tag.metric] || tag.metric;
-                                html = `<div class="my-4 w-full max-w-3xl mx-auto">
-                                    <div class="rounded-xl border ${isDarkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-white'} p-5 shadow-lg">
-                                        <!-- Header -->
-                                        <div class="flex items-center justify-between mb-4 pb-3 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
-                                            <div>
-                                                <div class="font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}">${metricLabel}</div>
-                                                <div class="text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}">${tag.ticker} • Historique 5 ans</div>
-                                            </div>
-                                            <span class="px-3 py-1 rounded-lg text-xs font-semibold ${isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-700'}">
-                                                📊 Analyse fondamentale
-                                            </span>
-                                        </div>
-
-                                        <!-- Chart placeholder - TradingView fundamentals or fallback to table -->
-                                        <div class="rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-800/30' : 'bg-gray-50'} p-4 min-h-[300px]">
-                                            <div class="text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} py-8" id="ratio-chart-${tag.ticker}-${tag.metric}">
-                                                <div class="animate-pulse mb-2">📈</div>
-                                                <div class="text-sm">Chargement des données historiques...</div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Link to detailed analysis -->
-                                        <div class="mt-4 flex items-center justify-between text-xs">
-                                            <span class="${isDarkMode ? 'text-gray-500' : 'text-gray-600'}">Source: FMP Financial Data</span>
-                                            <a href="https://www.macrotrends.net/stocks/charts/${tag.ticker.toLowerCase()}/${tag.ticker.toLowerCase()}/${tag.metric.toLowerCase().replace(/_/g, '-')}"
-                                               target="_blank"
-                                               class="text-blue-500 hover:text-blue-600 flex items-center gap-1">
-                                                Voir sur Macrotrends ↗
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <script>
-                                    (async () => {
-                                        try {
-                                            // Attempt to fetch historical ratio data from our API
-                                            const resp = await fetch('/api/fmp?endpoint=ratios&ticker=${tag.ticker}&period=annual&limit=5');
-                                            const data = await resp.json();
-
-                                            const container = document.getElementById('ratio-chart-${tag.ticker}-${tag.metric}');
-
-                                            if (data.success && data.data && data.data.length > 0) {
-                                                // Simple table display for now (can be upgraded to Chart.js later)
-                                                const ratioData = data.data.reverse(); // Oldest to newest
-                                                let tableHtml = '<table class="w-full text-sm"><thead><tr class="${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}"><th class="p-2 text-left">Année</th><th class="p-2 text-right">Valeur</th></tr></thead><tbody>';
-
-                                                ratioData.forEach((year, i) => {
-                                                    const value = year['${tag.metric.toLowerCase()}'] || '--';
-                                                    const displayValue = typeof value === 'number' ? value.toFixed(2) : value;
-                                                    const rowClass = i % 2 === 0 ? (isDarkMode ? 'bg-gray-900/30' : 'bg-white') : '';
-                                                    tableHtml += '<tr class="' + rowClass + '"><td class="p-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}">' + (year.date || year.year) + '</td><td class="p-2 text-right font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}">' + displayValue + '</td></tr>';
-                                                });
-
-                                                tableHtml += '</tbody></table>';
-                                                container.innerHTML = tableHtml;
-                                            } else {
-                                                container.innerHTML = '<div class="text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} py-8"><div class="mb-2">📊</div><div class="text-sm">Données non disponibles pour ce ratio.</div><div class="text-xs mt-2">Consultez Macrotrends pour l\\'historique complet.</div></div>';
-                                            }
-                                        } catch (err) {
-                                            console.error('Erreur RatioChart ${tag.ticker}:${tag.metric}:', err);
-                                            document.getElementById('ratio-chart-${tag.ticker}-${tag.metric}').innerHTML = '<div class="text-center ${isDarkMode ? 'text-gray-500' : 'text-gray-600'} py-8">⚠️ Erreur de chargement</div>';
-                                        }
-                                    })();
-                                    </script>
                                 </div>`;
                                 break;
 
@@ -12099,71 +11934,43 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     }`}>
                                                         {message.timestamp}
                                                     </div>
-                                                    {/* 📊 Métadonnées détaillées pour les messages d'Emma */}
+                                                    {/* Indicateur de paramètres pour les messages d'Emma */}
                                                     {message.type === 'emma' && (
-                                                        <div className="text-xs mt-3 px-3 py-2 rounded bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200">
-                                                            {/* Ligne 1: Modèle LLM utilisé */}
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <span className="font-semibold text-gray-700">🤖 Modèle LLM:</span>
-                                                                {message.model && (
-                                                                    <span className={`px-2 py-0.5 rounded-md text-xs font-bold shadow-sm ${
-                                                                        message.model === 'sonar-pro' ? 'bg-blue-500 text-white' :
-                                                                        message.model === 'claude' ? 'bg-purple-500 text-white' :
-                                                                        message.model === 'gemini' ? 'bg-green-500 text-white' :
-                                                                        'bg-gray-500 text-white'
-                                                                    }`}>
-                                                                        {message.model === 'sonar-pro' ? 'Perplexity Sonar Pro' :
-                                                                         message.model === 'claude' ? 'Anthropic Claude 3.5 Sonnet' :
-                                                                         message.model === 'gemini' ? 'Google Gemini 2.0 Flash' :
-                                                                         message.model}
-                                                                    </span>
-                                                                )}
-                                                                {message.modelReason && (
-                                                                    <span className="text-gray-500 italic">
-                                                                        • {message.modelReason}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-
-                                                            {/* Ligne 2: Paramètres de génération */}
-                                                            <div className="flex items-center gap-2 flex-wrap mb-2">
-                                                                <span className="font-semibold text-gray-700">⚙️ Paramètres:</span>
-                                                                <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${
-                                                                    (message.temperature || emmaTemperature) <= 0.3 ? 'bg-blue-100 text-blue-700' :
-                                                                    (message.temperature || emmaTemperature) <= 0.5 ? 'bg-green-100 text-green-700' :
-                                                                    (message.temperature || emmaTemperature) <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
-                                                                    'bg-orange-100 text-orange-700'
-                                                                }`}>
-                                                                    🌡️ Température: {message.temperature || emmaTemperature}
+                                                        <div className="text-xs mt-2 px-2 py-1 rounded bg-gray-100 text-gray-600">
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <span className="font-medium flex items-center gap-1">
+                                                                    <Icon emoji="⚙️" size={16} />
+                                                                    Paramètres:
                                                                 </span>
-                                                                <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${
-                                                                    (message.maxTokens || emmaMaxTokens) <= 2048 ? 'bg-purple-100 text-purple-700' :
-                                                                    (message.maxTokens || emmaMaxTokens) <= 4096 ? 'bg-indigo-100 text-indigo-700' :
+                                                                {message.model && (
+                                                                    <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${
+                                                                        message.model === 'sonar-pro' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
+                                                                        message.model === 'claude' ? 'bg-purple-100 text-purple-700 border border-purple-300' :
+                                                                        message.model === 'gemini' ? 'bg-green-100 text-green-700 border border-green-300' :
+                                                                        'bg-gray-200 text-gray-700'
+                                                                    }`}>
+                                                                        🤖 {message.model === 'sonar-pro' ? 'Sonar Pro' : message.model === 'claude' ? 'Claude' : message.model === 'gemini' ? 'Gemini' : message.model}
+                                                                    </span>
+                                                                )}
+                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
+                                                                    emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
+                                                                    emmaTemperature <= 0.5 ? 'bg-gray-700 text-gray-200' :
+                                                                    emmaTemperature <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
+                                                                    'bg-green-100 text-green-700'
+                                                                }`}>
+                                                                    Temp: {emmaTemperature} ({emmaTemperature <= 0.3 ? 'Précis' : emmaTemperature <= 0.5 ? 'Équilibré' : emmaTemperature <= 0.7 ? 'Naturel' : 'Créatif'})
+                                                                </span>
+                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
+                                                                    emmaMaxTokens <= 2048 ? 'bg-purple-100 text-purple-700' :
+                                                                    emmaMaxTokens <= 4096 ? 'bg-indigo-100 text-indigo-700' :
                                                                     'bg-pink-100 text-pink-700'
                                                                 }`}>
-                                                                    📏 Tokens max: {message.maxTokens || emmaMaxTokens}
+                                                                    Longueur: {emmaMaxTokens} ({emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'})
                                                                 </span>
-                                                                {message.actualTokens && (
-                                                                    <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-cyan-100 text-cyan-700">
-                                                                        ✅ Tokens utilisés: {message.actualTokens}
-                                                                    </span>
-                                                                )}
                                                             </div>
-
-                                                            {/* Ligne 3: Agents/Outils utilisés */}
-                                                            {message.toolsUsed && message.toolsUsed.length > 0 && (
-                                                                <div className="flex items-start gap-2 pt-2 border-t border-gray-200">
-                                                                    <span className="font-semibold text-gray-700 flex-shrink-0">🛠️ Agents utilisés:</span>
-                                                                    <div className="flex flex-wrap gap-1">
-                                                                        {message.toolsUsed.map((tool, idx) => (
-                                                                            <span
-                                                                                key={idx}
-                                                                                className="px-2 py-0.5 rounded-md text-xs bg-emerald-100 text-emerald-700 border border-emerald-300"
-                                                                            >
-                                                                                {tool}
-                                                                            </span>
-                                                                        ))}
-                                                                    </div>
+                                                            {message.modelReason && (
+                                                                <div className="text-xs mt-1 text-gray-500 italic">
+                                                                    💡 {message.modelReason}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -12196,7 +12003,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         isDarkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-100 text-gray-600'
                                                     }`}>
                                                         <div className="flex items-center gap-2">
-                                                            <span className="font-medium">⚙️ Utilise:</span>
+                                                            <span className="font-medium flex items-center gap-1">
+                                                                <Icon emoji="⚙️" size={16} />
+                                                                Utilise:
+                                                            </span>
                                                             <span className={`px-1.5 py-0.5 rounded text-xs ${
                                                                 emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
                                                                 emmaTemperature <= 0.5 ? 'bg-gray-700 text-gray-200' :
@@ -12281,12 +12091,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </button>
                                 )}
                             </div>
-
-                            {/* 💡 Suggestions de prompts intelligentes */}
-                            <EmmaSuggestions
-                                setEmmaInput={setEmmaInput}
-                                isDarkMode={isDarkMode}
-                            />
                         </div>
 
                         {/* Éditeur de prompt */}
@@ -12486,7 +12290,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium">📊 Très Précis</div>
+                                                <div className="font-medium flex items-center gap-2">
+                                                    <Icon emoji="📊" size={16} />
+                                                    Très Précis
+                                                </div>
                                                 <div className="text-xs opacity-75">Analyses factuelles</div>
                                             </button>
                                             <button
@@ -12499,7 +12306,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium">📈 Financier</div>
+                                                <div className="font-medium flex items-center gap-2">
+                                                    <Icon emoji="📈" size={16} />
+                                                    Financier
+                                                </div>
                                                 <div className="text-xs opacity-75">Analyses professionnelles</div>
                                             </button>
                                             <button
@@ -12538,7 +12348,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium">🎨 Créatif</div>
+                                                <div className="font-medium flex items-center gap-2">
+                                                    <Icon emoji="🎨" size={16} />
+                                                    Créatif
+                                                </div>
                                                 <div className="text-xs opacity-75">Idées innovantes</div>
                                             </button>
                                         </div>
@@ -12643,7 +12456,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 onClick={() => setEmmaMaxTokens(8192)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 8192 ? 'bg-green-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                                             >
-                                                <div className="font-medium">📋 Rapport</div>
+                                                <div className="font-medium flex items-center gap-2">
+                                                    <Icon emoji="📋" size={16} />
+                                                    Rapport
+                                                </div>
                                                 <div className="text-xs opacity-75">Rapports complets</div>
                                             </button>
                                         </div>
@@ -16158,7 +15974,10 @@ console.log('✅ Données hybrides récupérées:', {
                                                 ? (isDarkMode ? 'bg-red-900/20 border-red-800 text-red-300' : 'bg-red-50 border-red-200 text-red-700')
                                                 : (isDarkMode ? 'bg-yellow-900/20 border-yellow-800 text-yellow-300' : 'bg-yellow-50 border-yellow-200 text-yellow-700')
                                         }`}>
-                                            <div className="font-semibold mb-1">📊 Analyse des Croisements</div>
+                                            <div className="font-semibold mb-1 flex items-center gap-2">
+                                                <Icon emoji="📊" size={16} />
+                                                Analyse des Croisements
+                                            </div>
                                             {movingAverages.sma20.value > movingAverages.sma50.value && movingAverages.sma50.value > movingAverages.sma200.value ? (
                                                 <div>✅ Configuration idéale : SMA20 &gt; SMA50 &gt; SMA200. Tendance haussière confirmée sur tous les horizons temporels.</div>
                                             ) : movingAverages.sma20.value < movingAverages.sma50.value && movingAverages.sma50.value < movingAverages.sma200.value ? (
@@ -16515,7 +16334,7 @@ console.log('✅ Données hybrides récupérées:', {
                                         </div>
                                     ) : (
                                         <div className="text-center text-gray-500 text-xs py-4">
-                                            <div className="mb-2">📊</div>
+                                            <div className="mb-2"><Icon emoji="📊" size={24} /></div>
                                             <div>Chargement des ratios historiques...</div>
                                         </div>
                                     )}
@@ -20144,7 +19963,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             isDarkMode ? 'bg-green-600 hover:bg-green-500' : 'bg-green-500 hover:bg-green-600'
                                         } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
                                     >
-                                        <div className="font-bold text-lg mb-2">📊 Requête financière</div>
+                                        <div className="font-bold text-lg mb-2 flex items-center gap-2">
+                                            <Icon emoji="📊" size={20} />
+                                            Requête financière
+                                        </div>
                                         <div className="text-sm opacity-90">Teste l'extraction de données de marché</div>
                                     </button>
 
@@ -20155,7 +19977,10 @@ console.log('✅ Données hybrides récupérées:', {
                                             isDarkMode ? 'bg-purple-600 hover:bg-purple-500' : 'bg-purple-500 hover:bg-purple-600'
                                         } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
                                     >
-                                        <div className="font-bold text-lg mb-2">🎨 Tags d'images</div>
+                                        <div className="font-bold text-lg mb-2 flex items-center gap-2">
+                                            <Icon emoji="🎨" size={20} />
+                                            Tags d'images
+                                        </div>
                                         <div className="text-sm opacity-90">Vérifie la génération de tags [CHART:...]</div>
                                     </button>
 
@@ -20250,10 +20075,38 @@ console.log('✅ Données hybrides récupérées:', {
 
             return (
                 <div className={`min-h-screen transition-colors duration-300 ${
-                    isDarkMode 
-                        ? 'bg-black' 
+                    isDarkMode
+                        ? 'bg-black'
                         : 'bg-white'
                 }`}>
+                    {/* Professional/Fun Mode Toggle Button */}
+                    <button
+                        onClick={() => {
+                            const newMode = window.ProfessionalModeSystem.toggle();
+                            setIsProfessionalMode(newMode);
+                        }}
+                        className={`fixed top-4 right-4 z-[60] p-3 rounded-lg shadow-lg transition-all duration-300 border-2 ${
+                            isProfessionalMode
+                                ? 'bg-gradient-to-br from-blue-600 to-blue-700 border-blue-400 text-white hover:from-blue-700 hover:to-blue-800'
+                                : 'bg-gradient-to-br from-purple-600 to-pink-600 border-purple-400 text-white hover:from-purple-700 hover:to-pink-700'
+                        }`}
+                        title={isProfessionalMode ? 'Mode Professionnel (clic pour Mode Fun 🎉)' : 'Mode Fun (clic pour Mode Professionnel 💼)'}
+                    >
+                        <div className="flex items-center gap-2">
+                            {isProfessionalMode ? (
+                                <>
+                                    <i className="iconoir-briefcase text-xl"></i>
+                                    <span className="hidden sm:inline text-sm font-semibold">PRO</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="text-xl">🎉</span>
+                                    <span className="hidden sm:inline text-sm font-semibold">FUN</span>
+                                </>
+                            )}
+                        </div>
+                    </button>
+
                     {/* Intro Emma IA - première visite de session */}
                     {showEmmaIntro && activeTab === 'ask-emma' && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
@@ -20543,10 +20396,11 @@ console.log('✅ Données hybrides récupérées:', {
                                         isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                                     }`}>
                                         <div className="flex items-center justify-between">
-                                            <h3 className={`text-lg font-semibold ${
+                                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
                                             }`}>
-                                                📱 Autres onglets
+                                                <Icon emoji="📱" size={20} />
+                                                Autres onglets
                                             </h3>
                                             <button
                                                 onClick={() => setShowMoreTabsOverlay(false)}

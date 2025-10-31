@@ -35,14 +35,18 @@ Copiez et collez ce script dans le SQL Editor et cliquez sur **Run**:
 -- MIGRATION: Fix RLS Policies for Users Table
 -- ============================================================
 
--- Add missing INSERT policy for users table
-CREATE POLICY IF NOT EXISTS "Service role can insert users"
+-- Drop existing policies if they exist (to avoid duplicates)
+DROP POLICY IF EXISTS "Service role can insert users" ON users;
+DROP POLICY IF EXISTS "Service role can update users" ON users;
+
+-- Create INSERT policy for users table
+CREATE POLICY "Service role can insert users"
   ON users
   FOR INSERT
   WITH CHECK (true);
 
--- Add missing UPDATE policy for users table
-CREATE POLICY IF NOT EXISTS "Service role can update users"
+-- Create UPDATE policy for users table
+CREATE POLICY "Service role can update users"
   ON users
   FOR UPDATE
   USING (true)
@@ -91,6 +95,11 @@ CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 
 -- Activer RLS
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist (to avoid duplicates on re-run)
+DROP POLICY IF EXISTS "Users can view themselves" ON users;
+DROP POLICY IF EXISTS "Service role can insert users" ON users;
+DROP POLICY IF EXISTS "Service role can update users" ON users;
 
 -- Politiques RLS
 CREATE POLICY "Users can view themselves"
