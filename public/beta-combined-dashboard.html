@@ -9826,6 +9826,195 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
             // Composant onglet Ask Emma avec intégration Gemini
             // Isolé avec React.memo pour éviter les re-renders causés par les mises à jour de marché
+            // ============================================================================
+            // 💡 EMMA SUGGESTIONS - Prompts intelligents pour guider l'utilisateur
+            // ============================================================================
+            const EmmaSuggestions = ({ setEmmaInput, isDarkMode }) => {
+                const [selectedCategory, setSelectedCategory] = useState(null);
+                const [isExpanded, setIsExpanded] = useState(true);
+
+                const categories = [
+                    { id: 'quick', label: 'Analyse rapide', icon: '📊' },
+                    { id: 'deep', label: 'Analyse approfondie', icon: '🔬' },
+                    { id: 'charts', label: 'Graphiques', icon: '📈' },
+                    { id: 'compare', label: 'Comparaisons', icon: '⚖️' },
+                    { id: 'portfolio', label: 'Portefeuille', icon: '💼' },
+                    { id: 'news', label: 'Actualités', icon: '📰' },
+                    { id: 'scoring', label: 'Scoring', icon: '🎯' },
+                    { id: 'sectors', label: 'Secteurs', icon: '🌍' }
+                ];
+
+                const suggestions = {
+                    quick: [
+                        "Quel est le prix actuel de [TICKER] ?",
+                        "Performance de [TICKER] aujourd'hui",
+                        "Résumé rapide de [TICKER]",
+                        "[TICKER] est-il suracheté ou survendu ?"
+                    ],
+                    deep: [
+                        "Analyse approfondie de [TICKER] : fondamentaux, technique, actualités et recommandation",
+                        "Évalue [TICKER] selon les critères de Warren Buffett",
+                        "Force et faiblesses de [TICKER] par rapport à ses concurrents",
+                        "Analyse complète du bilan de [TICKER]"
+                    ],
+                    charts: [
+                        "Montre-moi le graphique technique de [TICKER]",
+                        "Visualise la performance de [TICKER] avec chart",
+                        "Heatmap des secteurs du marché aujourd'hui",
+                        "Compare [ACTION1] et [ACTION2] avec graphiques"
+                    ],
+                    compare: [
+                        "Compare [ACTION1], [ACTION2] et [ACTION3] : valorisation, croissance et dividendes",
+                        "Qui est le meilleur entre [ACTION1] et [ACTION2] ?",
+                        "Range [ACTION1], [ACTION2], [ACTION3] du meilleur au pire selon le P/E",
+                        "Quelle action offre le meilleur potentiel : [ACTION1], [ACTION2] ou [ACTION3] ?"
+                    ],
+                    portfolio: [
+                        "Mon portefeuille contient [ACTION1], [ACTION2], [ACTION3]. Que dois-je surveiller ?",
+                        "Analyse les risques de mon portefeuille : [ACTION1], [ACTION2], [ACTION3]",
+                        "Suggère des actions pour diversifier un portefeuille tech ([ACTION1], [ACTION2])",
+                        "Mon portefeuille [ACTION1], [ACTION2], [ACTION3] est-il trop concentré ?"
+                    ],
+                    news: [
+                        "Quelles sont les dernières actualités importantes sur [TICKER] ?",
+                        "Y a-t-il des catalyseurs à venir pour [TICKER] ?",
+                        "Résumé des résultats trimestriels de [TICKER]",
+                        "Calendrier des événements importants pour [TICKER] cette semaine"
+                    ],
+                    scoring: [
+                        "Calcule le score JSLAI™ de [TICKER] et explique-le",
+                        "[TICKER] est-il un achat, une conservation ou une vente ?",
+                        "Note [TICKER] sur 10 selon les critères de Peter Lynch",
+                        "Quel est le fair value de [TICKER] ?"
+                    ],
+                    sectors: [
+                        "Quel est le meilleur secteur à investir en ce moment ?",
+                        "Performance du secteur technologique vs secteur financier",
+                        "Quelles actions profitent de la tendance IA ?",
+                        "Analyse macro-économique et implications pour mon portefeuille"
+                    ]
+                };
+
+                const handleSuggestionClick = (text) => {
+                    setEmmaInput(text);
+                    setSelectedCategory(null);
+
+                    // Auto-focus sur l'input après insertion
+                    setTimeout(() => {
+                        const input = document.querySelector('input[placeholder*="Emma"]');
+                        if (input) {
+                            input.focus();
+
+                            // Sélectionner le premier placeholder [TICKER] ou [ACTION1]
+                            const firstPlaceholder = text.match(/\[([^\]]+)\]/);
+                            if (firstPlaceholder) {
+                                const start = text.indexOf(firstPlaceholder[0]);
+                                const end = start + firstPlaceholder[0].length;
+                                input.setSelectionRange(start, end);
+                            }
+                        }
+                    }, 100);
+                };
+
+                if (!isExpanded) {
+                    return (
+                        <div className="mt-2">
+                            <button
+                                onClick={() => setIsExpanded(true)}
+                                className={`text-sm px-3 py-1 rounded-lg transition-all ${
+                                    isDarkMode
+                                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                                }`}
+                            >
+                                💡 Afficher les suggestions
+                            </button>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div className={`mt-3 p-4 rounded-lg border transition-colors duration-300 ${
+                        isDarkMode
+                            ? 'bg-gray-800/50 border-gray-700'
+                            : 'bg-blue-50 border-blue-200'
+                    }`}>
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={`text-sm font-semibold ${isDarkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                                💡 Suggestions de prompts
+                            </div>
+                            <button
+                                onClick={() => setIsExpanded(false)}
+                                className={`text-xs px-2 py-1 rounded transition-colors ${
+                                    isDarkMode
+                                        ? 'hover:bg-gray-700 text-gray-400'
+                                        : 'hover:bg-gray-200 text-gray-500'
+                                }`}
+                            >
+                                Masquer
+                            </button>
+                        </div>
+
+                        {/* Grille de catégories */}
+                        <div className="grid grid-cols-4 gap-2 mb-3">
+                            {categories.map(cat => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+                                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                                        selectedCategory === cat.id
+                                            ? (isDarkMode
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-blue-500 text-white')
+                                            : (isDarkMode
+                                                ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                                                : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200')
+                                    }`}
+                                >
+                                    <div>{cat.icon}</div>
+                                    <div className="mt-1">{cat.label}</div>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Dropdown de suggestions */}
+                        {selectedCategory && (
+                            <div className={`p-3 rounded-lg ${
+                                isDarkMode ? 'bg-gray-900/50' : 'bg-white'
+                            }`}>
+                                <div className={`text-xs font-medium mb-2 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Cliquez sur une suggestion pour l'insérer :
+                                </div>
+                                <div className="space-y-2">
+                                    {suggestions[selectedCategory].map((text, i) => (
+                                        <div
+                                            key={i}
+                                            onClick={() => handleSuggestionClick(text)}
+                                            className={`px-3 py-2 rounded-lg cursor-pointer transition-all text-sm ${
+                                                isDarkMode
+                                                    ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:border-l-4 hover:border-blue-500'
+                                                    : 'bg-gray-50 hover:bg-blue-50 text-gray-700 hover:border-l-4 hover:border-blue-500'
+                                            }`}
+                                        >
+                                            {text}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                            💡 Astuce : Remplacez [TICKER], [ACTION1], etc. par vos valeurs
+                        </div>
+                    </div>
+                );
+            };
+
+            // ============================================================================
+            // ASK EMMA TAB - Onglet principal du chatbot Emma IA
+            // ============================================================================
             const AskEmmaTab = React.memo(({
                 prefillMessage = '',
                 setPrefillMessage = () => {},
@@ -11287,6 +11476,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         return `@@IMAGE_TAG_${idx}@@`;
                     });
 
+                    // [STOCKCARD:TICKER] - Perplexity Finance-style stock card
+                    t = t.replace(/\[STOCKCARD:([A-Z\.]+)\]/g, (_m, ticker) => {
+                        const idx = imageTags.length;
+                        imageTags.push({
+                            type: 'stockcard',
+                            ticker: ticker
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
+                    // [RATIO_CHART:TICKER:METRIC] - Macrotrends-style historical ratio chart
+                    t = t.replace(/\[RATIO_CHART:([A-Z\.]+):([A-Z_]+)\]/g, (_m, ticker, metric) => {
+                        const idx = imageTags.length;
+                        imageTags.push({
+                            type: 'ratio_chart',
+                            ticker: ticker,
+                            metric: metric
+                        });
+                        return `@@IMAGE_TAG_${idx}@@`;
+                    });
+
                     // Gras / italique basiques (type Markdown)
                     t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                     t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -11460,6 +11670,182 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             Voir le graphique sur TradingView →
                                         </a>
                                     </div>
+                                </div>`;
+                                break;
+
+                            case 'stockcard':
+                                // Perplexity Finance-style stock card
+                                const cleanTicker = tag.ticker.replace(/\.(TO|V)$/, '');
+                                const logoStockUrl = `https://logo.clearbit.com/${cleanTicker.toLowerCase()}.com`;
+                                html = `<div class="my-4 w-full max-w-md mx-auto">
+                                    <div class="rounded-xl border-2 ${isDarkMode ? 'border-blue-500/30 bg-gradient-to-br from-gray-900/80 to-gray-800/80' : 'border-blue-200 bg-gradient-to-br from-white to-blue-50'} p-5 shadow-xl hover-lift">
+                                        <!-- Header avec logo et ticker -->
+                                        <div class="flex items-center gap-3 mb-4 pb-3 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
+                                            <img
+                                                src="${logoStockUrl}"
+                                                alt="${tag.ticker} Logo"
+                                                class="h-12 w-12 rounded-lg shadow-md"
+                                                loading="lazy"
+                                                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22%3E%3Crect width=%2248%22 height=%2248%22 fill=%22%234299e1%22/%3E%3Ctext x=%2224%22 y=%2230%22 font-family=%22Arial%22 font-size=%2220%22 fill=%22white%22 text-anchor=%22middle%22%3E${tag.ticker.charAt(0)}%3C/text%3E%3C/svg%3E'"
+                                            />
+                                            <div class="flex-1">
+                                                <div class="font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}">${tag.ticker}</div>
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}" id="stockcard-${tag.ticker}-name">Chargement...</div>
+                                            </div>
+                                            <a href="https://finance.yahoo.com/quote/${tag.ticker}" target="_blank" class="text-blue-500 hover:text-blue-600 text-xs">↗</a>
+                                        </div>
+
+                                        <!-- Prix et variation -->
+                                        <div class="mb-4">
+                                            <div class="flex items-baseline gap-2 mb-1">
+                                                <span class="text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-price">--</span>
+                                                <span class="text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}">USD</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 rounded-md text-sm font-semibold" id="stockcard-${tag.ticker}-change">--</span>
+                                                <span class="text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-600'}" id="stockcard-${tag.ticker}-time">--</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Métriques clés (2x2 grid) -->
+                                        <div class="grid grid-cols-2 gap-3 mb-4">
+                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">Cap. boursière</div>
+                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-mktcap">--</div>
+                                            </div>
+                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">Volume</div>
+                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-volume">--</div>
+                                            </div>
+                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">P/E Ratio</div>
+                                                <div class="font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-pe">--</div>
+                                            </div>
+                                            <div class="rounded-lg ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'} p-3">
+                                                <div class="text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1">52W Range</div>
+                                                <div class="text-xs font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}" id="stockcard-${tag.ticker}-52w">--</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Mini chart -->
+                                        <div class="rounded-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
+                                            <img
+                                                src="https://finviz.com/chart.ashx?t=${tag.ticker}&ty=c&ta=0&p=d&s=l"
+                                                alt="${tag.ticker} Mini Chart"
+                                                class="w-full h-auto"
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    </div>
+                                    <script>
+                                    (async () => {
+                                        try {
+                                            const resp = await fetch('/api/marketdata?ticker=${tag.ticker}');
+                                            const data = await resp.json();
+                                            if (data.success && data.data) {
+                                                const d = data.data;
+                                                document.getElementById('stockcard-${tag.ticker}-name').textContent = d.name || '${tag.ticker}';
+                                                document.getElementById('stockcard-${tag.ticker}-price').textContent = d.price ? '$' + d.price.toFixed(2) : '--';
+
+                                                const changePercent = d.changesPercentage || 0;
+                                                const changeValue = d.change || 0;
+                                                const changeColor = changePercent >= 0 ? 'bg-green-500 text-white' : 'bg-red-500 text-white';
+                                                const changeSign = changePercent >= 0 ? '+' : '';
+                                                document.getElementById('stockcard-${tag.ticker}-change').textContent = changeSign + changePercent.toFixed(2) + '% (' + changeSign + changeValue.toFixed(2) + ')';
+                                                document.getElementById('stockcard-${tag.ticker}-change').className = 'px-2 py-1 rounded-md text-sm font-semibold ' + changeColor;
+
+                                                document.getElementById('stockcard-${tag.ticker}-time').textContent = d.timestamp ? new Date(d.timestamp * 1000).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) : 'Temps réel';
+                                                document.getElementById('stockcard-${tag.ticker}-mktcap').textContent = d.marketCap ? (d.marketCap / 1e9).toFixed(2) + 'B' : '--';
+                                                document.getElementById('stockcard-${tag.ticker}-volume').textContent = d.volume ? (d.volume / 1e6).toFixed(1) + 'M' : '--';
+                                                document.getElementById('stockcard-${tag.ticker}-pe').textContent = d.pe ? d.pe.toFixed(2) : '--';
+                                                document.getElementById('stockcard-${tag.ticker}-52w').textContent = (d.yearLow && d.yearHigh) ? '$' + d.yearLow.toFixed(2) + ' - $' + d.yearHigh.toFixed(2) : '--';
+                                            }
+                                        } catch (err) {
+                                            console.error('Erreur StockCard ${tag.ticker}:', err);
+                                        }
+                                    })();
+                                    </script>
+                                </div>`;
+                                break;
+
+                            case 'ratio_chart':
+                                // Macrotrends-style historical ratio chart
+                                const metricLabels = {
+                                    'PE': 'P/E Ratio',
+                                    'PB': 'P/B Ratio',
+                                    'PS': 'P/S Ratio',
+                                    'PROFIT_MARGIN': 'Marge bénéficiaire',
+                                    'ROE': 'Return on Equity',
+                                    'ROA': 'Return on Assets',
+                                    'DEBT_EQUITY': 'Dette/Capitaux propres',
+                                    'CURRENT_RATIO': 'Ratio de liquidité',
+                                    'REVENUE_GROWTH': 'Croissance du CA',
+                                    'EARNINGS_GROWTH': 'Croissance des bénéfices'
+                                };
+                                const metricLabel = metricLabels[tag.metric] || tag.metric;
+                                html = `<div class="my-4 w-full max-w-3xl mx-auto">
+                                    <div class="rounded-xl border ${isDarkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-white'} p-5 shadow-lg">
+                                        <!-- Header -->
+                                        <div class="flex items-center justify-between mb-4 pb-3 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}">
+                                            <div>
+                                                <div class="font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}">${metricLabel}</div>
+                                                <div class="text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}">${tag.ticker} • Historique 5 ans</div>
+                                            </div>
+                                            <span class="px-3 py-1 rounded-lg text-xs font-semibold ${isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-700'}">
+                                                📊 Analyse fondamentale
+                                            </span>
+                                        </div>
+
+                                        <!-- Chart placeholder - TradingView fundamentals or fallback to table -->
+                                        <div class="rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-800/30' : 'bg-gray-50'} p-4 min-h-[300px]">
+                                            <div class="text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} py-8" id="ratio-chart-${tag.ticker}-${tag.metric}">
+                                                <div class="animate-pulse mb-2">📈</div>
+                                                <div class="text-sm">Chargement des données historiques...</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Link to detailed analysis -->
+                                        <div class="mt-4 flex items-center justify-between text-xs">
+                                            <span class="${isDarkMode ? 'text-gray-500' : 'text-gray-600'}">Source: FMP Financial Data</span>
+                                            <a href="https://www.macrotrends.net/stocks/charts/${tag.ticker.toLowerCase()}/${tag.ticker.toLowerCase()}/${tag.metric.toLowerCase().replace(/_/g, '-')}"
+                                               target="_blank"
+                                               class="text-blue-500 hover:text-blue-600 flex items-center gap-1">
+                                                Voir sur Macrotrends ↗
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <script>
+                                    (async () => {
+                                        try {
+                                            // Attempt to fetch historical ratio data from our API
+                                            const resp = await fetch('/api/fmp?endpoint=ratios&ticker=${tag.ticker}&period=annual&limit=5');
+                                            const data = await resp.json();
+
+                                            const container = document.getElementById('ratio-chart-${tag.ticker}-${tag.metric}');
+
+                                            if (data.success && data.data && data.data.length > 0) {
+                                                // Simple table display for now (can be upgraded to Chart.js later)
+                                                const ratioData = data.data.reverse(); // Oldest to newest
+                                                let tableHtml = '<table class="w-full text-sm"><thead><tr class="${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}"><th class="p-2 text-left">Année</th><th class="p-2 text-right">Valeur</th></tr></thead><tbody>';
+
+                                                ratioData.forEach((year, i) => {
+                                                    const value = year['${tag.metric.toLowerCase()}'] || '--';
+                                                    const displayValue = typeof value === 'number' ? value.toFixed(2) : value;
+                                                    const rowClass = i % 2 === 0 ? (isDarkMode ? 'bg-gray-900/30' : 'bg-white') : '';
+                                                    tableHtml += '<tr class="' + rowClass + '"><td class="p-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}">' + (year.date || year.year) + '</td><td class="p-2 text-right font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}">' + displayValue + '</td></tr>';
+                                                });
+
+                                                tableHtml += '</tbody></table>';
+                                                container.innerHTML = tableHtml;
+                                            } else {
+                                                container.innerHTML = '<div class="text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} py-8"><div class="mb-2">📊</div><div class="text-sm">Données non disponibles pour ce ratio.</div><div class="text-xs mt-2">Consultez Macrotrends pour l\\'historique complet.</div></div>';
+                                            }
+                                        } catch (err) {
+                                            console.error('Erreur RatioChart ${tag.ticker}:${tag.metric}:', err);
+                                            document.getElementById('ratio-chart-${tag.ticker}-${tag.metric}').innerHTML = '<div class="text-center ${isDarkMode ? 'text-gray-500' : 'text-gray-600'} py-8">⚠️ Erreur de chargement</div>';
+                                        }
+                                    })();
+                                    </script>
                                 </div>`;
                                 break;
 
@@ -11713,40 +12099,71 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     }`}>
                                                         {message.timestamp}
                                                     </div>
-                                                    {/* Indicateur de paramètres pour les messages d'Emma */}
+                                                    {/* 📊 Métadonnées détaillées pour les messages d'Emma */}
                                                     {message.type === 'emma' && (
-                                                        <div className="text-xs mt-2 px-2 py-1 rounded bg-gray-100 text-gray-600">
-                                                            <div className="flex items-center gap-2 flex-wrap">
-                                                                <span className="font-medium">⚙️ Paramètres:</span>
+                                                        <div className="text-xs mt-3 px-3 py-2 rounded bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200">
+                                                            {/* Ligne 1: Modèle LLM utilisé */}
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <span className="font-semibold text-gray-700">🤖 Modèle LLM:</span>
                                                                 {message.model && (
-                                                                    <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${
-                                                                        message.model === 'sonar-pro' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
-                                                                        message.model === 'claude' ? 'bg-purple-100 text-purple-700 border border-purple-300' :
-                                                                        message.model === 'gemini' ? 'bg-green-100 text-green-700 border border-green-300' :
-                                                                        'bg-gray-200 text-gray-700'
+                                                                    <span className={`px-2 py-0.5 rounded-md text-xs font-bold shadow-sm ${
+                                                                        message.model === 'sonar-pro' ? 'bg-blue-500 text-white' :
+                                                                        message.model === 'claude' ? 'bg-purple-500 text-white' :
+                                                                        message.model === 'gemini' ? 'bg-green-500 text-white' :
+                                                                        'bg-gray-500 text-white'
                                                                     }`}>
-                                                                        🤖 {message.model === 'sonar-pro' ? 'Sonar Pro' : message.model === 'claude' ? 'Claude' : message.model === 'gemini' ? 'Gemini' : message.model}
+                                                                        {message.model === 'sonar-pro' ? 'Perplexity Sonar Pro' :
+                                                                         message.model === 'claude' ? 'Anthropic Claude 3.5 Sonnet' :
+                                                                         message.model === 'gemini' ? 'Google Gemini 2.0 Flash' :
+                                                                         message.model}
                                                                     </span>
                                                                 )}
-                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                    emmaTemperature <= 0.3 ? 'bg-green-100 text-green-700' :
-                                                                    emmaTemperature <= 0.5 ? 'bg-gray-700 text-gray-200' :
-                                                                    emmaTemperature <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
-                                                                    'bg-green-100 text-green-700'
+                                                                {message.modelReason && (
+                                                                    <span className="text-gray-500 italic">
+                                                                        • {message.modelReason}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Ligne 2: Paramètres de génération */}
+                                                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                                                                <span className="font-semibold text-gray-700">⚙️ Paramètres:</span>
+                                                                <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${
+                                                                    (message.temperature || emmaTemperature) <= 0.3 ? 'bg-blue-100 text-blue-700' :
+                                                                    (message.temperature || emmaTemperature) <= 0.5 ? 'bg-green-100 text-green-700' :
+                                                                    (message.temperature || emmaTemperature) <= 0.7 ? 'bg-yellow-100 text-yellow-700' :
+                                                                    'bg-orange-100 text-orange-700'
                                                                 }`}>
-                                                                    Temp: {emmaTemperature} ({emmaTemperature <= 0.3 ? 'Précis' : emmaTemperature <= 0.5 ? 'Équilibré' : emmaTemperature <= 0.7 ? 'Naturel' : 'Créatif'})
+                                                                    🌡️ Température: {message.temperature || emmaTemperature}
                                                                 </span>
-                                                                <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                                                    emmaMaxTokens <= 2048 ? 'bg-purple-100 text-purple-700' :
-                                                                    emmaMaxTokens <= 4096 ? 'bg-indigo-100 text-indigo-700' :
+                                                                <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${
+                                                                    (message.maxTokens || emmaMaxTokens) <= 2048 ? 'bg-purple-100 text-purple-700' :
+                                                                    (message.maxTokens || emmaMaxTokens) <= 4096 ? 'bg-indigo-100 text-indigo-700' :
                                                                     'bg-pink-100 text-pink-700'
                                                                 }`}>
-                                                                    Longueur: {emmaMaxTokens} ({emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'})
+                                                                    📏 Tokens max: {message.maxTokens || emmaMaxTokens}
                                                                 </span>
+                                                                {message.actualTokens && (
+                                                                    <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-cyan-100 text-cyan-700">
+                                                                        ✅ Tokens utilisés: {message.actualTokens}
+                                                                    </span>
+                                                                )}
                                                             </div>
-                                                            {message.modelReason && (
-                                                                <div className="text-xs mt-1 text-gray-500 italic">
-                                                                    💡 {message.modelReason}
+
+                                                            {/* Ligne 3: Agents/Outils utilisés */}
+                                                            {message.toolsUsed && message.toolsUsed.length > 0 && (
+                                                                <div className="flex items-start gap-2 pt-2 border-t border-gray-200">
+                                                                    <span className="font-semibold text-gray-700 flex-shrink-0">🛠️ Agents utilisés:</span>
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {message.toolsUsed.map((tool, idx) => (
+                                                                            <span
+                                                                                key={idx}
+                                                                                className="px-2 py-0.5 rounded-md text-xs bg-emerald-100 text-emerald-700 border border-emerald-300"
+                                                                            >
+                                                                                {tool}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </div>
@@ -11864,6 +12281,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </button>
                                 )}
                             </div>
+
+                            {/* 💡 Suggestions de prompts intelligentes */}
+                            <EmmaSuggestions
+                                setEmmaInput={setEmmaInput}
+                                isDarkMode={isDarkMode}
+                            />
                         </div>
 
                         {/* Éditeur de prompt */}
