@@ -42,6 +42,18 @@
     },
     "api/finviz-news.js": {
       "maxDuration": 15
+    },
+    "api/chat.js": {
+      "maxDuration": 60
+    },
+    "api/adapters/sms.js": {
+      "maxDuration": 30
+    },
+    "api/adapters/email.js": {
+      "maxDuration": 30
+    },
+    "api/adapters/messenger.js": {
+      "maxDuration": 30
     }
   },
   "crons": [
