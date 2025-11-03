@@ -46,6 +46,12 @@ node test-fmp-direct.js
 # Test Emma AI system
 node test-emma-function-calling.js
 
+# Test multichannel system (SMS, Email, Messenger, Web)
+node test-multichannel.js         # All channels
+node test-multichannel.js web     # Web only
+node test-multichannel.js sms     # SMS only
+node test-multichannel.js email   # Email only
+
 # Diagnose Vercel deployment
 bash diagnose-vercel-deployment.sh
 
@@ -89,6 +95,55 @@ Emma is the core AI assistant with two operational modes:
 - Integrates with Perplexity for response generation
 - Tool configurations: `config/tools_config.json`
 - Usage statistics: `config/usage_stats.json`
+
+### Emma Multichannel Communication System
+
+Emma IA is accessible through multiple communication channels, providing a unified conversational experience across platforms:
+
+**Supported Channels**:
+1. **Web** - Interactive chat in dashboard (`/api/chat`)
+2. **SMS** - Twilio integration (`/api/adapters/sms`)
+3. **Email** - ImprovMX + Resend (`/api/adapters/email`)
+4. **Facebook Messenger** - Direct messaging (`/api/adapters/messenger`)
+
+**Architecture Flow**:
+```
+Channel → Adapter → /api/chat → User Manager → Conversation Manager → emma-agent → Response → Channel Adapter
+```
+
+**Key Components**:
+- `/api/chat.js` - Unified chat API for all channels
+- `/lib/user-manager.js` - Cross-channel user profile management
+- `/lib/conversation-manager.js` - Conversation history with channel context
+- `/lib/channel-adapter.js` - Response formatting per channel
+- `/lib/intent-analyzer.js` - Message intent classification
+
+**Database Schema** (Supabase):
+- `user_profiles` - Unified user profiles across channels
+- `conversation_history` - Extended with `channel`, `channel_identifier`, `status` columns
+- `multichannel_messages` - Message queue and delivery tracking
+- `channel_logs` - Debugging and audit trail
+- `channel_preferences` - User notification preferences per channel
+
+**Required Environment Variables**:
+```bash
+# Twilio (SMS)
+TWILIO_ACCOUNT_SID=ACxxxxx
+TWILIO_AUTH_TOKEN=xxxxx
+TWILIO_PHONE_NUMBER=+1234567890
+
+# Resend (Email)
+RESEND_API_KEY=re_xxxxx
+EMAIL_FROM=emma@gobapps.com
+
+# Facebook Messenger
+MESSENGER_PAGE_ACCESS_TOKEN=EAAxxxxx
+MESSENGER_VERIFY_TOKEN=gob_emma_verify_token_2025
+```
+
+**Setup Instructions**: See `docs/MULTICANAL-SETUP.md` for complete configuration guide.
+
+**Workflow Automation**: Optional n8n workflows in `/n8n-workflows/` for advanced email/SMS processing.
 
 ### JSLAI™ Score System
 
@@ -135,11 +190,23 @@ These run automatically on Vercel's infrastructure.
 - `api/emma-agent.js` - Smart AI agent with function calling
 - `api/gemini/chat.js` - Direct Gemini chat endpoint
 - `api/gemini/tools.js` - Function declarations for Gemini
+- `api/chat.js` - Unified multichannel chat API
+- `api/adapters/sms.js` - Twilio SMS webhook handler
+- `api/adapters/email.js` - Email webhook handler (ImprovMX + Resend)
+- `api/adapters/messenger.js` - Facebook Messenger webhook handler
 - `api/fmp.js` - FMP API health check
 - `api/marketdata.js` - Unified market data endpoint with fallback
 - `api/supabase-watchlist.js` - Watchlist management
 - `api/emma-briefing.js` - Generate AI briefings
 - `api/briefing-cron.js` - Automated briefing cron job
+
+### Library Layer
+- `lib/user-manager.js` - Cross-channel user profile management
+- `lib/conversation-manager.js` - Conversation history with channel context
+- `lib/channel-adapter.js` - Channel-specific response formatting
+- `lib/intent-analyzer.js` - Message intent classification
+- `lib/supabase-config.js` - Supabase client configuration
+- `lib/logger.js` - Structured logging utility
 
 ### Configuration
 - `vercel.json` - Vercel deployment config (timeouts, cron, redirects)
@@ -177,6 +244,25 @@ SUPABASE_KEY           # Database access
 ```bash
 NEWSAPI_KEY            # News data (Finnhub also provides news)
 PERPLEXITY_API_KEY     # Enhanced AI responses (emma-agent)
+```
+
+### Multichannel Communication (Emma IA)
+```bash
+# Required for SMS support
+TWILIO_ACCOUNT_SID     # Twilio Account SID
+TWILIO_AUTH_TOKEN      # Twilio Auth Token
+TWILIO_PHONE_NUMBER    # Twilio phone number (format: +1234567890)
+
+# Required for Email support
+RESEND_API_KEY         # Resend API key for sending emails
+EMAIL_FROM             # Sender email address (e.g., emma@gobapps.com)
+
+# Required for Facebook Messenger support
+MESSENGER_PAGE_ACCESS_TOKEN  # Facebook Page Access Token
+MESSENGER_VERIFY_TOKEN       # Webhook verification token
+
+# Optional for enhanced workflow automation
+N8N_WEBHOOK_BASE_URL   # n8n webhook base URL (if using n8n)
 ```
 
 ## Common Development Workflows
@@ -249,7 +335,34 @@ Multiple Python scraper scripts exist for Seeking Alpha data extraction. These a
 3. Check browser console for frontend errors
 4. Verify system prompt is being sent (network tab in DevTools)
 
+### Multichannel System Issues
+1. **SMS not working**:
+   - Verify Twilio webhook URL is set to `https://[app].vercel.app/api/adapters/sms`
+   - Check Twilio credentials: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`
+   - Review Twilio logs in Console → Monitor → Logs
+   - Test: `node test-multichannel.js sms`
+
+2. **Email not working**:
+   - Verify Resend API key: `RESEND_API_KEY`
+   - Check domain verification in Resend dashboard
+   - Verify ImprovMX DNS records (MX1, MX2)
+   - Test: `node test-multichannel.js email`
+
+3. **Messenger not responding**:
+   - Verify webhook is verified (green checkmark in Facebook App)
+   - Check `MESSENGER_PAGE_ACCESS_TOKEN` is valid
+   - Test webhook: Facebook App → Messenger → Webhooks → Test
+   - Review Facebook webhook deliveries
+   - Test: `node test-multichannel.js messenger`
+
+4. **Database errors**:
+   - Verify Supabase tables exist: run `supabase-multichannel-setup.sql`
+   - Check `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in Vercel env
+   - Query `channel_logs` table for error details
+   - Test: `node test-multichannel.js` (includes DB check)
+
 ## Recent Major Changes
+- **Multichannel Emma IA System** (Nov 2025) - Added SMS, Email, and Messenger support with unified conversation management
 - Rebranded from "IntelliStocks" to "JLab™"
 - Removed all demo/fake data from APIs
 - Implemented smart agent system for Emma
