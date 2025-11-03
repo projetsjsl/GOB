@@ -184,7 +184,7 @@
   },
   "notes": [
     {
-      "content": "Configuration IMAP:\n\nServeur: imap.improvmx.com (ou votre serveur IMAP)\nPort: 993\nSSL: true\nUsername: emma@yourdomain.com\nPassword: Votre mot de passe ImprovMX\n\nAlternativement, utilisez Gmail IMAP si vous redirigez vers Gmail.",
+      "content": "Configuration IMAP:\n\nServeur: imap.improvmx.com (ou votre serveur IMAP)\nPort: 993\nSSL: true\nUsername: emma@gobapps.com\nPassword: Votre mot de passe ImprovMX\n\nAlternativement, utilisez Gmail IMAP si vous redirigez vers Gmail.",
       "height": 200,
       "width": 300
     }

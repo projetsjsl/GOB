@@ -5,7 +5,7 @@
  * appelle /api/chat, et renvoie la réponse par email via Resend.
  *
  * Flow:
- * 1. Email arrive à emma@yourdomain.com (ImprovMX)
+ * 1. Email arrive à emma@gobapps.com (ImprovMX)
  * 2. ImprovMX forward vers n8n webhook
  * 3. n8n parse et call /api/adapters/email
  * 4. Cet endpoint appelle /api/chat
@@ -31,7 +31,7 @@ const getResendClient = () => {
  * Body (de n8n):
  * {
  *   from: "user@example.com",
- *   to: "emma@yourdomain.com",
+ *   to: "emma@gobapps.com",
  *   subject: "Question sur AAPL",
  *   text: "Peux-tu analyser Apple ?",
  *   html: "<p>Peux-tu analyser Apple ?</p>"
