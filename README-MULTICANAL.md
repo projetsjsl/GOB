@@ -35,7 +35,7 @@ TWILIO_PHONE_NUMBER=+1234567890
 
 # Resend (Email)
 RESEND_API_KEY=re_xxx
-EMAIL_FROM=emma@gob.ai
+EMAIL_FROM=emma@gobapps.com
 
 # Messenger (Facebook)
 MESSENGER_PAGE_ACCESS_TOKEN=EAAxx

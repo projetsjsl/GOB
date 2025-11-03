@@ -211,7 +211,7 @@ Priority 20: mx2.improvmx.com
 ### Étape 3 : Créer l'alias email
 
 1. Menu **Aliases** → **Add Alias**
-2. **From** : `emma@yourdomain.com`
+2. **From** : `emma@gobapps.com`
 3. **To** : Votre email personnel ou webhook n8n
 
 ### Étape 4 : Configuration du forward
@@ -316,7 +316,7 @@ Accédez à : `http://localhost:5678`
 - Host : `imap.improvmx.com` (ou `imap.gmail.com`)
 - Port : 993
 - SSL : true
-- User : `emma@yourdomain.com`
+- User : `emma@gobapps.com`
 - Password : Votre mot de passe IMAP
 
 **Pour Twilio** :
@@ -355,7 +355,7 @@ TWILIO_PHONE_NUMBER=+1234567890
 
 # Resend (Email)
 RESEND_API_KEY=re_xxxxxxxxxxxxx
-EMAIL_FROM=emma@yourdomain.com
+EMAIL_FROM=emma@gobapps.com
 
 # Facebook Messenger
 MESSENGER_PAGE_ACCESS_TOKEN=EAAxxxxxxxxxxxxxxxxxxxxx
@@ -397,7 +397,7 @@ Emma devrait répondre dans les 5 secondes.
 
 ### Test 2 : Email
 
-Envoyez un email à `emma@yourdomain.com` :
+Envoyez un email à `emma@gobapps.com` :
 ```
 Subject: Test Emma IA
 Body: Analyse AAPL
@@ -476,7 +476,7 @@ Réponse attendue :
    curl -X POST https://api.resend.com/emails \
      -H "Authorization: Bearer re_xxxxx" \
      -H "Content-Type: application/json" \
-     -d '{"from":"emma@yourdomain.com","to":"test@example.com","subject":"Test","html":"Test"}'
+     -d '{"from":"emma@gobapps.com","to":"test@example.com","subject":"Test","html":"Test"}'
    ```
 
 ### Problème : Messenger ne répond pas
