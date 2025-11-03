@@ -1,0 +1,119 @@
+{
+  "name": "GOB Emma - SMS via Twilio",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gob-sms-webhook",
+        "options": {}
+      },
+      "name": "Webhook Twilio",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "gob-sms-twilio"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "from_phone",
+              "value": "={{ $json.body.From }}"
+            },
+            {
+              "name": "to_phone",
+              "value": "={{ $json.body.To }}"
+            },
+            {
+              "name": "message_body",
+              "value": "={{ $json.body.Body }}"
+            },
+            {
+              "name": "message_sid",
+              "value": "={{ $json.body.MessageSid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Extract SMS Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://your-app.vercel.app/api/adapters/sms",
+        "authentication": "none",
+        "options": {},
+        "bodyParametersJson": "={{ JSON.stringify({\n  From: $json.from_phone,\n  To: $json.to_phone,\n  Body: $json.message_body,\n  MessageSid: $json.message_sid\n}) }}"
+      },
+      "name": "Call SMS Adapter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "options": {}
+      },
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Twilio": {
+      "main": [
+        [
+          {
+            "node": "Extract SMS Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract SMS Data": {
+      "main": [
+        [
+          {
+            "node": "Call SMS Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call SMS Adapter": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "name": "GOB",
+      "id": "1"
+    },
+    {
+      "name": "SMS",
+      "id": "2"
+    }
+  ],
+  "meta": {
+    "instanceId": "gob_emma_sms"
+  }
+}

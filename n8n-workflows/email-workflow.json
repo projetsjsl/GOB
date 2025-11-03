@@ -1,0 +1,192 @@
+{
+  "name": "GOB Emma - Email via ImprovMX + Resend",
+  "nodes": [
+    {
+      "parameters": {
+        "protocol": "imap",
+        "mailbox": "INBOX",
+        "options": {
+          "allowUnauthorizedCerts": false,
+          "forceReconnect": false
+        }
+      },
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "credentials": {
+        "imap": {
+          "id": "1",
+          "name": "ImprovMX IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "from",
+              "value": "={{ $json.from.value[0].address }}"
+            },
+            {
+              "name": "to",
+              "value": "={{ $json.to.value[0].address }}"
+            },
+            {
+              "name": "subject",
+              "value": "={{ $json.subject }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "html",
+              "value": "={{ $json.html }}"
+            },
+            {
+              "name": "messageId",
+              "value": "={{ $json.messageId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Parse Email Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.from }}",
+              "operation": "notContains",
+              "value2": "noreply"
+            },
+            {
+              "value1": "={{ $json.subject }}",
+              "operation": "notContains",
+              "value2": "Out of Office"
+            }
+          ]
+        }
+      },
+      "name": "Filter Auto-Replies",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://your-app.vercel.app/api/adapters/email",
+        "authentication": "none",
+        "options": {},
+        "bodyParametersJson": "={{ JSON.stringify({\n  from: $json.from,\n  to: $json.to,\n  subject: $json.subject,\n  text: $json.text,\n  html: $json.html\n}) }}"
+      },
+      "name": "Call Email Adapter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "message": "Email response sent successfully"
+      },
+      "name": "Success",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "message": "Auto-reply filtered out"
+      },
+      "name": "Filtered",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [850, 450]
+    }
+  ],
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Parse Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Email Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Auto-Replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Auto-Replies": {
+      "main": [
+        [
+          {
+            "node": "Call Email Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filtered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Email Adapter": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "GOB",
+      "id": "1"
+    },
+    {
+      "name": "Email",
+      "id": "3"
+    }
+  ],
+  "meta": {
+    "instanceId": "gob_emma_email"
+  },
+  "notes": [
+    {
+      "content": "Configuration IMAP:\n\nServeur: imap.improvmx.com (ou votre serveur IMAP)\nPort: 993\nSSL: true\nUsername: emma@yourdomain.com\nPassword: Votre mot de passe ImprovMX\n\nAlternativement, utilisez Gmail IMAP si vous redirigez vers Gmail.",
+      "height": 200,
+      "width": 300
+    }
+  ]
+}
