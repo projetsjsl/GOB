@@ -1,0 +1,169 @@
+{
+  "name": "GOB Emma - Facebook Messenger",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gob-messenger-webhook",
+        "options": {}
+      },
+      "name": "Webhook Messenger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "gob-messenger"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "sender_id",
+              "value": "={{ $json.body.entry[0].messaging[0].sender.id }}"
+            },
+            {
+              "name": "recipient_id",
+              "value": "={{ $json.body.entry[0].messaging[0].recipient.id }}"
+            },
+            {
+              "name": "message_text",
+              "value": "={{ $json.body.entry[0].messaging[0].message.text }}"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ $json.body.entry[0].messaging[0].timestamp }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Extract Messenger Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.message_text }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Check Message Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://your-app.vercel.app/api/adapters/messenger",
+        "authentication": "none",
+        "options": {},
+        "bodyParametersJson": "={{ JSON.stringify({\n  entry: [{\n    messaging: [{\n      sender: { id: $json.sender_id },\n      recipient: { id: $json.recipient_id },\n      message: { text: $json.message_text },\n      timestamp: $json.timestamp\n    }]\n  }]\n}) }}"
+      },
+      "name": "Call Messenger Adapter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "EVENT_RECEIVED"
+      },
+      "name": "Respond to Facebook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "message": "Non-text message ignored"
+      },
+      "name": "Ignored",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [850, 450]
+    }
+  ],
+  "connections": {
+    "Webhook Messenger": {
+      "main": [
+        [
+          {
+            "node": "Extract Messenger Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Messenger Data": {
+      "main": [
+        [
+          {
+            "node": "Check Message Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Message Exists": {
+      "main": [
+        [
+          {
+            "node": "Call Messenger Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignored",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Messenger Adapter": {
+      "main": [
+        [
+          {
+            "node": "Respond to Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    {
+      "name": "GOB",
+      "id": "1"
+    },
+    {
+      "name": "Messenger",
+      "id": "4"
+    }
+  ],
+  "meta": {
+    "instanceId": "gob_emma_messenger"
+  },
+  "notes": [
+    {
+      "content": "Configuration Facebook Messenger:\n\n1. Créer une app sur developers.facebook.com\n2. Ajouter le produit Messenger\n3. Générer un Page Access Token\n4. Configurer le webhook:\n   - URL: https://n8n.yourdomain.com/webhook/gob-messenger-webhook\n   - Verify Token: gob_emma_verify_token_2025\n   - Events: messages, messaging_postbacks\n\nRemarque: Ce workflow peut être simplifié en appelant directement /api/adapters/messenger sans n8n. Le webhook Facebook peut pointer directement sur l'API Vercel.",
+      "height": 300,
+      "width": 400
+    }
+  ]
+}
