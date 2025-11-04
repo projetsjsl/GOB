@@ -938,7 +938,11 @@ class SmartAgent {
         const shouldIntroduce = context.should_introduce || false;
         const introContext = shouldIntroduce ? `\n🎯 PRÉSENTATION REQUISE: C'est le premier contact avec cet utilisateur OU ils ont écrit "Test Emma". COMMENCE ta réponse par une brève présentation de qui tu es (Emma, assistante IA financière), ce que tu peux faire (analyses de marchés, nouvelles financières, données en temps réel), et invite-les à poser leurs questions. Garde la présentation concise (2-3 phrases max).\n` : '';
 
-        return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.${userContext}${introContext}
+        // Instruction pour emojis (canal SMS)
+        const userChannel = context.user_channel || 'chat';
+        const emojiInstructions = userChannel === 'sms' ? `\n😊 STYLE SMS: Tu communiques par SMS. Utilise des emojis pour rendre tes réponses plus vivantes et engageantes (📊 📈 💰 💡 ✅ ⚠️ 🎯 👋 etc.). Garde tes réponses relativement courtes et agréables à lire sur mobile.\n` : '';
+
+        return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.${userContext}${introContext}${emojiInstructions}
 📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
 ⚠️ CRITIQUE: Toutes les données doivent refléter les informations les plus récentes. Si une donnée est datée (ex: "au 8 août"), précise clairement que c'est une donnée ancienne et cherche des informations plus récentes si disponibles.
 
