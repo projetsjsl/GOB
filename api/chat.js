@@ -129,7 +129,7 @@ export default async function handler(req, res) {
         try {
           await updateUserProfile(userProfile.id, {
             name: userName,
-            metadata: { ...userProfile.metadata, awaiting_name: false }
+            metadata: { ...userProfile.metadata, awaiting_name: false, has_been_introduced: true }
           });
           console.log(`[Chat API] Nom enregistré: ${userName}`);
 
@@ -195,10 +195,23 @@ export default async function handler(req, res) {
     // 5. DÉTECTER SI EMMA DOIT SE PRÉSENTER
     const isFirstMessage = conversationHistory.length === 0;
     const isTestEmma = message.toLowerCase().includes('test emma');
-    const shouldIntroduce = isFirstMessage || isTestEmma;
+    const hasBeenIntroduced = userProfile.metadata?.has_been_introduced === true;
+    const shouldIntroduce = (!hasBeenIntroduced && isFirstMessage) || isTestEmma;
 
     if (shouldIntroduce) {
-      console.log(`[Chat API] Emma va se présenter (first=${isFirstMessage}, test=${isTestEmma})`);
+      console.log(`[Chat API] Emma va se présenter (first=${isFirstMessage}, test=${isTestEmma}, introduced=${hasBeenIntroduced})`);
+
+      // Marquer que Emma s'est présentée (sauf si c'est juste "Test Emma")
+      if (!hasBeenIntroduced && !isTestEmma) {
+        try {
+          await updateUserProfile(userProfile.id, {
+            metadata: { ...userProfile.metadata, has_been_introduced: true }
+          });
+          console.log(`[Chat API] Flag has_been_introduced défini pour user ${userProfile.id}`);
+        } catch (error) {
+          console.error('[Chat API] Erreur mise à jour has_been_introduced:', error);
+        }
+      }
     }
 
     // 6. PRÉPARER LE CONTEXTE POUR EMMA-AGENT
