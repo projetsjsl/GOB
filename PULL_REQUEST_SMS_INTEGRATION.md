@@ -57,7 +57,54 @@ Configurer l'intégration SMS Twilio pour permettre à Emma IA de répondre via 
   - Prompt LLM enrichi avec exemples de conversations générales
 - **Impact** : Emma maintenant capable de conversations générales, pas seulement finance !
 
-### 7. Documentation Complète ✅
+### 7. Personnalisation avec Numéros de Téléphone ✅ ⭐ NEW
+- **Fichiers** : `lib/phone-contacts.js` (nouveau), `api/chat.js`, `api/emma-agent.js`
+- **Commits** : `01762e3`, `b4c9d6d`
+- **Fonctionnalité** : Emma reconnaît les utilisateurs par leur numéro et personnalise ses réponses
+- **Solution** :
+  - Nouveau fichier `lib/phone-contacts.js` avec mapping téléphone → nom
+  - Contacts configurés : J-S (+14183185826), Daniel (+14187501061), Maxime (+18193425966)
+  - Enrichissement des métadonnées dans `/api/chat.js` pour SMS
+  - Personnalisation des prompts Emma avec le nom de l'utilisateur
+- **Impact** : Emma salue les utilisateurs par leur nom et personnalise ses réponses !
+
+### 8. Présentation Automatique d'Emma ✅ ⭐ NEW
+- **Fichiers** : `api/chat.js`, `api/emma-agent.js`
+- **Commits** : `c39b695`, `05b4d63`
+- **Fonctionnalité** : Emma se présente automatiquement lors du premier message ou quand on écrit "Test Emma"
+- **Solution** :
+  - Détection du premier message (historique vide)
+  - Détection de "Test Emma" dans le message
+  - Flag `metadata.has_been_introduced` pour tracker si Emma s'est déjà présentée
+  - Emma se présente aux contacts connus (J-S, Daniel, Maxime) lors de leur première interaction
+  - Ajout du flag `should_introduce` dans le contexte Emma
+  - Instructions dans le prompt Emma pour une présentation concise (2-3 phrases)
+- **Impact** : Meilleure expérience utilisateur - Emma s'introduit à TOUS les utilisateurs (connus ou inconnus) !
+
+### 9. Collecte et Enregistrement des Noms (Numéros Inconnus) ✅ ⭐ NEW
+- **Fichier** : `api/chat.js`
+- **Commit** : `31170c7`
+- **Fonctionnalité** : Emma demande automatiquement le nom aux numéros inconnus et l'enregistre en base de données
+- **Solution** :
+  - Détection des numéros inconnus (pas dans `phone-contacts.js` ET pas de nom dans `user_profiles`)
+  - Emma demande : "Bonjour ! 👋 Avant de commencer, pourrais-tu me dire ton prénom ?"
+  - Enregistrement du nom dans `user_profiles.name` via `updateUserProfile()`
+  - Utilisation du flag `metadata.awaiting_name` pour gérer le flux
+  - Réponse personnalisée : "Enchanté [Nom] ! 👋 Je suis Emma..."
+- **Impact** : Système auto-apprenant - Emma apprend les nouveaux utilisateurs automatiquement !
+
+### 10. Réponses avec Emojis pour SMS ✅ ⭐ NEW
+- **Fichier** : `api/emma-agent.js`
+- **Commit** : `db3abd6`
+- **Fonctionnalité** : Emma utilise des emojis dans ses réponses SMS pour les rendre plus vivantes et engageantes
+- **Solution** :
+  - Détection du canal SMS via `context.user_channel`
+  - Instruction spécifique dans le prompt : "Utilise des emojis pour rendre tes réponses plus vivantes (📊 📈 💰 💡 ✅ ⚠️ 🎯 👋 etc.)"
+  - Réponses courtes et agréables à lire sur mobile
+  - Emojis contextuels selon le type d'information (finance, salutations, alertes)
+- **Impact** : Communication SMS plus moderne, conviviale et facile à lire sur mobile ! 📱
+
+### 11. Documentation Complète ✅
 - ✅ `SETUP_INSTRUCTIONS_TWILIO_SMS.md` - Guide complet de configuration Twilio + Supabase
 - ✅ `DIAGNOSTIC_SMS_ERROR.md` - Guide de diagnostic des erreurs SMS
 - ✅ `FIX_SMS_FOREIGN_KEY.md` - Guide pour corriger la contrainte foreign key
@@ -103,8 +150,12 @@ Configurer l'intégration SMS Twilio pour permettre à Emma IA de répondre via 
 - [x] Emma Agent "Method not allowed" résolu ⭐
 - [x] SMS delivery fix (TwiML response) ⭐
 - [x] Emma IA conversationnelle (pas seulement finance) ⭐
+- [x] Personnalisation avec numéros de téléphone ⭐
+- [x] Présentation automatique d'Emma (premier message / "Test Emma") ⭐
+- [x] Collecte automatique des noms (numéros inconnus) ⭐
+- [x] Réponses avec emojis pour SMS (communication engageante) ⭐
 - [x] Documentation complète créée
-- [x] **SMS Integration 100% fonctionnelle + IA conversationnelle** 🎉
+- [x] **SMS Integration 100% fonctionnelle + IA conversationnelle + Personnalisation auto-apprenante + Emojis** 🎉
 
 ---
 
@@ -156,13 +207,22 @@ Vérifier que ces variables existent dans Vercel :
 5. **Method not allowed** ✅ - Ajout `method: 'POST'` (commit `92dfac8`) ⭐
 6. **SMS non reçus** ✅ - TwiML `<Message>` response (commit `a05cf04`) ⭐
 7. **Biais financier Emma** ✅ - Intent analyzer conversationnel (commit `111f9b1`) ⭐
+8. **Personnalisation** ✅ - Mapping téléphone → nom (commits `01762e3`, `b4c9d6d`) ⭐
+9. **Présentation automatique** ✅ - Emma s'introduit au premier message (commits `c39b695`, `05b4d63`) ⭐
+10. **Collecte des noms** ✅ - Demande et enregistre les noms des numéros inconnus (commit `31170c7`) ⭐
+11. **Emojis SMS** ✅ - Réponses vivantes avec emojis pour canal SMS (commit `db3abd6`) ⭐
 
 ### Résultat Final
 
-**Emma IA répond maintenant parfaitement par SMS avec IA conversationnelle !** 🎉
+**Emma IA répond maintenant parfaitement par SMS avec IA conversationnelle + personnalisation !** 🎉
 
 **Capacités Emma :**
 - ✅ Conversations générales ("Bonjour", "Test", "Comment vas-tu ?")
+- ✅ Présentation automatique à tous les utilisateurs (première interaction)
+- ✅ Collecte automatique des noms (numéros inconnus)
+- ✅ Personnalisation par numéro de téléphone (reconnait J-S, Daniel, Maxime)
+- ✅ Enregistrement permanent des nouveaux utilisateurs en base de données
+- ✅ **Réponses avec emojis pour communication engageante** 😊📊📈💰💡
 - ✅ Aide et support ("Comment tu fonctionnes ?", "Aide")
 - ✅ Analyses financières ("Prix AAPL", "Analyse Tesla", "Nouvelles MSFT")
 - ✅ Réponses contextuelles et intelligentes
@@ -186,9 +246,11 @@ SMS reçu par l'utilisateur ✅
 
 ### Code - Fixes Critiques ⭐
 - `lib/conversation-manager.js` - Fix UUID generation (crypto.randomUUID)
-- `api/chat.js` - Ajout logging détaillé + method POST Emma Agent
+- `api/chat.js` - Ajout logging détaillé + method POST Emma Agent + personnalisation + introduction
 - `api/adapters/sms.js` - TwiML response au lieu de manual SMS
 - `lib/intent-analyzer.js` - Intent analyzer conversationnel (greetings, help, general)
+- `lib/phone-contacts.js` - **NOUVEAU** - Mapping téléphone → nom (J-S, Daniel, Maxime)
+- `api/emma-agent.js` - Personnalisation avec noms + présentation automatique
 
 ### SQL
 - `supabase-fix-conversation-fkey.sql` - Script de correction foreign key
@@ -210,7 +272,7 @@ SMS reçu par l'utilisateur ✅
 
 ---
 
-## 📊 Commits de cette PR (11 commits)
+## 📊 Commits de cette PR (20 commits)
 
 ### Fixes Critiques ⭐
 1. `b39d6cc` - **fix: Generate proper UUID for session_id in conversation manager** ⭐
@@ -218,16 +280,25 @@ SMS reçu par l'utilisateur ✅
 3. `92dfac8` - **fix: Add method POST to Emma Agent request in chat API** ⭐ CRITICAL
 4. `a05cf04` - **fix: Switch to TwiML response instead of manual SMS sending** ⭐
 5. `111f9b1` - **feat: Make Emma IA more conversational and flexible** ⭐ NEW
+6. `01762e3` - **feat: Add personalization with phone-to-name mapping** ⭐ NEW
+7. `b4c9d6d` - **feat: Add Maxime to phone contacts mapping** ⭐
+8. `c39b695` - **feat: Emma introduces herself on first message or 'Test Emma'** ⭐ NEW
+9. `31170c7` - **feat: Ask and save user name for unknown phone numbers** ⭐ NEW
+10. `05b4d63` - **feat: Emma introduces herself to known contacts on first interaction** ⭐ NEW
+11. `db3abd6` - **feat: Emma uses emojis in SMS responses for engaging communication** ⭐ NEW
 
 ### Documentation 📚
-6. `8beee5c` - docs: Add Twilio SMS configuration and Supabase setup instructions
-7. `1ba2edf` - docs: Add comprehensive SMS error diagnostic guide
-8. `b1f31fc` - docs: Add guide to fix conversation_history foreign key constraint
-9. `15e6480` - docs: Add pull request description for SMS integration
-10. `896e67d` - docs: Update PR description with Emma Agent fix complete
+12. `8beee5c` - docs: Add Twilio SMS configuration and Supabase setup instructions
+13. `1ba2edf` - docs: Add comprehensive SMS error diagnostic guide
+14. `b1f31fc` - docs: Add guide to fix conversation_history foreign key constraint
+15. `15e6480` - docs: Add pull request description for SMS integration
+16. `896e67d` - docs: Update PR description with Emma Agent fix complete
+17. `def29e6` - docs: Update PR description with TwiML fix and conversational Emma improvements
+18. `989e88a` - docs: Update PR description with personalization and auto-introduction features
+19. `959be01` - docs: Update PR with name collection and known contacts introduction
 
 ### Debug & Improvements 🔧
-11. `f9e49f0` - debug: Add detailed Emma Agent error logging to diagnose SMS issues
+20. `f9e49f0` - debug: Add detailed Emma Agent error logging to diagnose SMS issues
 
 ---
 
