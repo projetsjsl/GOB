@@ -892,7 +892,7 @@ class SmartAgent {
 
         switch (outputMode) {
             case 'chat':
-                return this._buildChatPrompt(userMessage, toolsData, conversationContext, intentData);
+                return this._buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData);
 
             case 'data':
                 return this._buildDataPrompt(userMessage, toolsData, context);
@@ -905,14 +905,14 @@ class SmartAgent {
 
             default:
                 console.warn(`⚠️ Unknown output_mode: ${outputMode}, fallback to chat`);
-                return this._buildChatPrompt(userMessage, toolsData, conversationContext, intentData);
+                return this._buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData);
         }
     }
 
     /**
      * MODE CHAT: Réponse conversationnelle naturelle
      */
-    _buildChatPrompt(userMessage, toolsData, conversationContext, intentData) {
+    _buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData) {
         const currentDate = new Date().toLocaleDateString('fr-FR', {
             weekday: 'long',
             year: 'numeric',
