@@ -11,13 +11,16 @@
 import fs from 'fs';
 import path from 'path';
 import { HybridIntentAnalyzer } from '../lib/intent-analyzer.js';
+import { createSupabaseClient } from '../lib/supabase-config.js';
 
 class SmartAgent {
     constructor() {
         this.toolsConfig = this._loadToolsConfig();
-        this.usageStats = this._loadUsageStats();
+        this.usageStats = {}; // Will be loaded asynchronously from Supabase
         this.conversationHistory = [];
         this.intentAnalyzer = new HybridIntentAnalyzer();
+        this.supabase = null; // Will be initialized when needed
+        this.statsLoaded = false;
     }
 
     /**
@@ -26,6 +29,11 @@ class SmartAgent {
     async processRequest(userMessage, context = {}) {
         try {
             console.log('🤖 Emma Agent: Processing request:', userMessage.substring(0, 100) + '...');
+
+            // Load usage stats from Supabase if not already loaded
+            if (!this.statsLoaded) {
+                this.usageStats = await this._loadUsageStats();
+            }
 
             // 0. COGNITIVE SCAFFOLDING: Analyse d'intention avec Perplexity
             const intentData = await this._analyzeIntent(userMessage, context);
@@ -71,8 +79,10 @@ class SmartAgent {
             // 4. Mise à jour de l'historique
             this._updateConversationHistory(userMessage, finalResponse, toolResults);
 
-            // 5. Sauvegarde des statistiques
-            this._saveUsageStats();
+            // 5. Sauvegarde des statistiques (async, no need to await - fire and forget)
+            this._saveUsageStats().catch(err => {
+                console.error('⚠️ Failed to save usage stats (non-blocking):', err);
+            });
 
             // Identifier les outils qui ont échoué ou retourné des données non fiables
             const failedToolsData = toolResults
@@ -1801,12 +1811,56 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
     }
 
     /**
-     * Chargement des statistiques d'utilisation
+     * Initialize Supabase client if not already done
      */
-    _loadUsageStats() {
+    _initSupabase() {
+        if (!this.supabase) {
+            try {
+                this.supabase = createSupabaseClient(true); // Use service role for stats
+            } catch (error) {
+                console.error('❌ Failed to initialize Supabase:', error);
+            }
+        }
+    }
+
+    /**
+     * Chargement des statistiques d'utilisation depuis Supabase
+     */
+    async _loadUsageStats() {
         try {
-            const statsPath = path.join(process.cwd(), 'config', 'usage_stats.json');
-            return JSON.parse(fs.readFileSync(statsPath, 'utf8'));
+            this._initSupabase();
+            if (!this.supabase) {
+                console.warn('⚠️ Supabase not available, using in-memory stats');
+                return {};
+            }
+
+            const { data, error } = await this.supabase
+                .from('tool_usage_stats')
+                .select('*');
+
+            if (error) {
+                console.error('❌ Failed to load usage stats from Supabase:', error);
+                return {};
+            }
+
+            // Convert array of stats to object keyed by tool_id
+            const stats = {};
+            if (data) {
+                data.forEach(stat => {
+                    stats[stat.tool_id] = {
+                        total_calls: stat.total_calls,
+                        successful_calls: stat.successful_calls,
+                        failed_calls: stat.failed_calls,
+                        average_response_time_ms: stat.average_response_time_ms,
+                        last_used: stat.last_used,
+                        success_rate: parseFloat(stat.success_rate) || 0,
+                        error_history: stat.error_history || []
+                    };
+                });
+            }
+
+            this.statsLoaded = true;
+            return stats;
         } catch (error) {
             console.error('❌ Failed to load usage stats:', error);
             return {};
@@ -1814,12 +1868,40 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
     }
 
     /**
-     * Sauvegarde des statistiques d'utilisation
+     * Sauvegarde des statistiques d'utilisation dans Supabase
      */
-    _saveUsageStats() {
+    async _saveUsageStats() {
         try {
-            const statsPath = path.join(process.cwd(), 'config', 'usage_stats.json');
-            fs.writeFileSync(statsPath, JSON.stringify(this.usageStats, null, 2));
+            this._initSupabase();
+            if (!this.supabase) {
+                console.warn('⚠️ Supabase not available, stats not saved');
+                return;
+            }
+
+            // Convert usageStats object to array for database upsert
+            const statsArray = Object.entries(this.usageStats).map(([toolId, stats]) => ({
+                tool_id: toolId,
+                total_calls: stats.total_calls,
+                successful_calls: stats.successful_calls,
+                failed_calls: stats.failed_calls,
+                average_response_time_ms: stats.average_response_time_ms,
+                last_used: stats.last_used,
+                success_rate: stats.success_rate,
+                error_history: stats.error_history || []
+            }));
+
+            // Upsert each stat (insert or update if exists)
+            for (const stat of statsArray) {
+                const { error } = await this.supabase
+                    .from('tool_usage_stats')
+                    .upsert(stat, {
+                        onConflict: 'tool_id'
+                    });
+
+                if (error) {
+                    console.error(`❌ Failed to save stats for tool ${stat.tool_id}:`, error);
+                }
+            }
         } catch (error) {
             console.error('❌ Failed to save usage stats:', error);
         }
