@@ -8,10 +8,10 @@
  * Canal → /api/chat → User Manager → Conversation Manager → emma-agent → Response → Channel Adapter
  */
 
-import { getOrCreateUserProfile } from '../lib/user-manager.js';
+import { getOrCreateUserProfile, updateUserProfile } from '../lib/user-manager.js';
 import { getOrCreateConversation, saveConversationTurn, getConversationHistory, formatHistoryForEmma } from '../lib/conversation-manager.js';
 import { adaptForChannel } from '../lib/channel-adapter.js';
-import { getNameFromPhone } from '../lib/phone-contacts.js';
+import { getNameFromPhone, isKnownContact } from '../lib/phone-contacts.js';
 
 /**
  * Handler POST /api/chat
@@ -111,6 +111,75 @@ export default async function handler(req, res) {
         error: 'Failed to get or create conversation',
         details: error.message
       });
+    }
+
+    // 3.5 DEMANDER LE NOM SI NUMÉRO INCONNU (SMS uniquement)
+    if (channel === 'sms') {
+      const isKnownInContacts = isKnownContact(userId);
+      const hasName = userProfile.name && userProfile.name !== userId;
+      const awaitingName = userProfile.metadata?.awaiting_name === true;
+
+      // CAS 1: Utilisateur en train de donner son nom
+      if (awaitingName) {
+        console.log(`[Chat API] Réception du nom de l'utilisateur`);
+
+        // Extraire le nom (prendre le message comme nom, nettoyer)
+        const userName = message.trim().split(/\s+/)[0]; // Premier mot
+
+        try {
+          await updateUserProfile(userProfile.id, {
+            name: userName,
+            metadata: { ...userProfile.metadata, awaiting_name: false }
+          });
+          console.log(`[Chat API] Nom enregistré: ${userName}`);
+
+          // Réponse de confirmation + présentation d'Emma
+          const welcomeResponse = `Enchanté ${userName} ! 👋\n\nJe suis Emma, ton assistante IA financière. Je peux t'aider avec :\n\n📊 Analyses de marchés et actions\n📈 Données financières en temps réel\n📰 Nouvelles économiques\n💡 Conseils et insights\n\nComment puis-je t'aider aujourd'hui ?`;
+
+          // Sauvegarder dans la conversation
+          await saveConversationTurn(conversation.id, message, welcomeResponse, {
+            type: 'name_registration',
+            channel: channel
+          });
+
+          return res.status(200).json({
+            success: true,
+            response: welcomeResponse,
+            metadata: { name_registered: true, user_name: userName }
+          });
+        } catch (error) {
+          console.error('[Chat API] Erreur enregistrement nom:', error);
+          // Continuer normalement en cas d'erreur
+        }
+      }
+
+      // CAS 2: Numéro inconnu sans nom - demander le nom
+      if (!isKnownInContacts && !hasName && !awaitingName) {
+        console.log(`[Chat API] Numéro inconnu détecté, demande du nom`);
+
+        try {
+          await updateUserProfile(userProfile.id, {
+            metadata: { ...userProfile.metadata, awaiting_name: true }
+          });
+
+          const askNameResponse = "Bonjour ! 👋\n\nAvant de commencer, pourrais-tu me dire ton prénom ? Ça me permettra de personnaliser nos échanges.";
+
+          // Sauvegarder dans la conversation
+          await saveConversationTurn(conversation.id, message, askNameResponse, {
+            type: 'name_request',
+            channel: channel
+          });
+
+          return res.status(200).json({
+            success: true,
+            response: askNameResponse,
+            metadata: { awaiting_name: true }
+          });
+        } catch (error) {
+          console.error('[Chat API] Erreur demande nom:', error);
+          // Continuer normalement en cas d'erreur
+        }
+      }
     }
 
     // 4. RÉCUPÉRER HISTORIQUE (pour contexte Emma)
