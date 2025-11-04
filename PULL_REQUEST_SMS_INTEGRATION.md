@@ -39,7 +39,25 @@ Configurer l'intégration SMS Twilio pour permettre à Emma IA de répondre via 
 - **Solution** : Ajout de `method: 'POST'` dans le mock request vers Emma Agent
 - **Impact** : Emma Agent fonctionne maintenant correctement via SMS !
 
-### 5. Documentation Complète ✅
+### 5. Fix SMS Non Reçus - TwiML Response ✅ ⭐
+- **Fichier** : `api/adapters/sms.js`
+- **Commit** : `a05cf04`
+- **Problème résolu** : SMS marqués "envoyés" mais non reçus par les utilisateurs
+- **Solution** : Utilisation de TwiML `<Message>` au lieu de `client.messages.create()`
+- **Impact** : Messages SMS maintenant reçus correctement !
+
+### 6. Emma IA Plus Conversationnelle ✅ ⭐ NEW
+- **Fichier** : `lib/intent-analyzer.js`
+- **Commit** : `111f9b1`
+- **Problème résolu** : Emma assumait toujours une intention financière (biais "stock_price")
+- **Solution** :
+  - Ajout intentions générales : `greeting`, `help`, `general_conversation`
+  - Default intent changé : `stock_price` → `general_conversation`
+  - Logique intelligente : intent financier SEULEMENT si ticker ou keywords détectés
+  - Prompt LLM enrichi avec exemples de conversations générales
+- **Impact** : Emma maintenant capable de conversations générales, pas seulement finance !
+
+### 7. Documentation Complète ✅
 - ✅ `SETUP_INSTRUCTIONS_TWILIO_SMS.md` - Guide complet de configuration Twilio + Supabase
 - ✅ `DIAGNOSTIC_SMS_ERROR.md` - Guide de diagnostic des erreurs SMS
 - ✅ `FIX_SMS_FOREIGN_KEY.md` - Guide pour corriger la contrainte foreign key
@@ -83,8 +101,10 @@ Configurer l'intégration SMS Twilio pour permettre à Emma IA de répondre via 
 - [x] Foreign key fix créé (script SQL)
 - [x] Logging détaillé ajouté pour debug
 - [x] Emma Agent "Method not allowed" résolu ⭐
+- [x] SMS delivery fix (TwiML response) ⭐
+- [x] Emma IA conversationnelle (pas seulement finance) ⭐
 - [x] Documentation complète créée
-- [x] **SMS Integration 100% fonctionnelle** 🎉
+- [x] **SMS Integration 100% fonctionnelle + IA conversationnelle** 🎉
 
 ---
 
@@ -134,10 +154,19 @@ Vérifier que ces variables existent dans Vercel :
 3. **Foreign Key** ✅ - Script SQL vers `user_profiles` (commit `44934b5`)
 4. **Logging insuffisant** ✅ - Ajout logs détaillés (commit `f9e49f0`)
 5. **Method not allowed** ✅ - Ajout `method: 'POST'` (commit `92dfac8`) ⭐
+6. **SMS non reçus** ✅ - TwiML `<Message>` response (commit `a05cf04`) ⭐
+7. **Biais financier Emma** ✅ - Intent analyzer conversationnel (commit `111f9b1`) ⭐
 
 ### Résultat Final
 
-**Emma IA répond maintenant parfaitement par SMS !** 🎉
+**Emma IA répond maintenant parfaitement par SMS avec IA conversationnelle !** 🎉
+
+**Capacités Emma :**
+- ✅ Conversations générales ("Bonjour", "Test", "Comment vas-tu ?")
+- ✅ Aide et support ("Comment tu fonctionnes ?", "Aide")
+- ✅ Analyses financières ("Prix AAPL", "Analyse Tesla", "Nouvelles MSFT")
+- ✅ Réponses contextuelles et intelligentes
+- ✅ Pas de biais "tout est finance"
 
 **Logs de validation** :
 ```
@@ -145,17 +174,21 @@ Vérifier que ces variables existent dans Vercel :
 [User Manager] Utilisateur trouvé ✅
 [Conversation Manager] Conversation créée ✅
 [Chat API] Appel emma-agent ✅
+[Intent Analyzer] Intent: general_conversation ✅ (ou stock_price si ticker)
 [Emma Agent] Traitement réussi ✅
-[SMS Adapter] Réponse envoyée ✅
+[SMS Adapter] Réponse via TwiML ✅
+SMS reçu par l'utilisateur ✅
 ```
 
 ---
 
 ## 📚 Fichiers Modifiés
 
-### Code
+### Code - Fixes Critiques ⭐
 - `lib/conversation-manager.js` - Fix UUID generation (crypto.randomUUID)
-- `api/chat.js` - Ajout logging détaillé Emma Agent
+- `api/chat.js` - Ajout logging détaillé + method POST Emma Agent
+- `api/adapters/sms.js` - TwiML response au lieu de manual SMS
+- `lib/intent-analyzer.js` - Intent analyzer conversationnel (greetings, help, general)
 
 ### SQL
 - `supabase-fix-conversation-fkey.sql` - Script de correction foreign key
@@ -164,6 +197,7 @@ Vérifier que ces variables existent dans Vercel :
 - `SETUP_INSTRUCTIONS_TWILIO_SMS.md` - Guide setup complet
 - `DIAGNOSTIC_SMS_ERROR.md` - Guide diagnostic erreurs
 - `FIX_SMS_FOREIGN_KEY.md` - Guide correction SQL
+- `PULL_REQUEST_SMS_INTEGRATION.md` - Description PR (ce fichier)
 
 ---
 
@@ -176,16 +210,24 @@ Vérifier que ces variables existent dans Vercel :
 
 ---
 
-## 📊 Commits de cette PR
+## 📊 Commits de cette PR (11 commits)
 
-1. `8beee5c` - docs: Add Twilio SMS configuration and Supabase setup instructions
-2. `1ba2edf` - docs: Add comprehensive SMS error diagnostic guide
-3. `b39d6cc` - fix: Generate proper UUID for session_id in conversation manager
-4. `44934b5` - fix: Add SQL script to fix conversation_history foreign key constraint
-5. `b1f31fc` - docs: Add guide to fix conversation_history foreign key constraint
-6. `f9e49f0` - debug: Add detailed Emma Agent error logging to diagnose SMS issues
-7. `15e6480` - docs: Add pull request description for SMS integration
-8. `92dfac8` - **fix: Add method POST to Emma Agent request in chat API** ⭐ **CRITICAL FIX**
+### Fixes Critiques ⭐
+1. `b39d6cc` - **fix: Generate proper UUID for session_id in conversation manager** ⭐
+2. `44934b5` - **fix: Add SQL script to fix conversation_history foreign key constraint** ⭐
+3. `92dfac8` - **fix: Add method POST to Emma Agent request in chat API** ⭐ CRITICAL
+4. `a05cf04` - **fix: Switch to TwiML response instead of manual SMS sending** ⭐
+5. `111f9b1` - **feat: Make Emma IA more conversational and flexible** ⭐ NEW
+
+### Documentation 📚
+6. `8beee5c` - docs: Add Twilio SMS configuration and Supabase setup instructions
+7. `1ba2edf` - docs: Add comprehensive SMS error diagnostic guide
+8. `b1f31fc` - docs: Add guide to fix conversation_history foreign key constraint
+9. `15e6480` - docs: Add pull request description for SMS integration
+10. `896e67d` - docs: Update PR description with Emma Agent fix complete
+
+### Debug & Improvements 🔧
+11. `f9e49f0` - debug: Add detailed Emma Agent error logging to diagnose SMS issues
 
 ---
 
