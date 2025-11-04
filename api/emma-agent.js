@@ -930,8 +930,11 @@ class SmartAgent {
 - Tickers identifiés: ${intentData.tickers?.join(', ') || 'aucun'}\n`;
         }
 
-        return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.
+        // Information sur l'utilisateur
+        const userName = context.user_name || null;
+        const userContext = userName ? `\n👤 UTILISATEUR: Tu parles avec ${userName}. Personnalise tes salutations et réponses en utilisant son nom quand approprié.\n` : '';
 
+        return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.${userContext}
 📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
 ⚠️ CRITIQUE: Toutes les données doivent refléter les informations les plus récentes. Si une donnée est datée (ex: "au 8 août"), précise clairement que c'est une donnée ancienne et cherche des informations plus récentes si disponibles.
 

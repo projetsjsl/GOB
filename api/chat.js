@@ -11,6 +11,7 @@
 import { getOrCreateUserProfile } from '../lib/user-manager.js';
 import { getOrCreateConversation, saveConversationTurn, getConversationHistory, formatHistoryForEmma } from '../lib/conversation-manager.js';
 import { adaptForChannel } from '../lib/channel-adapter.js';
+import { getNameFromPhone } from '../lib/phone-contacts.js';
 
 /**
  * Handler POST /api/chat
@@ -74,8 +75,17 @@ export default async function handler(req, res) {
     // 2. GESTION UTILISATEUR
     let userProfile;
     try {
+      // Enrichir les métadonnées avec le nom si c'est un contact connu (SMS)
+      if (channel === 'sms') {
+        const userName = getNameFromPhone(userId);
+        if (userName !== userId) { // Si un nom a été trouvé
+          metadata.name = userName;
+          console.log(`[Chat API] Contact connu: ${userName}`);
+        }
+      }
+
       userProfile = await getOrCreateUserProfile(userId, channel, metadata);
-      console.log(`[Chat API] User profile ID: ${userProfile.id}`);
+      console.log(`[Chat API] User profile ID: ${userProfile.id}, Name: ${userProfile.name}`);
     } catch (error) {
       console.error('[Chat API] Erreur user profile:', error);
       return res.status(500).json({
@@ -116,6 +126,8 @@ export default async function handler(req, res) {
     // 5. PRÉPARER LE CONTEXTE POUR EMMA-AGENT
     const emmaContext = {
       output_mode: channel === 'email' ? 'ticker_note' : 'chat', // Email = format long, autres = chat
+      user_name: userProfile.name || null, // Nom de l'utilisateur pour personnalisation
+      user_channel: channel, // Canal de communication
       tickers: metadata?.tickers || [],
       stockData: metadata?.stockData || {},
       newsData: metadata?.newsData || [],
