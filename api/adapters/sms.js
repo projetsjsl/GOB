@@ -141,13 +141,23 @@ export default async function handler(req, res) {
       );
     }
 
-    // 5. ENVOYER LA RÉPONSE PAR SMS
+    // 5. ENVOYER LA RÉPONSE PAR SMS via TwiML
     try {
-      await sendSMS(senderPhone, chatResponse.response);
+      // Option A: Répondre directement via TwiML (recommandé pour Twilio)
+      const response = chatResponse.response;
 
-      // 6. RÉPONDRE À TWILIO (TwiML vide = pas de réponse automatique supplémentaire)
+      console.log(`[SMS Adapter] Envoi réponse via TwiML (${response.length} chars)`);
+
       res.setHeader('Content-Type', 'text/xml');
-      return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
+      return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>${escapeXml(response)}</Message>
+</Response>`);
+
+      // Option B: Envoi manuel (désactivé temporairement)
+      // await sendSMS(senderPhone, chatResponse.response);
+      // res.setHeader('Content-Type', 'text/xml');
+      // return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
 
     } catch (error) {
       console.error('[SMS Adapter] Erreur envoi SMS:', error);
@@ -241,6 +251,21 @@ async function sendSMS(to, message) {
     console.error('[SMS Adapter] Erreur Twilio:', error);
     throw error;
   }
+}
+
+/**
+ * Échappe les caractères XML spéciaux
+ *
+ * @param {string} text - Le texte à échapper
+ * @returns {string} Texte avec caractères XML échappés
+ */
+function escapeXml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 /**
