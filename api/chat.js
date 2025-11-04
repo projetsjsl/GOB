@@ -132,6 +132,7 @@ export default async function handler(req, res) {
       // En production, on importe et appelle la fonction directement
       const emmaAgentModule = await import('./emma-agent.js');
       const emmaRequest = {
+        method: 'POST',
         body: {
           message: message,
           context: emmaContext
