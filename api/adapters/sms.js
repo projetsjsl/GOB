@@ -13,6 +13,8 @@
 
 import twilio from 'twilio';
 import { sendConversationEmail } from '../../lib/email-notifier.js';
+import { isInvitationCommand, handleInvitationCommand } from '../../lib/invitation-handler.js';
+import { isKnownContact } from '../../lib/phone-contacts.js';
 
 // Initialiser Twilio client
 const getTwilioClient = () => {
@@ -91,10 +93,36 @@ export default async function handler(req, res) {
       return await sendSMS(senderPhone, 'Message vide reçu. Envoyez une question pour Emma IA.');
     }
 
-    // 3. VÉRIFICATION ANTI-SPAM (optionnel)
+    // 3. DÉTECTER LES COMMANDES D'INVITATION (Admin uniquement)
+    if (isKnownContact(senderPhone) && isInvitationCommand(messageBody)) {
+      console.log('[SMS Adapter] Commande d\'invitation détectée');
+
+      try {
+        const invitationResult = await handleInvitationCommand(messageBody, senderPhone);
+
+        console.log(`[SMS Adapter] Résultat invitation: ${invitationResult.success ? 'Succès' : 'Échec'}`);
+
+        // Répondre à l'admin via TwiML
+        res.setHeader('Content-Type', 'text/xml');
+        return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>${escapeXml(invitationResult.response)}</Message>
+</Response>`);
+
+      } catch (inviteError) {
+        console.error('[SMS Adapter] Erreur commande invitation:', inviteError);
+        res.setHeader('Content-Type', 'text/xml');
+        return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>❌ Erreur lors de l'envoi de l'invitation. Vérifiez les logs.</Message>
+</Response>`);
+      }
+    }
+
+    // 4. VÉRIFICATION ANTI-SPAM (optionnel)
     // TODO: Implémenter rate limiting basé sur le numéro de téléphone
 
-    // 4. APPELER L'API CHAT CENTRALISÉE
+    // 5. APPELER L'API CHAT CENTRALISÉE
     let chatResponse;
     try {
       // Import dynamique pour éviter les circular dependencies
@@ -134,7 +162,7 @@ export default async function handler(req, res) {
       chatResponse = chatResponseData;
       console.log(`[SMS Adapter] Réponse reçue de /api/chat (${chatResponse.response.length} chars)`);
 
-      // 4.5. ENVOYER NOTIFICATION EMAIL
+      // 5.5. ENVOYER NOTIFICATION EMAIL
       try {
         console.log('[SMS Adapter] Envoi notification email...');
 
@@ -168,7 +196,7 @@ export default async function handler(req, res) {
       );
     }
 
-    // 5. ENVOYER LA RÉPONSE PAR SMS via TwiML
+    // 6. ENVOYER LA RÉPONSE PAR SMS via TwiML
     try {
       // Option A: Répondre directement via TwiML (recommandé pour Twilio)
       const response = chatResponse.response;
