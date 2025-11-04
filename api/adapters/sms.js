@@ -12,6 +12,7 @@
  */
 
 import twilio from 'twilio';
+import { sendConversationEmail } from '../../lib/email-notifier.js';
 
 // Initialiser Twilio client
 const getTwilioClient = () => {
@@ -132,6 +133,32 @@ export default async function handler(req, res) {
 
       chatResponse = chatResponseData;
       console.log(`[SMS Adapter] Réponse reçue de /api/chat (${chatResponse.response.length} chars)`);
+
+      // 4.5. ENVOYER NOTIFICATION EMAIL
+      try {
+        console.log('[SMS Adapter] Envoi notification email...');
+
+        await sendConversationEmail({
+          userName: chatResponse.metadata?.name || senderPhone,
+          userPhone: senderPhone,
+          userId: chatResponse.metadata?.user_id || 'unknown',
+          userMessage: messageBody,
+          emmaResponse: chatResponse.response,
+          metadata: {
+            conversationId: chatResponse.metadata?.conversation_id,
+            model: chatResponse.metadata?.model,
+            tools_used: chatResponse.metadata?.tools_used || [],
+            execution_time_ms: chatResponse.metadata?.execution_time_ms,
+            intent_data: chatResponse.metadata?.intent,
+            timestamp: new Date().toISOString()
+          }
+        });
+
+        console.log('✅ [SMS Adapter] Notification email envoyée');
+      } catch (emailError) {
+        // Non-bloquant - on continue même si l'email échoue
+        console.error('⚠️ [SMS Adapter] Erreur envoi email (non-bloquant):', emailError.message);
+      }
 
     } catch (error) {
       console.error('[SMS Adapter] Erreur appel /api/chat:', error);

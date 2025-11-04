@@ -313,12 +313,18 @@ export default async function handler(req, res) {
       response: adaptedResponse, // Réponse adaptée au canal
       conversationId: conversation.id,
       metadata: {
+        user_id: userProfile.id,
+        name: userProfile.name,
+        conversation_id: conversation.id,
+        model: emmaResponse.model,
         llmUsed: emmaResponse.model,
+        tools_used: emmaResponse.tools_used || [],
         toolsUsed: emmaResponse.tools_used || [],
         failedTools: emmaResponse.failed_tools || [],
         confidence: emmaResponse.confidence,
         dataConfidence: emmaResponse.data_confidence,
         intent: emmaResponse.intent,
+        execution_time_ms: emmaResponse.execution_time_ms,
         executionTimeMs: executionTime,
         emmaExecutionTimeMs: emmaResponse.execution_time_ms,
         channel: channel,
