@@ -133,8 +133,8 @@ export default async function handler(req, res) {
           });
           console.log(`[Chat API] Nom enregistré: ${userName}`);
 
-          // Réponse de confirmation + présentation d'Emma
-          const welcomeResponse = `Enchanté ${userName} ! 👋\n\nJe suis Emma, ton assistante IA financière propulsée par JSLAI 🚀\n\nJe peux t'aider avec :\n📊 Analyses de marchés et actions\n📈 Données financières en temps réel\n📰 Nouvelles économiques\n💡 Conseils et insights\n\nComment puis-je t'aider aujourd'hui ?`;
+          // Réponse de confirmation + bienvenue (sans branding, juste accueil)
+          const welcomeResponse = `Enchanté ${userName} ! 👋\n\nJe suis Emma, ton assistante IA financière 📊\n\nJe peux t'aider avec :\n📊 Analyses de marchés et actions\n📈 Données financières en temps réel\n📰 Nouvelles économiques\n💡 Conseils et insights\n\nComment puis-je t'aider aujourd'hui ?`;
 
           // Sauvegarder dans la conversation
           await saveConversationTurn(conversation.id, message, welcomeResponse, {
