@@ -123,11 +123,21 @@ export default async function handler(req, res) {
       // Non-bloquant, on continue sans historique
     }
 
-    // 5. PRÉPARER LE CONTEXTE POUR EMMA-AGENT
+    // 5. DÉTECTER SI EMMA DOIT SE PRÉSENTER
+    const isFirstMessage = conversationHistory.length === 0;
+    const isTestEmma = message.toLowerCase().includes('test emma');
+    const shouldIntroduce = isFirstMessage || isTestEmma;
+
+    if (shouldIntroduce) {
+      console.log(`[Chat API] Emma va se présenter (first=${isFirstMessage}, test=${isTestEmma})`);
+    }
+
+    // 6. PRÉPARER LE CONTEXTE POUR EMMA-AGENT
     const emmaContext = {
       output_mode: channel === 'email' ? 'ticker_note' : 'chat', // Email = format long, autres = chat
       user_name: userProfile.name || null, // Nom de l'utilisateur pour personnalisation
       user_channel: channel, // Canal de communication
+      should_introduce: shouldIntroduce, // Emma doit se présenter
       tickers: metadata?.tickers || [],
       stockData: metadata?.stockData || {},
       newsData: metadata?.newsData || [],
@@ -135,7 +145,7 @@ export default async function handler(req, res) {
       conversationHistory: formatHistoryForEmma(conversationHistory)
     };
 
-    // 6. APPELER EMMA-AGENT (Function Calling Router existant)
+    // 7. APPELER EMMA-AGENT (Function Calling Router existant)
     let emmaResponse;
     try {
       console.log('[Chat API] Appel emma-agent...');
@@ -183,7 +193,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 7. ADAPTER LA RÉPONSE POUR LE CANAL
+    // 8. ADAPTER LA RÉPONSE POUR LE CANAL
     let adaptedResponse;
     try {
       adaptedResponse = adaptForChannel(emmaResponse.response, channel);
@@ -193,7 +203,7 @@ export default async function handler(req, res) {
       adaptedResponse = emmaResponse.response; // Fallback: réponse brute
     }
 
-    // 8. SAUVEGARDER DANS LA CONVERSATION
+    // 9. SAUVEGARDER DANS LA CONVERSATION
     try {
       await saveConversationTurn(
         conversation.id,
@@ -213,7 +223,7 @@ export default async function handler(req, res) {
       // Non-bloquant, on continue
     }
 
-    // 9. RÉPONSE FINALE
+    // 10. RÉPONSE FINALE
     const executionTime = Date.now() - startTime;
 
     return res.status(200).json({

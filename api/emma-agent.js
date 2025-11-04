@@ -934,7 +934,11 @@ class SmartAgent {
         const userName = context.user_name || null;
         const userContext = userName ? `\n👤 UTILISATEUR: Tu parles avec ${userName}. Personnalise tes salutations et réponses en utilisant son nom quand approprié.\n` : '';
 
-        return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.${userContext}
+        // Si Emma doit se présenter (premier message ou "Test Emma")
+        const shouldIntroduce = context.should_introduce || false;
+        const introContext = shouldIntroduce ? `\n🎯 PRÉSENTATION REQUISE: C'est le premier contact avec cet utilisateur OU ils ont écrit "Test Emma". COMMENCE ta réponse par une brève présentation de qui tu es (Emma, assistante IA financière), ce que tu peux faire (analyses de marchés, nouvelles financières, données en temps réel), et invite-les à poser leurs questions. Garde la présentation concise (2-3 phrases max).\n` : '';
+
+        return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.${userContext}${introContext}
 📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
 ⚠️ CRITIQUE: Toutes les données doivent refléter les informations les plus récentes. Si une donnée est datée (ex: "au 8 août"), précise clairement que c'est une donnée ancienne et cherche des informations plus récentes si disponibles.
 
