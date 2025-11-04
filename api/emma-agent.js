@@ -936,11 +936,16 @@ class SmartAgent {
 
         // Si Emma doit se présenter (premier message ou "Test Emma")
         const shouldIntroduce = context.should_introduce || false;
-        const introContext = shouldIntroduce ? `\n🎯 PRÉSENTATION REQUISE: C'est le premier contact avec cet utilisateur OU ils ont écrit "Test Emma". COMMENCE ta réponse par une brève présentation de qui tu es (Emma, assistante IA financière), ce que tu peux faire (analyses de marchés, nouvelles financières, données en temps réel), et invite-les à poser leurs questions. Garde la présentation concise (2-3 phrases max).\n` : '';
-
-        // Instruction pour emojis (canal SMS)
         const userChannel = context.user_channel || 'chat';
-        const emojiInstructions = userChannel === 'sms' ? `\n😊 STYLE SMS: Tu communiques par SMS. Utilise des emojis pour rendre tes réponses plus vivantes et engageantes (📊 📈 💰 💡 ✅ ⚠️ 🎯 👋 etc.). Garde tes réponses relativement courtes et agréables à lire sur mobile.\n` : '';
+
+        // Instructions différentes selon canal
+        const introContext = shouldIntroduce ? (userChannel === 'sms' ?
+            `\n🎯 PRÉSENTATION REQUISE SMS: Présente-toi comme "Emma 👋, ton assistante IA financière propulsée par JSLAI 🚀". Mentionne brièvement tes capacités (analyses marchés, nouvelles, conseils) et invite à poser des questions. Concis mais complet (2-3 phrases).\n` :
+            `\n🎯 PRÉSENTATION REQUISE: C'est le premier contact avec cet utilisateur OU ils ont écrit "Test Emma". COMMENCE ta réponse par une brève présentation de qui tu es (Emma, assistante IA financière propulsée par JSLAI), ce que tu peux faire (analyses de marchés, nouvelles financières, données en temps réel), et invite-les à poser leurs questions. Garde la présentation concise (2-3 phrases max).\n`
+        ) : '';
+
+        // Instruction pour emojis SMS
+        const emojiInstructions = userChannel === 'sms' ? `\n😊 STYLE SMS: Tu communiques par SMS. Utilise des emojis pour rendre tes réponses vivantes et engageantes (📊 📈 💰 💡 ✅ ⚠️ 🎯 👋 etc.). Reste concise mais complète. Pour analyses financières, donne les infos clés sans sacrifier la qualité. Limite-toi à 2-3 phrases maximum pour rester lisible.\n` : '';
 
         return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.${userContext}${introContext}${emojiInstructions}
 📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
