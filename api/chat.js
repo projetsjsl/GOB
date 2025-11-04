@@ -154,7 +154,8 @@ export default async function handler(req, res) {
       await emmaAgentModule.default(emmaRequest, emmaRes);
 
       if (!emmaResponseData || !emmaResponseData.success) {
-        throw new Error('Emma agent returned unsuccessful response');
+        console.error('[Chat API] Emma agent unsuccessful response:', JSON.stringify(emmaResponseData, null, 2));
+        throw new Error(`Emma agent returned unsuccessful response: ${emmaResponseData?.error || emmaResponseData?.response || 'Unknown error'}`);
       }
 
       emmaResponse = emmaResponseData;
