@@ -9,7 +9,7 @@ Ces commandes sont détectées par **match exact** dans `api/chat.js` et retourn
 | **SKILLS** | `SKILLS` ou `SKILL` | Exact (case insensitive) | "skills" ou "SKILL" |
 | **AIDE** | `AIDE` ou `HELP` | Exact (case insensitive) | "aide" ou "HELP" |
 | **EXEMPLES** | `EXEMPLES` ou `EXAMPLES` | Exact (case insensitive) | "exemples" |
-| **CAPSULE** | `CAPSULE` OU (`ACTUALIT` + `AUJOURD`) | Contains | "capsule" ou "actualités aujourd'hui" |
+| **TOP 5 NEWS** | `TOP 5` ou `TOP5` OU (`ACTUALIT` + `AUJOURD`) | Contains | "Top 5 news" ou "actualités aujourd'hui" |
 
 **⚡ Performance**: < 100ms (pas d'appel IA)
 
@@ -385,7 +385,7 @@ const tools = this.selectTools(extracted, intentData, context);
 | **Commande bot** (SKILLS, AIDE) | < 50ms | < 100ms |
 | **Intention claire** (prix, news) | ~50ms (local) | ~10-13s (avec outils) |
 | **Intention ambiguë** | ~800ms (Gemini) | ~11-14s (avec outils) |
-| **CAPSULE** (news directe) | < 50ms | ~1-2s |
+| **Top 5 news** (news directe) | < 50ms | ~1-2s |
 
 ---
 
@@ -426,7 +426,7 @@ Référence ce fichier pour voir tous les mots-clés détectés par intention
 ## 💡 Tips d'Utilisation
 
 ### **Pour une réponse rapide (<2s):**
-Utilise les commandes bot: `SKILLS`, `AIDE`, `EXEMPLES`, `CAPSULE`
+Utilise les commandes bot: `SKILLS`, `AIDE`, `EXEMPLES`, `Top 5 news`
 
 ### **Pour une analyse complète (~10-13s):**
 - "Analyse AAPL"

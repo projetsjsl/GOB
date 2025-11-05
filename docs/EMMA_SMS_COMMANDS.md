@@ -56,6 +56,44 @@ Essaie "Analyse AAPL" ou "Quoi de neuf en bourse ?"
 
 ## 🎯 Commandes SMS Disponibles
 
+### **📋 Commande: TOP 5 NEWS**
+Affiche les 5 actualités financières les plus récentes du jour
+
+**Mots-clés**:
+- "Top 5 news"
+- "Top 5"
+- "Actualités aujourd'hui"
+
+**Réponse**:
+```
+📰 TOP 5 NEWS FINANCIÈRES
+mercredi 5 novembre 2025
+
+1. Apple dépasse attentes Q4 grâce aux ventes iPhone
+   Apple Inc. a publié des résultats trimestriels au-dessus des attentes des analystes, portés par de fortes ventes d'iPhone...
+   🔗 https://finance.example.com/apple-q4-earnings
+
+2. Fed maintient taux directeur à 5.25%-5.50%
+   La Réserve fédérale américaine a maintenu ses taux d'intérêt inchangés lors de sa réunion de novembre...
+   🔗 https://reuters.com/fed-rates-nov
+
+3. Tesla annonce nouveau Gigafactory au Mexique
+   Le constructeur de véhicules électriques Tesla a confirmé la construction d'une nouvelle usine...
+   🔗 https://bloomberg.com/tesla-mexico
+
+4. Microsoft dépasse 3T$ de capitalisation boursière
+   Microsoft devient la deuxième entreprise à franchir le seuil des 3 trillions...
+   🔗 https://cnbc.com/msft-3trillion
+
+5. Bitcoin franchit 45,000$ pour la première fois depuis 2021
+   La cryptomonnaie phare a dépassé le niveau psychologique de 45,000 dollars...
+   🔗 https://coindesk.com/bitcoin-45k
+
+💼 Tape SKILLS pour toutes mes capacités
+```
+
+---
+
 ### **📋 Commande: SKILLS**
 Affiche la liste complète des commandes et capacités Emma
 

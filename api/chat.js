@@ -314,7 +314,7 @@ export default async function handler(req, res) {
 • "Moyennes mobiles TSLA" → Tendances
 
 📰 ACTUALITÉS:
-• "CAPSULE" → Top 5 news financières
+• "Top 5 news" → Top 5 news financières
 • "Nouvelles AAPL" → News du ticker
 • "Quoi de neuf ?" → Actualités marché
 
@@ -444,7 +444,7 @@ Comment puis-je t'aider ? 🚀`;
 • "TSLA est suracheté ?"
 
 📰 ACTUALITÉS:
-• "CAPSULE" → Top 5 news du jour
+• "Top 5 news" → Top 5 news du jour
 • "Actualités Apple"
 • "Pourquoi TSLA monte ?"
 • "Quoi de neuf en bourse ?"
@@ -488,9 +488,9 @@ Comment puis-je t'aider ? 🚀`;
       });
     }
 
-    // Commande CAPSULE / NEWS du jour (rapide, pas d'appel Emma complet)
-    if (messageUpper.includes('CAPSULE') || (messageUpper.includes('ACTUALIT') && messageUpper.includes('AUJOURD'))) {
-      console.log('[Chat API] Commande CAPSULE actualités détectée');
+    // Commande TOP 5 NEWS / NEWS du jour (rapide, pas d'appel Emma complet)
+    if (messageUpper.includes('TOP 5') || messageUpper.includes('TOP5') || (messageUpper.includes('ACTUALIT') && messageUpper.includes('AUJOURD'))) {
+      console.log('[Chat API] Commande TOP 5 NEWS détectée');
 
       // Appeler endpoint news directement (plus rapide que Emma complète)
       try {
@@ -510,7 +510,7 @@ Comment puis-je t'aider ? 🚀`;
           const news = Array.isArray(newsData) ? newsData.slice(0, 5) : (newsData.data || []).slice(0, 5);
 
           if (news.length > 0) {
-            let capsuleText = `📰 CAPSULE ACTU FINANCIÈRE\n${new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n\n`;
+            let capsuleText = `📰 TOP 5 NEWS FINANCIÈRES\n${new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n\n`;
 
             news.forEach((item, idx) => {
               capsuleText += `${idx + 1}. ${item.title || item.headline || 'Sans titre'}\n`;
@@ -532,7 +532,7 @@ Comment puis-je t'aider ? 🚀`;
             capsuleText += '💼 Tape SKILLS pour toutes mes capacités';
 
             await saveConversationTurn(conversation.id, message, capsuleText, {
-              type: 'command_capsule',
+              type: 'command_top5news',
               channel: channel,
               news_count: news.length
             });
@@ -540,7 +540,7 @@ Comment puis-je t'aider ? 🚀`;
             return res.status(200).json({
               success: true,
               response: capsuleText,
-              metadata: { command: 'CAPSULE', news_count: news.length }
+              metadata: { command: 'TOP5NEWS', news_count: news.length }
             });
           } else {
             console.log('[Chat API] Aucune actualité trouvée');
