@@ -877,15 +877,15 @@ class SmartAgent {
             }
 
             // 📱 TRONCATURE DE SÉCURITÉ FINALE POUR SMS
-            // Limite absolue: 4500 caractères (2-3 SMS longs)
-            if (context.user_channel === 'sms' && response.length > 4500) {
-                console.warn(`⚠️ SMS response too long (${response.length} chars), truncating to 4500...`);
+            // Limite absolue: 7500 caractères (4-5 SMS longs)
+            if (context.user_channel === 'sms' && response.length > 7500) {
+                console.warn(`⚠️ SMS response too long (${response.length} chars), truncating to 7500...`);
 
-                // Tronquer intelligemment au dernier point ou saut de ligne avant 4200 chars
-                const truncated = response.substring(0, 4200);
+                // Tronquer intelligemment au dernier point ou saut de ligne avant 7000 chars
+                const truncated = response.substring(0, 7000);
                 const lastPeriod = Math.max(truncated.lastIndexOf('.'), truncated.lastIndexOf('\n'));
 
-                if (lastPeriod > 3500) {
+                if (lastPeriod > 6000) {
                     // Tronquer au dernier point/saut de ligne
                     response = truncated.substring(0, lastPeriod + 1) + '\n\n💬 Réponse tronquée. Pour + de détails, visite gobapps.com';
                 } else {
@@ -1764,10 +1764,10 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             let maxTokens = 1000;  // Default pour chat
             let complexityInfo = null;
 
-            // 📱 SMS: Limiter à 2-3 messages (utilisateur a confirmé que c'est acceptable)
+            // 📱 SMS: 4-5 messages pour réponses détaillées comme Perplexity web
             if (context.user_channel === 'sms') {
-                maxTokens = 1200;  // 📱 SMS: MAX 1200 tokens (~900 mots = ~3600 chars = 2-3 SMS)
-                console.log('📱 SMS mode: FORCED 1200 tokens max (2-3 SMS acceptables)');
+                maxTokens = 2000;  // 📱 SMS: MAX 2000 tokens (~1500 mots = ~6000 chars = 4-5 SMS)
+                console.log('📱 SMS mode: FORCED 2000 tokens max (4-5 SMS - réponses détaillées)');
             } else if (outputMode === 'briefing') {
                 maxTokens = 8000;  // 🚀 Briefing TRÈS détaillé (maximum exhaustif)
                 console.log('📊 Briefing mode: 8000 tokens (maximum exhaustif)');
@@ -1879,11 +1879,11 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 throw new Error('GEMINI_API_KEY not configured');
             }
 
-            // 📱 SMS: 2-3 messages acceptables
+            // 📱 SMS: 4-5 messages pour réponses détaillées
             let maxTokens = 1000;
             if (context.user_channel === 'sms') {
-                maxTokens = 1200;  // 📱 SMS: MAX 1200 tokens (2-3 SMS)
-                console.log('📱 Gemini SMS mode: FORCED 1200 tokens max (2-3 SMS)');
+                maxTokens = 2000;  // 📱 SMS: MAX 2000 tokens (4-5 SMS)
+                console.log('📱 Gemini SMS mode: FORCED 2000 tokens max (4-5 SMS détaillés)');
             } else if (outputMode === 'data') {
                 maxTokens = 500;
             }
@@ -1968,10 +1968,10 @@ RÈGLES CRITIQUES:
             // Ajuster max_tokens selon le mode ET la complexité
             let maxTokens = 1000;  // Default
 
-            // 📱 SMS: 2-3 messages acceptables
+            // 📱 SMS: 4-5 messages pour réponses détaillées
             if (context.user_channel === 'sms') {
-                maxTokens = 1200;  // 📱 SMS: MAX 1200 tokens (2-3 SMS)
-                console.log('📱 Claude SMS mode: FORCED 1200 tokens max (2-3 SMS)');
+                maxTokens = 2000;  // 📱 SMS: MAX 2000 tokens (4-5 SMS)
+                console.log('📱 Claude SMS mode: FORCED 2000 tokens max (4-5 SMS détaillés)');
             } else if (outputMode === 'briefing') {
                 maxTokens = 8000;  // 🚀 Briefing TRÈS détaillé (maximum exhaustif)
                 console.log('📊 Claude Briefing mode: 8000 tokens (maximum exhaustif)');
