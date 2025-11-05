@@ -293,6 +293,173 @@ export default async function handler(req, res) {
       }
     }
 
+    // 5.5. DÉTECTER COMMANDES SPÉCIALES (SKILLS, AIDE, EXEMPLES)
+    const messageUpper = message.trim().toUpperCase();
+
+    if (messageUpper === 'SKILLS' || messageUpper === 'SKILL') {
+      console.log('[Chat API] Commande SKILLS détectée');
+
+      const skillsResponse = `🤖 EMMA IA - COMPÉTENCES & COMMANDES
+
+📊 ANALYSES ACTIONS:
+• "Analyse [TICKER]" → Analyse complète
+• "Prix [TICKER]" → Cours temps réel
+• "[TICKER] actualités" → News récentes
+
+📈 MARCHÉS:
+• "Indices" → Dow, S&P, Nasdaq
+• "Secteurs" → Performance secteurs
+• "Gagnants/Perdants" → Top/Worst
+
+📰 ACTUALITÉS:
+• "Nouvelles" → News du jour
+• "Nouvelles [TICKER]" → News ticker
+• "Économie" → Actu économiques
+
+📅 CALENDRIERS:
+• "Résultats" → Earnings calendar
+• "Dividendes" → Prochains dividendes
+• "Économique" → Événements éco
+
+📊 WATCHLIST:
+• "Ma liste" → Voir watchlist
+• "Ajouter [TICKER]" → Ajouter
+• "Supprimer [TICKER]" → Retirer
+
+🎯 ANALYSES AVANCÉES:
+• "Comparer [T1] [T2]" → Comparaison
+• "Secteur tech" → Analyse secteur
+• "Tendances" → Tendances marché
+
+📚 AIDE:
+• "AIDE" → Guide complet
+• "EXEMPLES" → Exemples questions
+
+💡 TU PEUX AUSSI POSER DES QUESTIONS NATURELLES:
+"Pourquoi Apple monte aujourd'hui ?"
+"Quelles actions tech acheter ?"
+"C'est quoi le P/E de Tesla ?"
+
+Écris-moi n'importe quelle question financière ! 🚀`;
+
+      // Sauvegarder dans la conversation
+      try {
+        await saveConversationTurn(conversation.id, message, skillsResponse, {
+          type: 'command_skills',
+          channel: channel
+        });
+      } catch (error) {
+        console.error('[Chat API] Erreur sauvegarde SKILLS:', error);
+      }
+
+      return res.status(200).json({
+        success: true,
+        response: skillsResponse,
+        metadata: { command: 'SKILLS' }
+      });
+    }
+
+    if (messageUpper === 'AIDE' || messageUpper === 'HELP') {
+      console.log('[Chat API] Commande AIDE détectée');
+
+      const helpResponse = `📖 GUIDE EMMA IA
+
+🗣️ PARLE-MOI NATURELLEMENT:
+Emma comprend le langage naturel.
+Pas besoin de commandes strictes !
+
+✅ EXEMPLES:
+• "Analyse Microsoft"
+• "Pourquoi Tesla chute ?"
+• "Meilleures actions tech ?"
+• "Résultats Apple quand ?"
+
+📊 DONNÉES TEMPS RÉEL:
+Toutes mes analyses utilisent données
+actualisées de Bloomberg, Reuters, FMP
+
+🎯 POUR CHAQUE ACTION:
+• Prix & variation
+• P/E ratio vs secteur
+• Performance YTD
+• Actualités récentes
+• Consensus analystes
+
+💼 SKILLS: Liste toutes commandes
+📱 Contact: 1-438-544-EMMA
+
+Comment puis-je t'aider ? 🚀`;
+
+      try {
+        await saveConversationTurn(conversation.id, message, helpResponse, {
+          type: 'command_help',
+          channel: channel
+        });
+      } catch (error) {
+        console.error('[Chat API] Erreur sauvegarde AIDE:', error);
+      }
+
+      return res.status(200).json({
+        success: true,
+        response: helpResponse,
+        metadata: { command: 'AIDE' }
+      });
+    }
+
+    if (messageUpper === 'EXEMPLES' || messageUpper === 'EXAMPLES') {
+      console.log('[Chat API] Commande EXEMPLES détectée');
+
+      const examplesResponse = `💡 EXEMPLES DE QUESTIONS
+
+📊 ANALYSES:
+• "Analyse complète AAPL"
+• "Fondamentaux Microsoft"
+• "C'est quoi le P/E de Tesla ?"
+
+📈 MARCHÉS:
+• "Comment vont les marchés ?"
+• "Indices aujourd'hui"
+• "Secteur tech performe ?"
+
+📰 ACTUALITÉS:
+• "Quoi de neuf en bourse ?"
+• "Pourquoi Apple monte ?"
+• "News tech cette semaine"
+
+🎯 COMPARAISONS:
+• "Comparer GOOGL vs MSFT"
+• "Meilleures actions IA"
+• "Top 5 dividendes tech"
+
+💰 INVESTISSEMENT:
+• "Acheter Tesla maintenant ?"
+• "Actions sous-évaluées tech"
+• "Risques Amazon ?"
+
+📅 CALENDRIER:
+• "Prochains résultats AAPL"
+• "Dividende Microsoft quand ?"
+• "Événements éco semaine"
+
+👉 Pose n'importe quelle question !
+Je comprends le langage naturel 🤖`;
+
+      try {
+        await saveConversationTurn(conversation.id, message, examplesResponse, {
+          type: 'command_examples',
+          channel: channel
+        });
+      } catch (error) {
+        console.error('[Chat API] Erreur sauvegarde EXEMPLES:', error);
+      }
+
+      return res.status(200).json({
+        success: true,
+        response: examplesResponse,
+        metadata: { command: 'EXEMPLES' }
+      });
+    }
+
     // 6. PRÉPARER LE CONTEXTE POUR EMMA-AGENT
     // Combiner watchlist + team tickers (union sans doublons)
     const allTickers = [...new Set([...userWatchlist, ...teamTickers])];
