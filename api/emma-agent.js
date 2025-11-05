@@ -1631,14 +1631,32 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 console.log(`🕐 Using recency filter: ${recency}`);
             }
 
+            // Vérifier que la clé API est définie
+            if (!process.env.PERPLEXITY_API_KEY) {
+                console.error('❌ PERPLEXITY_API_KEY not configured - falling back to Gemini');
+                throw new Error('PERPLEXITY_API_KEY not configured');
+            }
+
+            console.log('🚀 Calling Perplexity API...');
+
+            // Ajouter timeout de 25 secondes
+            const controller = new AbortController();
+            const timeout = setTimeout(() => {
+                console.error('⏱️ Perplexity API timeout after 25s');
+                controller.abort();
+            }, 25000);
+
             const response = await fetch('https://api.perplexity.ai/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify(requestBody),
+                signal: controller.signal
             });
+
+            clearTimeout(timeout);
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
@@ -1646,6 +1664,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 throw new Error(`Perplexity API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
             }
 
+            console.log('✅ Perplexity API responded');
             const data = await response.json();
             const content = data.choices[0].message.content;
 
@@ -1661,6 +1680,14 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
 
         } catch (error) {
             console.error('❌ Perplexity API error:', error);
+
+            // Si Perplexity échoue, fallback sur Gemini
+            if (error.name === 'AbortError') {
+                console.log('⏱️ Perplexity timeout - falling back to Gemini');
+            } else {
+                console.log('🔄 Falling back to Gemini due to Perplexity error');
+            }
+
             throw new Error(`Erreur de communication avec Perplexity: ${error.message}`);
         }
     }
