@@ -236,46 +236,36 @@ class SmartAgent {
         const teamTickers = context.team_tickers || [];
         const userName = context.user_name || 'Utilisateur';
 
-        let response = `📊 **Système à 2 Listes de Tickers**\n\n`;
+        let response = `🌍 **Emma a accès à MILLIERS de tickers mondiaux !**\n`;
+        response += `NYSE • NASDAQ • TSX • LSE • Euronext • etc.\n\n`;
+
+        response += `📊 **VOS LISTES FAVORITES (raccourcis)**\n\n`;
 
         // LISTE 1: Watchlist personnelle
-        response += `**LISTE 1️⃣ - Watchlist Personnelle**\n`;
+        response += `**1️⃣ Votre Watchlist**\n`;
         if (userWatchlist.length > 0) {
-            response += `🎯 ${userWatchlist.length} titres que VOUS suivez:\n`;
-            response += userWatchlist.map(ticker => `• ${ticker}`).join('\n');
-            response += '\n\n';
+            response += `${userWatchlist.join(', ')}\n\n`;
         } else {
-            response += `🎯 Vide (ajoutez vos tickers personnels)\n\n`;
+            response += `Vide - Ajoutez vos favoris\n\n`;
         }
 
         // LISTE 2: Team tickers
-        response += `**LISTE 2️⃣ - Tickers d'Équipe**\n`;
+        response += `**2️⃣ Tickers Équipe**\n`;
         if (teamTickers.length > 0) {
-            response += `👥 ${teamTickers.length} titres suivis par l'ÉQUIPE:\n`;
-            response += teamTickers.map(ticker => `• ${ticker}`).join('\n');
-            response += '\n\n';
+            response += `${teamTickers.join(', ')}\n\n`;
         } else {
-            response += `👥 Aucun ticker d'équipe configuré\n\n`;
+            response += `Aucun ticker d'équipe\n\n`;
         }
-
-        // Intersection (tickers communs)
-        const common = userWatchlist.filter(t => teamTickers.includes(t));
-        if (common.length > 0) {
-            response += `🔗 **Communs aux 2 listes**: ${common.join(', ')}\n\n`;
-        }
-
-        // Total unique
-        const allUnique = [...new Set([...userWatchlist, ...teamTickers])];
-        response += `📈 **Total Unique**: ${allUnique.length} tickers\n\n`;
 
         response += `---\n\n`;
-        response += `💡 **Vous pouvez aussi demander N'IMPORTE QUEL autre ticker !**\n\n`;
+        response += `✨ **Demandez N'IMPORTE QUEL ticker !**\n\n`;
         response += `Exemples:\n`;
-        response += `• "Analyse TSLA" - Ticker hors listes\n`;
-        response += `• "Comparer AAPL vs MSFT"\n`;
-        response += `• "Actualités Accenture" (ACN)\n`;
-        response += `• "Performance de ma watchlist"\n`;
-        response += `• "Vue d'ensemble team tickers"\n`;
+        response += `• "Tesla analyse" (TSLA)\n`;
+        response += `• "Accenture actualités" (ACN)\n`;
+        response += `• "Nestlé Europe" (NSRGY)\n`;
+        response += `• "Air Canada" (AC.TO)\n`;
+        response += `• "Performance watchlist"\n`;
+        response += `• "Secteur bancaire canadien"\n`;
 
         return {
             success: true,
