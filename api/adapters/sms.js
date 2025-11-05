@@ -281,7 +281,7 @@ async function sendSMS(to, message) {
 
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        const prefix = chunks.length > 1 ? `(${i + 1}/${chunks.length}) ` : '';
+        const prefix = chunks.length > 1 ? `📱 Partie ${i + 1}/${chunks.length}\n\n` : '';
 
         await client.messages.create({
           from: twilioPhoneNumber,
@@ -289,9 +289,10 @@ async function sendSMS(to, message) {
           body: prefix + chunk
         });
 
-        // Délai entre les SMS pour éviter rate limiting
+        // Délai entre les SMS pour garantir l'ordre (Twilio peut livrer hors séquence)
+        // 2 secondes garantit que le message est traité avant d'envoyer le suivant
         if (i < chunks.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
 
