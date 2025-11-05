@@ -846,10 +846,10 @@ class SmartAgent {
             // Router vers le bon modèle
             if (modelSelection.model === 'claude') {
                 // CLAUDE: Briefings premium
-                response = await this._call_claude(prompt, outputMode, userMessage, intentData, toolResults);
+                response = await this._call_claude(prompt, outputMode, userMessage, intentData, toolResults, context);
             } else if (modelSelection.model === 'gemini') {
                 // GEMINI: Questions conceptuelles (gratuit)
-                response = await this._call_gemini(prompt, outputMode);
+                response = await this._call_gemini(prompt, outputMode, context);
             } else {
                 // PERPLEXITY: Données factuelles avec sources (default)
                 const perplexityResult = await this._call_perplexity(prompt, outputMode, modelSelection.recency, userMessage, intentData, toolResults, context);
@@ -874,6 +874,26 @@ class SmartAgent {
             } else if (outputMode === 'chat') {
                 // 🛡️ Nettoyer tout JSON brut qui pourrait avoir été inclus dans la réponse conversationnelle
                 response = this._sanitizeJsonInResponse(response);
+            }
+
+            // 📱 TRONCATURE DE SÉCURITÉ FINALE POUR SMS
+            // Limite absolue: 1500 caractères (1 SMS long)
+            if (context.user_channel === 'sms' && response.length > 1500) {
+                console.warn(`⚠️ SMS response too long (${response.length} chars), truncating to 1500...`);
+
+                // Tronquer intelligemment au dernier point ou saut de ligne avant 1400 chars
+                const truncated = response.substring(0, 1400);
+                const lastPeriod = Math.max(truncated.lastIndexOf('.'), truncated.lastIndexOf('\n'));
+
+                if (lastPeriod > 1000) {
+                    // Tronquer au dernier point/saut de ligne
+                    response = truncated.substring(0, lastPeriod + 1) + '\n\n💬 Réponse tronquée. Pour + de détails, visite gobapps.com';
+                } else {
+                    // Tronquer brutalement si pas de point trouvé
+                    response = truncated + '...\n\n💬 Réponse tronquée. Pour + de détails, visite gobapps.com';
+                }
+
+                console.log(`✅ SMS truncated to ${response.length} chars`);
             }
 
             // 🛡️ FRESH DATA GUARD: Valider que les données factuelles ont des sources
@@ -1744,7 +1764,11 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             let maxTokens = 1000;  // Default pour chat
             let complexityInfo = null;
 
-            if (outputMode === 'briefing') {
+            // 📱 PRIORITÉ SMS: Limiter drastiquement pour éviter 76 pages de réponse!
+            if (context.user_channel === 'sms') {
+                maxTokens = 400;  // 📱 SMS: MAX 400 tokens (~300 mots = ~1200 chars)
+                console.log('📱 SMS mode: FORCED 400 tokens max (limite stricte anti-spam)');
+            } else if (outputMode === 'briefing') {
                 maxTokens = 8000;  // 🚀 Briefing TRÈS détaillé (maximum exhaustif)
                 console.log('📊 Briefing mode: 8000 tokens (maximum exhaustif)');
             } else if (outputMode === 'ticker_note') {
@@ -1849,13 +1873,20 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
     /**
      * Appel à Gemini (gratuit) pour questions conceptuelles
      */
-    async _call_gemini(prompt, outputMode = 'chat') {
+    async _call_gemini(prompt, outputMode = 'chat', context = {}) {
         try {
             if (!process.env.GEMINI_API_KEY) {
                 throw new Error('GEMINI_API_KEY not configured');
             }
 
-            const maxTokens = outputMode === 'data' ? 500 : 1000;
+            // 📱 Limite stricte pour SMS
+            let maxTokens = 1000;
+            if (context.user_channel === 'sms') {
+                maxTokens = 400;  // 📱 SMS: MAX 400 tokens
+                console.log('📱 Gemini SMS mode: FORCED 400 tokens max');
+            } else if (outputMode === 'data') {
+                maxTokens = 500;
+            }
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
             // Ajouter instructions système pour mode conversationnel
@@ -1928,7 +1959,7 @@ RÈGLES CRITIQUES:
     /**
      * Appel à Claude (premium) pour briefings et rédaction
      */
-    async _call_claude(prompt, outputMode = 'briefing', userMessage = '', intentData = null, toolResults = []) {
+    async _call_claude(prompt, outputMode = 'briefing', userMessage = '', intentData = null, toolResults = [], context = {}) {
         try {
             if (!process.env.ANTHROPIC_API_KEY) {
                 throw new Error('ANTHROPIC_API_KEY not configured');
@@ -1937,7 +1968,11 @@ RÈGLES CRITIQUES:
             // Ajuster max_tokens selon le mode ET la complexité
             let maxTokens = 1000;  // Default
 
-            if (outputMode === 'briefing') {
+            // 📱 PRIORITÉ SMS: Limiter drastiquement
+            if (context.user_channel === 'sms') {
+                maxTokens = 400;  // 📱 SMS: MAX 400 tokens
+                console.log('📱 Claude SMS mode: FORCED 400 tokens max');
+            } else if (outputMode === 'briefing') {
                 maxTokens = 8000;  // 🚀 Briefing TRÈS détaillé (maximum exhaustif)
                 console.log('📊 Claude Briefing mode: 8000 tokens (maximum exhaustif)');
             } else if (outputMode === 'data') {

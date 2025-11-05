@@ -174,6 +174,21 @@ export default async function handler(req, res) {
     try {
       const response = chatResponse.response;
 
+      // 🛡️ PROTECTION ANTI-SPAM: Refuser les réponses > 3000 chars (2 SMS max)
+      if (response.length > 3000) {
+        console.error(`❌ [SMS Adapter] RÉPONSE TROP LONGUE (${response.length} chars) - REFUSÉE!`);
+
+        // Envoyer un message d'erreur court
+        await sendSMS(
+          senderPhone,
+          "❌ Désolé, la réponse est trop longue pour SMS. Essayez une question plus spécifique ou consultez gobapps.com pour l'analyse complète."
+        );
+
+        res.setHeader('Content-Type', 'text/xml');
+        return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response></Response>`);
+      }
+
       // Pour messages > 1600 chars, TwiML échoue silencieusement
       // On utilise sendSMS() qui découpe automatiquement en plusieurs SMS
       if (response.length > 1600) {
