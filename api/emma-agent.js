@@ -8,16 +8,17 @@
  * - SYNTHESIS LAYER: Génération de réponse finale
  */
 
-import fs from 'fs';
-import path from 'path';
 import { HybridIntentAnalyzer } from '../lib/intent-analyzer.js';
+import { createSupabaseClient } from '../lib/supabase-config.js';
 
 class SmartAgent {
     constructor() {
         this.toolsConfig = this._loadToolsConfig();
-        this.usageStats = this._loadUsageStats();
+        this.usageStats = {}; // Will be loaded from Supabase on first use
         this.conversationHistory = [];
         this.intentAnalyzer = new HybridIntentAnalyzer();
+        this.supabase = null; // Lazy initialization
+        this.usageStatsLoaded = false;
     }
 
     /**
@@ -26,6 +27,13 @@ class SmartAgent {
     async processRequest(userMessage, context = {}) {
         try {
             console.log('🤖 Emma Agent: Processing request:', userMessage.substring(0, 100) + '...');
+
+            // Load usage stats from Supabase if not already loaded (non-blocking)
+            if (!this.usageStatsLoaded) {
+                await this._loadUsageStats().catch(err => {
+                    console.warn('⚠️ Could not load usage stats, continuing with empty stats:', err.message);
+                });
+            }
 
             // 0. COGNITIVE SCAFFOLDING: Analyse d'intention avec Perplexity
             const intentData = await this._analyzeIntent(userMessage, context);
@@ -71,8 +79,7 @@ class SmartAgent {
             // 4. Mise à jour de l'historique
             this._updateConversationHistory(userMessage, finalResponse, toolResults);
 
-            // 5. Sauvegarde des statistiques
-            this._saveUsageStats();
+            // Note: Statistiques sauvegardées automatiquement en temps réel dans Supabase via _updateToolStats
 
             // Identifier les outils qui ont échoué ou retourné des données non fiables
             const failedToolsData = toolResults
@@ -1742,9 +1749,10 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
     }
 
     /**
-     * Mise à jour des statistiques d'outil
+     * Mise à jour des statistiques d'outil (sauvegarde dans Supabase)
      */
-    _updateToolStats(toolId, success, executionTime, errorMessage = null) {
+    async _updateToolStats(toolId, success, executionTime, errorMessage = null) {
+        // Mise à jour en mémoire pour utilisation immédiate
         if (!this.usageStats[toolId]) {
             this.usageStats[toolId] = {
                 total_calls: 0,
@@ -1756,11 +1764,11 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
                 error_history: []
             };
         }
-        
+
         const stats = this.usageStats[toolId];
         stats.total_calls++;
         stats.last_used = new Date().toISOString();
-        
+
         if (success) {
             stats.successful_calls++;
         } else {
@@ -1776,15 +1784,54 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
                 }
             }
         }
-        
+
         // Calcul du taux de succès
         stats.success_rate = stats.total_calls > 0 ? (stats.successful_calls / stats.total_calls) * 100 : 0;
-        
+
         // Mise à jour du temps de réponse moyen
         if (executionTime > 0) {
             const totalTime = stats.average_response_time_ms * (stats.total_calls - 1) + executionTime;
             stats.average_response_time_ms = Math.round(totalTime / stats.total_calls);
         }
+
+        // Sauvegarde asynchrone dans Supabase (non-bloquante)
+        // Si ça échoue, ce n'est pas grave - on a déjà les stats en mémoire
+        try {
+            const supabase = this._initSupabase();
+            if (supabase) {
+                // Appel non-bloquant à la fonction Supabase
+                supabase.rpc('update_tool_stats', {
+                    p_tool_id: toolId,
+                    p_success: success,
+                    p_execution_time: executionTime,
+                    p_error_message: errorMessage
+                }).then(({ error }) => {
+                    if (error) {
+                        console.warn(`⚠️ Failed to save stats for ${toolId} to Supabase:`, error.message);
+                    }
+                }).catch(err => {
+                    console.warn(`⚠️ Error saving stats for ${toolId}:`, err.message);
+                });
+            }
+        } catch (error) {
+            // Silently fail - stats en mémoire sont suffisantes pour cette exécution
+            console.warn(`⚠️ Could not save stats for ${toolId}:`, error.message);
+        }
+    }
+
+    /**
+     * Initialise le client Supabase (lazy loading)
+     */
+    _initSupabase() {
+        if (!this.supabase) {
+            try {
+                this.supabase = createSupabaseClient(true); // Use service role for write access
+            } catch (error) {
+                console.error('❌ Failed to initialize Supabase client:', error);
+                this.supabase = null;
+            }
+        }
+        return this.supabase;
     }
 
     /**
@@ -1792,6 +1839,9 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
      */
     _loadToolsConfig() {
         try {
+            // Read tools config from file (read-only, safe on Vercel)
+            const fs = require('fs');
+            const path = require('path');
             const configPath = path.join(process.cwd(), 'config', 'tools_config.json');
             return JSON.parse(fs.readFileSync(configPath, 'utf8'));
         } catch (error) {
@@ -1801,28 +1851,67 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
     }
 
     /**
-     * Chargement des statistiques d'utilisation
+     * Chargement des statistiques d'utilisation depuis Supabase
      */
-    _loadUsageStats() {
+    async _loadUsageStats() {
+        if (this.usageStatsLoaded) {
+            return this.usageStats;
+        }
+
         try {
-            const statsPath = path.join(process.cwd(), 'config', 'usage_stats.json');
-            return JSON.parse(fs.readFileSync(statsPath, 'utf8'));
+            const supabase = this._initSupabase();
+            if (!supabase) {
+                console.warn('⚠️ Supabase not available, using empty stats');
+                this.usageStatsLoaded = true;
+                return {};
+            }
+
+            const { data, error } = await supabase.rpc('get_all_tool_stats');
+
+            if (error) {
+                console.error('❌ Failed to load usage stats from Supabase:', error);
+                this.usageStatsLoaded = true;
+                return {};
+            }
+
+            // Convert array to object indexed by tool_id
+            const stats = {};
+            if (data && Array.isArray(data)) {
+                data.forEach(stat => {
+                    stats[stat.tool_id] = {
+                        total_calls: stat.total_calls,
+                        successful_calls: stat.successful_calls,
+                        failed_calls: stat.failed_calls,
+                        average_response_time_ms: stat.average_response_time_ms,
+                        last_used: stat.last_used,
+                        success_rate: parseFloat(stat.success_rate) || 0,
+                        error_history: stat.error_history || []
+                    };
+                });
+            }
+
+            this.usageStats = stats;
+            this.usageStatsLoaded = true;
+            console.log(`✅ Loaded usage stats for ${Object.keys(stats).length} tools from Supabase`);
+            return stats;
+
         } catch (error) {
             console.error('❌ Failed to load usage stats:', error);
+            this.usageStatsLoaded = true;
             return {};
         }
     }
 
     /**
-     * Sauvegarde des statistiques d'utilisation
+     * Sauvegarde des statistiques d'utilisation dans Supabase (non-bloquante)
+     * Note: Cette méthode n'est plus nécessaire car les stats sont maintenant
+     * sauvegardées directement dans _updateToolStats via Supabase RPC
      */
-    _saveUsageStats() {
-        try {
-            const statsPath = path.join(process.cwd(), 'config', 'usage_stats.json');
-            fs.writeFileSync(statsPath, JSON.stringify(this.usageStats, null, 2));
-        } catch (error) {
-            console.error('❌ Failed to save usage stats:', error);
-        }
+    async _saveUsageStats() {
+        // Cette méthode est maintenant un no-op
+        // Les statistiques sont sauvegardées en temps réel via _updateToolStats
+        // qui appelle la fonction Supabase update_tool_stats
+        return;
     }
 }
 
