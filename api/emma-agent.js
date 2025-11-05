@@ -10,6 +10,13 @@
 
 import { HybridIntentAnalyzer } from '../lib/intent-analyzer.js';
 import { createSupabaseClient } from '../lib/supabase-config.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class SmartAgent {
     constructor() {
@@ -1984,8 +1991,7 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
     _loadToolsConfig() {
         try {
             // Read tools config from file (read-only, safe on Vercel)
-            const fs = require('fs');
-            const path = require('path');
+            // fs and path are now imported at top of file
             const configPath = path.join(process.cwd(), 'config', 'tools_config.json');
             return JSON.parse(fs.readFileSync(configPath, 'utf8'));
         } catch (error) {
