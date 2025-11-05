@@ -134,7 +134,7 @@ export default async function handler(req, res) {
           console.log(`[Chat API] Nom enregistré: ${userName}`);
 
           // Réponse de confirmation + bienvenue (sans branding, juste accueil)
-          const welcomeResponse = `Enchanté ${userName} ! 👋\n\nJe suis Emma, ton assistante IA financière 📊\n\nJe peux t'aider avec :\n📊 Analyses de marchés et actions\n📈 Données financières en temps réel\n📰 Nouvelles économiques\n💡 Conseils et insights\n\nÉcris-moi au 1-438-544-EMMA 📱\n\nComment puis-je t'aider aujourd'hui ?`;
+          const welcomeResponse = `Enchanté ${userName} ! 👋\n\nJe suis Emma, ton assistante IA financière 📊\n\nJe peux t'aider avec :\n📊 Analyses de marchés et actions\n📈 Données financières en temps réel\n📰 Nouvelles économiques\n💡 Conseils et insights\n\n💼 Tape SKILLS pour voir mes capacités avancées (calendriers, courbes, briefings, etc.)\n\nÉcris-moi au 1-438-544-EMMA 📱\n\nComment puis-je t'aider aujourd'hui ?`;
 
           // Sauvegarder dans la conversation
           await saveConversationTurn(conversation.id, message, welcomeResponse, {
