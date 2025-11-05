@@ -35,6 +35,12 @@ class SmartAgent {
                 });
             }
 
+            // Load conversation history from context if provided
+            if (context.conversationHistory && Array.isArray(context.conversationHistory)) {
+                this.conversationHistory = context.conversationHistory;
+                console.log(`💬 Loaded conversation history: ${this.conversationHistory.length} messages`);
+            }
+
             // 0. COGNITIVE SCAFFOLDING: Analyse d'intention avec Perplexity
             const intentData = await this._analyzeIntent(userMessage, context);
             console.log('🧠 Intent analysis:', intentData ? intentData.intent : 'fallback to keyword scoring');

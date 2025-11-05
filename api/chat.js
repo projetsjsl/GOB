@@ -192,6 +192,70 @@ export default async function handler(req, res) {
       // Non-bloquant, on continue sans historique
     }
 
+    // 4.5. RÉCUPÉRER LA WATCHLIST DE L'UTILISATEUR (pour contexte Emma)
+    let userWatchlist = [];
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+
+      const { data: watchlistData, error: watchlistError } = await supabase
+        .from('watchlists')
+        .select('tickers')
+        .eq('user_id', userProfile.id)
+        .single();
+
+      if (!watchlistError && watchlistData?.tickers) {
+        userWatchlist = watchlistData.tickers;
+        console.log(`[Chat API] Watchlist utilisateur: ${userWatchlist.join(', ')} (${userWatchlist.length} tickers)`);
+      } else if (watchlistError && watchlistError.code !== 'PGRST116') {
+        // PGRST116 = pas de ligne trouvée (watchlist vide)
+        console.log(`[Chat API] Watchlist non trouvée ou vide pour user ${userProfile.id}`);
+      }
+    } catch (error) {
+      console.error('[Chat API] Erreur récupération watchlist (non-bloquant):', error.message);
+      // Non-bloquant, on continue sans watchlist
+    }
+
+    // 4.6. RÉCUPÉRER LES TEAM TICKERS (tickers partagés de l'équipe)
+    let teamTickers = [];
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+
+      const { data: teamTickersData, error: teamTickersError } = await supabase
+        .from('tickers')
+        .select('ticker')
+        .eq('source', 'team')
+        .eq('is_active', true);
+
+      if (!teamTickersError && teamTickersData && teamTickersData.length > 0) {
+        teamTickers = teamTickersData.map(item => item.ticker);
+        console.log(`[Chat API] Team tickers: ${teamTickers.join(', ')} (${teamTickers.length} tickers)`);
+      } else {
+        // Fallback vers liste hardcodée
+        teamTickers = [
+          'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
+          'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
+          'TRP', 'UNH', 'UL', 'VZ', 'WFC'
+        ];
+        console.log(`[Chat API] Team tickers (fallback): ${teamTickers.length} tickers`);
+      }
+    } catch (error) {
+      console.error('[Chat API] Erreur récupération team tickers (non-bloquant):', error.message);
+      // Fallback en cas d'erreur
+      teamTickers = [
+        'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
+        'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
+        'TRP', 'UNH', 'UL', 'VZ', 'WFC'
+      ];
+    }
+
     // 5. DÉTECTER SI EMMA DOIT SE PRÉSENTER
     const isFirstMessage = conversationHistory.length === 0;
     const isTestEmma = message.toLowerCase().includes('test emma');
@@ -215,12 +279,18 @@ export default async function handler(req, res) {
     }
 
     // 6. PRÉPARER LE CONTEXTE POUR EMMA-AGENT
+    // Combiner watchlist + team tickers (union sans doublons)
+    const allTickers = [...new Set([...userWatchlist, ...teamTickers])];
+
     const emmaContext = {
       output_mode: channel === 'email' ? 'ticker_note' : 'chat', // Email = format long, autres = chat
       user_name: userProfile.name || null, // Nom de l'utilisateur pour personnalisation
       user_channel: channel, // Canal de communication
       should_introduce: shouldIntroduce, // Emma doit se présenter
-      tickers: metadata?.tickers || [],
+      tickers: metadata?.tickers || allTickers, // Utiliser watchlist + team tickers si pas de tickers fournis
+      user_watchlist: userWatchlist, // Watchlist personnelle de l'utilisateur
+      team_tickers: teamTickers, // Tickers d'équipe partagés
+      all_tickers: allTickers, // Union watchlist + team (sans doublons)
       stockData: metadata?.stockData || {},
       newsData: metadata?.newsData || [],
       apiStatus: metadata?.apiStatus || {},
