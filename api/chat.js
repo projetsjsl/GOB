@@ -193,6 +193,8 @@ export default async function handler(req, res) {
     }
 
     // 4.5. RÉCUPÉRER LA WATCHLIST DE L'UTILISATEUR (pour contexte Emma)
+    // NOTE: Ces listes sont des FAVORIS/RACCOURCIS uniquement.
+    // Emma a accès à MILLIERS de tickers mondiaux via APIs (FMP, Polygon, etc.)
     let userWatchlist = [];
     try {
       const { createClient } = await import('@supabase/supabase-js');
