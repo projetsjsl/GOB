@@ -390,7 +390,7 @@
     }
   ],
   "config": {
-    "max_concurrent_tools": 5,
+    "max_concurrent_tools": 8,
     "timeout_ms": 10000,
     "retry_attempts": 2,
     "cache_duration_minutes": 5,
