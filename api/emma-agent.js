@@ -356,10 +356,13 @@ class SmartAgent {
 
         if (factualIntents.includes(intent) || hasTickers || hasToolData) {
             console.log(`💎 Factual query (${intent}) → Using PERPLEXITY (with sources)`);
+            // Si recency_filter est 'none', utiliser null (ne pas envoyer le paramètre)
+            const recencyValue = intentData?.recency_filter;
+            const validRecency = (recencyValue && recencyValue !== 'none') ? recencyValue : 'day';
             return {
                 model: 'perplexity',
                 reason: `Factual data required for ${intent}`,
-                recency: intentData?.recency_filter || 'day'
+                recency: validRecency
             };
         }
 
@@ -938,7 +941,7 @@ class SmartAgent {
             console.error('❌ Response generation failed:', error);
 
             // Réponse de fallback basée sur les données des outils
-            const fallbackResponse = this._generateFallbackResponse(userMessage, toolResults, context.output_mode);
+            const fallbackResponse = this._generateFallbackResponse(userMessage, toolResults, outputMode, context);
             return {
                 response: fallbackResponse,
                 validation: { passed: false, confidence: 0.3, reason: 'Fallback response' }
@@ -1803,10 +1806,13 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 temperature: outputMode === 'briefing' ? 0.5 : 0.7  // Plus déterministe pour briefings
             };
 
-            // Ajouter recency filter si disponible
-            if (recency) {
-                requestBody.search_recency_filter = recency; // hour, day, week, month, year
+            // Ajouter recency filter si disponible (seulement les valeurs valides)
+            const validRecencyValues = ['hour', 'day', 'week', 'month', 'year'];
+            if (recency && validRecencyValues.includes(recency)) {
+                requestBody.search_recency_filter = recency;
                 console.log(`🕐 Using recency filter: ${recency}`);
+            } else if (recency) {
+                console.warn(`⚠️ Invalid recency value "${recency}", omitting recency filter`);
             }
 
             // Vérifier que la clé API est définie
@@ -2059,7 +2065,7 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
     /**
      * Réponse de fallback si Perplexity échoue (adapté selon mode)
      */
-    _generateFallbackResponse(userMessage, toolResults, outputMode = 'chat') {
+    _generateFallbackResponse(userMessage, toolResults, outputMode = 'chat', context = {}) {
         const successfulResults = toolResults.filter(r => r.success && r.data);
 
         if (successfulResults.length === 0) {
@@ -2081,13 +2087,30 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
         }
 
         // Mode CHAT ou BRIEFING: retourner texte formaté
-        let response = "Voici les informations que j'ai pu récupérer :\n\n";
+        // 📱 SMS: Réponse ultra-courte (erreur de service, pas de dump de données)
+        if (context.user_channel === 'sms') {
+            return "⚠️ Service temporairement indisponible. Emma reviendra dans quelques instants. Pour une réponse immédiate, visitez gobapps.com";
+        }
 
-        successfulResults.forEach(result => {
-            response += `**${result.tool_id}**: ${JSON.stringify(result.data, null, 2)}\n\n`;
+        // Mode WEB: Réponse concise avec données résumées
+        let response = "Voici les informations disponibles :\n\n";
+
+        // Limiter à 3 outils max pour éviter les réponses trop longues
+        const limitedResults = successfulResults.slice(0, 3);
+
+        limitedResults.forEach(result => {
+            // Utiliser le résumé au lieu du JSON complet
+            const summary = this._summarizeToolData(result.tool_id, result.data);
+            // Limiter chaque résumé à 200 chars
+            const shortSummary = summary.length > 200 ? summary.substring(0, 200) + '...' : summary;
+            response += `**${result.tool_id}**: ${shortSummary}\n\n`;
         });
 
-        response += "Note: Cette réponse est basée uniquement sur les données disponibles. Pour une analyse plus approfondie, veuillez reformuler votre question.";
+        if (successfulResults.length > 3) {
+            response += `... et ${successfulResults.length - 3} autres sources de données.\n\n`;
+        }
+
+        response += "Note: Réponse partielle. Pour une analyse complète, reformulez votre question.";
 
         return response;
     }
