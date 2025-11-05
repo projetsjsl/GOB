@@ -236,33 +236,46 @@ class SmartAgent {
         const teamTickers = context.team_tickers || [];
         const userName = context.user_name || 'Utilisateur';
 
-        let response = `📊 **Vos Tickers Suivis**\n\n`;
+        let response = `📊 **Système à 2 Listes de Tickers**\n\n`;
 
-        // Watchlist personnelle
+        // LISTE 1: Watchlist personnelle
+        response += `**LISTE 1️⃣ - Watchlist Personnelle**\n`;
         if (userWatchlist.length > 0) {
-            response += `🎯 **Watchlist Personnelle** (${userWatchlist.length} titres):\n`;
+            response += `🎯 ${userWatchlist.length} titres que VOUS suivez:\n`;
             response += userWatchlist.map(ticker => `• ${ticker}`).join('\n');
             response += '\n\n';
         } else {
-            response += `🎯 **Watchlist Personnelle**: Vide\n\n`;
+            response += `🎯 Vide (ajoutez vos tickers personnels)\n\n`;
         }
 
-        // Team tickers
+        // LISTE 2: Team tickers
+        response += `**LISTE 2️⃣ - Tickers d'Équipe**\n`;
         if (teamTickers.length > 0) {
-            response += `👥 **Tickers d'Équipe** (${teamTickers.length} titres):\n`;
+            response += `👥 ${teamTickers.length} titres suivis par l'ÉQUIPE:\n`;
             response += teamTickers.map(ticker => `• ${ticker}`).join('\n');
             response += '\n\n';
+        } else {
+            response += `👥 Aucun ticker d'équipe configuré\n\n`;
+        }
+
+        // Intersection (tickers communs)
+        const common = userWatchlist.filter(t => teamTickers.includes(t));
+        if (common.length > 0) {
+            response += `🔗 **Communs aux 2 listes**: ${common.join(', ')}\n\n`;
         }
 
         // Total unique
         const allUnique = [...new Set([...userWatchlist, ...teamTickers])];
         response += `📈 **Total Unique**: ${allUnique.length} tickers\n\n`;
 
-        // Suggestions
-        response += `💡 **Suggestions**:\n`;
-        response += `• "Analyse AAPL" - Analyser une action\n`;
-        response += `• "Actualités sur mes tickers" - News récentes\n`;
-        response += `• "Performance de ma watchlist" - Vue d'ensemble\n`;
+        response += `---\n\n`;
+        response += `💡 **Vous pouvez aussi demander N'IMPORTE QUEL autre ticker !**\n\n`;
+        response += `Exemples:\n`;
+        response += `• "Analyse TSLA" - Ticker hors listes\n`;
+        response += `• "Comparer AAPL vs MSFT"\n`;
+        response += `• "Actualités Accenture" (ACN)\n`;
+        response += `• "Performance de ma watchlist"\n`;
+        response += `• "Vue d'ensemble team tickers"\n`;
 
         return {
             success: true,
