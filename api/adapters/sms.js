@@ -162,11 +162,28 @@ export default async function handler(req, res) {
       chatResponse = chatResponseData;
       console.log(`[SMS Adapter] Réponse reçue de /api/chat (${chatResponse.response.length} chars)`);
 
-      // 5.5. ENVOYER NOTIFICATION EMAIL
-      try {
-        console.log('[SMS Adapter] Envoi notification email...');
+    } catch (error) {
+      console.error('[SMS Adapter] Erreur appel /api/chat:', error);
+      return await sendSMS(
+        senderPhone,
+        '❌ Désolé, une erreur est survenue. Réessayez dans quelques instants.'
+      );
+    }
 
-        await sendConversationEmail({
+    // 6. ENVOYER LA RÉPONSE PAR SMS (PRIORITÉ: latence minimale)
+    try {
+      const response = chatResponse.response;
+
+      // Pour messages > 1600 chars, TwiML échoue silencieusement
+      // On utilise sendSMS() qui découpe automatiquement en plusieurs SMS
+      if (response.length > 1600) {
+        console.log(`[SMS Adapter] Message long (${response.length} chars) - envoi via sendSMS() avec découpage`);
+
+        await sendSMS(senderPhone, response);
+
+        // 6.5. ENVOYER NOTIFICATION EMAIL EN ARRIÈRE-PLAN (après SMS)
+        // Ne pas attendre pour ne pas ralentir la réponse SMS
+        sendConversationEmail({
           userName: chatResponse.metadata?.name || senderPhone,
           userPhone: senderPhone,
           userId: chatResponse.metadata?.user_id || 'unknown',
@@ -180,32 +197,11 @@ export default async function handler(req, res) {
             intent_data: chatResponse.metadata?.intent,
             timestamp: new Date().toISOString()
           }
+        }).then(() => {
+          console.log('✅ [SMS Adapter] Notification email envoyée (arrière-plan)');
+        }).catch((emailError) => {
+          console.error('⚠️ [SMS Adapter] Erreur envoi email (non-bloquant):', emailError.message);
         });
-
-        console.log('✅ [SMS Adapter] Notification email envoyée');
-      } catch (emailError) {
-        // Non-bloquant - on continue même si l'email échoue
-        console.error('⚠️ [SMS Adapter] Erreur envoi email (non-bloquant):', emailError.message);
-      }
-
-    } catch (error) {
-      console.error('[SMS Adapter] Erreur appel /api/chat:', error);
-      return await sendSMS(
-        senderPhone,
-        '❌ Désolé, une erreur est survenue. Réessayez dans quelques instants.'
-      );
-    }
-
-    // 6. ENVOYER LA RÉPONSE PAR SMS
-    try {
-      const response = chatResponse.response;
-
-      // Pour messages > 1600 chars, TwiML échoue silencieusement
-      // On utilise sendSMS() qui découpe automatiquement en plusieurs SMS
-      if (response.length > 1600) {
-        console.log(`[SMS Adapter] Message long (${response.length} chars) - envoi via sendSMS() avec découpage`);
-
-        await sendSMS(senderPhone, response);
 
         // Retourner TwiML vide pour confirmer à Twilio
         res.setHeader('Content-Type', 'text/xml');
@@ -214,6 +210,27 @@ export default async function handler(req, res) {
       } else {
         // Message court: TwiML direct (plus rapide)
         console.log(`[SMS Adapter] Message court (${response.length} chars) - envoi via TwiML`);
+
+        // 6.5. ENVOYER NOTIFICATION EMAIL EN ARRIÈRE-PLAN (après SMS)
+        sendConversationEmail({
+          userName: chatResponse.metadata?.name || senderPhone,
+          userPhone: senderPhone,
+          userId: chatResponse.metadata?.user_id || 'unknown',
+          userMessage: messageBody,
+          emmaResponse: chatResponse.response,
+          metadata: {
+            conversationId: chatResponse.metadata?.conversation_id,
+            model: chatResponse.metadata?.model,
+            tools_used: chatResponse.metadata?.tools_used || [],
+            execution_time_ms: chatResponse.metadata?.execution_time_ms,
+            intent_data: chatResponse.metadata?.intent,
+            timestamp: new Date().toISOString()
+          }
+        }).then(() => {
+          console.log('✅ [SMS Adapter] Notification email envoyée (arrière-plan)');
+        }).catch((emailError) => {
+          console.error('⚠️ [SMS Adapter] Erreur envoi email (non-bloquant):', emailError.message);
+        });
 
         res.setHeader('Content-Type', 'text/xml');
         return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
