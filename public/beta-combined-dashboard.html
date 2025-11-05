@@ -2354,47 +2354,20 @@ const fetchHybridData = async (symbol, dataType) => {
             // Chargement initial UNE SEULE FOIS au démarrage avec écran de chargement
             useEffect(() => {
                 if (initialLoadComplete) return; // Éviter les rechargements
-                
-                console.log('🚀 Initialisation du dashboard (une seule fois)...');
-                
-                const loadAllData = async () => {
-                    console.log('📊 Chargement des données en arrière-plan...');
-                    try {
-                        // STEP 1: Load tickers first (required by refreshAllStocks)
-                        console.log('📊 Étape 1: Chargement des tickers...');
-                        await loadTickersFromSupabase();
 
-                        // STEP 2: Load data that depends on tickers + independent data
-                        console.log('📊 Étape 2: Chargement des données stocks et actualités...');
-                        await Promise.all([
-                            refreshAllStocks(),  // Needs tickers to be loaded
-                            fetchNews(),          // Needs tickers to be loaded
-                            fetchFinvizNews(),    // Needs tickers to be loaded - Latest news from Finviz
-                            preloadWatchlist(),
-                            fetchSeekingAlphaData(),
-                            fetchSeekingAlphaStockData(),
-                            checkApiStatus()
-                        ]);
+                console.log('🚀 Initialisation du dashboard (mode lazy loading activé)');
 
-                        console.log('✅ Toutes les données chargées en arrière-plan');
-                    } catch (error) {
-                        console.error('❌ Erreur lors du chargement des données:', error?.message || String(error));
-                    }
-                };
-                
-                // Chargement initial silencieux
-                loadAllData();
-                
-                // Écran de chargement de 3 secondes pour masquer les actualisations
+                // ⚡ LAZY LOADING: Ne charge RIEN automatiquement au démarrage
+                // Les données se chargent SEULEMENT quand l'utilisateur clique sur un onglet
+                // Cela économise énormément d'appels API inutiles
+
+                // Désactiver l'écran de chargement immédiatement (pas de chargement = pas d'attente)
                 setTimeout(() => {
                     setShowLoadingScreen(false);
                     setInitialLoadComplete(true);
-                    console.log('🎉 Écran de chargement terminé - Dashboard prêt !');
-                }, 3000);
-                
-                // ⚡ OPTIMISATION API: Pas d'auto-refresh
-                // Les données se chargent une seule fois au démarrage
-                // Rafraîchissement manuel uniquement via les boutons
+                    console.log('✅ Dashboard prêt (lazy loading) - Les données se chargeront à la demande');
+                }, 500); // Juste le temps d'afficher brièvement le logo
+
             }, []); // Dépendance vide = une seule fois au montage
 
             // Intro Emma: première visite de session (séparé du chargement)
