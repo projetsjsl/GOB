@@ -18,6 +18,8 @@ class SmartAgent {
         this.usageStats = this._loadUsageStats();
         this.conversationHistory = [];
         this.intentAnalyzer = new HybridIntentAnalyzer();
+        this.isReadOnlyEnv = false; // Flag to track if we're in a read-only environment
+        this.hasLoggedReadOnlyWarning = false; // Only log warning once
     }
 
     /**
@@ -1815,13 +1817,32 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
 
     /**
      * Sauvegarde des statistiques d'utilisation
+     * Gère gracieusement les environnements serverless en read-only (Vercel)
      */
     _saveUsageStats() {
+        // Si déjà détecté comme read-only, skip silencieusement
+        if (this.isReadOnlyEnv) {
+            return;
+        }
+
         try {
             const statsPath = path.join(process.cwd(), 'config', 'usage_stats.json');
             fs.writeFileSync(statsPath, JSON.stringify(this.usageStats, null, 2));
         } catch (error) {
-            console.error('❌ Failed to save usage stats:', error);
+            // Détecter erreur EROFS (Read-Only File System)
+            if (error.code === 'EROFS') {
+                // Marquer comme read-only pour éviter de réessayer
+                this.isReadOnlyEnv = true;
+
+                // Logger seulement une fois
+                if (!this.hasLoggedReadOnlyWarning) {
+                    console.warn('⚠️ Serverless read-only environment detected - usage stats will not be persisted');
+                    this.hasLoggedReadOnlyWarning = true;
+                }
+            } else {
+                // Autre erreur - logger
+                console.error('❌ Failed to save usage stats:', error.message);
+            }
         }
     }
 }
