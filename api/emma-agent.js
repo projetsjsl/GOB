@@ -334,6 +334,18 @@ class SmartAgent {
         const hasTickers = intentData?.tickers && intentData.tickers.length > 0;
         const hasToolData = toolsData && toolsData.length > 0;
 
+        // GEMINI: Greetings, help, and simple queries (NO financial data needed)
+        const simpleIntents = ['greeting', 'help', 'capabilities', 'unknown'];
+        if (simpleIntents.includes(intent) && !hasTickers && !hasToolData) {
+            console.log(`👋 Simple query (${intent}) → Using GEMINI (conversational, no data)`);
+            return {
+                model: 'gemini',
+                reason: `Simple conversational response for ${intent}`,
+                recency: null,
+                simple_mode: true // Flag to use simple greeting instructions
+            };
+        }
+
         // PERPLEXITY: Requêtes factuelles avec sources (RIGUEUR MAXIMALE)
         const factualIntents = [
             'stock_price',
@@ -843,6 +855,11 @@ class SmartAgent {
             const modelSelection = this._selectModel(intentData, outputMode, toolsData);
             console.log(`🤖 Selected model: ${modelSelection.model} (${modelSelection.reason})`);
 
+            // Add simple_mode to context if detected
+            if (modelSelection.simple_mode) {
+                context.simple_mode = true;
+            }
+
             // Construire le prompt approprié
             const prompt = this._buildPerplexityPrompt(
                 userMessage,
@@ -884,8 +901,11 @@ class SmartAgent {
                 // Nettoyer le Markdown (enlever éventuels artifacts)
                 response = this._cleanMarkdown(response);
             } else if (outputMode === 'chat') {
-                // 🛡️ Nettoyer tout JSON brut qui pourrait avoir été inclus dans la réponse conversationnelle
-                response = this._sanitizeJsonInResponse(response);
+                // 🛡️ SMS ONLY: Nettoyer tout JSON brut qui pourrait avoir été inclus dans la réponse conversationnelle
+                // WEB: Skip sanitization - users want full detailed data with ratios and metrics
+                if (context.user_channel === 'sms') {
+                    response = this._sanitizeJsonInResponse(response);
+                }
             }
 
             // 📱 TRONCATURE DE SÉCURITÉ FINALE POUR SMS
@@ -928,8 +948,10 @@ class SmartAgent {
                         response = retryResult;
                     }
 
-                    // Nettoyer JSON du retry aussi
-                    response = this._sanitizeJsonInResponse(response);
+                    // SMS ONLY: Nettoyer JSON du retry aussi
+                    if (context.user_channel === 'sms') {
+                        response = this._sanitizeJsonInResponse(response);
+                    }
 
                     // Re-valider
                     validation = this._validateFreshData(response, intentData);
@@ -1257,10 +1279,12 @@ class SmartAgent {
 CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
 ${intentContext}
-DONNÉES DISPONIBLES DES OUTILS (résumées pour éviter surcharge):
+DONNÉES DISPONIBLES DES OUTILS${userChannel === 'sms' ? ' (résumées pour SMS)' : ''}:
 ${toolsData.map(t => {
     const reliabilityNote = t.is_reliable === false ? ' [⚠️ SOURCE PARTIELLE - Utiliser avec prudence]' : '';
-    return `- ${t.tool}${reliabilityNote}: ${this._summarizeToolData(t.tool, t.data)}`;
+    // SMS: données résumées | WEB: données complètes pour analyse détaillée
+    const dataStr = userChannel === 'sms' ? this._summarizeToolData(t.tool, t.data) : JSON.stringify(t.data, null, 2);
+    return `- ${t.tool}${reliabilityNote}: ${dataStr}`;
 }).join('\n')}
 
 QUESTION DE L'UTILISATEUR: ${userMessage}
@@ -1905,9 +1929,32 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
             // Ajouter instructions système pour mode conversationnel
-            const systemInstructions = outputMode === 'data'
-                ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide.'
-                : `Tu es Emma, analyste financière experte.
+            let systemInstructions;
+
+            if (context.simple_mode) {
+                // SIMPLE MODE: Greetings, help, capabilities
+                systemInstructions = `Tu es Emma, assistante virtuelle financière du Groupe Ouellet Bolduc.
+
+🎯 MODE SIMPLE: L'utilisateur dit bonjour ou demande de l'aide.
+
+RÈGLES:
+- ✅ Réponds de manière amicale, professionnelle et concise (2-3 phrases max)
+- ✅ Ne pas analyser de données financières sauf si l'utilisateur mentionne explicitement un ticker
+- ✅ Pour "bonjour/allo/hi" → Saluer et proposer ton aide
+- ✅ Pour "help" → Expliquer tes capacités (analyse actions, news, ratios, comparaisons)
+- ✅ Rester sur le sujet: finance/investissement
+
+Exemples:
+User: "Allo"
+Emma: "Bonjour ! Je suis Emma, votre assistante financière. Comment puis-je vous aider aujourd'hui ? Analyse d'actions, actualités des marchés, ratios financiers ?"
+
+User: "Help"
+Emma: "Je peux vous aider avec : analyse d'actions (prix, ratios, fondamentaux), actualités financières, comparaisons de titres, calendrier des résultats. Posez-moi une question !"
+`;
+            } else if (outputMode === 'data') {
+                systemInstructions = 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide.';
+            } else {
+                systemInstructions = `Tu es Emma, analyste financière experte.
 
 RÈGLES CRITIQUES:
 - ❌ NE JAMAIS retourner du JSON brut ou du code
