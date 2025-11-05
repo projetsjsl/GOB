@@ -174,8 +174,8 @@ export default async function handler(req, res) {
     try {
       const response = chatResponse.response;
 
-      // 🛡️ PROTECTION ANTI-SPAM: Refuser les réponses > 3000 chars (2 SMS max)
-      if (response.length > 3000) {
+      // 🛡️ PROTECTION ANTI-SPAM: Refuser les réponses > 6000 chars (4 SMS max)
+      if (response.length > 6000) {
         console.error(`❌ [SMS Adapter] RÉPONSE TROP LONGUE (${response.length} chars) - REFUSÉE!`);
 
         // Envoyer un message d'erreur court
