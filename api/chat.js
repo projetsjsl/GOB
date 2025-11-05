@@ -299,48 +299,52 @@ export default async function handler(req, res) {
     if (messageUpper === 'SKILLS' || messageUpper === 'SKILL') {
       console.log('[Chat API] Commande SKILLS détectée');
 
-      const skillsResponse = `🤖 EMMA IA - COMPÉTENCES & COMMANDES
+      const skillsResponse = `🤖 EMMA IA - MES COMPÉTENCES
 
-📊 ANALYSES ACTIONS:
-• "Analyse [TICKER]" → Analyse complète
-• "Prix [TICKER]" → Cours temps réel
-• "[TICKER] actualités" → News récentes
+📊 ANALYSES D'ACTIONS:
+• "Analyse AAPL" → Analyse complète
+  (prix, ratios P/E, ROE, consensus, news)
+• "Prix MSFT" → Cours temps réel
+• "TSLA actualités" → News récentes
+• "Fondamentaux GOOGL" → Profil détaillé
 
-📈 MARCHÉS:
-• "Indices" → Dow, S&P, Nasdaq
-• "Secteurs" → Performance secteurs
-• "Gagnants/Perdants" → Top/Worst
+📈 INDICATEURS TECHNIQUES:
+• "RSI NVDA" → Force relative
+• "MACD AAPL" → Momentum
+• "Moyennes mobiles TSLA" → Tendances
 
 📰 ACTUALITÉS:
-• "Nouvelles" → News du jour
-• "Nouvelles [TICKER]" → News ticker
-• "Économie" → Actu économiques
+• "CAPSULE" → Top 5 news financières
+• "Nouvelles AAPL" → News du ticker
+• "Quoi de neuf ?" → Actualités marché
 
 📅 CALENDRIERS:
-• "Résultats" → Earnings calendar
-• "Dividendes" → Prochains dividendes
-• "Économique" → Événements éco
+• "Résultats cette semaine" → Earnings
+• "Prochains résultats AAPL" → Dates
+• "Événements économiques" → Macro
 
 📊 WATCHLIST:
-• "Ma liste" → Voir watchlist
-• "Ajouter [TICKER]" → Ajouter
-• "Supprimer [TICKER]" → Retirer
+• "Ma liste" → Voir ta watchlist
+• "Ajouter NVDA" → Ajouter ticker
+• "Retirer TSLA" → Supprimer ticker
 
-🎯 ANALYSES AVANCÉES:
-• "Comparer [T1] [T2]" → Comparaison
-• "Secteur tech" → Analyse secteur
-• "Tendances" → Tendances marché
+🎯 BRIEFINGS QUOTIDIENS:
+• Matin (7h20) → Pré-marché
+• Midi (15h50) → Intraday
+• Soir (20h20) → Post-marché
+  (envoyés automatiquement par email)
 
-📚 AIDE:
-• "AIDE" → Guide complet
-• "EXEMPLES" → Exemples questions
+📚 AUTRES COMMANDES:
+• "AIDE" → Guide d'utilisation
+• "EXEMPLES" → Questions types
 
-💡 TU PEUX AUSSI POSER DES QUESTIONS NATURELLES:
+💡 QUESTIONS NATURELLES:
+Tu peux me parler normalement:
 "Pourquoi Apple monte aujourd'hui ?"
-"Quelles actions tech acheter ?"
-"C'est quoi le P/E de Tesla ?"
+"Tesla est-il suracheté ?"
+"Devrais-je acheter Microsoft ?"
 
-Écris-moi n'importe quelle question financière ! 🚀`;
+🚀 Écris-moi ce que tu veux savoir !`;
 
       // Sauvegarder dans la conversation
       try {
@@ -364,28 +368,39 @@ export default async function handler(req, res) {
 
       const helpResponse = `📖 GUIDE EMMA IA
 
-🗣️ PARLE-MOI NATURELLEMENT:
-Emma comprend le langage naturel.
-Pas besoin de commandes strictes !
+🗣️ PARLE NATURELLEMENT:
+Pas besoin de commandes strictes.
+Je comprends le français courant !
 
-✅ EXEMPLES:
-• "Analyse Microsoft"
-• "Pourquoi Tesla chute ?"
-• "Meilleures actions tech ?"
-• "Résultats Apple quand ?"
+✅ CE QUE JE FAIS:
+• Analyses complètes d'actions
+• Prix et données temps réel
+• Indicateurs techniques (RSI, MACD)
+• Actualités financières
+• Calendriers (résultats, événements)
+• Gestion watchlist
+• Briefings quotidiens (email)
 
-📊 DONNÉES TEMPS RÉEL:
-Toutes mes analyses utilisent données
-actualisées de Bloomberg, Reuters, FMP
+📊 SOURCES DE DONNÉES:
+• FMP (Financial Modeling Prep)
+• Polygon.io & Twelve Data
+• Finnhub & Alpha Vantage
+• Données en cache 5-60 min
 
-🎯 POUR CHAQUE ACTION:
-• Prix & variation
-• P/E ratio vs secteur
-• Performance YTD
-• Actualités récentes
+🎯 ANALYSE TYPIQUE INCLUT:
+• Prix actuel & variation
+• Ratios: P/E, P/B, ROE, marges
+• Croissance revenus/bénéfices
 • Consensus analystes
+• News récentes avec sources
+• Indicateurs techniques
 
-💼 SKILLS: Liste toutes commandes
+⚡ RÉPONSE RAPIDE:
+• Commandes: ~instant
+• Analyses: ~10-13 secondes
+• Briefings: automatiques 3x/jour
+
+💼 SKILLS → Toutes mes capacités
 📱 Contact: 1-438-544-EMMA
 
 Comment puis-je t'aider ? 🚀`;
@@ -409,40 +424,53 @@ Comment puis-je t'aider ? 🚀`;
     if (messageUpper === 'EXEMPLES' || messageUpper === 'EXAMPLES') {
       console.log('[Chat API] Commande EXEMPLES détectée');
 
-      const examplesResponse = `💡 EXEMPLES DE QUESTIONS
+      const examplesResponse = `💡 EXEMPLES QUI FONCTIONNENT
 
-📊 ANALYSES:
-• "Analyse complète AAPL"
-• "Fondamentaux Microsoft"
-• "C'est quoi le P/E de Tesla ?"
+📊 ANALYSES COMPLÈTES:
+• "Analyse AAPL"
+• "Analyse complète Microsoft"
+• "Dis-moi tout sur NVDA"
 
-📈 MARCHÉS:
-• "Comment vont les marchés ?"
-• "Indices aujourd'hui"
-• "Secteur tech performe ?"
+💰 PRIX & RATIOS:
+• "Prix Tesla"
+• "C'est quoi le P/E de MSFT ?"
+• "ROE de Apple"
+• "Marges bénéficiaires GOOGL"
+
+📈 INDICATEURS TECHNIQUES:
+• "RSI de NVDA"
+• "MACD Tesla"
+• "Moyennes mobiles AAPL"
+• "TSLA est suracheté ?"
 
 📰 ACTUALITÉS:
+• "CAPSULE" → Top 5 news du jour
+• "Actualités Apple"
+• "Pourquoi TSLA monte ?"
 • "Quoi de neuf en bourse ?"
-• "Pourquoi Apple monte ?"
-• "News tech cette semaine"
+
+📅 CALENDRIERS:
+• "Prochains résultats AAPL"
+• "Résultats cette semaine"
+• "Événements économiques"
+• "Earnings calendar"
+
+📊 WATCHLIST:
+• "Ma liste"
+• "Ajouter NVDA"
+• "Retirer TSLA"
+• "Watchlist de l'équipe"
 
 🎯 COMPARAISONS:
-• "Comparer GOOGL vs MSFT"
-• "Meilleures actions IA"
-• "Top 5 dividendes tech"
+• "Comparer AAPL et MSFT"
+• "NVDA vs AMD fondamentaux"
 
-💰 INVESTISSEMENT:
-• "Acheter Tesla maintenant ?"
-• "Actions sous-évaluées tech"
-• "Risques Amazon ?"
+💭 QUESTIONS OUVERTES:
+• "Devrais-je acheter Tesla ?"
+• "Microsoft est-il cher ?"
+• "Meilleures actions IA ?"
 
-📅 CALENDRIER:
-• "Prochains résultats AAPL"
-• "Dividende Microsoft quand ?"
-• "Événements éco semaine"
-
-👉 Pose n'importe quelle question !
-Je comprends le langage naturel 🤖`;
+👉 Essaie et je comprendrai ! 🤖`;
 
       try {
         await saveConversationTurn(conversation.id, message, examplesResponse, {
@@ -458,6 +486,72 @@ Je comprends le langage naturel 🤖`;
         response: examplesResponse,
         metadata: { command: 'EXEMPLES' }
       });
+    }
+
+    // Commande CAPSULE / NEWS du jour (rapide, pas d'appel Emma complet)
+    if (messageUpper.includes('CAPSULE') || (messageUpper.includes('ACTUALIT') && messageUpper.includes('AUJOURD'))) {
+      console.log('[Chat API] Commande CAPSULE actualités détectée');
+
+      // Appeler endpoint news directement (plus rapide que Emma complète)
+      try {
+        const baseUrl = process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'https://gob.vercel.app';
+
+        const newsResponse = await fetch(`${baseUrl}/api/fmp?endpoint=news&limit=5`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (newsResponse.ok) {
+          const newsData = await newsResponse.json();
+
+          // Vérifier si c'est un array ou un objet avec data
+          const news = Array.isArray(newsData) ? newsData.slice(0, 5) : (newsData.data || []).slice(0, 5);
+
+          if (news.length > 0) {
+            let capsuleText = `📰 CAPSULE ACTU FINANCIÈRE\n${new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n\n`;
+
+            news.forEach((item, idx) => {
+              capsuleText += `${idx + 1}. ${item.title || item.headline || 'Sans titre'}\n`;
+
+              // Ajouter un court extrait si disponible
+              if (item.text || item.summary) {
+                const excerpt = (item.text || item.summary).substring(0, 120).trim();
+                capsuleText += `   ${excerpt}...\n`;
+              }
+
+              // Ajouter l'URL
+              if (item.url || item.link) {
+                capsuleText += `   🔗 ${item.url || item.link}\n`;
+              }
+
+              capsuleText += '\n';
+            });
+
+            capsuleText += '💼 Tape SKILLS pour toutes mes capacités';
+
+            await saveConversationTurn(conversation.id, message, capsuleText, {
+              type: 'command_capsule',
+              channel: channel,
+              news_count: news.length
+            });
+
+            return res.status(200).json({
+              success: true,
+              response: capsuleText,
+              metadata: { command: 'CAPSULE', news_count: news.length }
+            });
+          } else {
+            console.log('[Chat API] Aucune actualité trouvée');
+          }
+        } else {
+          console.error('[Chat API] Erreur API news:', newsResponse.status);
+        }
+      } catch (error) {
+        console.error('[Chat API] Erreur capsule news:', error.message);
+        // Fallback: laisser Emma gérer normalement
+      }
     }
 
     // 6. PRÉPARER LE CONTEXTE POUR EMMA-AGENT

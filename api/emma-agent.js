@@ -1131,22 +1131,41 @@ INSTRUCTIONS CRITIQUES:
 10. Ton: professionnel mais accessible, comme une vraie analyste financière
 ${intentData ? `11. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
 
-📊 GRAPHIQUES ET VISUALISATIONS - IMPORTANT:
-Si l'utilisateur demande EXPLICITEMENT des graphiques, charts ou visualisations, tu PEUX inclure ces tags:
+📊 GRAPHIQUES ET VISUALISATIONS - ANALYSE CONTEXTUALISÉE:
 
-**Tags disponibles (UTILISER AVEC PARCIMONIE):**
-- [CHART:FINVIZ:TICKER] → Graphique Finviz (ex: [CHART:FINVIZ:AAPL])
-- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Graphique TradingView (ex: [CHART:TRADINGVIEW:NASDAQ:AAPL])
-- [CHART:FINVIZ:SECTORS] → Heatmap sectorielle Finviz
-- [STOCKCARD:TICKER] → Carte boursière (ex: [STOCKCARD:AAPL])
-- [RATIO_CHART:TICKER:METRIC] → Évolution ratio (ex: [RATIO_CHART:AAPL:PE])
-- [LOGO:TICKER] → Logo de l'entreprise (ex: [LOGO:GOOGL])
+**🎯 GRAPHIQUES DE RATIOS HISTORIQUES (RECOMMANDÉS):**
+Quand tu analyses des ratios financiers (P/E, P/B, ROE, etc.), tu DOIS comparer avec l'historique et le secteur:
+
+**Tags disponibles:**
+- [RATIO_CHART:TICKER:PE] → Évolution P/E Ratio (5 ans)
+- [RATIO_CHART:TICKER:PB] → Évolution Price-to-Book
+- [RATIO_CHART:TICKER:ROE] → Évolution Return on Equity
+- [RATIO_CHART:TICKER:PROFIT_MARGIN] → Évolution Marge bénéficiaire
+- [RATIO_CHART:TICKER:DEBT_EQUITY] → Évolution Ratio d'endettement
+
+**✅ UTILISATION RECOMMANDÉE:**
+Lors d'une analyse complète, intègre 1-2 graphiques de ratios pertinents:
+
+Exemple CORRECT:
+"Microsoft affiche un P/E de 32,5x, supérieur à sa moyenne historique de 28x et au secteur (28x). Cette expansion de multiple reflète les attentes de croissance IA.
+
+[RATIO_CHART:MSFT:PE]
+
+La marge bénéficiaire de 34% se maintient au-dessus de 30% depuis 5 ans, témoignant de la qualité du business model.
+
+[RATIO_CHART:MSFT:PROFIT_MARGIN]"
+
+**📈 AUTRES GRAPHIQUES (Si demandé explicitement):**
+- [CHART:FINVIZ:TICKER] → Graphique technique
+- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → TradingView interactif
+- [STOCKCARD:TICKER] → Carte boursière Perplexity-style
 
 **Règles d'utilisation:**
-❌ NE PAS ajouter de graphiques automatiquement à chaque réponse
-✅ Ajouter SEULEMENT si l'utilisateur demande "graphique", "chart", "montre-moi"
-✅ Maximum 1 tag par réponse (sauf si explicitement demandé plusieurs)
-✅ Placer les tags DANS le texte là où logique
+✅ Analyses complètes: Ajouter 1-2 graphiques ratios pertinents
+✅ Comparer ratio actuel vs historique (graphique le montre)
+✅ Mentionner contexte secteur dans analyse
+❌ SMS: Pas de graphiques ratios (trop lourds), juste mention verbale
+✅ Web/Email: Inclure graphiques ratios systématiquement
 
 **Exemple d'intégration (si demandé):**
 "Voici l'analyse de Apple (AAPL) :
