@@ -361,7 +361,8 @@ export default async function handler(req, res) {
     // 8. ADAPTER LA RÉPONSE POUR LE CANAL
     let adaptedResponse;
     try {
-      adaptedResponse = adaptForChannel(emmaResponse.response, channel);
+      // Passer le contexte pour SMS (liens TradingView)
+      adaptedResponse = adaptForChannel(emmaResponse.response, channel, emmaContext);
       console.log(`[Chat API] Réponse adaptée pour ${channel} (${adaptedResponse.length} chars)`);
     } catch (error) {
       console.error('[Chat API] Erreur adaptation canal:', error);
