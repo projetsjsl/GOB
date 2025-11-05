@@ -798,6 +798,7 @@ class SmartAgent {
             );
 
             let response;
+            let citations = []; // 📰 Citations extraites de Perplexity
 
             // Router vers le bon modèle
             if (modelSelection.model === 'claude') {
@@ -808,7 +809,16 @@ class SmartAgent {
                 response = await this._call_gemini(prompt, outputMode);
             } else {
                 // PERPLEXITY: Données factuelles avec sources (default)
-                response = await this._call_perplexity(prompt, outputMode, modelSelection.recency, userMessage, intentData, toolResults);
+                const perplexityResult = await this._call_perplexity(prompt, outputMode, modelSelection.recency, userMessage, intentData, toolResults);
+
+                // Extraire contenu et citations
+                if (typeof perplexityResult === 'object' && perplexityResult.content) {
+                    response = perplexityResult.content;
+                    citations = perplexityResult.citations || [];
+                } else {
+                    // Fallback si ancien format (string directement)
+                    response = perplexityResult;
+                }
             }
 
             // Post-traitement selon le mode
@@ -830,16 +840,26 @@ class SmartAgent {
                     console.warn('⚠️ FreshDataGuard: Response lacks sources, retrying...');
                     // Retry avec prompt renforcé
                     const reinforcedPrompt = `${prompt}\n\n⚠️ CRITICAL: You MUST include sources for all factual claims. Do not provide generic answers without sources.`;
-                    response = await this._call_perplexity(reinforcedPrompt, outputMode, modelSelection.recency);
+                    const retryResult = await this._call_perplexity(reinforcedPrompt, outputMode, modelSelection.recency);
+
+                    // Extraire contenu et citations du retry
+                    if (typeof retryResult === 'object' && retryResult.content) {
+                        response = retryResult.content;
+                        citations = retryResult.citations || [];
+                    } else {
+                        response = retryResult;
+                    }
+
                     // Re-valider
                     validation = this._validateFreshData(response, intentData);
                     console.log(`🛡️ FreshDataGuard (retry): Confidence ${(validation.confidence * 100).toFixed(0)}%, Sources: ${validation.source_types_found}`);
                 }
             }
 
-            // Retourner réponse avec validation et modèle utilisé
+            // Retourner réponse avec validation, modèle utilisé, et citations
             return {
                 response,
+                citations,  // 📰 Ajouter les citations pour formatage amical ultérieur
                 validation,
                 model: modelSelection.model,  // Ajout du modèle pour affichage dans l'UI
                 model_reason: modelSelection.reason
@@ -1523,12 +1543,13 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         else if (userMessage.length > 100) complexityScore += 1;
 
         // Déterminer le niveau de complexité et les tokens appropriés
+        // 🚀 TOKENS AUGMENTÉS pour réponses SMS complètes avec chiffres et données
         if (complexityScore <= 2) {
-            return { level: 'simple', tokens: 800, description: 'Question simple et directe' };
+            return { level: 'simple', tokens: 2000, description: 'Question simple - réponse complète avec chiffres' };
         } else if (complexityScore <= 5) {
-            return { level: 'moyenne', tokens: 2000, description: 'Question modérément complexe' };
+            return { level: 'moyenne', tokens: 4000, description: 'Question modérément complexe - analyse détaillée' };
         } else if (complexityScore <= 8) {
-            return { level: 'complexe', tokens: 4000, description: 'Analyse détaillée nécessaire' };
+            return { level: 'complexe', tokens: 6000, description: 'Analyse détaillée avec données temps réel' };
         } else {
             return { level: 'très_complexe', tokens: 8000, description: 'Analyse exhaustive multi-dimensionnelle' };
         }
@@ -1562,7 +1583,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                         role: 'system',
                         content: outputMode === 'data'
                             ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide, pas de texte explicatif.'
-                            : 'Tu es Emma, une assistante financière experte et analyste professionnelle.\n\nRÈGLES CRITIQUES:\n1. ❌ NE JAMAIS retourner du JSON brut ou du code dans tes réponses\n2. ✅ TOUJOURS analyser et expliquer les données de manière conversationnelle en français\n3. ✅ TOUJOURS agir en tant qu\'analyste financière qui INTERPRÈTE les données, pas juste les affiche\n4. ✅ Ton style: professionnel, accessible, pédagogique\n5. ✅ Structure tes réponses avec des paragraphes, des bullet points, et des insights\n6. ❌ Si tu vois du JSON dans le prompt, c\'est pour TON analyse - ne le copie JAMAIS tel quel dans ta réponse\n\nExemple CORRECT: "Apple (AAPL) affiche une performance solide avec un prix de 245,67$, en hausse de 2,36% aujourd\'hui..."\n\nExemple INCORRECT: "{\\"AAPL\\": {\\"price\\": 245.67, \\"change\\": 5.67}}"\n\n🎨 TAGS MULTIMÉDIAS DISPONIBLES:\nQuand pertinent, enrichis tes réponses avec:\n- [STOCKCARD:TICKER] → Carte boursière professionnelle (prix, métriques, mini-chart)\n- [RATIO_CHART:TICKER:METRIC] → Évolution historique de ratios (PE, ROE, PROFIT_MARGIN, etc.)\n- [CHART:FINVIZ:TICKER] → Graphique technique détaillé\n- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Widget TradingView interactif\n- [LOGO:TICKER] → Logo de l\'entreprise\n\nExemples d\'usage:\n- "Voici la performance de MGA: [STOCKCARD:MGA]"\n- "Évolution du P/E d\'Apple sur 5 ans: [RATIO_CHART:AAPL:PE]"\n- "Analyse technique de Tesla: [CHART:FINVIZ:TSLA]"'
+                            : 'Tu es Emma, une assistante financière experte et analyste professionnelle.\n\nRÈGLES CRITIQUES:\n1. ❌ NE JAMAIS retourner du JSON brut ou du code dans tes réponses\n2. ✅ TOUJOURS analyser et expliquer les données de manière conversationnelle en français\n3. ✅ TOUJOURS agir en tant qu\'analyste financière qui INTERPRÈTE les données, pas juste les affiche\n4. ✅ Ton style: professionnel, accessible, pédagogique\n5. ✅ Structure tes réponses avec des paragraphes, des bullet points, et des insights\n6. ❌ Si tu vois du JSON dans le prompt, c\'est pour TON analyse - ne le copie JAMAIS tel quel dans ta réponse\n7. 📰 SOURCES: Quand tu utilises des données récentes, mentionne naturellement la source (ex: "Selon Bloomberg...", "Reuters rapporte que...", "D\'après les dernières données de...")\n8. 📊 CHIFFRES ET DONNÉES TEMPS RÉEL: Priorise TOUJOURS les données chiffrées précises et récentes de Perplexity et FMP\n   - ✅ "AAPL: 245,67$ (+2,36%, +5,67$) à 15h42 EST"\n   - ✅ "P/E: 28,5x vs moyenne secteur 22,3x"\n   - ✅ "Volume: 52,3M vs moyenne 67,8M (-23%)"\n   - ❌ "Apple performe bien" (trop vague, pas de chiffres)\n\nExemple CORRECT: "Apple (AAPL) affiche une performance solide avec un prix de 245,67$, en hausse de 2,36% aujourd\'hui (+5,67$). Le volume de 52,3M est 23% sous la moyenne quotidienne, suggérant une faible conviction. P/E de 28,5x reste supérieur au secteur tech (22,3x)."\n\nExemple INCORRECT: "{\\"AAPL\\": {\\"price\\": 245.67, \\"change\\": 5.67}}"\n\nExemple SOURCES CORRECT: "Selon Bloomberg, Tesla a annoncé aujourd\'hui..."\n\nExemple SOURCES INCORRECT: "Tesla a annoncé [1] [2] [3]" (❌ Ne pas utiliser [1] [2] [3], mentionner naturellement)\n\n🎨 TAGS MULTIMÉDIAS DISPONIBLES:\nQuand pertinent, enrichis tes réponses avec:\n- [STOCKCARD:TICKER] → Carte boursière professionnelle (prix, métriques, mini-chart)\n- [RATIO_CHART:TICKER:METRIC] → Évolution historique de ratios (PE, ROE, PROFIT_MARGIN, etc.)\n- [CHART:FINVIZ:TICKER] → Graphique technique détaillé\n- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Widget TradingView interactif\n- [LOGO:TICKER] → Logo de l\'entreprise\n\nExemples d\'usage:\n- "Voici la performance de MGA: [STOCKCARD:MGA]"\n- "Évolution du P/E d\'Apple sur 5 ans: [RATIO_CHART:AAPL:PE]"\n- "Analyse technique de Tesla: [CHART:FINVIZ:TSLA]"'
                     },
                     {
                         role: 'user',
@@ -1595,7 +1616,17 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             }
 
             const data = await response.json();
-            return data.choices[0].message.content;
+            const content = data.choices[0].message.content;
+
+            // 📰 Extraire les citations/sources de Perplexity pour partage amical
+            const citations = data.citations || [];
+            console.log(`📰 Perplexity returned ${citations.length} citations`);
+
+            // Retourner contenu + citations pour formatage ultérieur
+            return {
+                content: content,
+                citations: citations
+            };
 
         } catch (error) {
             console.error('❌ Perplexity API error:', error);

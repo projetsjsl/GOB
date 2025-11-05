@@ -363,8 +363,12 @@ export default async function handler(req, res) {
     // 8. ADAPTER LA RÉPONSE POUR LE CANAL
     let adaptedResponse;
     try {
-      // Passer le contexte pour SMS (liens TradingView)
-      adaptedResponse = adaptForChannel(emmaResponse.response, channel, emmaContext);
+      // Passer le contexte + citations pour SMS (liens TradingView + sources amicales)
+      const adaptContext = {
+        ...emmaContext,
+        citations: emmaResponse.citations || []  // 📰 Ajouter citations pour formatage amical
+      };
+      adaptedResponse = adaptForChannel(emmaResponse.response, channel, adaptContext);
       console.log(`[Chat API] Réponse adaptée pour ${channel} (${adaptedResponse.length} chars)`);
     } catch (error) {
       console.error('[Chat API] Erreur adaptation canal:', error);
