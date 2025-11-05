@@ -56,20 +56,6 @@
       "maxDuration": 30
     }
   },
-  "crons": [
-    {
-      "path": "/api/briefing-cron",
-      "schedule": "20 11 * * 1-5"
-    },
-    {
-      "path": "/api/briefing-cron",
-      "schedule": "50 15 * * 1-5"
-    },
-    {
-      "path": "/api/briefing-cron",
-      "schedule": "20 20 * * 1-5"
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
