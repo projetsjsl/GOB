@@ -196,23 +196,31 @@ export default async function handler(req, res) {
       );
     }
 
-    // 6. ENVOYER LA RÉPONSE PAR SMS via TwiML
+    // 6. ENVOYER LA RÉPONSE PAR SMS
     try {
-      // Option A: Répondre directement via TwiML (recommandé pour Twilio)
       const response = chatResponse.response;
 
-      console.log(`[SMS Adapter] Envoi réponse via TwiML (${response.length} chars)`);
+      // Pour messages > 1600 chars, TwiML échoue silencieusement
+      // On utilise sendSMS() qui découpe automatiquement en plusieurs SMS
+      if (response.length > 1600) {
+        console.log(`[SMS Adapter] Message long (${response.length} chars) - envoi via sendSMS() avec découpage`);
 
-      res.setHeader('Content-Type', 'text/xml');
-      return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+        await sendSMS(senderPhone, response);
+
+        // Retourner TwiML vide pour confirmer à Twilio
+        res.setHeader('Content-Type', 'text/xml');
+        return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response></Response>`);
+      } else {
+        // Message court: TwiML direct (plus rapide)
+        console.log(`[SMS Adapter] Message court (${response.length} chars) - envoi via TwiML`);
+
+        res.setHeader('Content-Type', 'text/xml');
+        return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Message>${escapeXml(response)}</Message>
 </Response>`);
-
-      // Option B: Envoi manuel (désactivé temporairement)
-      // await sendSMS(senderPhone, chatResponse.response);
-      // res.setHeader('Content-Type', 'text/xml');
-      // return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
+      }
 
     } catch (error) {
       console.error('[SMS Adapter] Erreur envoi SMS:', error);
