@@ -192,6 +192,33 @@ export default async function handler(req, res) {
       // Non-bloquant, on continue sans historique
     }
 
+    // 4.5. RÉCUPÉRER LA WATCHLIST DE L'UTILISATEUR (pour contexte Emma)
+    let userWatchlist = [];
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+
+      const { data: watchlistData, error: watchlistError } = await supabase
+        .from('watchlists')
+        .select('tickers')
+        .eq('user_id', userProfile.id)
+        .single();
+
+      if (!watchlistError && watchlistData?.tickers) {
+        userWatchlist = watchlistData.tickers;
+        console.log(`[Chat API] Watchlist utilisateur: ${userWatchlist.join(', ')} (${userWatchlist.length} tickers)`);
+      } else if (watchlistError && watchlistError.code !== 'PGRST116') {
+        // PGRST116 = pas de ligne trouvée (watchlist vide)
+        console.log(`[Chat API] Watchlist non trouvée ou vide pour user ${userProfile.id}`);
+      }
+    } catch (error) {
+      console.error('[Chat API] Erreur récupération watchlist (non-bloquant):', error.message);
+      // Non-bloquant, on continue sans watchlist
+    }
+
     // 5. DÉTECTER SI EMMA DOIT SE PRÉSENTER
     const isFirstMessage = conversationHistory.length === 0;
     const isTestEmma = message.toLowerCase().includes('test emma');
@@ -220,7 +247,8 @@ export default async function handler(req, res) {
       user_name: userProfile.name || null, // Nom de l'utilisateur pour personnalisation
       user_channel: channel, // Canal de communication
       should_introduce: shouldIntroduce, // Emma doit se présenter
-      tickers: metadata?.tickers || [],
+      tickers: metadata?.tickers || userWatchlist, // Utiliser la watchlist si pas de tickers fournis
+      user_watchlist: userWatchlist, // Watchlist complète de l'utilisateur
       stockData: metadata?.stockData || {},
       newsData: metadata?.newsData || [],
       apiStatus: metadata?.apiStatus || {},
