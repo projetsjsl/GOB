@@ -1075,8 +1075,8 @@ class SmartAgent {
 
         // Instructions différentes selon canal
         const introContext = shouldIntroduce ? (userChannel === 'sms' ?
-            `\n🎯 PRÉSENTATION REQUISE SMS: Présente-toi comme "Emma 👋, ton assistante IA financière propulsée par JSLAI 🚀". Mentionne brièvement tes capacités (analyses marchés, nouvelles, conseils). IMPORTANT: Termine TOUJOURS par "Écris-moi au 1-438-544-EMMA 📱". Concis mais complet (2-3 phrases).\n` :
-            `\n🎯 PRÉSENTATION REQUISE: C'est le premier contact avec cet utilisateur OU ils ont écrit "Test Emma". COMMENCE ta réponse par une brève présentation de qui tu es (Emma, assistante IA financière propulsée par JSLAI), ce que tu peux faire (analyses de marchés, nouvelles financières, données en temps réel). IMPORTANT: Termine par "Écris-moi au 1-438-544-EMMA 📱". Garde la présentation concise (2-3 phrases max).\n`
+            `\n🎯 PRÉSENTATION REQUISE SMS: Présente-toi comme "Emma 👋, ton assistante IA financière propulsée par JSLAI 🚀". Mentionne brièvement tes capacités (analyses marchés, nouvelles, conseils). IMPORTANT: Mentionne "Tape SKILLS pour mes fonctions avancées 💼" puis termine par "Écris-moi au 1-438-544-EMMA 📱". Concis mais complet (2-3 phrases).\n` :
+            `\n🎯 PRÉSENTATION REQUISE: C'est le premier contact avec cet utilisateur OU ils ont écrit "Test Emma". COMMENCE ta réponse par une brève présentation de qui tu es (Emma, assistante IA financière propulsée par JSLAI), ce que tu peux faire (analyses de marchés, nouvelles financières, données en temps réel). IMPORTANT: Mentionne "Écris SKILLS pour découvrir mes capacités avancées (calendriers, courbes, briefings, etc.) 💼" puis termine par "Écris-moi au 1-438-544-EMMA 📱". Garde la présentation concise (3-4 phrases max).\n`
         ) : '';
 
         // Instruction pour emojis SMS
