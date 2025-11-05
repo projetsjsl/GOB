@@ -871,6 +871,9 @@ class SmartAgent {
             } else if (outputMode === 'briefing' || outputMode === 'ticker_note') {
                 // Nettoyer le Markdown (enlever éventuels artifacts)
                 response = this._cleanMarkdown(response);
+            } else if (outputMode === 'chat') {
+                // 🛡️ Nettoyer tout JSON brut qui pourrait avoir été inclus dans la réponse conversationnelle
+                response = this._sanitizeJsonInResponse(response);
             }
 
             // 🛡️ FRESH DATA GUARD: Valider que les données factuelles ont des sources
@@ -892,6 +895,9 @@ class SmartAgent {
                     } else {
                         response = retryResult;
                     }
+
+                    // Nettoyer JSON du retry aussi
+                    response = this._sanitizeJsonInResponse(response);
 
                     // Re-valider
                     validation = this._validateFreshData(response, intentData);
@@ -1026,6 +1032,64 @@ class SmartAgent {
     }
 
     /**
+     * 🛡️ Détecte et nettoie le JSON brut dans les réponses conversationnelles
+     * Protection contre les réponses qui contiennent du JSON au lieu de texte naturel
+     */
+    _sanitizeJsonInResponse(response) {
+        try {
+            // Détecter si la réponse contient beaucoup de JSON brut
+            const jsonPatterns = [
+                /\{[\s\S]{100,}\}/g,  // Gros objets JSON (>100 chars)
+                /\[[\s\S]{100,}\]/g,  // Gros arrays JSON (>100 chars)
+                /"[a-zA-Z_]+"\s*:\s*[{\["]/g  // Pattern clé:valeur JSON
+            ];
+
+            let hasJsonDump = false;
+            for (const pattern of jsonPatterns) {
+                if (pattern.test(response)) {
+                    hasJsonDump = true;
+                    break;
+                }
+            }
+
+            // Si pas de JSON dump détecté, retourner tel quel
+            if (!hasJsonDump) {
+                return response;
+            }
+
+            console.warn('⚠️ JSON dump detected in response, attempting to clean...');
+
+            // Extraire le texte avant et après le JSON
+            let cleaned = response;
+
+            // Supprimer les gros blocs JSON (>100 chars)
+            cleaned = cleaned.replace(/\{[\s\S]{100,}\}/g, '[données supprimées]');
+            cleaned = cleaned.replace(/\[[\s\S]{100,}\]/g, '[données supprimées]');
+
+            // Supprimer les code blocks JSON
+            cleaned = cleaned.replace(/```json[\s\S]*?```/g, '[données supprimées]');
+            cleaned = cleaned.replace(/```[\s\S]*?```/g, '[données supprimées]');
+
+            // Si la réponse nettoyée est trop courte (moins de 50 chars), c'était probablement que du JSON
+            if (cleaned.replace(/\[données supprimées\]/g, '').trim().length < 50) {
+                console.error('❌ Response was mostly JSON, returning fallback message');
+                return "Je dispose de nombreuses données financières pour répondre à votre question, mais je rencontre un problème technique pour les présenter clairement. Pourriez-vous reformuler votre question de manière plus spécifique ? Par exemple : 'Quel est le prix actuel de [TICKER] ?' ou 'Quelles sont les dernières nouvelles sur [TICKER] ?'";
+            }
+
+            // Nettoyer les espaces multiples
+            cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+            cleaned = cleaned.trim();
+
+            console.log('✅ JSON dump cleaned from response');
+            return cleaned;
+
+        } catch (error) {
+            console.error('Error sanitizing JSON in response:', error);
+            return response; // Retourner original en cas d'erreur
+        }
+    }
+
+    /**
      * Construction du prompt pour Perplexity (ROUTER - 4 MODES)
      */
     _buildPerplexityPrompt(userMessage, toolsData, conversationContext, context, intentData = null) {
@@ -1048,6 +1112,71 @@ class SmartAgent {
             default:
                 console.warn(`⚠️ Unknown output_mode: ${outputMode}, fallback to chat`);
                 return this._buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData);
+        }
+    }
+
+    /**
+     * 📝 Résume intelligemment les données d'un outil pour éviter de dumper du JSON massif
+     * Limite la taille et structure les données de manière plus lisible pour l'AI
+     */
+    _summarizeToolData(toolId, data) {
+        try {
+            // Limite de taille pour éviter les dumps JSON massifs
+            const MAX_ITEMS = 5;  // Max 5 items par array
+            const MAX_CHARS = 1000;  // Max 1000 chars par outil
+
+            // Cas spéciaux selon le type d'outil
+            if (toolId.includes('news')) {
+                // Pour les news, limiter à 5 articles max avec résumé
+                if (Array.isArray(data)) {
+                    const limitedNews = data.slice(0, MAX_ITEMS).map(article => ({
+                        title: article.title || article.headline,
+                        date: article.publishedDate || article.datetime,
+                        url: article.url
+                    }));
+                    return JSON.stringify(limitedNews, null, 2);
+                }
+            }
+
+            if (toolId.includes('fundamentals') || toolId.includes('ratios') || toolId.includes('metrics')) {
+                // Pour les fondamentaux, extraire seulement les métriques clés
+                const keyMetrics = {};
+                const importantKeys = ['price', 'pe', 'eps', 'marketCap', 'revenue', 'netIncome', 'debtToEquity', 'currentRatio', 'roe', 'dividendYield'];
+
+                for (const key of importantKeys) {
+                    if (data[key] !== undefined) {
+                        keyMetrics[key] = data[key];
+                    }
+                }
+
+                // Si pas de clés importantes trouvées, prendre les 10 premières clés
+                if (Object.keys(keyMetrics).length === 0 && typeof data === 'object') {
+                    const allKeys = Object.keys(data).slice(0, 10);
+                    for (const key of allKeys) {
+                        keyMetrics[key] = data[key];
+                    }
+                }
+
+                return JSON.stringify(keyMetrics, null, 2);
+            }
+
+            // Pour les arrays génériques, limiter le nombre d'éléments
+            if (Array.isArray(data)) {
+                const limited = data.slice(0, MAX_ITEMS);
+                return JSON.stringify(limited, null, 2);
+            }
+
+            // Pour les objets, convertir en JSON et tronquer si trop long
+            let jsonStr = JSON.stringify(data, null, 2);
+            if (jsonStr.length > MAX_CHARS) {
+                jsonStr = jsonStr.substring(0, MAX_CHARS) + '\n... (données tronquées pour lisibilité)';
+            }
+
+            return jsonStr;
+
+        } catch (error) {
+            console.error(`Error summarizing data for ${toolId}:`, error);
+            return JSON.stringify(data, null, 2).substring(0, 500);
         }
     }
 
@@ -1096,25 +1225,29 @@ class SmartAgent {
 CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
 ${intentContext}
-DONNÉES DISPONIBLES DES OUTILS:
+DONNÉES DISPONIBLES DES OUTILS (résumées pour éviter surcharge):
 ${toolsData.map(t => {
     const reliabilityNote = t.is_reliable === false ? ' [⚠️ SOURCE PARTIELLE - Utiliser avec prudence]' : '';
-    return `- ${t.tool}${reliabilityNote}: ${JSON.stringify(t.data, null, 2)}`;
+    return `- ${t.tool}${reliabilityNote}: ${this._summarizeToolData(t.tool, t.data)}`;
 }).join('\n')}
 
 QUESTION DE L'UTILISATEUR: ${userMessage}
 
 INSTRUCTIONS CRITIQUES:
-1. ❌ ❌ ❌ NE JAMAIS COPIER DU JSON BRUT DANS TA RÉPONSE ❌ ❌ ❌
-   - Les données JSON ci-dessus sont pour TON analyse SEULEMENT
-   - Tu dois TOUJOURS transformer ces données en texte conversationnel français
-   - Exemple INTERDIT: "{\\"price\\": 245.67}"
-   - Exemple CORRECT: "Le prix actuel est de 245,67$"
+1. ❌ ❌ ❌ ABSOLUMENT INTERDIT DE COPIER DU JSON/CODE DANS TA RÉPONSE ❌ ❌ ❌
+   - Les données JSON ci-dessus sont pour TON ANALYSE INTERNE SEULEMENT
+   - Tu dois TOUJOURS transformer ces données en TEXTE NATUREL EN FRANÇAIS
+   - ❌ INTERDIT: Afficher "{\\"price\\": 245.67}" ou tout autre JSON/code
+   - ❌ INTERDIT: Afficher des listes JSON comme "[{...}, {...}]"
+   - ❌ INTERDIT: Copier-coller des structures de données brutes
+   - ✅ CORRECT: "Le prix actuel est de 245,67$, en hausse de 2,3%"
+   - ✅ CORRECT: "Voici les 3 dernières actualités : 1) [titre], 2) [titre], 3) [titre]"
 
-2. ✅ TU ES UNE ANALYSTE, PAS UN ROBOT QUI AFFICHE DES DONNÉES
-   - INTERPRÈTE les chiffres, ne les affiche pas juste
-   - EXPLIQUE ce que signifient les données
-   - DONNE des insights et du contexte
+2. ✅ TU ES UNE ANALYSTE FINANCIÈRE HUMAINE, PAS UN TERMINAL DE DONNÉES
+   - INTERPRÈTE et SYNTHÉTISE les chiffres de manière conversationnelle
+   - EXPLIQUE le contexte et la signification des données
+   - RACONTE l'histoire derrière les chiffres, ne les liste pas
+   - Utilise des PHRASES COMPLÈTES et des PARAGRAPHES lisibles
 
 3. ✅ TOUJOURS fournir une réponse COMPLÈTE et UTILE basée sur les données disponibles
 4. ✅ Utilise TOUTES les données fournies par les outils, MÊME si marquées "[⚠️ SOURCE PARTIELLE]"
