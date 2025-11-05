@@ -1162,10 +1162,15 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
 
                 // Afficher intro Seeking Alpha si c'est la première visite de cette page load
-                if (tabId === 'scrapping-sa' && !tabsVisitedThisSession['seekingalpha']) {
-                    setShowSeekingAlphaIntro(true);
-                    setTimeout(() => setShowSeekingAlphaIntro(false), 3000);
-                    setTabsVisitedThisSession(prev => ({...prev, 'seekingalpha': true}));
+                if (tabId === 'scrapping-sa') {
+                    if (!tabsVisitedThisSession['seekingalpha']) {
+                        setShowSeekingAlphaIntro(true);
+                        setTimeout(() => setShowSeekingAlphaIntro(false), 3000);
+                        setTabsVisitedThisSession(prev => ({...prev, 'seekingalpha': true}));
+                    }
+                    // Charger les données Seeking Alpha
+                    fetchSeekingAlphaData();
+                    fetchSeekingAlphaStockData();
                 }
             };
 
