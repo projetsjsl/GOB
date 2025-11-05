@@ -45,10 +45,9 @@ class SmartAgent {
             const intentData = await this._analyzeIntent(userMessage, context);
             console.log('🧠 Intent analysis:', intentData ? intentData.intent : 'fallback to keyword scoring');
 
-            // Si clarification nécessaire, retourner immédiatement
-            if (intentData && intentData.needs_clarification) {
-                return this._handleClarification(intentData, userMessage);
-            }
+            // ❌ CLARIFICATIONS DÉSACTIVÉES - Emma répond TOUJOURS directement
+            // Les LLMs (Perplexity, Gemini, Claude) gèrent mieux l'ambiguïté que les clarifications
+            // L'utilisateur préfère des réponses (même imparfaites) que des questions
 
             // GESTION DIRECTE: Demande de watchlist/portfolio (réponse immédiate sans outils)
             if (intentData && intentData.intent === 'portfolio') {
@@ -325,7 +324,7 @@ class SmartAgent {
         const hasTickers = intentData?.tickers && intentData.tickers.length > 0;
         const hasToolData = toolsData && toolsData.length > 0;
 
-        // PERPLEXITY: Requêtes factuelles avec sources
+        // PERPLEXITY: Requêtes factuelles avec sources (RIGUEUR MAXIMALE)
         const factualIntents = [
             'stock_price',
             'fundamentals',
@@ -334,7 +333,15 @@ class SmartAgent {
             'comparative_analysis',
             'earnings',
             'market_overview',
-            'recommendation'
+            'recommendation',
+            // Nouveaux intents financiers avancés
+            'economic_analysis',
+            'political_analysis',
+            'investment_strategy',
+            'risk_volatility',
+            'sector_industry',
+            'valuation',
+            'technical_analysis' // Toujours factuel avec données
         ];
 
         if (factualIntents.includes(intent) || hasTickers || hasToolData) {
