@@ -50,6 +50,12 @@ class SmartAgent {
                 return this._handleClarification(intentData, userMessage);
             }
 
+            // GESTION DIRECTE: Demande de watchlist/portfolio (réponse immédiate sans outils)
+            if (intentData && intentData.intent === 'portfolio') {
+                console.log('📊 Portfolio/Watchlist request detected - responding directly');
+                return this._handlePortfolioRequest(userMessage, context);
+            }
+
             // Enrichir le contexte avec les données d'intention
             if (intentData) {
                 context.intent_data = intentData;
@@ -216,6 +222,56 @@ class SmartAgent {
             intent: intentData.intent,
             confidence: intentData.confidence,
             tools_used: [],
+            is_reliable: true
+        };
+    }
+
+    /**
+     * Gestion directe des demandes de watchlist/portfolio
+     */
+    _handlePortfolioRequest(userMessage, context) {
+        console.log('📊 Handling portfolio/watchlist request directly');
+
+        const userWatchlist = context.user_watchlist || [];
+        const teamTickers = context.team_tickers || [];
+        const userName = context.user_name || 'Utilisateur';
+
+        let response = `📊 **Vos Tickers Suivis**\n\n`;
+
+        // Watchlist personnelle
+        if (userWatchlist.length > 0) {
+            response += `🎯 **Watchlist Personnelle** (${userWatchlist.length} titres):\n`;
+            response += userWatchlist.map(ticker => `• ${ticker}`).join('\n');
+            response += '\n\n';
+        } else {
+            response += `🎯 **Watchlist Personnelle**: Vide\n\n`;
+        }
+
+        // Team tickers
+        if (teamTickers.length > 0) {
+            response += `👥 **Tickers d'Équipe** (${teamTickers.length} titres):\n`;
+            response += teamTickers.map(ticker => `• ${ticker}`).join('\n');
+            response += '\n\n';
+        }
+
+        // Total unique
+        const allUnique = [...new Set([...userWatchlist, ...teamTickers])];
+        response += `📈 **Total Unique**: ${allUnique.length} tickers\n\n`;
+
+        // Suggestions
+        response += `💡 **Suggestions**:\n`;
+        response += `• "Analyse AAPL" - Analyser une action\n`;
+        response += `• "Actualités sur mes tickers" - News récentes\n`;
+        response += `• "Performance de ma watchlist" - Vue d'ensemble\n`;
+
+        return {
+            success: true,
+            response: response,
+            intent: 'portfolio',
+            confidence: 0.99,
+            tools_used: [],
+            model: 'direct',
+            execution_time_ms: 10,
             is_reliable: true
         };
     }
