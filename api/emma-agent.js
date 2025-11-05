@@ -398,6 +398,15 @@ class SmartAgent {
         const message = userMessage.toLowerCase();
         const availableTools = this.toolsConfig.tools.filter(tool => tool.enabled);
 
+        // 🚫 SKIP OUTILS pour greetings et questions simples qui n'ont PAS besoin de données
+        const intent = context.intent_data?.intent || 'unknown';
+        const noToolsIntents = ['greeting', 'help', 'capabilities'];
+
+        if (noToolsIntents.includes(intent)) {
+            console.log(`👋 Intent "${intent}" detected - NO TOOLS NEEDED (will respond directly)`);
+            return []; // Retourner liste vide - Emma répondra sans données
+        }
+
         // Si intent analysis a suggéré des outils, leur donner la priorité
         const suggestedTools = context.suggested_tools || [];
         const extractedTickers = context.extracted_tickers || context.tickers || [];
