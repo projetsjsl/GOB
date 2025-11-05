@@ -50,6 +50,12 @@ class SmartAgent {
                 return this._handleClarification(intentData, userMessage);
             }
 
+            // GESTION DIRECTE: Demande de watchlist/portfolio (réponse immédiate sans outils)
+            if (intentData && intentData.intent === 'portfolio') {
+                console.log('📊 Portfolio/Watchlist request detected - responding directly');
+                return this._handlePortfolioRequest(userMessage, context);
+            }
+
             // Enrichir le contexte avec les données d'intention
             if (intentData) {
                 context.intent_data = intentData;
@@ -216,6 +222,69 @@ class SmartAgent {
             intent: intentData.intent,
             confidence: intentData.confidence,
             tools_used: [],
+            is_reliable: true
+        };
+    }
+
+    /**
+     * Gestion directe des demandes de watchlist/portfolio
+     */
+    _handlePortfolioRequest(userMessage, context) {
+        console.log('📊 Handling portfolio/watchlist request directly');
+
+        const userWatchlist = context.user_watchlist || [];
+        const teamTickers = context.team_tickers || [];
+        const userName = context.user_name || 'Utilisateur';
+
+        let response = `📊 **Système à 2 Listes de Tickers**\n\n`;
+
+        // LISTE 1: Watchlist personnelle
+        response += `**LISTE 1️⃣ - Watchlist Personnelle**\n`;
+        if (userWatchlist.length > 0) {
+            response += `🎯 ${userWatchlist.length} titres que VOUS suivez:\n`;
+            response += userWatchlist.map(ticker => `• ${ticker}`).join('\n');
+            response += '\n\n';
+        } else {
+            response += `🎯 Vide (ajoutez vos tickers personnels)\n\n`;
+        }
+
+        // LISTE 2: Team tickers
+        response += `**LISTE 2️⃣ - Tickers d'Équipe**\n`;
+        if (teamTickers.length > 0) {
+            response += `👥 ${teamTickers.length} titres suivis par l'ÉQUIPE:\n`;
+            response += teamTickers.map(ticker => `• ${ticker}`).join('\n');
+            response += '\n\n';
+        } else {
+            response += `👥 Aucun ticker d'équipe configuré\n\n`;
+        }
+
+        // Intersection (tickers communs)
+        const common = userWatchlist.filter(t => teamTickers.includes(t));
+        if (common.length > 0) {
+            response += `🔗 **Communs aux 2 listes**: ${common.join(', ')}\n\n`;
+        }
+
+        // Total unique
+        const allUnique = [...new Set([...userWatchlist, ...teamTickers])];
+        response += `📈 **Total Unique**: ${allUnique.length} tickers\n\n`;
+
+        response += `---\n\n`;
+        response += `💡 **Vous pouvez aussi demander N'IMPORTE QUEL autre ticker !**\n\n`;
+        response += `Exemples:\n`;
+        response += `• "Analyse TSLA" - Ticker hors listes\n`;
+        response += `• "Comparer AAPL vs MSFT"\n`;
+        response += `• "Actualités Accenture" (ACN)\n`;
+        response += `• "Performance de ma watchlist"\n`;
+        response += `• "Vue d'ensemble team tickers"\n`;
+
+        return {
+            success: true,
+            response: response,
+            intent: 'portfolio',
+            confidence: 0.99,
+            tools_used: [],
+            model: 'direct',
+            execution_time_ms: 10,
             is_reliable: true
         };
     }

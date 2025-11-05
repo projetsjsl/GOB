@@ -228,23 +228,36 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
+      // Essayer d'abord la table team_tickers (table principale)
       const { data: teamTickersData, error: teamTickersError } = await supabase
-        .from('tickers')
+        .from('team_tickers')
         .select('ticker')
-        .eq('source', 'team')
-        .eq('is_active', true);
+        .order('priority', { ascending: false });
 
       if (!teamTickersError && teamTickersData && teamTickersData.length > 0) {
         teamTickers = teamTickersData.map(item => item.ticker);
-        console.log(`[Chat API] Team tickers: ${teamTickers.join(', ')} (${teamTickers.length} tickers)`);
+        console.log(`[Chat API] Team tickers (team_tickers table): ${teamTickers.join(', ')} (${teamTickers.length} tickers)`);
       } else {
-        // Fallback vers liste hardcodée
-        teamTickers = [
-          'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
-          'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
-          'TRP', 'UNH', 'UL', 'VZ', 'WFC'
-        ];
-        console.log(`[Chat API] Team tickers (fallback): ${teamTickers.length} tickers`);
+        // Fallback: essayer la nouvelle table tickers avec source='team'
+        console.log('[Chat API] Table team_tickers vide ou erreur, essai table tickers...');
+        const { data: altTickersData, error: altError } = await supabase
+          .from('tickers')
+          .select('ticker')
+          .eq('source', 'team')
+          .eq('is_active', true);
+
+        if (!altError && altTickersData && altTickersData.length > 0) {
+          teamTickers = altTickersData.map(item => item.ticker);
+          console.log(`[Chat API] Team tickers (tickers table): ${teamTickers.join(', ')} (${teamTickers.length} tickers)`);
+        } else {
+          // Fallback ultime: liste hardcodée
+          teamTickers = [
+            'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
+            'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
+            'TRP', 'UNH', 'UL', 'VZ', 'WFC'
+          ];
+          console.log(`[Chat API] Team tickers (fallback hardcodé): ${teamTickers.length} tickers`);
+        }
       }
     } catch (error) {
       console.error('[Chat API] Erreur récupération team tickers (non-bloquant):', error.message);
@@ -348,7 +361,8 @@ export default async function handler(req, res) {
     // 8. ADAPTER LA RÉPONSE POUR LE CANAL
     let adaptedResponse;
     try {
-      adaptedResponse = adaptForChannel(emmaResponse.response, channel);
+      // Passer le contexte pour SMS (liens TradingView)
+      adaptedResponse = adaptForChannel(emmaResponse.response, channel, emmaContext);
       console.log(`[Chat API] Réponse adaptée pour ${channel} (${adaptedResponse.length} chars)`);
     } catch (error) {
       console.error('[Chat API] Erreur adaptation canal:', error);
