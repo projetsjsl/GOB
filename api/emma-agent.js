@@ -795,8 +795,10 @@ class SmartAgent {
      * Génération de la réponse finale avec SMART ROUTING (Perplexity/Gemini/Claude)
      */
     async _generate_response(userMessage, toolResults, context, intentData = null) {
-        try {
+        // Déclarer outputMode avant le try pour qu'il soit accessible dans le catch
             const outputMode = context.output_mode || 'chat';
+        
+        try {
             console.log(`🎯 Generating response for mode: ${outputMode}`);
 
             // Préparation du contexte
