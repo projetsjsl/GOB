@@ -2270,22 +2270,20 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
             console.log('🚀 Calling Perplexity API...');
 
             // ⏱️ Timeout flexible selon le mode
-            // - SMS: 45s pour streaming, 30s sinon
+            // - SMS: 30s
             // - Chat/Briefing: 45s (requêtes complexes avec screening)
-            const enableStreaming = context.user_channel === 'sms';
-            const timeoutDuration = context.user_channel === 'sms' 
-                ? (enableStreaming ? 45000 : 30000)
-                : 45000;
+            const enableStreaming = false; // DÉSACTIVÉ - Causait corruption de texte
+            const timeoutDuration = context.user_channel === 'sms' ? 30000 : 45000;
             const controller = new AbortController();
             const timeout = setTimeout(() => {
                 console.error(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s`);
                 controller.abort();
             }, timeoutDuration);
 
-            // Activer streaming pour SMS
-            if (enableStreaming) {
-                requestBody.stream = true;
-            }
+            // Streaming désactivé (causait corruption)
+            // if (enableStreaming) {
+            //     requestBody.stream = true;
+            // }
 
             const response = await fetch('https://api.perplexity.ai/chat/completions', {
                 method: 'POST',
@@ -2344,77 +2342,27 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
 
     /**
      * Gestion du streaming Perplexity pour SMS avec envoi progressif
+     * DÉSACTIVÉ - Causait corruption de texte (tokens coupés)
      */
     async _handleStreamingSMS(response, context) {
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder('utf-8');
-        
-        let accumulatedContent = '';
-        let citations = [];
-        let chunksSent = 0;
-        const CHUNK_SIZE = 2000;
+        // STREAMING DÉSACTIVÉ - Retour au mode classique
+        console.log('⚠️ Streaming désactivé, utilisation mode classique');
         
         try {
-            console.log('📡 Starting Perplexity streaming for SMS...');
+            const data = await response.json();
+            const content = data.choices[0].message.content;
+            const citations = data.citations || [];
             
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                
-                const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split('\n').filter(line => line.trim() !== '');
-                
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const jsonStr = line.slice(6);
-                        if (jsonStr === '[DONE]') continue;
-                        
-                        try {
-                            const data = JSON.parse(jsonStr);
-                            const content = data.choices?.[0]?.delta?.content || '';
-                            accumulatedContent += content;
-                            
-                            // Extraire citations si présentes
-                            if (data.citations) {
-                                citations = data.citations;
-                            }
-                            
-                            // Envoyer chunk SMS dès que 2000 chars atteints
-                            if (accumulatedContent.length >= CHUNK_SIZE * (chunksSent + 1)) {
-                                await this._sendSMSChunk(accumulatedContent, chunksSent, context);
-                                chunksSent++;
-                            }
-                        } catch (parseError) {
-                            console.warn('⚠️ Failed to parse streaming chunk:', parseError.message);
-                        }
-                    }
-                }
-            }
-            
-            // Envoyer le dernier chunk si reste du contenu
-            if (accumulatedContent.length > CHUNK_SIZE * chunksSent) {
-                await this._sendSMSChunk(accumulatedContent, chunksSent, context, true);
-                chunksSent++;
-            }
-            
-            console.log(`✅ Streaming completed: ${accumulatedContent.length} chars, ${chunksSent} chunks sent`);
+            console.log(`✅ Perplexity responded (non-streaming): ${content.length} chars`);
             
             return {
-                content: accumulatedContent,
+                content: content,
                 citations: citations,
-                streaming: true,
-                chunks_sent: chunksSent
+                streaming: false
             };
-            
         } catch (error) {
-            console.error('❌ Streaming error:', error);
-            // Fallback: retourner ce qui a été accumulé
-            return {
-                content: accumulatedContent || 'Erreur streaming, réponse partielle.',
-                citations: citations,
-                streaming: false,
-                error: error.message
-            };
+            console.error('❌ Error parsing Perplexity response:', error);
+            throw error;
         }
     }
 
