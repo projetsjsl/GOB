@@ -47,10 +47,10 @@
       "maxDuration": 15
     },
     "api/chat.js": {
-      "maxDuration": 60
+      "maxDuration": 90
     },
     "api/adapters/sms.js": {
-      "maxDuration": 30
+      "maxDuration": 90
     },
     "api/adapters/email.js": {
       "maxDuration": 30
