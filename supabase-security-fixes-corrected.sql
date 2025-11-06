@@ -294,3 +294,4 @@ BEGIN
     RAISE NOTICE '✅ Vues recréées sans SECURITY DEFINER';
     RAISE NOTICE '🚀 Base de données sécurisée et conforme!';
 END $$;
+

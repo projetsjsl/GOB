@@ -570,3 +570,5 @@ console.log('FIN DU SCRIPT');
 console.log('═'.repeat(60));
 
 export { ADAPTIVE_SQL };
+
+

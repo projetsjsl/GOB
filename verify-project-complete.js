@@ -264,3 +264,4 @@ console.log('');
 console.log('🎉 Vérification terminée!');
 
 export { REQUIRED_FILES, REQUIRED_DIRECTORIES, CRITICAL_DEPENDENCIES };
+

@@ -266,3 +266,4 @@ console.log(`   • ${issues.length} problèmes à résoudre`);
 console.log(`   • Score global: ${Math.round((activeTablesPct + viewsPct) / 2)}%`);
 
 export { EXPECTED_TABLES, EXPECTED_VIEWS, issues };
+

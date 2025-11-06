@@ -156,3 +156,4 @@ vercel --prod
 
 **✅ Configuration terminée !**  
 Le système Emma AI est maintenant prêt avec toutes les tables nécessaires pour le suivi des earnings et l'analyse des nouvelles.
+
