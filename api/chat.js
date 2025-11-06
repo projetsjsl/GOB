@@ -565,7 +565,7 @@ Comment puis-je t'aider ? 🚀`;
 
     // 5.6. DÉTECTION MOTS-CLÉS MAJUSCULES (Raccourcis directs - ultra-rapide)
     // Ces mots-clés forcent une intention spécifique sans analyse NLP
-    let forcedIntent = null;
+    // forcedIntent déjà déclaré ligne 205
     let extractedTickers = [];
 
     // Helper functions delegating to centralized TickerExtractor utility
