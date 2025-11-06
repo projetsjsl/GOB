@@ -341,7 +341,7 @@ async function sendSMS(to, message, simulate = false) {
       // Donc on envoie 3/3, puis 2/3, puis 1/3 pour qu'ils s'affichent 1/3, 2/3, 3/3
       for (let i = chunks.length - 1; i >= 0; i--) {
         const chunk = chunks[i];
-        const prefix = chunks.length > 1 ? `📱 Partie ${i + 1}/${chunks.length}\n\n` : '';
+        const prefix = chunks.length > 1 ? `👩🏻 📱 Partie ${i + 1}/${chunks.length}\n\n` : '👩🏻 ';
 
         await client.messages.create({
           from: twilioPhoneNumber,
@@ -360,11 +360,11 @@ async function sendSMS(to, message, simulate = false) {
       return { success: true, messageCount: chunks.length };
 
     } else {
-      // Message simple
+      // Message simple (< 1600 chars) - Ajouter emoji Emma au début
       const result = await client.messages.create({
         from: twilioPhoneNumber,
         to: to,
-        body: message
+        body: `👩🏻 ${message}`
       });
 
       console.log(`[SMS Adapter] SMS envoyé avec succès - SID: ${result.sid}`);
