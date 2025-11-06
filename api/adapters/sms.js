@@ -415,12 +415,23 @@ function chunkMessage(text, maxLength) {
       if (currentChunk) {
         chunks.push(currentChunk);
       }
-      // Si une phrase est trop longue, la couper brutalement
+      // Si une phrase est trop longue, la couper INTELLIGEMMENT au dernier espace
       if (sentence.length > maxLength) {
         let remaining = sentence;
         while (remaining.length > 0) {
-          chunks.push(remaining.substring(0, maxLength));
-          remaining = remaining.substring(maxLength);
+          if (remaining.length <= maxLength) {
+            chunks.push(remaining);
+            remaining = '';
+          } else {
+            // Chercher le dernier espace avant maxLength
+            let cutPos = maxLength;
+            const lastSpace = remaining.lastIndexOf(' ', maxLength);
+            if (lastSpace > maxLength * 0.7) { // Au moins 70% du max pour éviter chunks trop courts
+              cutPos = lastSpace;
+            }
+            chunks.push(remaining.substring(0, cutPos).trim());
+            remaining = remaining.substring(cutPos).trim();
+          }
         }
         currentChunk = '';
       } else {
