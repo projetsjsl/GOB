@@ -202,9 +202,10 @@ export default async function handler(req, res) {
 <Response></Response>`);
       }
 
-      // Pour messages > 1600 chars, TwiML échoue silencieusement
+      // Pour messages > 1000 chars, TwiML échoue silencieusement
       // On utilise sendSMS() qui découpe automatiquement en plusieurs SMS
-      if (response.length > 1600) {
+      // BAISSÉ de 1600 → 1000 car TwiML échoue même pour 1400 chars
+      if (response.length > 1000) {
         console.log(`[SMS Adapter] Message long (${response.length} chars) - envoi via sendSMS() avec découpage`);
 
         await sendSMS(senderPhone, response);

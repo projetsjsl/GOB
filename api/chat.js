@@ -17,6 +17,51 @@ import { validateYTDData, enrichStockDataWithSources } from '../lib/ytd-validato
 import { generateCacheKey, getCachedResponse, setCachedResponse } from '../lib/response-cache.js';
 
 /**
+ * Valide qu'une réponse est complète selon le type d'analyse
+ * 
+ * @param {string} response - La réponse à valider
+ * @param {string} analysisType - Type d'analyse (comprehensive_analysis, fundamentals, etc.)
+ * @param {object} intentData - Données d'intention (forcedIntent)
+ * @returns {boolean} true si la réponse est complète, false sinon
+ */
+function validateResponseCompleteness(response, analysisType, intentData) {
+  const intent = intentData?.intent || analysisType;
+  
+  // Pour comprehensive_analysis, vérifier présence des sections obligatoires
+  if (intent === 'comprehensive_analysis') {
+    const requiredSections = [
+      'Valorisation', 'Performance', 'Fondamentaux', 
+      'Moat', 'Valeur', 'Risques', 'Recommandation', 'Questions'
+    ];
+    
+    const missingCount = requiredSections.filter(
+      section => !response.includes(section)
+    ).length;
+    
+    // Si > 3 sections manquantes OU réponse < 1500 mots, considérer incomplète
+    const wordCount = response.split(/\s+/).length;
+    const isComplete = missingCount <= 3 && wordCount >= 1500;
+    
+    if (!isComplete) {
+      console.warn(`⚠️ [Validation] Sections manquantes: ${missingCount}/8, Mots: ${wordCount}/1500`);
+    }
+    
+    return isComplete;
+  }
+  
+  // Pour autres types, validation basique (longueur minimale)
+  const minWordCount = {
+    'fundamentals': 500,
+    'technical_analysis': 400,
+    'news': 300,
+    'stock_price': 100
+  };
+  
+  const wordCount = response.split(/\s+/).length;
+  return wordCount >= (minWordCount[intent] || 200);
+}
+
+/**
  * Handler POST /api/chat
  *
  * Body: {
@@ -893,16 +938,29 @@ Comment puis-je t'aider ? 🚀`;
     // 8.5. 💾 SAUVEGARDER DANS LE CACHE (si applicable)
     if (cacheKey && primaryTicker && !isSimulation) {
       try {
-        await setCachedResponse(cacheKey, emmaResponse.response, {
-          ticker: primaryTicker,
-          analysis_type: analysisType,
-          channel: channel,
-          user_id: userId,
-          model: emmaResponse.model,
-          tools_used: emmaResponse.tools_used,
-          confidence: emmaResponse.confidence
-        });
-        console.log('[Chat API] 💾 ✅ Réponse sauvegardée dans le cache (expire: 2h)');
+        // ✅ NOUVEAU: Valider complétude avant mise en cache
+        const isComplete = validateResponseCompleteness(
+          emmaResponse.response, 
+          analysisType, 
+          forcedIntent
+        );
+        
+        if (!isComplete) {
+          console.warn(`⚠️ [Cache] Réponse incomplète détectée, pas de mise en cache`);
+          console.warn(`⚠️ [Cache] Longueur: ${emmaResponse.response.length} chars, Type: ${analysisType}`);
+          // Ne pas mettre en cache les réponses incomplètes
+        } else {
+          await setCachedResponse(cacheKey, emmaResponse.response, {
+            ticker: primaryTicker,
+            analysis_type: analysisType,
+            channel: channel,
+            user_id: userId,
+            model: emmaResponse.model,
+            tools_used: emmaResponse.tools_used,
+            confidence: emmaResponse.confidence
+          });
+          console.log('[Chat API] 💾 ✅ Réponse complète sauvegardée dans le cache (expire: 2h)');
+        }
       } catch (error) {
         console.error('[Chat API] ⚠️ Erreur sauvegarde cache (non-bloquant):', error);
         // Non-bloquant, on continue
