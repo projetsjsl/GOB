@@ -127,7 +127,7 @@ export default async function handler(req, res) {
     try {
       await sendSMS(
         senderPhone,
-        '🔍 Message reçu! Emma analyse ta demande... Je reviens dans quelques instants! ⏳'
+        '🔍 Message reçu! J\'analyse ta demande, je te reviens! ⏳'
       );
       console.log('[SMS Adapter] SMS de confirmation envoyé');
     } catch (confirmError) {
