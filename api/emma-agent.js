@@ -1895,9 +1895,17 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             } else if (outputMode === 'chat') {
                 // 🧠 Détection automatique de complexité pour ajustement intelligent
                 complexityInfo = this._detectComplexity(userMessage, intentData, toolResults);
-                // 🚀🚀 MULTIPLIER par 3 les tokens pour réponses ULTRA-LONGUES
-                maxTokens = complexityInfo.tokens * 3;
-                console.log(`🧠 Complexité détectée: ${complexityInfo.level} → ${maxTokens} tokens (×3 BOOST MAXIMUM pour réponses ULTRA-LONGUES) (${complexityInfo.description})`);
+                
+                // ✅ FIX: Forcer 15000 tokens pour comprehensive_analysis (12 sections obligatoires)
+                const isComprehensiveAnalysis = intentData?.intent === 'comprehensive_analysis';
+                if (isComprehensiveAnalysis) {
+                    maxTokens = 15000;  // 🎯 FORCÉ: 15000 tokens pour analyses complètes (12 sections)
+                    console.log(`🎯 Comprehensive Analysis détecté → FORCÉ à 15000 tokens (12 sections obligatoires)`);
+                } else {
+                    // 🚀🚀 MULTIPLIER par 3 les tokens pour réponses ULTRA-LONGUES
+                    maxTokens = complexityInfo.tokens * 3;
+                    console.log(`🧠 Complexité détectée: ${complexityInfo.level} → ${maxTokens} tokens (×3 BOOST MAXIMUM pour réponses ULTRA-LONGUES) (${complexityInfo.description})`);
+                }
             }
 
             const requestBody = {
@@ -2269,14 +2277,21 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
 
             console.log('🚀 Calling Perplexity API...');
 
-            // ⏱️ Timeout flexible selon le mode
-            // - SMS: 30s
-            // - Chat/Briefing: 45s (requêtes complexes avec screening)
+            // ⏱️ Timeout flexible selon le mode et l'intent
+            // - SMS: 30s (optimisé pour vitesse)
+            // - Comprehensive Analysis: 90s (analyses longues avec 12 sections)
+            // - Autres: 60s (standard)
             const enableStreaming = false; // DÉSACTIVÉ - Causait corruption de texte
-            const timeoutDuration = context.user_channel === 'sms' ? 30000 : 45000;
+            const isComprehensiveAnalysis = intentData?.intent === 'comprehensive_analysis';
+            const timeoutDuration = context.user_channel === 'sms' 
+                ? 30000  // SMS: 30s
+                : isComprehensiveAnalysis 
+                    ? 90000  // Comprehensive: 90s (12 sections + macro + moat + DCF)
+                    : 60000; // Autres: 60s
+            
             const controller = new AbortController();
             const timeout = setTimeout(() => {
-                console.error(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s`);
+                console.error(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s (intent: ${intentData?.intent || 'unknown'})`);
                 controller.abort();
             }, timeoutDuration);
 
@@ -2316,7 +2331,34 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
 
             // 📰 Extraire les citations/sources de Perplexity pour partage amical
             const citations = data.citations || [];
-            console.log(`📰 Perplexity returned ${citations.length} citations`);
+            
+            // ✅ NOUVEAU: Logging détaillé pour diagnostic
+            const wordCount = content.split(/\s+/).length;
+            const charCount = content.length;
+            const tokensUsed = data.usage?.total_tokens || 'unknown';
+            const tokensRequested = maxTokens;
+
+            console.log(`📊 [Perplexity Response Stats]`);
+            console.log(`   - Words: ${wordCount}`);
+            console.log(`   - Characters: ${charCount}`);
+            console.log(`   - Tokens used: ${tokensUsed}/${tokensRequested}`);
+            console.log(`   - Intent: ${intentData?.intent || 'unknown'}`);
+            console.log(`   - Output mode: ${outputMode}`);
+            console.log(`   - User channel: ${context.user_channel}`);
+            console.log(`   - Citations: ${citations.length}`);
+
+            // Vérifier si réponse semble tronquée
+            const seemsTruncated = !content.trim().endsWith('.') && 
+                                   !content.trim().endsWith('?') && 
+                                   !content.trim().endsWith('!');
+
+            if (seemsTruncated) {
+                console.warn(`⚠️ [Perplexity] Réponse semble tronquée (pas de ponctuation finale)`);
+            }
+
+            if (wordCount < 500 && intentData?.intent === 'comprehensive_analysis') {
+                console.warn(`⚠️ [Perplexity] Réponse très courte pour comprehensive_analysis: ${wordCount} mots (attendu: 2000+ mots)`);
+            }
 
             // Retourner contenu + citations pour formatage ultérieur
             return {
