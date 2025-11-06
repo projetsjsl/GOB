@@ -122,6 +122,19 @@ export default async function handler(req, res) {
     // 4. VÉRIFICATION ANTI-SPAM (optionnel)
     // TODO: Implémenter rate limiting basé sur le numéro de téléphone
 
+    // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMÉDIAT (UX)
+    // L'utilisateur sait qu'Emma travaille pendant le traitement
+    try {
+      await sendSMS(
+        senderPhone,
+        '🔍 Message reçu! Emma analyse ta demande... Je reviens dans quelques instants! ⏳'
+      );
+      console.log('[SMS Adapter] SMS de confirmation envoyé');
+    } catch (confirmError) {
+      console.error('[SMS Adapter] Erreur envoi SMS confirmation:', confirmError);
+      // Non-bloquant: on continue même si la confirmation échoue
+    }
+
     // 5. APPELER L'API CHAT CENTRALISÉE
     let chatResponse;
     try {
