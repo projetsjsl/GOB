@@ -202,10 +202,10 @@ export default async function handler(req, res) {
 <Response></Response>`);
       }
 
-      // Pour messages > 1000 chars, TwiML échoue silencieusement
+      // Pour messages > 800 chars, TwiML échoue silencieusement
       // On utilise sendSMS() qui découpe automatiquement en plusieurs SMS
-      // BAISSÉ de 1600 → 1000 car TwiML échoue même pour 1400 chars
-      if (response.length > 1000) {
+      // BAISSÉ de 1600 → 1000 → 800 car TwiML échoue même pour 800-1000 chars
+      if (response.length > 800) {
         console.log(`[SMS Adapter] Message long (${response.length} chars) - envoi via sendSMS() avec découpage`);
 
         await sendSMS(senderPhone, response);
@@ -239,6 +239,36 @@ export default async function handler(req, res) {
       } else {
         // Message court: TwiML direct (plus rapide)
         console.log(`[SMS Adapter] Message court (${response.length} chars) - envoi via TwiML`);
+
+        // 🛡️ FALLBACK: Si TwiML échoue, envoyer via sendSMS() après 3 secondes
+        setTimeout(async () => {
+          try {
+            // Vérifier si le message a été livré via Twilio API
+            const client = getTwilioClient();
+            const messages = await client.messages.list({
+              to: senderPhone,
+              limit: 1
+            });
+            
+            const lastMessage = messages[0];
+            const wasJustSent = lastMessage && 
+                                (Date.now() - new Date(lastMessage.dateCreated).getTime()) < 5000;
+            
+            if (!wasJustSent) {
+              console.warn('⚠️ [SMS Adapter] TwiML semble avoir échoué - Fallback vers sendSMS()');
+              await sendSMS(senderPhone, response);
+              console.log('✅ [SMS Adapter] Fallback SMS envoyé avec succès');
+            }
+          } catch (fallbackError) {
+            console.error('❌ [SMS Adapter] Erreur fallback:', fallbackError.message);
+            // Dernier recours: envoyer message d'erreur
+            try {
+              await sendSMS(senderPhone, '❌ Erreur technique. Réessayez ou consultez gobapps.com');
+            } catch (e) {
+              console.error('❌ [SMS Adapter] Impossible d\'envoyer message d\'erreur');
+            }
+          }
+        }, 3000);
 
         // 6.5. ENVOYER NOTIFICATION EMAIL EN ARRIÈRE-PLAN (après SMS)
         sendConversationEmail({
