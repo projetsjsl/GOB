@@ -1145,25 +1145,59 @@ class SmartAgent {
             }
 
             if (toolId.includes('fundamentals') || toolId.includes('ratios') || toolId.includes('metrics')) {
-                // Pour les fondamentaux, extraire seulement les métriques clés
-                const keyMetrics = {};
-                const importantKeys = ['price', 'pe', 'eps', 'marketCap', 'revenue', 'netIncome', 'debtToEquity', 'currentRatio', 'roe', 'dividendYield'];
+                // CFA®-Level: Extraire TOUS les ratios pertinents (39 ratios au lieu de 10)
+                const cfaMetrics = {};
 
-                for (const key of importantKeys) {
-                    if (data[key] !== undefined) {
-                        keyMetrics[key] = data[key];
+                // Définition complète des ratios CFA® par catégorie
+                const cfa_ratios = [
+                    // Valorisation (9 ratios)
+                    'pe', 'pb', 'ps', 'pfcf', 'pegRatio', 'evToSales', 'evToEbitda',
+                    'priceToFreeCashFlowsRatio', 'enterpriseValueMultiple', 'priceToOperatingCashFlowsRatio',
+
+                    // Prix et Capitalisation
+                    'price', 'marketCap', 'enterpriseValue',
+
+                    // Revenus et Croissance
+                    'revenue', 'revenueGrowth', 'revenuePerShare', 'netIncome', 'eps', 'epsgrowth',
+
+                    // Rentabilité (8 ratios)
+                    'roe', 'roa', 'roic', 'grossProfitMargin', 'operatingProfitMargin',
+                    'netProfitMargin', 'returnOnTangibleAssets', 'effectiveTaxRate',
+
+                    // Liquidité & Solvabilité (6 ratios)
+                    'currentRatio', 'quickRatio', 'cashRatio', 'debtToEquity',
+                    'debtToAssets', 'interestCoverage', 'longTermDebtToCapitalization',
+
+                    // Efficacité (5 ratios)
+                    'assetTurnover', 'inventoryTurnover', 'receivablesTurnover',
+                    'daysSalesOutstanding', 'daysPayablesOutstanding', 'cashConversionCycle',
+
+                    // Cash Flow (5 ratios)
+                    'freeCashFlowPerShare', 'freeCashFlowYield', 'operatingCashFlowPerShare',
+                    'cashPerShare', 'freeCashFlowGrowth',
+
+                    // Dividendes (4 ratios)
+                    'dividendYield', 'payoutRatio', 'dividendPerShare', 'bookValuePerShareGrowth'
+                ];
+
+                // Extraire tous les ratios disponibles
+                for (const key of cfa_ratios) {
+                    if (data[key] !== undefined && data[key] !== null) {
+                        cfaMetrics[key] = data[key];
                     }
                 }
 
-                // Si pas de clés importantes trouvées, prendre les 10 premières clés
-                if (Object.keys(keyMetrics).length === 0 && typeof data === 'object') {
-                    const allKeys = Object.keys(data).slice(0, 10);
+                // Si aucun ratio CFA trouvé, prendre toutes les clés disponibles (fallback)
+                if (Object.keys(cfaMetrics).length === 0 && typeof data === 'object') {
+                    const allKeys = Object.keys(data);
                     for (const key of allKeys) {
-                        keyMetrics[key] = data[key];
+                        if (data[key] !== undefined && data[key] !== null) {
+                            cfaMetrics[key] = data[key];
+                        }
                     }
                 }
 
-                return JSON.stringify(keyMetrics, null, 2);
+                return JSON.stringify(cfaMetrics, null, 2);
             }
 
             // Pour les arrays génériques, limiter le nombre d'éléments
@@ -1224,7 +1258,23 @@ class SmartAgent {
         // Instruction pour emojis SMS
         const emojiInstructions = userChannel === 'sms' ? `\n😊 STYLE SMS: Tu communiques par SMS. Utilise des emojis pour rendre tes réponses vivantes et engageantes (📊 📈 💰 💡 ✅ ⚠️ 🎯 👋 etc.). Reste concise mais complète. Pour analyses financières, donne les infos clés sans sacrifier la qualité. Limite-toi à 2-3 phrases maximum pour rester lisible.\n` : '';
 
-        return `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.${userContext}${introContext}${emojiInstructions}
+        // CFA®-Level Identity Integration
+        const cfaIdentity = intentData && ['comprehensive_analysis', 'fundamentals', 'comparative_analysis', 'earnings', 'recommendation'].includes(intentData.intent)
+            ? `${CFA_SYSTEM_PROMPT.identity}
+
+${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
+
+🎯 MISSION: Analyse de niveau institutionnel CFA® avec:
+- Minimum 8-12 ratios financiers
+- Comparaisons sectorielles obligatoires
+- Justifications détaillées chiffrées
+- Sources fiables (FMP, Perplexity, Bloomberg)
+- Formatage Bloomberg Terminal style
+
+`
+            : `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.`;
+
+        return `${cfaIdentity}${userContext}${introContext}${emojiInstructions}
 📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
 ⚠️ CRITIQUE: Toutes les données doivent refléter les informations les plus récentes. Si une donnée est datée (ex: "au 8 août"), précise clairement que c'est une donnée ancienne et cherche des informations plus récentes si disponibles.
 
