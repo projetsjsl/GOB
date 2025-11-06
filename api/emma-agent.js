@@ -12,6 +12,7 @@ import { HybridIntentAnalyzer } from '../lib/intent-analyzer.js';
 import { createSupabaseClient } from '../lib/supabase-config.js';
 import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 import { CFA_SYSTEM_PROMPT } from '../config/emma-cfa-prompt.js';
+import { getIntentPrompt, hasCustomPrompt } from '../config/intent-prompts.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -1908,12 +1909,21 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 }
             }
 
+            // 🎯 NOUVEAU: Utiliser prompt spécifique par intent si disponible
+            let systemPrompt = null;
+            
+            // Vérifier si un prompt custom existe pour cet intent
+            if (intentData && intentData.intent && hasCustomPrompt(intentData.intent)) {
+                systemPrompt = getIntentPrompt(intentData.intent);
+                console.log(`🎯 Using custom prompt for intent: ${intentData.intent}`);
+            }
+
             const requestBody = {
                 model: 'sonar-pro',  // Modèle premium Perplexity (Jan 2025) - Meilleure qualité, plus de citations, recherche approfondie
                 messages: [
                     {
                         role: 'system',
-                        content: outputMode === 'data'
+                        content: systemPrompt || (outputMode === 'data'
                             ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide, pas de texte explicatif.'
                             : context.user_channel === 'sms'
                             ? `Tu es Emma, analyste financière CFA inspirée par Warren Buffett, Peter Lynch et Benjamin Graham.
