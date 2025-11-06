@@ -387,6 +387,46 @@
       "fallback_tools": [],
       "usage_context": ["fallback", "backup", "general", "général"],
       "keywords": ["fallback", "backup", "general", "général", "yahoo", "finance"]
+    },
+    {
+      "id": "stock-screener",
+      "name": "Stock Screener",
+      "description": "Recherche intelligente d'actions selon critères spécifiques (large cap, sous-évaluées, dividendes, etc.)",
+      "category": "screening",
+      "priority": 1,
+      "enabled": true,
+      "parameters": {
+        "criteria": {
+          "type": "string",
+          "required": true,
+          "description": "Critères de recherche (ex: 'large cap sous-évaluées', 'dividendes élevés')"
+        },
+        "limit": {
+          "type": "number",
+          "required": false,
+          "default": 10,
+          "description": "Nombre de résultats à retourner"
+        },
+        "market_cap": {
+          "type": "string",
+          "required": false,
+          "enum": ["large", "mid", "small"],
+          "description": "Taille de capitalisation"
+        },
+        "sector": {
+          "type": "string",
+          "required": false,
+          "description": "Secteur spécifique (Technology, Healthcare, etc.)"
+        }
+      },
+      "implementation": {
+        "file": "stock-screener.js",
+        "function": "searchStocks",
+        "api_key_env": ["PERPLEXITY_API_KEY", "FMP_API_KEY"]
+      },
+      "fallback_tools": [],
+      "usage_context": ["screening", "recherche", "trouve", "cherche", "liste", "recommande", "suggère", "identifie", "top", "meilleurs"],
+      "keywords": ["screening", "screener", "recherche", "trouve", "cherche", "liste", "recommande", "suggère", "identifie", "top", "meilleurs", "sous-évalué", "undervalued", "dividende", "croissance", "growth", "value", "large cap", "mid cap", "small cap"]
     }
   ],
   "config": {

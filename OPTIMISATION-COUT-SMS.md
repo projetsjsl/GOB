@@ -72,9 +72,14 @@ Avec GSM-7 (sans emojis): 160 caractères/segment
 
 #### Emojis Gardés (Personnalisation)
 ```javascript
-👩🏻 → Gardé UNIQUEMENT au début du message
-👋 → Gardé UNIQUEMENT au début du message
+👩🏻 → GARDÉ au début pour branding Emma (choix délibéré)
+👋 → Converti en "Salut" (texte)
 ```
+
+**Note importante** : Garder l'emoji Emma (👩🏻) force l'encodage UCS-2, mais c'est un compromis accepté pour :
+- ✅ Personnalisation forte (branding Emma)
+- ✅ Reconnaissance immédiate par l'utilisateur
+- ✅ Économie reste significative (suppression des autres emojis)
 
 ### 2. Limitation Intelligente de Longueur
 
@@ -98,10 +103,12 @@ if (cleanedText.length > 1500) {
 
 | Métrique | Avant | Après | Amélioration |
 |----------|-------|-------|--------------|
-| **Encodage** | UCS-2 (70 chars) | GSM-7 (160 chars) | **×2.3** |
-| **Segments (exemple RHI)** | 23 segments | ~7-10 segments | **-60%** |
-| **Coût (exemple RHI)** | $0.19 USD | $0.06-0.08 USD | **-56%** |
+| **Encodage** | UCS-2 (70 chars) | UCS-2* (70 chars) | - |
+| **Segments (exemple RHI)** | 23 segments | ~10-12 segments | **-50%** |
+| **Coût (exemple RHI)** | $0.19 USD | $0.08-0.10 USD | **-50%** |
 | **Longueur moyenne** | 1500-2000 chars | 800-1500 chars | Optimisé |
+
+*UCS-2 maintenu pour emoji Emma (👩🏻), mais économie substantielle via suppression des autres emojis
 
 ### Exemple Avant/Après
 
@@ -122,9 +129,9 @@ YTD : -11% (vs S&P500 +13%)...
 [... 1600 chars total]
 ```
 
-#### APRÈS (7-10 segments = $0.06-0.08)
+#### APRÈS (10-12 segments = $0.08-0.10)
 ```
-Emma: Salut JS! Analyse RHI (Robert Half) version express:
+👩🏻 Salut JS! Analyse RHI (Robert Half) version express:
 
 1. Vue densemble + prix
 RHI cote 68.30$ aujourdhui. Perf YTD: -11% (vs S&P500 +13%)
@@ -141,7 +148,8 @@ Marge nette: 7.5% (5 ans: 8.8%)
 ```
 
 **Différences clés**:
-- ✅ Emojis → ASCII (GSM-7 compatible)
+- ✅ Emoji Emma gardé (👩🏻) pour branding
+- ✅ Autres emojis → ASCII (1️⃣→1., 📊→[Graphique])
 - ✅ Texte compact mais complet
 - ✅ Sections prioritaires gardées
 - ✅ Lien vers site pour détails
