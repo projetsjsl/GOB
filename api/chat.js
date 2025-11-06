@@ -12,6 +12,7 @@ import { getOrCreateUserProfile, updateUserProfile } from '../lib/user-manager.j
 import { getOrCreateConversation, saveConversationTurn, getConversationHistory, formatHistoryForEmma } from '../lib/conversation-manager.js';
 import { adaptForChannel } from '../lib/channel-adapter.js';
 import { getNameFromPhone, isKnownContact } from '../lib/phone-contacts.js';
+import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 
 /**
  * Handler POST /api/chat
@@ -572,27 +573,13 @@ Comment puis-je t'aider ? 🚀`;
     let forcedIntent = null;
     let extractedTickers = [];
 
-    // Helper: Extraire ticker du message (après le mot-clé)
+    // Helper functions delegating to centralized TickerExtractor utility
     const extractTickerFromCommand = (msg, keyword) => {
-      const regex = new RegExp(`${keyword}\\s+([A-Z]{1,5})`, 'i');
-      const match = msg.match(regex);
-      return match ? match[1].toUpperCase() : null;
+      return TickerExtractor.extractFromCommand(msg, keyword);
     };
 
-    // Helper: Extraire 2 tickers pour comparaison
     const extractTickersForComparison = (msg) => {
-      // Patterns: "COMPARER AAPL MSFT", "AAPL VS MSFT", "COMPARER AAPL ET MSFT"
-      const patterns = [
-        /COMPARER\s+([A-Z]{1,5})\s+(?:ET\s+|VS\s+)?([A-Z]{1,5})/i,
-        /([A-Z]{1,5})\s+VS\s+([A-Z]{1,5})/i,
-        /([A-Z]{1,5})\s+OU\s+([A-Z]{1,5})/i
-      ];
-
-      for (const pattern of patterns) {
-        const match = msg.match(pattern);
-        if (match) return [match[1].toUpperCase(), match[2].toUpperCase()];
-      }
-      return [];
+      return TickerExtractor.extractForComparison(msg);
     };
 
     // ANALYSES

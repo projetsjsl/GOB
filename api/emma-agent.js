@@ -10,6 +10,7 @@
 
 import { HybridIntentAnalyzer } from '../lib/intent-analyzer.js';
 import { createSupabaseClient } from '../lib/supabase-config.js';
+import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -778,41 +779,13 @@ class SmartAgent {
             context.tickers.forEach(t => tickers.add(t.toUpperCase()));
         }
 
-        // 2. Tickers explicitement mentionnés dans le message
-        const tickerPattern = /\b([A-Z]{1,5})\b/g;
-        const matches = userMessage.match(tickerPattern);
-        if (matches) {
-            matches.forEach(match => {
-                // Vérifier si c'est un ticker valide (2-5 lettres)
-                if (match.length >= 2 && match.length <= 5) {
-                    tickers.add(match);
-                }
-            });
-        }
-
-        // 3. Mapping de noms de compagnies vers tickers
-        const companyToTicker = {
-            'apple': 'AAPL',
-            'microsoft': 'MSFT',
-            'google': 'GOOGL',
-            'alphabet': 'GOOGL',
-            'amazon': 'AMZN',
-            'tesla': 'TSLA',
-            'meta': 'META',
-            'facebook': 'META',
-            'nvidia': 'NVDA',
-            'amd': 'AMD',
-            'intel': 'INTC',
-            'netflix': 'NFLX',
-            'disney': 'DIS'
-        };
-
-        const messageLower = userMessage.toLowerCase();
-        Object.entries(companyToTicker).forEach(([company, ticker]) => {
-            if (messageLower.includes(company)) {
-                tickers.add(ticker);
-            }
+        // 2. Extract tickers from message using centralized TickerExtractor utility
+        const extractedTickers = TickerExtractor.extract(userMessage, {
+            includeCompanyNames: true,
+            filterCommonWords: true
         });
+
+        extractedTickers.forEach(ticker => tickers.add(ticker));
 
         return Array.from(tickers);
     }
