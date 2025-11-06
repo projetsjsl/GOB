@@ -1243,7 +1243,22 @@ class SmartAgent {
 
         // Information sur l'utilisateur
         const userName = context.user_name || null;
-        const userContext = userName ? `\n👤 UTILISATEUR: Tu parles avec ${userName}. Personnalise tes salutations et réponses en utilisant son nom quand approprié.\n` : '';
+        const userContext = userName
+            ? `\n👤 UTILISATEUR: Tu parles avec ${userName}. Personnalise tes salutations et réponses en utilisant son nom quand approprié.
+
+🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS:
+- PRIORITÉ: Marchés américains (NYSE, NASDAQ) 🇺🇸
+- SECONDAIRE: Marchés canadiens (TSX) 🇨🇦
+- TERTIAIRE: Aperçu marchés mondiaux (Europe, Asie)
+- ❌ ÉVITER: Immobilier français, marchés européens de niche sauf si explicitement demandé
+- L'utilisateur est un gestionnaire de portefeuille québécois/canadien axé sur les actions nord-américaines
+
+⚠️ NE JAMAIS parler d'immobilier français ou de marchés européens de niche sauf si l'utilisateur le demande explicitement.\n`
+            : `\n🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS:
+- PRIORITÉ: Marchés américains (NYSE, NASDAQ) 🇺🇸
+- SECONDAIRE: Marchés canadiens (TSX) 🇨🇦
+- TERTIAIRE: Aperçu marchés mondiaux
+- ❌ ÉVITER: Immobilier français, marchés européens de niche sauf si explicitement demandé\n`;
 
         // Si Emma doit se présenter (premier message ou "Test Emma")
         const shouldIntroduce = context.should_introduce || false;

@@ -276,10 +276,16 @@ export default async function handler(req, res) {
     const isFirstMessage = conversationHistory.length === 0;
     const isTestEmma = message.toLowerCase().includes('test emma');
     const hasBeenIntroduced = userProfile.metadata?.has_been_introduced === true;
-    const shouldIntroduce = (!hasBeenIntroduced && isFirstMessage) || isTestEmma;
+
+    // ✅ FIX BUG 3: Détecter les salutations pour forcer présentation Emma
+    const messageLower = message.toLowerCase().trim();
+    const greetingKeywords = ['bonjour', 'salut', 'hello', 'hi', 'bonsoir', 'hey', 'coucou', 'good morning', 'bonne journée'];
+    const isGreeting = greetingKeywords.some(kw => messageLower === kw || messageLower.startsWith(kw + ' ') || messageLower.startsWith(kw + '!'));
+
+    const shouldIntroduce = (!hasBeenIntroduced && isFirstMessage) || isTestEmma || isGreeting;
 
     if (shouldIntroduce) {
-      console.log(`[Chat API] Emma va se présenter (first=${isFirstMessage}, test=${isTestEmma}, introduced=${hasBeenIntroduced})`);
+      console.log(`[Chat API] Emma va se présenter (first=${isFirstMessage}, test=${isTestEmma}, greeting=${isGreeting}, introduced=${hasBeenIntroduced})`);
 
       // Marquer que Emma s'est présentée (sauf si c'est juste "Test Emma")
       if (!hasBeenIntroduced && !isTestEmma) {
