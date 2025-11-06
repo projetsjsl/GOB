@@ -13,6 +13,7 @@ import { createSupabaseClient } from '../lib/supabase-config.js';
 import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 import { CFA_SYSTEM_PROMPT } from '../config/emma-cfa-prompt.js';
 import { getIntentPrompt, hasCustomPrompt } from '../config/intent-prompts.js';
+import { geminiFetchWithRetry } from '../lib/utils/gemini-retry.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -2517,7 +2518,8 @@ RÈGLES CRITIQUES:
 
             const fullPrompt = systemInstructions + prompt;
 
-            const response = await fetch(apiUrl, {
+            // ✅ Utiliser geminiFetchWithRetry pour gestion automatique du rate limiting (429)
+            const response = await geminiFetchWithRetry(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2532,12 +2534,11 @@ RÈGLES CRITIQUES:
                         candidateCount: 1
                     }
                 })
+            }, {
+                maxRetries: 4,
+                baseDelay: 1000,
+                logRetries: true
             });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
-            }
 
             const data = await response.json();
             const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
