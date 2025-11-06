@@ -2259,7 +2259,7 @@ Exemple SOURCES INCORRECT: "Tesla a annoncé [1] [2] [3]" (❌ Ne pas utiliser [
 - [CHART:FINVIZ:TICKER] → Graphique Finviz (si demandé "graphique", "chart")
 - [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Graphique TradingView (si demandé)
 
-Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explicitement demandé)`
+Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explicitement demandé)`)
                     },
                     {
                         role: 'user',

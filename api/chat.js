@@ -894,8 +894,19 @@ Comment puis-je t'aider ? 🚀`;
         setHeader: () => {}
       };
 
-      // Call emma-agent
-      await emmaAgentModule.default(emmaRequest, emmaRes);
+      // ⏱️ TIMEOUT INTELLIGENT : SMS=60s, Email=90s, Web/Messenger=75s
+      const timeoutMs = channel === 'sms' ? 60000 : channel === 'email' ? 90000 : 75000;
+      console.log(`[Chat API] ⏱️ Timeout configuré: ${timeoutMs}ms pour canal ${channel}`);
+
+      // Call emma-agent avec timeout
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`Emma agent timeout after ${timeoutMs}ms`)), timeoutMs)
+      );
+
+      await Promise.race([
+        emmaAgentModule.default(emmaRequest, emmaRes),
+        timeoutPromise
+      ]);
 
       if (!emmaResponseData || !emmaResponseData.success) {
         console.error('[Chat API] Emma agent unsuccessful response:', JSON.stringify(emmaResponseData, null, 2));
