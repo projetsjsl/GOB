@@ -872,15 +872,21 @@ Comment puis-je t'aider ? 🚀`;
     // 8. ADAPTER LA RÉPONSE POUR LE CANAL
     let adaptedResponse;
     try {
+      console.log(`[Chat API] 🔧 AVANT adaptation - Channel: ${channel}, Longueur: ${emmaResponse.response.length} chars`);
+      console.log(`[Chat API] 🔧 Premiers 200 chars AVANT: ${emmaResponse.response.substring(0, 200)}`);
+      
       // Passer le contexte + citations pour SMS (liens TradingView + sources amicales)
       const adaptContext = {
         ...emmaContext,
-        citations: emmaResponse.citations || []  // 📰 Ajouter citations pour formatage amical
+        citations: emmaResponse.response.citations || []  // 📰 Ajouter citations pour formatage amical
       };
       adaptedResponse = adaptForChannel(emmaResponse.response, channel, adaptContext);
-      console.log(`[Chat API] Réponse adaptée pour ${channel} (${adaptedResponse.length} chars)`);
+      
+      console.log(`[Chat API] ✅ APRÈS adaptation - Channel: ${channel}, Longueur: ${adaptedResponse.length} chars`);
+      console.log(`[Chat API] ✅ Premiers 200 chars APRÈS: ${adaptedResponse.substring(0, 200)}`);
+      console.log(`[Chat API] ✅ Contient emojis numérotés: ${/[0-9]️⃣/.test(adaptedResponse)}`);
     } catch (error) {
-      console.error('[Chat API] Erreur adaptation canal:', error);
+      console.error('[Chat API] ❌ Erreur adaptation canal:', error);
       adaptedResponse = emmaResponse.response; // Fallback: réponse brute
     }
 
