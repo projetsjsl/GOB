@@ -334,7 +334,7 @@ async function sendSMS(to, message, simulate = false) {
     if (message.length > 1600) {
       console.log('[SMS Adapter] Message trop long, découpage en plusieurs SMS');
 
-      // Limite réelle: 1600 (Twilio) - 35 (préfixe "👩🏻 📱 Partie X/Y\n\n") - 65 (marge sécurité)
+      // Limite réelle: 1600 (Twilio) - 30 (préfixe "👩🏻 Partie X/Y\n\n") - 70 (marge sécurité)
       const chunks = chunkMessage(message, 1500);
 
       // Envoyer les SMS dans l'ORDRE INVERSE pour compenser l'affichage inversé des téléphones
@@ -342,7 +342,8 @@ async function sendSMS(to, message, simulate = false) {
       // Donc on envoie 3/3, puis 2/3, puis 1/3 pour qu'ils s'affichent 1/3, 2/3, 3/3
       for (let i = chunks.length - 1; i >= 0; i--) {
         const chunk = chunks[i];
-        const prefix = chunks.length > 1 ? `👩🏻 📱 Partie ${i + 1}/${chunks.length}\n\n` : '👩🏻 ';
+        // 🚨 PAS d'emoji 📱 dans le préfixe (force UCS-2 = coût ×2.3)
+        const prefix = chunks.length > 1 ? `👩🏻 Partie ${i + 1}/${chunks.length}\n\n` : '👩🏻 ';
 
         await client.messages.create({
           from: twilioPhoneNumber,
