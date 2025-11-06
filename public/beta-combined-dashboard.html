@@ -10823,25 +10823,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         const channelSimRadio = document.querySelector('input[name="channel-sim"]:checked');
                         const channelSim = channelSimRadio ? channelSimRadio.value : 'web';
                         
-                        console.log(`📤 Envoi de la requête à Emma via /api/chat (canal: ${channelSim}, simulate: true)...`);
+                        console.log(`📤 Envoi de la requête à Emma Agent (format: ${channelSim})...`);
 
-                        // Utiliser /api/chat avec le canal simulé
-                        const response = await fetch('/api/chat', {
+                        // Utiliser Emma Agent avec le format de sortie adapté
+                        const response = await fetch('/api/emma-agent', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
                                 message: userMessage,
-                                userId: 'web-dashboard-user',
-                                channel: channelSim,  // 'web' ou 'sms'
-                                simulate: true,  // 🧪 MODE SIMULATION - pas d'envoi SMS réel
-                                metadata: {
+                                context: {
+                                    output_mode: 'chat',  // ← MODE CHAT pour chatbot web
+                                    user_channel: channelSim,  // 'web' ou 'sms' pour adapter le FORMAT
                                     tickers: tickers,
+                                    news_requested: true,
                                     stockData: currentStockData,
                                     newsData: currentNewsData,
                                     apiStatus: currentApiStatus,
-                                    source: 'dashboard'
+                                    emmaPrompt: emmaPrompt,
+                                    temperature: emmaTemperature,
+                                    max_tokens: emmaMaxTokens
                                 }
                             })
                         });
@@ -10861,7 +10863,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             success: data.success,
                             tools_used: data.tools_used,
                             is_reliable: data.is_reliable,
-                            responseLength: data.response?.length || 0
+                            responseLength: data.response?.length || 0,
+                            channel: channelSim
                         });
 
                         if (!data.success) {
@@ -10884,7 +10887,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         }
 
                         // Log de la réponse pour diagnostic
-                        console.log(`📝 Réponse Emma (${responseText.length} caractères):`, responseText);
+                        console.log(`📝 Réponse Emma (${responseText.length} caractères, format: ${channelSim}):`, responseText);
 
                         // Vérifier si la réponse semble tronquée
                         if (responseText.length < 50) {
@@ -10894,10 +10897,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Retourner le texte avec les métadonnées du modèle
                         return {
                             text: responseText,
-                            model: data.model || data.metadata?.model || 'unknown',
+                            model: data.model || 'unknown',
                             modelReason: data.model_reason || 'Unknown reason',
-                            channel: channelSim,
-                            cached: data.cached || false
+                            channel: channelSim,  // 'web' ou 'sms' pour l'affichage
+                            cached: false  // Pas de cache dans ce mode
                         };
                     } catch (error) {
                         console.error('Erreur Emma Agent:', error?.message || String(error));
