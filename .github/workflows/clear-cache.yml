@@ -1,0 +1,38 @@
+name: Clear Cache Post-Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lib/channel-adapter.js'
+      - 'api/**'
+      - 'lib/**'
+
+jobs:
+  clear-cache:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js
+      
+      - name: Clear cache
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/clear-cache-post-deploy.js
+      
+      - name: Notify completion
+        run: |
+          echo "✅ Cache vidé avec succès après déploiement"
+          echo "📝 Les nouvelles optimisations seront appliquées immédiatement"
+
