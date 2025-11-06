@@ -352,9 +352,9 @@ async function sendSMS(to, message, simulate = false) {
         });
 
         // Délai entre les SMS pour garantir l'ordre (Twilio peut livrer hors séquence)
-        // 3 secondes garantit que le message est REÇU avant d'envoyer le suivant
+        // 5 secondes garantit que le message est REÇU et AFFICHÉ avant d'envoyer le suivant
         if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          await new Promise(resolve => setTimeout(resolve, 5000));
         }
       }
 
@@ -399,6 +399,7 @@ function escapeXml(text) {
 
 /**
  * Découpe un message en chunks pour SMS
+ * AMÉLIORATION: Respecte les sections complètes (titres + contenu)
  *
  * @param {string} text - Le texte à découper
  * @param {number} maxLength - Longueur max par chunk
@@ -408,42 +409,64 @@ function chunkMessage(text, maxLength) {
   const chunks = [];
   let currentChunk = '';
 
-  const sentences = text.split(/(?<=[.!?\n])\s+/);
+  // 🎯 AMÉLIORATION: Découper par sections (paragraphes) au lieu de phrases
+  // Cela évite de couper un titre de son contenu
+  const paragraphs = text.split(/\n\n+/);
 
-  for (const sentence of sentences) {
-    if ((currentChunk + sentence).length <= maxLength) {
-      currentChunk += (currentChunk ? ' ' : '') + sentence;
+  for (const paragraph of paragraphs) {
+    const paragraphWithSpacing = currentChunk ? '\n\n' + paragraph : paragraph;
+    
+    // Si ajouter ce paragraphe ne dépasse pas la limite
+    if ((currentChunk + paragraphWithSpacing).length <= maxLength) {
+      currentChunk += paragraphWithSpacing;
     } else {
+      // Sauvegarder le chunk actuel si non vide
       if (currentChunk) {
-        chunks.push(currentChunk);
+        chunks.push(currentChunk.trim());
+        currentChunk = '';
       }
-      // Si une phrase est trop longue, la couper INTELLIGEMMENT au dernier espace
-      if (sentence.length > maxLength) {
-        let remaining = sentence;
-        while (remaining.length > 0) {
-          if (remaining.length <= maxLength) {
-            // Le dernier morceau COMMENCE le prochain chunk (pas pushé directement)
-            currentChunk = remaining;
-            remaining = '';
+      
+      // Si le paragraphe seul est trop long, le découper par phrases
+      if (paragraph.length > maxLength) {
+        const sentences = paragraph.split(/(?<=[.!?])\s+/);
+        
+        for (const sentence of sentences) {
+          if ((currentChunk + (currentChunk ? ' ' : '') + sentence).length <= maxLength) {
+            currentChunk += (currentChunk ? ' ' : '') + sentence;
           } else {
-            // Chercher le dernier espace avant maxLength
-            let cutPos = maxLength;
-            const lastSpace = remaining.lastIndexOf(' ', maxLength);
-            if (lastSpace > maxLength * 0.7) { // Au moins 70% du max pour éviter chunks trop courts
-              cutPos = lastSpace;
+            if (currentChunk) {
+              chunks.push(currentChunk.trim());
             }
-            chunks.push(remaining.substring(0, cutPos).trim());
-            remaining = remaining.substring(cutPos).trim();
+            
+            // Phrase trop longue: couper au dernier espace
+            if (sentence.length > maxLength) {
+              let remaining = sentence;
+              while (remaining.length > 0) {
+                if (remaining.length <= maxLength) {
+                  currentChunk = remaining;
+                  remaining = '';
+                } else {
+                  const lastSpace = remaining.lastIndexOf(' ', maxLength);
+                  const cutPos = lastSpace > maxLength * 0.7 ? lastSpace : maxLength;
+                  chunks.push(remaining.substring(0, cutPos).trim());
+                  remaining = remaining.substring(cutPos).trim();
+                }
+              }
+            } else {
+              currentChunk = sentence;
+            }
           }
         }
       } else {
-        currentChunk = sentence;
+        // Le paragraphe entier devient le nouveau chunk
+        currentChunk = paragraph;
       }
     }
   }
 
+  // Ajouter le dernier chunk
   if (currentChunk) {
-    chunks.push(currentChunk);
+    chunks.push(currentChunk.trim());
   }
 
   return chunks;
