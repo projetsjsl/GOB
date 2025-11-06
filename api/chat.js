@@ -13,6 +13,7 @@ import { getOrCreateConversation, saveConversationTurn, getConversationHistory, 
 import { adaptForChannel } from '../lib/channel-adapter.js';
 import { getNameFromPhone, isKnownContact } from '../lib/phone-contacts.js';
 import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
+import { validateYTDData, enrichStockDataWithSources } from '../lib/ytd-validator.js';
 
 /**
  * Handler POST /api/chat
@@ -725,6 +726,36 @@ Comment puis-je t'aider ? 🚀`;
     // Combiner watchlist + team tickers (union sans doublons)
     const allTickers = [...new Set([...userWatchlist, ...teamTickers])];
 
+    // 6.5. ✅ VALIDATION YTD - Éviter les hallucinations de Perplexity
+    // Enrichir les données de stock avec validation YTD
+    let validatedStockData = metadata?.stockData || {};
+    try {
+      if (Object.keys(validatedStockData).length > 0) {
+        console.log(`[Chat API] Validation YTD pour ${Object.keys(validatedStockData).length} stocks...`);
+        
+        // Enrichir chaque stock avec validation et source
+        for (const ticker in validatedStockData) {
+          const stock = validatedStockData[ticker];
+          if (stock && typeof stock === 'object') {
+            // Valider YTD cohérence
+            const validation = validateYTDData(stock);
+            
+            if (!validation.valid) {
+              console.warn(`⚠️ [Chat API] YTD invalide pour ${ticker}:`, validation.issues);
+            }
+            
+            // Enrichir avec métadonnées de source (marque les données FMP vs Perplexity)
+            validatedStockData[ticker] = enrichStockDataWithSources(stock, 'fmp');
+          }
+        }
+        
+        console.log(`[Chat API] ✅ Validation YTD complétée`);
+      }
+    } catch (error) {
+      console.warn(`[Chat API] ⚠️ Erreur validation YTD (non-bloquant):`, error.message);
+      // Non-bloquant, continuer avec les données originales
+    }
+
     const emmaContext = {
       output_mode: channel === 'email' ? 'ticker_note' : 'chat', // Email = format long, autres = chat
       user_name: userProfile.name || null, // Nom de l'utilisateur pour personnalisation
@@ -734,7 +765,7 @@ Comment puis-je t'aider ? 🚀`;
       user_watchlist: userWatchlist, // Watchlist personnelle de l'utilisateur
       team_tickers: teamTickers, // Tickers d'équipe partagés
       all_tickers: allTickers, // Union watchlist + team (sans doublons)
-      stockData: metadata?.stockData || {},
+      stockData: validatedStockData, // Utiliser données VALIDÉES au lieu de metadata?.stockData
       newsData: metadata?.newsData || [],
       apiStatus: metadata?.apiStatus || {},
       conversationHistory: formatHistoryForEmma(conversationHistory),
