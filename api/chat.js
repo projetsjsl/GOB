@@ -301,50 +301,63 @@ export default async function handler(req, res) {
 
       const skillsResponse = `🤖 EMMA IA - MES COMPÉTENCES
 
-📊 ANALYSES D'ACTIONS:
-• "Analyse AAPL" → Analyse complète
-  (prix, ratios P/E, ROE, consensus, news)
-• "Prix MSFT" → Cours temps réel
-• "TSLA actualités" → News récentes
-• "Fondamentaux GOOGL" → Profil détaillé
+📊 ANALYSES (Mots-clés MAJUSCULES):
+• ANALYSE [TICKER] → Analyse complète
+• FONDAMENTAUX [TICKER] → Ratios & finances
+• TECHNIQUE [TICKER] → Analyse technique
+• COMPARER [T1] [T2] → Comparaison
+• PRIX [TICKER] → Prix temps réel
+• RATIOS [TICKER] → Ratios financiers
+• CROISSANCE [TICKER] → Croissance revenus
 
 📈 INDICATEURS TECHNIQUES:
-• "RSI NVDA" → Force relative
-• "MACD AAPL" → Momentum
-• "Moyennes mobiles TSLA" → Tendances
+• RSI [TICKER] → Force relative
+• MACD [TICKER] → Momentum
+• MOYENNES [TICKER] → Moyennes mobiles
 
 📰 ACTUALITÉS:
-• "Top 5 news" → Top 5 news financières
-• "Nouvelles AAPL" → News du ticker
-• "Quoi de neuf ?" → Actualités marché
+• TOP 5 NEWS → Top 5 news du jour
+• NEWS [TICKER] → News du ticker
+• ACTUALITES [TICKER] → Actualités
 
 📅 CALENDRIERS:
-• "Résultats cette semaine" → Earnings
-• "Prochains résultats AAPL" → Dates
-• "Événements économiques" → Macro
+• RESULTATS → Earnings calendar
+• RESULTATS [TICKER] → Earnings ticker
+• CALENDRIER ECONOMIQUE → Événements macro
 
 📊 WATCHLIST:
-• "Ma liste" → Voir ta watchlist
-• "Ajouter NVDA" → Ajouter ticker
-• "Retirer TSLA" → Supprimer ticker
+• LISTE → Voir ta watchlist
+• AJOUTER [TICKER] → Ajouter ticker
+• RETIRER [TICKER] → Supprimer ticker
 
-🎯 BRIEFINGS QUOTIDIENS:
-• Matin (7h20) → Pré-marché
-• Midi (15h50) → Intraday
-• Soir (20h20) → Post-marché
-  (envoyés automatiquement par email)
+📈 MARCHÉ:
+• INDICES → Dow, S&P, Nasdaq
+• MARCHE → Vue marchés
+• SECTEUR [NOM] → Analyse secteur
 
-📚 AUTRES COMMANDES:
-• "AIDE" → Guide d'utilisation
-• "EXEMPLES" → Questions types
+💼 INVESTISSEMENT:
+• ACHETER [TICKER] → Avis achat
+• VENDRE [TICKER] → Avis vente
 
-💡 QUESTIONS NATURELLES:
-Tu peux me parler normalement:
-"Pourquoi Apple monte aujourd'hui ?"
-"Tesla est-il suracheté ?"
-"Devrais-je acheter Microsoft ?"
+🌍 ÉCONOMIE:
+• INFLATION → Données inflation
+• FED → Infos Fed/taux
+• TAUX → Taux directeurs
 
-🚀 Écris-moi ce que tu veux savoir !`;
+🎯 BRIEFINGS AUTO (email):
+• 7h20 → Pré-marché
+• 15h50 → Intraday
+• 20h20 → Post-marché
+
+📚 AIDE:
+• AIDE → Guide complet
+• EXEMPLES → Exemples questions
+
+💡 TU PEUX AUSSI PARLER NATURELLEMENT:
+"Pourquoi Apple monte ?"
+"Devrais-je acheter Tesla ?"
+
+🚀 30+ mots-clés disponibles !`;
 
       // Sauvegarder dans la conversation
       try {
@@ -554,6 +567,167 @@ Comment puis-je t'aider ? 🚀`;
       }
     }
 
+    // 5.6. DÉTECTION MOTS-CLÉS MAJUSCULES (Raccourcis directs - ultra-rapide)
+    // Ces mots-clés forcent une intention spécifique sans analyse NLP
+    let forcedIntent = null;
+    let extractedTickers = [];
+
+    // Helper: Extraire ticker du message (après le mot-clé)
+    const extractTickerFromCommand = (msg, keyword) => {
+      const regex = new RegExp(`${keyword}\\s+([A-Z]{1,5})`, 'i');
+      const match = msg.match(regex);
+      return match ? match[1].toUpperCase() : null;
+    };
+
+    // Helper: Extraire 2 tickers pour comparaison
+    const extractTickersForComparison = (msg) => {
+      // Patterns: "COMPARER AAPL MSFT", "AAPL VS MSFT", "COMPARER AAPL ET MSFT"
+      const patterns = [
+        /COMPARER\s+([A-Z]{1,5})\s+(?:ET\s+|VS\s+)?([A-Z]{1,5})/i,
+        /([A-Z]{1,5})\s+VS\s+([A-Z]{1,5})/i,
+        /([A-Z]{1,5})\s+OU\s+([A-Z]{1,5})/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = msg.match(pattern);
+        if (match) return [match[1].toUpperCase(), match[2].toUpperCase()];
+      }
+      return [];
+    };
+
+    // ANALYSES
+    if (messageUpper.startsWith('ANALYSE ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'ANALYSE');
+      if (ticker) {
+        forcedIntent = { intent: 'comprehensive_analysis', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut' };
+      }
+    } else if (messageUpper.startsWith('FONDAMENTAUX ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'FONDAMENTAUX');
+      if (ticker) {
+        forcedIntent = { intent: 'fundamentals', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut' };
+      }
+    } else if (messageUpper.startsWith('TECHNIQUE ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'TECHNIQUE');
+      if (ticker) {
+        forcedIntent = { intent: 'technical_analysis', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut' };
+      }
+    } else if (messageUpper.startsWith('COMPARER ') || messageUpper.includes(' VS ') || messageUpper.includes(' OU ')) {
+      const tickers = extractTickersForComparison(messageUpper);
+      if (tickers.length === 2) {
+        forcedIntent = { intent: 'comparative_analysis', tickers: tickers, confidence: 1.0, method: 'keyword_shortcut' };
+      }
+    }
+
+    // PRIX & DONNÉES
+    else if (messageUpper.startsWith('PRIX ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'PRIX');
+      if (ticker) {
+        forcedIntent = { intent: 'stock_price', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut' };
+      }
+    } else if (messageUpper.startsWith('RATIOS ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'RATIOS');
+      if (ticker) {
+        forcedIntent = { intent: 'fundamentals', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', focus: 'ratios' };
+      }
+    } else if (messageUpper.startsWith('CROISSANCE ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'CROISSANCE');
+      if (ticker) {
+        forcedIntent = { intent: 'fundamentals', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', focus: 'growth' };
+      }
+    }
+
+    // INDICATEURS TECHNIQUES
+    else if (messageUpper.startsWith('RSI ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'RSI');
+      if (ticker) {
+        forcedIntent = { intent: 'technical_analysis', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', indicator: 'RSI' };
+      }
+    } else if (messageUpper.startsWith('MACD ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'MACD');
+      if (ticker) {
+        forcedIntent = { intent: 'technical_analysis', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', indicator: 'MACD' };
+      }
+    } else if (messageUpper.startsWith('MOYENNES ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'MOYENNES');
+      if (ticker) {
+        forcedIntent = { intent: 'technical_analysis', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', indicator: 'SMA' };
+      }
+    }
+
+    // ACTUALITÉS
+    else if (messageUpper.startsWith('NEWS ') || messageUpper.startsWith('ACTUALITES ')) {
+      const keyword = messageUpper.startsWith('NEWS') ? 'NEWS' : 'ACTUALITES';
+      const ticker = extractTickerFromCommand(messageUpper, keyword);
+      if (ticker) {
+        forcedIntent = { intent: 'news', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut' };
+      }
+    }
+
+    // CALENDRIERS
+    else if (messageUpper.startsWith('RESULTATS')) {
+      if (messageUpper.includes(' ')) {
+        // "RESULTATS AAPL" → earnings pour ticker spécifique
+        const ticker = extractTickerFromCommand(messageUpper, 'RESULTATS');
+        if (ticker) {
+          forcedIntent = { intent: 'earnings', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut' };
+        }
+      } else {
+        // "RESULTATS" seul → earnings calendar général
+        forcedIntent = { intent: 'earnings', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
+      }
+    } else if (messageUpper.includes('CALENDRIER') && messageUpper.includes('ECONOMIQUE')) {
+      forcedIntent = { intent: 'economic_analysis', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
+    } else if (messageUpper.includes('CALENDRIER') && messageUpper.includes('EARNINGS')) {
+      forcedIntent = { intent: 'earnings', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
+    }
+
+    // WATCHLIST
+    else if (messageUpper === 'LISTE' || messageUpper === 'MA LISTE' || messageUpper === 'WATCHLIST') {
+      forcedIntent = { intent: 'portfolio', tickers: [], confidence: 1.0, method: 'keyword_shortcut', action: 'view' };
+    } else if (messageUpper.startsWith('AJOUTER ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'AJOUTER');
+      if (ticker) {
+        forcedIntent = { intent: 'portfolio', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', action: 'add' };
+      }
+    } else if (messageUpper.startsWith('RETIRER ') || messageUpper.startsWith('SUPPRIMER ')) {
+      const keyword = messageUpper.startsWith('RETIRER') ? 'RETIRER' : 'SUPPRIMER';
+      const ticker = extractTickerFromCommand(messageUpper, keyword);
+      if (ticker) {
+        forcedIntent = { intent: 'portfolio', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', action: 'remove' };
+      }
+    }
+
+    // MARCHÉ
+    else if (messageUpper === 'INDICES' || messageUpper === 'MARCHE' || messageUpper === 'MARCHÉS') {
+      forcedIntent = { intent: 'market_overview', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
+    } else if (messageUpper.includes('SECTEUR ')) {
+      // "SECTEUR TECH", "SECTEUR FINANCE", etc.
+      forcedIntent = { intent: 'market_overview', tickers: [], confidence: 1.0, method: 'keyword_shortcut', sector: true };
+    }
+
+    // RECOMMANDATION
+    else if (messageUpper.startsWith('ACHETER ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'ACHETER');
+      if (ticker) {
+        forcedIntent = { intent: 'recommendation', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', bias: 'buy' };
+      }
+    } else if (messageUpper.startsWith('VENDRE ')) {
+      const ticker = extractTickerFromCommand(messageUpper, 'VENDRE');
+      if (ticker) {
+        forcedIntent = { intent: 'recommendation', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut', bias: 'sell' };
+      }
+    }
+
+    // ÉCONOMIE
+    else if (messageUpper.includes('INFLATION') || messageUpper.includes('FED') || messageUpper.includes('TAUX')) {
+      forcedIntent = { intent: 'economic_analysis', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
+    }
+
+    // Si forced intent détecté, logger et utiliser directement
+    if (forcedIntent) {
+      console.log(`[Chat API] 🎯 Mot-clé majuscule détecté: ${forcedIntent.intent} (${forcedIntent.tickers.join(', ') || 'aucun ticker'})`);
+    }
+
     // 6. PRÉPARER LE CONTEXTE POUR EMMA-AGENT
     // Combiner watchlist + team tickers (union sans doublons)
     const allTickers = [...new Set([...userWatchlist, ...teamTickers])];
@@ -563,14 +737,15 @@ Comment puis-je t'aider ? 🚀`;
       user_name: userProfile.name || null, // Nom de l'utilisateur pour personnalisation
       user_channel: channel, // Canal de communication
       should_introduce: shouldIntroduce, // Emma doit se présenter
-      tickers: metadata?.tickers || allTickers, // Utiliser watchlist + team tickers si pas de tickers fournis
+      tickers: metadata?.tickers || (forcedIntent?.tickers.length > 0 ? forcedIntent.tickers : allTickers), // Utiliser forced tickers si présent
       user_watchlist: userWatchlist, // Watchlist personnelle de l'utilisateur
       team_tickers: teamTickers, // Tickers d'équipe partagés
       all_tickers: allTickers, // Union watchlist + team (sans doublons)
       stockData: metadata?.stockData || {},
       newsData: metadata?.newsData || [],
       apiStatus: metadata?.apiStatus || {},
-      conversationHistory: formatHistoryForEmma(conversationHistory)
+      conversationHistory: formatHistoryForEmma(conversationHistory),
+      forced_intent: forcedIntent // Passer le forced intent à Emma Agent
     };
 
     // 7. APPELER EMMA-AGENT (Function Calling Router existant)
