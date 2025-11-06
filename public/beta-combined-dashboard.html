@@ -10662,28 +10662,85 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         const response = typeof responseData === 'string' ? responseData : responseData.text;
                         const model = typeof responseData === 'object' ? responseData.model : null;
                         const modelReason = typeof responseData === 'object' ? responseData.modelReason : null;
+                        const channelUsed = typeof responseData === 'object' ? responseData.channel : 'web';
+                        const isCached = typeof responseData === 'object' ? responseData.cached : false;
 
-                        const messageId = Date.now() + 1;
-                        const emmaResponse = {
-                            id: messageId,
-                            type: 'emma',
-                            content: '', // Contenu vide au départ pour l'effet de typing
-                            fullContent: response, // Contenu complet stocké séparément
-                            timestamp: new Date().toLocaleTimeString('fr-FR'),
-                            model: model,  // Stocker le modèle utilisé
-                            modelReason: modelReason  // Stocker la raison du choix
-                        };
+                        // 📱 Si mode SMS, découper en segments SMS
+                        const channelSimRadio = document.querySelector('input[name="channel-sim"]:checked');
+                        const channelSim = channelSimRadio ? channelSimRadio.value : 'web';
                         
-                        setEmmaMessages(prev => {
+                        if (channelSim === 'sms') {
+                            // Découper la réponse en segments SMS (1500 chars max par SMS)
+                            const smsSegments = splitIntoSMS(response, 1500);
+                            
                             // Supprimer le message de confirmation temporaire
-                            const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
-                            const newMessages = [...filteredMessages, emmaResponse];
-                            // Sauvegarde automatique via useEffect
-                            return newMessages;
-                        });
+                            setEmmaMessages(prev => prev.filter(msg => msg.content !== '📤 Message envoyé...'));
+                            
+                            // ✅ AJOUT SÉQUENTIEL pour garantir l'ordre 1/3, 2/3, 3/3
+                            const baseTimestamp = Date.now();
+                            const smsMessages = smsSegments.map((segment, index) => ({
+                                id: baseTimestamp + index,
+                                type: 'sms',
+                                content: '', // Contenu vide au départ pour l'effet de typing
+                                fullContent: segment,
+                                timestamp: new Date().toLocaleTimeString('fr-FR'),
+                                model: model,
+                                modelReason: modelReason,
+                                smsIndex: index + 1,
+                                smsTotal: smsSegments.length,
+                                charCount: segment.length,
+                                cached: isCached
+                            }));
+                            
+                            // Ajouter TOUS les messages SMS en une seule fois (garantit l'ordre)
+                            setEmmaMessages(prev => [...prev, ...smsMessages]);
+                            
+                            // Démarrer l'effet de typing progressif pour chaque segment avec délai
+                            smsMessages.forEach((smsMsg, index) => {
+                                setTimeout(() => {
+                                    startTypingEffect(smsMsg.id, smsMsg.fullContent);
+                                }, index * 500);
+                            });
+                            
+                            // Ajouter un message avec le coût estimé
+                            const costPerSMS = 0.0075;
+                            const totalCost = smsSegments.length * costPerSMS;
+                            const costMessage = {
+                                id: baseTimestamp + smsSegments.length,
+                                type: 'cost-estimate',
+                                content: `💰 Coût estimé: ${smsSegments.length} SMS × ${costPerSMS}$ = ${totalCost.toFixed(4)}$${isCached ? ' (Cache: gratuit!)' : ''}`,
+                                timestamp: new Date().toLocaleTimeString('fr-FR')
+                            };
+                            
+                            setTimeout(() => {
+                                setEmmaMessages(prev => [...prev, costMessage]);
+                            }, smsSegments.length * 500 + 500);
+                            
+                        } else {
+                            // Mode Web normal
+                            const messageId = Date.now() + 1;
+                            const emmaResponse = {
+                                id: messageId,
+                                type: 'emma',
+                                content: '', // Contenu vide au départ pour l'effet de typing
+                                fullContent: response, // Contenu complet stocké séparément
+                                timestamp: new Date().toLocaleTimeString('fr-FR'),
+                                model: model,  // Stocker le modèle utilisé
+                                modelReason: modelReason,  // Stocker la raison du choix
+                                cached: isCached
+                            };
+                            
+                            setEmmaMessages(prev => {
+                                // Supprimer le message de confirmation temporaire
+                                const filteredMessages = prev.filter(msg => msg.content !== '📤 Message envoyé...');
+                                const newMessages = [...filteredMessages, emmaResponse];
+                                // Sauvegarde automatique via useEffect
+                                return newMessages;
+                            });
 
-                        // Démarrer l'effet de typing progressif
-                        startTypingEffect(messageId, response);
+                            // Démarrer l'effet de typing progressif
+                            startTypingEffect(messageId, response);
+                        }
                         
                         // Confirmation de réception
                         console.log('✅ Réponse d\'Emma reçue:', response.length, 'caractères');
@@ -10762,26 +10819,29 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Extraire les tickers de l'équipe
                         const tickers = teamTickers || Object.keys(currentStockData);
 
-                        console.log('📤 Envoi de la requête à Emma Agent avec function calling...');
+                        // 📱 Récupérer le canal simulé (web ou sms)
+                        const channelSimRadio = document.querySelector('input[name="channel-sim"]:checked');
+                        const channelSim = channelSimRadio ? channelSimRadio.value : 'web';
+                        
+                        console.log(`📤 Envoi de la requête à Emma via /api/chat (canal: ${channelSim}, simulate: true)...`);
 
-                        // Utiliser Emma Agent avec Perplexity function calling complet
-                        const response = await fetch('/api/emma-agent', {
+                        // Utiliser /api/chat avec le canal simulé
+                        const response = await fetch('/api/chat', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
                                 message: userMessage,
-                                context: {
-                                    output_mode: 'chat',  // ← MODE CHAT pour réponse conversationnelle
+                                userId: 'web-dashboard-user',
+                                channel: channelSim,  // 'web' ou 'sms'
+                                simulate: true,  // 🧪 MODE SIMULATION - pas d'envoi SMS réel
+                                metadata: {
                                     tickers: tickers,
-                                    news_requested: true,
                                     stockData: currentStockData,
                                     newsData: currentNewsData,
                                     apiStatus: currentApiStatus,
-                                    emmaPrompt: emmaPrompt,
-                                    temperature: emmaTemperature,
-                                    max_tokens: emmaMaxTokens
+                                    source: 'dashboard'
                                 }
                             })
                         });
@@ -10834,13 +10894,49 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         // Retourner le texte avec les métadonnées du modèle
                         return {
                             text: responseText,
-                            model: data.model || 'unknown',
-                            modelReason: data.model_reason || 'Unknown reason'
+                            model: data.model || data.metadata?.model || 'unknown',
+                            modelReason: data.model_reason || 'Unknown reason',
+                            channel: channelSim,
+                            cached: data.cached || false
                         };
                     } catch (error) {
                         console.error('Erreur Emma Agent:', error?.message || String(error));
                         throw error;
                     }
+                };
+
+                // 📱 Fonction pour découper un message en segments SMS
+                const splitIntoSMS = (text, maxLength = 1500) => {
+                    if (text.length <= maxLength) {
+                        return [text];
+                    }
+                    
+                    const segments = [];
+                    let remaining = text;
+                    
+                    while (remaining.length > 0) {
+                        if (remaining.length <= maxLength) {
+                            segments.push(remaining);
+                            break;
+                        }
+                        
+                        // Chercher un point de coupure naturel (fin de phrase, paragraphe, etc.)
+                        let cutPoint = maxLength;
+                        const naturalBreaks = ['\n\n', '\n', '. ', '! ', '? ', ', ', ' '];
+                        
+                        for (const breakChar of naturalBreaks) {
+                            const lastBreak = remaining.lastIndexOf(breakChar, maxLength);
+                            if (lastBreak > maxLength * 0.7) { // Au moins 70% du max
+                                cutPoint = lastBreak + breakChar.length;
+                                break;
+                            }
+                        }
+                        
+                        segments.push(remaining.substring(0, cutPoint).trim());
+                        remaining = remaining.substring(cutPoint).trim();
+                    }
+                    
+                    return segments;
                 };
 
                 const clearChat = () => {
@@ -11882,8 +11978,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ) : (
                                     <div className="space-y-4">
                                         {emmaMessages.map((message) => (
-                                            <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                                {message.type !== 'user' && (
+                                            <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : message.type === 'cost-estimate' ? 'justify-center' : 'justify-start'}`}>
+                                                {message.type !== 'user' && message.type !== 'cost-estimate' && (
                                                     <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                                                         <img 
                                                             src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
@@ -11892,15 +11988,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         />
                                                     </div>
                                                 )}
-                                                <div className={`max-w-xl px-4 py-3 rounded-lg shadow ${
+                                                <div className={`${message.type === 'sms' ? 'max-w-sm' : message.type === 'cost-estimate' ? 'max-w-md' : 'max-w-xl'} px-4 py-3 rounded-lg shadow ${
                                                     message.type === 'user'
                                                         ? 'bg-gray-800 text-white shadow-gray-500/20'
                                                         : message.type === 'error'
                                                         ? 'bg-red-600 text-white shadow-red-500/20'
                                                         : message.type === 'system'
                                                         ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+                                                        : message.type === 'sms'
+                                                        ? 'bg-green-50 text-gray-900 border-2 border-green-400 shadow-green-200'
+                                                        : message.type === 'cost-estimate'
+                                                        ? 'bg-yellow-50 text-yellow-900 border border-yellow-300'
                                                         : 'bg-gray-50 text-gray-900 border border-gray-200'
                                                 }`}>
+                                                    {/* 📱 Header SMS avec numéro de segment */}
+                                                    {message.type === 'sms' && (
+                                                        <div className="text-xs font-bold text-green-700 mb-2 pb-2 border-b border-green-300 flex justify-between items-center">
+                                                            <span>📱 SMS {message.smsIndex}/{message.smsTotal}</span>
+                                                            <span className="text-gray-500 font-normal">{message.charCount} chars</span>
+                                                        </div>
+                                                    )}
+                                                    
                                                     <div className="prose prose-sm max-w-none">
                                                         <div dangerouslySetInnerHTML={{ __html: formatMessageText(message.content) }} />
                                                         {typingMessageId === message.id && (
@@ -11908,19 +12016,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         )}
                                                     </div>
                                                     <div className={`text-xs mt-1 ${
-                                                        message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
+                                                        message.type === 'user' ? 'text-blue-100' : message.type === 'sms' ? 'text-green-600' : 'text-gray-400'
                                                     }`}>
                                                         {message.timestamp}
+                                                        {message.cached && <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-bold">💾 Cache</span>}
                                                     </div>
-                                                    {/* Indicateur de paramètres pour les messages d'Emma */}
-                                                    {message.type === 'emma' && (
-                                                        <div className="text-xs mt-2 px-2 py-1 rounded bg-gray-100 text-gray-600">
+                                                    {/* Indicateur de paramètres pour les messages d'Emma et SMS */}
+                                                    {(message.type === 'emma' || message.type === 'sms') && (
+                                                        <div className={`text-xs mt-2 px-2 py-1 rounded ${
+                                                            message.type === 'sms' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                                                        }`}>
                                                             <div className="flex items-center gap-2 flex-wrap">
                                                                 <span className="font-medium flex items-center gap-1">
                                                                     <Icon emoji="⚙️" size={16} />
                                                                     Paramètres:
                                                                 </span>
-                                                                {message.model && (
+                                                                {message.model && message.model !== 'cached' && (
                                                                     <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${
                                                                         message.model === 'sonar-pro' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
                                                                         message.model === 'claude' ? 'bg-purple-100 text-purple-700 border border-purple-300' :
@@ -11928,6 +12039,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                         'bg-gray-200 text-gray-700'
                                                                     }`}>
                                                                         🤖 {message.model === 'sonar-pro' ? 'Sonar Pro' : message.model === 'claude' ? 'Claude' : message.model === 'gemini' ? 'Gemini' : message.model}
+                                                                    </span>
+                                                                )}
+                                                                {message.cached && (
+                                                                    <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-300">
+                                                                        💾 Cache (instantané)
                                                                     </span>
                                                                 )}
                                                                 <span className={`px-1.5 py-0.5 rounded text-xs ${
@@ -12025,6 +12141,68 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </svg>
                                     </button>
                                 )}
+                            </div>
+
+                            {/* 📱 Simulateur de Canal SMS/Web */}
+                            <div className={`mb-3 p-3 rounded-lg border transition-colors duration-300 ${
+                                isDarkMode 
+                                    ? 'bg-gray-800 border-gray-700' 
+                                    : 'bg-gray-100 border-gray-300'
+                            }`}>
+                                <div className="flex items-center gap-4">
+                                    <label className={`font-semibold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>
+                                        📱 Simuler canal:
+                                    </label>
+                                    
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="channel-sim"
+                                            value="web"
+                                            defaultChecked
+                                            className="cursor-pointer"
+                                            onChange={(e) => {
+                                                const info = document.getElementById('sms-preview-info');
+                                                if (info) info.style.display = 'none';
+                                            }}
+                                        />
+                                        <span className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            🌐 Web (complet)
+                                        </span>
+                                    </label>
+                                    
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="channel-sim"
+                                            value="sms"
+                                            className="cursor-pointer"
+                                            onChange={(e) => {
+                                                const info = document.getElementById('sms-preview-info');
+                                                if (info) info.style.display = 'block';
+                                            }}
+                                        />
+                                        <span className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            📱 SMS (format court)
+                                        </span>
+                                    </label>
+                                </div>
+                                
+                                <div 
+                                    id="sms-preview-info" 
+                                    className={`mt-2 text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                    }`}
+                                    style={{ display: 'none' }}
+                                >
+                                    ℹ️ Mode SMS: Réponse formatée comme un vrai SMS (3 messages max, pas d'envoi réel)
+                                </div>
                             </div>
 
                             {/* Input */}

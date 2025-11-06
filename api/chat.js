@@ -14,6 +14,7 @@ import { adaptForChannel } from '../lib/channel-adapter.js';
 import { getNameFromPhone, isKnownContact } from '../lib/phone-contacts.js';
 import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 import { validateYTDData, enrichStockDataWithSources } from '../lib/ytd-validator.js';
+import { generateCacheKey, getCachedResponse, setCachedResponse } from '../lib/response-cache.js';
 
 /**
  * Handler POST /api/chat
@@ -772,6 +773,73 @@ Comment puis-je t'aider ? 🚀`;
       forced_intent: forcedIntent // Passer le forced intent à Emma Agent
     };
 
+    // 6.7. 💾 CACHE INTELLIGENT (2H) - Vérifier si réponse en cache
+    // Générer clé de cache basée sur ticker + type d'analyse + canal
+    const primaryTicker = (forcedIntent?.tickers && forcedIntent.tickers.length > 0) 
+      ? forcedIntent.tickers[0] 
+      : (metadata?.tickers && metadata.tickers.length > 0 ? metadata.tickers[0] : null);
+    
+    const analysisType = forcedIntent?.intent || 'general';
+    const isSimulation = req.body.simulate === true; // Flag pour mode simulation
+    
+    // Générer clé de cache seulement si on a un ticker et que ce n'est pas une simulation
+    let cacheKey = null;
+    let cachedData = null;
+    
+    if (primaryTicker && !isSimulation) {
+      cacheKey = generateCacheKey(primaryTicker, analysisType, channel);
+      cachedData = await getCachedResponse(cacheKey);
+      
+      if (cachedData) {
+        const cacheAge = Math.round((Date.now() - cachedData.created_at) / 1000 / 60);
+        console.log(`[Chat API] 💾 ✅ CACHE HIT - Âge: ${cacheAge} min, Hits: ${cachedData.hit_count}`);
+        
+        // Adapter la réponse cachée pour le canal
+        let adaptedCachedResponse;
+        try {
+          adaptedCachedResponse = adaptForChannel(cachedData.response, channel, emmaContext);
+        } catch (error) {
+          console.error('[Chat API] Erreur adaptation réponse cachée:', error);
+          adaptedCachedResponse = cachedData.response;
+        }
+        
+        // Sauvegarder dans la conversation
+        try {
+          await saveConversationTurn(
+            conversation.id,
+            message,
+            cachedData.response,
+            {
+              model: 'cached',
+              cached: true,
+              cache_age_minutes: cacheAge,
+              hit_count: cachedData.hit_count,
+              channel: channel
+            }
+          );
+        } catch (error) {
+          console.error('[Chat API] Erreur sauvegarde conversation (cache):', error);
+        }
+        
+        // Retourner réponse cachée
+        const duration = Date.now() - startTime;
+        return res.status(200).json({
+          success: true,
+          response: adaptedCachedResponse,
+          model: 'cached',
+          cached: true,
+          cache_age_minutes: cacheAge,
+          hit_count: cachedData.hit_count,
+          execution_time_ms: duration,
+          conversationId: conversation.id
+        });
+      } else {
+        console.log(`[Chat API] 💾 ❌ CACHE MISS - Génération nouvelle réponse`);
+      }
+    } else if (isSimulation) {
+      console.log(`[Chat API] 🧪 MODE SIMULATION - Cache désactivé`);
+    }
+
     // 7. APPELER EMMA-AGENT (Function Calling Router existant)
     let emmaResponse;
     try {
@@ -833,6 +901,25 @@ Comment puis-je t'aider ? 🚀`;
     } catch (error) {
       console.error('[Chat API] Erreur adaptation canal:', error);
       adaptedResponse = emmaResponse.response; // Fallback: réponse brute
+    }
+
+    // 8.5. 💾 SAUVEGARDER DANS LE CACHE (si applicable)
+    if (cacheKey && primaryTicker && !isSimulation) {
+      try {
+        await setCachedResponse(cacheKey, emmaResponse.response, {
+          ticker: primaryTicker,
+          analysis_type: analysisType,
+          channel: channel,
+          user_id: userId,
+          model: emmaResponse.model,
+          tools_used: emmaResponse.tools_used,
+          confidence: emmaResponse.confidence
+        });
+        console.log('[Chat API] 💾 ✅ Réponse sauvegardée dans le cache (expire: 2h)');
+      } catch (error) {
+        console.error('[Chat API] ⚠️ Erreur sauvegarde cache (non-bloquant):', error);
+        // Non-bloquant, on continue
+      }
     }
 
     // 9. SAUVEGARDER DANS LA CONVERSATION

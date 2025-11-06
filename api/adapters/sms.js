@@ -306,8 +306,20 @@ export default async function handler(req, res) {
  * @param {string} message - Message à envoyer
  * @returns {Promise<object>} Résultat Twilio
  */
-async function sendSMS(to, message) {
+async function sendSMS(to, message, simulate = false) {
   try {
+    // 🧪 MODE SIMULATION: Ne pas envoyer de vrai SMS
+    if (simulate) {
+      console.log(`[SMS Adapter] 🧪 MODE SIMULATION - SMS NON ENVOYÉ à ${to} (${message.length} chars)`);
+      console.log(`[SMS Adapter] 🧪 Contenu simulé: "${message.substring(0, 100)}..."`);
+      return { 
+        success: true, 
+        simulated: true, 
+        messageCount: message.length > 1600 ? Math.ceil(message.length / 1500) : 1,
+        message: 'SMS simulé (pas envoyé)'
+      };
+    }
+
     const client = getTwilioClient();
     const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
