@@ -204,14 +204,10 @@ export default async function handler(req, res) {
     // Déclarer forcedIntent qui sera initialisé plus tard (ligne 581+)
     let forcedIntent = null;
 
-    // Déterminer si on a besoin des listes (économie ~300ms sur 80% des requêtes)
-    const needsWatchlist = 
-        forcedIntent?.intent === 'portfolio' ||
-        (intentData?.intent === 'portfolio') ||
-        (!forcedIntent?.tickers?.length && !metadata?.tickers?.length);
-
-    if (needsWatchlist) {
-      console.log('[Chat API] Loading watchlist/team_tickers (needed for context)');
+    // SIMPLIFICATION: Charger toujours (optimisation conditionnelle causait trop d'erreurs)
+    // L'impact performance est minime (~300ms) comparé à la stabilité
+    try {
+      console.log('[Chat API] Loading watchlist/team_tickers');
       
       try {
         const { createClient } = await import('@supabase/supabase-js');
@@ -255,10 +251,8 @@ export default async function handler(req, res) {
           'TRP', 'UNH', 'UL', 'VZ', 'WFC'
         ];
       }
-    } else {
-      console.log('[Chat API] ⚡ Skipping watchlist/team_tickers (not needed for this query - performance optimization)');
-      // Utiliser fallback léger pour team_tickers uniquement
-      teamTickers = ['GOOGL', 'AAPL', 'MSFT', 'TSLA', 'AMZN'];
+    } catch (error) {
+      console.error('[Chat API] Erreur chargement listes (non-bloquant):', error.message);
     }
 
     // 5. DÉTECTER SI EMMA DOIT SE PRÉSENTER
