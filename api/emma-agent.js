@@ -11,6 +11,7 @@
 import { HybridIntentAnalyzer } from '../lib/intent-analyzer.js';
 import { createSupabaseClient } from '../lib/supabase-config.js';
 import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
+import { CFA_SYSTEM_PROMPT } from '../config/emma-cfa-prompt.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
