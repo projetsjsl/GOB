@@ -50,6 +50,10 @@ class SmartAgent {
                 console.log(`💬 Loaded conversation history: ${this.conversationHistory.length} messages`);
             }
 
+            // 🔧 AUTO-CORRECTION DES TICKERS (avant analyse d'intent)
+            userMessage = this._autoCorrectTickers(userMessage);
+
+
             // 0. COGNITIVE SCAFFOLDING: Analyse d'intention avec Perplexity
             const intentData = await this._analyzeIntent(userMessage, context);
             console.log('🧠 Intent analysis:', intentData ? intentData.intent : 'fallback to keyword scoring');
@@ -487,6 +491,38 @@ class SmartAgent {
         } else {
             // Sélection normale basée sur le scoring
             selectedTools = scoredTools;
+        }
+
+        // 🚀 OPTIMISATION SMS: Skip outils "nice-to-have" non essentiels
+        if (context.user_channel === 'sms') {
+            const message = userMessage.toLowerCase();
+            
+            // Outils optionnels (skip sauf si explicitement demandés)
+            const optionalTools = ['earnings-calendar', 'analyst-recommendations', 'economic-calendar'];
+            
+            const isExplicitlyRequested = (toolId) => {
+                const toolKeywords = {
+                    'earnings-calendar': ['résultats', 'earnings', 'résultat', 'publication'],
+                    'analyst-recommendations': ['analyste', 'recommandation', 'consensus', 'rating'],
+                    'economic-calendar': ['calendrier', 'économique', 'événement', 'macro']
+                };
+                
+                const keywords = toolKeywords[toolId] || [];
+                return keywords.some(kw => message.includes(kw));
+            };
+            
+            selectedTools = selectedTools.filter(tool => {
+                if (optionalTools.includes(tool.id)) {
+                    const keep = isExplicitlyRequested(tool.id);
+                    if (!keep) {
+                        console.log(`📱 SMS optimization: Skipping ${tool.id} (not explicitly requested)`);
+                    }
+                    return keep;
+                }
+                return true;
+            });
+            
+            console.log(`📱 SMS mode: ${selectedTools.length} tools selected (optimized)`);
         }
 
         // Limitation au nombre max d'outils concurrents
@@ -2233,12 +2269,23 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
 
             console.log('🚀 Calling Perplexity API...');
 
-            // Ajouter timeout de 25 secondes
+            // ⏱️ Timeout flexible selon le mode
+            // - SMS: 45s pour streaming, 30s sinon
+            // - Chat/Briefing: 45s (requêtes complexes avec screening)
+            const enableStreaming = context.user_channel === 'sms';
+            const timeoutDuration = context.user_channel === 'sms' 
+                ? (enableStreaming ? 45000 : 30000)
+                : 45000;
             const controller = new AbortController();
             const timeout = setTimeout(() => {
-                console.error('⏱️ Perplexity API timeout after 25s');
+                console.error(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s`);
                 controller.abort();
-            }, 25000);
+            }, timeoutDuration);
+
+            // Activer streaming pour SMS
+            if (enableStreaming) {
+                requestBody.stream = true;
+            }
 
             const response = await fetch('https://api.perplexity.ai/chat/completions', {
                 method: 'POST',
@@ -2259,6 +2306,13 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
             }
 
             console.log('✅ Perplexity API responded');
+
+            // NOUVEAU: Traitement streaming pour SMS
+            if (enableStreaming && requestBody.stream) {
+                return await this._handleStreamingSMS(response, context);
+            }
+
+            // Fallback non-streaming pour autres canaux
             const data = await response.json();
             const content = data.choices[0].message.content;
 
@@ -2282,7 +2336,130 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
                 console.log('🔄 Falling back to Gemini due to Perplexity error');
             }
 
-            throw new Error(`Erreur de communication avec Perplexity: ${error.message}`);
+            // ✅ VRAI FALLBACK: Appeler Gemini au lieu de throw
+            console.log('🔄 Calling Gemini as fallback...');
+            return await this._call_gemini(prompt, outputMode, context);
+        }
+    }
+
+    /**
+     * Gestion du streaming Perplexity pour SMS avec envoi progressif
+     */
+    async _handleStreamingSMS(response, context) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        
+        let accumulatedContent = '';
+        let citations = [];
+        let chunksSent = 0;
+        const CHUNK_SIZE = 2000;
+        
+        try {
+            console.log('📡 Starting Perplexity streaming for SMS...');
+            
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n').filter(line => line.trim() !== '');
+                
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const jsonStr = line.slice(6);
+                        if (jsonStr === '[DONE]') continue;
+                        
+                        try {
+                            const data = JSON.parse(jsonStr);
+                            const content = data.choices?.[0]?.delta?.content || '';
+                            accumulatedContent += content;
+                            
+                            // Extraire citations si présentes
+                            if (data.citations) {
+                                citations = data.citations;
+                            }
+                            
+                            // Envoyer chunk SMS dès que 2000 chars atteints
+                            if (accumulatedContent.length >= CHUNK_SIZE * (chunksSent + 1)) {
+                                await this._sendSMSChunk(accumulatedContent, chunksSent, context);
+                                chunksSent++;
+                            }
+                        } catch (parseError) {
+                            console.warn('⚠️ Failed to parse streaming chunk:', parseError.message);
+                        }
+                    }
+                }
+            }
+            
+            // Envoyer le dernier chunk si reste du contenu
+            if (accumulatedContent.length > CHUNK_SIZE * chunksSent) {
+                await this._sendSMSChunk(accumulatedContent, chunksSent, context, true);
+                chunksSent++;
+            }
+            
+            console.log(`✅ Streaming completed: ${accumulatedContent.length} chars, ${chunksSent} chunks sent`);
+            
+            return {
+                content: accumulatedContent,
+                citations: citations,
+                streaming: true,
+                chunks_sent: chunksSent
+            };
+            
+        } catch (error) {
+            console.error('❌ Streaming error:', error);
+            // Fallback: retourner ce qui a été accumulé
+            return {
+                content: accumulatedContent || 'Erreur streaming, réponse partielle.',
+                citations: citations,
+                streaming: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Envoi d'un chunk SMS progressif pendant le streaming
+     */
+    async _sendSMSChunk(fullContent, chunkIndex, context, isFinal = false) {
+        const CHUNK_SIZE = 2000;
+        const start = chunkIndex * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, fullContent.length);
+        const chunkContent = fullContent.substring(start, end);
+        
+        // Découper intelligemment par phrases si possible
+        let finalChunk = chunkContent;
+        if (!isFinal && end < fullContent.length) {
+            const lastPeriod = chunkContent.lastIndexOf('.');
+            const lastNewline = chunkContent.lastIndexOf('\n');
+            const cutPoint = Math.max(lastPeriod, lastNewline);
+            
+            if (cutPoint > CHUNK_SIZE * 0.7) {
+                finalChunk = chunkContent.substring(0, cutPoint + 1);
+            }
+        }
+        
+        // Appeler directement l'adaptateur SMS
+        try {
+            // Import dynamique pour éviter circular dependencies
+            const smsModule = await import('./adapters/sms.js');
+            const totalChunks = Math.ceil(fullContent.length / CHUNK_SIZE);
+            const prefix = totalChunks > 1 ? `[${chunkIndex + 1}/${totalChunks}] ` : '';
+            
+            await smsModule.sendSMS(
+                context.userId,
+                prefix + finalChunk,
+                false // pas de simulation
+            );
+            
+            console.log(`📱 SMS chunk ${chunkIndex + 1}/${totalChunks} sent (${finalChunk.length} chars)`);
+            
+            // Délai entre chunks pour garantir l'ordre
+            if (!isFinal) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        } catch (error) {
+            console.error(`❌ Failed to send SMS chunk ${chunkIndex + 1}:`, error);
         }
     }
 
@@ -2717,6 +2894,109 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
         // Les statistiques sont sauvegardées en temps réel via _updateToolStats
         // qui appelle la fonction Supabase update_tool_stats
         return;
+    }
+
+    /**
+     * 🔧 AUTO-CORRECTION DES TICKERS
+     * Corrige les erreurs courantes de tickers (ex: SONOCO → SON, GOOGL → GOOGL, etc.)
+     */
+    _autoCorrectTickers(message) {
+        // Dictionnaire des corrections courantes (nom complet → ticker correct)
+        const tickerCorrections = {
+            // Erreurs courantes avec suffixes
+            'SONOCO': 'SON',
+            'SONOC': 'SON',
+            'GOOGLE': 'GOOGL',
+            'GOOGL': 'GOOGL',
+            'GOOG': 'GOOGL',
+            'ALPHABET': 'GOOGL',
+            'APPLE': 'AAPL',
+            'MICROSOFT': 'MSFT',
+            'AMAZON': 'AMZN',
+            'TESLA': 'TSLA',
+            'META': 'META',
+            'FACEBOOK': 'META',
+            'NVIDIA': 'NVDA',
+            'NETFLIX': 'NFLX',
+            'DISNEY': 'DIS',
+            'WALMART': 'WMT',
+            'JPMORGAN': 'JPM',
+            'JP MORGAN': 'JPM',
+            'VISA': 'V',
+            'MASTERCARD': 'MA',
+            'COCA COLA': 'KO',
+            'COCA-COLA': 'KO',
+            'PEPSI': 'PEP',
+            'PEPSICO': 'PEP',
+            'MCDONALD': 'MCD',
+            'MCDONALDS': 'MCD',
+            'NIKE': 'NKE',
+            'STARBUCKS': 'SBUX',
+            'BOEING': 'BA',
+            'INTEL': 'INTC',
+            'AMD': 'AMD',
+            'CISCO': 'CSCO',
+            'ORACLE': 'ORCL',
+            'SALESFORCE': 'CRM',
+            'ADOBE': 'ADBE',
+            'PFIZER': 'PFE',
+            'JOHNSON': 'JNJ',
+            'JOHNSON & JOHNSON': 'JNJ',
+            'MERCK': 'MRK',
+            'ABBVIE': 'ABBV',
+            'EXXON': 'XOM',
+            'EXXONMOBIL': 'XOM',
+            'CHEVRON': 'CVX',
+            'SHELL': 'SHEL',
+            'BP': 'BP',
+            'TOTAL': 'TTE',
+            'BERKSHIRE': 'BRK.B',
+            'BERKSHIRE HATHAWAY': 'BRK.B',
+            // Canadiennes
+            'ROYAL BANK': 'RY',
+            'TD BANK': 'TD',
+            'TORONTO DOMINION': 'TD',
+            'BANK OF NOVA SCOTIA': 'BNS',
+            'SCOTIABANK': 'BNS',
+            'BMO': 'BMO',
+            'BANK OF MONTREAL': 'BMO',
+            'CIBC': 'CM',
+            'NATIONAL BANK': 'NA',
+            'BANQUE NATIONALE': 'NA',
+            'MANULIFE': 'MFC',
+            'SUN LIFE': 'SLF',
+            'ENBRIDGE': 'ENB',
+            'TC ENERGY': 'TRP',
+            'TRANSCANADA': 'TRP',
+            'CN RAIL': 'CNR',
+            'CNR': 'CNR',
+            'CP RAIL': 'CP',
+            'CANADIAN PACIFIC': 'CP',
+            'SHOPIFY': 'SHOP',
+            'BCE': 'BCE',
+            'BELL': 'BCE',
+            'TELUS': 'T',
+            'ROGERS': 'RCI.B'
+        };
+
+        let correctedMessage = message;
+        let corrections = [];
+
+        // Chercher et corriger les tickers dans le message
+        for (const [wrong, correct] of Object.entries(tickerCorrections)) {
+            // Regex pour matcher le mot entier (insensible à la casse)
+            const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
+            if (regex.test(correctedMessage)) {
+                correctedMessage = correctedMessage.replace(regex, correct);
+                corrections.push(`${wrong} → ${correct}`);
+            }
+        }
+
+        if (corrections.length > 0) {
+            console.log(`🔧 Auto-correction tickers: ${corrections.join(', ')}`);
+        }
+
+        return correctedMessage;
     }
 }
 
