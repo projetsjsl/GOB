@@ -360,11 +360,14 @@ async function sendSMS(to, message, simulate = false) {
       return { success: true, messageCount: chunks.length };
 
     } else {
-      // Message simple (< 1600 chars) - Ajouter emoji Emma au début
+      // Message simple (< 1600 chars) - Ajouter emoji Emma au début SI PAS DÉJÀ PRÉSENT
+      const hasEmmaEmoji = message.startsWith('👩🏻');
+      const finalMessage = hasEmmaEmoji ? message : `👩🏻 ${message}`;
+      
       const result = await client.messages.create({
         from: twilioPhoneNumber,
         to: to,
-        body: `👩🏻 ${message}`
+        body: finalMessage
       });
 
       console.log(`[SMS Adapter] SMS envoyé avec succès - SID: ${result.sid}`);
@@ -432,6 +435,9 @@ function chunkMessage(text, maxLength) {
 
   return chunks;
 }
+
+// Export pour utilisation par emma-agent streaming
+export { sendSMS };
 
 /**
  * Exemple de requête Twilio:
