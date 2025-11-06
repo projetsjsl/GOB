@@ -334,6 +334,7 @@ async function sendSMS(to, message, simulate = false) {
     if (message.length > 1600) {
       console.log('[SMS Adapter] Message trop long, découpage en plusieurs SMS');
 
+      // Limite réelle: 1600 (Twilio) - 35 (préfixe "👩🏻 📱 Partie X/Y\n\n") - 65 (marge sécurité)
       const chunks = chunkMessage(message, 1500);
 
       // Envoyer les SMS dans l'ORDRE INVERSE pour compenser l'affichage inversé des téléphones
@@ -420,7 +421,8 @@ function chunkMessage(text, maxLength) {
         let remaining = sentence;
         while (remaining.length > 0) {
           if (remaining.length <= maxLength) {
-            chunks.push(remaining);
+            // Le dernier morceau COMMENCE le prochain chunk (pas pushé directement)
+            currentChunk = remaining;
             remaining = '';
           } else {
             // Chercher le dernier espace avant maxLength
@@ -433,7 +435,6 @@ function chunkMessage(text, maxLength) {
             remaining = remaining.substring(cutPos).trim();
           }
         }
-        currentChunk = '';
       } else {
         currentChunk = sentence;
       }
