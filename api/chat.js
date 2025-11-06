@@ -200,6 +200,9 @@ export default async function handler(req, res) {
     // Emma a accès à MILLIERS de tickers mondiaux via APIs (FMP, Polygon, etc.)
     let userWatchlist = [];
     let teamTickers = [];
+    
+    // Déclarer forcedIntent qui sera initialisé plus tard (ligne 581+)
+    let forcedIntent = null;
 
     // Déterminer si on a besoin des listes (économie ~300ms sur 80% des requêtes)
     const needsWatchlist = 
