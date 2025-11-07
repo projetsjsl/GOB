@@ -799,8 +799,11 @@ Comment puis-je t'aider ? 🚀`;
       forced_intent: forcedIntent // Passer le forced intent à Emma Agent
     };
 
-    // 6.7. 💾 CACHE INTELLIGENT (2H) - Vérifier si réponse en cache
-    // Générer clé de cache basée sur ticker + type d'analyse + canal
+    // 6.7. 💾 CACHE INTELLIGENT (2H) - DÉSACTIVÉ
+    // Le cache de 2h a été désactivé pour que chaque demande soit régénérée
+    console.log(`[Chat API] 🔄 CACHE DÉSACTIVÉ - Chaque demande sera régénérée`);
+    
+    // Générer clé de cache basée sur ticker + type d'analyse + canal (pour référence uniquement)
     const primaryTicker = (forcedIntent?.tickers && forcedIntent.tickers.length > 0) 
       ? forcedIntent.tickers[0] 
       : (metadata?.tickers && metadata.tickers.length > 0 ? metadata.tickers[0] : null);
@@ -808,10 +811,12 @@ Comment puis-je t'aider ? 🚀`;
     const analysisType = forcedIntent?.intent || 'general';
     const isSimulation = req.body.simulate === true; // Flag pour mode simulation
     
-    // Générer clé de cache seulement si on a un ticker et que ce n'est pas une simulation
-    let cacheKey = null;
-    let cachedData = null;
+    // CACHE DÉSACTIVÉ - Ne plus vérifier ni utiliser le cache
+    // let cacheKey = null;
+    // let cachedData = null;
     
+    // CODE CACHE COMMENTÉ - Désactivé pour régénération systématique
+    /*
     if (primaryTicker && !isSimulation) {
       cacheKey = generateCacheKey(primaryTicker, analysisType, channel);
       cachedData = await getCachedResponse(cacheKey);
@@ -865,6 +870,7 @@ Comment puis-je t'aider ? 🚀`;
     } else if (isSimulation) {
       console.log(`[Chat API] 🧪 MODE SIMULATION - Cache désactivé`);
     }
+    */
 
     // 7. APPELER EMMA-AGENT (Function Calling Router existant)
     let emmaResponse;
@@ -947,6 +953,9 @@ Comment puis-je t'aider ? 🚀`;
     }
 
     // 8.5. 💾 SAUVEGARDER DANS LE CACHE (si applicable)
+    // CACHE DÉSACTIVÉ - Ne plus sauvegarder dans le cache
+    // Chaque demande sera régénérée sans mise en cache
+    /*
     if (cacheKey && primaryTicker && !isSimulation) {
       try {
         // ✅ NOUVEAU: Valider complétude avant mise en cache
@@ -977,6 +986,7 @@ Comment puis-je t'aider ? 🚀`;
         // Non-bloquant, on continue
       }
     }
+    */
 
     // 9. SAUVEGARDER DANS LA CONVERSATION
     try {
