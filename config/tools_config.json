@@ -427,6 +427,51 @@
       "fallback_tools": [],
       "usage_context": ["screening", "recherche", "trouve", "cherche", "liste", "recommande", "suggère", "identifie", "top", "meilleurs"],
       "keywords": ["screening", "screener", "recherche", "trouve", "cherche", "liste", "recommande", "suggère", "identifie", "top", "meilleurs", "sous-évalué", "undervalued", "dividende", "croissance", "growth", "value", "large cap", "mid cap", "small cap"]
+    },
+    {
+      "id": "rsi-screener",
+      "name": "RSI Screener",
+      "description": "Identifie les opportunités RSI extrêmes (survente: RSI(14)≤20 ET RSI(5)≤5, surachat: RSI(14)≥80 ET RSI(5)≥95) sur marchés internationaux (US, CA, EU)",
+      "category": "screening",
+      "priority": 2,
+      "enabled": true,
+      "parameters": {
+        "type": {
+          "type": "string",
+          "required": false,
+          "enum": ["oversold", "overbought", "both"],
+          "default": "both",
+          "description": "Type de recherche: oversold (survente), overbought (surachat), both (les deux)"
+        },
+        "markets": {
+          "type": "array",
+          "required": false,
+          "default": ["US"],
+          "description": "Marchés à scanner: US, CA, UK, FR, DE, EU"
+        },
+        "limit": {
+          "type": "number",
+          "required": false,
+          "default": 20,
+          "description": "Nombre max de résultats par catégorie"
+        },
+        "market_cap": {
+          "type": "string",
+          "required": false,
+          "enum": ["large", "mid", "all"],
+          "default": "large",
+          "description": "Capitalisation minimum"
+        }
+      },
+      "implementation": {
+        "file": "rsi-screener.js",
+        "function": "screenByRSI",
+        "endpoint": "/api/rsi-screener",
+        "api_key_env": ["FMP_API_KEY", "TWELVE_DATA_API_KEY"]
+      },
+      "fallback_tools": [],
+      "usage_context": ["rsi", "survente", "surachat", "oversold", "overbought", "extrême", "extreme", "indicateur", "technique", "opportunité"],
+      "keywords": ["rsi", "survente", "surachat", "oversold", "overbought", "extrême", "extreme", "indicateur", "technique", "technical", "momentum", "opportunité", "opportunity", "trading", "swing"]
     }
   ],
   "config": {
