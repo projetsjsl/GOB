@@ -121,69 +121,275 @@ END $$;
 -- 3. MIGRER LES DONNÉES DE `team_tickers` VERS `tickers`
 -- ============================================================================
 
-INSERT INTO tickers (ticker, company_name, priority, is_active, source, notes, added_date, created_at, updated_at)
-SELECT 
-    tt.ticker,
-    tt.company_name,
-    COALESCE(tt.priority, 1) as priority,
-    COALESCE(tt.active, true) as is_active,
-    'team' as source,
-    tt.notes,
-    COALESCE(tt.added_at, NOW()) as added_date,
-    COALESCE(tt.added_at, NOW()) as created_at,
-    COALESCE(tt.updated_at, NOW()) as updated_at
-FROM team_tickers tt
-WHERE NOT EXISTS (
-    SELECT 1 FROM tickers t 
-    WHERE t.ticker = tt.ticker
-)
-ON CONFLICT (ticker) DO UPDATE SET
-    source = CASE 
-        WHEN tickers.source = 'watchlist' THEN 'both' -- Si déjà dans watchlist, mettre 'both'
-        ELSE 'team'
-    END,
-    priority = GREATEST(tickers.priority, EXCLUDED.priority),
-    company_name = COALESCE(EXCLUDED.company_name, tickers.company_name),
-    is_active = EXCLUDED.is_active,
-    updated_at = NOW();
+-- Migration adaptative qui gère les colonnes qui peuvent ne pas exister
+DO $$
+DECLARE
+    has_company_name BOOLEAN;
+    has_priority BOOLEAN;
+    has_active BOOLEAN;
+    has_notes BOOLEAN;
+    has_added_at BOOLEAN;
+    has_updated_at BOOLEAN;
+    sql_query TEXT;
+BEGIN
+    -- Vérifier quelles colonnes existent dans team_tickers
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'team_tickers' AND column_name = 'company_name'
+    ) INTO has_company_name;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'team_tickers' AND column_name = 'priority'
+    ) INTO has_priority;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'team_tickers' AND column_name = 'active'
+    ) INTO has_active;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'team_tickers' AND column_name = 'notes'
+    ) INTO has_notes;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'team_tickers' AND column_name = 'added_at'
+    ) INTO has_added_at;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'team_tickers' AND column_name = 'updated_at'
+    ) INTO has_updated_at;
+    
+    -- Construire la requête INSERT adaptative
+    sql_query := 'INSERT INTO tickers (ticker, priority, is_active, source, added_date, created_at, updated_at';
+    
+    IF has_company_name THEN
+        sql_query := sql_query || ', company_name';
+    END IF;
+    
+    IF has_notes THEN
+        sql_query := sql_query || ', notes';
+    END IF;
+    
+    sql_query := sql_query || ') SELECT tt.ticker, ';
+    
+    IF has_priority THEN
+        sql_query := sql_query || 'COALESCE(tt.priority, 1), ';
+    ELSE
+        sql_query := sql_query || '1, ';
+    END IF;
+    
+    IF has_active THEN
+        sql_query := sql_query || 'COALESCE(tt.active, true), ';
+    ELSE
+        sql_query := sql_query || 'true, ';
+    END IF;
+    
+    sql_query := sql_query || '''team'', ';
+    
+    IF has_added_at THEN
+        sql_query := sql_query || 'COALESCE(tt.added_at, NOW()), ';
+    ELSE
+        sql_query := sql_query || 'NOW(), ';
+    END IF;
+    
+    IF has_added_at THEN
+        sql_query := sql_query || 'COALESCE(tt.added_at, NOW()), ';
+    ELSE
+        sql_query := sql_query || 'NOW(), ';
+    END IF;
+    
+    IF has_updated_at THEN
+        sql_query := sql_query || 'COALESCE(tt.updated_at, NOW())';
+    ELSE
+        sql_query := sql_query || 'NOW()';
+    END IF;
+    
+    IF has_company_name THEN
+        sql_query := sql_query || ', tt.company_name';
+    END IF;
+    
+    IF has_notes THEN
+        sql_query := sql_query || ', tt.notes';
+    END IF;
+    
+    sql_query := sql_query || ' FROM team_tickers tt WHERE NOT EXISTS (SELECT 1 FROM tickers t WHERE t.ticker = tt.ticker)';
+    
+    sql_query := sql_query || ' ON CONFLICT (ticker) DO UPDATE SET source = CASE WHEN tickers.source = ''watchlist'' THEN ''both'' ELSE ''team'' END, priority = GREATEST(tickers.priority, EXCLUDED.priority), is_active = EXCLUDED.is_active, updated_at = NOW()';
+    
+    IF has_company_name THEN
+        sql_query := sql_query || ', company_name = COALESCE(EXCLUDED.company_name, tickers.company_name)';
+    END IF;
+    
+    -- Exécuter la requête
+    EXECUTE sql_query;
+    
+    RAISE NOTICE 'Migration team_tickers terminée';
+END $$;
 
 -- ============================================================================
 -- 4. MIGRER LES DONNÉES DE `watchlist` VERS `tickers`
 -- ============================================================================
 
-INSERT INTO tickers (ticker, company_name, user_id, target_price, stop_loss, is_active, source, notes, added_date, created_at, updated_at)
-SELECT 
-    w.ticker,
-    w.company_name,
-    w.user_id,
-    w.target_price,
-    w.stop_loss,
-    COALESCE(w.active, true) as is_active,
-    CASE 
-        WHEN EXISTS (SELECT 1 FROM tickers t WHERE t.ticker = w.ticker AND t.source IN ('team', 'both')) THEN 'both'
-        ELSE 'watchlist'
-    END as source,
-    w.notes,
-    COALESCE(w.added_at, NOW()) as added_date,
-    COALESCE(w.added_at, NOW()) as created_at,
-    COALESCE(w.updated_at, NOW()) as updated_at
-FROM watchlist w
-WHERE NOT EXISTS (
-    SELECT 1 FROM tickers t 
-    WHERE t.ticker = w.ticker AND t.user_id = w.user_id
-)
-ON CONFLICT (ticker) DO UPDATE SET
-    source = CASE 
-        WHEN tickers.source = 'team' THEN 'both'
-        WHEN tickers.source = 'both' THEN 'both'
-        ELSE 'watchlist'
-    END,
-    user_id = COALESCE(EXCLUDED.user_id, tickers.user_id),
-    target_price = COALESCE(EXCLUDED.target_price, tickers.target_price),
-    stop_loss = COALESCE(EXCLUDED.stop_loss, tickers.stop_loss),
-    company_name = COALESCE(EXCLUDED.company_name, tickers.company_name),
-    is_active = EXCLUDED.is_active,
-    updated_at = NOW();
+-- Migration adaptative qui gère les colonnes qui peuvent ne pas exister
+DO $$
+DECLARE
+    has_company_name BOOLEAN;
+    has_user_id BOOLEAN;
+    has_target_price BOOLEAN;
+    has_stop_loss BOOLEAN;
+    has_active BOOLEAN;
+    has_notes BOOLEAN;
+    has_added_at BOOLEAN;
+    has_updated_at BOOLEAN;
+    sql_query TEXT;
+BEGIN
+    -- Vérifier quelles colonnes existent dans watchlist
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'watchlist' AND column_name = 'company_name'
+    ) INTO has_company_name;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'watchlist' AND column_name = 'user_id'
+    ) INTO has_user_id;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'watchlist' AND column_name = 'target_price'
+    ) INTO has_target_price;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'watchlist' AND column_name = 'stop_loss'
+    ) INTO has_stop_loss;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'watchlist' AND column_name = 'active'
+    ) INTO has_active;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'watchlist' AND column_name = 'notes'
+    ) INTO has_notes;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'watchlist' AND column_name = 'added_at'
+    ) INTO has_added_at;
+    
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'watchlist' AND column_name = 'updated_at'
+    ) INTO has_updated_at;
+    
+    -- Construire la requête INSERT adaptative
+    sql_query := 'INSERT INTO tickers (ticker, is_active, source, added_date, created_at, updated_at';
+    
+    IF has_company_name THEN
+        sql_query := sql_query || ', company_name';
+    END IF;
+    
+    IF has_user_id THEN
+        sql_query := sql_query || ', user_id';
+    END IF;
+    
+    IF has_target_price THEN
+        sql_query := sql_query || ', target_price';
+    END IF;
+    
+    IF has_stop_loss THEN
+        sql_query := sql_query || ', stop_loss';
+    END IF;
+    
+    IF has_notes THEN
+        sql_query := sql_query || ', notes';
+    END IF;
+    
+    sql_query := sql_query || ') SELECT w.ticker, ';
+    
+    IF has_active THEN
+        sql_query := sql_query || 'COALESCE(w.active, true), ';
+    ELSE
+        sql_query := sql_query || 'true, ';
+    END IF;
+    
+    sql_query := sql_query || 'CASE WHEN EXISTS (SELECT 1 FROM tickers t WHERE t.ticker = w.ticker AND t.source IN (''team'', ''both'')) THEN ''both'' ELSE ''watchlist'' END, ';
+    
+    IF has_added_at THEN
+        sql_query := sql_query || 'COALESCE(w.added_at, NOW()), ';
+    ELSE
+        sql_query := sql_query || 'NOW(), ';
+    END IF;
+    
+    IF has_added_at THEN
+        sql_query := sql_query || 'COALESCE(w.added_at, NOW()), ';
+    ELSE
+        sql_query := sql_query || 'NOW(), ';
+    END IF;
+    
+    IF has_updated_at THEN
+        sql_query := sql_query || 'COALESCE(w.updated_at, NOW())';
+    ELSE
+        sql_query := sql_query || 'NOW()';
+    END IF;
+    
+    IF has_company_name THEN
+        sql_query := sql_query || ', w.company_name';
+    END IF;
+    
+    IF has_user_id THEN
+        sql_query := sql_query || ', w.user_id';
+    END IF;
+    
+    IF has_target_price THEN
+        sql_query := sql_query || ', w.target_price';
+    END IF;
+    
+    IF has_stop_loss THEN
+        sql_query := sql_query || ', w.stop_loss';
+    END IF;
+    
+    IF has_notes THEN
+        sql_query := sql_query || ', w.notes';
+    END IF;
+    
+    sql_query := sql_query || ' FROM watchlist w WHERE NOT EXISTS (SELECT 1 FROM tickers t WHERE t.ticker = w.ticker';
+    
+    IF has_user_id THEN
+        sql_query := sql_query || ' AND t.user_id = w.user_id';
+    END IF;
+    
+    sql_query := sql_query || ')';
+    
+    sql_query := sql_query || ' ON CONFLICT (ticker) DO UPDATE SET source = CASE WHEN tickers.source = ''team'' THEN ''both'' WHEN tickers.source = ''both'' THEN ''both'' ELSE ''watchlist'' END, is_active = EXCLUDED.is_active, updated_at = NOW()';
+    
+    IF has_company_name THEN
+        sql_query := sql_query || ', company_name = COALESCE(EXCLUDED.company_name, tickers.company_name)';
+    END IF;
+    
+    IF has_user_id THEN
+        sql_query := sql_query || ', user_id = COALESCE(EXCLUDED.user_id, tickers.user_id)';
+    END IF;
+    
+    IF has_target_price THEN
+        sql_query := sql_query || ', target_price = COALESCE(EXCLUDED.target_price, tickers.target_price)';
+    END IF;
+    
+    IF has_stop_loss THEN
+        sql_query := sql_query || ', stop_loss = COALESCE(EXCLUDED.stop_loss, tickers.stop_loss)';
+    END IF;
+    
+    -- Exécuter la requête
+    EXECUTE sql_query;
+    
+    RAISE NOTICE 'Migration watchlist terminée';
+END $$;
 
 -- ============================================================================
 -- 5. INSÉRER LES TICKERS PAR DÉFAUT DE L'ÉQUIPE (si aucun ticker team n'existe)
