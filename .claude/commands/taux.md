@@ -150,17 +150,30 @@ Hausse du 10Y/30Y sur 1 mois (+5 bps, +8 bps) malgré baisse Fed. Marché antici
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🌍 COMPARAISON USA vs CANADA
+🌍 COMPARAISON USA vs CANADA - Tableau Complet
 
-| Maturité       | 🇨🇦 Canada | 🇺🇸 USA  | Spread (US-CA) |
-|----------------|------------|----------|----------------|
-| Taux Directeur | 4.50%      | 4.625%*  | +0.125%        |
-| 2 Ans          | 3.45%      | 4.05%    | +0.60%         |
-| 5 Ans          | 3.15%      | 4.10%    | +0.95%         |
-| 10 Ans         | 3.50%      | 4.45%    | +0.95%         |
-| 30 Ans         | 3.85%      | 4.65%    | +0.80%         |
+| Maturité       | 🇨🇦 Canada | 🇺🇸 USA  | Spread (US-CA) | Écart (bps) |
+|----------------|------------|----------|----------------|-------------|
+| **Taux Directeur** | **4.50%** | **4.625%*** | **+0.125%** | **+12.5 bps** |
+| 1 Mois         | 4.25%      | 4.55%    | +0.30%         | +30 bps     |
+| 3 Mois         | 4.35%      | 4.62%    | +0.27%         | +27 bps     |
+| 6 Mois         | 4.10%      | 4.45%    | +0.35%         | +35 bps     |
+| 1 An           | 3.85%      | 4.25%    | +0.40%         | +40 bps     |
+| 2 Ans          | 3.45%      | 4.05%    | +0.60%         | +60 bps     |
+| 3 Ans          | 3.25%      | 3.95%    | +0.70%         | +70 bps     |
+| 5 Ans          | 3.15%      | 4.10%    | +0.95%         | +95 bps     |
+| 7 Ans          | 3.30%      | 4.25%    | +0.95%         | +95 bps     |
+| 10 Ans         | 3.50%      | 4.45%    | +0.95%         | +95 bps     |
+| 20 Ans         | N/A        | 4.80%    | N/A            | N/A         |
+| 30 Ans         | 3.85%      | 4.65%    | +0.80%         | +80 bps     |
 
 *Milieu de fourchette 4.50-4.75%
+
+📊 **OBSERVATIONS CLÉS**:
+- **Spread maximum**: 5-10 ans (+95 bps) - Écart historiquement élevé
+- **Spread minimum**: Taux directeur (+12.5 bps) - Politiques monétaires convergentes
+- **Moyenne des spreads (2-30Y)**: +77 bps (vs moyenne historique ~50 bps)
+- **Tendance**: Spreads s'élargissent du court terme (30 bps) au moyen terme (95 bps), puis se resserrent légèrement au long terme (80 bps)
 
 📊 ANALYSE COMPARATIVE:
 
@@ -185,27 +198,49 @@ Spread de +95 bps favorable au USD crée pression baissière sur CAD. Opportunit
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📈 VISUALISATION ASCII
+📈 VISUALISATION ASCII - Courbes Complètes
 
-🇨🇦 CANADA (Courbe inversée court terme)
+🇨🇦 CANADA (10 maturités)
+Forme: Inversion court terme, puis normalisation progressive
+
 5.0% |
-4.5% | ●●
+4.5% | ●●                            Taux directeur: 4.50%
 4.0% |   ●●
-3.5% |     ●●
-3.0% |       ●●●●●
+3.5% |     ●                     ●   Court terme > Long terme
+3.0% |      ●●●●●●            ●      (Inversion partielle)
 2.5% |
-     +─────────────────────
+     +─────────────────────────────
      1M 3M 6M 1Y 2Y 3Y 5Y 7Y 10Y 30Y
 
-🇺🇸 USA (Courbe normalisée)
-5.0% |
-4.5% | ●●●              ●●●●●
-4.0% |    ●●●●●●●●
-3.5% |
+Taux:  4.25 4.35 4.10 3.85 3.45 3.25 3.15 3.30 3.50 3.85
+
+🇺🇸 USA (11 maturités)
+Forme: Courbe normale (légèrement pentue)
+
+5.0% |                        ●
+4.5% | ●●●                 ●●●  ●●   Taux directeur: 4.625%
+4.0% |    ●●●●●●●●                   Court terme ≈ Long terme
+3.5% |                               (Quasi-flat avec bump)
 3.0% |
 2.5% |
-     +─────────────────────────
+     +──────────────────────────────────
      1M 3M 6M 1Y 2Y 3Y 5Y 7Y 10Y 20Y 30Y
+
+Taux:  4.55 4.62 4.45 4.25 4.05 3.95 4.10 4.25 4.45 4.80 4.65
+
+📊 SUPERPOSITION US (rouge ●) vs CANADA (bleu ○)
+
+5.0% |                        ●
+4.5% | ●●●○○              ●●●  ●●   Écart moyen: +77 bps
+4.0% |    ●●●●●●●●    ○              Écart max (10Y): +95 bps
+3.5% |     ○          ○○○   ○
+3.0% |      ○○○○○○            ○
+2.5% |
+     +──────────────────────────────────
+     1M 3M 6M 1Y 2Y 3Y 5Y 7Y 10Y 20Y 30Y
+
+🔴 USA: Courbe quasi-flat (4.05%-4.80%), légèrement inversée court terme
+🔵 CA: Courbe inversée court terme (4.35% → 3.15%), puis remonte à 3.85%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
