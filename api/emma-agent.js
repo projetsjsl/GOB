@@ -1876,6 +1876,10 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
     }
 
     async _call_perplexity(prompt, outputMode = 'chat', recency = 'month', userMessage = '', intentData = null, toolResults = [], context = {}) {
+        // ✅ Variables pour gestion de timeout (déclarées avant try pour être accessibles dans catch)
+        let timeout = null;
+        let timeoutDuration = 60000;  // Valeur par défaut
+        
         try {
             // 🚀🚀🚀 RÉPONSES ULTRA-LONGUES PAR DÉFAUT (MAXIMUM DÉTAIL)
             // RÈGLE: Plus c'est long, mieux c'est!
@@ -2289,39 +2293,58 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
             console.log('🚀 Calling Perplexity API...');
 
             // ⏱️ Timeout flexible selon le mode et l'intent
-            // - SMS: 30s (optimisé pour vitesse)
-            // - Comprehensive Analysis: 90s (analyses longues avec 12 sections)
+            // PRIORITÉ: Intent > Canal
+            // - Comprehensive Analysis: 90s (analyses longues avec 12 sections) - PRIORITAIRE même pour SMS
+            // - SMS (non-comprehensive): 30s (optimisé pour vitesse)
             // - Autres: 60s (standard)
             const enableStreaming = false; // DÉSACTIVÉ - Causait corruption de texte
             const isComprehensiveAnalysis = intentData?.intent === 'comprehensive_analysis';
-            const timeoutDuration = context.user_channel === 'sms' 
-                ? 30000  // SMS: 30s
-                : isComprehensiveAnalysis 
-                    ? 90000  // Comprehensive: 90s (12 sections + macro + moat + DCF)
-                    : 60000; // Autres: 60s
+            
+            // ✅ FIX: Prioriser l'intent sur le canal pour comprehensive_analysis
+            if (isComprehensiveAnalysis) {
+                timeoutDuration = 90000;  // Comprehensive: 90s (12 sections + macro + moat + DCF) - PRIORITAIRE
+                console.log(`⏱️ Comprehensive Analysis détecté → timeout: 90s (prioritaire sur canal)`);
+            } else if (context.user_channel === 'sms') {
+                timeoutDuration = 30000;  // SMS: 30s (sauf comprehensive_analysis)
+            } else {
+                timeoutDuration = 60000;  // Autres: 60s (standard)
+            }
             
             const controller = new AbortController();
-            const timeout = setTimeout(() => {
-                console.error(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s (intent: ${intentData?.intent || 'unknown'})`);
-                controller.abort();
-            }, timeoutDuration);
-
+            
             // Streaming désactivé (causait corruption)
             // if (enableStreaming) {
             //     requestBody.stream = true;
             // }
 
-            const response = await fetch('https://api.perplexity.ai/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody),
-                signal: controller.signal
-            });
+            let response;
+            try {
+                timeout = setTimeout(() => {
+                    console.error(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s (intent: ${intentData?.intent || 'unknown'})`);
+                    controller.abort();
+                }, timeoutDuration);
 
-            clearTimeout(timeout);
+                response = await fetch('https://api.perplexity.ai/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody),
+                    signal: controller.signal
+                });
+
+                // ✅ Nettoyer le timeout après succès
+                clearTimeout(timeout);
+                timeout = null;
+            } catch (fetchError) {
+                // ✅ Nettoyer le timeout en cas d'erreur de fetch
+                if (timeout) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                }
+                throw fetchError;  // Re-throw pour être géré par le catch externe
+            }
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
@@ -2378,12 +2401,17 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
             };
 
         } catch (error) {
-            console.error('❌ Perplexity API error:', error);
+            // ✅ Nettoyer le timeout si pas déjà fait (sécurité)
+            if (timeout !== null) {
+                clearTimeout(timeout);
+            }
 
-            // Si Perplexity échoue, fallback sur Gemini
-            if (error.name === 'AbortError') {
-                console.log('⏱️ Perplexity timeout - falling back to Gemini');
+            // Gestion spécifique des erreurs de timeout
+            if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+                console.warn(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s (intent: ${intentData?.intent || 'unknown'})`);
+                console.log('🔄 Falling back to Gemini due to timeout...');
             } else {
+                console.error('❌ Perplexity API error:', error);
                 console.log('🔄 Falling back to Gemini due to Perplexity error');
             }
 
