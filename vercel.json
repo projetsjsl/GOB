@@ -57,6 +57,13 @@
     },
     "api/adapters/messenger.js": {
       "maxDuration": 30
+    },
+    "api/rsi-screener.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/treasury-rates.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
