@@ -472,6 +472,31 @@
       "fallback_tools": [],
       "usage_context": ["rsi", "survente", "surachat", "oversold", "overbought", "extrême", "extreme", "indicateur", "technique", "opportunité"],
       "keywords": ["rsi", "survente", "surachat", "oversold", "overbought", "extrême", "extreme", "indicateur", "technique", "technical", "momentum", "opportunité", "opportunity", "trading", "swing"]
+    },
+    {
+      "id": "treasury-rates",
+      "name": "Treasury Rates",
+      "description": "Courbe des taux obligataires US et Canada avec spreads, indicateurs de récession (10Y-2Y), et graphique TradingView",
+      "category": "macro_data",
+      "priority": 3,
+      "enabled": true,
+      "parameters": {
+        "country": {
+          "type": "string",
+          "required": false,
+          "enum": ["US", "CA", "both"],
+          "default": "both",
+          "description": "Pays: US (États-Unis), CA (Canada), both (les deux)"
+        }
+      },
+      "implementation": {
+        "file": "treasury-rates.js",
+        "endpoint": "/api/treasury-rates",
+        "api_key_env": ["FRED_API_KEY", "FMP_API_KEY"]
+      },
+      "fallback_tools": [],
+      "usage_context": ["taux", "obligations", "courbe", "yield", "treasury", "spread", "récession", "inversion"],
+      "keywords": ["taux", "obligations", "courbe", "yield", "treasury", "bonds", "spread", "10Y-2Y", "récession", "recession", "inversion", "fed", "boc", "banque centrale", "taux directeur", "policy rate"]
     }
   ],
   "config": {

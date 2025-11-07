@@ -157,6 +157,27 @@ Calendrier des résultats trimestriels avec consensus et surprises.
 
 ---
 
+#### `/taux` - Courbe des Taux Obligataires
+Affiche courbe des taux US et Canada avec spreads et signaux de récession.
+
+**Exemples d'utilisation:**
+```
+/taux
+/taux US uniquement
+/taux spread 10Y-2Y
+/taux inversion courbe
+```
+
+**Données retournées:**
+- Taux obligataires (1M à 30Y)
+- Taux directeurs (Fed, BoC)
+- Spreads clés (10Y-2Y, 30Y-10Y)
+- Signaux de récession
+- Graphique TradingView
+- Comparaison US vs Canada
+
+---
+
 ### 💼 Portfolio & Watchlist
 
 #### `/watchlist` - Gestion Watchlist
