@@ -40,6 +40,9 @@
 // TEMPORAIREMENT DÉSACTIVÉ - Import cause FUNCTION_INVOCATION_FAILED sur Vercel
 // import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
 
+// ✅ Import du retry handler pour gestion rate limiting Gemini
+import { geminiFetchWithRetry } from '../../lib/utils/gemini-retry.js';
+
 export default async function handler(req, res) {
   // CORS basique
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -183,10 +186,11 @@ Emma : "Je ne peux pas accéder aux prix en temps réel actuellement. Pour voir 
     console.log('🔧 Appel API Gemini REST directe (sans SDK)');
     console.log('📦 Modèle: gemini-2.0-flash-exp');
     console.log('📤 Envoi de la requête...');
-    
+
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
-    
-    const response = await fetch(apiUrl, {
+
+    // ✅ Utiliser geminiFetchWithRetry pour gestion automatique du rate limiting (429)
+    const response = await geminiFetchWithRetry(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -203,15 +207,13 @@ Emma : "Je ne peux pas accéder aux prix en temps réel actuellement. Pour voir 
           candidateCount: 1
         }
       })
+    }, {
+      maxRetries: 4,
+      baseDelay: 1000,
+      logRetries: true
     });
 
     console.log('📡 Réponse reçue, status:', response.status);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Erreur API Gemini:', response.status, errorText);
-      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
-    }
 
     const data = await response.json();
     console.log('✅ Données parsées avec succès');
