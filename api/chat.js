@@ -261,15 +261,28 @@ export default async function handler(req, res) {
           process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
-        // Charger watchlist et team_tickers en parallèle pour gagner du temps
+        // Charger watchlist et team_tickers depuis la table unifiée tickers
         const [watchlistResult, teamTickersResult] = await Promise.all([
-          supabase.from('watchlists').select('tickers').eq('user_id', userProfile.id).single(),
-          supabase.from('team_tickers').select('ticker').order('priority', { ascending: false })
+          // Watchlist: source='watchlist' ou 'both'
+          // Note: On charge les watchlists globales (user_id IS NULL) ET les watchlists utilisateur
+          supabase
+            .from('tickers')
+            .select('ticker')
+            .eq('is_active', true)
+            .or('source.eq.watchlist,source.eq.both')
+            .order('ticker', { ascending: true }),
+          // Team tickers: source='team' ou 'both'
+          supabase
+            .from('tickers')
+            .select('ticker')
+            .eq('is_active', true)
+            .or('source.eq.team,source.eq.both')
+            .order('priority', { ascending: false })
         ]);
 
         // Traiter watchlist
-        if (!watchlistResult.error && watchlistResult.data?.tickers) {
-          userWatchlist = watchlistResult.data.tickers;
+        if (!watchlistResult.error && watchlistResult.data?.length > 0) {
+          userWatchlist = watchlistResult.data.map(item => item.ticker);
           console.log(`[Chat API] Watchlist: ${userWatchlist.length} tickers`);
         } else if (watchlistResult.error && watchlistResult.error.code !== 'PGRST116') {
           console.log(`[Chat API] Watchlist non trouvée ou vide pour user ${userProfile.id}`);

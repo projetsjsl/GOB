@@ -28,14 +28,15 @@ export default async function handler(req, res) {
         let result = {};
 
         if (!list || list === 'team') {
-            // Récupérer les tickers d'équipe depuis la nouvelle table `tickers`
+            // Récupérer les tickers d'équipe depuis la table unifiée `tickers` avec source='team' ou 'both'
             const teamResponse = await fetch(
-                `${supabaseUrl}/rest/v1/tickers?select=ticker&source=eq.team&is_active=eq.true&order=ticker.asc`,
+                `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(source.eq.team,source.eq.both)&order=priority.desc,ticker.asc`,
                 {
                     headers: {
                         'apikey': supabaseKey,
                         'Authorization': `Bearer ${supabaseKey}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
                     }
                 }
             );
@@ -59,15 +60,19 @@ export default async function handler(req, res) {
         }
 
         if (!list || list === 'watchlist') {
-            // Récupérer les tickers de la watchlist depuis l'ancienne table `watchlist`
-            // (keeping backward compatibility with existing watchlist table)
-            const watchlistResponse = await fetch(`${supabaseUrl}/rest/v1/watchlist?select=*`, {
-                headers: {
-                    'apikey': supabaseKey,
-                    'Authorization': `Bearer ${supabaseKey}`,
-                    'Content-Type': 'application/json'
+            // Récupérer les tickers de watchlist depuis la table unifiée `tickers` avec source='watchlist' ou 'both'
+            // Note: user_id est NULL pour les watchlists globales, ou spécifique pour les watchlists utilisateur
+            const watchlistResponse = await fetch(
+                `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(source.eq.watchlist,source.eq.both)&order=ticker.asc`,
+                {
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    }
                 }
-            });
+            );
 
             if (watchlistResponse.ok) {
                 const watchlistData = await watchlistResponse.json();

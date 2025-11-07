@@ -37,13 +37,18 @@ export default async function handler(req, res) {
 }
 
 async function handleGet(req, res, supabaseUrl, supabaseKey) {
-    const response = await fetch(`${supabaseUrl}/rest/v1/team_tickers?select=*&order=priority.desc,ticker.asc`, {
-        headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json'
+    // Récupérer depuis la table unifiée tickers avec source='team' ou 'both'
+    const response = await fetch(
+        `${supabaseUrl}/rest/v1/tickers?select=*&is_active=eq.true&or=(source.eq.team,source.eq.both)&order=priority.desc,ticker.asc`,
+        {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            }
         }
-    });
+    );
 
     if (!response.ok) {
         throw new Error(`Supabase error: ${response.status}`);
@@ -60,7 +65,7 @@ async function handleGet(req, res, supabaseUrl, supabaseKey) {
 }
 
 async function handlePost(req, res, supabaseUrl, supabaseKey) {
-    const { ticker, priority = 1, notes = '' } = req.body;
+    const { ticker, priority = 1, notes = '', company_name = '' } = req.body;
 
     if (!ticker) {
         return res.status(400).json({ error: 'Ticker is required' });
@@ -71,17 +76,81 @@ async function handlePost(req, res, supabaseUrl, supabaseKey) {
         return res.status(400).json({ error: 'Invalid ticker format' });
     }
 
-    const response = await fetch(`${supabaseUrl}/rest/v1/team_tickers`, {
+    const tickerUpper = ticker.toUpperCase();
+    
+    // Vérifier si le ticker existe déjà
+    const checkResponse = await fetch(
+        `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}&select=ticker,source`,
+        {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
+        }
+    );
+
+    if (checkResponse.ok) {
+        const existing = await checkResponse.json();
+        if (existing.length > 0) {
+            // Si existe déjà, mettre à jour le source si nécessaire
+            const existingTicker = existing[0];
+            let newSource = 'team';
+            
+            if (existingTicker.source === 'watchlist') {
+                newSource = 'both';
+            } else if (existingTicker.source === 'both') {
+                newSource = 'both';
+            }
+
+            const updateResponse = await fetch(
+                `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': `Bearer ${supabaseKey}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({
+                        source: newSource,
+                        priority: parseInt(priority),
+                        notes: notes || existingTicker.notes,
+                        company_name: company_name || existingTicker.company_name,
+                        is_active: true,
+                        updated_at: new Date().toISOString()
+                    })
+                }
+            );
+
+            if (updateResponse.ok) {
+                const updated = await updateResponse.json();
+                return res.status(200).json({
+                    success: true,
+                    ticker: updated[0],
+                    message: 'Ticker updated successfully'
+                });
+            }
+        }
+    }
+
+    // Insérer nouveau ticker
+    const response = await fetch(`${supabaseUrl}/rest/v1/tickers`, {
         method: 'POST',
         headers: {
             'apikey': supabaseKey,
             'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
         },
         body: JSON.stringify({
-            ticker: ticker.toUpperCase(),
+            ticker: tickerUpper,
+            source: 'team',
             priority: parseInt(priority),
-            notes: notes
+            notes: notes,
+            company_name: company_name,
+            is_active: true
         })
     });
 
@@ -109,14 +178,73 @@ async function handleDelete(req, res, supabaseUrl, supabaseKey) {
         return res.status(400).json({ error: 'Ticker is required' });
     }
 
-    const response = await fetch(`${supabaseUrl}/rest/v1/team_tickers?ticker=eq.${ticker.toUpperCase()}`, {
-        method: 'DELETE',
-        headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json'
+    const tickerUpper = ticker.toUpperCase();
+
+    // Vérifier si le ticker existe et son source
+    const checkResponse = await fetch(
+        `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}&select=ticker,source`,
+        {
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
         }
-    });
+    );
+
+    if (!checkResponse.ok) {
+        throw new Error(`Supabase error: ${checkResponse.status}`);
+    }
+
+    const existing = await checkResponse.json();
+    
+    if (existing.length === 0) {
+        return res.status(404).json({ error: 'Ticker not found' });
+    }
+
+    const existingTicker = existing[0];
+
+    // Si source est 'both', mettre à jour vers 'watchlist' au lieu de supprimer
+    if (existingTicker.source === 'both') {
+        const updateResponse = await fetch(
+            `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({
+                    source: 'watchlist',
+                    updated_at: new Date().toISOString()
+                })
+            }
+        );
+
+        if (!updateResponse.ok) {
+            throw new Error(`Supabase error: ${updateResponse.status}`);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `Ticker ${ticker} removed from team (now watchlist only)`
+        });
+    }
+
+    // Si source est 'team', supprimer
+    const response = await fetch(
+        `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}&source=eq.team`,
+        {
+            method: 'DELETE',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json'
+            }
+        }
+    );
 
     if (!response.ok) {
         throw new Error(`Supabase error: ${response.status}`);

@@ -24,16 +24,20 @@ export default async function handler(req, res) {
         let teamTickers = [];
         let watchlistTickers = [];
 
-        // Fetch team tickers from Supabase
+        // Fetch team tickers from unified tickers table
         if (supabaseUrl && supabaseKey) {
             try {
-                const teamResponse = await fetch(`${supabaseUrl}/rest/v1/team_tickers?select=ticker&order=priority.desc,ticker.asc`, {
-                    headers: {
-                        'apikey': supabaseKey,
-                        'Authorization': `Bearer ${supabaseKey}`,
-                        'Content-Type': 'application/json'
+                const teamResponse = await fetch(
+                    `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(source.eq.team,source.eq.both)&order=priority.desc,ticker.asc`,
+                    {
+                        headers: {
+                            'apikey': supabaseKey,
+                            'Authorization': `Bearer ${supabaseKey}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        }
                     }
-                });
+                );
 
                 if (teamResponse.ok) {
                     const teamData = await teamResponse.json();
@@ -44,15 +48,19 @@ export default async function handler(req, res) {
                 console.error('⚠️ Error loading team tickers:', error);
             }
 
-            // Fetch watchlist tickers from Supabase
+            // Fetch watchlist tickers from unified tickers table
             try {
-                const watchlistResponse = await fetch(`${supabaseUrl}/rest/v1/watchlist?select=ticker&order=ticker.asc`, {
-                    headers: {
-                        'apikey': supabaseKey,
-                        'Authorization': `Bearer ${supabaseKey}`,
-                        'Content-Type': 'application/json'
+                const watchlistResponse = await fetch(
+                    `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(source.eq.watchlist,source.eq.both)&order=ticker.asc`,
+                    {
+                        headers: {
+                            'apikey': supabaseKey,
+                            'Authorization': `Bearer ${supabaseKey}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        }
                     }
-                });
+                );
 
                 if (watchlistResponse.ok) {
                     const watchlistData = await watchlistResponse.json();
