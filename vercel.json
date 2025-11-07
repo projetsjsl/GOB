@@ -58,6 +58,9 @@
     "api/adapters/messenger.js": {
       "maxDuration": 30
     },
+    "api/yield-curve.js": {
+      "maxDuration": 15
+    },
     "api/rsi-screener.js": {
       "maxDuration": 300,
       "memory": 1024
