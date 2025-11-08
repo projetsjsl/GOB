@@ -179,7 +179,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La réponse de /api/chat contient:\n// { success: true, response: '...', metadata: { model, tools_used, execution_time_ms, ... } }\nconst content = data.response || data.message || data.analysis || 'No content received';\nconst metadata = data.metadata || {};\n\n// Récupérer le trigger depuis l'exécution n8n\nlet triggerType = 'Manuel';\ntry {\n  const execution = $execution;\n  if (execution?.trigger) {\n    const triggerName = execution.trigger.name || '';\n    if (triggerName.includes('Schedule')) triggerType = 'Planifié (Schedule)';\n    else if (triggerName.includes('Webhook')) triggerType = 'Webhook';\n    else if (triggerName.includes('Gmail')) triggerType = 'Gmail';\n    else if (triggerName.includes('Telegram')) triggerType = 'Telegram';\n    else if (triggerName.includes('Manual')) triggerType = 'Manuel';\n    else triggerType = triggerName || 'Inconnu';\n  }\n} catch (e) {\n  // Si pas disponible, utiliser une valeur par défaut\n  triggerType = data.trigger_type || 'Manuel';\n}\n\nreturn [{\n  json: {\n    ...data,\n    newsletter_content: content,\n    api_type: 'emma-agent',\n    generated_at: new Date().toISOString(),\n    trigger_type: triggerType,\n    emma_model: metadata.model || metadata.llmUsed || 'perplexity',\n    emma_tools: metadata.tools_used || metadata.toolsUsed || [],\n    emma_execution_time: metadata.execution_time_ms || metadata.executionTimeMs || 0,\n    emma_confidence: metadata.confidence || null\n  }\n}];"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La réponse de /api/chat contient:\n// { success: true, response: '...', metadata: { model, tools_used, execution_time_ms, ... } }\nconst content = data.response || data.message || data.analysis || 'No content received';\nconst metadata = data.metadata || {};\n\n// Récupérer le trigger depuis l'exécution n8n\nlet triggerType = 'Manuel';\ntry {\n  const execution = $execution;\n  if (execution?.trigger) {\n    const triggerName = execution.trigger.name || '';\n    if (triggerName.includes('Schedule')) triggerType = 'Planifié (Schedule)';\n    else if (triggerName.includes('Webhook')) triggerType = 'Webhook';\n    else if (triggerName.includes('Gmail')) triggerType = 'Gmail';\n    else if (triggerName.includes('Telegram')) triggerType = 'Telegram';\n    else if (triggerName.includes('Manual')) triggerType = 'Manuel';\n    else triggerType = triggerName || 'Inconnu';\n  }\n} catch (e) {\n  // Si pas disponible, utiliser une valeur par défaut\n  triggerType = data.trigger_type || 'Manuel';\n}\n\nreturn [{\n  json: {\n    ...data,\n    newsletter_content: content,\n    api_type: 'emma-agent',\n    generated_at: new Date().toISOString(),\n    trigger_type: triggerType,\n    emma_model: metadata.model || metadata.llmUsed || 'perplexity',\n    emma_tools: metadata.tools_used || metadata.toolsUsed || [],\n    emma_execution_time: metadata.execution_time_ms || metadata.executionTimeMs || 0,\n    emma_confidence: metadata.confidence || null\n  }\n}];\n\n// ============================================\n// PRÉSERVER preview_mode et approved\n// ============================================\nconst preservedPreviewMode = item.json.preview_mode !== undefined ? item.json.preview_mode : true;\nconst preservedApproved = item.json.approved !== undefined ? item.json.approved : false;\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    preview_mode: preservedPreviewMode,\n    approved: preservedApproved\n  }\n}));"
       },
       "id": "40676021-3728-41a7-a961-9ec5a4f31b19",
       "name": "Parse API Response",
@@ -345,13 +345,13 @@
             {
               "id": "id-preview-mode-1762640093151",
               "name": "preview_mode",
-              "value": "false",
+              "value": false,
               "type": "boolean"
             },
             {
               "id": "id-approved-1762640093151",
               "name": "approved",
-              "value": "true",
+              "value": true,
               "type": "boolean"
             }
           ]
@@ -533,7 +533,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extraire le contenu de la réponse\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu reçu';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: data.emma_tools || [],\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString()\n};\n\n// Créer un résumé pour la prévisualisation\nconst preview = {\n  success: true,\n  preview_mode: true,\n  content: content.substring(0, 500) + (content.length > 500 ? '...' : ''),\n  content_length: content.length,\n  metadata: metadata,\n  full_content: content,\n  ready_for_approval: true\n};\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ...preview\n  }\n}));"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// ============================================\n// PRÉSERVER preview_mode et approved depuis les nodes de configuration\n// ============================================\n// Ces valeurs viennent des nodes: Schedule Config, Webhook Config, Manual Config, Chat Config\nconst previewMode = data.preview_mode !== undefined ? data.preview_mode : true; // Fallback à true si non défini\nconst approved = data.approved !== undefined ? data.approved : false; // Fallback à false si non défini\n\nconsole.log('📊 Preview Briefing Content - Valeurs préservées:');\nconsole.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\nconsole.log('   approved:', approved, '(type:', typeof approved, ')');\n\n// Extraire le contenu de la réponse\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu reçu';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: data.emma_tools || [],\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString()\n};\n\n// Créer un résumé pour la prévisualisation\n// IMPORTANT: Préserver preview_mode et approved depuis les nodes de configuration\nconst preview = {\n  success: true,\n  preview_mode: previewMode, // PRÉSERVER depuis les nodes de configuration\n  approved: approved, // PRÉSERVER depuis les nodes de configuration\n  content: content.substring(0, 500) + (content.length > 500 ? '...' : ''),\n  content_length: content.length,\n  metadata: metadata,\n  full_content: content,\n  ready_for_approval: approved === true && previewMode === false\n};\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ...preview\n  }\n}));"
       },
       "id": "preview-briefing-content",
       "name": "Preview Briefing Content",
@@ -586,7 +586,7 @@
               "conditions": {
                 "boolean": [
                   {
-                    "value1": "={{ $json.preview_mode === true || $json.approved !== true }}",
+                    "value1": "={{ ($json.preview_mode === true || $json.preview_mode === 'true') || ($json.approved !== true && $json.approved !== 'true') }}",
                     "value2": true
                   }
                 ]
@@ -598,7 +598,7 @@
               "conditions": {
                 "boolean": [
                   {
-                    "value1": "={{ $json.preview_mode === false && $json.approved === true }}",
+                    "value1": "={{ ($json.preview_mode === false || $json.preview_mode === 'false') && ($json.approved === true || $json.approved === 'true') }}",
                     "value2": true
                   }
                 ]
@@ -789,13 +789,13 @@
             {
               "id": "id-preview-mode-1762640093151",
               "name": "preview_mode",
-              "value": "false",
+              "value": false,
               "type": "boolean"
             },
             {
               "id": "id-approved-1762640093151",
               "name": "approved",
-              "value": "true",
+              "value": true,
               "type": "boolean"
             }
           ]
@@ -831,13 +831,13 @@
             {
               "id": "id-preview-mode-1762640093151",
               "name": "preview_mode",
-              "value": "false",
+              "value": false,
               "type": "boolean"
             },
             {
               "id": "id-approved-1762640093151",
               "name": "approved",
-              "value": "true",
+              "value": true,
               "type": "boolean"
             }
           ]
@@ -873,13 +873,13 @@
             {
               "id": "id-preview-mode-1762640093151",
               "name": "preview_mode",
-              "value": "true",
+              "value": true,
               "type": "boolean"
             },
             {
               "id": "id-approved-1762640093151",
               "name": "approved",
-              "value": "false",
+              "value": false,
               "type": "boolean"
             }
           ]
@@ -915,13 +915,13 @@
             {
               "id": "id-preview-mode-1762640093151",
               "name": "preview_mode",
-              "value": "true",
+              "value": true,
               "type": "boolean"
             },
             {
               "id": "id-approved-1762640093151",
               "name": "approved",
-              "value": "false",
+              "value": false,
               "type": "boolean"
             }
           ]
