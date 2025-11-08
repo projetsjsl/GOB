@@ -37,7 +37,7 @@
             
             // V?rifier le chargement des biblioth?ques
             window.addEventListener('load', function() {
-                console.log('=ù V?rification des biblioth?ques:');
+                console.log('=? V?rification des biblioth?ques:');
                 console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
                 console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
                 
@@ -147,7 +147,7 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
-        /* =ù VAGUES 3+4 - Finance Pro UI Effects */
+        /* =? VAGUES 3+4 - Finance Pro UI Effects */
 
         /* <+ Glassmorphism Effect */
         .glass-card {
@@ -254,7 +254,7 @@
             }
         }
 
-        /* =´ Shimmer Effect for Loading States */
+        /* =? Shimmer Effect for Loading States */
         .shimmer {
             background: linear-gradient(
                 90deg,
@@ -713,10 +713,10 @@ const fetchHybridData = async (symbol, dataType) => {
                     return newMode;
                 },
 
-                // Mapping emoji í ic?ne Iconoir
+                // Mapping emoji ? ic?ne Iconoir
                 emojiToIcon: {
                     '=?': 'antenna-signal',
-                    'ô': 'settings',
+                    '?': 'settings',
                     '=?': 'calendar',
                     '<': 'sun-light',
                     ' ': 'sun-light',
@@ -725,11 +725,11 @@ const fetchHybridData = async (symbol, dataType) => {
                     '=?': 'trending-up',
                     '=?': 'trending-down',
                     '>': 'brain',
-                    '=¨': 'chat-bubble',
+                    '=?': 'chat-bubble',
                     '=': 'search',
-                    '=ù': 'page',
-                    '<Ø': 'target',
-                    '=º': 'briefcase',
+                    '=?': 'page',
+                    '<?': 'target',
+                    '=?': 'briefcase',
                     '<': 'globe',
                     '=∞': 'dollar',
                     '<?': 'building',
@@ -739,12 +739,12 @@ const fetchHybridData = async (symbol, dataType) => {
                     '': 'check-circle',
                     'L': 'xmark-circle',
                     '†': 'warning-triangle',
-                    '=Ä': 'rocket',
+                    '=?': 'rocket',
                     '=%': 'sparks',
-                    '=°': 'light-bulb',
+                    '=?': 'light-bulb',
                     '>?': 'brain',
                     '=?': 'newspaper',
-                    '=µ': 'dollar',
+                    '=?': 'dollar',
                     '=?': 'smartphone-device',
                     '<®': 'palette',
                     '=': 'lock',
@@ -755,25 +755,25 @@ const fetchHybridData = async (symbol, dataType) => {
                     '<?': 'trophy',
                     '=?': 'pin',
                     '=': 'link',
-                    '=º': 'media-image',
+                    '=?': 'media-image',
                     '=?': 'camera',
-                    '<¨': 'movie',
-                    '<µ': 'music-note',
+                    '<?': 'movie',
+                    '<?': 'music-note',
                     '=?': 'folder',
                     '=?': 'page',
-                    '=ª': 'laptop',
+                    '=?': 'laptop',
                     '(': 'keyboard',
-                    '=±': 'mouse-button-right',
-                    '=•': 'pc-monitor',
+                    '=?': 'mouse-button-right',
+                    '=?': 'pc-monitor',
                     '=?': 'smartphone-device',
                     '=': 'battery-charging',
                     '=': 'plug',
                     '=?': 'tools',
-                    '<ì': 'graduation-cap',
-                    '=ù': 'book-stack',
+                    '<?': 'graduation-cap',
+                    '=?': 'book-stack',
                     '=?': 'book',
                     '': 'edit-pencil',
-                    '=ù': 'pen',
+                    '=?': 'pen',
                     '=?': 'attachment',
                     '=?': 'pin-alt',
                     '>?': 'compass',
@@ -782,17 +782,17 @@ const fetchHybridData = async (symbol, dataType) => {
                     '<?': 'shop',
                     '<?': 'city',
                     '<?': 'industry',
-                    '°': 'flash',
+                    '?': 'flash',
                     '<': 'star-solid',
-                    '=ù': 'gem-stone',
-                    '<ù': 'gift',
+                    '=?': 'gem-stone',
+                    '<?': 'gift',
                     '=?': 'cart',
-                    '=≥': 'credit-card',
-                    '<â': 'party',
-                    '<ù': 'gift',
+                    '=?': 'credit-card',
+                    '<?': 'party',
+                    '<?': 'gift',
                     '=': 'lock',
-                    '<Æ': 'gamepad',
-                    '<≤': 'dice'
+                    '<é': 'gamepad',
+                    '<?': 'dice'
                 },
 
                 // Rendu conditionnel emoji ou ic?ne
@@ -912,25 +912,25 @@ const fetchHybridData = async (symbol, dataType) => {
             const cleanText = (text) => {
                 if (!text) return '';
                 return text
-                    .replace(/?©/g, '?')
+                    .replace(/?ä/g, '?')
                     .replace(/?®/g, '?')
                     .replace(/? /g, '?')
                     .replace(/?ß/g, '?')
                     .replace(/?¥/g, '?')
-                    .replace(/?¢/g, '?')
-                    .replace(/?Æ/g, '?')
-                    .replace(/?Ø/g, '?')
-                    .replace(/?π/g, '?')
-                    .replace(/?ª/g, 'ù')
-                    .replace(/?´/g, '?')
                     .replace(/??/g, '?')
-                    .replace(/?∂/g, '?')
-                    .replace(/?º/g, 'ù')
-                    .replace(/?¨"/g, "'")
-                    .replace(/?¨S/g, '"')
-                    .replace(/?¨/g, '"')
-                    .replace(/?¨"/g, '')
-                    .replace(/?¨"/g, '');
+                    .replace(/?é/g, '?')
+                    .replace(/??/g, '?')
+                    .replace(/?ö/g, '?')
+                    .replace(/??/g, '?')
+                    .replace(/??/g, '?')
+                    .replace(/??/g, '?')
+                    .replace(/??/g, '?')
+                    .replace(/??/g, '?')
+                    .replace(/??"/g, "'")
+                    .replace(/??S/g, '"')
+                    .replace(/??/g, '"')
+                    .replace(/??"/g, '')
+                    .replace(/??"/g, '');
             };
 
             // Fonction pour d?terminer l'ic?ne et la couleur d'une nouvelle
@@ -1070,7 +1070,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const summarizeWithEmma = (articleUrl, articleTitle) => {
                 const prompt = `=? R?sume cet article et donne-moi les points cl?s:\n\nTitre: ${articleTitle}\nURL: ${articleUrl}\n\nMerci de fournir:\n1. R?sum? en 3-4 points\n2. Impact potentiel sur les march?s\n3. ?l?ments ? surveiller`;
 
-                console.log('=ù Redirecting to Emma with article:', articleTitle);
+                console.log('=? Redirecting to Emma with article:', articleTitle);
                 setEmmaPrefillMessage(prompt);
                 setEmmaAutoSend(true);
                 setActiveTab('ask-emma');
@@ -1214,7 +1214,7 @@ const fetchHybridData = async (symbol, dataType) => {
                             const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                             if (preloadedData.tickerData && dataAge < MAX_AGE) {
-                                console.log('° Utilisation des donn?es pr?charg?es pour les tickers');
+                                console.log('? Utilisation des donn?es pr?charg?es pour les tickers');
                                 setTickerData(preloadedData.tickerData);
                                 addLog(` Ticker charg? depuis pr?chargement: ${preloadedData.tickerData.length} instruments`, 'success');
                                 return;
@@ -1342,7 +1342,7 @@ const fetchHybridData = async (symbol, dataType) => {
                         const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                         if (preloadedData.titlesTabData?.tickerLatestNews && dataAge < MAX_AGE) {
-                            console.log('° Utilisation des nouvelles par ticker pr?charg?es');
+                            console.log('? Utilisation des nouvelles par ticker pr?charg?es');
                             setTickerLatestNews(preloadedData.titlesTabData.tickerLatestNews);
                             console.log(` Nouvelles pr?charg?es pour ${Object.keys(preloadedData.titlesTabData.tickerLatestNews).length} tickers`);
                             return;
@@ -1445,7 +1445,7 @@ const fetchHybridData = async (symbol, dataType) => {
                         const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                         if (preloadedData.titlesTabData?.stockData && dataAge < MAX_AGE && Object.keys(preloadedData.titlesTabData.stockData).length > 0) {
-                            console.log('° Utilisation des donn?es de march? pr?charg?es pour l\'onglet Titres');
+                            console.log('? Utilisation des donn?es de march? pr?charg?es pour l\'onglet Titres');
                             setStockData(preloadedData.titlesTabData.stockData);
                             setLastUpdate(new Date(preloadedData.timestamp));
                             setLoading(false);
@@ -1612,7 +1612,7 @@ const fetchHybridData = async (symbol, dataType) => {
                         const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                         if (preloadedData.titlesTabData?.newsData && dataAge < MAX_AGE) {
-                            console.log('° Utilisation des nouvelles pr?charg?es pour l\'onglet Titres');
+                            console.log('? Utilisation des nouvelles pr?charg?es pour l\'onglet Titres');
                             setNewsData(preloadedData.titlesTabData.newsData);
                             setFilteredNews(preloadedData.titlesTabData.newsData);
                             addLog(` ${preloadedData.titlesTabData.newsData.length} nouvelles charg?es depuis pr?chargement`, 'success');
@@ -1711,7 +1711,7 @@ const fetchHybridData = async (symbol, dataType) => {
 
                 } catch (error) {
                     addLog(`L ERREUR CRITIQUE: ${error.message}`, 'error');
-                    addLog('=° V?rifiez les cl?s API dans Admin JSLAI', 'warning');
+                    addLog('=? V?rifiez les cl?s API dans Admin JSLAI', 'warning');
                     setNewsData([]);
                     setFilteredNews([]);
                 }
@@ -1950,7 +1950,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                 message: "R?cup?rer prix, PE, volume, marketCap, EPS, ROE, revenueGrowth, debtToEquity pour tous les tickers",
                                 context: {
                                     ...contexts.jlab,
-                                    output_mode: 'data',  // ù MODE DATA pour JSON structur?
+                                    output_mode: 'data',  // ? MODE DATA pour JSON structur?
                                     fields_requested: ['price', 'pe', 'volume', 'marketCap', 'eps', 'roe', 'revenueGrowth', 'debtToEquity']
                                 }
                             })
@@ -1963,7 +1963,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                 message: "R?cup?rer prix, variation, volume, RSI, MACD, SMA50, SMA200 pour tous les tickers watchlist",
                                 context: {
                                     ...contexts.watchlist,
-                                    output_mode: 'data',  // ù MODE DATA pour JSON structur?
+                                    output_mode: 'data',  // ? MODE DATA pour JSON structur?
                                     fields_requested: ['price', 'change', 'changePercent', 'volume', 'rsi', 'macd', 'sma50', 'sma200']
                                 }
                             })
@@ -1976,7 +1976,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                 message: "R?cup?rer prix, news (top 10), analyst_recommendations, marketCap pour tous les tickers",
                                 context: {
                                     ...contexts.stocks_news,
-                                    output_mode: 'data',  // ù MODE DATA pour JSON structur?
+                                    output_mode: 'data',  // ? MODE DATA pour JSON structur?
                                     fields_requested: ['price', 'news', 'analyst_recommendations', 'marketCap']
                                 }
                             })
@@ -2231,7 +2231,7 @@ const fetchHybridData = async (symbol, dataType) => {
                             const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                             if (preloadedData.seekingAlphaData && dataAge < MAX_AGE) {
-                                console.log('° Utilisation des donn?es Seeking Alpha pr?charg?es');
+                                console.log('? Utilisation des donn?es Seeking Alpha pr?charg?es');
                                 // Convertir au format attendu par le dashboard
                                 const formattedData = {
                                     stocks: preloadedData.seekingAlphaData.stocks.map(item => ({
@@ -2319,7 +2319,7 @@ const fetchHybridData = async (symbol, dataType) => {
                             const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                             if (preloadedData.seekingAlphaStockData && dataAge < MAX_AGE) {
-                                console.log('° Utilisation des donn?es Seeking Alpha Stock pr?charg?es');
+                                console.log('? Utilisation des donn?es Seeking Alpha Stock pr?charg?es');
                                 // Convertir au format attendu par le dashboard
                                 let stocksObject = {};
                                 if (Array.isArray(preloadedData.seekingAlphaStockData)) {
@@ -2847,7 +2847,7 @@ const fetchHybridData = async (symbol, dataType) => {
                             const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                             if (preloadedData.titlesTabData?.tickers && dataAge < MAX_AGE) {
-                                console.log('° Utilisation des tickers pr?charg?s pour l\'onglet Titres');
+                                console.log('? Utilisation des tickers pr?charg?s pour l\'onglet Titres');
                                 const preloadedTickers = preloadedData.titlesTabData.tickers;
                                 setTeamTickers(preloadedTickers);
                                 setWatchlistTickers(preloadedTickers);
@@ -2856,21 +2856,21 @@ const fetchHybridData = async (symbol, dataType) => {
                                 
                                 // Charger aussi les donn?es de march? pr?charg?es si disponibles
                                 if (preloadedData.titlesTabData.stockData) {
-                                    console.log('° Utilisation des donn?es de march? pr?charg?es');
+                                    console.log('? Utilisation des donn?es de march? pr?charg?es');
                                     setStockData(preloadedData.titlesTabData.stockData);
                                     setLastUpdate(new Date(preloadedData.timestamp));
                                 }
                                 
                                 // Charger aussi les nouvelles pr?charg?es si disponibles
                                 if (preloadedData.titlesTabData.newsData) {
-                                    console.log('° Utilisation des nouvelles pr?charg?es');
+                                    console.log('? Utilisation des nouvelles pr?charg?es');
                                     setNewsData(preloadedData.titlesTabData.newsData);
                                     setFilteredNews(preloadedData.titlesTabData.newsData);
                                 }
                                 
                                 // Charger aussi les nouvelles par ticker pr?charg?es si disponibles
                                 if (preloadedData.titlesTabData.tickerLatestNews) {
-                                    console.log('° Utilisation des nouvelles par ticker pr?charg?es');
+                                    console.log('? Utilisation des nouvelles par ticker pr?charg?es');
                                     setTickerLatestNews(preloadedData.titlesTabData.tickerLatestNews);
                                 }
                                 
@@ -2960,7 +2960,7 @@ const fetchHybridData = async (symbol, dataType) => {
             useEffect(() => {
                 if (initialLoadComplete) return; // ?viter les rechargements
 
-                console.log('=Ä Initialisation du dashboard');
+                console.log('=? Initialisation du dashboard');
 
                 // Charger les tickers et nouvelles pour l'onglet d'accueil (stocks-news)
                 // car c'est l'onglet par d?faut et les utilisateurs s'attendent ? voir des donn?es
@@ -3015,7 +3015,7 @@ const fetchHybridData = async (symbol, dataType) => {
 
                     // Charger les donn?es de stocks si les tickers sont disponibles mais pas les donn?es
                     if (tickers.length > 0 && Object.keys(stockData).length === 0) {
-                        console.log('=π Chargement automatique des donn?es de stocks pour stocks-news...');
+                        console.log('=ö Chargement automatique des donn?es de stocks pour stocks-news...');
                         refreshAllStocks().catch(err => {
                             console.error('L Erreur chargement stocks:', err);
                         });
@@ -3035,7 +3035,7 @@ const fetchHybridData = async (symbol, dataType) => {
             // OPTIMISATION: Charger seulement les 5 premiers tickers initialement pour am?liorer les performances
             useEffect(() => {
                 if (activeTab === 'stocks-news' && tickers.length > 0 && Object.keys(stockData).length === 0) {
-                    console.log('=π Chargement automatique des donn?es de stocks pour stocks-news (optimis?: 5 premiers)...');
+                    console.log('=ö Chargement automatique des donn?es de stocks pour stocks-news (optimis?: 5 premiers)...');
                     // Charger seulement les 5 premiers tickers pour l'affichage initial
                     const initialTickers = tickers.slice(0, 5);
                     if (initialTickers.length > 0) {
@@ -3349,13 +3349,13 @@ const fetchHybridData = async (symbol, dataType) => {
                     '1. Cliquez sur "Annuler"\n' +
                     '2. Utilisez le bouton "= Se connecter ? Seeking Alpha"\n' +
                     '3. Connectez-vous dans le nouvel onglet\n' +
-                    '4. Revenez ici et cliquez ? nouveau sur "=Ä Lancer le Scraper"\n\n' +
+                    '4. Revenez ici et cliquez ? nouveau sur "=? Lancer le Scraper"\n\n' +
                     'Si oui, cliquez sur "OK" pour continuer.'
                 );
 
                 if (!isLoggedIn) {
                     addScrapingLog('? Scraping annul? - Veuillez vous connecter d\'abord', 'warning');
-                    addScrapingLog('=° Utilisez le bouton "= Se connecter ? Seeking Alpha" ci-dessus', 'info');
+                    addScrapingLog('=? Utilisez le bouton "= Se connecter ? Seeking Alpha" ci-dessus', 'info');
                     return;
                 }
 
@@ -3363,7 +3363,7 @@ const fetchHybridData = async (symbol, dataType) => {
                 setScrapingProgress(0);
                 setScrapingLogs([]);
 
-                addScrapingLog('=Ä D?marrage du scraper Seeking Alpha', 'info');
+                addScrapingLog('=? D?marrage du scraper Seeking Alpha', 'info');
                 addScrapingLog(`=? Tickers ? traiter: ${tickers.join(', ')}`, 'info');
                 
                 let successCount = 0;
@@ -3397,15 +3397,15 @@ const fetchHybridData = async (symbol, dataType) => {
                     // D?terminer le statut final
                     if (successCount > 0) {
                         setScrapingStatus('completed');
-                        addScrapingLog(`<â Scraping termin?! ${successCount} succ?s, ${errorCount} erreurs`, 'success');
+                        addScrapingLog(`<? Scraping termin?! ${successCount} succ?s, ${errorCount} erreurs`, 'success');
                     } else {
                         setScrapingStatus('error');
-                        addScrapingLog(`=• Aucun ticker n'a pu ?tre trait? (${errorCount} erreurs)`, 'error');
+                        addScrapingLog(`=? Aucun ticker n'a pu ?tre trait? (${errorCount} erreurs)`, 'error');
                     }
                     
                 } catch (error) {
                     setScrapingStatus('error');
-                    addScrapingLog(`=• Erreur fatale: ${error.message}`, 'error');
+                    addScrapingLog(`=? Erreur fatale: ${error.message}`, 'error');
                 }
             };
 
@@ -3436,13 +3436,13 @@ const fetchHybridData = async (symbol, dataType) => {
                     }
                 } catch (error) {
                     addScrapingLog(`L Erreur lors de l'ouverture: ${error.message}`, 'error');
-                    addScrapingLog(`=° Essayez d'autoriser les popups pour ce site`, 'info');
+                    addScrapingLog(`=? Essayez d'autoriser les popups pour ce site`, 'info');
                 }
             };
 
             // Fonction alternative pour le scraping sans cross-origin
             const scrapeTickerAlternative = async (ticker) => {
-                addScrapingLog(`=Ä M?thode alternative pour ${ticker}...`, 'info');
+                addScrapingLog(`=? M?thode alternative pour ${ticker}...`, 'info');
                 
                 try {
                     // Ouvrir dans un nouvel onglet au lieu d'une fen?tre popup
@@ -3460,7 +3460,7 @@ const fetchHybridData = async (symbol, dataType) => {
                     
                     addScrapingLog(` Onglet ouvert avec succ?s pour ${ticker}`, 'success');
                     addScrapingLog(`=? Instructions: Utilisez F12 pour inspecter la page`, 'info');
-                    addScrapingLog(`=° Copiez les donn?es manuellement depuis la console`, 'info');
+                    addScrapingLog(`=? Copiez les donn?es manuellement depuis la console`, 'info');
                     
                     // Simuler une pause pour l'utilisateur
                     await wait(2000);
@@ -3581,10 +3581,10 @@ D. Traduire descriptions en francais, garder notes A-F en anglais
 E. Verifier coherence: peRatio vs price/eps, dividendYield vs payout/price
 
 === EXEMPLES ===
-"Apple Inc. (AAPL) $247.25 +1.96% Cap: $3.85T" í companyName:"Apple Inc.", price:"$247.25", priceChange:"+1.96%", marketCap:"$3.85T"
-"P/E: 32.4 | Forward P/E: 28.5 | EPS: $7.58" í peRatio:"32.4", forwardPE:"28.5", eps:"$7.58"
-"Overall: A- | Valuation: B+ | Growth: A" í quantRating: {overall:"A-", valuation:"B+", growth:"A"}
-"Dividend: 3.53% | $2.66/year | Quarterly" í dividendYield:"3.53%", annualPayout:"$2.66", dividendFrequency:"Quarterly"
+"Apple Inc. (AAPL) $247.25 +1.96% Cap: $3.85T" ? companyName:"Apple Inc.", price:"$247.25", priceChange:"+1.96%", marketCap:"$3.85T"
+"P/E: 32.4 | Forward P/E: 28.5 | EPS: $7.58" ? peRatio:"32.4", forwardPE:"28.5", eps:"$7.58"
+"Overall: A- | Valuation: B+ | Growth: A" ? quantRating: {overall:"A-", valuation:"B+", growth:"A"}
+"Dividend: 3.53% | $2.66/year | Quarterly" ? dividendYield:"3.53%", annualPayout:"$2.66", dividendFrequency:"Quarterly"
 
 === RETOURNER JSON PUR (sans markdown) ===
 
@@ -3723,7 +3723,7 @@ STRUCTURE JSON OBLIGATOIRE:
                     // STEP 1: Save raw scraped data to Supabase
                     // ========================================================================
                     try {
-                        addScrapingLog(`=æ Sauvegarde des donn?es brutes dans Supabase pour ${ticker}...`, 'info');
+                        addScrapingLog(`=û Sauvegarde des donn?es brutes dans Supabase pour ${ticker}...`, 'info');
 
                         const rawResponse = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=raw`, {
                             method: 'POST',
@@ -3755,7 +3755,7 @@ STRUCTURE JSON OBLIGATOIRE:
                     // STEP 2: Save Perplexity analysis to Supabase
                     // ========================================================================
                     try {
-                        addScrapingLog(`=æ Sauvegarde de l'analyse Perplexity dans Supabase pour ${ticker}...`, 'info');
+                        addScrapingLog(`=û Sauvegarde de l'analyse Perplexity dans Supabase pour ${ticker}...`, 'info');
 
                         const analysisResponse = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=analysis`, {
                             method: 'POST',
@@ -3803,7 +3803,7 @@ STRUCTURE JSON OBLIGATOIRE:
                     // ========================================================================
                     // STEP 3: Update JSON files via GitHub API (fallback/backup)
                     // ========================================================================
-                    addScrapingLog(`=ù Sauvegarde de secours dans GitHub JSON...`, 'info');
+                    addScrapingLog(`=? Sauvegarde de secours dans GitHub JSON...`, 'info');
                     await updateStockDataFiles(ticker, analysisData, scrapedData);
 
                     return analysisData;
@@ -3816,7 +3816,7 @@ STRUCTURE JSON OBLIGATOIRE:
 
             // Fonction pour mettre ? jour les fichiers JSON via GitHub API
             const updateStockDataFiles = async (ticker, analysisData, scrapedData) => {
-                addScrapingLog(`=ù Mise ? jour des fichiers JSON pour ${ticker}...`, 'info');
+                addScrapingLog(`=? Mise ? jour des fichiers JSON pour ${ticker}...`, 'info');
 
                 try {
                     // Mettre ? jour stock_data.json
@@ -3937,7 +3937,7 @@ STRUCTURE JSON OBLIGATOIRE:
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>ô Admin-JSLAI</h2>
+                        }`}>? Admin-JSLAI</h2>
                     </div>
 
                     {/* = Debug des Donn?es (d?plac? ici depuis Titres & nouvelles) */}
@@ -3978,7 +3978,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="<Ø" size={18} />
+                                    <Icon emoji="<?" size={18} />
                                     Seeking Alpha
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -4050,7 +4050,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    <Icon emoji="<Ø" size={16} />
+                                    <Icon emoji="<?" size={16} />
                                     Statut du syst?me
                                 </div>
                                 <div className="text-xs space-y-1">
@@ -4119,7 +4119,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             )}
                         </div>
                         <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            =° <strong>Info:</strong> Les violations sont automatiquement track?es. Consultez les logs syst?me ci-dessus pour plus de d?tails.
+                            =? <strong>Info:</strong> Les violations sont automatiquement track?es. Consultez les logs syst?me ci-dessus pour plus de d?tails.
                         </div>
                     </div>
 
@@ -4137,14 +4137,14 @@ STRUCTURE JSON OBLIGATOIRE:
                                     ? isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-200 text-blue-900'
                                     : isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'
                             }`}>
-                                {isProfessionalMode ? '=º Professionnel' : '<â Fun'}
+                                {isProfessionalMode ? '=? Professionnel' : '<? Fun'}
                             </div>
                         </div>
                         <div className={`space-y-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
-                                        <Icon emoji={isProfessionalMode ? "=º" : "<â"} size={18} />
+                                        <Icon emoji={isProfessionalMode ? "=?" : "<?"} size={18} />
                                         <span className="font-semibold">
                                             {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
                                         </span>
@@ -4167,7 +4167,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <span><â</span>
+                                                <span><?</span>
                                                 Mode Fun
                                             </span>
                                         )}
@@ -4188,7 +4188,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 </div>
                             </div>
                             <div className={`p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
-                                =° <strong>Astuce:</strong> Le mode s?lectionn? est sauvegard? automatiquement et s'applique ? tous les onglets du dashboard.
+                                =? <strong>Astuce:</strong> Le mode s?lectionn? est sauvegard? automatiquement et s'applique ? tous les onglets du dashboard.
                             </div>
                         </div>
                     </div>
@@ -4219,7 +4219,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                                 }`}
                             >
-                                =ù Modifier Prompt
+                                =? Modifier Prompt
                             </button>
                             <button
                                 onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
@@ -4243,7 +4243,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             </button>
                         </div>
                         <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            =° <strong>Info:</strong> Ces param?tres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliqu?es imm?diatement.
+                            =? <strong>Info:</strong> Ces param?tres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliqu?es imm?diatement.
                         </div>
                     </div>
 
@@ -4330,9 +4330,9 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <ol className={`text-sm space-y-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    <li><strong>1.</strong> Cliquez "= SE CONNECTER" í Login Seeking Alpha</li>
-                                    <li><strong>2.</strong> Cliquez "=Ä LANCER SCRAPING BATCH" í Toutes les popups s'ouvrent</li>
-                                    <li><strong>3.</strong> Pour CHAQUE popup: F12 í Console í Collez script í Entr?e</li>
+                                    <li><strong>1.</strong> Cliquez "= SE CONNECTER" ? Login Seeking Alpha</li>
+                                    <li><strong>2.</strong> Cliquez "=? LANCER SCRAPING BATCH" ? Toutes les popups s'ouvrent</li>
+                                    <li><strong>3.</strong> Pour CHAQUE popup: F12 ? Console ? Collez script ? Entr?e</li>
                                     <li><strong>4.</strong> Fermez la popup apr?s copie</li>
                                     <li><strong>5.</strong> Les donn?es sont auto-sauvegard?es dans Supabase</li>
                                 </ol>
@@ -4354,7 +4354,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                     disabled={scrapingStatus === 'running'}
                                     className="flex-1 px-6 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg shadow-lg"
                                 >
-                                    {scrapingStatus === 'running' ? '? SCRAPING EN COURS...' : '=Ä LANCER SCRAPING BATCH'}
+                                    {scrapingStatus === 'running' ? '? SCRAPING EN COURS...' : '=? LANCER SCRAPING BATCH'}
                                 </button>
                             </div>
                         </div>
@@ -4412,11 +4412,11 @@ STRUCTURE JSON OBLIGATOIRE:
                                                     content: {}
                                                 });
                                             }
-                                            addScrapingLog('<â Analyse Perplexity termin?e pour TOUS les tickers!', 'success');
-                                            addScrapingLog('=æ R?sultats sauvegard?s dans Supabase', 'success');
+                                            addScrapingLog('<? Analyse Perplexity termin?e pour TOUS les tickers!', 'success');
+                                            addScrapingLog('=û R?sultats sauvegard?s dans Supabase', 'success');
                                         } else {
                                             addScrapingLog('† Aucune donn?e trouv?e dans Supabase', 'warning');
-                                            addScrapingLog('=° Effectuez d\'abord le scraping (?tape 1)', 'info');
+                                            addScrapingLog('=? Effectuez d\'abord le scraping (?tape 1)', 'info');
                                         }
                                     } catch (error) {
                                         addScrapingLog(`L Erreur: ${error.message}`, 'error');
@@ -4628,7 +4628,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <h4 className={`font-semibold mb-3 ${
                                     isDarkMode ? 'text-white' : 'text-blue-900'
                                 }`}>
-                                    =° Recommandations
+                                    =? Recommandations
                                 </h4>
                                 <div className="space-y-2">
                                     {healthStatus.recommendations.map((rec, index) => (
@@ -4645,7 +4645,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         'text-yellow-800'
                                                     }`}>
                                                         {rec.priority === 'critical' ? '=®' :
-                                                         rec.priority === 'high' ? '†' : '=°'}
+                                                         rec.priority === 'high' ? '†' : '=?'}
                                                         {rec.message}
                                                     </p>
                                                     <p className="text-xs text-gray-600 mt-1">
@@ -4863,7 +4863,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                     }}
                                     className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                                 >
-                                    ô Voir Configuration
+                                    ? Voir Configuration
                                 </button>
                             </div>
                         </div>
@@ -4879,7 +4879,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="ô" size={20} className="mr-2 inline-block" />
+                        <Icon emoji="?" size={20} className="mr-2 inline-block" />
                         Configuration
                     </h3>
                         <div className="space-y-4">
@@ -4935,7 +4935,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                <Icon emoji="ô" size={24} className="mr-2 inline-block" />
+                                <Icon emoji="?" size={24} className="mr-2 inline-block" />
                                 Param?tres
                             </h2>
 
@@ -5177,7 +5177,7 @@ STRUCTURE JSON OBLIGATOIRE:
                     try {
                         // BATCH OPTIMIZATION: Use batch endpoint for multiple tickers
                         if (tickers.length > 1) {
-                            console.log(`=Ä Batch loading ${tickers.length} tickers...`);
+                            console.log(`=? Batch loading ${tickers.length} tickers...`);
                             const symbolsQuery = tickers.join(',');
                             const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
 
@@ -5640,7 +5640,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <div className={`text-sm px-4 py-2 rounded ${
                                     isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                                 }`}>
-                                    {!initialLoadComplete ? '? Chargement initial...' : '=Ä Supabase + Arri?re-plan silencieux'}
+                                    {!initialLoadComplete ? '? Chargement initial...' : '=? Supabase + Arri?re-plan silencieux'}
                                 </div>
                             </div>
                         </div>
@@ -5653,7 +5653,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>ï Ajouter un Ticker</h3>
+                            }`}>? Ajouter un Ticker</h3>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -5671,13 +5671,13 @@ STRUCTURE JSON OBLIGATOIRE:
                                     onClick={addTickerToWatchlist}
                                     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                                 >
-                                    ï Ajouter
+                                    ? Ajouter
                                 </button>
                             </div>
                             <p className={`text-sm mt-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
                             }`}>
-                                =° Ces tickers ne seront visibles que dans cette watchlist personnalis?e
+                                =? Ces tickers ne seront visibles que dans cette watchlist personnalis?e
                             </p>
                         </div>
 
@@ -6033,7 +6033,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             rel="noopener noreferrer"
                                                             className="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                                         >
-                                                            Lire l'analyse compl?te sur Seeking Alpha í
+                                                            Lire l'analyse compl?te sur Seeking Alpha ?
                                                         </a>
                                                     </div>
                                                 )}
@@ -6065,7 +6065,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                 rel="noopener noreferrer"
                                                 className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline"
                                             >
-                                                Lire l'analyse compl?te sur Seeking Alpha í
+                                                Lire l'analyse compl?te sur Seeking Alpha ?
                                             </a>
                                         </div>
                                     );
@@ -6396,7 +6396,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                     onClick={(e) => e.stopPropagation()}
                                                     className="block w-full px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors text-center"
                                                 >
-                                                    =? Lire sur Seeking Alpha í
+                                                    =? Lire sur Seeking Alpha ?
                                                 </a>
                                             </div>
                                         )}
@@ -6474,9 +6474,9 @@ STRUCTURE JSON OBLIGATOIRE:
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-blue-200' : 'text-blue-800'
                             }`}>
-                                <div>" <strong>M?thode 1:</strong> Cliquez sur "=Ä Lancer le Scraper" pour ouvrir les pages</div>
+                                <div>" <strong>M?thode 1:</strong> Cliquez sur "=? Lancer le Scraper" pour ouvrir les pages</div>
                                 <div>" <strong>M?thode 2:</strong> Cliquez sur "=? Script F12" pour copier un script</div>
-                                <div>" <strong>?tapes:</strong> Ouvrez F12 í Console í Collez le script í Entr?e</div>
+                                <div>" <strong>?tapes:</strong> Ouvrez F12 ? Console ? Collez le script ? Entr?e</div>
                                 <div>" <strong>R?sultat:</strong> Les donn?es seront affich?es et copi?es automatiquement</div>
                             </div>
                         </div>
@@ -6493,9 +6493,9 @@ STRUCTURE JSON OBLIGATOIRE:
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-yellow-200' : 'text-yellow-800'
                             }`}>
-                                <div>" <strong>Chrome/Edge:</strong> Cliquez sur l'ic?ne popup dans la barre d'adresse í "Toujours autoriser"</div>
-                                <div>" <strong>Firefox:</strong> Cliquez sur l'ic?ne bouclier í "D?sactiver la protection"</div>
-                                <div>" <strong>Safari:</strong> Safari í Pr?f?rences í Sites web í Pop-ups í Autoriser</div>
+                                <div>" <strong>Chrome/Edge:</strong> Cliquez sur l'ic?ne popup dans la barre d'adresse ? "Toujours autoriser"</div>
+                                <div>" <strong>Firefox:</strong> Cliquez sur l'ic?ne bouclier ? "D?sactiver la protection"</div>
+                                <div>" <strong>Safari:</strong> Safari ? Pr?f?rences ? Sites web ? Pop-ups ? Autoriser</div>
                                 <div>" <strong>Alternative:</strong> Utilisez le bouton "< Ouvrir Seeking Alpha" ou le script F12</div>
                             </div>
                         </div>
@@ -6517,7 +6517,7 @@ STRUCTURE JSON OBLIGATOIRE:
                             }`}>
                                 <div>" <strong>Claude API:</strong> Configurez ANTHROPIC_API_KEY pour l'analyse automatique</div>
                                 <div>" <strong>GitHub API:</strong> Configurez GITHUB_TOKEN pour la mise ? jour des fichiers</div>
-                                <div>" <strong>Fonctionnalit?:</strong> Scraping í Analyse Perplexity í Mise ? jour JSON automatique</div>
+                                <div>" <strong>Fonctionnalit?:</strong> Scraping ? Analyse Perplexity ? Mise ? jour JSON automatique</div>
                                 <div>" <strong>Bouton:</strong> "> Analyser avec Claude" pour traiter les donn?es existantes</div>
                             </div>
                         </div>
@@ -6583,7 +6583,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 disabled={scrapingStatus === 'running'}
                                 className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
                             >
-                                {scrapingStatus === 'running' ? 'Scraping...' : '=Ä Lancer le Scraper'}
+                                {scrapingStatus === 'running' ? 'Scraping...' : '=? Lancer le Scraper'}
                             </button>
                             <button
                                 onClick={() => openSeekingAlpha('AAPL')}
@@ -6596,7 +6596,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                     const script = generateScrapingScript('CVS');
                                     navigator.clipboard.writeText(script).then(() => {
                                         addScrapingLog('=? Script de scraping copi? dans le presse-papiers', 'success');
-                                        addScrapingLog('=° Collez-le dans la console F12 de Seeking Alpha', 'info');
+                                        addScrapingLog('=? Collez-le dans la console F12 de Seeking Alpha', 'info');
                                     });
                                 }}
                                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
@@ -6806,7 +6806,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                  !claudeData?.finalConclusion?.recommendation?.includes('En attente') && (
                                                     <div className="bg-blue-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
-                                                            <span className="mr-2">=°</span>
+                                                            <span className="mr-2">=?</span>
                                                             Recommandation
                                                         </h4>
                                                         <div className="text-blue-700 leading-relaxed">
@@ -6833,7 +6833,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             </ol>
                                                             <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
                                                                 <p className="text-sm text-blue-800">
-                                                                    =° <strong>Astuce :</strong> Les donn?es pars?es automatiquement sont affich?es ci-dessus. 
+                                                                    =? <strong>Astuce :</strong> Les donn?es pars?es automatiquement sont affich?es ci-dessus. 
                                                                     Pour une analyse plus approfondie avec insights IA, utilisez l'API Claude.
                                                                 </p>
                                                             </div>
@@ -6850,7 +6850,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             rel="noopener noreferrer"
                                                             className="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                                         >
-                                                            Lire l'analyse compl?te sur Seeking Alpha í
+                                                            Lire l'analyse compl?te sur Seeking Alpha ?
                                                         </a>
                                                     </div>
                                                 )}
@@ -6880,7 +6880,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                     onClick={() => setActiveTab('stocks-news')}
                                     className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                 >
-                                    Aller ? Titres & Nouvelles í
+                                    Aller ? Titres & Nouvelles ?
                                 </button>
                             </div>
                         </div>
@@ -6968,7 +6968,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                     rel="noopener noreferrer"
                                                     className="text-blue-300 hover:text-blue-200 text-sm"
                                                 >
-                                                    Lire l'analyse compl?te í
+                                                    Lire l'analyse compl?te ?
                                                 </a>
                                             </div>
                                         )}
@@ -7028,7 +7028,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                     onClick={() => setActiveTab('stocks-news')}
                                     className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                 >
-                                    Aller ? Titres & Nouvelles í
+                                    Aller ? Titres & Nouvelles ?
                                 </button>
                             </div>
                         </div>
@@ -7117,7 +7117,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         rel="noopener noreferrer"
                                                         className="text-blue-600 hover:text-blue-700 text-sm"
                                                     >
-                                                        Lire l'analyse compl?te sur Seeking Alpha í
+                                                        Lire l'analyse compl?te sur Seeking Alpha ?
                                                     </a>
                                                 </div>
                                             )}
@@ -7261,7 +7261,7 @@ STRUCTURE JSON OBLIGATOIRE:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emma En Direct ∑ Matin</title>
+  <title>Emma En Direct ? Matin</title>
   <style>
     body {
       font-family: 'Segoe UI', 'Arial', sans-serif;
@@ -7511,7 +7511,7 @@ STRUCTURE JSON OBLIGATOIRE:
     <!-- Header Emma En Direct -->
     <div class="header">
       <div class="beta-badge">B?TA v1.0</div>
-      <h1>=? Emma En Direct ∑ Matin</h1>
+      <h1>=? Emma En Direct ? Matin</h1>
       <div class="header-subtitle">L'analyse des march?s, sans filtre</div>
       <div class="header-time">${new Date().toLocaleDateString('fr-FR', { 
         weekday: 'long', 
@@ -7585,7 +7585,7 @@ STRUCTURE JSON OBLIGATOIRE:
       ${expertModules.yield_curves ? `
       <div class="section">
         <div class="section-title">
-          <span class="section-title-icon">=µ</span>
+          <span class="section-title-icon">=?</span>
           Courbes de Taux US & Canada
         </div>
         <div class="metric-grid">
@@ -7623,7 +7623,7 @@ STRUCTURE JSON OBLIGATOIRE:
       ${expertModules.forex_detailed ? `
       <div class="section">
         <div class="section-title">
-          <span class="section-title-icon">=±</span>
+          <span class="section-title-icon">=?</span>
           Devises vs USD & CAD
         </div>
         <div class="metric-grid">
@@ -7690,7 +7690,7 @@ STRUCTURE JSON OBLIGATOIRE:
             </div>
           </div>
           <div class="metric-card">
-            <div class="metric-label">>ô Or (USD/oz)</div>
+            <div class="metric-label">>? Or (USD/oz)</div>
             <div class="metric-value">${expertModules.commodities.gold?.price?.toFixed(0) || 'N/A'}</div>
             <div class="metric-change ${expertModules.commodities.gold?.change_pct >= 0 ? 'positive' : 'negative'}">
               ${expertModules.commodities.gold?.change_pct}%
@@ -7762,14 +7762,14 @@ STRUCTURE JSON OBLIGATOIRE:
       </div>
       
       <a href="${window.location.origin}" class="cta-button">
-        =? Voir le Dashboard Complet í
+        =? Voir le Dashboard Complet ?
       </a>
     </div>
     
     <!-- Footer Emma En Direct -->
     <div class="footer">
       <div class="footer-brand">Emma En Direct</div>
-      <div class="footer-tagline">L'analyse des march?s, sans filtre ∑ Powered by JSL AI</div>
+      <div class="footer-tagline">L'analyse des march?s, sans filtre ? Powered by JSL AI</div>
       
       <div class="footer-disclaimer">
         <strong>† AVERTISSEMENT IMPORTANT</strong><br/>
@@ -7781,7 +7781,7 @@ STRUCTURE JSON OBLIGATOIRE:
       
       <div class="footer-legal">
         Sources : ${expertModules.sources_status ? Object.values(expertModules.sources_status).join(', ') : 'Yahoo Finance, Alpha Vantage, FMP, Finnhub, Perplexity, OpenAI'}<br/>
-        © ${new Date().getFullYear()} JSL AI - Emma En Direct. Tous droits r?serv?s.
+        ä ${new Date().getFullYear()} JSL AI - Emma En Direct. Tous droits r?serv?s.
       </div>
     </div>
   </div>
@@ -7914,7 +7914,7 @@ STRUCTURE JSON OBLIGATOIRE:
 <body>
   <div class="container">
     <div class="header">
-      <h1>° Update Mi-Journ?e</h1>
+      <h1>? Update Mi-Journ?e</h1>
       <div class="timestamp">${new Date().toLocaleDateString('fr-FR', { 
         weekday: 'long', 
         year: 'numeric', 
@@ -7946,7 +7946,7 @@ STRUCTURE JSON OBLIGATOIRE:
       
       ${data.top_movers ? `
       <div class="section">
-        <div class="section-title">=Ä Top Movers</div>
+        <div class="section-title">=? Top Movers</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           <div>
             <h4 style="color: #10b981; margin-bottom: 10px;">=? Hausses</h4>
@@ -7992,7 +7992,7 @@ STRUCTURE JSON OBLIGATOIRE:
       </div>
       
       <a href="${window.location.origin}" class="cta-button">
-        Voir le dashboard complet í
+        Voir le dashboard complet ?
       </a>
     </div>
     
@@ -8168,7 +8168,7 @@ STRUCTURE JSON OBLIGATOIRE:
       </div>
       
       <a href="${window.location.origin}" class="cta-button">
-        Dashboard Complet í
+        Dashboard Complet ?
       </a>
     </div>
     
@@ -8274,7 +8274,7 @@ STRUCTURE JSON OBLIGATOIRE:
                 // ============================================================================
                 // EMMA EN DIRECT 100% PERPLEXITY - PROMPTS ULTRA-D?TAILL?S
                 // ============================================================================
-                // <Ø Architecture ultra-simplifi?e : 1 requ?te Perplexity í Contenu complet
+                // <? Architecture ultra-simplifi?e : 1 requ?te Perplexity ? Contenu complet
                 //  Plus de Yahoo Finance, plus de variables multiples, plus de complexit?
                 //  Prompts de 2000+ mots = analyses professionnelles compl?tes
                 //  4 mod?les de backup + cache intelligent + monitoring en temps r?el
@@ -8292,7 +8292,7 @@ Contenu attendu
 
 =? Analyse d?taill?e des courbes de taux US & CA (2Y, 5Y, 10Y, 30Y), ?carts cl?s, tendances intraday, sources officielles (Slickcharts, Banque du Canada)
 
-=± Devises cl?s vs USD/CAD, impact sur mati?res premi?res, corr?lations, donn?es chiffr?es (Investing, Banque du Canada)
+=? Devises cl?s vs USD/CAD, impact sur mati?res premi?res, corr?lations, donn?es chiffr?es (Investing, Banque du Canada)
 
 =? Volatilit? & sentiment march? : VIX, MOVE, put/call ratios, indicateurs options, analyse sentiment institutionnel et retail
 
@@ -8316,7 +8316,7 @@ Contenu attendu
 
 =? Analyse d?taill?e des courbes de taux US & CA (2Y, 5Y, 10Y, 30Y), ?carts cl?s, tendances intraday, sources officielles (Slickcharts, Banque du Canada)
 
-=± Devises cl?s vs USD/CAD, impact sur mati?res premi?res, corr?lations, donn?es chiffr?es (Investing, Banque du Canada)
+=? Devises cl?s vs USD/CAD, impact sur mati?res premi?res, corr?lations, donn?es chiffr?es (Investing, Banque du Canada)
 
 =? Volatilit? & sentiment march? : VIX, MOVE, put/call ratios, indicateurs options, analyse sentiment institutionnel et retail
 
@@ -8332,71 +8332,71 @@ Contenu attendu
 
 = Sources valid?es (Bloomberg, Reuters, CNBC, sites banques centrales, Investing.com) avec URLs
 
-=Ä PROMPT MATINAL - PR?OUVERTURE :
+=? PROMPT MATINAL - PR?OUVERTURE :
 
 < R?SUM? EX?CUTIF APPROFONDI (6-8 phrases)
-í Bonjour ! Voici votre briefing matinal avec les mouvements overnight d?taill?s
-í Th?me dominant des march?s et rotation sectorielle observ?e avec contexte
-í Sentiment g?n?ral (risk-on/risk-off) et flux institutionnels avec analyse
-í Implications pour vos strat?gies tactiques et positionnement
-í Niveaux techniques cl?s ? surveiller aujourd'hui
-í ?v?nements majeurs du jour et leur impact potentiel
+? Bonjour ! Voici votre briefing matinal avec les mouvements overnight d?taill?s
+? Th?me dominant des march?s et rotation sectorielle observ?e avec contexte
+? Sentiment g?n?ral (risk-on/risk-off) et flux institutionnels avec analyse
+? Implications pour vos strat?gies tactiques et positionnement
+? Niveaux techniques cl?s ? surveiller aujourd'hui
+? ?v?nements majeurs du jour et leur impact potentiel
 
 =? PERFORMANCE DES MARCH?S APPROFONDIE ET D?TAILL?E
-í Asie : analyse d?taill?e par r?gion avec contexte ?conomique et tendances
-í Futures : implications pour l'ouverture US/EU avec niveaux cl?s et volumes
-í Secteurs moteurs et sous-performants avec drivers explicatifs d?taill?s
-í Corr?lations inter-march?s et devises avec analyse des flux
-í Volumes et liquidit? par secteur avec comparaisons historiques
-í Indicateurs de sentiment et positionnement institutionnel
+? Asie : analyse d?taill?e par r?gion avec contexte ?conomique et tendances
+? Futures : implications pour l'ouverture US/EU avec niveaux cl?s et volumes
+? Secteurs moteurs et sous-performants avec drivers explicatifs d?taill?s
+? Corr?lations inter-march?s et devises avec analyse des flux
+? Volumes et liquidit? par secteur avec comparaisons historiques
+? Indicateurs de sentiment et positionnement institutionnel
 
-=° CATALYSEURS & ACTUALIT?S CL?S D?TAILL?ES
-í Top 8 ?v?nements impactants avec analyse quantitative approfondie
-í Signification pour vos secteurs et titres de la watchlist avec implications
-í R?actions des march?s et ajustements de positionnement observ?s
-í D?clarations de dirigeants et banquiers centraux avec contexte
-í ?v?nements g?opolitiques et r?glementaires avec ?valuation des risques
-í Activisme actionnarial et mouvements corporate avec d?tails
+=? CATALYSEURS & ACTUALIT?S CL?S D?TAILL?ES
+? Top 8 ?v?nements impactants avec analyse quantitative approfondie
+? Signification pour vos secteurs et titres de la watchlist avec implications
+? R?actions des march?s et ajustements de positionnement observ?s
+? D?clarations de dirigeants et banquiers centraux avec contexte
+? ?v?nements g?opolitiques et r?glementaires avec ?valuation des risques
+? Activisme actionnarial et mouvements corporate avec d?tails
 
 =? DONN?ES TECHNIQUES & SENTIMENT APPROFONDIES
-í Niveaux S&P 500, support/r?sistance, volumes avec analyse technique
-í Indicateurs de sentiment (VIX, put/call ratio, flows) avec tendances
-í Positionnement institutionnel et retail avec flux d?taill?s
-í Corr?lations et divergences techniques entre asset classes
-í Momentum et oscillateurs sur les indices majeurs
-í Analyse des gaps et niveaux de retournement
+? Niveaux S&P 500, support/r?sistance, volumes avec analyse technique
+? Indicateurs de sentiment (VIX, put/call ratio, flows) avec tendances
+? Positionnement institutionnel et retail avec flux d?taill?s
+? Corr?lations et divergences techniques entre asset classes
+? Momentum et oscillateurs sur les indices majeurs
+? Analyse des gaps et niveaux de retournement
 
-<Ø FOCUS DU JOUR APPROFONDI - VOTRE WATCHLIST
-í Publications ?conomiques ? surveiller (impact d?taill? sur vos secteurs)
-í R?sultats d'entreprises attendus (earnings calendar) avec consensus
-í Dividendes ? venir et ex-dates avec impact sur les cours
-í ?v?nements corporate (analyst days, conf?rences) avec participants
-í Activisme actionnarial et proxy fights en cours
-í Changements r?glementaires sectoriels avec implications
+<? FOCUS DU JOUR APPROFONDI - VOTRE WATCHLIST
+? Publications ?conomiques ? surveiller (impact d?taill? sur vos secteurs)
+? R?sultats d'entreprises attendus (earnings calendar) avec consensus
+? Dividendes ? venir et ex-dates avec impact sur les cours
+? ?v?nements corporate (analyst days, conf?rences) avec participants
+? Activisme actionnarial et proxy fights en cours
+? Changements r?glementaires sectoriels avec implications
 
 † RISQUES & OPPORTUNIT?S TACTIQUES D?TAILL?ES
-í 5 risques majeurs avec probabilit?, impact et mitigation
-í 5 opportunit?s tactiques avec entry/exit levels et stop-loss
-í Recommandations de positionnement par secteur avec allocation
-í Strat?gies de hedging et protection de portefeuille
-í Niveaux de volatilit? attendus et gestion des risques
-í Corr?lations ? surveiller et diversification
+? 5 risques majeurs avec probabilit?, impact et mitigation
+? 5 opportunit?s tactiques avec entry/exit levels et stop-loss
+? Recommandations de positionnement par secteur avec allocation
+? Strat?gies de hedging et protection de portefeuille
+? Niveaux de volatilit? attendus et gestion des risques
+? Corr?lations ? surveiller et diversification
 
 =? AGENDA ?CONOMIQUE & CORPORATE D?TAILL?
-í Calendrier ?conomique du jour avec consensus et impact attendu
-í R?sultats d'entreprises avec estimations et guidance
-í Interventions de banquiers centraux avec contexte
-í ?v?nements sectoriels et conf?rences industrielles
-í R?unions d'actionnaires et votes importants
-í Publications de donn?es macro avec tendances
+? Calendrier ?conomique du jour avec consensus et impact attendu
+? R?sultats d'entreprises avec estimations et guidance
+? Interventions de banquiers centraux avec contexte
+? ?v?nements sectoriels et conf?rences industrielles
+? R?unions d'actionnaires et votes importants
+? Publications de donn?es macro avec tendances
 
 =. PERSPECTIVES COURT TERME & POSITIONNEMENT
-í Analyse des tendances ?mergentes et leur durabilit?
-í Niveaux techniques critiques pour la suite de la semaine
-í Corr?lations ? surveiller entre asset classes
-í Strat?gies de positionnement pour les prochains jours
-í Gestion des risques et opportunit?s tactiques
-í Recommandations sectorielles avec conviction
+? Analyse des tendances ?mergentes et leur durabilit?
+? Niveaux techniques critiques pour la suite de la semaine
+? Corr?lations ? surveiller entre asset classes
+? Strat?gies de positionnement pour les prochains jours
+? Gestion des risques et opportunit?s tactiques
+? Recommandations sectorielles avec conviction
 
 **Important :** Rappelez toujours que pour des conseils personnalis?s, il faut consulter un expert qualifi?.
 
@@ -8418,11 +8418,11 @@ Contenu attendu
 
 =? Analyse technique intraday (supports, r?sistances, oscillateurs RSI/MACD, volumes, VIX, corr?lations inter-march?s), implications tactiques
 
-=π Flux institutionnels et retail : rotation sectorielle, flux devises/obligations/actions, analyse sentiment et volumes
+=ö Flux institutionnels et retail : rotation sectorielle, flux devises/obligations/actions, analyse sentiment et volumes
 
 =? Calendrier apr?s-midi : discours Fed (Powell), publications ?conomiques cl?s, r?sultats after-market, votes/actionnariat
 
-<Ø Recommandations tactiques : niveaux d'entry, stops, hedging, diversification, gestion de risques avec chiffres et sc?narios d?taill?s
+<? Recommandations tactiques : niveaux d'entry, stops, hedging, diversification, gestion de risques avec chiffres et sc?narios d?taill?s
 
 =? Graphiques riches : heatmaps secteurs, volumes titres, courbes techniques, sentiment options
 
@@ -8430,7 +8430,7 @@ Contenu attendu
 
 ? PROMPT MI-JOURN?E - UPDATE INTRADAY :
 
-=ù Breaking news corporate r?centes (4h) : M&A, annonces de guidances, upgrades/downgrades, rachats/dividendes, changements de direction, avec chiffres, consensus, r?actions (cours, volumes)
+=? Breaking news corporate r?centes (4h) : M&A, annonces de guidances, upgrades/downgrades, rachats/dividendes, changements de direction, avec chiffres, consensus, r?actions (cours, volumes)
 
 =? Donn?es macro US/EU publi?es en matin?e : r?cents chiffres retail sales, PPI, consumer sentiment, spreads, taux, avec analyse des diff?rences consensus vs r?alit? et impact quantifi? sur march?s
 
@@ -8440,7 +8440,7 @@ Contenu attendu
 
 =? Analyse technique avanc?e intraday : supports/r?sistances tests, oscillateurs, volumes, corr?lations inter-march?s, VIX, avec implications tactiques
 
-=π Flux institutionnels et retail d?taill?s : rotation sectorielle, corr?lations devises/obligations/actions, analyse de sentiment et volume avec impact imm?diat
+=ö Flux institutionnels et retail d?taill?s : rotation sectorielle, corr?lations devises/obligations/actions, analyse de sentiment et volume avec impact imm?diat
 
 =? Agenda apr?s-midi aper?u : prochains ?v?nements macro, discours Fed/BCE, publications earnings, voting corporate
 
@@ -8462,11 +8462,11 @@ Contenu attendu
 
 =? Analyse technique intraday (supports, r?sistances, oscillateurs RSI/MACD, volumes, VIX, corr?lations inter-march?s), implications tactiques
 
-=π Flux institutionnels et retail : rotation sectorielle, flux devises/obligations/actions, analyse sentiment et volumes
+=ö Flux institutionnels et retail : rotation sectorielle, flux devises/obligations/actions, analyse sentiment et volumes
 
 =? Calendrier apr?s-midi : discours Fed (Powell), publications ?conomiques cl?s, r?sultats after-market, votes/actionnariat
 
-<Ø Recommandations tactiques : niveaux d'entry, stops, hedging, diversification, gestion de risques avec chiffres et sc?narios d?taill?s
+<? Recommandations tactiques : niveaux d'entry, stops, hedging, diversification, gestion de risques avec chiffres et sc?narios d?taill?s
 
 =? Graphiques riches : heatmaps secteurs, volumes titres, courbes techniques, sentiment options
 
@@ -8474,7 +8474,7 @@ Contenu attendu
 
 ? PROMPT MI-JOURN?E - UPDATE INTRADAY :
 
-=ù Breaking news corporate r?centes (4h) : M&A, annonces de guidances, upgrades/downgrades, rachats/dividendes, changements de direction, avec chiffres, consensus, r?actions (cours, volumes)
+=? Breaking news corporate r?centes (4h) : M&A, annonces de guidances, upgrades/downgrades, rachats/dividendes, changements de direction, avec chiffres, consensus, r?actions (cours, volumes)
 
 =? Donn?es macro US/EU publi?es en matin?e : r?cents chiffres retail sales, PPI, consumer sentiment, spreads, taux, avec analyse des diff?rences consensus vs r?alit? et impact quantifi? sur march?s
 
@@ -8484,7 +8484,7 @@ Contenu attendu
 
 =? Analyse technique avanc?e intraday : supports/r?sistances tests, oscillateurs, volumes, corr?lations inter-march?s, VIX, avec implications tactiques
 
-=π Flux institutionnels et retail d?taill?s : rotation sectorielle, corr?lations devises/obligations/actions, analyse de sentiment et volume avec impact imm?diat
+=ö Flux institutionnels et retail d?taill?s : rotation sectorielle, corr?lations devises/obligations/actions, analyse de sentiment et volume avec impact imm?diat
 
 =? Agenda apr?s-midi aper?u : prochains ?v?nements macro, discours Fed/BCE, publications earnings, voting corporate
 
@@ -8502,17 +8502,17 @@ Contenu attendu
 
 <? Review r?sultats after-market et intraday : analyse des ?carts vs consensus, guidances, r?actions march?s, avec libert? d'individuer les titres ? mentionner
 
-=ù ?v?nements macro-financiers : discours Fed/BCE, publications du jour, impacts sur taux, devises, actions
+=? ?v?nements macro-financiers : discours Fed/BCE, publications du jour, impacts sur taux, devises, actions
 
 =? Analyse des flux fin de s?ance : volumes, VIX, rapports put/call, rotation trading final, corr?lations inter-actifs
 
 =? Analyse technique fin de s?ance : supports, r?sistances, oscillateurs, impulsion, perspectives pour s?ance prochaine
 
-=º Positionnements institutionnels & retail : mouvements notables, r?allocations sectorielles, flux intraday
+=? Positionnements institutionnels & retail : mouvements notables, r?allocations sectorielles, flux intraday
 
 =? Points ? surveiller demain : publications macro, earnings, ?v?nements corporate, discours banques centrales
 
-<Ø Recommandations tactiques overnight & open next day : stops, hedge, opportunit?s, anticipation risques
+<? Recommandations tactiques overnight & open next day : stops, hedge, opportunit?s, anticipation risques
 
 =? Graphiques et images : courbes taux, heatmaps, volumes, sentiment, l?gendes soign?es
 
@@ -8524,17 +8524,17 @@ Contenu attendu
 
 <? Review r?sultats d'apr?s-midi : publications intras?ance et after-market, analyse des ?carts versus consensus, guidance, r?actions boursi?res
 
-=ù ?v?nements macro-financiers cl?s de la journ?e (Federal Reserve, BCE, discours, annonces) avec r?sum? des impacts sur taux, devises, actions
+=? ?v?nements macro-financiers cl?s de la journ?e (Federal Reserve, BCE, discours, annonces) avec r?sum? des impacts sur taux, devises, actions
 
 =? Analyse de flux fin de journ?e : liquidit?, pression acheteuse/vendeuse, sentiment options et ?volution du VIX, corr?lations inter-assets (actions/obligations/devise)
 
 =? Analyse technique de cl?ture : supports r?sistances touch?s, indicateurs momentum, implications pour la s?ance suivante
 
-=º Positionnement institutionnel fin de s?ance : ajustements, rotations sectorielles, comportements retail avec chiffres
+=? Positionnement institutionnel fin de s?ance : ajustements, rotations sectorielles, comportements retail avec chiffres
 
 =? ? suivre demain : ?v?nements macro, earnings, points de vigilance sectoriels
 
-<Ø Recommendations tactiques overnight et open next day : stops, hedging, opportunit?s, risques ? anticiper
+<? Recommendations tactiques overnight et open next day : stops, hedging, opportunit?s, risques ? anticiper
 
 Style : Information dense, riche en donn?es et chiffres, 100% sourc? (endpoints Bloomberg, Reuters, sites officiels). Utilisation de graphiques et tableaux int?gr?s possible (selon format), toujours l?gend?s et r?f?renc?s. Format clair avec sous-titres, emojis, listes, paragraphes courts pour interface rapide avec prise de d?cision.
 
@@ -8570,7 +8570,7 @@ Style : Information dense, riche en donn?es et chiffres, 100% sourc? (endpoints 
 - Interventions de banquiers centraux avec contexte et implications
 - R?unions d'actionnaires et votes importants avec d?tails
 
-<Ø FOCUS SECTEUR APPROFONDI - SETUP DEMAIN
+<? FOCUS SECTEUR APPROFONDI - SETUP DEMAIN
 - Technologie (GOOGL, CSCO, MU) - actualit?s tech, earnings, r?gulation, tendances
 - Sant? (JNJ, MDT, PFE, UNH) - r?glementation, r?sultats, innovation, pipeline
 - Finance (JPM, BNS, TD, WFC) - taux, stress tests, provisions, r?gulation
@@ -8596,17 +8596,17 @@ Contenu attendu
 
 <? Review r?sultats after-market et intraday : analyse des ?carts vs consensus, guidances, r?actions march?s, avec libert? d'individuer les titres ? mentionner
 
-=ù ?v?nements macro-financiers : discours Fed/BCE, publications du jour, impacts sur taux, devises, actions
+=? ?v?nements macro-financiers : discours Fed/BCE, publications du jour, impacts sur taux, devises, actions
 
 =? Analyse des flux fin de s?ance : volumes, VIX, rapports put/call, rotation trading final, corr?lations inter-actifs
 
 =? Analyse technique fin de s?ance : supports, r?sistances, oscillateurs, impulsion, perspectives pour s?ance prochaine
 
-=º Positionnements institutionnels & retail : mouvements notables, r?allocations sectorielles, flux intraday
+=? Positionnements institutionnels & retail : mouvements notables, r?allocations sectorielles, flux intraday
 
 =? Points ? surveiller demain : publications macro, earnings, ?v?nements corporate, discours banques centrales
 
-<Ø Recommandations tactiques overnight & open next day : stops, hedge, opportunit?s, anticipation risques
+<? Recommandations tactiques overnight & open next day : stops, hedge, opportunit?s, anticipation risques
 
 =? Graphiques et images : courbes taux, heatmaps, volumes, sentiment, l?gendes soign?es
 
@@ -8614,69 +8614,69 @@ Contenu attendu
 
 =? PROMPT CL?TURE - SYNTH?SE ET PERSPECTIVES :
 
-<Ø SYNTH?SE EX?CUTIVE APPROFONDIE (6-8 phrases)
-í Bonsoir ! Voici votre rapport de cl?ture avec la performance globale d?taill?e
-í Th?me dominant et rotation sectorielle observ?e avec contexte et analyse
-í Sentiment et positionnement institutionnel avec flux d?taill?s
-í Implications pour vos strat?gies tactiques et positionnement
-í Setup pour la s?ance de demain avec niveaux techniques cl?s
-í ?v?nements majeurs de demain et leur impact potentiel
+<? SYNTH?SE EX?CUTIVE APPROFONDIE (6-8 phrases)
+? Bonsoir ! Voici votre rapport de cl?ture avec la performance globale d?taill?e
+? Th?me dominant et rotation sectorielle observ?e avec contexte et analyse
+? Sentiment et positionnement institutionnel avec flux d?taill?s
+? Implications pour vos strat?gies tactiques et positionnement
+? Setup pour la s?ance de demain avec niveaux techniques cl?s
+? ?v?nements majeurs de demain et leur impact potentiel
 
 =? ANALYSE DE MARCH? APPROFONDIE ET D?TAILL?E
-í Indices majeurs : variations, volumes, corr?lations avec analyse comparative
-í Secteurs : performance relative et drivers explicatifs avec tendances
-í Devises et obligations : impact sur les actions avec flux d?taill?s
-í Flux institutionnels et retail par secteur avec patterns d'activit?
-í Volatilit? et liquidit? par asset class avec comparaisons historiques
-í Indicateurs de sentiment et positionnement avec analyse
+? Indices majeurs : variations, volumes, corr?lations avec analyse comparative
+? Secteurs : performance relative et drivers explicatifs avec tendances
+? Devises et obligations : impact sur les actions avec flux d?taill?s
+? Flux institutionnels et retail par secteur avec patterns d'activit?
+? Volatilit? et liquidit? par asset class avec comparaisons historiques
+? Indicateurs de sentiment et positionnement avec analyse
 
-=° DEEP DIVE ?V?NEMENTS CORPORATE APPROFONDIS
-í R?sultats d'entreprises : beat/miss, guidances, r?visions avec analyse comparative
-í M&A et restructurations : impact sectoriel avec ?valuation strat?gique
-í Activisme actionnarial et proxy fights avec d?tails des demandes
-í ?v?nements corporate (analyst days, roadshows) avec participants
-í R?visions d'estimations et changements de consensus avec impact
-í D?clarations de dirigeants et banquiers centraux avec contexte
+=? DEEP DIVE ?V?NEMENTS CORPORATE APPROFONDIS
+? R?sultats d'entreprises : beat/miss, guidances, r?visions avec analyse comparative
+? M&A et restructurations : impact sectoriel avec ?valuation strat?gique
+? Activisme actionnarial et proxy fights avec d?tails des demandes
+? ?v?nements corporate (analyst days, roadshows) avec participants
+? R?visions d'estimations et changements de consensus avec impact
+? D?clarations de dirigeants et banquiers centraux avec contexte
 
 =, ANALYSE SECTORIELLE APPROFONDIE - VOTRE WATCHLIST
-í Technologie (GOOGL, CSCO, MU) : actualit?s tech, earnings, r?gulation, tendances
-í Sant? (JNJ, MDT, PFE, UNH) : FDA, r?sultats, innovation, pipeline
-í Finance (JPM, BNS, TD, WFC) : taux, stress tests, provisions, r?gulation
-í Consommation (NKE, DEO, UL) : retail, consumer sentiment, ESG, tendances
-í ?nergie/Mat?riaux (NTR, TRP) : commodities, transition ?nerg?tique, ESG
-í T?l?coms (T, BCE, VZ) : 5G, infrastructure, consolidation, r?gulation
+? Technologie (GOOGL, CSCO, MU) : actualit?s tech, earnings, r?gulation, tendances
+? Sant? (JNJ, MDT, PFE, UNH) : FDA, r?sultats, innovation, pipeline
+? Finance (JPM, BNS, TD, WFC) : taux, stress tests, provisions, r?gulation
+? Consommation (NKE, DEO, UL) : retail, consumer sentiment, ESG, tendances
+? ?nergie/Mat?riaux (NTR, TRP) : commodities, transition ?nerg?tique, ESG
+? T?l?coms (T, BCE, VZ) : 5G, infrastructure, consolidation, r?gulation
 
 =? ANALYSE TECHNIQUE & SENTIMENT APPROFONDIES
-í Niveaux cl?s : support/r?sistance, volumes, momentum avec analyse d?taill?e
-í Indicateurs de sentiment : VIX, put/call, flows avec tendances et patterns
-í Positionnement institutionnel et retail avec flux d?taill?s
-í Corr?lations et divergences techniques avec asset classes
-í Momentum et oscillateurs sur les indices majeurs
-í Analyse des gaps et niveaux de retournement
+? Niveaux cl?s : support/r?sistance, volumes, momentum avec analyse d?taill?e
+? Indicateurs de sentiment : VIX, put/call, flows avec tendances et patterns
+? Positionnement institutionnel et retail avec flux d?taill?s
+? Corr?lations et divergences techniques avec asset classes
+? Momentum et oscillateurs sur les indices majeurs
+? Analyse des gaps et niveaux de retournement
 
 =. PERSPECTIVES & POSITIONNEMENT APPROFONDIS
-í Calendrier ?conomique de demain (impact sectoriel) avec consensus
-í R?sultats d'entreprises attendus (earnings calendar) avec estimations
-í Dividendes ? venir et ex-dates avec impact sur les cours
-í ?v?nements corporate et analyst days avec participants
-í Recommandations tactiques par secteur avec allocation
-í Strat?gies de hedging et protection de portefeuille
+? Calendrier ?conomique de demain (impact sectoriel) avec consensus
+? R?sultats d'entreprises attendus (earnings calendar) avec estimations
+? Dividendes ? venir et ex-dates avec impact sur les cours
+? ?v?nements corporate et analyst days avec participants
+? Recommandations tactiques par secteur avec allocation
+? Strat?gies de hedging et protection de portefeuille
 
 † RISQUES & OPPORTUNIT?S TACTIQUES D?TAILL?ES
-í 5 risques majeurs avec probabilit?, impact et mitigation
-í 5 opportunit?s tactiques avec entry/exit levels et stop-loss
-í Recommandations de positionnement par secteur avec allocation
-í Strat?gies de hedging et protection de portefeuille
-í Niveaux de volatilit? attendus et gestion des risques
-í Corr?lations ? surveiller et diversification
+? 5 risques majeurs avec probabilit?, impact et mitigation
+? 5 opportunit?s tactiques avec entry/exit levels et stop-loss
+? Recommandations de positionnement par secteur avec allocation
+? Strat?gies de hedging et protection de portefeuille
+? Niveaux de volatilit? attendus et gestion des risques
+? Corr?lations ? surveiller et diversification
 
 =? AGENDA ?CONOMIQUE & CORPORATE D?TAILL?
-í Calendrier ?conomique de demain avec consensus et impact attendu
-í R?sultats d'entreprises avec estimations et guidance
-í Interventions de banquiers centraux avec contexte
-í ?v?nements sectoriels et conf?rences industrielles
-í R?unions d'actionnaires et votes importants
-í Publications de donn?es macro avec tendances
+? Calendrier ?conomique de demain avec consensus et impact attendu
+? R?sultats d'entreprises avec estimations et guidance
+? Interventions de banquiers centraux avec contexte
+? ?v?nements sectoriels et conf?rences industrielles
+? R?unions d'actionnaires et votes importants
+? Publications de donn?es macro avec tendances
 
 **Important :** Rappelez toujours que pour des conseils personnalis?s, il faut consulter un expert qualifi?.
 
@@ -8903,7 +8903,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                 // ============================================================================
                 // G?N?RATION BRIEFING EMMA EN DIRECT - ARCHITECTURE ULTRA-SIMPLE
                 // ============================================================================
-                // <Ø FLUX SIMPLIFI? : 1 requ?te Perplexity í Analyse compl?te í HTML
+                // <? FLUX SIMPLIFI? : 1 requ?te Perplexity ? Analyse compl?te ? HTML
                 //  Plus de collecte de donn?es multiples, plus de variables complexes
                 //  Prompt ultra-d?taill? (2000+ mots) = contenu professionnel complet
                 //  Syst?me de backup multi-mod?les + cache intelligent + monitoring
@@ -8911,7 +8911,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                 
                 // Fonction pour g?n?rer un briefing
                 const generateBriefing = async (type) => {
-                    console.log('=Ä D?BUT generateBriefing:', { type, loading });
+                    console.log('=? D?BUT generateBriefing:', { type, loading });
                     console.log('= API Sources configur?es:', apiSources);
                     console.log('= Perplexity enabled:', perplexityEnabled);
                     
@@ -8945,8 +8945,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         // ============================================================================
                         // 1. COLLECTE DONN?ES MARCH? VIA PERPLEXITY (ULTRA-SIMPLIFI?)
                         // ============================================================================
-                        // <Ø AVANT : Yahoo Finance + variables multiples + complexit?
-                        //  MAINTENANT : 1 requ?te Perplexity í Donn?es compl?tes
+                        // <? AVANT : Yahoo Finance + variables multiples + complexit?
+                        //  MAINTENANT : 1 requ?te Perplexity ? Donn?es compl?tes
                         // ============================================================================
                         
                         addLogEntry('MARKET_DATA', 'D?but collecte donn?es march?', { 
@@ -9025,8 +9025,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         // ============================================================================
                         // 2. RECHERCHE ACTUALIT?S VIA PERPLEXITY (ULTRA-SIMPLIFI?)
                         // ============================================================================
-                        // <Ø AVANT : Marketaux + variables + complexit?
-                        //  MAINTENANT : 1 requ?te Perplexity í Actualit?s compl?tes
+                        // <? AVANT : Marketaux + variables + complexit?
+                        //  MAINTENANT : 1 requ?te Perplexity ? Actualit?s compl?tes
                         // ============================================================================
                         
                         addLogEntry('NEWS', 'D?but recherche actualit?s', { 
@@ -9088,8 +9088,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         // ============================================================================
                         // 3. G?N?RATION ANALYSE VIA PERPLEXITY (ULTRA-SIMPLIFI?)
                         // ============================================================================
-                        // <Ø AVANT : OpenAI + variables + complexit?
-                        //  MAINTENANT : 1 requ?te Perplexity í Analyse compl?te (2000+ mots)
+                        // <? AVANT : OpenAI + variables + complexit?
+                        //  MAINTENANT : 1 requ?te Perplexity ? Analyse compl?te (2000+ mots)
                         // ============================================================================
                         
                         addLogEntry('ANALYSIS', 'D?but g?n?ration analyse IA', { 
@@ -9219,7 +9219,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                             timestamp: briefing.timestamp
                         }, 'success');
 
-                        console.log('<Ø Mise ? jour des ?tats React:', {
+                        console.log('<? Mise ? jour des ?tats React:', {
                             briefingType: briefing.type,
                             hasHtml: !!briefing.html,
                             htmlLength: briefing.html.length,
@@ -9389,7 +9389,7 @@ R?PONDS EN JSON UNIQUEMENT:
                             body: JSON.stringify({
                                 message: `R?cup?rer les donn?es pour briefing ${type}. Focus: ${intentData.summary}`,
                                 context: {
-                                    output_mode: 'data',  // ù MODE DATA pour r?cup?ration de donn?es
+                                    output_mode: 'data',  // ? MODE DATA pour r?cup?ration de donn?es
                                     briefing_type: type,
                                     intent: intentData.intent,
                                     suggested_tools: intentData.recommended_tools,
@@ -9436,7 +9436,7 @@ R?PONDS EN JSON UNIQUEMENT:
 
                 // ?TAPE 2: Content Selection
                 const selectEmailContent = (intentData, smartData) => {
-                    console.log('<Ø ?TAPE 2: Content Selection START');
+                    console.log('<? ?TAPE 2: Content Selection START');
 
                     const sections = [];
 
@@ -9528,11 +9528,11 @@ ${basePrompt}
 
                     // Si Fed Decision
                     else if (intentData.intent === 'fed_decision') {
-                        adaptedPrompt = `<ù FED DECISION DAY
+                        adaptedPrompt = `<? FED DECISION DAY
 
 ${basePrompt}
 
-<Ø FOCUS PRIORITAIRE:
+<? FOCUS PRIORITAIRE:
 - D?cision taux
 - Commentaires Powell
 - R?action obligataire
@@ -9597,7 +9597,7 @@ ${basePrompt}
 
                         // OPTIMISATION: Pour briefings pr?d?finis, utiliser intent pr?d?fini (?conomise 5-15s)
                         if (['morning', 'noon', 'evening'].includes(type)) {
-                            console.log(`° OPTIMISATION: Intent pr?d?fini pour ${type} (skip API call)`);
+                            console.log(`? OPTIMISATION: Intent pr?d?fini pour ${type} (skip API call)`);
                             const currentHour = new Date().getHours();
 
                             // Intent adapt? selon l'heure
@@ -9622,7 +9622,7 @@ ${basePrompt}
                                 intentData
                             }, 'info');
 
-                            setStepDetails(`° Intent pr?d?fini: ${intentData.intent} (${intentData.importance_level}/10) - Analyse skipp?e pour rapidit?`);
+                            setStepDetails(`? Intent pr?d?fini: ${intentData.intent} (${intentData.importance_level}/10) - Analyse skipp?e pour rapidit?`);
                         } else {
                             // Custom briefing: analyse compl?te n?cessaire
                             setStepDetails('Emma analyse l\'actualit? du jour et d?tecte les sujets importants...');
@@ -9700,12 +9700,12 @@ CONTEXTE EARNINGS:
 - Tendances d?tect?es: ${intentData.trending_topics?.join(', ') || 'N/A'}`;
 
                         } else if (intentData.intent === 'fed_decision' || intentData.intent === 'central_bank') {
-                            // <ù FED/CENTRAL BANK DECISION
-                            briefingMessage = `<ù D?CISION BANQUE CENTRALE
+                            // <? FED/CENTRAL BANK DECISION
+                            briefingMessage = `<? D?CISION BANQUE CENTRALE
 
 ${basePrompt}
 
-<Ø FOCUS PRIORITAIRE POLITIQUE MON?TAIRE:
+<? FOCUS PRIORITAIRE POLITIQUE MON?TAIRE:
 - D?cision taux et communiqu? officiel
 - Dot plot et forward guidance
 - Commentaires pr?sident/gouverneur
@@ -9724,7 +9724,7 @@ CONTEXTE BANQUE CENTRALE:
 
 ${basePrompt}
 
-° FOCUS PRIORITAIRE VOLATILIT?:
+? FOCUS PRIORITAIRE VOLATILIT?:
 - Ampleur des mouvements et vitesse
 - Secteurs et valeurs les plus touch?s
 - VIX et indicateurs de stress
@@ -9823,7 +9823,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                 body: JSON.stringify({
                                     message: briefingMessage,
                                     context: {
-                                        output_mode: 'briefing',  // ù MODE BRIEFING
+                                        output_mode: 'briefing',  // ? MODE BRIEFING
                                         briefing_type: type,
                                     intent_data: intentData,
                                         smart_data: smartData,
@@ -10018,7 +10018,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
                     switch (type) {
                         case 'morning': return `${urgentFlag}=? Briefing Matinal - ${date}`;
-                        case 'noon': return `${urgentFlag}° Update Mi-Journ?e - ${date}`;
+                        case 'noon': return `${urgentFlag}? Update Mi-Journ?e - ${date}`;
                         case 'evening': return `${urgentFlag}< Rapport de Cl?ture - ${date}`;
                         default: return `Briefing - ${date}`;
                     }
@@ -10230,7 +10230,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>ô Briefings Automatiques (Cron Jobs)</h3>
+                            }`}>? Briefings Automatiques (Cron Jobs)</h3>
 
                             <p className={`text-sm mb-6 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -10335,7 +10335,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                 }`}>
                                     <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>ô Configuration Globale</h4>
+                                    }`}>? Configuration Globale</h4>
                                     <div className={`text-sm space-y-1 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
@@ -10353,7 +10353,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <p className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-800'
                                     }`}>
-                                        =° <strong>Note:</strong> Les crons sont configur?s dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">vercel.json</code>.
+                                        =? <strong>Note:</strong> Les crons sont configur?s dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">vercel.json</code>.
                                         Pour modifier les horaires, utilisez les scripts <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:edt</code> ou
                                         <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:est</code>.
                                     </p>
@@ -10381,7 +10381,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <label className={`block text-sm font-semibold mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        =ù Prompt Personnalis?
+                                        =? Prompt Personnalis?
                                     </label>
                                     <textarea
                                         placeholder="Exemple: Analyse d?taill?e de Tesla suite ? la publication des Q4 earnings. Focus sur les marges et le guidance 2025."
@@ -10399,7 +10399,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <label className={`block text-sm font-semibold mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        <Ø Tickers ? Analyser (optionnel)
+                                        <? Tickers ? Analyser (optionnel)
                                     </label>
                                     <input
                                         type="text"
@@ -10492,7 +10492,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                 <div className={`p-3 rounded-lg text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'bg-purple-900/20 text-purple-300' : 'bg-purple-50 text-purple-800'
                                 }`}>
-                                    =° <strong>Astuce:</strong> Le prompt personnalis? utilise Emma Agent pour g?n?rer un briefing sur-mesure. Plus votre demande est pr?cise, meilleur sera le r?sultat.
+                                    =? <strong>Astuce:</strong> Le prompt personnalis? utilise Emma Agent pour g?n?rer un briefing sur-mesure. Plus votre demande est pr?cise, meilleur sera le r?sultat.
                                 </div>
                             </div>
                         </div>
@@ -10533,7 +10533,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                                         isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                     }`}>
-                                        í
+                                        ?
                                     </div>
                                 </button>
 
@@ -10564,7 +10564,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                                         isDarkMode ? 'text-green-400' : 'text-green-600'
                                     }`}>
-                                        í
+                                        ?
                                     </div>
                                 </button>
 
@@ -10595,7 +10595,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                                         isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
                                     }`}>
-                                        í
+                                        ?
                                     </div>
                                 </button>
                             </div>
@@ -10806,7 +10806,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <div className={`mt-3 pt-3 border-t text-sm italic transition-colors duration-300 ${
                                                 isDarkMode ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-600'
                                             }`}>
-                                                =° {currentBriefing.intentData.summary}
+                                                =? {currentBriefing.intentData.summary}
                                             </div>
                                         )}
                                     </div>
@@ -10907,7 +10907,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                     spellCheck="false"
                                                 />
                                                 <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                    =° Astuce: Vous pouvez modifier le HTML directement. Les changements seront appliqu?s au briefing.
+                                                    =? Astuce: Vous pouvez modifier le HTML directement. Les changements seront appliqu?s au briefing.
                                                 </div>
                                             </div>
                                         ) : (
@@ -10935,7 +10935,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>=ù Historique des Briefings</h3>
+                            }`}>=? Historique des Briefings</h3>
                             
                             {briefingHistory.length > 0 ? (
                                 <div className="space-y-3">
@@ -11114,7 +11114,7 @@ Domaines d'expertise : Analyse financi?re, gestion de portefeuille, donn?es de m
 Style : PROFESSIONNEL et TECHNIQUE
 Tonalit? : FORMELLE, PR?CISE, ACCESSIBLE
 Niveau de d?tail : ADAPTATIF selon l'audience (d?butant ? expert)
-Structure de r?ponse : Analyse structur?e í Explications claires í Synth?se finale í Sources
+Structure de r?ponse : Analyse structur?e ? Explications claires ? Synth?se finale ? Sources
 </interaction_guidelines>
 
 <safety_protocols>
@@ -11139,7 +11139,7 @@ Compression contextuelle : Impl?mentez la troncature intelligente des ?l?ments s
 </context_management>
 
 <real_time_capabilities>
-=Ä ACC?S DIRECT AUX DONN?ES EN TEMPS R?EL:
+=? ACC?S DIRECT AUX DONN?ES EN TEMPS R?EL:
 Tu as acc?s DIRECT aux donn?es de march? en temps r?el via les APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance, Financial Modeling Prep (FMP) et Marketaux. Tu peux faire des requ?tes en temps r?el pour :
 
 =? DONN?ES DE MARCH?:
@@ -11148,7 +11148,7 @@ Tu as acc?s DIRECT aux donn?es de march? en temps r?el via les APIs Finnhub, Alp
 - compareTickers(symbols) : Comparaison rapide de plusieurs titres
 - getFundamentals(symbol) : Donn?es fondamentales (P/E, EV/EBITDA, ROE, marges, dividende, etc.)
 
-=º FINANCIAL MODELING PREP (FMP):
+=? FINANCIAL MODELING PREP (FMP):
 - getCompanyProfile(symbol) : Profil complet d'entreprise (secteur, industrie, CEO, employ?s, description)
 - getFinancialStatements(symbol, period, limit) : ?tats financiers complets (Income Statement, Balance Sheet, Cash Flow)
 - getFinancialRatios(symbol) : Ratios financiers TTM (P/E, P/B, ROE, ROA, Debt/Equity, Current Ratio, etc.)
@@ -11174,7 +11174,7 @@ L INTERDIT de dire : "J'utilise l'API getStockPrice(symbol) pour obtenir..."
 
 Tu dois TOUJOURS ex?cuter les fonctions et int?grer les r?sultats dans ta r?ponse. Ne te contente jamais de mentionner que tu vas utiliser une fonction - EX?CUTE-LA et pr?sente les donn?es r?elles !
 
-=° RECOMMANDATIONS D'USAGE:
+=? RECOMMANDATIONS D'USAGE:
 - Pour une analyse compl?te d'un titre : utilise getCompleteAnalysis(symbol) qui combine profil, ratios, DCF, ratings, earnings et insider trading
 - Pour comprendre le sentiment du march? : utilise getMarketSentiment(symbol) de Marketaux
 - Pour des actualit?s r?centes avec sentiment : utilise getMarketauxNews(symbol)
@@ -11183,7 +11183,7 @@ Tu dois TOUJOURS ex?cuter les fonctions et int?grer les r?sultats dans ta r?pons
 </real_time_capabilities>
 
 <configuration_adaptation>
-ô PARAM?TRES DE CONFIGURATION DYNAMIQUES:
+? PARAM?TRES DE CONFIGURATION DYNAMIQUES:
 Tu re?ois ? chaque requ?te tes param?tres de configuration actuels. Adapte ton style de r?ponse selon ces param?tres :
 
 TEMP?RATURE (Cr?ativit? vs Pr?cision):
@@ -11251,7 +11251,7 @@ Validation : toujours appliquer les proc?dures de v?rification automatique des r
 </integration_protocols>
 
 <sources_and_references>
-=ù SOURCES ET R?F?RENCES OBLIGATOIRES:
+=? SOURCES ET R?F?RENCES OBLIGATOIRES:
 ? la fin de chaque r?ponse, ajoute TOUJOURS une section "Sources:" avec des liens cliquables vers les sources utilis?es.
 
 Format standardis? :
@@ -11322,7 +11322,7 @@ Bulles potentielles dans la tech
 Risques g?opolitiques
 Taux d'int?r?t et politique mon?taire
 
-<ì Expertise et Domaines de Comp?tence
+<? Expertise et Domaines de Comp?tence
 Comp?tences principales (niveau CFA) :
 
 Analyse de titres : actions, obligations, produits d?riv?s
@@ -11424,7 +11424,7 @@ Rechercher donn?es contradictoires pour analyse ?quilibr?e
 Actualiser avec donn?es les plus r?centes disponibles
 Mentionner date de derni?re mise ? jour
 
-=¨ Ton et Style de Communication
+=? Ton et Style de Communication
 Principes g?n?raux :
 
 Professionnelle mais accessible : expertise sans jargon inutile
@@ -11471,10 +11471,10 @@ L Acc?der ? des donn?es propri?taires ou confidentielles
 L Remplacer le jugement professionnel de l'?quipe
 Formulations transparentes :
 
-´ Selon les donn?es disponibles... ª
-´ Les analyses sugg?rent que... ª
-´ Parmi les risques ? consid?rer... ª
-´ Cette perspective doit ?tre valid?e par... ª
+? Selon les donn?es disponibles... ?
+? Les analyses sugg?rent que... ?
+? Parmi les risques ? consid?rer... ?
+? Cette perspective doit ?tre valid?e par... ?
 
 =' Int?gration avec le Dashboard Financier
 Contexte technique :
@@ -11495,30 +11495,30 @@ Compl?ter avec recherches externes
 
 =? Exemples d'Interactions
 Question type 1 : Analyse d'un titre
-Utilisateur : ´ Peux-tu analyser BCE Inc. dans le contexte actuel des t?l?coms canadiens ? ª
+Utilisateur : ? Peux-tu analyser BCE Inc. dans le contexte actuel des t?l?coms canadiens ? ?
 Emma :
 Synth?se : BCE pr?sente un profil d?fensif avec rendement attrayant (~7%), mais fait face ? des vents contraires sectoriels (saturation, concurrence, capex 5G).
 [Analyse compl?te suivant la structure : contexte, forces, faiblesses, m?triques, recommandations, risques]
 Sources :
 
 Rapport Q3 2024 BCE
-´ Les t?l?coms canadiens sous pression ª - Les Affaires, oct. 2024
+? Les t?l?coms canadiens sous pression ? - Les Affaires, oct. 2024
 Analyse sectorielle Morningstar
 
 Question type 2 : Macro-?conomie
-Utilisateur : ´ Que penses-tu de l'impact potentiel des tarifs douaniers de Trump sur nos positions manufacturi?res ? ª
+Utilisateur : ? Que penses-tu de l'impact potentiel des tarifs douaniers de Trump sur nos positions manufacturi?res ? ?
 Emma :
 Perspective : Risque ?lev? de compression de marges pour les entreprises avec cha?nes d'approvisionnement int?gr?es US-Canada-Mexique. Opportunit?s contrarian possibles si surr?action du march?.
 [Analyse des impacts sectoriels, identification d'opportunit?s valeur, recommandations de couverture]
 
 Question type 3 : Strat?gie de portefeuille
-Utilisateur : ´ Devrions-nous augmenter notre exposition or actuellement ? ª
+Utilisateur : ? Devrions-nous augmenter notre exposition or actuellement ? ?
 Emma :
 [Analyse du contexte macro : taux r?els, dollar US, tensions g?opolitiques]
 [Corr?lations historiques or/actions/obligations]
 [Sc?narios d'allocation selon convictions]
 
-ñ Signature Emma - Analyste Financi?re
+? Signature Emma - Analyste Financi?re
 Valeurs cardinales dans ce r?le :
 
 Rigueur analytique et m?thodologique
@@ -11527,9 +11527,9 @@ Transparence sur limites et incertitudes
 Pragmatisme orient? d?cisions
 Curiosit? intellectuelle continue
 
-´ Je ne pr?dis pas les march?s. Mais j'analyse, je questionne et j'?claire  avec rigueur et humilit?. ª
+? Je ne pr?dis pas les march?s. Mais j'analyse, je questionne et j'?claire  avec rigueur et humilit?. ?
 
-<¨ Activation
+<? Activation
 Tu es maintenant Emma, Analyste Financi?re Experte.
 R?ponds toujours en fran?ais qu?b?cois, adopte un ton professionnel ?quilibr?, et structure tes analyses selon la m?thodologie d?crite. N'h?site pas ? rechercher sur le web pour fournir des donn?es actuelles et citer tes sources.
 Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
@@ -11547,13 +11547,13 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
                 // Handle prefill message from other tabs
                 React.useEffect(() => {
                     if (prefillMessage && prefillMessage.trim() && typeof setPrefillMessage === 'function') {
-                        console.log('=ù Prefill message received:', prefillMessage);
+                        console.log('=? Prefill message received:', prefillMessage);
                         setEmmaInput(prefillMessage);
                         setPrefillMessage(''); // Clear the prefill message after using it
 
                         // If autoSend is true, trigger send after input is set
                         if (autoSend) {
-                            console.log('=Ä Auto-send enabled, will send message');
+                            console.log('=? Auto-send enabled, will send message');
                             // Use setTimeout to ensure state is updated
                             setTimeout(() => {
                                 const sendButton = document.querySelector('[data-emma-send-button]');
@@ -11575,7 +11575,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
 
                         if (!hasHistory) {
                             // Aucun historique sauvegard? - ajouter welcome message
-                            const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. =Ä\n\n**Comment puis-je vous assister aujourd\'hui ?**';
+                            const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. =?\n\n**Comment puis-je vous assister aujourd\'hui ?**';
 
                             setEmmaMessages([{
                                 type: 'emma',
@@ -11657,7 +11657,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
                     };
                     
                     setEmmaMessages(prev => {
-                        console.log('=ù Ajout du message utilisateur:', userMessage);
+                        console.log('=? Ajout du message utilisateur:', userMessage);
                         return [...prev, userMessage];
                     });
                     setEmmaLoading(true);
@@ -11679,7 +11679,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
                     
                     try {
                         // Utiliser les donn?es existantes du dashboard
-                        console.log('=Ä Envoi de la requ?te ? Emma avec les donn?es actuelles...');
+                        console.log('=? Envoi de la requ?te ? Emma avec les donn?es actuelles...');
                         
                         // Les fonctions refreshAllStocks, fetchNews, checkApiStatus ne sont pas accessibles ici
                         // Les donn?es sont d?j? incluses dans realTimeContext via stockData, newsData, apiStatus
@@ -11730,13 +11730,13 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
                                 }, index * 500);
                             });
                             
-                            // Ajouter un message avec le coùt estim?
+                            // Ajouter un message avec le co?t estim?
                             const costPerSMS = 0.0075;
                             const totalCost = smsSegments.length * costPerSMS;
                             const costMessage = {
                                 id: baseTimestamp + smsSegments.length,
                                 type: 'cost-estimate',
-                                content: `=∞ Coùt estim?: ${smsSegments.length} SMS ? ${costPerSMS}$ = ${totalCost.toFixed(4)}$${isCached ? ' (Cache: gratuit!)' : ''}`,
+                                content: `=∞ Co?t estim?: ${smsSegments.length} SMS ? ${costPerSMS}$ = ${totalCost.toFixed(4)}$${isCached ? ' (Cache: gratuit!)' : ''}`,
                                 timestamp: new Date().toLocaleTimeString('fr-FR')
                             };
                             
@@ -11790,7 +11790,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
 
 **Configuration requise :**
 1. Allez dans votre dashboard Vercel
-2. Section "Settings" í "Environment Variables"
+2. Section "Settings" ? "Environment Variables"
 3. Ajoutez : PERPLEXITY_API_KEY = votre_cl?_api
 4. Red?ployez l'application
 
@@ -11862,7 +11862,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
                             body: JSON.stringify({
                                 message: userMessage,
                                 context: {
-                                    output_mode: 'chat',  // ù MODE CHAT pour chatbot web
+                                    output_mode: 'chat',  // ? MODE CHAT pour chatbot web
                                     user_channel: channelSim,  // 'web' ou 'sms' pour adapter le FORMAT
                                     tickers: tickers,
                                     news_requested: true,
@@ -11915,7 +11915,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
                         }
 
                         // Log de la r?ponse pour diagnostic
-                        console.log(`=ù R?ponse Emma (${responseText.length} caract?res, format: ${channelSim}):`, responseText);
+                        console.log(`=? R?ponse Emma (${responseText.length} caract?res, format: ${channelSim}):`, responseText);
 
                         // V?rifier si la r?ponse semble tronqu?e
                         if (responseText.length < 50) {
@@ -12014,7 +12014,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
                     try {
                         if (emmaMessages.length > 0) {
                             sessionStorage.setItem('emma-chat-history', JSON.stringify(emmaMessages));
-                            console.log('=æ Historique Emma sauvegard?:', emmaMessages.length, 'messages');
+                            console.log('=û Historique Emma sauvegard?:', emmaMessages.length, 'messages');
                         }
                     } catch (error) {
                         console.error('L Erreur sauvegarde historique Emma:', error);
@@ -12057,7 +12057,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`);
 
                     // Mettre ? jour le message de bienvenue si c'est le premier message
                     if (emmaMessages.length === 1 && emmaMessages[0].type === 'emma') {
-                        const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. =Ä\n\n**Comment puis-je vous assister aujourd\'hui ?**';
+                        const welcomeMessage = 'Bonjour au Groupe Ouellet Bolduc ! Je suis Emma, Assistante virtuelle experte de JSLAI. =?\n\n**Comment puis-je vous assister aujourd\'hui ?**';
 
                         setEmmaMessages([{
                             type: 'emma',
@@ -12116,7 +12116,7 @@ Domaines d'expertise : Analyse financi?re, gestion de portefeuille, donn?es de m
 Style : PROFESSIONNEL et TECHNIQUE
 Tonalit? : FORMELLE, PR?CISE, ACCESSIBLE
 Niveau de d?tail : ADAPTATIF selon l'audience (d?butant ? expert)
-Structure de r?ponse : Analyse structur?e í Explications claires í Synth?se finale í Sources
+Structure de r?ponse : Analyse structur?e ? Explications claires ? Synth?se finale ? Sources
 </interaction_guidelines>
 
 <safety_protocols>
@@ -12141,7 +12141,7 @@ Compression contextuelle : Impl?mentez la troncature intelligente des ?l?ments s
 </context_management>
 
 <real_time_capabilities>
-=Ä ACC?S DIRECT AUX DONN?ES EN TEMPS R?EL:
+=? ACC?S DIRECT AUX DONN?ES EN TEMPS R?EL:
 Tu as acc?s DIRECT aux donn?es de march? en temps r?el via les APIs Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance, Financial Modeling Prep (FMP) et Marketaux. Tu peux faire des requ?tes en temps r?el pour :
 
 =? DONN?ES DE MARCH?:
@@ -12150,7 +12150,7 @@ Tu as acc?s DIRECT aux donn?es de march? en temps r?el via les APIs Finnhub, Alp
 - compareTickers(symbols) : Comparaison rapide de plusieurs titres
 - getFundamentals(symbol) : Donn?es fondamentales (P/E, EV/EBITDA, ROE, marges, dividende, etc.)
 
-=º FINANCIAL MODELING PREP (FMP):
+=? FINANCIAL MODELING PREP (FMP):
 - getCompanyProfile(symbol) : Profil complet d'entreprise (secteur, industrie, CEO, employ?s, description)
 - getFinancialStatements(symbol, period, limit) : ?tats financiers complets (Income Statement, Balance Sheet, Cash Flow)
 - getFinancialRatios(symbol) : Ratios financiers TTM (P/E, P/B, ROE, ROA, Debt/Equity, Current Ratio, etc.)
@@ -12176,7 +12176,7 @@ L INTERDIT de dire : "J'utilise l'API getStockPrice(symbol) pour obtenir..."
 
 Tu dois TOUJOURS ex?cuter les fonctions et int?grer les r?sultats dans ta r?ponse. Ne te contente jamais de mentionner que tu vas utiliser une fonction - EX?CUTE-LA et pr?sente les donn?es r?elles !
 
-=° RECOMMANDATIONS D'USAGE:
+=? RECOMMANDATIONS D'USAGE:
 - Pour une analyse compl?te d'un titre : utilise getCompleteAnalysis(symbol) qui combine profil, ratios, DCF, ratings, earnings et insider trading
 - Pour comprendre le sentiment du march? : utilise getMarketSentiment(symbol) de Marketaux
 - Pour des actualit?s r?centes avec sentiment : utilise getMarketauxNews(symbol)
@@ -12185,7 +12185,7 @@ Tu dois TOUJOURS ex?cuter les fonctions et int?grer les r?sultats dans ta r?pons
 </real_time_capabilities>
 
 <configuration_adaptation>
-ô PARAM?TRES DE CONFIGURATION DYNAMIQUES:
+? PARAM?TRES DE CONFIGURATION DYNAMIQUES:
 Tu re?ois ? chaque requ?te tes param?tres de configuration actuels. Adapte ton style de r?ponse selon ces param?tres :
 
 TEMP?RATURE (Cr?ativit? vs Pr?cision):
@@ -12253,7 +12253,7 @@ Validation : toujours appliquer les proc?dures de v?rification automatique des r
 </integration_protocols>
 
 <sources_and_references>
-=ù SOURCES ET R?F?RENCES OBLIGATOIRES:
+=? SOURCES ET R?F?RENCES OBLIGATOIRES:
 ? la fin de chaque r?ponse, ajoute TOUJOURS une section "Sources:" avec des liens cliquables vers les sources utilis?es.
 
 Format standardis? :
@@ -12324,7 +12324,7 @@ Bulles potentielles dans la tech
 Risques g?opolitiques
 Taux d'int?r?t et politique mon?taire
 
-<ì Expertise et Domaines de Comp?tence
+<? Expertise et Domaines de Comp?tence
 Comp?tences principales (niveau CFA) :
 
 Analyse de titres : actions, obligations, produits d?riv?s
@@ -12426,7 +12426,7 @@ Rechercher donn?es contradictoires pour analyse ?quilibr?e
 Actualiser avec donn?es les plus r?centes disponibles
 Mentionner date de derni?re mise ? jour
 
-=¨ Ton et Style de Communication
+=? Ton et Style de Communication
 Principes g?n?raux :
 
 Professionnelle mais accessible : expertise sans jargon inutile
@@ -12473,10 +12473,10 @@ L Acc?der ? des donn?es propri?taires ou confidentielles
 L Remplacer le jugement professionnel de l'?quipe
 Formulations transparentes :
 
-´ Selon les donn?es disponibles... ª
-´ Les analyses sugg?rent que... ª
-´ Parmi les risques ? consid?rer... ª
-´ Cette perspective doit ?tre valid?e par... ª
+? Selon les donn?es disponibles... ?
+? Les analyses sugg?rent que... ?
+? Parmi les risques ? consid?rer... ?
+? Cette perspective doit ?tre valid?e par... ?
 
 =' Int?gration avec le Dashboard Financier
 Contexte technique :
@@ -12497,30 +12497,30 @@ Compl?ter avec recherches externes
 
 =? Exemples d'Interactions
 Question type 1 : Analyse d'un titre
-Utilisateur : ´ Peux-tu analyser BCE Inc. dans le contexte actuel des t?l?coms canadiens ? ª
+Utilisateur : ? Peux-tu analyser BCE Inc. dans le contexte actuel des t?l?coms canadiens ? ?
 Emma :
 Synth?se : BCE pr?sente un profil d?fensif avec rendement attrayant (~7%), mais fait face ? des vents contraires sectoriels (saturation, concurrence, capex 5G).
 [Analyse compl?te suivant la structure : contexte, forces, faiblesses, m?triques, recommandations, risques]
 Sources :
 
 Rapport Q3 2024 BCE
-´ Les t?l?coms canadiens sous pression ª - Les Affaires, oct. 2024
+? Les t?l?coms canadiens sous pression ? - Les Affaires, oct. 2024
 Analyse sectorielle Morningstar
 
 Question type 2 : Macro-?conomie
-Utilisateur : ´ Que penses-tu de l'impact potentiel des tarifs douaniers de Trump sur nos positions manufacturi?res ? ª
+Utilisateur : ? Que penses-tu de l'impact potentiel des tarifs douaniers de Trump sur nos positions manufacturi?res ? ?
 Emma :
 Perspective : Risque ?lev? de compression de marges pour les entreprises avec cha?nes d'approvisionnement int?gr?es US-Canada-Mexique. Opportunit?s contrarian possibles si surr?action du march?.
 [Analyse des impacts sectoriels, identification d'opportunit?s valeur, recommandations de couverture]
 
 Question type 3 : Strat?gie de portefeuille
-Utilisateur : ´ Devrions-nous augmenter notre exposition or actuellement ? ª
+Utilisateur : ? Devrions-nous augmenter notre exposition or actuellement ? ?
 Emma :
 [Analyse du contexte macro : taux r?els, dollar US, tensions g?opolitiques]
 [Corr?lations historiques or/actions/obligations]
 [Sc?narios d'allocation selon convictions]
 
-ñ Signature Emma - Analyste Financi?re
+? Signature Emma - Analyste Financi?re
 Valeurs cardinales dans ce r?le :
 
 Rigueur analytique et m?thodologique
@@ -12529,9 +12529,9 @@ Transparence sur limites et incertitudes
 Pragmatisme orient? d?cisions
 Curiosit? intellectuelle continue
 
-´ Je ne pr?dis pas les march?s. Mais j'analyse, je questionne et j'?claire  avec rigueur et humilit?. ª
+? Je ne pr?dis pas les march?s. Mais j'analyse, je questionne et j'?claire  avec rigueur et humilit?. ?
 
-<¨ Activation
+<? Activation
 Tu es maintenant Emma, Analyste Financi?re Experte.
 R?ponds toujours en fran?ais qu?b?cois, adopte un ton professionnel ?quilibr?, et structure tes analyses selon la m?thodologie d?crite. N'h?site pas ? rechercher sur le web pour fournir des donn?es actuelles et citer tes sources.
 Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
@@ -12621,7 +12621,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                     t = t.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-gray-800/10 text-[0.95em]">$1</code>');
 
                     // Titres de section avec emoji (avec ou sans **titre**)
-                    t = t.replace(/^(=|=?|=°|†||=|=?|=¨|=?|=?|	|=)\s*(?:\*\*(.+?)\*\*|([^\n]+))$/gm, (_m, emj, boldTitle, plainTitle) => {
+                    t = t.replace(/^(=|=?|=?|†||=|=?|=?|=?|=?|	|=)\s*(?:\*\*(.+?)\*\*|([^\n]+))$/gm, (_m, emj, boldTitle, plainTitle) => {
                         const title = boldTitle || plainTitle || '';
                         return `<div class="mt-3 mb-2 font-semibold text-base flex items-center gap-2">${emj} <span>${title}</span></div>`;
                     });
@@ -12661,7 +12661,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                     // R?gles horizontales --- ou ___
                     t = t.replace(/^\s*(?:---|___)\s*$/gm, '<hr class="my-3 opacity-50">');
 
-                    // Mise en avant de la ligne ´ Sources ª
+                    // Mise en avant de la ligne ? Sources ?
                     t = t.replace(/^\s*(?:=\s*)?Sources?\s*:\s*$/gim, '<div class="mt-3 mb-1 font-semibold">= Sources</div>');
 
                     // Paragraphes (double saut) + sauts de ligne simples
@@ -12783,7 +12783,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                             rel="noopener noreferrer"
                                             class="text-blue-600 hover:text-blue-700 underline"
                                         >
-                                            Voir le graphique sur TradingView í
+                                            Voir le graphique sur TradingView ?
                                         </a>
                                     </div>
                                 </div>`;
@@ -12893,17 +12893,17 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    =Ä Acc?s DIRECT aux APIs : Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance
+                                    =? Acc?s DIRECT aux APIs : Finnhub, Alpha Vantage, Twelve Data, Yahoo Finance
                                 </p>
                                 <p className={`text-xs transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-500' : 'text-gray-500'
                                 }`}>
-                                    =° Emma peut faire des requ?tes en temps r?el pour n'importe quel symbole
+                                    =? Emma peut faire des requ?tes en temps r?el pour n'importe quel symbole
                                 </p>
                                 <p className={`text-xs transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                 }`}>
-                                    ô Temp?rature: {emmaTemperature} " Longueur: {emmaMaxTokens} tokens
+                                    ? Temp?rature: {emmaTemperature} " Longueur: {emmaMaxTokens} tokens
                                 </p>
                             </div>
                             <div className="flex gap-2">
@@ -13050,7 +13050,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                         message.type === 'user' ? 'text-blue-100' : message.type === 'sms' ? 'text-green-600' : 'text-gray-400'
                                                     }`}>
                                                         {message.timestamp}
-                                                        {message.cached && <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-bold">=æ Cache</span>}
+                                                        {message.cached && <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-bold">=û Cache</span>}
                                                     </div>
                                                     {/* Indicateur de param?tres pour les messages d'Emma et SMS */}
                                                     {(message.type === 'emma' || message.type === 'sms') && (
@@ -13059,7 +13059,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                         }`}>
                                                             <div className="flex items-center gap-2 flex-wrap">
                                                                 <span className="font-medium flex items-center gap-1">
-                                                                    <Icon emoji="ô" size={16} />
+                                                                    <Icon emoji="?" size={16} />
                                                                     Param?tres:
                                                                 </span>
                                                                 {message.model && message.model !== 'cached' && (
@@ -13074,7 +13074,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                                 )}
                                                                 {message.cached && (
                                                                     <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-300">
-                                                                        =æ Cache (instantan?)
+                                                                        =û Cache (instantan?)
                                                                     </span>
                                                                 )}
                                                                 <span className={`px-1.5 py-0.5 rounded text-xs ${
@@ -13095,7 +13095,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                             </div>
                                                             {message.modelReason && (
                                                                 <div className="text-xs mt-1 text-gray-500 italic">
-                                                                    =° {message.modelReason}
+                                                                    =? {message.modelReason}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -13129,7 +13129,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                     }`}>
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-medium flex items-center gap-1">
-                                                                <Icon emoji="ô" size={16} />
+                                                                <Icon emoji="?" size={16} />
                                                                 Utilise:
                                                             </span>
                                                             <span className={`px-1.5 py-0.5 rounded text-xs ${
@@ -13255,7 +13255,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                     data-emma-send-button
                                     onClick={() => {
                                         console.log('= Bouton Envoyer cliqu? !');
-                                        console.log('=ù Contenu de emmaInput:', emmaInput);
+                                        console.log('=? Contenu de emmaInput:', emmaInput);
                                         console.log('=? ?tat de emmaLoading:', emmaLoading);
                                         sendMessageToEmma();
                                     }}
@@ -13290,7 +13290,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className={`text-lg font-semibold transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>=ù ?diteur de Prompt Emma</h3>
+                                    }`}>=? ?diteur de Prompt Emma</h3>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={resetPrompt}
@@ -13302,7 +13302,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                             onClick={savePrompt}
                                             className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                                         >
-                                            =æ Sauvegarder
+                                            =û Sauvegarder
                                         </button>
                                     </div>
                                 </div>
@@ -13431,7 +13431,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                             }}
                                             className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                                         >
-                                            =æ Sauvegarder
+                                            =û Sauvegarder
                                         </button>
                                     </div>
                                 </div>
@@ -13509,7 +13509,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium"><Ø Mod?r?</div>
+                                                <div className="font-medium"><? Mod?r?</div>
                                                 <div className="text-xs opacity-75">?quilibr? et factuel</div>
                                             </button>
                                             <button
@@ -13522,7 +13522,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium">ñ ?quilibr?</div>
+                                                <div className="font-medium">? ?quilibr?</div>
                                                 <div className="text-xs opacity-75">Professionnel et naturel</div>
                                             </button>
                                             <button
@@ -13586,7 +13586,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                             }}
                                             className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                                         >
-                                            =æ Sauvegarder
+                                            =û Sauvegarder
                                         </button>
                                     </div>
                                 </div>
@@ -13622,7 +13622,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                 onClick={() => setEmmaMaxTokens(1024)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 1024 ? 'bg-green-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                                             >
-                                                <div className="font-medium">=ù Court</div>
+                                                <div className="font-medium">=? Court</div>
                                                 <div className="text-xs opacity-75">2-3 paragraphes</div>
                                             </button>
                                             <button
@@ -13656,10 +13656,10 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                     <div className={`p-3 rounded-lg text-sm ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
                                         <p className="font-medium mb-2">Exemples d'ajustements possibles de maxOutputTokens :</p>
                                         <div className="space-y-2 text-xs">
-                                            <div><strong>1024 í</strong> r?ponses courtes (2-3 paragraphes)</div>
-                                            <div><strong>2048 í</strong> analyses courtes ? moyenne</div>
+                                            <div><strong>1024 ?</strong> r?ponses courtes (2-3 paragraphes)</div>
+                                            <div><strong>2048 ?</strong> analyses courtes ? moyenne</div>
                                             <div><strong>Par D?faut : 4096</strong> analyses moyennes</div>
-                                            <div><strong>8192 í</strong> rapports complets (si mod?le supporte)</div>
+                                            <div><strong>8192 ?</strong> rapports complets (si mod?le supporte)</div>
                                         </div>
                                     </div>
                                 </div>
@@ -13674,7 +13674,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>=° Suggestions rapides</h3>
+                            }`}>=? Suggestions rapides</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {[
                                     "Analyse compl?te de Microsoft",
@@ -13719,7 +13719,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                 <div>" <strong>Actualit?s & Sentiment :</strong> News r?centes avec analyse de sentiment</div>
                                 <div>" <strong>Comparaisons :</strong> Analyse comparative multi-titres (jusqu'? 5)</div>
                                 <div>" <strong>Insights Experts :</strong> Recommandations analystes, transactions d'initi?s</div>
-                                <div className="pt-2 border-t border-blue-300"><strong><Ø Confiance :</strong> Toutes les r?ponses incluent des sources cit?es et un score de fiabilit?</div>
+                                <div className="pt-2 border-t border-blue-300"><strong><? Confiance :</strong> Toutes les r?ponses incluent des sources cit?es et un score de fiabilit?</div>
                             </div>
                         </div>
                     </div>
@@ -13965,7 +13965,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-green-500 font-bold">
-                                                            +{item.change.toFixed(2)}% ë
+                                                            +{item.change.toFixed(2)}% ?
                                                         </div>
                                                         <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                             ${item.price.toFixed(2)}
@@ -14028,7 +14028,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-red-500 font-bold">
-                                                            {item.change.toFixed(2)}% ì
+                                                            {item.change.toFixed(2)}% ?
                                                         </div>
                                                         <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                             ${item.price.toFixed(2)}
@@ -14362,7 +14362,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                             ? 'bg-green-500/20 text-green-500 border border-green-500/30'
                                                             : 'bg-red-500/20 text-red-500 border border-red-500/30'
                                                     }`}>
-                                                        {isPositive ? '≤' : 'º'}
+                                                        {isPositive ? '?' : '?'}
                                                     </div>
                                                 </div>
 
@@ -14446,7 +14446,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                             }`}>=? P/E</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                                 isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                            }`}>=ù Dividende</th>
+                                            }`}>=? Dividende</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                                 isDarkMode ? 'text-blue-300' : 'text-blue-700'
                                             }`}><? Secteur</th>
@@ -14459,7 +14459,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
  Sentiment</th>
                                             <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                                 isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                            }`}>° Actions</th>
+                                            }`}>? Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -14745,7 +14745,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                 <div className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-300' : 'text-blue-700'
                                 }`}>
-                                    =ù Section Principale - Donn?es Financi?res
+                                    =? Section Principale - Donn?es Financi?res
                                 </div>
                                 <div className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-600'
@@ -14900,7 +14900,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                                                     : 'bg-purple-500 hover:bg-purple-600 text-white'
                                             }`}
                                         >
-                                            Voir toutes les actualit?s ({newsData.length}) í
+                                            Voir toutes les actualit?s ({newsData.length}) ?
                                         </button>
                                     </div>
                                 )}
@@ -14930,7 +14930,7 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                 // Screener visibility
                 const [showScreener, setShowScreener] = useState(false);
                 
-                // <Ø Configuration du Score JSLAI" (pond?rations)
+                // <? Configuration du Score JSLAI" (pond?rations)
                 const [jslaiConfig, setJslaiConfig] = useState(() => {
                     const saved = localStorage.getItem('jslaiConfig');
                     return saved ? JSON.parse(saved) : {
@@ -15041,10 +15041,10 @@ Pr?te ? accompagner l'?quipe dans leurs d?cisions d'investissement ?`;
                     };
                 };
 
-                // <Ø CALCULATED SENTIMENT - No AI, pure data-driven analysis
+                // <? CALCULATED SENTIMENT - No AI, pure data-driven analysis
                 // Replaces Perplexity AI with free calculated metrics
 
-                // <Ø Calculate sentiment from financial data (NO AI, NO COST)
+                // <? Calculate sentiment from financial data (NO AI, NO COST)
                 const calculateSentiment = (symbol, stockData) => {
                     const { quote, metrics, ratios, profile, news } = stockData;
 
@@ -15285,7 +15285,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                             ratiosFreshness: ratios?.metadata?.freshness || 'unknown'
                         });
 
-                        // <Ø Calcul du Score JSLAI" Global (0-100)
+                        // <? Calcul du Score JSLAI" Global (0-100)
                         const calculateJSLAIScore = () => {
                             let totalScore = 0;
                             let scores = {};
@@ -15437,7 +15437,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
 
                         const jslaiScore = calculateJSLAIScore();
 
-                        // <Ø Calcul automatique du sentiment et insights bas? sur les donn?es r?elles
+                        // <? Calcul automatique du sentiment et insights bas? sur les donn?es r?elles
                         // Plus besoin de Perplexity - on utilise les donn?es gratuites des APIs
                         console.log('> Calcul du sentiment et insights ? partir des donn?es r?elles...');
 
@@ -15520,7 +15520,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
 
                         // Construire l'objet de donn?es structur?
                         return {
-                            jslaiScore: jslaiScore,  // <Ø Score JSLAI" ajout?
+                            jslaiScore: jslaiScore,  // <? Score JSLAI" ajout?
                             quote: {
                                 symbol: symbol,
                                 name: profile?.data?.[0]?.companyName || profile?.companyName || `${symbol} Inc.`,
@@ -15697,13 +15697,13 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                         } else {
                                             // Pour les p?riodes courtes, utiliser la logique existante
                                             const trend = changePercent > 0 ? 1 : -1;
-                                            const volatility = Math.random() * 0.02 - 0.01; // ±1% de volatilit?
+                                            const volatility = Math.random() * 0.02 - 0.01; // ?1% de volatilit?
                                             const priceVariation = (progress * change) + (volatility * basePrice);
                                             historicalPrice = Math.max(0.01, basePrice + priceVariation);
                                         }
                                         
                                         // Ajouter de la volatilit? r?aliste
-                                        const volatility = Math.random() * 0.015 - 0.0075; // ±0.75% de volatilit?
+                                        const volatility = Math.random() * 0.015 - 0.0075; // ?0.75% de volatilit?
                                         const finalPrice = historicalPrice * (1 + volatility);
                                         
                                         // Calculer OHLC r?alistes
@@ -15766,7 +15766,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                 retail: 70,  // Pas encore disponible via IA
                                 summary: aiData?.sentiment?.summary || 'Analyse en cours'
                             },
-                            // <Ø Nouvelles donn?es avec validation crois?e
+                            // <? Nouvelles donn?es avec validation crois?e
                             analystRecommendations: analystData ? {
                                 consensus: analystData.consensus?.rating || 'N/A',
                                 targetPrice: analystData.consensus?.targetPrice || null,
@@ -15819,13 +15819,13 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                 consensus: aiData?.insights?.consensus || 'neutral',
                                 reasoning: aiData?.insights?.reasoning || 'Analyse bas?e sur les donn?es de march? actuelles'
                             },
-                            // <Ø Recommandations d'analyste IA (batch Perplexity)
+                            // <? Recommandations d'analyste IA (batch Perplexity)
                             aiAnalyst: aiData?.analyst ? {
                                 recommendation: aiData.analyst.recommendation,
                                 confidence: aiData.analyst.confidence,
                                 keyPoints: aiData.analyst.keyPoints
                             } : null,
-                            // <Ø Indicateurs de fallback pour transparence
+                            // <? Indicateurs de fallback pour transparence
                             fallbackIndicators: fallbackIndicators,
                             dataQuality: {
                                 total_sections: totalSections,
@@ -15895,7 +15895,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                         }
                     };
                     fetchData();
-                    // ° OPTIMISATION API: Pas d'auto-refresh
+                    // ? OPTIMISATION API: Pas d'auto-refresh
                     // Chargement uniquement au changement de stock ou manuel
                 }, [selectedStock]);
 
@@ -15927,7 +15927,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                     }
                 }, [selectedStock, isDarkMode]);
 
-                // ° AUTO-REFRESH: D?sactiv? - Chargement unique ? l'arriv?e sur la page
+                // ? AUTO-REFRESH: D?sactiv? - Chargement unique ? l'arriv?e sur la page
                 // L'utilisateur peut actualiser manuellement via le bouton refresh
                 // Les caches API optimisent les appels r?p?t?s:
                 // - Quotes: 5 min cache
@@ -16491,7 +16491,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                             ) : (
                                                 <LucideIcon name="WifiOff" className="w-3 h-3 text-red-500" />
                                             )}
-                                            {/* <Ø Badge Score JSLAI" avec Glow Animation - VAGUE 3+4 */}
+                                            {/* <? Badge Score JSLAI" avec Glow Animation - VAGUE 3+4 */}
                                             {stockDataIntelli?.jslaiScore && (
                                                 <div className={`px-4 py-1.5 rounded text-sm font-bold border-2 ${
                                                     stockDataIntelli.jslaiScore.total >= 75 ? 'bg-emerald-900/30 text-emerald-400 border-emerald-600 glow-pulse' :
@@ -16499,7 +16499,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                     stockDataIntelli.jslaiScore.total >= 50 ? 'bg-yellow-900/30 text-yellow-400 border-yellow-600' :
                                                     'bg-red-900/30 text-red-400 border-red-600 glow-pulse-red'
                                                 }`}>
-                                                    <Ø JSLAI" {stockDataIntelli.jslaiScore.total}/100
+                                                    <? JSLAI" {stockDataIntelli.jslaiScore.total}/100
                                                 </div>
                                             )}
                                             {/* Emma AI Analysis Button with Avatar */}
@@ -17151,7 +17151,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                     movingAverages.sma20?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
                                                 }`}>
                                                     {movingAverages.interpretation?.sma20}
-                                                    {movingAverages.sma20?.diff > 0 ? ' ë' : ' ì'}
+                                                    {movingAverages.sma20?.diff > 0 ? ' ?' : ' ?'}
                                                 </div>
                                                 <div className={`text-xs font-bold ${
                                                     Math.abs(movingAverages.sma20?.diff || 0) > 5 
@@ -17163,9 +17163,9 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                             </div>
                                             <div className="text-[7px] text-gray-500 mt-1 italic">
                                                 {Math.abs(movingAverages.sma20?.diff || 0) < 2 
-                                                    ? '=° Proche de la moyenne - Zone de consolidation'
+                                                    ? '=? Proche de la moyenne - Zone de consolidation'
                                                     : movingAverages.sma20?.diff > 5 
-                                                    ? '=Ä Fort au-dessus - Momentum haussier'
+                                                    ? '=? Fort au-dessus - Momentum haussier'
                                                     : movingAverages.sma20?.diff < -5
                                                     ? '† Fort en-dessous - Pression baissi?re'
                                                     : movingAverages.sma20?.diff > 0
@@ -17189,7 +17189,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                     movingAverages.sma50?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
                                                 }`}>
                                                     {movingAverages.interpretation?.sma50}
-                                                    {movingAverages.sma50?.diff > 0 ? ' ë' : ' ì'}
+                                                    {movingAverages.sma50?.diff > 0 ? ' ?' : ' ?'}
                                                 </div>
                                                 <div className={`text-xs font-bold ${
                                                     Math.abs(movingAverages.sma50?.diff || 0) > 5 
@@ -17205,7 +17205,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                     : movingAverages.sma50?.diff < 0 && movingAverages.sma20?.diff < 0
                                                     ? '=? Tendance moyen terme n?gative'
                                                     : movingAverages.sma50?.diff > 0
-                                                    ? '° Support potentiel - Test en cours'
+                                                    ? '? Support potentiel - Test en cours'
                                                     : '† R?sistance - Vigilance recommand?e'}
                                             </div>
                                         </div>
@@ -17225,7 +17225,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                     movingAverages.sma200?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
                                                 }`}>
                                                     {movingAverages.interpretation?.sma200}
-                                                    {movingAverages.sma200?.diff > 0 ? ' ë' : ' ì'}
+                                                    {movingAverages.sma200?.diff > 0 ? ' ?' : ' ?'}
                                                 </div>
                                                 <div className={`text-xs font-bold ${
                                                     Math.abs(movingAverages.sma200?.diff || 0) > 10 
@@ -17237,7 +17237,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                             </div>
                                             <div className="text-[7px] text-gray-500 mt-1 italic">
                                                 {movingAverages.sma200?.diff > 10
-                                                    ? '<Ø Bull Market confirm? - Tendance long terme haussi?re'
+                                                    ? '<? Bull Market confirm? - Tendance long terme haussi?re'
                                                     : movingAverages.sma200?.diff > 0
                                                     ? ' Au-dessus SMA200 - March? haussier'
                                                     : movingAverages.sma200?.diff < -10
@@ -17265,7 +17265,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                             ) : movingAverages.sma20.value < movingAverages.sma50.value && movingAverages.sma50.value < movingAverages.sma200.value ? (
                                                 <div>† Configuration baissi?re : SMA20 &lt; SMA50 &lt; SMA200. Pression vendeuse sur tous les horizons. Prudence recommand?e.</div>
                                             ) : movingAverages.sma20.value > movingAverages.sma50.value ? (
-                                                <div>° Croisement r?cent possible : SMA20 au-dessus de SMA50. Signal de retournement haussier ? confirmer.</div>
+                                                <div>? Croisement r?cent possible : SMA20 au-dessus de SMA50. Signal de retournement haussier ? confirmer.</div>
                                             ) : (
                                                 <div>=? Moyennes d?salign?es : Configuration mixte. Attendre confirmation de tendance avant prise de position.</div>
                                             )}
@@ -17633,7 +17633,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                         </h3>
                                         <div className="space-y-2">
                                             <div>
-                                                <div className="text-[9px] text-gray-500 mb-1 font-semibold">=Ä Catalyseurs</div>
+                                                <div className="text-[9px] text-gray-500 mb-1 font-semibold">=? Catalyseurs</div>
                                                 {insights.catalysts.map((cat, i) => (
                                                     <div key={i} className="text-[8px] text-emerald-400 mb-0.5">" {cat}</div>
                                                 ))}
@@ -17653,7 +17653,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                         insights.consensus === 'bearish' ? 'text-red-500' : 'text-gray-400'
                                                     }`}>
                                                         {insights.consensus === 'bullish' ? '=? Bullish' : 
-                                                         insights.consensus === 'bearish' ? '=? Bearish' : 'ñ Neutre'}
+                                                         insights.consensus === 'bearish' ? '=? Bearish' : '? Neutre'}
                                                     </span>
                                                 </div>
                                                 <div className="text-[8px] text-gray-400">{insights.reasoning}</div>
@@ -18053,7 +18053,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                         'AUD': '<?<?',
                         'CHF': '<?<?',
                         'CNY': '<?<?',
-                        'NZD': '<?<ù'
+                        'NZD': '<?<?'
                     };
                     return flags[currency] || '<';
                 };
@@ -18206,10 +18206,10 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                         : 'bg-white text-gray-900 border-gray-300'
                                                 } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                             >
-                                                <option value="all">All Stocks</option>
-                                                <option value="team">=e Team ({teamTickers.length})</option>
-                                                <option value="watchlist">P Watchlist ({watchlistTickers.length})</option>
-                                                <option value="both"><Ø Team + Watchlist ({teamTickers.length + watchlistTickers.length})</option>
+                                                <option value="all">Tous les titres</option>
+                                                <option value="team">?? …quipe ({teamTickers.length})</option>
+                                                <option value="watchlist">? Watchlist ({watchlistTickers.length})</option>
+                                                <option value="both">?? …quipe + Watchlist ({teamTickers.length + watchlistTickers.length})</option>
                                             </select>
                                         </div>
                                     )}
@@ -18229,7 +18229,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                     filterTickerGroup !== 'all' ? 'opacity-50 cursor-not-allowed' : ''
                                                 }`}
                                             >
-                                                <option value="all">Specific Ticker ({availableTickers.length})</option>
+                                                <option value="all">Ticker spÈcifique ({availableTickers.length})</option>
                                                 {availableTickers.map(ticker => (
                                                     <option key={ticker} value={ticker}>
                                                         {ticker}
@@ -18315,7 +18315,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-cyan-900 text-cyan-200' : 'bg-cyan-100 text-cyan-800'}`}>
                                                 {filterTickerGroup === 'team' ? '=e Team Tickers' :
                                                  filterTickerGroup === 'watchlist' ? 'P Watchlist Tickers' :
-                                                 '<Ø Team + Watchlist'}
+                                                 '<? Team + Watchlist'}
                                             </span>
                                         )}
                                         {filterTicker !== 'all' && (
@@ -19188,7 +19188,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                         </div>
 
                         {/* ========================================== */}
-                        {/* SECTION 2: =± MARCH?S FOREX                */}
+                        {/* SECTION 2: =? MARCH?S FOREX                */}
                         {/* ========================================== */}
                         <div className="mb-4">
                             <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
@@ -19197,7 +19197,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-green-400' : 'text-green-600'
                                 }`}>
-                                    =± March?s Forex
+                                    =? March?s Forex
                                 </h3>
                             </div>
                         </div>
@@ -19210,7 +19210,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                 <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    =± Forex Heat Map
+                                    =? Forex Heat Map
                                 </h2>
                                 <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -19258,7 +19258,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                 <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    =± Forex Cross Rates
+                                    =? Forex Cross Rates
                                 </h2>
                                 <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -19474,8 +19474,8 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                                         { symbol: 'NASDAQ:NVDA', name: 'NVDA - NVIDIA', category: '<N Tech' },
                                                         { symbol: 'NASDAQ:TSLA', name: 'TSLA - Tesla', category: '<N Tech' },
                                                         { symbol: 'NASDAQ:META', name: 'META - Meta', category: '<N Tech' },
-                                                        { symbol: 'BITSTAMP:BTCUSD', name: 'BTC - Bitcoin', category: 'ø Crypto' },
-                                                        { symbol: 'BITSTAMP:ETHUSD', name: 'ETH - Ethereum', category: 'ø Crypto' },
+                                                        { symbol: 'BITSTAMP:BTCUSD', name: 'BTC - Bitcoin', category: '? Crypto' },
+                                                        { symbol: 'BITSTAMP:ETHUSD', name: 'ETH - Ethereum', category: '? Crypto' },
                                                         { symbol: 'NYSE:JPM', name: 'JPM - JPMorgan', category: '<? Finance' },
                                                         { symbol: 'NYSE:BAC', name: 'BAC - Bank of America', category: '<? Finance' },
                                                         { symbol: 'NYSE:GS', name: 'GS - Goldman Sachs', category: '<? Finance' }
@@ -20163,7 +20163,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                     <h4 className={`font-bold mb-2 ${
                                         darkMode ? 'text-blue-300' : 'text-blue-800'
                                     }`}>
-                                        =° ? propos de la courbe des taux
+                                        =? ? propos de la courbe des taux
                                     </h4>
                                     <ul className={`text-sm space-y-1 ${
                                         darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -20532,7 +20532,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                     <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        =Ä Screener - Top Gainers & Losers
+                                        =? Screener - Top Gainers & Losers
                                     </h3>
                                     <p className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -20677,7 +20677,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                                         : 'bg-yellow-50 border-yellow-300 text-yellow-800'
                                 }`}>
                                     <div className="flex items-start gap-3">
-                                        <span className="text-xl">=°</span>
+                                        <span className="text-xl">=?</span>
                                         <div>
                                             <p className="font-semibold mb-1">R?sultats similaires affich?s</p>
                                             <p className="text-sm">
