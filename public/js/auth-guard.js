@@ -112,6 +112,7 @@
       const userInfoDiv = document.createElement('div');
       userInfoDiv.id = 'user-info-display';
       userInfoDiv.className = 'fixed top-4 right-4 bg-white rounded-lg shadow-lg px-4 py-2 flex items-center gap-3 z-50';
+      userInfoDiv.style.display = 'none'; // Rendre invisible
 
       // Icône selon le rôle
       const roleIcons = {
@@ -144,6 +145,7 @@
       const logoutBtn = document.createElement('button');
       logoutBtn.id = 'logout-btn';
       logoutBtn.className = 'fixed top-4 right-52 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all z-50 flex items-center gap-2';
+      logoutBtn.style.display = 'none'; // Rendre invisible
       logoutBtn.innerHTML = `
         <i class="iconoir-log-out"></i>
         <span>Déconnexion</span>
