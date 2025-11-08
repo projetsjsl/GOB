@@ -1,0 +1,185 @@
+{
+  "name": "GOB Theme Colors",
+  "version": "1.0.0",
+  "description": "Configuration centralisée des couleurs pour le site web et tous les emails",
+  
+  "colors": {
+    "primary": {
+      "value": "#6366f1",
+      "name": "Indigo-500",
+      "description": "Couleur principale du thème"
+    },
+    "primaryDark": {
+      "value": "#4f46e5",
+      "name": "Indigo-600",
+      "description": "Variante foncée pour textes et accents"
+    },
+    "primaryLight": {
+      "value": "#8b5cf6",
+      "name": "Violet-500",
+      "description": "Variante claire pour gradients"
+    },
+    "secondary": {
+      "value": "#7c3aed",
+      "name": "Violet-600",
+      "description": "Couleur secondaire"
+    },
+    "success": {
+      "value": "#10b981",
+      "name": "Emerald-500",
+      "description": "Pour indicateurs positifs et accents verts"
+    },
+    "warning": {
+      "value": "#f59e0b",
+      "name": "Amber-500",
+      "description": "Pour alertes et warnings"
+    },
+    "error": {
+      "value": "#ef4444",
+      "name": "Red-500",
+      "description": "Pour erreurs"
+    },
+    "text": {
+      "dark": {
+        "value": "#1f2937",
+        "name": "Gray-800",
+        "description": "Texte principal"
+      },
+      "medium": {
+        "value": "#4b5563",
+        "name": "Gray-600",
+        "description": "Texte secondaire"
+      },
+      "light": {
+        "value": "#6b7280",
+        "name": "Gray-500",
+        "description": "Texte tertiaire"
+      },
+      "muted": {
+        "value": "#9ca3af",
+        "name": "Gray-400",
+        "description": "Texte désactivé/muted"
+      }
+    },
+    "background": {
+      "white": {
+        "value": "#ffffff",
+        "name": "White",
+        "description": "Fond blanc"
+      },
+      "light": {
+        "value": "#f8fafc",
+        "name": "Gray-50",
+        "description": "Fond clair"
+      },
+      "medium": {
+        "value": "#f1f5f9",
+        "name": "Slate-100",
+        "description": "Fond moyen"
+      },
+      "dark": {
+        "value": "#e2e8f0",
+        "name": "Slate-200",
+        "description": "Fond sombre"
+      }
+    },
+    "border": {
+      "light": {
+        "value": "#e5e7eb",
+        "name": "Gray-200",
+        "description": "Bordures légères"
+      },
+      "medium": {
+        "value": "#d1d5db",
+        "name": "Gray-300",
+        "description": "Bordures moyennes"
+      },
+      "dark": {
+        "value": "#9ca3af",
+        "name": "Gray-400",
+        "description": "Bordures sombres"
+      }
+    }
+  },
+  
+  "gradients": {
+    "primary": {
+      "value": "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+      "description": "Gradient principal purple/indigo"
+    },
+    "primaryAlt": {
+      "value": "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)",
+      "description": "Gradient alternatif indigo"
+    },
+    "secondary": {
+      "value": "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+      "description": "Gradient secondaire violet"
+    },
+    "success": {
+      "value": "linear-gradient(135deg, #059669 0%, #10b981 100%)",
+      "description": "Gradient pour succès"
+    },
+    "warning": {
+      "value": "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+      "description": "Gradient pour warnings (matin)"
+    },
+    "info": {
+      "value": "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+      "description": "Gradient pour info (midi)"
+    }
+  },
+  
+  "email": {
+    "fonts": {
+      "primary": "'Inter', 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "monospace": "monospace"
+    },
+    "spacing": {
+      "containerMaxWidth": "700px",
+      "padding": {
+        "small": "20px",
+        "medium": "30px",
+        "large": "40px"
+      },
+      "borderRadius": {
+        "small": "8px",
+        "medium": "12px",
+        "large": "16px"
+      }
+    },
+    "shadows": {
+      "small": "0 2px 4px rgba(0, 0, 0, 0.05)",
+      "medium": "0 4px 6px rgba(0, 0, 0, 0.1)",
+      "large": "0 10px 25px rgba(99, 102, 241, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)",
+      "primary": "0 4px 12px rgba(99, 102, 241, 0.15)"
+    }
+  },
+  
+  "briefingTypes": {
+    "morning": {
+      "headerGradient": "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+      "backgroundColor": "#fef3c7",
+      "tickerBoxGradient": "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+      "tickerBoxBorder": "#f59e0b",
+      "tickerTextColor": "#92400e",
+      "emoji": "🌅"
+    },
+    "midday": {
+      "headerGradient": "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+      "backgroundColor": "#eff6ff",
+      "tickerBoxGradient": "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
+      "tickerBoxBorder": "#3b82f6",
+      "tickerTextColor": "#1e40af",
+      "emoji": "☀️"
+    },
+    "evening": {
+      "headerGradient": "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+      "backgroundColor": "#f3e8ff",
+      "tickerBoxGradient": "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+      "tickerBoxBorder": "#8b5cf6",
+      "tickerTextColor": "#6b21a8",
+      "emoji": "🌆"
+    }
+  }
+}
+

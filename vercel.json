@@ -79,7 +79,13 @@
     },
     "api/treasury-rates.js": {
       "maxDuration": 30
-    }
+    },
+        "api/briefing-prompts.js": {
+          "maxDuration": 10
+        },
+        "api/theme-colors.js": {
+          "maxDuration": 10
+        }
   },
   "headers": [
     {
