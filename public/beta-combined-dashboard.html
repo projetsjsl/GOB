@@ -4164,46 +4164,175 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
                     )}
 
-                    {/* Section État des Connexions */}
+                    {/* Section État des Connexions & Diagnostic des APIs - FUSIONNÉE */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                         isDarkMode 
                             ? 'bg-gray-900 border-gray-700' 
                             : 'bg-gray-50 border-gray-200'
                     }`}>
-                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔗 État des Connexions</h3>
-                        <div className="space-y-3">
-                            {Object.entries(apiStatus).map(([api, status]) => (
-                                <div key={api} className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
-                                }`}>
-                                    <span className={`font-mono capitalize transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>{api}</span>
-                                    <div className="flex items-center gap-2">
-                                        <span className={`w-3 h-3 rounded-full ${
-                                            status.status === 'success' ? 'bg-green-500' :
-                                            status.status === 'warning' ? 'bg-yellow-500' :
-                                            status.status === 'error' ? 'bg-red-500' : 'bg-gray-500'
-                                        }`}></span>
-                                        <span className={`text-sm transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>🔗 État des Connexions & Diagnostic des APIs</h3>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={async () => {
+                                        await checkApiStatus();
+                                        await runHealthCheck();
+                                    }}
+                                    disabled={healthCheckLoading}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
+                                        healthCheckLoading
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-gray-800 text-white hover:bg-gray-700'
+                                    }`}
+                                >
+                                    {healthCheckLoading ? 'Vérification...' : '🔄 Vérifier Toutes'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Status Global (si healthStatus disponible) */}
+                        {healthStatus && (
+                            <div className={`p-4 rounded-lg border-2 mb-4 ${
+                                healthStatus.overall_status === 'healthy'
+                                    ? 'bg-green-50 border-green-200'
+                                    : healthStatus.overall_status === 'degraded'
+                                    ? 'bg-yellow-50 border-yellow-200'
+                                    : 'bg-red-50 border-red-200'
+                            }`}>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h4 className={`font-bold text-lg ${
+                                            healthStatus.overall_status === 'healthy'
+                                                ? 'text-green-800'
+                                                : healthStatus.overall_status === 'degraded'
+                                                ? 'text-yellow-800'
+                                                : 'text-red-800'
                                         }`}>
-                                            {status.responseTime}ms
-                                        </span>
+                                            {healthStatus.overall_status === 'healthy' ? '🟢' :
+                                             healthStatus.overall_status === 'degraded' ? '🟡' : '🔴'}
+                                            Status Global: {healthStatus.overall_status.toUpperCase()}
+                                        </h4>
+                                        <p className={`text-sm ${
+                                            healthStatus.overall_status === 'healthy'
+                                                ? 'text-green-600'
+                                                : healthStatus.overall_status === 'degraded'
+                                                ? 'text-yellow-600'
+                                                : 'text-red-600'
+                                        }`}>
+                                            {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs opérationnelles
+                                            ({Math.round((healthStatus.healthy_apis / healthStatus.total_apis) * 100)}%)
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className={`text-sm font-medium ${
+                                            healthStatus.overall_status === 'healthy'
+                                                ? 'text-green-600'
+                                                : healthStatus.overall_status === 'degraded'
+                                                ? 'text-yellow-600'
+                                                : 'text-red-600'
+                                        }`}>
+                                            {healthStatus.response_time_ms}ms
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            {new Date(healthStatus.timestamp).toLocaleTimeString('fr-FR')}
+                                        </p>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                        <div className="flex gap-2 mt-4">
-                            <button
-                                onClick={checkApiStatus}
-                                className="flex-1 px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
-                            >
-                                🔄 Vérifier
-                            </button>
-                        </div>
+                            </div>
+                        )}
+
+                        {/* Liste détaillée des connexions */}
+                        {Object.keys(apiStatus).length > 0 && (
+                            <div className="space-y-3 mb-4">
+                                <h4 className={`text-sm font-semibold mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>Connexions détaillées:</h4>
+                                {Object.entries(apiStatus).map(([api, status]) => (
+                                    <div key={api} className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                                    }`}>
+                                        <div className="flex-1">
+                                            <span className={`font-mono capitalize transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            }`}>{api}</span>
+                                            {status.error && (
+                                                <div className={`text-xs mt-1 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-red-400' : 'text-red-600'
+                                                }`}>
+                                                    {status.error}
+                                                </div>
+                                            )}
+                                            {status.source && (
+                                                <div className={`text-xs mt-1 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                                                }`}>
+                                                    Source: {status.source}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`w-3 h-3 rounded-full ${
+                                                status.status === 'success' ? 'bg-green-500' :
+                                                status.status === 'warning' ? 'bg-yellow-500' :
+                                                status.status === 'error' ? 'bg-red-500' : 'bg-gray-500'
+                                            }`}></span>
+                                            <span className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            }`}>
+                                                {status.responseTime}ms
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Recommandations (si healthStatus disponible) */}
+                        {healthStatus && healthStatus.recommendations && healthStatus.recommendations.length > 0 && (
+                            <div className={`p-4 rounded-lg mt-4 ${
+                                isDarkMode ? 'bg-gray-800' : 'bg-gray-700'
+                            }`}>
+                                <h4 className={`font-semibold mb-3 ${
+                                    isDarkMode ? 'text-white' : 'text-blue-900'
+                                }`}>
+                                    💡 Recommandations
+                                </h4>
+                                <div className="space-y-2">
+                                    {healthStatus.recommendations.map((rec, index) => (
+                                        <div key={index} className={`p-3 rounded-lg ${
+                                            rec.priority === 'critical' ? 'bg-red-100 border border-red-200' :
+                                            rec.priority === 'high' ? 'bg-green-100 border border-green-200' :
+                                            'bg-yellow-100 border border-yellow-200'
+                                        }`}>
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <p className={`font-medium text-sm ${
+                                                        rec.priority === 'critical' ? 'text-red-800' :
+                                                        rec.priority === 'high' ? 'text-green-800' :
+                                                        'text-yellow-800'
+                                                    }`}>
+                                                        {rec.priority === 'critical' ? '🚨' :
+                                                         rec.priority === 'high' ? '⚠️' : '💡'}
+                                                        {rec.message}
+                                                    </p>
+                                                    <p className="text-xs text-gray-600 mt-1">
+                                                        <strong>Action:</strong> {rec.action}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {Object.keys(apiStatus).length === 0 && !healthStatus && (
+                            <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <p>Cliquez sur "🔄 Vérifier Toutes" pour diagnostiquer les connexions</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Section Monitoring API Emma */}
@@ -4409,176 +4538,6 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
                     </div>
 
-                    {/* Health Check Panel (déplacé depuis Emma En Direct) */}
-                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
-                    }`}>
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🏥 Diagnostic des APIs</h3>
-                            <button
-                                onClick={runHealthCheck}
-                                disabled={healthCheckLoading}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-300 ${
-                                    healthCheckLoading
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-gray-800 text-white hover:bg-gray-700'
-                                }`}
-                            >
-                                {healthCheckLoading ? 'Vérification...' : '🔍 Vérifier APIs'}
-                            </button>
-                        </div>
-
-                        {healthStatus && (
-                            <div className="space-y-4">
-                                {/* Status Global */}
-                                <div className={`p-4 rounded-lg border-2 ${
-                                    healthStatus.overall_status === 'healthy'
-                                        ? 'bg-green-50 border-green-200'
-                                        : healthStatus.overall_status === 'degraded'
-                                        ? 'bg-yellow-50 border-yellow-200'
-                                        : 'bg-red-50 border-red-200'
-                                }`}>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h4 className={`font-bold text-lg ${
-                                                healthStatus.overall_status === 'healthy'
-                                                    ? 'text-green-800'
-                                                    : healthStatus.overall_status === 'degraded'
-                                                    ? 'text-yellow-800'
-                                                    : 'text-red-800'
-                                            }`}>
-                                                {healthStatus.overall_status === 'healthy' ? '🟢' :
-                                                 healthStatus.overall_status === 'degraded' ? '🟡' : '🔴'}
-                                                Status Global: {healthStatus.overall_status.toUpperCase()}
-                                            </h4>
-                                            <p className={`text-sm ${
-                                                healthStatus.overall_status === 'healthy'
-                                                    ? 'text-green-600'
-                                                    : healthStatus.overall_status === 'degraded'
-                                                    ? 'text-yellow-600'
-                                                    : 'text-red-600'
-                                            }`}>
-                                                {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs opérationnelles
-                                                ({Math.round((healthStatus.healthy_apis / healthStatus.total_apis) * 100)}%)
-                                            </p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className={`text-sm font-medium ${
-                                                healthStatus.overall_status === 'healthy'
-                                                    ? 'text-green-600'
-                                                    : healthStatus.overall_status === 'degraded'
-                                                    ? 'text-yellow-600'
-                                                    : 'text-red-600'
-                                            }`}>
-                                                {healthStatus.response_time_ms}ms
-                                            </p>
-                                            <p className="text-xs text-gray-500">
-                                                {new Date(healthStatus.timestamp).toLocaleTimeString('fr-FR')}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* APIs Status Grid */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {Object.entries(healthStatus.apis).map(([name, api]) => (
-                                        <div key={name} className={`p-3 rounded-lg border ${
-                                            api.status === 'healthy'
-                                                ? 'bg-green-50 border-green-200'
-                                                : api.status === 'degraded'
-                                                ? 'bg-yellow-50 border-yellow-200'
-                                                : 'bg-red-50 border-red-200'
-                                        }`}>
-                                            <div className="flex items-center justify-between mb-2">
-                                                <h5 className={`font-semibold text-sm ${
-                                                    api.status === 'healthy'
-                                                        ? 'text-green-800'
-                                                        : api.status === 'degraded'
-                                                        ? 'text-yellow-800'
-                                                        : 'text-red-800'
-                                                }`}>
-                                                    {api.status === 'healthy' ? '🟢' :
-                                                     api.status === 'degraded' ? '🟡' : '🔴'}
-                                                    {name.replace(/_/g, ' ').toUpperCase()}
-                                                </h5>
-                                                <span className={`text-xs font-medium ${
-                                                    api.status === 'healthy'
-                                                        ? 'text-green-600'
-                                                        : api.status === 'degraded'
-                                                        ? 'text-yellow-600'
-                                                        : 'text-red-600'
-                                                }`}>
-                                                    {api.response_time_ms}ms
-                                                </span>
-                                            </div>
-
-                                            {api.details && (
-                                                <div className="text-xs text-gray-600 mb-2">
-                                                    <p><strong>Rate Limit:</strong> {api.details.rate_limit}</p>
-                                                    <p><strong>Reliability:</strong> {api.details.reliability}</p>
-                                                </div>
-                                            )}
-
-                                            {api.error && (
-                                                <p className="text-xs text-red-600 font-medium">
-                                                    ❌ {api.error}
-                                                </p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Recommandations */}
-                                {healthStatus.recommendations && healthStatus.recommendations.length > 0 && (
-                                    <div className={`p-4 rounded-lg ${
-                                        isDarkMode ? 'bg-gray-800' : 'bg-gray-700'
-                                    }`}>
-                                        <h4 className={`font-semibold mb-3 ${
-                                            isDarkMode ? 'text-white' : 'text-blue-900'
-                                        }`}>
-                                        <Icon emoji="💡" size={18} className="mr-2 inline-block" />
-                                        Recommandations
-                                    </h4>
-                                        <div className="space-y-2">
-                                            {healthStatus.recommendations.map((rec, index) => (
-                                                <div key={index} className={`p-3 rounded-lg ${
-                                                    rec.priority === 'critical' ? 'bg-red-100 border border-red-200' :
-                                                    rec.priority === 'high' ? 'bg-green-100 border border-green-200' :
-                                                    'bg-yellow-100 border border-yellow-200'
-                                                }`}>
-                                                    <div className="flex items-start justify-between">
-                                                        <div className="flex-1">
-                                                            <p className={`font-medium text-sm ${
-                                                                rec.priority === 'critical' ? 'text-red-800' :
-                                                                rec.priority === 'high' ? 'text-green-800' :
-                                                                'text-yellow-800'
-                                                            }`}>
-                                                                {rec.priority === 'critical' ? '🚨' :
-                                                                 rec.priority === 'high' ? '⚠️' : '💡'}
-                                                                {rec.message}
-                                                            </p>
-                                                            <p className="text-xs text-gray-600 mt-1">
-                                                                <strong>Action:</strong> {rec.action}
-                                                            </p>
-                                                        </div>
-                                                        <span className={`text-xs px-2 py-1 rounded ${
-                                                            rec.priority === 'critical' ? 'bg-red-200 text-red-800' :
-                                                            rec.priority === 'high' ? 'bg-green-200 text-green-800' :
-                                                            'bg-yellow-200 text-yellow-800'
-                                                        }`}>
-                                                            {rec.priority}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
 
                     {/* Section Configuration */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
