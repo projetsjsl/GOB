@@ -1213,28 +1213,33 @@ const fetchHybridData = async (symbol, dataType) => {
                         { symbol: '^FVX', name: 'US 5Y', type: 'bond' }
                     ];
 
-                    const tickerResults = [];
-                    for (const item of symbols) {
+                    // OPTIMISATION: Chargement parallèle au lieu de séquentiel
+                    const symbolSymbols = symbols.map(s => s.symbol);
+                    const tickerPromises = symbolSymbols.map(async (symbol, index) => {
                         try {
-                            const response = await fetch(`${API_BASE_URL}/api/marketdata?symbol=${encodeURIComponent(item.symbol)}`);
+                            const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${encodeURIComponent(symbol)}&source=auto`);
                             if (response.ok) {
                                 const data = await response.json();
-                                if (data.success && data.data) {
-                                    const quote = data.data;
-                                    tickerResults.push({
+                                if (data && data.c !== undefined) {
+                                    const item = symbols[index];
+                                    return {
                                         symbol: item.symbol,
                                         name: item.name,
                                         type: item.type,
-                                        price: quote.c || quote.price || 0,
-                                        change: quote.d || quote.change || 0,
-                                        changePercent: quote.dp || quote.changePercent || 0
-                                    });
+                                        price: data.c || data.price || 0,
+                                        change: data.d || data.change || 0,
+                                        changePercent: data.dp || data.changePercent || 0
+                                    };
                                 }
                             }
                         } catch (err) {
-                            console.error(`Erreur chargement ${item.symbol}:`, err);
+                            console.error(`Erreur chargement ${symbol}:`, err);
                         }
-                    }
+                        return null;
+                    });
+
+                    // Attendre tous les appels en parallèle
+                    const tickerResults = (await Promise.all(tickerPromises)).filter(Boolean);
                     setTickerData(tickerResults);
                     addLog(`✅ Ticker chargé: ${tickerResults.length} instruments`, 'success');
                 } catch (error) {
@@ -1294,11 +1299,62 @@ const fetchHybridData = async (symbol, dataType) => {
                 let successCount = 0;
                 let errorCount = 0;
                 
-                for (const ticker of tickers) {
-                    console.log(`📊 Récupération des données pour ${ticker}...`);
+                // OPTIMISATION: Utiliser batch endpoint si plusieurs tickers, sinon appels parallèles
+                if (tickers.length > 1) {
+                    try {
+                        // Utiliser le batch endpoint pour optimiser les appels API
+                        const symbolsQuery = tickers.join(',');
+                        const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
+                        
+                        if (batchResponse.ok) {
+                            const batchData = await batchResponse.json();
+                            if (batchData.success && batchData.data) {
+                                const quotes = batchData.data.quote || {};
+                                const fundamentals = batchData.data.fundamentals || {};
+                                
+                                tickers.forEach(ticker => {
+                                    const tickerUpper = ticker.toUpperCase();
+                                    const quote = quotes[tickerUpper];
+                                    const fundamental = fundamentals[tickerUpper];
+                                    
+                                    if (quote || fundamental) {
+                                        newStockData[ticker] = {
+                                            symbol: tickerUpper,
+                                            c: quote?.c || fundamental?.quote?.price || 0,
+                                            d: quote?.d || fundamental?.quote?.change || 0,
+                                            dp: quote?.dp || fundamental?.quote?.changesPercentage || 0,
+                                            h: quote?.h || 0,
+                                            l: quote?.l || 0,
+                                            o: quote?.o || 0,
+                                            v: quote?.v || 0,
+                                            fundamentals: fundamental || null,
+                                            timestamp: new Date().toISOString()
+                                        };
+                                        successCount++;
+                                    } else {
+                                        errorCount++;
+                                    }
+                                });
+                                
+                                console.log(`✅ Batch chargé: ${successCount} succès`);
+                            }
+                        } else {
+                            throw new Error('Batch endpoint failed');
+                        }
+                    } catch (batchError) {
+                        console.warn('⚠️ Batch endpoint failed, fallback to parallel individual requests:', batchError);
+                        // Fallback: appels parallèles individuels
+                        await refreshAllStocksParallel(tickers, newStockData, { successCount: 0, errorCount: 0 });
+                        successCount = newStockData._successCount || 0;
+                        errorCount = newStockData._errorCount || 0;
+                        delete newStockData._successCount;
+                        delete newStockData._errorCount;
+                    }
+                } else if (tickers.length === 1) {
+                    // Single ticker - appel direct
+                    const ticker = tickers[0];
                     try {
                         const data = await fetchStockData(ticker);
-                        // Charger les fondamentaux pour alimenter P/E/Dividende/Secteur
                         let fundamentals = null;
                         try {
                             const fundamentalsResp = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${ticker}&source=auto`);
@@ -1313,9 +1369,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                 timestamp: new Date().toISOString()
                             };
                             successCount++;
-                            console.log(`✅ ${ticker}: Données récupérées`, data);
                         } else {
-                            console.log(`⚠️ ${ticker}: Pas de données ou erreur API`, data);
                             errorCount++;
                         }
                     } catch (error) {
@@ -1333,7 +1387,47 @@ const fetchHybridData = async (symbol, dataType) => {
                 showMessage(message, successCount > 0 ? 'success' : 'warning');
             };
 
-            // Actualités avec stratégie multi-sources (NO DEMO DATA)
+            // Fonction helper pour appels parallèles individuels (fallback)
+            const refreshAllStocksParallel = async (tickersList, newStockData, counters) => {
+                const promises = tickersList.map(async (ticker) => {
+                    try {
+                        const [data, fundamentalsResp] = await Promise.allSettled([
+                            fetchStockData(ticker),
+                            fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${ticker}&source=auto`)
+                        ]);
+                        
+                        const stockData = data.status === 'fulfilled' ? data.value : null;
+                        let fundamentals = null;
+                        
+                        if (fundamentalsResp.status === 'fulfilled' && fundamentalsResp.value.ok) {
+                            fundamentals = await fundamentalsResp.value.json();
+                        }
+                        
+                        if (stockData && !stockData.message) {
+                            newStockData[ticker] = {
+                                ...stockData,
+                                fundamentals,
+                                timestamp: new Date().toISOString()
+                            };
+                            counters.successCount++;
+                            return { ticker, success: true };
+                        } else {
+                            counters.errorCount++;
+                            return { ticker, success: false };
+                        }
+                    } catch (error) {
+                        console.error(`❌ ${ticker}: Erreur`, error?.message || String(error));
+                        counters.errorCount++;
+                        return { ticker, success: false };
+                    }
+                });
+                
+                await Promise.all(promises);
+                newStockData._successCount = counters.successCount;
+                newStockData._errorCount = counters.errorCount;
+            };
+
+            // Actualités avec stratégie multi-sources (NO DEMO DATA) - OPTIMISÉE avec appels parallèles
             const fetchNews = async () => {
                 addLog('📰 Démarrage récupération actualités...', 'info');
 
@@ -1342,17 +1436,29 @@ const fetchHybridData = async (symbol, dataType) => {
                 const tickersQuery = availableTickers.slice(0, 5).join(',');
 
                 try {
-                    // SOURCE 1: FMP General News (Primary - STARTER PLAN avec 300 calls/min)
-                    addLog('🔍 Tentative FMP General News (Primary)...', 'info');
-                    try {
-                        const fmpNewsResponse = await fetch(
-                            `${API_BASE_URL}/api/fmp?endpoint=news&limit=100`
-                        );
+                    // OPTIMISATION: Appels parallèles aux 3 sources avec priorité
+                    const today = new Date().toISOString().split('T')[0];
+                    const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
 
-                        if (fmpNewsResponse.ok) {
-                            const fmpNewsResult = await fmpNewsResponse.json();
-                            const fmpNewsData = fmpNewsResult.data || fmpNewsResult.news || [];
-                            const newsArticles = (fmpNewsData || []).slice(0, 100).map(article => ({
+                    addLog('🔍 Tentative parallèle des 3 sources d\'actualités...', 'info');
+                    
+                    const [fmpResult, finnhubMarketResult, finnhubCompanyResult] = await Promise.allSettled([
+                        // SOURCE 1: FMP General News (Primary)
+                        fetch(`${API_BASE_URL}/api/fmp?endpoint=news&limit=100`).then(r => r.ok ? r.json() : null),
+                        // SOURCE 2: Finnhub Market News (Fallback)
+                        fetch(`${API_BASE_URL}/api/finnhub?endpoint=market-news&category=general`).then(r => r.ok ? r.json() : null),
+                        // SOURCE 3: Finnhub Company News (Last Resort)
+                        fetch(`${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${availableTickers[0]}&from=${weekAgo}&to=${today}`).then(r => r.ok ? r.json() : null)
+                    ]);
+
+                    // Traiter les résultats par ordre de priorité
+                    let newsArticles = [];
+
+                    // Priorité 1: FMP
+                    if (fmpResult.status === 'fulfilled' && fmpResult.value) {
+                        const fmpNewsData = fmpResult.value.data || fmpResult.value.news || [];
+                        if (fmpNewsData.length > 0) {
+                            newsArticles = fmpNewsData.slice(0, 100).map(article => ({
                                 title: article.title,
                                 description: article.text || '',
                                 url: article.url || article.link || '#',
@@ -1362,30 +1468,15 @@ const fetchHybridData = async (symbol, dataType) => {
                                 category: 'general',
                                 image: article.image || null
                             }));
-
-                            if (newsArticles.length > 0) {
-                                const sortedNews = sortNewsByCredibility(newsArticles);
-                                setNewsData(sortedNews);
-                                setFilteredNews(sortedNews);
-                                addLog(`✅ ${newsArticles.length} actualités chargées depuis FMP (triées par crédibilité)`, 'success');
-                                return;
-                            }
+                            addLog(`✅ ${newsArticles.length} actualités chargées depuis FMP (Primary)`, 'success');
                         }
-                        addLog('⚠️ FMP General News: réponse vide ou erreur', 'warning');
-                    } catch (fmpNewsError) {
-                        addLog(`❌ FMP General News erreur: ${fmpNewsError.message}`, 'error');
                     }
 
-                    // SOURCE 2: Finnhub Market News (Fallback - General Market)
-                    addLog('🔄 Tentative Finnhub Market News (Fallback)...', 'info');
-                    try {
-                        const finnhubMarketResponse = await fetch(
-                            `${API_BASE_URL}/api/finnhub?endpoint=market-news&category=general`
-                        );
-
-                        if (finnhubMarketResponse.ok) {
-                            const finnhubMarketData = await finnhubMarketResponse.json();
-                            const newsArticles = (finnhubMarketData || []).slice(0, 100).map(article => ({
+                    // Priorité 2: Finnhub Market (si FMP vide)
+                    if (newsArticles.length === 0 && finnhubMarketResult.status === 'fulfilled' && finnhubMarketResult.value) {
+                        const finnhubData = Array.isArray(finnhubMarketResult.value) ? finnhubMarketResult.value : [];
+                        if (finnhubData.length > 0) {
+                            newsArticles = finnhubData.slice(0, 100).map(article => ({
                                 title: article.headline,
                                 description: article.summary || '',
                                 url: article.url || '#',
@@ -1394,33 +1485,15 @@ const fetchHybridData = async (symbol, dataType) => {
                                 sentiment: article.sentiment || 'neutral',
                                 category: article.category || 'general'
                             }));
-
-                            if (newsArticles.length > 0) {
-                                const sortedNews = sortNewsByCredibility(newsArticles);
-                                setNewsData(sortedNews);
-                                setFilteredNews(sortedNews);
-                                addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub Market News (triées par crédibilité)`, 'success');
-                                return;
-                            }
+                            addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub Market News (Fallback)`, 'success');
                         }
-                        addLog('⚠️ Finnhub Market News: réponse vide ou erreur', 'warning');
-                    } catch (finnhubMarketError) {
-                        addLog(`❌ Finnhub Market News erreur: ${finnhubMarketError.message}`, 'error');
                     }
 
-                    // SOURCE 3: Finnhub Company News (Last Resort - ticker-specific)
-                    addLog('🔄 Tentative Finnhub Company News (Last Resort)...', 'info');
-                    try {
-                        const today = new Date().toISOString().split('T')[0];
-                        const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
-
-                        const finnhubCompanyResponse = await fetch(
-                            `${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${availableTickers[0]}&from=${weekAgo}&to=${today}`
-                        );
-
-                        if (finnhubCompanyResponse.ok) {
-                            const finnhubCompanyData = await finnhubCompanyResponse.json();
-                            const newsArticles = (finnhubCompanyData || []).slice(0, 50).map(article => ({
+                    // Priorité 3: Finnhub Company (si les deux précédents vides)
+                    if (newsArticles.length === 0 && finnhubCompanyResult.status === 'fulfilled' && finnhubCompanyResult.value) {
+                        const finnhubData = Array.isArray(finnhubCompanyResult.value) ? finnhubCompanyResult.value : [];
+                        if (finnhubData.length > 0) {
+                            newsArticles = finnhubData.slice(0, 50).map(article => ({
                                 title: article.headline,
                                 description: article.summary || '',
                                 url: article.url || '#',
@@ -1429,30 +1502,26 @@ const fetchHybridData = async (symbol, dataType) => {
                                 sentiment: article.sentiment || 'neutral',
                                 category: availableTickers[0]
                             }));
-
-                            if (newsArticles.length > 0) {
-                                const sortedNews = sortNewsByCredibility(newsArticles);
-                                setNewsData(sortedNews);
-                                setFilteredNews(sortedNews);
-                                addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub Company News (triées par crédibilité)`, 'success');
-                                return;
-                            }
+                            addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub Company News (Last Resort)`, 'success');
                         }
-                        addLog('⚠️ Finnhub Company News: réponse vide ou erreur', 'warning');
-                    } catch (finnhubCompanyError) {
-                        addLog(`❌ Finnhub Company News erreur: ${finnhubCompanyError.message}`, 'error');
                     }
 
-                    // Toutes les sources ont échoué - pas de données disponibles
-                    addLog('⚠️ Toutes les sources d\'actualités ont échoué', 'warning');
-                    throw new Error('Aucune source d\'actualités disponible');
+                    if (newsArticles.length > 0) {
+                        const sortedNews = sortNewsByCredibility(newsArticles);
+                        setNewsData(sortedNews);
+                        setFilteredNews(sortedNews);
+                        addLog(`✅ ${sortedNews.length} actualités triées par crédibilité`, 'success');
+                    } else {
+                        addLog('⚠️ Toutes les sources d\'actualités ont retourné des données vides', 'warning');
+                        setNewsData([]);
+                        setFilteredNews([]);
+                    }
 
                 } catch (error) {
                     addLog(`❌ ERREUR CRITIQUE: ${error.message}`, 'error');
                     addLog('💡 Vérifiez les clés API dans Admin JSLAI', 'warning');
                     setNewsData([]);
                     setFilteredNews([]);
-                    // Pas de message overlay - tout va dans les logs Admin JSLAI
                 }
             };
 
@@ -2493,10 +2562,59 @@ const fetchHybridData = async (symbol, dataType) => {
             }, [activeTab, initialLoadComplete]); // Se déclenche au changement d'onglet
 
             // Charger les données de stocks une fois que les tickers sont disponibles
+            // OPTIMISATION: Charger seulement les 5 premiers tickers initialement pour améliorer les performances
             useEffect(() => {
                 if (activeTab === 'stocks-news' && tickers.length > 0 && Object.keys(stockData).length === 0) {
-                    console.log('💹 Chargement automatique des données de stocks pour stocks-news...');
-                    refreshAllStocks();
+                    console.log('💹 Chargement automatique des données de stocks pour stocks-news (optimisé: 5 premiers)...');
+                    // Charger seulement les 5 premiers tickers pour l'affichage initial
+                    const initialTickers = tickers.slice(0, 5);
+                    if (initialTickers.length > 0) {
+                        // Utiliser la fonction batch optimisée
+                        const loadInitialStocks = async () => {
+                            try {
+                                const symbolsQuery = initialTickers.join(',');
+                                const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
+                                
+                                if (batchResponse.ok) {
+                                    const batchData = await batchResponse.json();
+                                    if (batchData.success && batchData.data) {
+                                        const quotes = batchData.data.quote || {};
+                                        const fundamentals = batchData.data.fundamentals || {};
+                                        const newStockData = {};
+                                        
+                                        initialTickers.forEach(ticker => {
+                                            const tickerUpper = ticker.toUpperCase();
+                                            const quote = quotes[tickerUpper];
+                                            const fundamental = fundamentals[tickerUpper];
+                                            
+                                            if (quote || fundamental) {
+                                                newStockData[ticker] = {
+                                                    symbol: tickerUpper,
+                                                    c: quote?.c || fundamental?.quote?.price || 0,
+                                                    d: quote?.d || fundamental?.quote?.change || 0,
+                                                    dp: quote?.dp || fundamental?.quote?.changesPercentage || 0,
+                                                    h: quote?.h || 0,
+                                                    l: quote?.l || 0,
+                                                    o: quote?.o || 0,
+                                                    v: quote?.v || 0,
+                                                    fundamentals: fundamental || null,
+                                                    timestamp: new Date().toISOString()
+                                                };
+                                            }
+                                        });
+                                        
+                                        setStockData(newStockData);
+                                        console.log(`✅ ${Object.keys(newStockData).length} stocks chargés initialement`);
+                                    }
+                                }
+                            } catch (error) {
+                                console.warn('⚠️ Erreur chargement initial stocks, fallback:', error);
+                                // Fallback: charger tous les tickers si batch échoue
+                                refreshAllStocks();
+                            }
+                        };
+                        loadInitialStocks();
+                    }
                 }
             }, [activeTab, tickers.length]); // Se déclenche quand les tickers changent
 
