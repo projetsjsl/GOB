@@ -19759,32 +19759,32 @@ console.log('✅ Données hybrides récupérées:', {
                                     </h3>
 
                                     <div className="overflow-x-auto">
-                                        <table className="w-full">
+                                        <table className="w-full text-xs">
                                             <thead>
                                                 <tr className={`border-b-2 ${
                                                     darkMode ? 'border-gray-700' : 'border-gray-200'
                                                 }`}>
-                                                    <th className={`px-4 py-3 text-left font-bold ${
+                                                    <th className={`px-3 py-2 text-left font-bold text-xs ${
                                                         darkMode ? 'text-gray-300' : 'text-gray-700'
                                                     }`}>
                                                         Maturité
                                                     </th>
                                                     {yieldData.data.us && (
-                                                        <th className={`px-4 py-3 text-right font-bold ${
+                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             🇺🇸 US Treasury (%)
                                                         </th>
                                                     )}
                                                     {yieldData.data.canada && (
-                                                        <th className={`px-4 py-3 text-right font-bold ${
+                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             🇨🇦 Canada Bonds (%)
                                                         </th>
                                                     )}
                                                     {yieldData.data.us && yieldData.data.canada && (
-                                                        <th className={`px-4 py-3 text-right font-bold ${
+                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             Écart (bps)
@@ -19814,27 +19814,27 @@ console.log('✅ Données hybrides récupérées:', {
                                                                 <tr key={maturity} className={`border-b ${
                                                                     darkMode ? 'border-gray-700' : 'border-gray-200'
                                                                 } ${idx % 2 === 0 ? (darkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
-                                                                    <td className={`px-4 py-3 font-semibold ${
+                                                                    <td className={`px-3 py-2 font-semibold text-xs ${
                                                                         darkMode ? 'text-white' : 'text-gray-900'
                                                                     }`}>
                                                                         {maturity}
                                                                     </td>
                                                                     {yieldData.data.us && (
-                                                                        <td className={`px-4 py-3 text-right ${
+                                                                        <td className={`px-3 py-2 text-right text-xs ${
                                                                             darkMode ? 'text-blue-400' : 'text-blue-600'
                                                                         }`}>
                                                                             {usRate ? usRate.rate.toFixed(2) : '-'}
                                                                         </td>
                                                                     )}
                                                                     {yieldData.data.canada && (
-                                                                        <td className={`px-4 py-3 text-right ${
+                                                                        <td className={`px-3 py-2 text-right text-xs ${
                                                                             darkMode ? 'text-red-400' : 'text-red-600'
                                                                         }`}>
                                                                             {caRate ? caRate.rate.toFixed(2) : '-'}
                                                                         </td>
                                                                     )}
                                                                     {yieldData.data.us && yieldData.data.canada && (
-                                                                        <td className={`px-4 py-3 text-right font-mono text-sm ${
+                                                                        <td className={`px-3 py-2 text-right font-mono text-xs ${
                                                                             spread > 0
                                                                                 ? (darkMode ? 'text-green-400' : 'text-green-600')
                                                                                 : spread < 0
@@ -19856,7 +19856,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     <div className={`mt-4 pt-4 border-t ${
                                         darkMode ? 'border-gray-700' : 'border-gray-200'
                                     }`}>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                                             {yieldData.data.us && (
                                                 <>
                                                     <div>
