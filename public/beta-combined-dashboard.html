@@ -21188,14 +21188,14 @@ console.log('✅ Données hybrides récupérées:', {
                                     {/* Theme toggle - icône seulement */}
                                     <button
                                         onClick={toggleTheme}
-                                        className={`p-2.5 rounded-md transition-all duration-300 hover:scale-105 border ${
+                                        className={`p-1.5 rounded-md transition-all duration-300 hover:scale-105 border ${
                                             isDarkMode
                                                 ? 'bg-gray-800 hover:bg-gray-700 border-green-500/30 text-green-400'
                                                 : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
                                         }`}
                                         title={isDarkMode ? 'Mode Clair' : 'Mode Sombre'}
                                     >
-                                        <span className="text-lg">{isDarkMode ? '☀️' : '🌙'}</span>
+                                        <span className="text-sm">{isDarkMode ? '☀️' : '🌙'}</span>
                                     </button>
 
                                     {/* Bouton de déconnexion - icône seulement */}
@@ -21210,14 +21210,14 @@ console.log('✅ Données hybrides récupérées:', {
                                                 window.location.href = '/login.html';
                                             }
                                         }}
-                                        className={`p-2.5 rounded-md transition-all duration-300 hover:scale-105 border ${
+                                        className={`p-1.5 rounded-md transition-all duration-300 hover:scale-105 border ${
                                             isDarkMode
                                                 ? 'bg-gray-800 hover:bg-gray-700 border-red-500/30 text-red-400'
                                                 : 'bg-white hover:bg-gray-50 border-red-300 text-red-600'
                                         }`}
                                         title="Déconnexion"
                                     >
-                                        <i className="iconoir-log-out text-lg"></i>
+                                        <i className="iconoir-log-out text-sm"></i>
                                     </button>
                                 </div>
                             </div>
