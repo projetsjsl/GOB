@@ -3037,45 +3037,37 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
             }, [activeTab]); // Se déclenche seulement au changement d'onglet
 
-            // Chargement automatique des tickers et nouvelles pour l'onglet stocks-news
+            // Chargement automatique des tickers et nouvelles (en arrière-plan, même si l'onglet n'est pas actif)
             useEffect(() => {
-                if (activeTab === 'stocks-news' && initialLoadComplete) {
-                    console.log('📊 Onglet Titres activé - Vérification des données...');
-                    console.log(`Tickers: ${tickers.length}, StockData: ${Object.keys(stockData).length}, News: ${newsData.length}`);
-                    
-                    // Toujours charger les tickers si la liste est vide
-                    if (tickers.length === 0) {
-                        console.log('📊 Chargement automatique des tickers pour stocks-news...');
-                        loadTickersFromSupabase().catch(err => {
-                            console.error('❌ Erreur chargement tickers:', err);
-                        });
-                    }
-                    
-                    // Charger les nouvelles si la liste est vide
-                    if (newsData.length === 0) {
-                        console.log('📰 Chargement automatique des nouvelles pour stocks-news...');
-                        fetchNews().catch(err => {
-                            console.error('❌ Erreur chargement nouvelles:', err);
-                        });
-                    }
-
-                    // Charger les données de stocks si les tickers sont disponibles mais pas les données
-                    if (tickers.length > 0 && Object.keys(stockData).length === 0) {
-                        console.log('💹 Chargement automatique des données de stocks pour stocks-news...');
-                        refreshAllStocks().catch(err => {
-                            console.error('❌ Erreur chargement stocks:', err);
-                        });
-                    }
-
-                    // Charger les news par ticker si les données sont disponibles
-                    if (tickers.length > 0 && Object.keys(stockData).length > 0 && Object.keys(tickerLatestNews).length === 0) {
-                        console.log('📰 Chargement automatique des news par ticker...');
-                        fetchLatestNewsForTickers().catch(err => {
-                            console.error('❌ Erreur chargement news par ticker:', err);
-                        });
-                    }
+                if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminée
+                
+                console.log('📊 Vérification des données (chargement en arrière-plan)...');
+                console.log(`Tickers: ${tickers.length}, StockData: ${Object.keys(stockData).length}, News: ${newsData.length}`);
+                
+                // Toujours charger les tickers si la liste est vide (indépendamment de l'onglet actif)
+                if (tickers.length === 0) {
+                    console.log('📊 Chargement automatique des tickers (en arrière-plan)...');
+                    loadTickersFromSupabase().catch(err => {
+                        console.error('❌ Erreur chargement tickers:', err);
+                    });
                 }
-            }, [activeTab, initialLoadComplete]); // Se déclenche au changement d'onglet
+                
+                // Charger les nouvelles si la liste est vide (indépendamment de l'onglet actif)
+                if (newsData.length === 0) {
+                    console.log('📰 Chargement automatique des nouvelles (en arrière-plan)...');
+                    fetchNews().catch(err => {
+                        console.error('❌ Erreur chargement nouvelles:', err);
+                    });
+                }
+
+                // Charger les news par ticker si les données sont disponibles (indépendamment de l'onglet actif)
+                if (tickers.length > 0 && Object.keys(stockData).length > 0 && Object.keys(tickerLatestNews).length === 0) {
+                    console.log('📰 Chargement automatique des news par ticker (en arrière-plan)...');
+                    fetchLatestNewsForTickers().catch(err => {
+                        console.error('❌ Erreur chargement news par ticker:', err);
+                    });
+                }
+            }, [initialLoadComplete]); // Se déclenche après l'initialisation, indépendamment de l'onglet actif
 
             // Charger les données de stocks une fois que les tickers sont disponibles (méthode batch optimisée)
             // Charger TOUS les tickers pour que les sections Top Movers, Top Gainers, Top Losers et Analyses fonctionnent
