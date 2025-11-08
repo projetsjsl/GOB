@@ -480,7 +480,8 @@
     </style>
 
     <!-- = Auth Guard - Protection du Dashboard -->
-    <script src="/js/auth-guard.js"></script>
+    <!-- Charger avec defer pour ne pas bloquer le rendu -->
+    <script src="/js/auth-guard.js" defer></script>
 </head>
 <body class="min-h-screen">
     <div id="root"></div>
