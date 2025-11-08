@@ -4,6 +4,9 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node"
+    },
     "api/marketdata.js": {
       "maxDuration": 10
     },
