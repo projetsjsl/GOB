@@ -1349,6 +1349,26 @@ const fetchHybridData = async (symbol, dataType) => {
             // Fonction pour récupérer la news la plus récente et pertinente pour chaque ticker
             const fetchLatestNewsForTickers = async () => {
                 console.log('📰 Chargement des news récentes pour chaque ticker...');
+                
+                // Vérifier d'abord les données préchargées depuis la page de login
+                const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                if (preloadedDataStr) {
+                    try {
+                        const preloadedData = JSON.parse(preloadedDataStr);
+                        const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                        const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                        if (preloadedData.titlesTabData?.tickerLatestNews && dataAge < MAX_AGE) {
+                            console.log('⚡ Utilisation des nouvelles par ticker préchargées');
+                            setTickerLatestNews(preloadedData.titlesTabData.tickerLatestNews);
+                            console.log(`✅ Nouvelles préchargées pour ${Object.keys(preloadedData.titlesTabData.tickerLatestNews).length} tickers`);
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Erreur lecture nouvelles par ticker préchargées:', e);
+                    }
+                }
+                
                 const today = new Date().toISOString().split('T')[0];
                 const newsMap = {};
 
@@ -1432,6 +1452,30 @@ const fetchHybridData = async (symbol, dataType) => {
 
             const refreshAllStocks = async () => {
                 console.log('🔄 Actualisation des données stocks...');
+                
+                // Vérifier d'abord les données préchargées depuis la page de login
+                const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                if (preloadedDataStr) {
+                    try {
+                        const preloadedData = JSON.parse(preloadedDataStr);
+                        const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                        const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                        if (preloadedData.titlesTabData?.stockData && dataAge < MAX_AGE && Object.keys(preloadedData.titlesTabData.stockData).length > 0) {
+                            console.log('⚡ Utilisation des données de marché préchargées pour l\'onglet Titres');
+                            setStockData(preloadedData.titlesTabData.stockData);
+                            setLastUpdate(new Date(preloadedData.timestamp));
+                            setLoading(false);
+                            const successCount = Object.keys(preloadedData.titlesTabData.stockData).length;
+                            console.log(`✅ ${successCount} données de marché chargées depuis préchargement`);
+                            showMessage(`Données chargées depuis préchargement: ${successCount} titres`, 'success');
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Erreur lecture données de marché préchargées:', e);
+                    }
+                }
+                
                 setLoading(true);
                 const newStockData = {};
                 let successCount = 0;
@@ -1575,6 +1619,26 @@ const fetchHybridData = async (symbol, dataType) => {
             // Actualités avec stratégie multi-sources (NO DEMO DATA) - OPTIMISÉE avec appels parallèles
             const fetchNews = async () => {
                 addLog('📰 Démarrage récupération actualités...', 'info');
+
+                // Vérifier d'abord les données préchargées depuis la page de login
+                const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                if (preloadedDataStr) {
+                    try {
+                        const preloadedData = JSON.parse(preloadedDataStr);
+                        const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                        const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                        if (preloadedData.titlesTabData?.newsData && dataAge < MAX_AGE) {
+                            console.log('⚡ Utilisation des nouvelles préchargées pour l\'onglet Titres');
+                            setNewsData(preloadedData.titlesTabData.newsData);
+                            setFilteredNews(preloadedData.titlesTabData.newsData);
+                            addLog(`✅ ${preloadedData.titlesTabData.newsData.length} nouvelles chargées depuis préchargement`, 'success');
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Erreur lecture nouvelles préchargées:', e);
+                    }
+                }
 
                 const defaultTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA'];
                 const availableTickers = tickers.length > 0 ? tickers : defaultTickers;
@@ -2791,6 +2855,49 @@ const fetchHybridData = async (symbol, dataType) => {
             // Fonction pour charger les tickers depuis Supabase
             const loadTickersFromSupabase = async () => {
                 try {
+                    // Vérifier d'abord les données préchargées depuis la page de login
+                    const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                    if (preloadedDataStr) {
+                        try {
+                            const preloadedData = JSON.parse(preloadedDataStr);
+                            const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                            const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                            if (preloadedData.titlesTabData?.tickers && dataAge < MAX_AGE) {
+                                console.log('⚡ Utilisation des tickers préchargés pour l\'onglet Titres');
+                                const preloadedTickers = preloadedData.titlesTabData.tickers;
+                                setTeamTickers(preloadedTickers);
+                                setWatchlistTickers(preloadedTickers);
+                                setTickers(preloadedTickers);
+                                console.log(`✅ ${preloadedTickers.length} tickers chargés depuis préchargement`);
+                                
+                                // Charger aussi les données de marché préchargées si disponibles
+                                if (preloadedData.titlesTabData.stockData) {
+                                    console.log('⚡ Utilisation des données de marché préchargées');
+                                    setStockData(preloadedData.titlesTabData.stockData);
+                                    setLastUpdate(new Date(preloadedData.timestamp));
+                                }
+                                
+                                // Charger aussi les nouvelles préchargées si disponibles
+                                if (preloadedData.titlesTabData.newsData) {
+                                    console.log('⚡ Utilisation des nouvelles préchargées');
+                                    setNewsData(preloadedData.titlesTabData.newsData);
+                                    setFilteredNews(preloadedData.titlesTabData.newsData);
+                                }
+                                
+                                // Charger aussi les nouvelles par ticker préchargées si disponibles
+                                if (preloadedData.titlesTabData.tickerLatestNews) {
+                                    console.log('⚡ Utilisation des nouvelles par ticker préchargées');
+                                    setTickerLatestNews(preloadedData.titlesTabData.tickerLatestNews);
+                                }
+                                
+                                return;
+                            }
+                        } catch (e) {
+                            console.warn('⚠️ Erreur lecture données préchargées:', e);
+                        }
+                    }
+                    
                     console.log('📊 Chargement des tickers depuis Supabase...');
                     const response = await fetch('/api/config/tickers');
                     
