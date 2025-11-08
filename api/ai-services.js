@@ -1075,52 +1075,216 @@ async function getUSMarketsYahoo() {
   return data;
 }
 
-async function getTopMovers() {
+// Cache simple pour les top movers (5 minutes)
+const topMoversCache = {
+  data: null,
+  timestamp: null,
+  ttl: 5 * 60 * 1000 // 5 minutes
+};
+
+// Helper pour fetch avec timeout
+const fetchWithTimeout = async (url, timeout = 8000) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  
   try {
-    // Récupérer les vrais top movers depuis Yahoo Finance
-    const gainersResponse = await fetch('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=true&lang=en-US&region=US&scrIds=day_gainers&count=5&corsDomain=finance.yahoo.com');
-    const losersResponse = await fetch('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=true&lang=en-US&region=US&scrIds=day_losers&count=5&corsDomain=finance.yahoo.com');
+    const response = await fetch(url, { 
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0',
+        'Accept': 'application/json'
+      }
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Timeout: La requête a pris trop de temps');
+    }
+    throw error;
+  }
+};
+
+async function getTopMovers() {
+  // Vérifier le cache d'abord
+  const now = Date.now();
+  if (topMoversCache.data && topMoversCache.timestamp && 
+      (now - topMoversCache.timestamp) < topMoversCache.ttl) {
+    console.log('📦 Top Movers: Cache hit');
+    return {
+      ...topMoversCache.data,
+      cached: true
+    };
+  }
+
+  try {
+    console.log('🔄 Top Movers: Récupération depuis Yahoo Finance...');
+    const startTime = Date.now();
     
-    const gainersData = await gainersResponse.json();
-    const losersData = await losersResponse.json();
+    // Appels PARALLÈLES au lieu de séquentiels pour améliorer la vitesse
+    const [gainersResponse, losersResponse] = await Promise.all([
+      fetchWithTimeout('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=true&lang=en-US&region=US&scrIds=day_gainers&count=5&corsDomain=finance.yahoo.com', 8000),
+      fetchWithTimeout('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=true&lang=en-US&region=US&scrIds=day_losers&count=5&corsDomain=finance.yahoo.com', 8000)
+    ]);
     
-    const gainers = gainersData.finance?.result?.[0]?.quotes?.slice(0, 3).map(quote => ({
-      symbol: quote.symbol,
-      change: quote.regularMarketChange || 0,
-      volume: quote.regularMarketVolume || 0
-    })) || [];
+    // Vérifier que les réponses sont OK
+    if (!gainersResponse.ok || !losersResponse.ok) {
+      throw new Error(`Yahoo Finance API error: ${gainersResponse.status} / ${losersResponse.status}`);
+    }
     
-    const losers = losersData.finance?.result?.[0]?.quotes?.slice(0, 3).map(quote => ({
-      symbol: quote.symbol,
-      change: quote.regularMarketChange || 0,
-      volume: quote.regularMarketVolume || 0
-    })) || [];
+    // Parser les réponses en parallèle aussi
+    const [gainersData, losersData] = await Promise.all([
+      gainersResponse.json(),
+      losersResponse.json()
+    ]);
     
-    return { 
+    // Helper pour extraire le pourcentage de changement
+    const extractChangePercent = (quote) => {
+      // Essayer d'abord regularMarketChangePercent (pourcentage direct)
+      if (quote.regularMarketChangePercent !== undefined) {
+        const percent = quote.regularMarketChangePercent;
+        if (typeof percent === 'number') return percent;
+        if (typeof percent === 'object' && percent !== null) {
+          // Format Yahoo: { raw: 5.2, fmt: "5.20%" }
+          const raw = percent.raw;
+          if (typeof raw === 'number') return raw;
+          // Essayer de parser depuis fmt si raw n'existe pas
+          if (percent.fmt) {
+            const parsed = parseFloat(percent.fmt.replace('%', ''));
+            if (!isNaN(parsed)) return parsed;
+          }
+        }
+        if (typeof percent === 'string') {
+          const parsed = parseFloat(percent.replace('%', ''));
+          if (!isNaN(parsed)) return parsed;
+        }
+      }
+      
+      // Fallback: calculer depuis regularMarketChange et regularMarketPrice
+      if (quote.regularMarketChange !== undefined && quote.regularMarketPrice !== undefined) {
+        const change = typeof quote.regularMarketChange === 'object' 
+          ? (quote.regularMarketChange.raw || parseFloat(quote.regularMarketChange.fmt || 0))
+          : parseFloat(quote.regularMarketChange || 0);
+        const price = typeof quote.regularMarketPrice === 'object'
+          ? (quote.regularMarketPrice.raw || parseFloat(quote.regularMarketPrice.fmt || 0))
+          : parseFloat(quote.regularMarketPrice || 0);
+        
+        if (price > 0 && change !== 0) {
+          return (change / price) * 100;
+        }
+      }
+      
+      // Dernier fallback: utiliser regularMarketPreviousClose si disponible
+      if (quote.regularMarketChange !== undefined && quote.regularMarketPreviousClose !== undefined) {
+        const change = typeof quote.regularMarketChange === 'object'
+          ? (quote.regularMarketChange.raw || parseFloat(quote.regularMarketChange.fmt || 0))
+          : parseFloat(quote.regularMarketChange || 0);
+        const prevClose = typeof quote.regularMarketPreviousClose === 'object'
+          ? (quote.regularMarketPreviousClose.raw || parseFloat(quote.regularMarketPreviousClose.fmt || 0))
+          : parseFloat(quote.regularMarketPreviousClose || 0);
+        
+        if (prevClose > 0 && change !== 0) {
+          return (change / prevClose) * 100;
+        }
+      }
+      
+      return 0;
+    };
+    
+    // Extraire et formater les données avec parsing robuste
+    const gainers = (gainersData.finance?.result?.[0]?.quotes || [])
+      .slice(0, 3)
+      .map(quote => {
+        const changePercent = extractChangePercent(quote);
+        const price = typeof quote.regularMarketPrice === 'object'
+          ? (quote.regularMarketPrice.raw || parseFloat(quote.regularMarketPrice.fmt || 0))
+          : parseFloat(quote.regularMarketPrice || quote.regularMarketPreviousClose || 0);
+        const volume = typeof quote.regularMarketVolume === 'object'
+          ? (quote.regularMarketVolume.raw || parseFloat(quote.regularMarketVolume.fmt || 0))
+          : parseFloat(quote.regularMarketVolume || 0);
+        
+        return {
+          symbol: quote.symbol || quote.ticker || 'N/A',
+          change: Math.abs(changePercent), // Toujours positif pour les gainers
+          changePercent: Math.abs(changePercent),
+          volume: volume,
+          price: price
+        };
+      })
+      .filter(stock => stock.symbol !== 'N/A' && stock.changePercent > 0); // Filtrer les invalides
+    
+    const losers = (losersData.finance?.result?.[0]?.quotes || [])
+      .slice(0, 3)
+      .map(quote => {
+        const changePercent = extractChangePercent(quote);
+        const price = typeof quote.regularMarketPrice === 'object'
+          ? (quote.regularMarketPrice.raw || parseFloat(quote.regularMarketPrice.fmt || 0))
+          : parseFloat(quote.regularMarketPrice || quote.regularMarketPreviousClose || 0);
+        const volume = typeof quote.regularMarketVolume === 'object'
+          ? (quote.regularMarketVolume.raw || parseFloat(quote.regularMarketVolume.fmt || 0))
+          : parseFloat(quote.regularMarketVolume || 0);
+        
+        return {
+          symbol: quote.symbol || quote.ticker || 'N/A',
+          change: -Math.abs(changePercent), // Toujours négatif pour les losers
+          changePercent: -Math.abs(changePercent),
+          volume: volume,
+          price: price
+        };
+      })
+      .filter(stock => stock.symbol !== 'N/A' && stock.changePercent < 0); // Filtrer les invalides
+    
+    const executionTime = Date.now() - startTime;
+    console.log(`✅ Top Movers: Récupérés en ${executionTime}ms (${gainers.length} gainers, ${losers.length} losers)`);
+    
+    const result = { 
       data: { gainers, losers },
       fallback: false,
       source: 'yahoo-finance',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      cached: false,
+      executionTime
     };
+    
+    // Mettre en cache
+    topMoversCache.data = result;
+    topMoversCache.timestamp = now;
+    
+    return result;
   } catch (error) {
-    console.error('Erreur getTopMovers:', error);
+    console.error('❌ Erreur getTopMovers:', error.message);
+    
+    // Si on a des données en cache (même expirées), les utiliser comme fallback
+    if (topMoversCache.data) {
+      console.log('⚠️ Top Movers: Utilisation du cache expiré comme fallback');
+      return {
+        ...topMoversCache.data,
+        fallback: true,
+        cached: true,
+        error: error.message
+      };
+    }
+    
+    // Fallback statique seulement en dernier recours
     return {
       data: {
         gainers: [
-          { symbol: 'NVDA', change: 5.2, volume: 50000000 },
-          { symbol: 'TSLA', change: 4.8, volume: 45000000 },
-          { symbol: 'AMD', change: 3.9, volume: 35000000 }
+          { symbol: 'NVDA', change: 5.2, changePercent: 5.2, volume: 50000000, price: 0 },
+          { symbol: 'TSLA', change: 4.8, changePercent: 4.8, volume: 45000000, price: 0 },
+          { symbol: 'AMD', change: 3.9, changePercent: 3.9, volume: 35000000, price: 0 }
         ],
         losers: [
-          { symbol: 'META', change: -3.1, volume: 40000000 },
-          { symbol: 'GOOGL', change: -2.7, volume: 38000000 },
-          { symbol: 'AMZN', change: -2.3, volume: 42000000 }
+          { symbol: 'META', change: -3.1, changePercent: -3.1, volume: 40000000, price: 0 },
+          { symbol: 'GOOGL', change: -2.7, changePercent: -2.7, volume: 38000000, price: 0 },
+          { symbol: 'AMZN', change: -2.3, changePercent: -2.3, volume: 42000000, price: 0 }
         ]
       },
       fallback: true,
-      source: 'fallback',
+      source: 'fallback-static',
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      cached: false
     };
   }
 }
