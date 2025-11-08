@@ -812,7 +812,7 @@ const fetchHybridData = async (symbol, dataType) => {
 
         const BetaCombinedDashboard = () => {
             // États principaux
-            const [activeTab, setActiveTab] = useState('stocks-news');
+            const [activeTab, setActiveTab] = useState('markets-economy');
             const [tickers, setTickers] = useState([]);
             const [teamTickers, setTeamTickers] = useState([]);
             const [watchlistTickers, setWatchlistTickers] = useState([]);
@@ -20274,10 +20274,10 @@ console.log('✅ Données hybrides récupérées:', {
             // Configuration des onglets (après déclaration de TOUS les composants)
             // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
             const tabs = [
+                { id: 'markets-economy', label: 'Marchés & Économie', component: MarketsEconomyTab },
                 { id: 'stocks-news', label: 'Titres & Nouvelles', component: StocksNewsTab },
                 { id: 'ask-emma', label: 'Emma IA™', component: AskEmmaTab },
                 { id: 'yield-curve', label: '📈 Yield Curve', component: YieldCurveTab },
-                { id: 'markets-economy', label: 'Marchés & Économie', component: MarketsEconomyTab },
                 { id: 'intellistocks', label: 'JLab™', component: IntelliStocksTab },
                 { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab },
