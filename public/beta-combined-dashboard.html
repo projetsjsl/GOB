@@ -479,12 +479,12 @@
         .emma-intro-image { animation: emma-zoom-in 800ms ease-out; }
     </style>
 
-    <!-- = Auth Guard - Protection du Dashboard -->
-    <!-- Charger avec defer pour ne pas bloquer le rendu -->
-    <script src="/js/auth-guard.js" defer></script>
 </head>
 <body class="min-h-screen">
     <div id="root"></div>
+    
+    <!-- Auth Guard - Protection du dashboard (chargé avec defer pour ne pas bloquer React) -->
+    <script src="/js/auth-guard.js" defer></script>
     
     <script type="text/babel" data-presets="react">
         // V?rification que Babel fonctionne
@@ -21887,7 +21887,6 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
 
         ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
     </script>
-    
     
 </body>
 </html>
