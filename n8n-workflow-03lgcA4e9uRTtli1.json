@@ -579,41 +579,20 @@
     },
     {
       "parameters": {
-        "mode": "rules",
-        "rules": {
-          "values": [
+        "conditions": {
+          "boolean": [
             {
-              "conditions": {
-                "boolean": [
-                  {
-                    "value1": "={{ ($json.preview_mode === true || $json.preview_mode === 'true') || ($json.approved !== true && $json.approved !== 'true') }}",
-                    "value2": true
-                  }
-                ]
-              },
-              "renameOutput": true,
-              "outputKey": "preview"
-            },
-            {
-              "conditions": {
-                "boolean": [
-                  {
-                    "value1": "={{ ($json.preview_mode === false || $json.preview_mode === 'false') && ($json.approved === true || $json.approved === 'true') }}",
-                    "value2": true
-                  }
-                ]
-              },
-              "renameOutput": true,
-              "outputKey": "send"
+              "value1": "={{ ($json.preview_mode === false || $json.preview_mode === 'false') && ($json.approved === true || $json.approved === 'true') }}",
+              "value2": true
             }
           ]
         },
         "options": {}
       },
       "id": "preview-or-send-switch",
-      "name": "Preview or Send?",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3,
+      "name": "Should Send Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
       "position": [
         20320,
         4536
@@ -1208,24 +1187,6 @@
         ]
       ]
     },
-    "Preview or Send?": {
-      "main": [
-        [
-          {
-            "node": "Preview Display",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Generate HTML Newsletter",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Preview Display": {
       "main": [
         [
@@ -1337,6 +1298,24 @@
         [
           {
             "node": "Preview or Send?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Send Email?": {
+      "main": [
+        [
+          {
+            "node": "Generate HTML Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preview Display",
             "type": "main",
             "index": 0
           }
