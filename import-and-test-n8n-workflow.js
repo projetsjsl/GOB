@@ -48,12 +48,12 @@ const cleanWorkflow = {
         console.log(`   🔧 Correction URL dans ${node.name}: ${url}`);
         // Si c'est /api/emma-agent, utiliser /api/chat à la place
         if (url.includes('/api/emma-agent')) {
-          cleanNode.parameters.url = '=https://gob.vercel.app/api/chat';
+          cleanNode.parameters.url = '=https://gob-projetsjsls-projects.vercel.app/api/chat';
         } else if (url.includes('/api/')) {
           // Garder le même endpoint mais corriger le domaine
-          cleanNode.parameters.url = url.replace(/https?:\/\/[^\/]+/, 'https://gob.vercel.app');
+          cleanNode.parameters.url = url.replace(/https?:\/\/[^\/]+/, 'https://gob-projetsjsls-projects.vercel.app');
         } else {
-          cleanNode.parameters.url = '=https://gob.vercel.app/api/chat';
+          cleanNode.parameters.url = '=https://gob-projetsjsls-projects.vercel.app/api/chat';
         }
         console.log(`      → ${cleanNode.parameters.url}`);
       }

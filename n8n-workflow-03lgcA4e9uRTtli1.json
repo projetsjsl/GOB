@@ -495,7 +495,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://gob.vercel.app/api/chat",
+        "url": "=https://gob-projetsjsls-projects.vercel.app/api/chat",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
