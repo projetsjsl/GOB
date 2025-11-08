@@ -13335,6 +13335,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
                 const [expandedStock, setExpandedStock] = useState(null);
 
+                // Fonction pour formater les nombres
+                const formatNumber = (num) => {
+                    if (!num && num !== 0) return 'N/A';
+                    if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+                    if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+                    if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+                    return num.toLocaleString('fr-FR');
+                };
+
                 // Mapping des noms de compagnies pour affichage
                 const companyNames = {
                     AAPL: 'Apple Inc.',
@@ -13821,8 +13830,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>🎴 Titres - Vue Cartes</h2>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {tickers.map((ticker) => {
+                                {tickers.length === 0 ? (
+                                    <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
+                                        <p className="text-sm">Ajoutez des tickers pour voir les cartes</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {tickers.map((ticker) => {
                                         const data = stockData[ticker] || {};
                                         const price = data.c || data.price || 0;
                                         const change = data.d || data.change || 0;
@@ -13903,7 +13918,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             </div>
                                         );
                                     })}
-                                </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
