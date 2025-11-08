@@ -25,6 +25,9 @@
     "api/briefing-test.js": {
       "maxDuration": 10
     },
+    "api/briefing-simple.js": {
+      "maxDuration": 10
+    },
     "api/emma-n8n.js": {
       "maxDuration": 60
     },
