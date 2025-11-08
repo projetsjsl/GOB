@@ -196,7 +196,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols from input 1 (tickers data)\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type;\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// Construire le message pour /api/chat (qui utilise emma-agent)\nconst fullPrompt = `${data.selected_prompt}\\n\\nFocus sur ces tickers: ${tickerList}`;\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    user_id: 'n8n-automation'\n  }\n}];"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols from input 1 (tickers data)\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type;\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// Construire le message pour /api/chat (qui utilise emma-agent)\nconst fullPrompt = `${data.selected_prompt}\\n\\nFocus sur ces tickers: ${tickerList}`;\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation'\n  }\n}];"
       },
       "id": "c5d69e3d-82d3-4459-8c12-02af81d03cdd",
       "name": "Prepare API Request",
@@ -507,7 +507,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"message\": $json.message,\n  \"channel\": $json.channel || 'web',\n  \"user_id\": $json.user_id || 'n8n-automation'\n} }}",
+        "jsonBody": "={{ {\n  \"message\": $json.message,\n  \"channel\": $json.channel || 'web',\n  \"userId\": $json.userId || 'n8n-automation'\n} }}",
         "options": {
           "response": {
             "response": {
