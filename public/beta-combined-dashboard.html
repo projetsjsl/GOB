@@ -11273,6 +11273,23 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             <PromptManager />
                         </div>
 
+                        {/* SECTION 2.5.5: GESTION DES HORAIRES ET AUTOMATISATIONS */}
+                        <div className={`p-6 rounded-lg border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>⏰ Gestion des Horaires et Automatisations</h3>
+
+                            <p className={`text-sm mb-6 transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                Configurez les horaires et activez/désactivez les briefings automatisés. Les modifications sont synchronisées avec n8n.
+                            </p>
+
+                            <ScheduleManager />
+                        </div>
+
                         {/* SECTION 2.6: GESTION DES DESTINATAIRES EMAIL */}
                         <div className={`p-6 rounded-lg border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
