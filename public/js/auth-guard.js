@@ -33,19 +33,25 @@
 
       // Vérifier si le dashboard est déjà en train de se charger (éviter les redirections conflictuelles)
       if (window.dashboardRendered || window.dashboardLoading) {
-        console.log('📊 Dashboard déjà en cours de chargement - pas de redirection');
+        console.log('📊 Dashboard déjà en cours de chargement - vérification rapide de session');
         // Attendre un peu et vérifier à nouveau
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 300));
         const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
         if (userJson) {
           try {
             this.currentUser = JSON.parse(userJson);
             this.permissions = this.currentUser.permissions;
             this.applyEmmaPermissions();
-            return;
+            // Ne pas retourner ici - continuer pour signaler l'événement
+            console.log('✅ Session trouvée pendant chargement dashboard');
+            return; // Retourner ici car on a trouvé la session et appliqué les permissions
           } catch (e) {
             console.warn('Erreur parsing session:', e);
+            // Continuer la vérification normale si parsing échoue
           }
+        } else {
+          // Si pas de session trouvée, continuer la vérification normale
+          console.log('⚠️ Pas de session trouvée pendant chargement dashboard - vérification normale');
         }
       }
 
@@ -423,6 +429,20 @@
         }
         
         // Vérifier l'état d'authentification
+        // Si currentUser n'est pas défini mais qu'on a une session, la charger
+        if (!window.authGuard.currentUser) {
+          const userJson = sessionStorage.getItem('gob-user');
+          if (userJson) {
+            try {
+              window.authGuard.currentUser = JSON.parse(userJson);
+              window.authGuard.permissions = window.authGuard.currentUser.permissions;
+              window.authGuard.applyEmmaPermissions();
+            } catch (e) {
+              console.warn('Erreur chargement session dans initAuthGuard:', e);
+            }
+          }
+        }
+        
         const isAuthenticated = window.authGuard.currentUser !== null;
         signalAuthGuardReady(isAuthenticated, window.authGuard.currentUser, null);
         

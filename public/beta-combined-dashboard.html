@@ -510,6 +510,13 @@
     </style>
     
     <!-- Auth Guard - Protection du dashboard (chargé AVANT React pour vérifier l'authentification) -->
+    <!-- Initialiser dashboardLoading AVANT de charger auth-guard pour éviter les race conditions -->
+    <script>
+        // Initialiser le flag AVANT que auth-guard ne se charge
+        window.dashboardLoading = false;
+        window.dashboardRendered = false;
+        console.log('?? Flags dashboard initialisés');
+    </script>
     <script src="/js/auth-guard.js"></script>
     
     <script type="text/babel" data-presets="react">
