@@ -2390,7 +2390,17 @@ const fetchHybridData = async (symbol, dataType) => {
                     newsapi: { status: 'checking', responseTime: 0, error: null },
                     seekingAlpha: { status: 'checking', responseTime: 0, error: null },
                     claude: { status: 'checking', responseTime: 0, error: null },
-                    vercel: { status: 'checking', responseTime: 0, error: null }
+                    vercel: { status: 'checking', responseTime: 0, error: null },
+                    gemini: { status: 'checking', responseTime: 0, error: null },
+                    github: { status: 'checking', responseTime: 0, error: null },
+                    fmp: { status: 'checking', responseTime: 0, error: null },
+                    polygon: { status: 'checking', responseTime: 0, error: null },
+                    twelveData: { status: 'checking', responseTime: 0, error: null },
+                    supabase: { status: 'checking', responseTime: 0, error: null },
+                    fred: { status: 'checking', responseTime: 0, error: null },
+                    emmaAgent: { status: 'checking', responseTime: 0, error: null },
+                    resend: { status: 'checking', responseTime: 0, error: null },
+                    twilio: { status: 'checking', responseTime: 0, error: null }
                 };
 
                 // Test Market Data API (nouvelle API unifiée)
@@ -2538,6 +2548,183 @@ const fetchHybridData = async (symbol, dataType) => {
                     }
                 } catch (error) {
                     status.vercel = { status: 'error', responseTime: 0, error: 'Route API Vercel non disponible - Déploiement requis' };
+                }
+
+                // Test FMP API (Financial Modeling Prep)
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=AAPL&source=auto`);
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        status.fmp = {
+                            status: data && data.profile ? 'success' : 'warning',
+                            responseTime,
+                            error: data && data.profile ? null : 'Données incomplètes',
+                            source: data.source || 'unknown'
+                        };
+                    } else {
+                        status.fmp = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.fmp = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test Polygon.io (via marketdata quote)
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=AAPL&source=auto`);
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        status.polygon = {
+                            status: data && data.source === 'polygon.io' ? 'success' : 'warning',
+                            responseTime,
+                            error: data && data.source === 'polygon.io' ? null : 'Utilise un fallback',
+                            source: data.source || 'unknown'
+                        };
+                    } else {
+                        status.polygon = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.polygon = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test Twelve Data (via marketdata quote)
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=intraday&symbol=AAPL&interval=5min&outputsize=10`);
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        status.twelveData = {
+                            status: data && data.values ? 'success' : 'warning',
+                            responseTime,
+                            error: data && data.values ? null : 'Données incomplètes',
+                            source: data.source || 'unknown'
+                        };
+                    } else {
+                        status.twelveData = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.twelveData = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test Supabase (via watchlist API)
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch('/api/supabase-watchlist');
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        status.supabase = {
+                            status: data.tickers !== undefined ? 'success' : 'warning',
+                            responseTime,
+                            error: data.tickers !== undefined ? null : 'Réponse inattendue'
+                        };
+                    } else {
+                        status.supabase = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.supabase = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test FRED API (via yield-curve)
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch('/api/yield-curve?country=us');
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        status.fred = {
+                            status: data && data.data && data.data.us ? 'success' : 'warning',
+                            responseTime,
+                            error: data && data.data && data.data.us ? null : 'Données incomplètes',
+                            source: data.data?.us?.source || 'unknown'
+                        };
+                    } else {
+                        status.fred = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.fred = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test Emma Agent API
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch('/api/emma-agent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: 'Test de connexion',
+                            context: { test: true }
+                        })
+                    });
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        status.emmaAgent = {
+                            status: data.success !== false ? 'success' : 'warning',
+                            responseTime,
+                            error: data.success !== false ? null : data.error || 'Réponse d\'erreur'
+                        };
+                    } else {
+                        status.emmaAgent = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.emmaAgent = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test Resend API (Email) - vérification via endpoint de test
+                try {
+                    const startTime = Date.now();
+                    // Test via l'endpoint email-briefings qui utilise Resend
+                    const response = await fetch('/api/emma-briefing?type=morning');
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok || response.status === 400) {
+                        // 400 peut signifier que l'API fonctionne mais qu'il manque des paramètres
+                        status.resend = {
+                            status: response.ok ? 'success' : 'warning',
+                            responseTime,
+                            error: response.ok ? null : 'Configuration incomplète'
+                        };
+                    } else {
+                        status.resend = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.resend = { status: 'error', responseTime: 0, error: error.message };
+                }
+
+                // Test Twilio API (SMS) - vérification via endpoint SMS
+                try {
+                    const startTime = Date.now();
+                    // Test via l'endpoint SMS adapter
+                    const response = await fetch('/api/adapters/sms', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ test: true })
+                    });
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok || response.status === 400 || response.status === 405) {
+                        // 400/405 peut signifier que l'API fonctionne mais qu'il manque des paramètres
+                        status.twilio = {
+                            status: response.ok ? 'success' : 'warning',
+                            responseTime,
+                            error: response.ok ? null : 'Configuration incomplète ou méthode non supportée'
+                        };
+                    } else {
+                        status.twilio = { status: 'error', responseTime, error: `HTTP ${response.status}` };
+                    }
+                } catch (error) {
+                    status.twilio = { status: 'error', responseTime: 0, error: error.message };
                 }
 
                 setApiStatus(status);
