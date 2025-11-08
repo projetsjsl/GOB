@@ -19764,52 +19764,135 @@ console.log('✅ Données hybrides récupérées:', {
                     }
                 }, [isDarkMode]);
 
-                // Filtrer les nouvelles à l'affichage
+                // Fonction pour détecter la source avec variations de noms
+                const matchesSource = (articleSource, selectedSource) => {
+                    if (!articleSource || !selectedSource) return false;
+                    const source = articleSource.toLowerCase();
+                    const selected = selectedSource.toLowerCase();
+                    
+                    // Mapping des variations de noms de sources
+                    const sourceVariations = {
+                        'bloomberg': ['bloomberg', 'bloomberg.com', 'bloomberg news'],
+                        'reuters': ['reuters', 'reuters.com', 'thomson reuters'],
+                        'wsj': ['wsj', 'wall street journal', 'the wall street journal', 'wsj.com'],
+                        'cnbc': ['cnbc', 'cnbc.com'],
+                        'marketwatch': ['marketwatch', 'marketwatch.com', 'market watch'],
+                        'la presse': ['la presse', 'lapresse', 'lapresse.ca', 'presse'],
+                        'les affaires': ['les affaires', 'lesaffaires', 'lesaffaires.com', 'affaires']
+                    };
+                    
+                    // Vérifier correspondance exacte
+                    if (source.includes(selected) || selected.includes(source)) return true;
+                    
+                    // Vérifier les variations
+                    const variations = sourceVariations[selected];
+                    if (variations) {
+                        return variations.some(variation => source.includes(variation));
+                    }
+                    
+                    return false;
+                };
+
+                // État pour suivre si les résultats sont exacts ou approximatifs
+                const [isApproximateMatch, setIsApproximateMatch] = useState(false);
+
+                // Filtrer les nouvelles à l'affichage avec système de fallback intelligent
                 React.useEffect(() => {
                     let filtered = newsData;
+                    let hasExactMatches = true;
 
                     // Appliquer le filtre français si activé
                     if (localFrenchOnly) {
                         filtered = filtered.filter(article => isFrenchArticle(article));
                     }
 
-                    // Appliquer le filtre source
+                    // Appliquer le filtre source avec détection flexible
                     if (selectedSource !== 'all') {
+                        const beforeFilter = filtered.length;
                         filtered = filtered.filter(article =>
-                            article.source?.name?.toLowerCase().includes(selectedSource.toLowerCase())
+                            matchesSource(article.source?.name, selectedSource)
                         );
+                        // Si aucun résultat, essayer un filtrage plus large
+                        if (filtered.length === 0 && beforeFilter > 0) {
+                            filtered = newsData.filter(article => {
+                                const sourceName = (article.source?.name || '').toLowerCase();
+                                const selected = selectedSource.toLowerCase();
+                                // Recherche partielle plus large
+                                return sourceName.includes(selected) || selected.includes(sourceName);
+                            });
+                            hasExactMatches = false;
+                        }
                     }
 
-                    // Appliquer le filtre marché (basé sur mots-clés)
+                    // Appliquer le filtre marché (basé sur mots-clés) avec fallback
                     if (selectedMarket !== 'all') {
                         const marketKeywords = {
-                            'US': ['u.s.', 'united states', 'american', 'wall street', 'nasdaq', 'dow', 'federal reserve', 'fed', 'sec'],
-                            'Canada': ['canada', 'canadian', 'toronto', 'tsx', 'montreal', 'quebec', 'ontario'],
-                            'Europe': ['europe', 'european', 'eu', 'ecb', 'london', 'frankfurt', 'paris', 'ftse', 'dax'],
-                            'Asie': ['asia', 'asian', 'china', 'japan', 'tokyo', 'shanghai', 'hong kong', 'nikkei']
+                            'US': ['u.s.', 'united states', 'american', 'wall street', 'nasdaq', 'dow', 's&p', 'sp500', 'federal reserve', 'fed', 'sec', 'new york', 'nyse', 'us market', 'us economy'],
+                            'Canada': ['canada', 'canadian', 'toronto', 'tsx', 'montreal', 'quebec', 'ontario', 'alberta', 'vancouver', 'canadian market', 'canadian economy', 'bank of canada', 'boc'],
+                            'Europe': ['europe', 'european', 'eu', 'ecb', 'london', 'frankfurt', 'paris', 'ftse', 'dax', 'cac', 'eurozone', 'euro', 'uk', 'germany', 'france', 'italy', 'spain'],
+                            'Asie': ['asia', 'asian', 'china', 'chinese', 'japan', 'japanese', 'tokyo', 'shanghai', 'hong kong', 'nikkei', 'south korea', 'korean', 'singapore', 'india', 'indian', 'taiwan']
                         };
+                        const beforeFilter = filtered.length;
                         filtered = filtered.filter(article => {
                             const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
                             return marketKeywords[selectedMarket]?.some(keyword => text.includes(keyword));
                         });
+                        // Si aucun résultat, essayer avec moins de mots-clés
+                        if (filtered.length === 0 && beforeFilter > 0) {
+                            const fallbackKeywords = {
+                                'US': ['us', 'usa', 'america'],
+                                'Canada': ['canada'],
+                                'Europe': ['europe', 'eu'],
+                                'Asie': ['asia', 'china', 'japan']
+                            };
+                            filtered = newsData.filter(article => {
+                                const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                                return fallbackKeywords[selectedMarket]?.some(keyword => text.includes(keyword));
+                            });
+                            hasExactMatches = false;
+                        }
                     }
 
-                    // Appliquer le filtre thème
+                    // Appliquer le filtre thème avec fallback
                     if (selectedTheme !== 'all') {
                         const themeKeywords = {
-                            'Tech': ['tech', 'technology', 'software', 'cloud', 'apple', 'google', 'microsoft', 'amazon', 'meta', 'tesla'],
-                            'Finance': ['bank', 'banque', 'finance', 'trading', 'investment', 'credit', 'loan', 'mortgage'],
-                            'Énergie': ['energy', 'oil', 'gas', 'renewable', 'solar', 'wind', 'nuclear', 'exxon', 'chevron'],
-                            'Santé': ['health', 'healthcare', 'pharma', 'medical', 'drug', 'vaccine', 'hospital', 'medicare'],
-                            'Crypto': ['crypto', 'bitcoin', 'ethereum', 'blockchain', 'btc', 'coinbase', 'binance'],
-                            'IA': ['ai', 'artificial intelligence', 'machine learning', 'chatgpt', 'openai', 'nvidia']
+                            'Tech': ['tech', 'technology', 'software', 'cloud', 'apple', 'google', 'microsoft', 'amazon', 'meta', 'tesla', 'nvidia', 'amd', 'intel', 'samsung', 'iphone', 'android', 'ai', 'artificial intelligence'],
+                            'Finance': ['bank', 'banque', 'finance', 'financial', 'trading', 'investment', 'investor', 'credit', 'loan', 'mortgage', 'interest rate', 'fed', 'central bank', 'stock market', 'equity', 'bond'],
+                            'Énergie': ['energy', 'oil', 'gas', 'petroleum', 'renewable', 'solar', 'wind', 'nuclear', 'exxon', 'chevron', 'bp', 'shell', 'crude', 'barrel', 'opec'],
+                            'Santé': ['health', 'healthcare', 'pharma', 'pharmaceutical', 'medical', 'drug', 'medicine', 'vaccine', 'hospital', 'medicare', 'pfizer', 'moderna', 'johnson & johnson'],
+                            'Crypto': ['crypto', 'cryptocurrency', 'bitcoin', 'btc', 'ethereum', 'eth', 'blockchain', 'coinbase', 'binance', 'crypto market', 'digital currency'],
+                            'IA': ['ai', 'artificial intelligence', 'machine learning', 'deep learning', 'chatgpt', 'openai', 'nvidia', 'neural network', 'llm', 'large language model']
                         };
+                        const beforeFilter = filtered.length;
                         filtered = filtered.filter(article => {
                             const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
                             return themeKeywords[selectedTheme]?.some(keyword => text.includes(keyword));
                         });
+                        // Si aucun résultat, essayer avec mots-clés plus généraux
+                        if (filtered.length === 0 && beforeFilter > 0) {
+                            const fallbackKeywords = {
+                                'Tech': ['tech', 'technology'],
+                                'Finance': ['finance', 'financial', 'bank'],
+                                'Énergie': ['energy', 'oil', 'gas'],
+                                'Santé': ['health', 'medical'],
+                                'Crypto': ['crypto', 'bitcoin'],
+                                'IA': ['ai', 'artificial intelligence']
+                            };
+                            filtered = newsData.filter(article => {
+                                const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                                return fallbackKeywords[selectedTheme]?.some(keyword => text.includes(keyword));
+                            });
+                            hasExactMatches = false;
+                        }
                     }
 
+                    // Si toujours aucun résultat, afficher toutes les nouvelles avec un message
+                    if (filtered.length === 0 && newsData.length > 0) {
+                        filtered = newsData.slice(0, 20); // Limiter à 20 pour éviter la surcharge
+                        hasExactMatches = false;
+                    }
+
+                    setIsApproximateMatch(!hasExactMatches);
                     setLocalFilteredNews(filtered);
                 }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
 
@@ -20044,6 +20127,25 @@ console.log('✅ Données hybrides récupérées:', {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Message informatif pour les résultats approximatifs */}
+                            {isApproximateMatch && localFilteredNews.length > 0 && (
+                                <div className={`mt-4 p-4 rounded-lg border-2 ${
+                                    isDarkMode
+                                        ? 'bg-yellow-900/20 border-yellow-600/50 text-yellow-200'
+                                        : 'bg-yellow-50 border-yellow-300 text-yellow-800'
+                                }`}>
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-xl">💡</span>
+                                        <div>
+                                            <p className="font-semibold mb-1">Résultats similaires affichés</p>
+                                            <p className="text-sm">
+                                                Aucun résultat exact trouvé pour les filtres sélectionnés. Nous affichons des articles similaires qui pourraient vous intéresser.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Liste des nouvelles */}
