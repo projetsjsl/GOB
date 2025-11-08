@@ -6,7 +6,7 @@ L'interface de gestion des destinataires email permet de configurer les adresses
 
 ## Accès à l'interface
 
-1. Ouvrez le dashboard : `https://gob.vercel.app` (ou votre URL Vercel)
+1. Ouvrez le dashboard : `https://gob-projetsjsls-projects.vercel.app` (ou votre URL Vercel)
 2. Allez dans l'onglet **"Emma En Direct"**
 3. Faites défiler jusqu'à la section **"📧 Gestion des Destinataires Email"**
 

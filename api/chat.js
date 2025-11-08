@@ -557,7 +557,7 @@ Comment puis-je t'aider ? 🚀`;
       try {
         const baseUrl = process.env.VERCEL_URL
           ? `https://${process.env.VERCEL_URL}`
-          : 'https://gob.vercel.app';
+          : 'https://gob-projetsjsls-projects.vercel.app';
 
         const newsResponse = await fetch(`${baseUrl}/api/fmp?endpoint=news&limit=5`, {
           method: 'GET',
