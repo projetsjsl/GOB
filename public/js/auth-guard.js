@@ -351,10 +351,37 @@
 
   // Créer l'instance globale
   window.authGuard = new AuthGuard();
-
-  // Créer un événement personnalisé pour signaler que l'initialisation est terminée
+  
+  // État d'initialisation
   window.authGuardInitialized = false;
-  window.dispatchEvent(new CustomEvent('authGuardReady'));
+  window.authGuardReady = false;
+
+  // Fonction pour signaler que l'initialisation est terminée
+  function signalAuthGuardReady(authenticated, user, error) {
+    if (window.authGuardInitialized) {
+      return; // Éviter les doubles signaux
+    }
+    
+    window.authGuardInitialized = true;
+    window.authGuardReady = true;
+    
+    // Créer l'objet détail de l'événement
+    const eventDetail = { 
+      authenticated: authenticated,
+      user: user || null,
+      error: error || null
+    };
+    
+    // Stocker l'événement dans window pour les cas de race condition
+    window.lastAuthGuardEvent = eventDetail;
+    
+    // Déclencher l'événement
+    window.dispatchEvent(new CustomEvent('authGuardInitialized', { 
+      detail: eventDetail
+    }));
+    
+    console.log('🔐 Auth Guard: Initialisation terminée', { authenticated, hasUser: !!user });
+  }
 
   // Initialiser automatiquement quand le DOM est prêt
   // Utiliser un try-catch global pour éviter que les erreurs bloquent le chargement
@@ -362,44 +389,66 @@
     const initAuthGuard = async () => {
       try {
         await window.authGuard.init();
-        window.authGuardInitialized = true;
-        // Déclencher un événement pour signaler que l'initialisation est terminée
-        window.dispatchEvent(new CustomEvent('authGuardInitialized', { 
-          detail: { 
-            authenticated: window.authGuard.currentUser !== null,
-            user: window.authGuard.currentUser 
-          } 
-        }));
+        
+        // Vérifier si on a été redirigé vers login
+        if (window.location.pathname.includes('login.html')) {
+          console.log('🔐 Auth Guard: Redirection vers login détectée');
+          signalAuthGuardReady(false, null, 'Redirected to login');
+          return;
+        }
+        
+        // Vérifier l'état d'authentification
+        const isAuthenticated = window.authGuard.currentUser !== null;
+        signalAuthGuardReady(isAuthenticated, window.authGuard.currentUser, null);
+        
       } catch (error) {
-        console.error('Erreur lors de l\'initialisation de Auth Guard:', error);
-        // Même en cas d'erreur, signaler que l'initialisation est terminée
-        window.authGuardInitialized = true;
-        window.dispatchEvent(new CustomEvent('authGuardInitialized', { 
-          detail: { 
-            authenticated: false,
-            error: error.message 
-          } 
-        }));
+        console.error('❌ Erreur lors de l\'initialisation de Auth Guard:', error);
+        
+        // Vérifier si on a été redirigé vers login pendant l'erreur
+        if (window.location.pathname.includes('login.html')) {
+          signalAuthGuardReady(false, null, 'Redirected to login');
+          return;
+        }
+        
+        // En cas d'erreur, vérifier si on a quand même une session
+        const userJson = sessionStorage.getItem('gob-user');
+        if (userJson) {
+          try {
+            const user = JSON.parse(userJson);
+            signalAuthGuardReady(true, user, error.message);
+          } catch (parseError) {
+            signalAuthGuardReady(false, null, error.message);
+          }
+        } else {
+          signalAuthGuardReady(false, null, error.message);
+        }
       }
     };
 
+    // Initialiser immédiatement si le DOM est déjà chargé, sinon attendre
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         initAuthGuard();
       });
     } else {
+      // DOM déjà chargé, initialiser immédiatement
       initAuthGuard();
     }
   } catch (error) {
-    console.error('Erreur critique lors de l\'initialisation de Auth Guard:', error);
-    // Même en cas d'erreur critique, signaler que l'initialisation est terminée
-    window.authGuardInitialized = true;
-    window.dispatchEvent(new CustomEvent('authGuardInitialized', { 
-      detail: { 
-        authenticated: false,
-        error: error.message 
-      } 
-    }));
+    console.error('❌ Erreur critique lors de l\'initialisation de Auth Guard:', error);
+    
+    // En cas d'erreur critique, vérifier si on a quand même une session
+    const userJson = sessionStorage.getItem('gob-user');
+    if (userJson && !window.location.pathname.includes('login.html')) {
+      try {
+        const user = JSON.parse(userJson);
+        signalAuthGuardReady(true, user, error.message);
+      } catch (parseError) {
+        signalAuthGuardReady(false, null, error.message);
+      }
+    } else {
+      signalAuthGuardReady(false, null, error.message);
+    }
   }
 
 })();
