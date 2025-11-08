@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "description": "Configuration des destinataires email par type de briefing",
+  
+  "preview_email": {
+    "address": "projetsjsl@gmail.com",
+    "description": "Adresse email pour recevoir les previews (tests manuels)"
+  },
+  
+  "recipients": {
+    "morning": {
+      "enabled": true,
+      "addresses": [
+        {
+          "email": "projetsjsl@gmail.com",
+          "enabled": true,
+          "label": "Email principal"
+        }
+      ],
+      "description": "Destinataires pour les briefings du matin"
+    },
+    "midday": {
+      "enabled": true,
+      "addresses": [
+        {
+          "email": "projetsjsl@gmail.com",
+          "enabled": true,
+          "label": "Email principal"
+        }
+      ],
+      "description": "Destinataires pour les briefings de midi"
+    },
+    "evening": {
+      "enabled": true,
+      "addresses": [
+        {
+          "email": "projetsjsl@gmail.com",
+          "enabled": true,
+          "label": "Email principal"
+        }
+      ],
+      "description": "Destinataires pour les briefings du soir"
+    },
+    "custom": {
+      "enabled": true,
+      "addresses": [
+        {
+          "email": "projetsjsl@gmail.com",
+          "enabled": true,
+          "label": "Email principal"
+        }
+      ],
+      "description": "Destinataires pour les briefings personnalisés"
+    }
+  },
+  
+  "default_recipient": "projetsjsl@gmail.com"
+}
+

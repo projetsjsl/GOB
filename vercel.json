@@ -85,6 +85,9 @@
         },
         "api/theme-colors.js": {
           "maxDuration": 10
+        },
+        "api/email-recipients.js": {
+          "maxDuration": 10
         }
   },
   "headers": [
