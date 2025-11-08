@@ -829,7 +829,7 @@ async function getAsianMarkets() {
     try {
       // Utiliser votre API marketdata existante
       const response = await fetch(
-        `https://gob-git-main-projetsjsls-projects.vercel.app/api/marketdata?endpoint=quote&symbol=${market.symbol}&source=auto`
+        `https://gob-projetsjsls-projects.vercel.app/api/marketdata?endpoint=quote&symbol=${market.symbol}&source=auto`
       );
       
       if (response.ok) {
@@ -922,7 +922,7 @@ async function getUSMarkets() {
     try {
       // Utiliser votre API marketdata existante
       const response = await fetch(
-        `https://gob-git-main-projetsjsls-projects.vercel.app/api/marketdata?endpoint=quote&symbol=${market.symbol}&source=auto`
+        `https://gob-projetsjsls-projects.vercel.app/api/marketdata?endpoint=quote&symbol=${market.symbol}&source=auto`
       );
       
       if (response.ok) {

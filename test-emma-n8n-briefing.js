@@ -2,7 +2,7 @@
  * Tester l'endpoint /api/emma-n8n?action=briefing
  */
 
-const BASE_URL = 'https://gob.vercel.app';
+const BASE_URL = 'https://gob-projetsjsls-projects.vercel.app';
 const N8N_API_KEY = process.env.N8N_API_KEY || 'test';
 
 async function testEmmaN8nBriefing() {

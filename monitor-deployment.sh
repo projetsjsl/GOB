@@ -5,7 +5,7 @@ echo "📊 Monitoring du déploiement Vercel"
 echo "==================================="
 echo ""
 
-BASE_URL="https://gob.vercel.app"
+BASE_URL="https://gob-projetsjsls-projects.vercel.app"
 
 # Fonction pour tester un endpoint
 test_endpoint() {

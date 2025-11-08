@@ -5,7 +5,7 @@ echo "🔍 Vérification du statut du déploiement Vercel"
 echo "=============================================="
 echo ""
 
-BASE_URL="https://gob.vercel.app"
+BASE_URL="https://gob-projetsjsls-projects.vercel.app"
 
 # Test des endpoints existants
 echo "🧪 Test des endpoints existants..."

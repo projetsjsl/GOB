@@ -6,7 +6,7 @@ echo "=========================================="
 echo ""
 
 # Configuration
-BASE_URL="https://gob.vercel.app"
+BASE_URL="https://gob-projetsjsls-projects.vercel.app"
 CRON_SECRET="0S0WkQvmLDYpkxDFrE1N7Q5JHl15bwCfb9g/Tpf19gA="
 
 echo "🔍 Test 1: Vérification de l'API de cache (nouvelles générales)"

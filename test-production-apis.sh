@@ -3,7 +3,7 @@
 # Production API Testing Script
 # Tests all critical endpoints on live Vercel deployment
 
-BASE_URL="https://gob.vercel.app"
+BASE_URL="https://gob-projetsjsls-projects.vercel.app"
 
 echo "========================================"
 echo "GOB Production API Testing"

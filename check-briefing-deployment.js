@@ -2,7 +2,7 @@
  * Vérifier le déploiement de /api/briefing
  */
 
-const BASE_URL = 'https://gob.vercel.app';
+const BASE_URL = 'https://gob-projetsjsls-projects.vercel.app';
 
 async function checkDeployment() {
   console.log('🔍 Vérification du déploiement /api/briefing...\n');

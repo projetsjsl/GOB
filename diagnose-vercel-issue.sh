@@ -5,7 +5,7 @@ echo "🔍 Diagnostic approfondi Vercel"
 echo "==============================="
 echo ""
 
-BASE_URL="https://gob.vercel.app"
+BASE_URL="https://gob-projetsjsls-projects.vercel.app"
 
 echo "📋 1. Vérification des commits récents..."
 echo ""

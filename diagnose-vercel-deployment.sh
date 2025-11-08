@@ -5,7 +5,7 @@ echo "🔍 Diagnostic du déploiement Vercel"
 echo "==================================="
 echo ""
 
-BASE_URL="https://gob.vercel.app"
+BASE_URL="https://gob-projetsjsls-projects.vercel.app"
 
 echo "📋 Vérification des fichiers locaux..."
 echo ""
