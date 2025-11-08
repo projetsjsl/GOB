@@ -3891,6 +3891,76 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
                     </div>
 
+                    {/* 🎨 Mode Professionnel / Fun */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
+                                <Icon emoji="🎨" size={20} />
+                                Mode d'Affichage des Icônes
+                            </h3>
+                            <div className={`px-3 py-1 rounded text-xs font-medium ${
+                                isProfessionalMode
+                                    ? isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-200 text-blue-900'
+                                    : isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'
+                            }`}>
+                                {isProfessionalMode ? '💼 Professionnel' : '🎉 Fun'}
+                            </div>
+                        </div>
+                        <div className={`space-y-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
+                                        <span className="font-semibold">
+                                            {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            const newMode = window.ProfessionalModeSystem.toggle();
+                                            setIsProfessionalMode(newMode);
+                                        }}
+                                        className={`px-4 py-2 rounded-lg transition-all duration-300 border-2 font-semibold ${
+                                            isProfessionalMode
+                                                ? 'bg-gradient-to-br from-blue-600 to-blue-700 border-blue-400 text-white hover:from-blue-700 hover:to-blue-800'
+                                                : 'bg-gradient-to-br from-purple-600 to-pink-600 border-purple-400 text-white hover:from-purple-700 hover:to-pink-700'
+                                        }`}
+                                    >
+                                        {isProfessionalMode ? (
+                                            <span className="flex items-center gap-2">
+                                                <i className="iconoir-briefcase"></i>
+                                                Mode Professionnel
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <span>🎉</span>
+                                                Mode Fun
+                                            </span>
+                                        )}
+                                    </button>
+                                </div>
+                                <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    {isProfessionalMode ? (
+                                        <>
+                                            <p className="mb-1">✅ Icônes professionnelles Iconoir activées</p>
+                                            <p>Les emojis sont remplacés par des icônes vectorielles modernes pour une apparence plus professionnelle.</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="mb-1">✅ Mode Fun avec emojis activé</p>
+                                            <p>Les icônes sont affichées sous forme d'emojis colorés pour une expérience plus décontractée.</p>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={`p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
+                                💡 <strong>Astuce:</strong> Le mode sélectionné est sauvegardé automatiquement et s'applique à tous les onglets du dashboard.
+                            </div>
+                        </div>
+                    </div>
+
                     {/* 🤖 Configuration Emma IA */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
@@ -20097,32 +20167,6 @@ console.log('✅ Données hybrides récupérées:', {
                         : 'bg-white'
                 }`}>
                     {/* Professional/Fun Mode Toggle Button */}
-                    <button
-                        onClick={() => {
-                            const newMode = window.ProfessionalModeSystem.toggle();
-                            setIsProfessionalMode(newMode);
-                        }}
-                        className={`fixed top-4 right-4 z-[60] p-3 rounded-lg shadow-lg transition-all duration-300 border-2 ${
-                            isProfessionalMode
-                                ? 'bg-gradient-to-br from-blue-600 to-blue-700 border-blue-400 text-white hover:from-blue-700 hover:to-blue-800'
-                                : 'bg-gradient-to-br from-purple-600 to-pink-600 border-purple-400 text-white hover:from-purple-700 hover:to-pink-700'
-                        }`}
-                        title={isProfessionalMode ? 'Mode Professionnel (clic pour Mode Fun 🎉)' : 'Mode Fun (clic pour Mode Professionnel 💼)'}
-                    >
-                        <div className="flex items-center gap-2">
-                            {isProfessionalMode ? (
-                                <>
-                                    <i className="iconoir-briefcase text-xl"></i>
-                                    <span className="hidden sm:inline text-sm font-semibold">PRO</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="text-xl">🎉</span>
-                                    <span className="hidden sm:inline text-sm font-semibold">FUN</span>
-                                </>
-                            )}
-                        </div>
-                    </button>
 
                     {/* Intro Emma IA - première visite de session */}
                     {showEmmaIntro && activeTab === 'ask-emma' && (
