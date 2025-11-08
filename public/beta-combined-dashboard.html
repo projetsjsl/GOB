@@ -887,6 +887,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const tabSoundRef = useRef(null);
             const audioCtxRef = useRef(null);
             const tickerTapeRef = useRef(null);
+            const stocksLoadingRef = useRef(false); // Pour éviter les chargements multiples
 
             // États pour Emma (partagés entre AskEmmaTab et AdminJSLaiTab)
             const [emmaConnected, setEmmaConnected] = useState(false);
@@ -2855,10 +2856,13 @@ const fetchHybridData = async (symbol, dataType) => {
                                 console.log(`✅ ${preloadedTickers.length} tickers chargés depuis préchargement`);
                                 
                                 // Charger aussi les données de marché préchargées si disponibles
-                                if (preloadedData.titlesTabData.stockData) {
+                                if (preloadedData.titlesTabData.stockData && Object.keys(preloadedData.titlesTabData.stockData).length > 0) {
                                     console.log('⚡ Utilisation des données de marché préchargées');
                                     setStockData(preloadedData.titlesTabData.stockData);
                                     setLastUpdate(new Date(preloadedData.timestamp));
+                                } else {
+                                    // Si pas de données préchargées, forcer le chargement
+                                    console.log('⚠️ Pas de données préchargées disponibles, chargement sera déclenché automatiquement');
                                 }
                                 
                                 // Charger aussi les nouvelles préchargées si disponibles
@@ -2968,7 +2972,7 @@ const fetchHybridData = async (symbol, dataType) => {
                 loadTickersFromSupabase().then(() => {
                     // Une fois les tickers chargés, charger les nouvelles
                     fetchNews();
-                    // refreshAllStocks sera appelé automatiquement par le useEffect suivant
+                    // Le chargement des stocks sera déclenché automatiquement par le useEffect qui surveille tickers.length
                 }).catch(error => {
                     console.error('❌ Erreur lors du chargement initial:', error);
                 });
@@ -2985,11 +2989,26 @@ const fetchHybridData = async (symbol, dataType) => {
             // Charger automatiquement les données de stocks dès que les tickers sont disponibles
             useEffect(() => {
                 if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminée
-                if (tickers.length > 0 && Object.keys(stockData).length === 0) {
-                    console.log('💹 Chargement automatique des données de stocks au démarrage (tous les tickers)...');
-                    refreshAllStocks().catch(err => {
-                        console.error('❌ Erreur chargement stocks:', err);
-                    });
+                if (tickers.length > 0 && !stocksLoadingRef.current) {
+                    // Vérifier si on a des données pour tous les tickers
+                    const tickersWithData = tickers.filter(ticker => stockData[ticker] && stockData[ticker].c !== undefined && stockData[ticker].c !== 0);
+                    const hasIncompleteData = tickersWithData.length < tickers.length;
+                    
+                    if (hasIncompleteData || Object.keys(stockData).length === 0) {
+                        console.log(`💹 Chargement automatique des données de stocks (${tickers.length} tickers, ${tickersWithData.length} avec données)...`);
+                        stocksLoadingRef.current = true; // Marquer comme en cours de chargement
+                        // Utiliser un petit délai pour s'assurer que les tickers sont bien chargés
+                        setTimeout(() => {
+                            refreshAllStocks().then(() => {
+                                stocksLoadingRef.current = false; // Réinitialiser après chargement
+                            }).catch(err => {
+                                console.error('❌ Erreur chargement stocks:', err);
+                                stocksLoadingRef.current = false; // Réinitialiser même en cas d'erreur
+                            });
+                        }, 500);
+                    } else {
+                        console.log(`✅ Données déjà disponibles pour ${tickersWithData.length}/${tickers.length} tickers`);
+                    }
                 }
             }, [tickers.length, initialLoadComplete]); // Se déclenche quand les tickers sont chargés (pas stockData pour éviter boucle)
 
@@ -3042,12 +3061,14 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
             }, [activeTab, initialLoadComplete]); // Se déclenche au changement d'onglet
 
-            // Charger les données de stocks une fois que les tickers sont disponibles
+            // Charger les données de stocks une fois que les tickers sont disponibles (méthode batch optimisée)
             // Charger TOUS les tickers pour que les sections Top Movers, Top Gainers, Top Losers et Analyses fonctionnent
             useEffect(() => {
                 // Charger les données même si on n'est pas sur l'onglet stocks-news pour que les sections soient prêtes
-                if (tickers.length > 0 && Object.keys(stockData).length === 0) {
-                    console.log('💹 Chargement automatique des données de stocks (tous les tickers pour sections complètes)...');
+                // Ne charger que si on n'est pas déjà en train de charger et qu'on n'a pas de données
+                if (tickers.length > 0 && Object.keys(stockData).length === 0 && !stocksLoadingRef.current && initialLoadComplete) {
+                    console.log('💹 Chargement automatique des données de stocks via batch (tous les tickers pour sections complètes)...');
+                    stocksLoadingRef.current = true; // Marquer comme en cours de chargement
                     // Charger TOUS les tickers pour que les sections Top Movers, Gainers, Losers et Analyses fonctionnent
                     const initialTickers = tickers; // Charger tous les tickers, pas seulement les 5 premiers
                     if (initialTickers.length > 0) {
@@ -3082,6 +3103,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                                     o: quote?.o || 0,
                                                     v: quote?.v || 0,
                                                     fundamentals: fundamental || null,
+                                                    recommendation: fundamental?.recommendation || null, // Inclure les recommandations d'analystes
                                                     timestamp: new Date().toISOString()
                                                 };
                                             }
@@ -3089,19 +3111,28 @@ const fetchHybridData = async (symbol, dataType) => {
                                         
                                         console.log(`✅ Données chargées pour ${Object.keys(newStockData).length} tickers`);
                                         setStockData(newStockData);
+                                        setLastUpdate(new Date());
+                                        stocksLoadingRef.current = false; // Réinitialiser après chargement
                                         console.log(`✅ ${Object.keys(newStockData).length} stocks chargés initialement`);
+                                    } else {
+                                        stocksLoadingRef.current = false;
                                     }
+                                } else {
+                                    stocksLoadingRef.current = false;
                                 }
                             } catch (error) {
                                 console.warn('⚠️ Erreur chargement initial stocks, fallback:', error);
+                                stocksLoadingRef.current = false;
                                 // Fallback: charger tous les tickers si batch échoue
                                 refreshAllStocks();
                             }
                         };
                         loadInitialStocks();
+                    } else {
+                        stocksLoadingRef.current = false;
                     }
                 }
-            }, [tickers.length]); // Se déclenche quand les tickers changent (pas besoin de activeTab)
+            }, [tickers.length, initialLoadComplete]); // Se déclenche quand les tickers changent et que l'initialisation est terminée
 
             // Chargement automatique du calendrier économique à l'ouverture de l'onglet
             // OBSOLÈTE: EconomicCalendarTab gère maintenant son propre chargement de données
