@@ -776,7 +776,7 @@
       "main": [
         [
           {
-            "node": "Fetch Prompts from API",
+            "node": "Workflow Configuration",
             "type": "main",
             "index": 0
           }
@@ -787,7 +787,7 @@
       "main": [
         [
           {
-            "node": "Fetch Prompts from API",
+            "node": "Workflow Configuration",
             "type": "main",
             "index": 0
           }
@@ -820,7 +820,7 @@
       "main": [
         [
           {
-            "node": "Fetch Prompts from API",
+            "node": "Workflow Configuration",
             "type": "main",
             "index": 0
           }
@@ -920,12 +920,7 @@
       "main": [
         [
           {
-            "node": "Get Active Tickers",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Determine Time-Based Prompt",
+            "node": "Fetch Prompts from API",
             "type": "main",
             "index": 0
           }
