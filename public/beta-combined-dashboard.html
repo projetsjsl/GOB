@@ -2987,30 +2987,37 @@ const fetchHybridData = async (symbol, dataType) => {
             }, []); // Dépendance vide = une seule fois au montage
 
             // Charger automatiquement les données de stocks dès que les tickers sont disponibles
+            // Ce useEffect est un fallback si le batch ne charge pas les données
             useEffect(() => {
                 if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminée
-                if (tickers.length > 0 && !stocksLoadingRef.current) {
+                if (tickers.length === 0) return; // Pas de tickers à charger
+                if (stocksLoadingRef.current) return; // Déjà en cours de chargement
+                
+                // Attendre un peu pour laisser le batch charger d'abord
+                const checkAndLoad = setTimeout(() => {
                     // Vérifier si on a des données pour tous les tickers
-                    const tickersWithData = tickers.filter(ticker => stockData[ticker] && stockData[ticker].c !== undefined && stockData[ticker].c !== 0);
+                    const tickersWithData = tickers.filter(ticker => {
+                        const data = stockData[ticker];
+                        return data && data.c !== undefined && data.c !== 0;
+                    });
                     const hasIncompleteData = tickersWithData.length < tickers.length;
                     
                     if (hasIncompleteData || Object.keys(stockData).length === 0) {
-                        console.log(`💹 Chargement automatique des données de stocks (${tickers.length} tickers, ${tickersWithData.length} avec données)...`);
+                        console.log(`💹 Fallback: Chargement automatique des données de stocks (${tickers.length} tickers, ${tickersWithData.length} avec données)...`);
                         stocksLoadingRef.current = true; // Marquer comme en cours de chargement
-                        // Utiliser un petit délai pour s'assurer que les tickers sont bien chargés
-                        setTimeout(() => {
-                            refreshAllStocks().then(() => {
-                                stocksLoadingRef.current = false; // Réinitialiser après chargement
-                            }).catch(err => {
-                                console.error('❌ Erreur chargement stocks:', err);
-                                stocksLoadingRef.current = false; // Réinitialiser même en cas d'erreur
-                            });
-                        }, 500);
+                        refreshAllStocks().then(() => {
+                            stocksLoadingRef.current = false; // Réinitialiser après chargement
+                        }).catch(err => {
+                            console.error('❌ Erreur chargement stocks:', err);
+                            stocksLoadingRef.current = false; // Réinitialiser même en cas d'erreur
+                        });
                     } else {
                         console.log(`✅ Données déjà disponibles pour ${tickersWithData.length}/${tickers.length} tickers`);
                     }
-                }
-            }, [tickers.length, initialLoadComplete]); // Se déclenche quand les tickers sont chargés (pas stockData pour éviter boucle)
+                }, 2000); // Attendre 2 secondes pour laisser le batch charger d'abord
+                
+                return () => clearTimeout(checkAndLoad);
+            }, [tickers.length, initialLoadComplete]); // Se déclenche quand les tickers sont chargés
 
             // Intro Emma: première visite de session (séparé du chargement)
             useEffect(() => {
@@ -3064,74 +3071,86 @@ const fetchHybridData = async (symbol, dataType) => {
             // Charger les données de stocks une fois que les tickers sont disponibles (méthode batch optimisée)
             // Charger TOUS les tickers pour que les sections Top Movers, Top Gainers, Top Losers et Analyses fonctionnent
             useEffect(() => {
-                // Charger les données même si on n'est pas sur l'onglet stocks-news pour que les sections soient prêtes
-                // Ne charger que si on n'est pas déjà en train de charger et qu'on n'a pas de données
-                if (tickers.length > 0 && Object.keys(stockData).length === 0 && !stocksLoadingRef.current && initialLoadComplete) {
-                    console.log('💹 Chargement automatique des données de stocks via batch (tous les tickers pour sections complètes)...');
-                    stocksLoadingRef.current = true; // Marquer comme en cours de chargement
-                    // Charger TOUS les tickers pour que les sections Top Movers, Gainers, Losers et Analyses fonctionnent
-                    const initialTickers = tickers; // Charger tous les tickers, pas seulement les 5 premiers
-                    if (initialTickers.length > 0) {
-                        // Utiliser la fonction batch optimisée
-                        const loadInitialStocks = async () => {
-                            try {
-                                const symbolsQuery = initialTickers.join(',');
-                                console.log(`📡 Appel API batch pour: ${symbolsQuery}`);
-                                const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
-                                
-                                if (batchResponse.ok) {
-                                    const batchData = await batchResponse.json();
-                                    console.log('📊 Réponse batch:', batchData);
-                                    if (batchData.success && batchData.data) {
-                                        const quotes = batchData.data.quote || {};
-                                        const fundamentals = batchData.data.fundamentals || {};
-                                        const newStockData = {};
-                                        
-                                        initialTickers.forEach(ticker => {
-                                            const tickerUpper = ticker.toUpperCase();
-                                            const quote = quotes[tickerUpper];
-                                            const fundamental = fundamentals[tickerUpper];
-                                            
-                                            if (quote || fundamental) {
-                                                newStockData[ticker] = {
-                                                    symbol: tickerUpper,
-                                                    c: quote?.c || fundamental?.quote?.price || 0,
-                                                    d: quote?.d || fundamental?.quote?.change || 0,
-                                                    dp: quote?.dp || fundamental?.quote?.changesPercentage || 0,
-                                                    h: quote?.h || 0,
-                                                    l: quote?.l || 0,
-                                                    o: quote?.o || 0,
-                                                    v: quote?.v || 0,
-                                                    fundamentals: fundamental || null,
-                                                    recommendation: fundamental?.recommendation || null, // Inclure les recommandations d'analystes
-                                                    timestamp: new Date().toISOString()
-                                                };
-                                            }
-                                        });
-                                        
-                                        console.log(`✅ Données chargées pour ${Object.keys(newStockData).length} tickers`);
-                                        setStockData(newStockData);
-                                        setLastUpdate(new Date());
-                                        stocksLoadingRef.current = false; // Réinitialiser après chargement
-                                        console.log(`✅ ${Object.keys(newStockData).length} stocks chargés initialement`);
-                                    } else {
-                                        stocksLoadingRef.current = false;
-                                    }
-                                } else {
-                                    stocksLoadingRef.current = false;
-                                }
-                            } catch (error) {
-                                console.warn('⚠️ Erreur chargement initial stocks, fallback:', error);
-                                stocksLoadingRef.current = false;
-                                // Fallback: charger tous les tickers si batch échoue
-                                refreshAllStocks();
-                            }
-                        };
-                        loadInitialStocks();
-                    } else {
-                        stocksLoadingRef.current = false;
-                    }
+                // Ne charger que si on a des tickers, que l'initialisation est terminée, et qu'on n'est pas déjà en train de charger
+                if (tickers.length === 0 || !initialLoadComplete || stocksLoadingRef.current) return;
+                
+                // Vérifier si on a déjà des données complètes
+                const tickersWithData = tickers.filter(ticker => {
+                    const data = stockData[ticker];
+                    return data && data.c !== undefined && data.c !== 0;
+                });
+                
+                // Si on a déjà des données pour tous les tickers, ne pas recharger
+                if (tickersWithData.length === tickers.length && tickers.length > 0) {
+                    console.log(`✅ Données déjà complètes pour ${tickersWithData.length}/${tickers.length} tickers`);
+                    return;
                 }
+                
+                console.log('💹 Chargement automatique des données de stocks via batch (tous les tickers pour sections complètes)...');
+                stocksLoadingRef.current = true; // Marquer comme en cours de chargement
+                
+                // Charger TOUS les tickers pour que les sections Top Movers, Gainers, Losers et Analyses fonctionnent
+                const initialTickers = tickers; // Charger tous les tickers, pas seulement les 5 premiers
+                
+                // Utiliser la fonction batch optimisée
+                const loadInitialStocks = async () => {
+                    try {
+                        const symbolsQuery = initialTickers.join(',');
+                        console.log(`📡 Appel API batch pour: ${symbolsQuery}`);
+                        const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
+                        
+                        if (batchResponse.ok) {
+                            const batchData = await batchResponse.json();
+                            console.log('📊 Réponse batch:', batchData);
+                            if (batchData.success && batchData.data) {
+                                const quotes = batchData.data.quote || {};
+                                const fundamentals = batchData.data.fundamentals || {};
+                                const newStockData = {};
+                                
+                                initialTickers.forEach(ticker => {
+                                    const tickerUpper = ticker.toUpperCase();
+                                    const quote = quotes[tickerUpper];
+                                    const fundamental = fundamentals[tickerUpper];
+                                    
+                                    if (quote || fundamental) {
+                                        newStockData[ticker] = {
+                                            symbol: tickerUpper,
+                                            c: quote?.c || fundamental?.quote?.price || 0,
+                                            d: quote?.d || fundamental?.quote?.change || 0,
+                                            dp: quote?.dp || fundamental?.quote?.changesPercentage || 0,
+                                            h: quote?.h || 0,
+                                            l: quote?.l || 0,
+                                            o: quote?.o || 0,
+                                            v: quote?.v || 0,
+                                            fundamentals: fundamental || null,
+                                            recommendation: fundamental?.recommendation || null, // Inclure les recommandations d'analystes
+                                            timestamp: new Date().toISOString()
+                                        };
+                                    }
+                                });
+                                
+                                console.log(`✅ Données chargées pour ${Object.keys(newStockData).length} tickers`);
+                                setStockData(prevData => ({ ...prevData, ...newStockData })); // Fusionner avec les données existantes
+                                setLastUpdate(new Date());
+                                stocksLoadingRef.current = false; // Réinitialiser après chargement
+                                console.log(`✅ ${Object.keys(newStockData).length} stocks chargés initialement`);
+                            } else {
+                                console.warn('⚠️ Réponse batch invalide:', batchData);
+                                stocksLoadingRef.current = false;
+                            }
+                        } else {
+                            console.warn(`⚠️ Erreur HTTP batch: ${batchResponse.status}`);
+                            stocksLoadingRef.current = false;
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Erreur chargement initial stocks, fallback:', error);
+                        stocksLoadingRef.current = false;
+                        // Fallback: charger tous les tickers si batch échoue
+                        refreshAllStocks();
+                    }
+                };
+                
+                loadInitialStocks();
             }, [tickers.length, initialLoadComplete]); // Se déclenche quand les tickers changent et que l'initialisation est terminée
 
             // Chargement automatique du calendrier économique à l'ouverture de l'onglet
