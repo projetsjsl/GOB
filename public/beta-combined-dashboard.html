@@ -2360,18 +2360,25 @@ const fetchHybridData = async (symbol, dataType) => {
             useEffect(() => {
                 if (initialLoadComplete) return; // Éviter les rechargements
 
-                console.log('🚀 Initialisation du dashboard (mode lazy loading activé)');
+                console.log('🚀 Initialisation du dashboard');
 
-                // ⚡ LAZY LOADING: Ne charge RIEN automatiquement au démarrage
-                // Les données se chargent SEULEMENT quand l'utilisateur clique sur un onglet
-                // Cela économise énormément d'appels API inutiles
+                // Charger les tickers et nouvelles pour l'onglet d'accueil (stocks-news)
+                // car c'est l'onglet par défaut et les utilisateurs s'attendent à voir des données
+                console.log('📊 Chargement initial des données pour stocks-news (onglet par défaut)...');
+                loadTickersFromSupabase().then(() => {
+                    // Une fois les tickers chargés, charger les nouvelles
+                    fetchNews();
+                    // refreshAllStocks sera appelé automatiquement par le useEffect suivant
+                }).catch(error => {
+                    console.error('❌ Erreur lors du chargement initial:', error);
+                });
 
-                // Désactiver l'écran de chargement immédiatement (pas de chargement = pas d'attente)
+                // Désactiver l'écran de chargement après un court délai
                 setTimeout(() => {
                     setShowLoadingScreen(false);
                     setInitialLoadComplete(true);
-                    console.log('✅ Dashboard prêt (lazy loading) - Les données se chargeront à la demande');
-                }, 500); // Juste le temps d'afficher brièvement le logo
+                    console.log('✅ Dashboard prêt');
+                }, 500);
 
             }, []); // Dépendance vide = une seule fois au montage
 
@@ -2383,6 +2390,31 @@ const fetchHybridData = async (symbol, dataType) => {
                     setTimeout(() => setShowEmmaIntro(false), 3000);
                 }
             }, [activeTab]); // Se déclenche seulement au changement d'onglet
+
+            // Chargement automatique des tickers et nouvelles pour l'onglet stocks-news
+            useEffect(() => {
+                if (activeTab === 'stocks-news' && initialLoadComplete) {
+                    // Charger les tickers si la liste est vide
+                    if (tickers.length === 0) {
+                        console.log('📊 Chargement automatique des tickers pour stocks-news...');
+                        loadTickersFromSupabase();
+                    }
+                    
+                    // Charger les nouvelles si la liste est vide
+                    if (newsData.length === 0) {
+                        console.log('📰 Chargement automatique des nouvelles pour stocks-news...');
+                        fetchNews();
+                    }
+                }
+            }, [activeTab, initialLoadComplete]); // Se déclenche au changement d'onglet
+
+            // Charger les données de stocks une fois que les tickers sont disponibles
+            useEffect(() => {
+                if (activeTab === 'stocks-news' && tickers.length > 0 && Object.keys(stockData).length === 0) {
+                    console.log('💹 Chargement automatique des données de stocks pour stocks-news...');
+                    refreshAllStocks();
+                }
+            }, [activeTab, tickers.length]); // Se déclenche quand les tickers changent
 
             // Chargement automatique du calendrier économique à l'ouverture de l'onglet
             // OBSOLÈTE: EconomicCalendarTab gère maintenant son propre chargement de données
