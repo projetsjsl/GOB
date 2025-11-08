@@ -769,6 +769,174 @@
         20544,
         4536
       ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": "false",
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": "true",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config-schedule-config-1762643453541",
+      "name": "Schedule Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        18656,
+        4264
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": "false",
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": "true",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config-webhook-config-1762643453541",
+      "name": "Webhook Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        18656,
+        4364
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": "true",
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": "false",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config-manual-config-1762643453541",
+      "name": "Manual Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        18656,
+        4564
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": "true",
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": "false",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config-chat-config-1762643453541",
+      "name": "Chat Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        18656,
+        4664
+      ]
     }
   ],
   "connections": {
@@ -776,7 +944,7 @@
       "main": [
         [
           {
-            "node": "Workflow Configuration",
+            "node": "Schedule Config",
             "type": "main",
             "index": 0
           }
@@ -787,7 +955,7 @@
       "main": [
         [
           {
-            "node": "Workflow Configuration",
+            "node": "Webhook Config",
             "type": "main",
             "index": 0
           }
@@ -820,7 +988,7 @@
       "main": [
         [
           {
-            "node": "Workflow Configuration",
+            "node": "Manual Config",
             "type": "main",
             "index": 0
           }
@@ -1101,6 +1269,50 @@
         [
           {
             "node": "Send Email via Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Config": {
+      "main": [
+        [
+          {
+            "node": "Fetch Prompts from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Config": {
+      "main": [
+        [
+          {
+            "node": "Fetch Prompts from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Config": {
+      "main": [
+        [
+          {
+            "node": "Fetch Prompts from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Config": {
+      "main": [
+        [
+          {
+            "node": "Fetch Prompts from API",
             "type": "main",
             "index": 0
           }
