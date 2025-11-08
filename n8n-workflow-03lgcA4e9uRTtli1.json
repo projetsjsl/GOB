@@ -179,7 +179,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La réponse de /api/chat contient:\n// { success: true, response: '...', metadata: { model, tools_used, execution_time_ms, ... } }\nconst content = data.response || data.message || data.analysis || 'No content received';\nconst metadata = data.metadata || {};\n\n// Récupérer le trigger depuis l'exécution n8n\nlet triggerType = 'Manuel';\ntry {\n  const execution = $execution;\n  if (execution?.trigger) {\n    const triggerName = execution.trigger.name || '';\n    if (triggerName.includes('Schedule')) triggerType = 'Planifié (Schedule)';\n    else if (triggerName.includes('Webhook')) triggerType = 'Webhook';\n    else if (triggerName.includes('Gmail')) triggerType = 'Gmail';\n    else if (triggerName.includes('Telegram')) triggerType = 'Telegram';\n    else if (triggerName.includes('Manual')) triggerType = 'Manuel';\n    else triggerType = triggerName || 'Inconnu';\n  }\n} catch (e) {\n  // Si pas disponible, utiliser une valeur par défaut\n  triggerType = data.trigger_type || 'Manuel';\n}\n\nreturn [{\n  json: {\n    ...data,\n    newsletter_content: content,\n    api_type: 'emma-agent',\n    generated_at: new Date().toISOString(),\n    trigger_type: triggerType,\n    emma_model: metadata.model || metadata.llmUsed || 'perplexity',\n    emma_tools: metadata.tools_used || metadata.toolsUsed || [],\n    emma_execution_time: metadata.execution_time_ms || metadata.executionTimeMs || 0,\n    emma_confidence: metadata.confidence || null\n  }\n}];\n\n// ============================================\n// PRÉSERVER preview_mode et approved\n// ============================================\nconst preservedPreviewMode = item.json.preview_mode !== undefined ? item.json.preview_mode : true;\nconst preservedApproved = item.json.approved !== undefined ? item.json.approved : false;\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    preview_mode: preservedPreviewMode,\n    approved: preservedApproved\n  }\n}));"
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // ============================================\n  // PRÉSERVER preview_mode et approved depuis les nodes de configuration\n  // ============================================\n  // Chercher dans les nodes précédents (Schedule Config, Webhook Config, Manual Config, Chat Config)\n  let previewMode = data.preview_mode;\n  let approved = data.approved;\n  \n  // Si les valeurs ne sont pas dans data, chercher dans les nodes précédents\n  if (previewMode === undefined || approved === undefined) {\n    try {\n      // Essayer de récupérer depuis les nodes de configuration\n      const configNodes = ['Schedule Config', 'Webhook Config', 'Manual Config', 'Chat Config', 'Workflow Configuration'];\n      for (const nodeName of configNodes) {\n        try {\n          const nodeData = $(nodeName).item?.json;\n          if (nodeData) {\n            if (previewMode === undefined && nodeData.preview_mode !== undefined) {\n              previewMode = nodeData.preview_mode;\n            }\n            if (approved === undefined && nodeData.approved !== undefined) {\n              approved = nodeData.approved;\n            }\n            if (previewMode !== undefined && approved !== undefined) break;\n          }\n        } catch (e) {\n          // Node n'existe pas ou n'est pas accessible, continuer\n        }\n      }\n    } catch (e) {\n      console.log('⚠️  Impossible de récupérer depuis les nodes précédents:', e.message);\n    }\n  }\n  \n  // Fallback si toujours undefined\n  if (previewMode === undefined) previewMode = true; // Par défaut, preview\n  if (approved === undefined) approved = false; // Par défaut, non approuvé\n  \n  // Convertir en boolean si c'est une string\n  if (previewMode === 'true' || previewMode === true) previewMode = true;\n  else if (previewMode === 'false' || previewMode === false) previewMode = false;\n  \n  if (approved === 'true' || approved === true) approved = true;\n  else if (approved === 'false' || approved === false) approved = false;\n  \n  // Extraire les métadonnées de la réponse API\n  const newsletterContent = data.newsletter_content || data.response || data.message || data.analysis || '';\n  const triggerType = data.trigger_type || 'Manuel';\n  const emmaModel = data.emma_model || data.model || 'perplexity';\n  const emmaTools = Array.isArray(data.emma_tools) ? data.emma_tools : (data.tools_used || []);\n  const emmaExecutionTime = data.emma_execution_time || data.execution_time_ms || 0;\n  const promptType = data.prompt_type || 'custom';\n  const generatedAt = data.generated_at || new Date().toISOString();\n  \n  // Logging pour débogage\n  console.log('📊 Parse API Response - Valeurs finales:');\n  console.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\n  console.log('   approved:', approved, '(type:', typeof approved, ')');\n  console.log('   trigger_type:', triggerType);\n  console.log('   prompt_type:', promptType);\n  \n  return {\n    json: {\n      ...data,\n      // PRÉSERVER les valeurs preview_mode et approved\n      preview_mode: previewMode,\n      approved: approved,\n      // Métadonnées extraites\n      newsletter_content: newsletterContent,\n      trigger_type: triggerType,\n      emma_model: emmaModel,\n      emma_tools: emmaTools,\n      emma_execution_time: emmaExecutionTime,\n      prompt_type: promptType,\n      generated_at: generatedAt,\n      content_length: newsletterContent.length,\n      // Debug\n      _debug_preview_mode: previewMode,\n      _debug_approved: approved,\n      _debug_preview_mode_type: typeof previewMode,\n      _debug_approved_type: typeof approved\n    }\n  };\n});"
       },
       "id": "40676021-3728-41a7-a961-9ec5a4f31b19",
       "name": "Parse API Response",
@@ -937,6 +937,19 @@
         18656,
         4664
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\nconsole.log('🔍 DEBUG AVANT SWITCH:');\nconsole.log('   preview_mode:', data.preview_mode, '(type:', typeof data.preview_mode, ')');\nconsole.log('   approved:', data.approved, '(type:', typeof data.approved, ')');\nconsole.log('   Condition Preview:', data.preview_mode === true || data.approved !== true);\nconsole.log('   Condition Send:', data.preview_mode === false && data.approved === true);\n\nreturn items;"
+      },
+      "id": "debug-before-switch-node",
+      "name": "Debug Before Switch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20160,
+        4536
+      ]
     }
   ],
   "connections": {
@@ -1032,7 +1045,7 @@
       "main": [
         [
           {
-            "node": "Preview or Send?",
+            "node": "Debug Before Switch",
             "type": "main",
             "index": 0
           }
@@ -1313,6 +1326,17 @@
         [
           {
             "node": "Fetch Prompts from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Debug Before Switch": {
+      "main": [
+        [
+          {
+            "node": "Preview or Send?",
             "type": "main",
             "index": 0
           }
