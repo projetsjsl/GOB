@@ -25,11 +25,26 @@ const cleanWorkflow = {
       parameters: node.parameters
     };
     
-    // CORRECTION: S'assurer que l'URL est correcte pour les nœuds HTTP Request
+    // CORRECTION: S'assurer que l'URL est correcte pour les nœuds HTTP Request qui appellent NOTRE API
     if (node.type === 'n8n-nodes-base.httpRequest' && cleanNode.parameters?.url) {
       const url = cleanNode.parameters.url;
-      // Remplacer toute URL incorrecte par gob.vercel.app
-      if (url.includes('mypros.chat') || url.includes('your-app.vercel.app') || !url.includes('gob.vercel.app')) {
+      // Ne corriger QUE les URLs qui pointent vers notre API (pas les APIs externes comme Resend, Perplexity, etc.)
+      const isOurAPI = url.includes('/api/') && (
+        url.includes('mypros.chat') || 
+        url.includes('your-app.vercel.app') || 
+        url.includes('gob.vercel.app') ||
+        url.includes('emma-agent') ||
+        url.includes('emma-n8n') ||
+        url.includes('briefing')
+      );
+      
+      // Ne pas toucher aux URLs externes (Resend, Perplexity, Gemini, Supabase, etc.)
+      const isExternalAPI = url.includes('resend.com') || 
+                           url.includes('perplexity.ai') || 
+                           url.includes('googleapis.com') ||
+                           url.includes('supabase.co');
+      
+      if (isOurAPI && !isExternalAPI) {
         console.log(`   🔧 Correction URL dans ${node.name}: ${url}`);
         // Si c'est /api/emma-agent, utiliser /api/chat à la place
         if (url.includes('/api/emma-agent')) {
