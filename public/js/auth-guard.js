@@ -31,37 +31,86 @@
         return;
       }
 
-      // Récupérer l'utilisateur depuis sessionStorage
-      const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+      // Vérifier si le dashboard est déjà en train de se charger (éviter les redirections conflictuelles)
+      if (window.dashboardRendered || window.dashboardLoading) {
+        console.log('📊 Dashboard déjà en cours de chargement - vérification rapide de session');
+        // Attendre un peu et vérifier à nouveau
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+        if (userJson) {
+          try {
+            this.currentUser = JSON.parse(userJson);
+            this.permissions = this.currentUser.permissions;
+            this.applyEmmaPermissions();
+            console.log('✅ Session trouvée pendant chargement dashboard');
+            // NE PAS retourner ici - continuer pour que signalAuthGuardReady soit appelé
+            // Le code continuera et signalAuthGuardReady sera appelé avec currentUser défini
+          } catch (e) {
+            console.warn('Erreur parsing session:', e);
+            // Continuer la vérification normale si parsing échoue
+          }
+        } else {
+          // Si pas de session trouvée, continuer la vérification normale
+          console.log('⚠️ Pas de session trouvée pendant chargement dashboard - vérification normale');
+        }
+      }
 
-      if (!userJson) {
-        console.warn('❌ Aucun utilisateur connecté - redirection vers login');
-        this.redirectToLogin();
-        return;
+      // Récupérer l'utilisateur depuis sessionStorage (seulement si pas déjà chargé)
+      let userJson = null;
+      if (!this.currentUser) {
+        userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+
+        if (!userJson) {
+          console.warn('❌ Aucun utilisateur connecté - attente avant redirection...');
+          // Attendre un court instant au cas où la session serait en train d'être écrite
+          await new Promise(resolve => setTimeout(resolve, 200));
+          userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+          if (!userJson) {
+            console.warn('❌ Aucune session trouvée après attente - redirection vers login');
+            this.redirectToLogin();
+            return;
+          }
+          console.log('✅ Session trouvée après attente');
+        }
+      } else {
+        console.log('✅ Utilisateur déjà chargé depuis vérification précédente');
+        userJson = null; // Pas besoin de recharger
       }
 
       try {
-        this.currentUser = JSON.parse(userJson);
-        this.permissions = this.currentUser.permissions;
+        // Parser seulement si on a récupéré une nouvelle session
+        if (userJson && !this.currentUser) {
+          this.currentUser = JSON.parse(userJson);
+          this.permissions = this.currentUser.permissions;
+        }
 
         // Valider la session auprès du serveur avec gestion d'erreur améliorée
-        let isValid = false;
-        try {
-          isValid = await this.validateSession();
-        } catch (validationError) {
-          console.warn('⚠️ Erreur lors de la validation de session (non bloquant):', validationError);
-          // En cas d'erreur réseau ou serveur, permettre l'accès avec les données en session
-          // pour éviter une page blanche
-          isValid = true; // Permettre l'accès basé sur sessionStorage uniquement
+        // Seulement si currentUser est défini (sinon on a déjà échoué plus haut)
+        if (this.currentUser) {
+          let isValid = false;
+          try {
+            isValid = await this.validateSession();
+          } catch (validationError) {
+            console.warn('⚠️ Erreur lors de la validation de session (non bloquant):', validationError);
+            // En cas d'erreur réseau ou serveur, permettre l'accès avec les données en session
+            // pour éviter une page blanche
+            isValid = true; // Permettre l'accès basé sur sessionStorage uniquement
+          }
+
+          if (!isValid) {
+            console.warn('❌ Session invalide - redirection vers login');
+            this.logout();
+            return;
+          }
+        } else {
+          // Si currentUser n'est toujours pas défini à ce stade, c'est une erreur
+          console.error('❌ Erreur: currentUser non défini après toutes les vérifications');
+          // Ne pas rediriger pour éviter une boucle, laisser le dashboard gérer
+          return; // Sortir ici pour éviter d'accéder à currentUser.display_name
         }
 
-        if (!isValid) {
-          console.warn('❌ Session invalide - redirection vers login');
-          this.logout();
-          return;
-        }
-
-        console.log('✅ Utilisateur authentifié:', this.currentUser.display_name);
+        // À ce stade, currentUser est garanti d'être défini
+        console.log('✅ Utilisateur authentifié:', this.currentUser?.display_name || 'Utilisateur');
         console.log('🔑 Permissions:', this.permissions);
 
         // Afficher les infos utilisateur dans le dashboard (DÉSACTIVÉ)
@@ -97,6 +146,12 @@
      * Valide la session auprès du serveur
      */
     async validateSession() {
+      // Protection: ne pas valider si currentUser n'est pas défini
+      if (!this.currentUser || !this.currentUser.username) {
+        console.warn('⚠️ validateSession appelé sans currentUser - retour false');
+        return false;
+      }
+      
       try {
         // Timeout pour éviter que la validation bloque indéfiniment
         const controller = new AbortController();
@@ -398,6 +453,20 @@
         }
         
         // Vérifier l'état d'authentification
+        // Si currentUser n'est pas défini mais qu'on a une session, la charger
+        if (!window.authGuard.currentUser) {
+          const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+          if (userJson) {
+            try {
+              window.authGuard.currentUser = JSON.parse(userJson);
+              window.authGuard.permissions = window.authGuard.currentUser.permissions;
+              window.authGuard.applyEmmaPermissions();
+            } catch (e) {
+              console.warn('Erreur chargement session dans initAuthGuard:', e);
+            }
+          }
+        }
+        
         const isAuthenticated = window.authGuard.currentUser !== null;
         signalAuthGuardReady(isAuthenticated, window.authGuard.currentUser, null);
         
@@ -411,7 +480,7 @@
         }
         
         // En cas d'erreur, vérifier si on a quand même une session
-        const userJson = sessionStorage.getItem('gob-user');
+        const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
         if (userJson) {
           try {
             const user = JSON.parse(userJson);
@@ -438,7 +507,7 @@
     console.error('❌ Erreur critique lors de l\'initialisation de Auth Guard:', error);
     
     // En cas d'erreur critique, vérifier si on a quand même une session
-    const userJson = sessionStorage.getItem('gob-user');
+    const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
     if (userJson && !window.location.pathname.includes('login.html')) {
       try {
         const user = JSON.parse(userJson);
