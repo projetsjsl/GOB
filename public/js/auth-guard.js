@@ -31,13 +31,38 @@
         return;
       }
 
+      // Vérifier si le dashboard est déjà en train de se charger (éviter les redirections conflictuelles)
+      if (window.dashboardRendered || window.dashboardLoading) {
+        console.log('📊 Dashboard déjà en cours de chargement - pas de redirection');
+        // Attendre un peu et vérifier à nouveau
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+        if (userJson) {
+          try {
+            this.currentUser = JSON.parse(userJson);
+            this.permissions = this.currentUser.permissions;
+            this.applyEmmaPermissions();
+            return;
+          } catch (e) {
+            console.warn('Erreur parsing session:', e);
+          }
+        }
+      }
+
       // Récupérer l'utilisateur depuis sessionStorage
-      const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+      let userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
 
       if (!userJson) {
-        console.warn('❌ Aucun utilisateur connecté - redirection vers login');
-        this.redirectToLogin();
-        return;
+        console.warn('❌ Aucun utilisateur connecté - attente avant redirection...');
+        // Attendre un court instant au cas où la session serait en train d'être écrite
+        await new Promise(resolve => setTimeout(resolve, 200));
+        userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+        if (!userJson) {
+          console.warn('❌ Aucune session trouvée après attente - redirection vers login');
+          this.redirectToLogin();
+          return;
+        }
+        console.log('✅ Session trouvée après attente');
       }
 
       try {

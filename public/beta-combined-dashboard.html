@@ -21935,11 +21935,14 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
             // Vérifier une dernière fois si on n'a pas été redirigé
             if (window.location.pathname.includes('login.html')) {
                 console.log('?? Redirection vers login détectée avant rendu');
+                window.dashboardLoading = false;
                 hideLoadingScreen();
                 return;
             }
             
             dashboardRendered = true;
+            window.dashboardRendered = true;
+            window.dashboardLoading = false;
             console.log('? Rendu du dashboard React...');
             
             // Masquer l'écran de chargement avant de rendre React
@@ -21950,6 +21953,9 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
         }
         
         function initDashboard() {
+            // Marquer que le dashboard est en cours de chargement (pour éviter que auth-guard redirige)
+            window.dashboardLoading = true;
+            
             // VÉRIFICATION IMMÉDIATE: Si on vient juste de se connecter, vérifier sessionStorage immédiatement
             const userJson = sessionStorage.getItem('gob-user');
             if (userJson && !window.location.pathname.includes('login.html')) {
@@ -21958,12 +21964,13 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                     console.log('? Session trouvée immédiatement - chargement rapide du dashboard...');
                     // Attendre un court instant pour que auth-guard se synchronise, puis charger
                     setTimeout(() => {
-                        if (!dashboardRendered) {
+                        if (!dashboardRendered && !window.location.pathname.includes('login.html')) {
                             renderDashboard();
                         }
-                    }, 100);
+                    }, 150);
                 } catch (parseError) {
                     console.warn('?? Session invalide - redirection vers login');
+                    window.dashboardLoading = false;
                     hideLoadingScreen();
                     window.location.href = '/login.html';
                     return;
@@ -22012,11 +22019,13 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                             renderDashboard();
                         } catch (parseError) {
                             console.warn('? Session invalide - redirection vers login');
+                            window.dashboardLoading = false;
                             hideLoadingScreen();
                             window.location.href = '/login.html';
                         }
                     } else {
                         console.warn('? Pas de session utilisateur - redirection vers login');
+                        window.dashboardLoading = false;
                         hideLoadingScreen();
                         window.location.href = '/login.html';
                     }
@@ -22049,11 +22058,13 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                             renderDashboard();
                         } catch (parseError) {
                             console.warn('? Session invalide - redirection vers login');
+                            window.dashboardLoading = false;
                             hideLoadingScreen();
                             window.location.href = '/login.html';
                         }
                     } else {
                         console.warn('? Pas de session utilisateur - redirection vers login');
+                        window.dashboardLoading = false;
                         hideLoadingScreen();
                         window.location.href = '/login.html';
                     }
