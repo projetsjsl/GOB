@@ -21192,6 +21192,28 @@ console.log('✅ Données hybrides récupérées:', {
                                     >
                                         <span className="text-lg">{isDarkMode ? '☀️' : '🌙'}</span>
                                     </button>
+
+                                    {/* Bouton de déconnexion - icône seulement */}
+                                    <button
+                                        onClick={() => {
+                                            if (confirm('Voulez-vous vraiment vous déconnecter?')) {
+                                                // Nettoyer toutes les données de session
+                                                sessionStorage.clear();
+                                                localStorage.clear();
+                                                
+                                                // Rediriger vers la page de login
+                                                window.location.href = '/login.html';
+                                            }
+                                        }}
+                                        className={`p-2.5 rounded-md transition-all duration-300 hover:scale-105 border ${
+                                            isDarkMode
+                                                ? 'bg-gray-800 hover:bg-gray-700 border-red-500/30 text-red-400'
+                                                : 'bg-white hover:bg-gray-50 border-red-300 text-red-600'
+                                        }`}
+                                        title="Déconnexion"
+                                    >
+                                        <span className="text-lg">🚪</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
