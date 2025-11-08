@@ -18858,18 +18858,18 @@ console.log('✅ Données hybrides récupérées:', {
                 }, [timelineSymbol]);
 
                 return (
-                    <div className="space-y-6">
+                    <div className="space-y-3 md:space-y-6">
                         {/* En-tête principal TESTS JS */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
                         }`}>
                             <div className="mb-2">
-                                <h2 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
+                                <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     🧪 TESTS JS - Widgets Financiers
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-200' : 'text-blue-800'
                                 }`}>
                                     Collection complète de 14 widgets TradingView et outils d'analyse financière organisés par catégorie
@@ -18880,11 +18880,11 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* ========================================== */}
                         {/* SECTION 1: 📅 CALENDRIERS & ÉVÉNEMENTS    */}
                         {/* ========================================== */}
-                        <div className="mb-4">
-                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                        <div className="mb-2 md:mb-4">
+                            <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${
                                 isDarkMode ? 'border-blue-500' : 'border-blue-600'
                             }`}>
-                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                 }`}>
                                     📅 Calendriers & Événements Économiques
@@ -18893,16 +18893,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Calendrier Économique Investing.com */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     📊 Calendrier Économique
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Calendrier économique complet avec événements majeurs et données en temps réel
@@ -18948,16 +18948,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Forex Heat Map */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     💱 Forex Heat Map
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Carte de chaleur des devises en temps réel (EUR, USD, JPY, GBP, CHF, AUD, CAD, CNY)
@@ -18972,16 +18972,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Economic Calendar Events */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     📅 Economic Calendar Events
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Événements économiques mondiaux par TradingView
@@ -18996,16 +18996,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Forex Cross Rates */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     💱 Forex Cross Rates
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Taux de change croisés pour 9 devises majeures (EUR, USD, JPY, GBP, CHF, AUD, CAD, NZD, CNY)
@@ -19022,11 +19022,11 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* ========================================== */}
                         {/* SECTION 3: 📊 MARCHÉS BOURSIERS            */}
                         {/* ========================================== */}
-                        <div className="mb-4">
-                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                        <div className="mb-2 md:mb-4">
+                            <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${
                                 isDarkMode ? 'border-purple-500' : 'border-purple-600'
                             }`}>
-                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-purple-400' : 'text-purple-600'
                                 }`}>
                                     📊 Marchés Boursiers - Vues Globales
@@ -19035,16 +19035,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Stock Heatmap */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     🇺🇸 Stock Heatmap All USA
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Carte thermique de toutes les actions américaines - Performance par secteur et capitalisation
@@ -19073,16 +19073,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Stock Heatmap TSX */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     🇨🇦 Stock Heatmap TSX
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Carte thermique du Toronto Stock Exchange (TSX) - Performance par secteur et capitalisation
@@ -19111,16 +19111,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Market Quotes */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     📊 Market Quotes - Indices, Futures, Bonds, Forex
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Cotations en temps réel organisées par catégories (Indices, Futures, Obligations US/CAN, Forex CAD)
@@ -19151,29 +19151,29 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* ========================================================================= */}
                         {/* BLOC UNIFIÉ: 📊 ANALYSE COMPLÈTE - 6 WIDGETS SYNCHRONISÉS                */}
                         {/* ========================================================================= */}
-                        <div className={`rounded-xl border-4 shadow-2xl transition-all duration-300 mb-6 ${
+                        <div className={`rounded-xl border-2 md:border-4 shadow-2xl transition-all duration-300 mb-3 md:mb-6 ${
                             isDarkMode
                                 ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-red-500'
                                 : 'bg-gradient-to-br from-white via-gray-50 to-white border-red-600'
                         }`}>
                             {/* En-tête du Bloc Unifié avec Sélecteur de Symbole */}
-                            <div className={`p-4 border-b-4 transition-colors duration-300 ${
+                            <div className={`p-3 md:p-4 border-b-2 md:border-b-4 transition-colors duration-300 ${
                                 isDarkMode ? 'border-red-500 bg-gray-800/50' : 'border-red-600 bg-gray-100/50'
                             }`}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h2 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-0 mb-3 md:mb-4">
+                                    <div className="flex-1">
+                                        <h2 className={`text-lg md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                             isDarkMode ? 'text-red-400' : 'text-red-600'
                                         }`}>
                                             📊 Analyse Complète - {timelineSymbol.split(':')[1] || timelineSymbol}
                                         </h2>
-                                        <p className={`text-sm transition-colors duration-300 ${
+                                        <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                         }`}>
                                             6 widgets synchronisés pour une analyse financière complète. Changez le symbole pour mettre à jour tous les widgets simultanément.
                                         </p>
                                     </div>
-                                    <div className="relative">
+                                    <div className="relative w-full md:w-auto">
                                         {/* Search Input - Style TradingView */}
                                         <div className="flex items-center gap-2">
                                             <input
@@ -19187,13 +19187,13 @@ console.log('✅ Données hybrides récupérées:', {
                                                 onFocus={() => setShowSearchResults(true)}
                                                 onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                                                 placeholder="Search symbols... (e.g., AAPL, BTC)"
-                                                className={`w-64 px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                                                className={`flex-1 md:w-64 px-3 md:px-4 py-2 rounded-lg border-2 text-sm md:text-base font-medium transition-all duration-300 ${
                                                     isDarkMode
                                                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 hover:border-blue-500 focus:border-blue-500'
                                                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-blue-500 focus:border-blue-500'
                                                 } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
                                             />
-                                            <div className={`text-xs px-3 py-2 rounded-lg font-mono font-bold ${
+                                            <div className={`text-xs px-2 md:px-3 py-2 rounded-lg font-mono font-bold whitespace-nowrap ${
                                                 isDarkMode ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800'
                                             }`}>
                                                 {timelineSymbol.split(':')[1]}
@@ -19202,7 +19202,7 @@ console.log('✅ Données hybrides récupérées:', {
 
                                         {/* Autocomplete Results - Style TradingView */}
                                         {showSearchResults && searchQuery && (
-                                            <div className={`absolute top-full left-0 mt-2 w-80 max-h-96 overflow-y-auto rounded-lg border-2 shadow-2xl z-50 ${
+                                            <div className={`absolute top-full left-0 mt-2 w-full md:w-80 max-h-96 overflow-y-auto rounded-lg border-2 shadow-2xl z-50 ${
                                                 isDarkMode
                                                     ? 'bg-gray-800 border-gray-600'
                                                     : 'bg-white border-gray-300'
@@ -19284,29 +19284,29 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
 
                             {/* Corps du Bloc - Layout Style TradingView Compact */}
-                            <div className="p-4">
+                            <div className="p-2 md:p-4">
                                 {/* Grille CSS avec gap de 16px (style compact) */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-4">
 
                                     {/* 1. Symbol Info - PLEINE LARGEUR */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 lg:col-span-2 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             📊 Symbol Info
                                         </h3>
-                                        <div className="h-[380px]">
+                                        <div className="h-[300px] md:h-[380px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 2. Advanced Chart - PLEINE LARGEUR */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 lg:col-span-2 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
@@ -19316,63 +19316,63 @@ console.log('✅ Données hybrides récupérées:', {
                                         }`}>
                                             Cliquez sur un symbole dans la watchlist pour changer tous les widgets
                                         </p>
-                                        <div className="h-[650px] md:h-[700px] lg:h-[750px]">
+                                        <div className="h-[400px] md:h-[650px] lg:h-[750px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 3. Symbol Profile - 1 COLONNE */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             🏢 Profil de l'Entreprise
                                         </h3>
-                                        <div className="h-[400px]">
+                                        <div className="h-[300px] md:h-[400px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 4. Timeline - 1 COLONNE */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             📰 Timeline - Fil d'Actualité
                                         </h3>
-                                        <div className="h-[400px]">
+                                        <div className="h-[300px] md:h-[400px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 5. Financials - PLEINE LARGEUR */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 lg:col-span-2 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             💰 États Financiers
                                         </h3>
-                                        <div className="h-[450px]">
+                                        <div className="h-[350px] md:h-[450px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 6. Technical Analysis - PLEINE LARGEUR */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 lg:col-span-2 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             📈 Analyse Technique
                                         </h3>
-                                        <div className="h-[400px]">
+                                        <div className="h-[300px] md:h-[400px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}></div>
                                         </div>
                                     </div>
@@ -19382,16 +19382,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Screener (Non synchronisé - reste séparé) */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     🔍 Screener de Titres
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Outil de filtrage et d'analyse des actions du marché américain avec critères personnalisables
