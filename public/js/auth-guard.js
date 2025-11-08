@@ -56,11 +56,14 @@
         console.log('✅ Utilisateur authentifié:', this.currentUser.display_name);
         console.log('🔑 Permissions:', this.permissions);
 
-        // Afficher les infos utilisateur dans le dashboard
-        this.displayUserInfo();
+        // Afficher les infos utilisateur dans le dashboard (DÉSACTIVÉ)
+        // this.displayUserInfo();
 
-        // Créer le bouton de déconnexion
-        this.createLogoutButton();
+        // Créer le bouton de déconnexion (DÉSACTIVÉ)
+        // this.createLogoutButton();
+
+        // Supprimer les éléments flottants s'ils existent déjà
+        this.removeFloatingElements();
 
         // Appliquer les permissions Emma
         this.applyEmmaPermissions();
@@ -159,6 +162,34 @@
     }
 
     /**
+     * Supprime les éléments flottants (déconnexion et GOB)
+     */
+    removeFloatingElements() {
+      // Supprimer l'élément d'info utilisateur (GOB)
+      const userInfoDisplay = document.getElementById('user-info-display');
+      if (userInfoDisplay) {
+        userInfoDisplay.remove();
+        console.log('🗑️ Élément flottant GOB supprimé');
+      }
+
+      // Supprimer le bouton de déconnexion
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.remove();
+        console.log('🗑️ Bouton de déconnexion flottant supprimé');
+      }
+
+      // Supprimer le badge admin s'il existe
+      const adminBadges = document.querySelectorAll('.fixed.bottom-4.right-4');
+      adminBadges.forEach(badge => {
+        if (badge.textContent.includes('Mode Admin')) {
+          badge.remove();
+          console.log('🗑️ Badge admin flottant supprimé');
+        }
+      });
+    }
+
+    /**
      * Applique les permissions Emma selon le rôle
      */
     applyEmmaPermissions() {
@@ -178,10 +209,10 @@
         console.log('⚠️ Utilisateur en mode lecture seule (conversations non sauvegardées)');
       }
 
-      // Si admin, afficher un indicateur
+      // Si admin, afficher un indicateur (DÉSACTIVÉ)
       if (this.permissions.view_all_history) {
         console.log('🔓 Mode Admin: Accès à tous les historiques');
-        this.showAdminIndicator();
+        // this.showAdminIndicator(); // Désactivé - élément flottant retiré
       }
     }
 

@@ -65,6 +65,9 @@
       "maxDuration": 300,
       "memory": 1024
     },
+    "api/fmp-historical.js": {
+      "maxDuration": 15
+    },
     "api/treasury-rates.js": {
       "maxDuration": 30
     }
