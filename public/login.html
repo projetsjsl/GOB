@@ -282,6 +282,13 @@
         tickerData: null,
         seekingAlphaData: null,
         seekingAlphaStockData: null,
+        // Nouvelles données pour l'onglet Titres
+        titlesTabData: {
+          tickers: null,
+          stockData: null,
+          newsData: null,
+          tickerLatestNews: null
+        },
         status: 'loading'
       };
 
@@ -357,6 +364,171 @@
         if (seekingAlphaAnalysis && seekingAlphaAnalysis.success && seekingAlphaAnalysis.data) {
           preloadData.seekingAlphaStockData = seekingAlphaAnalysis.data;
           console.log(`✅ ${seekingAlphaAnalysis.data.length} analyses Seeking Alpha préchargées`);
+        }
+
+        // 3. PRÉCHARGER TOUTES LES DONNÉES DE L'ONGLET TITRES
+        console.log('📊 Préchargement des données de l\'onglet Titres...');
+        
+        try {
+          // 3.1 Charger les tickers depuis Supabase
+          console.log('📋 Chargement des tickers depuis Supabase...');
+          const tickersResponse = await fetch(`${API_BASE_URL}/api/config/tickers`);
+          if (tickersResponse.ok) {
+            const tickersData = await tickersResponse.json();
+            if (tickersData.success) {
+              const allTickers = tickersData.team_tickers || [];
+              preloadData.titlesTabData.tickers = allTickers;
+              console.log(`✅ ${allTickers.length} tickers chargés pour l'onglet Titres`);
+
+              // 3.2 Charger les données de marché pour tous les tickers (batch)
+              if (allTickers.length > 0) {
+                console.log('💹 Chargement des données de marché (batch)...');
+                try {
+                  const symbolsQuery = allTickers.join(',');
+                  const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
+                  
+                  if (batchResponse.ok) {
+                    const batchData = await batchResponse.json();
+                    if (batchData.success && batchData.data) {
+                      const quotes = batchData.data.quote || {};
+                      const fundamentals = batchData.data.fundamentals || {};
+                      const stockDataMap = {};
+                      
+                      allTickers.forEach(ticker => {
+                        const tickerUpper = ticker.toUpperCase();
+                        const quote = quotes[tickerUpper];
+                        const fundamental = fundamentals[tickerUpper];
+                        
+                        if (quote || fundamental) {
+                          stockDataMap[ticker] = {
+                            symbol: tickerUpper,
+                            c: quote?.c || fundamental?.quote?.price || 0,
+                            d: quote?.d || fundamental?.quote?.change || 0,
+                            dp: quote?.dp || fundamental?.quote?.changesPercentage || 0,
+                            h: quote?.h || 0,
+                            l: quote?.l || 0,
+                            o: quote?.o || 0,
+                            v: quote?.v || 0,
+                            fundamentals: fundamental || null,
+                            timestamp: new Date().toISOString()
+                          };
+                        }
+                      });
+                      
+                      preloadData.titlesTabData.stockData = stockDataMap;
+                      console.log(`✅ ${Object.keys(stockDataMap).length} données de marché préchargées`);
+                    }
+                  }
+                } catch (batchError) {
+                  console.warn('⚠️ Erreur batch, chargement individuel...', batchError);
+                  // Fallback: charger les 5 premiers tickers individuellement
+                  const initialTickers = allTickers.slice(0, 5);
+                  const stockDataMap = {};
+                  
+                  await Promise.allSettled(initialTickers.map(async (ticker) => {
+                    try {
+                      const response = await fetch(`${API_BASE_URL}/api/marketdata?symbol=${ticker}&source=auto`);
+                      if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.data) {
+                          stockDataMap[ticker] = {
+                            ...data.data,
+                            timestamp: new Date().toISOString()
+                          };
+                        }
+                      }
+                    } catch (err) {
+                      console.warn(`⚠️ Erreur pour ${ticker}:`, err);
+                    }
+                  }));
+                  
+                  preloadData.titlesTabData.stockData = stockDataMap;
+                  console.log(`✅ ${Object.keys(stockDataMap).length} données de marché préchargées (fallback)`);
+                }
+
+                // 3.3 Charger les nouvelles générales
+                console.log('📰 Chargement des nouvelles générales...');
+                const today = new Date().toISOString().split('T')[0];
+                const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
+                
+                const newsPromises = [
+                  fetch(`${API_BASE_URL}/api/fmp?endpoint=news&limit=100`).then(r => r.ok ? r.json() : null).catch(() => null),
+                  fetch(`${API_BASE_URL}/api/finnhub?endpoint=market-news&category=general`).then(r => r.ok ? r.json() : null).catch(() => null)
+                ];
+                
+                const [fmpNews, finnhubNews] = await Promise.allSettled(newsPromises);
+                
+                let newsArticles = [];
+                
+                // Priorité 1: FMP
+                if (fmpNews.status === 'fulfilled' && fmpNews.value) {
+                  const fmpNewsData = fmpNews.value.data || fmpNews.value.news || [];
+                  if (fmpNewsData.length > 0) {
+                    newsArticles = fmpNewsData.slice(0, 100).map(article => ({
+                      title: article.title,
+                      description: article.text || '',
+                      url: article.url || article.link || '#',
+                      publishedAt: article.publishedDate || new Date().toISOString(),
+                      source: { name: article.site || 'FMP' },
+                      sentiment: article.sentiment || 'neutral',
+                      category: 'general'
+                    }));
+                    console.log(`✅ ${newsArticles.length} nouvelles FMP préchargées`);
+                  }
+                }
+                
+                // Priorité 2: Finnhub (si FMP vide)
+                if (newsArticles.length === 0 && finnhubNews.status === 'fulfilled' && finnhubNews.value) {
+                  const finnhubData = Array.isArray(finnhubNews.value) ? finnhubNews.value : [];
+                  if (finnhubData.length > 0) {
+                    newsArticles = finnhubData.slice(0, 100).map(article => ({
+                      title: article.headline,
+                      description: article.summary || '',
+                      url: article.url || '#',
+                      publishedAt: new Date(article.datetime * 1000).toISOString(),
+                      source: { name: article.source || 'Finnhub' },
+                      sentiment: article.sentiment || 'neutral',
+                      category: article.category || 'general'
+                    }));
+                    console.log(`✅ ${newsArticles.length} nouvelles Finnhub préchargées`);
+                  }
+                }
+                
+                preloadData.titlesTabData.newsData = newsArticles;
+                console.log(`✅ ${newsArticles.length} nouvelles générales préchargées`);
+
+                // 3.4 Charger les nouvelles par ticker (pour les 5 premiers tickers seulement pour optimiser)
+                console.log('📰 Chargement des nouvelles par ticker (5 premiers)...');
+                const topTickers = allTickers.slice(0, 5);
+                const tickerNewsMap = {};
+                
+                await Promise.allSettled(topTickers.map(async (ticker) => {
+                  try {
+                    const finnhubResponse = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${ticker}&from=${today}&to=${today}`);
+                    if (finnhubResponse.ok) {
+                      const finnhubData = await finnhubResponse.json();
+                      if (Array.isArray(finnhubData) && finnhubData.length > 0) {
+                        const latestNews = finnhubData[0];
+                        tickerNewsMap[ticker] = {
+                          title: latestNews.headline || latestNews.title,
+                          source: latestNews.source || 'Finnhub',
+                          date: new Date(latestNews.datetime * 1000).toLocaleDateString('fr-FR'),
+                          url: latestNews.url || '#'
+                        };
+                      }
+                    }
+                  } catch (error) {
+                    console.warn(`⚠️ Erreur news pour ${ticker}:`, error);
+                  }
+                }));
+                
+                preloadData.titlesTabData.tickerLatestNews = tickerNewsMap;
+                console.log(`✅ Nouvelles préchargées pour ${Object.keys(tickerNewsMap).length} tickers`);
+              }
+            }
+          }
+        } catch (titlesError) {
+          console.warn('⚠️ Erreur préchargement onglet Titres:', titlesError);
         }
 
         preloadData.status = 'completed';

@@ -1163,32 +1163,6 @@ const fetchHybridData = async (symbol, dataType) => {
                 try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch(_) {}
             };
 
-            // Fonction pour déconnexion
-            const handleLogout = () => {
-                if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-                    try {
-                        // Nettoyer le localStorage (garder le thème)
-                        const theme = localStorage.getItem('theme');
-                        localStorage.clear();
-                        if (theme) {
-                            localStorage.setItem('theme', theme);
-                        }
-                        
-                        // Nettoyer le sessionStorage
-                        sessionStorage.clear();
-                        
-                        // Fermer l'overlay
-                        setShowMoreTabsOverlay(false);
-                        
-                        // Recharger la page pour réinitialiser l'état
-                        window.location.reload();
-                    } catch (error) {
-                        console.error('Erreur lors de la déconnexion:', error);
-                        // Recharger quand même la page
-                        window.location.reload();
-                    }
-                }
-            };
 
             // Fonction pour gérer le changement d'onglet avec animations d'intro
             const handleTabChange = (tabId) => {
@@ -1349,6 +1323,26 @@ const fetchHybridData = async (symbol, dataType) => {
             // Fonction pour récupérer la news la plus récente et pertinente pour chaque ticker
             const fetchLatestNewsForTickers = async () => {
                 console.log('📰 Chargement des news récentes pour chaque ticker...');
+                
+                // Vérifier d'abord les données préchargées depuis la page de login
+                const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                if (preloadedDataStr) {
+                    try {
+                        const preloadedData = JSON.parse(preloadedDataStr);
+                        const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                        const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                        if (preloadedData.titlesTabData?.tickerLatestNews && dataAge < MAX_AGE) {
+                            console.log('⚡ Utilisation des nouvelles par ticker préchargées');
+                            setTickerLatestNews(preloadedData.titlesTabData.tickerLatestNews);
+                            console.log(`✅ Nouvelles préchargées pour ${Object.keys(preloadedData.titlesTabData.tickerLatestNews).length} tickers`);
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Erreur lecture nouvelles par ticker préchargées:', e);
+                    }
+                }
+                
                 const today = new Date().toISOString().split('T')[0];
                 const newsMap = {};
 
@@ -1432,6 +1426,30 @@ const fetchHybridData = async (symbol, dataType) => {
 
             const refreshAllStocks = async () => {
                 console.log('🔄 Actualisation des données stocks...');
+                
+                // Vérifier d'abord les données préchargées depuis la page de login
+                const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                if (preloadedDataStr) {
+                    try {
+                        const preloadedData = JSON.parse(preloadedDataStr);
+                        const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                        const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                        if (preloadedData.titlesTabData?.stockData && dataAge < MAX_AGE && Object.keys(preloadedData.titlesTabData.stockData).length > 0) {
+                            console.log('⚡ Utilisation des données de marché préchargées pour l\'onglet Titres');
+                            setStockData(preloadedData.titlesTabData.stockData);
+                            setLastUpdate(new Date(preloadedData.timestamp));
+                            setLoading(false);
+                            const successCount = Object.keys(preloadedData.titlesTabData.stockData).length;
+                            console.log(`✅ ${successCount} données de marché chargées depuis préchargement`);
+                            showMessage(`Données chargées depuis préchargement: ${successCount} titres`, 'success');
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Erreur lecture données de marché préchargées:', e);
+                    }
+                }
+                
                 setLoading(true);
                 const newStockData = {};
                 let successCount = 0;
@@ -1575,6 +1593,26 @@ const fetchHybridData = async (symbol, dataType) => {
             // Actualités avec stratégie multi-sources (NO DEMO DATA) - OPTIMISÉE avec appels parallèles
             const fetchNews = async () => {
                 addLog('📰 Démarrage récupération actualités...', 'info');
+
+                // Vérifier d'abord les données préchargées depuis la page de login
+                const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                if (preloadedDataStr) {
+                    try {
+                        const preloadedData = JSON.parse(preloadedDataStr);
+                        const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                        const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                        if (preloadedData.titlesTabData?.newsData && dataAge < MAX_AGE) {
+                            console.log('⚡ Utilisation des nouvelles préchargées pour l\'onglet Titres');
+                            setNewsData(preloadedData.titlesTabData.newsData);
+                            setFilteredNews(preloadedData.titlesTabData.newsData);
+                            addLog(`✅ ${preloadedData.titlesTabData.newsData.length} nouvelles chargées depuis préchargement`, 'success');
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Erreur lecture nouvelles préchargées:', e);
+                    }
+                }
 
                 const defaultTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA'];
                 const availableTickers = tickers.length > 0 ? tickers : defaultTickers;
@@ -2791,6 +2829,49 @@ const fetchHybridData = async (symbol, dataType) => {
             // Fonction pour charger les tickers depuis Supabase
             const loadTickersFromSupabase = async () => {
                 try {
+                    // Vérifier d'abord les données préchargées depuis la page de login
+                    const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                    if (preloadedDataStr) {
+                        try {
+                            const preloadedData = JSON.parse(preloadedDataStr);
+                            const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                            const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                            if (preloadedData.titlesTabData?.tickers && dataAge < MAX_AGE) {
+                                console.log('⚡ Utilisation des tickers préchargés pour l\'onglet Titres');
+                                const preloadedTickers = preloadedData.titlesTabData.tickers;
+                                setTeamTickers(preloadedTickers);
+                                setWatchlistTickers(preloadedTickers);
+                                setTickers(preloadedTickers);
+                                console.log(`✅ ${preloadedTickers.length} tickers chargés depuis préchargement`);
+                                
+                                // Charger aussi les données de marché préchargées si disponibles
+                                if (preloadedData.titlesTabData.stockData) {
+                                    console.log('⚡ Utilisation des données de marché préchargées');
+                                    setStockData(preloadedData.titlesTabData.stockData);
+                                    setLastUpdate(new Date(preloadedData.timestamp));
+                                }
+                                
+                                // Charger aussi les nouvelles préchargées si disponibles
+                                if (preloadedData.titlesTabData.newsData) {
+                                    console.log('⚡ Utilisation des nouvelles préchargées');
+                                    setNewsData(preloadedData.titlesTabData.newsData);
+                                    setFilteredNews(preloadedData.titlesTabData.newsData);
+                                }
+                                
+                                // Charger aussi les nouvelles par ticker préchargées si disponibles
+                                if (preloadedData.titlesTabData.tickerLatestNews) {
+                                    console.log('⚡ Utilisation des nouvelles par ticker préchargées');
+                                    setTickerLatestNews(preloadedData.titlesTabData.tickerLatestNews);
+                                }
+                                
+                                return;
+                            }
+                        } catch (e) {
+                            console.warn('⚠️ Erreur lecture données préchargées:', e);
+                        }
+                    }
+                    
                     console.log('📊 Chargement des tickers depuis Supabase...');
                     const response = await fetch('/api/config/tickers');
                     
@@ -3024,8 +3105,8 @@ const fetchHybridData = async (symbol, dataType) => {
             // Utilisation d'icônes Iconoir vérifiées et disponibles
             const getTabIcon = (tabId) => {
                 const iconMap = {
-                    'stocks-news': 'iconoir-chart-line', // ✅ Icône valide
-                    'intellistocks': 'iconoir-trending-up', // ✅ Icône valide
+                    'stocks-news': 'iconoir-briefcase', // Portefeuille pour Titres & Nouvelles
+                    'intellistocks': 'iconoir-flask', // Laboratoire pour JLab™
                     'ask-emma': 'iconoir-chat-bubble', // ✅ Icône valide
                     'admin-jsla': 'iconoir-settings', // ✅ Icône valide
                     'dans-watchlist': 'iconoir-star', // ✅ Icône valide
@@ -3033,8 +3114,8 @@ const fetchHybridData = async (symbol, dataType) => {
                     'seeking-alpha': 'iconoir-graph-up', // ✅ Icône valide
                     'email-briefings': 'iconoir-antenna-signal', // ✅ Icône valide
                     'economic-calendar': 'iconoir-calendar', // ✅ Icône valide
-                    'investing-calendar': 'iconoir-flask', // ✅ Icône valide
-                    'yield-curve': 'iconoir-trending-up', // ✅ Utilise trending-up (icône valide)
+                    'investing-calendar': 'iconoir-calendar', // Calendrier pour Investing Calendar
+                    'yield-curve': 'iconoir-graph-up', // Graphique pour Yield Curve
                     'markets-economy': 'iconoir-globe' // ✅ Icône valide
                 };
                 // Retourner l'icône avec fallback
@@ -3091,17 +3172,86 @@ const fetchHybridData = async (symbol, dataType) => {
                 script.async = true;
                 script.innerHTML = JSON.stringify({
                     symbols: [
+                        // Indices US
                         {
                             proName: 'FOREXCOM:SPXUSD',
-                            title: 'S&P 500 Index'
+                            title: 'S&P 500'
+                        },
+                        {
+                            proName: 'FOREXCOM:DJI',
+                            title: 'Dow Jones'
                         },
                         {
                             proName: 'FOREXCOM:NSXUSD',
-                            title: 'US 100 Cash CFD'
+                            title: 'NASDAQ 100'
                         },
+                        {
+                            proName: 'FOREXCOM:RUTUSD',
+                            title: 'Russell 2000'
+                        },
+                        // Indices Amérique du Nord
+                        {
+                            proName: 'TSX:TSX',
+                            title: 'TSX (Canada)'
+                        },
+                        // Indices Europe
+                        {
+                            proName: 'FOREXCOM:UKXGBP',
+                            title: 'FTSE 100 (UK)'
+                        },
+                        {
+                            proName: 'XETR:DAX',
+                            title: 'DAX (Allemagne)'
+                        },
+                        {
+                            proName: 'EURONEXT:CAC',
+                            title: 'CAC 40 (France)'
+                        },
+                        {
+                            proName: 'BME:IBEX',
+                            title: 'IBEX 35 (Espagne)'
+                        },
+                        {
+                            proName: 'MIL:FTSEMIB',
+                            title: 'FTSE MIB (Italie)'
+                        },
+                        {
+                            proName: 'EURONEXT:AEX',
+                            title: 'AEX (Pays-Bas)'
+                        },
+                        {
+                            proName: 'SIX:SMI',
+                            title: 'SMI (Suisse)'
+                        },
+                        // Indices Asie-Pacifique
+                        {
+                            proName: 'TVC:NK225',
+                            title: 'Nikkei 225 (Japon)'
+                        },
+                        {
+                            proName: 'HKEX:HSI',
+                            title: 'Hang Seng (Hong Kong)'
+                        },
+                        {
+                            proName: 'ASX:AS51',
+                            title: 'ASX 200 (Australie)'
+                        },
+                        {
+                            proName: 'SSE:000001',
+                            title: 'SSE Composite (Chine)'
+                        },
+                        {
+                            proName: 'BSE:SENSEX',
+                            title: 'BSE Sensex (Inde)'
+                        },
+                        // Crypto-monnaies
                         {
                             proName: 'BITSTAMP:BTCUSD',
                             title: 'Bitcoin'
+                        },
+                        {
+                            proName: 'BITSTAMP:ETHUSD',
+                            title: 'Ethereum'
                         }
                     ],
                     colorTheme: isDarkMode ? 'dark' : 'light',
@@ -18708,18 +18858,18 @@ console.log('✅ Données hybrides récupérées:', {
                 }, [timelineSymbol]);
 
                 return (
-                    <div className="space-y-6">
+                    <div className="space-y-3 md:space-y-6">
                         {/* En-tête principal TESTS JS */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
                         }`}>
                             <div className="mb-2">
-                                <h2 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
+                                <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     🧪 TESTS JS - Widgets Financiers
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-200' : 'text-blue-800'
                                 }`}>
                                     Collection complète de 14 widgets TradingView et outils d'analyse financière organisés par catégorie
@@ -18730,11 +18880,11 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* ========================================== */}
                         {/* SECTION 1: 📅 CALENDRIERS & ÉVÉNEMENTS    */}
                         {/* ========================================== */}
-                        <div className="mb-4">
-                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                        <div className="mb-2 md:mb-4">
+                            <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${
                                 isDarkMode ? 'border-blue-500' : 'border-blue-600'
                             }`}>
-                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                 }`}>
                                     📅 Calendriers & Événements Économiques
@@ -18743,16 +18893,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Calendrier Économique Investing.com */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     📊 Calendrier Économique
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Calendrier économique complet avec événements majeurs et données en temps réel
@@ -18798,16 +18948,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Forex Heat Map */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     💱 Forex Heat Map
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Carte de chaleur des devises en temps réel (EUR, USD, JPY, GBP, CHF, AUD, CAD, CNY)
@@ -18822,16 +18972,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Economic Calendar Events */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     📅 Economic Calendar Events
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Événements économiques mondiaux par TradingView
@@ -18846,16 +18996,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Forex Cross Rates */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     💱 Forex Cross Rates
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Taux de change croisés pour 9 devises majeures (EUR, USD, JPY, GBP, CHF, AUD, CAD, NZD, CNY)
@@ -18872,11 +19022,11 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* ========================================== */}
                         {/* SECTION 3: 📊 MARCHÉS BOURSIERS            */}
                         {/* ========================================== */}
-                        <div className="mb-4">
-                            <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
+                        <div className="mb-2 md:mb-4">
+                            <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${
                                 isDarkMode ? 'border-purple-500' : 'border-purple-600'
                             }`}>
-                                <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                                <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-purple-400' : 'text-purple-600'
                                 }`}>
                                     📊 Marchés Boursiers - Vues Globales
@@ -18885,16 +19035,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Stock Heatmap */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     🇺🇸 Stock Heatmap All USA
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Carte thermique de toutes les actions américaines - Performance par secteur et capitalisation
@@ -18923,16 +19073,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Stock Heatmap TSX */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     🇨🇦 Stock Heatmap TSX
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Carte thermique du Toronto Stock Exchange (TSX) - Performance par secteur et capitalisation
@@ -18961,16 +19111,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Market Quotes */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     📊 Market Quotes - Indices, Futures, Bonds, Forex
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Cotations en temps réel organisées par catégories (Indices, Futures, Obligations US/CAN, Forex CAD)
@@ -19001,29 +19151,29 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* ========================================================================= */}
                         {/* BLOC UNIFIÉ: 📊 ANALYSE COMPLÈTE - 6 WIDGETS SYNCHRONISÉS                */}
                         {/* ========================================================================= */}
-                        <div className={`rounded-xl border-4 shadow-2xl transition-all duration-300 mb-6 ${
+                        <div className={`rounded-xl border-2 md:border-4 shadow-2xl transition-all duration-300 mb-3 md:mb-6 ${
                             isDarkMode
                                 ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-red-500'
                                 : 'bg-gradient-to-br from-white via-gray-50 to-white border-red-600'
                         }`}>
                             {/* En-tête du Bloc Unifié avec Sélecteur de Symbole */}
-                            <div className={`p-4 border-b-4 transition-colors duration-300 ${
+                            <div className={`p-3 md:p-4 border-b-2 md:border-b-4 transition-colors duration-300 ${
                                 isDarkMode ? 'border-red-500 bg-gray-800/50' : 'border-red-600 bg-gray-100/50'
                             }`}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h2 className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-0 mb-3 md:mb-4">
+                                    <div className="flex-1">
+                                        <h2 className={`text-lg md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                             isDarkMode ? 'text-red-400' : 'text-red-600'
                                         }`}>
                                             📊 Analyse Complète - {timelineSymbol.split(':')[1] || timelineSymbol}
                                         </h2>
-                                        <p className={`text-sm transition-colors duration-300 ${
+                                        <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                         }`}>
                                             6 widgets synchronisés pour une analyse financière complète. Changez le symbole pour mettre à jour tous les widgets simultanément.
                                         </p>
                                     </div>
-                                    <div className="relative">
+                                    <div className="relative w-full md:w-auto">
                                         {/* Search Input - Style TradingView */}
                                         <div className="flex items-center gap-2">
                                             <input
@@ -19037,13 +19187,13 @@ console.log('✅ Données hybrides récupérées:', {
                                                 onFocus={() => setShowSearchResults(true)}
                                                 onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                                                 placeholder="Search symbols... (e.g., AAPL, BTC)"
-                                                className={`w-64 px-4 py-2 rounded-lg border-2 font-medium transition-all duration-300 ${
+                                                className={`flex-1 md:w-64 px-3 md:px-4 py-2 rounded-lg border-2 text-sm md:text-base font-medium transition-all duration-300 ${
                                                     isDarkMode
                                                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 hover:border-blue-500 focus:border-blue-500'
                                                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 hover:border-blue-500 focus:border-blue-500'
                                                 } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
                                             />
-                                            <div className={`text-xs px-3 py-2 rounded-lg font-mono font-bold ${
+                                            <div className={`text-xs px-2 md:px-3 py-2 rounded-lg font-mono font-bold whitespace-nowrap ${
                                                 isDarkMode ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800'
                                             }`}>
                                                 {timelineSymbol.split(':')[1]}
@@ -19052,7 +19202,7 @@ console.log('✅ Données hybrides récupérées:', {
 
                                         {/* Autocomplete Results - Style TradingView */}
                                         {showSearchResults && searchQuery && (
-                                            <div className={`absolute top-full left-0 mt-2 w-80 max-h-96 overflow-y-auto rounded-lg border-2 shadow-2xl z-50 ${
+                                            <div className={`absolute top-full left-0 mt-2 w-full md:w-80 max-h-96 overflow-y-auto rounded-lg border-2 shadow-2xl z-50 ${
                                                 isDarkMode
                                                     ? 'bg-gray-800 border-gray-600'
                                                     : 'bg-white border-gray-300'
@@ -19134,29 +19284,29 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
 
                             {/* Corps du Bloc - Layout Style TradingView Compact */}
-                            <div className="p-4">
+                            <div className="p-2 md:p-4">
                                 {/* Grille CSS avec gap de 16px (style compact) */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-4">
 
                                     {/* 1. Symbol Info - PLEINE LARGEUR */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 lg:col-span-2 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             📊 Symbol Info
                                         </h3>
-                                        <div className="h-[380px]">
+                                        <div className="h-[300px] md:h-[380px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 2. Advanced Chart - PLEINE LARGEUR */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 lg:col-span-2 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
@@ -19166,63 +19316,63 @@ console.log('✅ Données hybrides récupérées:', {
                                         }`}>
                                             Cliquez sur un symbole dans la watchlist pour changer tous les widgets
                                         </p>
-                                        <div className="h-[650px] md:h-[700px] lg:h-[750px]">
+                                        <div className="h-[400px] md:h-[650px] lg:h-[750px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 3. Symbol Profile - 1 COLONNE */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             🏢 Profil de l'Entreprise
                                         </h3>
-                                        <div className="h-[400px]">
+                                        <div className="h-[300px] md:h-[400px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 4. Timeline - 1 COLONNE */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             📰 Timeline - Fil d'Actualité
                                         </h3>
-                                        <div className="h-[400px]">
+                                        <div className="h-[300px] md:h-[400px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 5. Financials - PLEINE LARGEUR */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 lg:col-span-2 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             💰 États Financiers
                                         </h3>
-                                        <div className="h-[450px]">
+                                        <div className="h-[350px] md:h-[450px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}></div>
                                         </div>
                                     </div>
 
                                     {/* 6. Technical Analysis - PLEINE LARGEUR */}
-                                    <div className={`rounded-lg p-3 transition-colors duration-300 lg:col-span-2 ${
+                                    <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                                         isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                                     }`}>
-                                        <h3 className={`text-base font-bold mb-1 transition-colors duration-300 ${
+                                        <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             📈 Analyse Technique
                                         </h3>
-                                        <div className="h-[400px]">
+                                        <div className="h-[300px] md:h-[400px]">
                                             <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}></div>
                                         </div>
                                     </div>
@@ -19232,16 +19382,16 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Widget TradingView Screener (Non synchronisé - reste séparé) */}
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="mb-6">
-                                <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                     🔍 Screener de Titres
                                 </h2>
-                                <p className={`text-sm transition-colors duration-300 ${
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
                                     Outil de filtrage et d'analyse des actions du marché américain avec critères personnalisables
@@ -19609,32 +19759,32 @@ console.log('✅ Données hybrides récupérées:', {
                                     </h3>
 
                                     <div className="overflow-x-auto">
-                                        <table className="w-full">
+                                        <table className="w-full text-xs">
                                             <thead>
                                                 <tr className={`border-b-2 ${
                                                     darkMode ? 'border-gray-700' : 'border-gray-200'
                                                 }`}>
-                                                    <th className={`px-4 py-3 text-left font-bold ${
+                                                    <th className={`px-3 py-2 text-left font-bold text-xs ${
                                                         darkMode ? 'text-gray-300' : 'text-gray-700'
                                                     }`}>
                                                         Maturité
                                                     </th>
                                                     {yieldData.data.us && (
-                                                        <th className={`px-4 py-3 text-right font-bold ${
+                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             🇺🇸 US Treasury (%)
                                                         </th>
                                                     )}
                                                     {yieldData.data.canada && (
-                                                        <th className={`px-4 py-3 text-right font-bold ${
+                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             🇨🇦 Canada Bonds (%)
                                                         </th>
                                                     )}
                                                     {yieldData.data.us && yieldData.data.canada && (
-                                                        <th className={`px-4 py-3 text-right font-bold ${
+                                                        <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             Écart (bps)
@@ -19664,27 +19814,27 @@ console.log('✅ Données hybrides récupérées:', {
                                                                 <tr key={maturity} className={`border-b ${
                                                                     darkMode ? 'border-gray-700' : 'border-gray-200'
                                                                 } ${idx % 2 === 0 ? (darkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
-                                                                    <td className={`px-4 py-3 font-semibold ${
+                                                                    <td className={`px-3 py-2 font-semibold text-xs ${
                                                                         darkMode ? 'text-white' : 'text-gray-900'
                                                                     }`}>
                                                                         {maturity}
                                                                     </td>
                                                                     {yieldData.data.us && (
-                                                                        <td className={`px-4 py-3 text-right ${
+                                                                        <td className={`px-3 py-2 text-right text-xs ${
                                                                             darkMode ? 'text-blue-400' : 'text-blue-600'
                                                                         }`}>
                                                                             {usRate ? usRate.rate.toFixed(2) : '-'}
                                                                         </td>
                                                                     )}
                                                                     {yieldData.data.canada && (
-                                                                        <td className={`px-4 py-3 text-right ${
+                                                                        <td className={`px-3 py-2 text-right text-xs ${
                                                                             darkMode ? 'text-red-400' : 'text-red-600'
                                                                         }`}>
                                                                             {caRate ? caRate.rate.toFixed(2) : '-'}
                                                                         </td>
                                                                     )}
                                                                     {yieldData.data.us && yieldData.data.canada && (
-                                                                        <td className={`px-4 py-3 text-right font-mono text-sm ${
+                                                                        <td className={`px-3 py-2 text-right font-mono text-xs ${
                                                                             spread > 0
                                                                                 ? (darkMode ? 'text-green-400' : 'text-green-600')
                                                                                 : spread < 0
@@ -19706,7 +19856,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     <div className={`mt-4 pt-4 border-t ${
                                         darkMode ? 'border-gray-700' : 'border-gray-200'
                                     }`}>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                                             {yieldData.data.us && (
                                                 <>
                                                     <div>
@@ -20526,12 +20676,6 @@ console.log('✅ Données hybrides récupérées:', {
                                         <div className="flex items-center gap-4">
                                             <div>
                                                 <h1 className="text-2xl font-black tracking-tight font-['Inter'] text-white">
-                                                    Bienvenue {githubUser && (
-                                                        <span className="text-green-500">
-                                                            {githubUser.name || githubUser.login || 'Utilisateur'}
-                                                        </span>
-                                                    )}
-                                                    <br />
                                                     TERMINAL FINANCIER
                                                     <span className="ml-3 text-xs font-normal px-2 py-1 rounded bg-green-500/20 text-green-300">BÊTA</span>
                                                 </h1>
@@ -20539,25 +20683,6 @@ console.log('✅ Données hybrides récupérées:', {
                                                     Propulsé par <span className="font-bold text-green-400">JSL AI</span> - Tous droits réservés
                                                 </p>
                                             </div>
-                                            {/* Nom d'utilisateur avec avatar */}
-                                            {githubUser && (
-                                                <div className="ml-auto flex items-center gap-3 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/30">
-                                                    <div className="flex items-center gap-2">
-                                                        {githubUser.avatar_url && (
-                                                            <img
-                                                                src={githubUser.avatar_url}
-                                                                alt={githubUser.login || 'User'}
-                                                                className="w-8 h-8 rounded-full border-2 border-green-500/50"
-                                                            />
-                                                        )}
-                                                        {githubUser.login && githubUser.login !== githubUser.name && (
-                                                            <div className="text-xs text-gray-400">
-                                                                @{githubUser.login}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -20584,7 +20709,7 @@ console.log('✅ Données hybrides récupérées:', {
                                         }`}
                                         title={isDarkMode ? 'Mode Clair' : 'Mode Sombre'}
                                     >
-                                        <span className="text-lg">{isDarkMode ? '☀️' : '🌙'}</span>
+                                        <span className="text-sm">{isDarkMode ? '☀️' : '🌙'}</span>
                                     </button>
                                 </div>
                             </div>
@@ -20907,40 +21032,6 @@ console.log('✅ Données hybrides récupérées:', {
                                             );
                                         })}
 
-                                        {/* Séparateur */}
-                                        <div className={`my-4 border-t ${
-                                            isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                                        }`}></div>
-
-                                        {/* Bouton de déconnexion */}
-                                        <button
-                                            onClick={handleLogout}
-                                            className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group ${
-                                                isDarkMode
-                                                    ? 'bg-red-900/20 hover:bg-red-900/30 border-2 border-transparent hover:border-red-500/50'
-                                                    : 'bg-red-50 hover:bg-red-100 border-2 border-transparent hover:border-red-300'
-                                            }`}
-                                        >
-                                            <div className={`relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-300 ${
-                                                isDarkMode
-                                                    ? 'bg-red-600/30 text-red-400 group-hover:bg-red-600/50'
-                                                    : 'bg-red-100 text-red-600 group-hover:bg-red-200'
-                                            }`}>
-                                                <i className="iconoir-log-out text-2xl relative z-10 transition-all duration-300 group-hover:scale-110"></i>
-                                            </div>
-                                            <div className="flex-1 text-left">
-                                                <div className={`font-semibold ${
-                                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>
-                                                    Déconnexion
-                                                </div>
-                                                <div className={`text-xs mt-1 ${
-                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                }`}>
-                                                    Se déconnecter et réinitialiser la session
-                                                </div>
-                                            </div>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
