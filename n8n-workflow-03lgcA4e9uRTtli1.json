@@ -619,7 +619,7 @@
       "main": [
         [
           {
-            "node": "Call /api/emma-n8n (Briefing)",
+            "node": "Call /api/chat (Emma)",
             "type": "main",
             "index": 0
           }
@@ -724,7 +724,7 @@
         ]
       ]
     },
-    "Call /api/emma-n8n (Briefing)": {
+    "Call /api/chat (Emma)": {
       "main": [
         [
           {
