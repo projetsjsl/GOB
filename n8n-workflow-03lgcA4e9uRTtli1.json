@@ -494,45 +494,6 @@
     },
     {
       "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ ['gmail', 'telegram'].includes($json.trigger_source) }}",
-                    "rightValue": "true",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "29542c31-05a9-4a36-87a6-ba95edf43e78"
-                  }
-                ],
-                "combinator": "and"
-              }
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.3,
-      "position": [
-        18432,
-        4464
-      ],
-      "id": "158a6de2-37cb-4b70-b370-5ca05a5e26d7",
-      "name": "Switch"
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "=https://gob.vercel.app/api/emma-n8n?action=briefing",
         "sendHeaders": true,
@@ -629,7 +590,7 @@
       "main": [
         [
           {
-            "node": "Switch",
+            "node": "Workflow Configuration",
             "type": "main",
             "index": 0
           }
@@ -761,17 +722,6 @@
           },
           {
             "node": "Determine Time-Based Prompt",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Switch": {
-      "main": [
-        [
-          {
-            "node": "Workflow Configuration",
             "type": "main",
             "index": 0
           }
