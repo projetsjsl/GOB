@@ -483,8 +483,8 @@
 <body class="min-h-screen">
     <div id="root"></div>
     
-    <!-- Auth Guard - Protection du dashboard (chargé avec defer pour ne pas bloquer React) -->
-    <script src="/js/auth-guard.js" defer></script>
+    <!-- Auth Guard - Protection du dashboard (chargé AVANT React pour vérifier l'authentification) -->
+    <script src="/js/auth-guard.js"></script>
     
     <script type="text/babel" data-presets="react">
         // V?rification que Babel fonctionne
@@ -21885,7 +21885,67 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
 
         // Fonction fallback SUPPRIM?E - Plus de contenu demo
 
-        ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+        // Attendre que auth-guard.js ait terminé la vérification avant de rendre React
+        function initDashboard() {
+            // Vérifier si auth-guard est déjà initialisé
+            if (window.authGuardInitialized) {
+                const userJson = sessionStorage.getItem('gob-user');
+                if (userJson && !window.location.pathname.includes('login.html')) {
+                    console.log('Auth guard déjà initialisé, chargement du dashboard...');
+                    ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+                } else if (window.location.pathname.includes('login.html')) {
+                    console.log('Redirection vers login détectée');
+                    return;
+                }
+                return;
+            }
+            
+            // Attendre l'événement d'initialisation de auth-guard
+            window.addEventListener('authGuardInitialized', function(event) {
+                const detail = event.detail || {};
+                const authenticated = detail.authenticated;
+                const user = detail.user;
+                
+                // Vérifier si on a été redirigé vers login
+                if (window.location.pathname.includes('login.html')) {
+                    console.log('Redirection vers login détectée');
+                    return;
+                }
+                
+                if (authenticated && user) {
+                    console.log('Utilisateur authentifié, chargement du dashboard...');
+                    ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+                } else {
+                    // Vérifier si on a quand même une session (fallback)
+                    const userJson = sessionStorage.getItem('gob-user');
+                    if (userJson) {
+                        console.log('Auth guard non authentifié mais session valide - chargement du dashboard...');
+                        ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+                    } else {
+                        console.warn('Pas de session utilisateur - redirection vers login');
+                        window.location.href = '/login.html';
+                    }
+                }
+            }, { once: true });
+            
+            // Timeout de sécurité (5 secondes)
+            setTimeout(function() {
+                if (!window.authGuardInitialized) {
+                    console.warn('Timeout auth-guard - vérification de session...');
+                    const userJson = sessionStorage.getItem('gob-user');
+                    if (userJson && !window.location.pathname.includes('login.html')) {
+                        console.log('Session valide malgré timeout - chargement du dashboard...');
+                        ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+                    } else if (!window.location.pathname.includes('login.html')) {
+                        console.warn('Pas de session utilisateur - redirection vers login');
+                        window.location.href = '/login.html';
+                    }
+                }
+            }, 5000);
+        }
+        
+        // Démarrer l'initialisation
+        initDashboard();
     </script>
     
 </body>

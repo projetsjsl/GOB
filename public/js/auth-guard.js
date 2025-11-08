@@ -352,27 +352,54 @@
   // Créer l'instance globale
   window.authGuard = new AuthGuard();
 
+  // Créer un événement personnalisé pour signaler que l'initialisation est terminée
+  window.authGuardInitialized = false;
+  window.dispatchEvent(new CustomEvent('authGuardReady'));
+
   // Initialiser automatiquement quand le DOM est prêt
   // Utiliser un try-catch global pour éviter que les erreurs bloquent le chargement
   try {
+    const initAuthGuard = async () => {
+      try {
+        await window.authGuard.init();
+        window.authGuardInitialized = true;
+        // Déclencher un événement pour signaler que l'initialisation est terminée
+        window.dispatchEvent(new CustomEvent('authGuardInitialized', { 
+          detail: { 
+            authenticated: window.authGuard.currentUser !== null,
+            user: window.authGuard.currentUser 
+          } 
+        }));
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation de Auth Guard:', error);
+        // Même en cas d'erreur, signaler que l'initialisation est terminée
+        window.authGuardInitialized = true;
+        window.dispatchEvent(new CustomEvent('authGuardInitialized', { 
+          detail: { 
+            authenticated: false,
+            error: error.message 
+          } 
+        }));
+      }
+    };
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        // Initialiser de manière asynchrone pour ne pas bloquer le rendu
-        window.authGuard.init().catch(error => {
-          console.error('Erreur lors de l\'initialisation de Auth Guard:', error);
-          // Ne pas empêcher le chargement du dashboard en cas d'erreur
-        });
+        initAuthGuard();
       });
     } else {
-      // Initialiser de manière asynchrone pour ne pas bloquer le rendu
-      window.authGuard.init().catch(error => {
-        console.error('Erreur lors de l\'initialisation de Auth Guard:', error);
-        // Ne pas empêcher le chargement du dashboard en cas d'erreur
-      });
+      initAuthGuard();
     }
   } catch (error) {
     console.error('Erreur critique lors de l\'initialisation de Auth Guard:', error);
-    // Ne pas empêcher le chargement du dashboard même en cas d'erreur critique
+    // Même en cas d'erreur critique, signaler que l'initialisation est terminée
+    window.authGuardInitialized = true;
+    window.dispatchEvent(new CustomEvent('authGuardInitialized', { 
+      detail: { 
+        authenticated: false,
+        error: error.message 
+      } 
+    }));
   }
 
 })();
