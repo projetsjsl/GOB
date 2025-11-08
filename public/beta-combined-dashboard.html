@@ -1162,7 +1162,7 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
 
                 // Afficher intro Seeking Alpha si c'est la première visite de cette page load
-                if (tabId === 'scrapping-sa') {
+                if (tabId === 'scrapping-sa' || tabId === 'seeking-alpha') {
                     if (!tabsVisitedThisSession['seekingalpha']) {
                         setShowSeekingAlphaIntro(true);
                         setTimeout(() => setShowSeekingAlphaIntro(false), 3000);
