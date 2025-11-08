@@ -812,7 +812,7 @@ const fetchHybridData = async (symbol, dataType) => {
 
         const BetaCombinedDashboard = () => {
             // États principaux
-            const [activeTab, setActiveTab] = useState('markets-economy');
+            const [activeTab, setActiveTab] = useState('stocks-news'); // Onglet par défaut pour afficher les sections Top Movers, Analyses, et Titres
             const [tickers, setTickers] = useState([]);
             const [teamTickers, setTeamTickers] = useState([]);
             const [watchlistTickers, setWatchlistTickers] = useState([]);
