@@ -343,12 +343,6 @@
               "type": "boolean"
             },
             {
-              "id": "id-3",
-              "name": "recipients",
-              "value": "[\"projetsjsl@gmail.com\"]",
-              "type": "array"
-            },
-            {
               "id": "id-preview-mode-1762640093151",
               "name": "preview_mode",
               "value": "false",
@@ -732,6 +726,49 @@
         20864,
         4536
       ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://gob-projetsjsls-projects.vercel.app/api/email-recipients",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fetch-email-recipients-node",
+      "name": "Fetch Email Recipients",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20384,
+        4536
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Récupérer le type de briefing depuis les données précédentes\nconst briefingType = $('Determine Time-Based Prompt').item.json.prompt_type || 'custom';\nconst previewMode = $('Custom Prompt Input').item.json.preview_mode || false;\n\n// Normaliser le type\nlet normalizedType = briefingType;\nif (normalizedType === 'noon') {\n  normalizedType = 'midday';\n}\n\n// Récupérer les destinataires depuis l'API\nconst recipientsData = data.recipients || [];\nconst previewEmail = data.preview_email || 'projetsjsl@gmail.com';\n\nlet emailList = [];\n\nif (previewMode === true) {\n  // Mode preview : utiliser l'email de preview\n  emailList = [previewEmail];\n} else {\n  // Mode envoi : utiliser les destinataires actifs du type\n  emailList = recipientsData\n    .filter(r => r.active && r[normalizedType])\n    .map(r => r.email);\n  \n  // Fallback si aucun destinataire trouvé\n  if (emailList.length === 0) {\n    emailList = [previewEmail];\n  }\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    recipients: emailList,\n    recipient_count: emailList.length,\n    briefing_type: normalizedType,\n    preview_mode: previewMode\n  }\n}));"
+      },
+      "id": "process-recipients-node",
+      "name": "Process Recipients",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20544,
+        4536
+      ]
     }
   ],
   "connections": {
@@ -838,7 +875,12 @@
       "main": [
         [
           {
-            "node": "Send Email via Resend",
+            "node": "Fetch Email Recipients",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate HTML Preview",
             "type": "main",
             "index": 0
           }
@@ -1042,6 +1084,28 @@
         [
           {
             "node": "Preview Display",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Email Recipients": {
+      "main": [
+        [
+          {
+            "node": "Process Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Recipients": {
+      "main": [
+        [
+          {
+            "node": "Send Email via Resend",
             "type": "main",
             "index": 0
           }
