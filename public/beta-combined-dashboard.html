@@ -8372,7 +8372,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         alert('❌ Erreur lors de la mise à jour: ' + error.message);
                         await loadRecipients(); // Recharger en cas d'erreur
                     } finally {
-                        setSaving({ ...saving, [id]: false] });
+                        setSaving({ ...saving, [id]: false });
                     }
                 };
 
