@@ -105,12 +105,8 @@ async function getTickersFromSupabase() {
  */
 async function callEmmaAgent(prompt, tickers, briefingType, toolsPriority) {
   try {
-    // Utiliser l'URL Vercel si disponible, sinon localhost
-    const baseUrl = process.env.VERCEL_URL 
-      ? (process.env.VERCEL_URL.startsWith('http') ? process.env.VERCEL_URL : `https://${process.env.VERCEL_URL}`)
-      : process.env.VERCEL 
-        ? 'https://gob.vercel.app'
-        : 'http://localhost:3000';
+    // Utiliser l'URL Vercel directement (pas besoin de VERCEL_URL en production)
+    const baseUrl = 'https://gob.vercel.app';
 
     const response = await fetch(`${baseUrl}/api/emma-agent`, {
       method: 'POST',
