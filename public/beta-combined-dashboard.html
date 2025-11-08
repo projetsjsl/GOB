@@ -19276,23 +19276,31 @@ console.log('✅ Données hybrides récupérées:', {
                 const chartRef = useRef(null);
                 const chartInstance = useRef(null);
 
+                // S'assurer que isDarkMode est accessible (fallback si non défini)
+                const darkMode = typeof isDarkMode !== 'undefined' ? isDarkMode : true;
+                
+                console.log('📊 YieldCurveTab monté, isDarkMode:', darkMode);
+
                 // Récupérer les données de la yield curve
                 const fetchYieldCurve = async () => {
+                    console.log('🔄 fetchYieldCurve appelé pour country:', selectedCountry);
                     setLoading(true);
                     setError(null);
 
                     try {
                         const response = await fetch(`/api/yield-curve?country=${selectedCountry}`);
+                        console.log('📡 Réponse API yield-curve:', response.status, response.ok);
 
                         if (!response.ok) {
                             throw new Error(`Erreur API: ${response.status}`);
                         }
 
                         const data = await response.json();
+                        console.log('✅ Données yield curve reçues:', data);
                         setYieldData(data);
                         setLoading(false);
                     } catch (err) {
-                        console.error('Erreur yield curve:', err);
+                        console.error('❌ Erreur yield curve:', err);
                         setError(err.message);
                         setLoading(false);
                     }
@@ -19373,16 +19381,16 @@ console.log('✅ Données hybrides récupérées:', {
                                     display: true,
                                     position: 'top',
                                     labels: {
-                                        color: isDarkMode ? '#e5e7eb' : '#1f2937',
+                                        color: darkMode ? '#e5e7eb' : '#1f2937',
                                         font: { size: 14, weight: 'bold' },
                                         padding: 20
                                     }
                                 },
                                 tooltip: {
-                                    backgroundColor: isDarkMode ? '#1f2937' : '#fff',
-                                    titleColor: isDarkMode ? '#e5e7eb' : '#1f2937',
-                                    bodyColor: isDarkMode ? '#e5e7eb' : '#1f2937',
-                                    borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                                    backgroundColor: darkMode ? '#1f2937' : '#fff',
+                                    titleColor: darkMode ? '#e5e7eb' : '#1f2937',
+                                    bodyColor: darkMode ? '#e5e7eb' : '#1f2937',
+                                    borderColor: darkMode ? '#374151' : '#e5e7eb',
                                     borderWidth: 1,
                                     padding: 12,
                                     displayColors: true,
@@ -19435,7 +19443,7 @@ console.log('✅ Données hybrides récupérées:', {
                             chartInstance.current.destroy();
                         }
                     };
-                }, [yieldData, isDarkMode]);
+                }, [yieldData, darkMode]);
 
                 // Fonction pour formater la date
                 const formatDate = (dateStr) => {
@@ -19448,21 +19456,23 @@ console.log('✅ Données hybrides récupérées:', {
                     });
                 };
 
+                console.log('🎨 YieldCurveTab render - loading:', loading, 'error:', error, 'yieldData:', yieldData, 'darkMode:', darkMode);
+
                 return (
                     <div className="space-y-6">
                         {/* En-tête avec contrôles */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                            darkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             <div className="flex justify-between items-center mb-4">
                                 <div>
                                     <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                        darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
                                         📈 Courbe des Taux (Yield Curve)
                                     </h2>
                                     <p className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        darkMode ? 'text-gray-400' : 'text-gray-600'
                                     }`}>
                                         Visualisation des taux obligataires US Treasury et Canada par maturité
                                     </p>
@@ -19472,7 +19482,7 @@ console.log('✅ Données hybrides récupérées:', {
                                         value={selectedCountry}
                                         onChange={(e) => setSelectedCountry(e.target.value)}
                                         className={`px-4 py-2 rounded-lg border transition-colors duration-300 ${
-                                            isDarkMode
+                                            darkMode
                                                 ? 'bg-gray-700 border-gray-600 text-white'
                                                 : 'bg-white border-gray-300 text-gray-900'
                                         }`}
@@ -19508,13 +19518,13 @@ console.log('✅ Données hybrides récupérées:', {
                                                 {yieldData.data.us.inverted ? '⚠️ Courbe Inversée' : '✅ Courbe Normale'}
                                             </h3>
                                             <p className={`text-sm ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                darkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>
                                                 Spread 10Y-2Y: <strong>{yieldData.data.us.spread_10y_2y.toFixed(2)}%</strong>
                                             </p>
                                         </div>
                                         <div className={`text-xs ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            darkMode ? 'text-gray-400' : 'text-gray-600'
                                         }`}>
                                             {yieldData.data.us.inverted
                                                 ? 'Indicateur historique de récession potentielle'
@@ -19528,10 +19538,10 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* Graphique de la courbe */}
                         {loading && (
                             <div className={`p-12 rounded-lg text-center transition-colors duration-300 ${
-                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                darkMode ? 'bg-gray-800' : 'bg-white'
                             }`}>
                                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                                <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
                                     Chargement des données...
                                 </p>
                             </div>
@@ -19539,14 +19549,14 @@ console.log('✅ Données hybrides récupérées:', {
 
                         {error && (
                             <div className={`p-6 rounded-lg border-l-4 border-red-500 ${
-                                isDarkMode ? 'bg-red-900/20' : 'bg-red-50'
+                                darkMode ? 'bg-red-900/20' : 'bg-red-50'
                             }`}>
                                 <h3 className={`font-bold mb-2 ${
-                                    isDarkMode ? 'text-red-300' : 'text-red-800'
+                                    darkMode ? 'text-red-300' : 'text-red-800'
                                 }`}>
                                     ❌ Erreur
                                 </h3>
-                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+                                <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
                                     {error}
                                 </p>
                             </div>
@@ -19557,7 +19567,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 {/* Graphique */}
                                 {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
                                     <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                                        isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                        darkMode ? 'bg-gray-800' : 'bg-white'
                                     }`}>
                                         <div style={{ height: '400px' }}>
                                             <canvas ref={chartRef}></canvas>
@@ -19565,14 +19575,14 @@ console.log('✅ Données hybrides récupérées:', {
                                     </div>
                                 ) : (
                                     <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${
-                                        isDarkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'
+                                        darkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'
                                     }`}>
                                         <h3 className={`font-bold mb-2 ${
-                                            isDarkMode ? 'text-yellow-300' : 'text-yellow-800'
+                                            darkMode ? 'text-yellow-300' : 'text-yellow-800'
                                         }`}>
                                             ⚠️ Aucune donnée disponible
                                         </h3>
-                                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+                                        <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
                                             Les données de yield curve ne sont pas disponibles. Vérifiez que la clé API FRED_API_KEY est configurée dans les variables d'environnement Vercel.
                                         </p>
                                     </div>
@@ -19580,10 +19590,10 @@ console.log('✅ Données hybrides récupérées:', {
 
                                 {/* Tableau des maturités */}
                                 <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                    darkMode ? 'bg-gray-800' : 'bg-white'
                                 }`}>
                                     <h3 className={`text-xl font-bold mb-4 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                        darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
                                         📊 Tableau des Maturités
                                     </h3>
@@ -19592,30 +19602,30 @@ console.log('✅ Données hybrides récupérées:', {
                                         <table className="w-full">
                                             <thead>
                                                 <tr className={`border-b-2 ${
-                                                    isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                                                    darkMode ? 'border-gray-700' : 'border-gray-200'
                                                 }`}>
                                                     <th className={`px-4 py-3 text-left font-bold ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                        darkMode ? 'text-gray-300' : 'text-gray-700'
                                                     }`}>
                                                         Maturité
                                                     </th>
                                                     {yieldData.data.us && (
                                                         <th className={`px-4 py-3 text-right font-bold ${
-                                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             🇺🇸 US Treasury (%)
                                                         </th>
                                                     )}
                                                     {yieldData.data.canada && (
                                                         <th className={`px-4 py-3 text-right font-bold ${
-                                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             🇨🇦 Canada Bonds (%)
                                                         </th>
                                                     )}
                                                     {yieldData.data.us && yieldData.data.canada && (
                                                         <th className={`px-4 py-3 text-right font-bold ${
-                                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
                                                             Écart (bps)
                                                         </th>
@@ -19642,23 +19652,23 @@ console.log('✅ Données hybrides récupérées:', {
 
                                                             return (
                                                                 <tr key={maturity} className={`border-b ${
-                                                                    isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                                                                } ${idx % 2 === 0 ? (isDarkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
+                                                                    darkMode ? 'border-gray-700' : 'border-gray-200'
+                                                                } ${idx % 2 === 0 ? (darkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
                                                                     <td className={`px-4 py-3 font-semibold ${
-                                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                        darkMode ? 'text-white' : 'text-gray-900'
                                                                     }`}>
                                                                         {maturity}
                                                                     </td>
                                                                     {yieldData.data.us && (
                                                                         <td className={`px-4 py-3 text-right ${
-                                                                            isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                                                            darkMode ? 'text-blue-400' : 'text-blue-600'
                                                                         }`}>
                                                                             {usRate ? usRate.rate.toFixed(2) : '-'}
                                                                         </td>
                                                                     )}
                                                                     {yieldData.data.canada && (
                                                                         <td className={`px-4 py-3 text-right ${
-                                                                            isDarkMode ? 'text-red-400' : 'text-red-600'
+                                                                            darkMode ? 'text-red-400' : 'text-red-600'
                                                                         }`}>
                                                                             {caRate ? caRate.rate.toFixed(2) : '-'}
                                                                         </td>
@@ -19666,10 +19676,10 @@ console.log('✅ Données hybrides récupérées:', {
                                                                     {yieldData.data.us && yieldData.data.canada && (
                                                                         <td className={`px-4 py-3 text-right font-mono text-sm ${
                                                                             spread > 0
-                                                                                ? (isDarkMode ? 'text-green-400' : 'text-green-600')
+                                                                                ? (darkMode ? 'text-green-400' : 'text-green-600')
                                                                                 : spread < 0
-                                                                                ? (isDarkMode ? 'text-red-400' : 'text-red-600')
-                                                                                : (isDarkMode ? 'text-gray-400' : 'text-gray-600')
+                                                                                ? (darkMode ? 'text-red-400' : 'text-red-600')
+                                                                                : (darkMode ? 'text-gray-400' : 'text-gray-600')
                                                                         }`}>
                                                                             {spread !== null ? (spread > 0 ? '+' : '') + spread : '-'}
                                                                         </td>
@@ -19684,24 +19694,24 @@ console.log('✅ Données hybrides récupérées:', {
 
                                     {/* Métadonnées */}
                                     <div className={`mt-4 pt-4 border-t ${
-                                        isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                                        darkMode ? 'border-gray-700' : 'border-gray-200'
                                     }`}>
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                             {yieldData.data.us && (
                                                 <>
                                                     <div>
-                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                                                        <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
                                                             Source US:
                                                         </span>
-                                                        <strong className={`ml-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                        <strong className={`ml-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                                             {yieldData.data.us.source}
                                                         </strong>
                                                     </div>
                                                     <div>
-                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                                                        <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
                                                             Date US:
                                                         </span>
-                                                        <strong className={`ml-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                        <strong className={`ml-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                                             {formatDate(yieldData.data.us.date)}
                                                         </strong>
                                                     </div>
@@ -19710,18 +19720,18 @@ console.log('✅ Données hybrides récupérées:', {
                                             {yieldData.data.canada && (
                                                 <>
                                                     <div>
-                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                                                        <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
                                                             Source Canada:
                                                         </span>
-                                                        <strong className={`ml-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                        <strong className={`ml-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                                             {yieldData.data.canada.source}
                                                         </strong>
                                                     </div>
                                                     <div>
-                                                        <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
+                                                        <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
                                                             Date Canada:
                                                         </span>
-                                                        <strong className={`ml-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                        <strong className={`ml-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                                             {formatDate(yieldData.data.canada.date)}
                                                         </strong>
                                                     </div>
@@ -19733,15 +19743,15 @@ console.log('✅ Données hybrides récupérées:', {
 
                                 {/* Note explicative */}
                                 <div className={`p-4 rounded-lg ${
-                                    isDarkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
+                                    darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
                                 }`}>
                                     <h4 className={`font-bold mb-2 ${
-                                        isDarkMode ? 'text-blue-300' : 'text-blue-800'
+                                        darkMode ? 'text-blue-300' : 'text-blue-800'
                                     }`}>
                                         💡 À propos de la courbe des taux
                                     </h4>
                                     <ul className={`text-sm space-y-1 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
                                         <li>• <strong>Courbe normale:</strong> Les taux longs sont supérieurs aux taux courts (économie saine)</li>
                                         <li>• <strong>Courbe inversée:</strong> Les taux courts dépassent les taux longs (possibilité de récession)</li>
