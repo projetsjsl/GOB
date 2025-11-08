@@ -21993,6 +21993,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                     return;
                 } else if (window.location.pathname.includes('login.html')) {
                     console.log('?? Redirection vers login détectée');
+                    window.dashboardLoading = false;
                     hideLoadingScreen();
                     return;
                 }
@@ -22009,6 +22010,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                 // Vérifier si on a été redirigé vers login
                 if (window.location.pathname.includes('login.html')) {
                     console.log('?? Redirection vers login détectée dans l\'événement');
+                    window.dashboardLoading = false;
                     hideLoadingScreen();
                     return;
                 }
