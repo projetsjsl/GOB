@@ -19,6 +19,12 @@
     "api/emma-briefing.js": {
       "maxDuration": 45
     },
+    "api/briefing.js": {
+      "maxDuration": 60
+    },
+    "api/emma-n8n.js": {
+      "maxDuration": 60
+    },
     "api/supabase-watchlist.js": {
       "maxDuration": 15
     },
