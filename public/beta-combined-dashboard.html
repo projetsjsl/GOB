@@ -2139,7 +2139,10 @@ const fetchHybridData = async (symbol, dataType) => {
             // Fonction pour obtenir la couleur des grades Quant
             const getGradeColor = (grade) => {
                 if (!grade) return 'bg-gray-100 text-gray-600';
-                const letter = grade.charAt(0);
+                // Convertir en chaîne si ce n'est pas déjà le cas
+                const gradeStr = String(grade);
+                if (!gradeStr || gradeStr.length === 0) return 'bg-gray-100 text-gray-600';
+                const letter = gradeStr.charAt(0).toUpperCase();
                 if (letter === 'A') return 'bg-green-100 text-green-700';
                 if (letter === 'B') return 'bg-gray-100 text-gray-700';
                 if (letter === 'C') return 'bg-yellow-100 text-yellow-700';
