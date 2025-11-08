@@ -44,8 +44,16 @@
         this.currentUser = JSON.parse(userJson);
         this.permissions = this.currentUser.permissions;
 
-        // Valider la session auprès du serveur
-        const isValid = await this.validateSession();
+        // Valider la session auprès du serveur avec gestion d'erreur améliorée
+        let isValid = false;
+        try {
+          isValid = await this.validateSession();
+        } catch (validationError) {
+          console.warn('⚠️ Erreur lors de la validation de session (non bloquant):', validationError);
+          // En cas d'erreur réseau ou serveur, permettre l'accès avec les données en session
+          // pour éviter une page blanche
+          isValid = true; // Permettre l'accès basé sur sessionStorage uniquement
+        }
 
         if (!isValid) {
           console.warn('❌ Session invalide - redirection vers login');
@@ -70,7 +78,18 @@
 
       } catch (error) {
         console.error('❌ Erreur lors de la vérification de l\'authentification:', error);
-        this.redirectToLogin();
+        // Ne pas rediriger immédiatement en cas d'erreur pour éviter une page blanche
+        // Laisser le dashboard se charger et afficher un message d'erreur si nécessaire
+        console.warn('⚠️ Erreur non bloquante - le dashboard peut continuer à se charger');
+        
+        // Essayer d'appliquer les permissions même en cas d'erreur si on a les données utilisateur
+        if (this.currentUser && this.permissions) {
+          try {
+            this.applyEmmaPermissions();
+          } catch (permError) {
+            console.error('Erreur lors de l\'application des permissions:', permError);
+          }
+        }
       }
     }
 
@@ -79,6 +98,10 @@
      */
     async validateSession() {
       try {
+        // Timeout pour éviter que la validation bloque indéfiniment
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 secondes max
+
         const response = await fetch('/api/auth', {
           method: 'POST',
           headers: {
@@ -87,15 +110,27 @@
           body: JSON.stringify({
             action: 'validate',
             username: this.currentUser.username
-          })
+          }),
+          signal: controller.signal
         });
 
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
-        return data.success;
+        return data.success === true;
 
       } catch (error) {
-        console.error('Erreur validation session:', error);
-        return false;
+        if (error.name === 'AbortError') {
+          console.warn('⚠️ Timeout lors de la validation de session');
+        } else {
+          console.error('Erreur validation session:', error);
+        }
+        // Propager l'erreur pour que le code appelant puisse décider
+        throw error;
       }
     }
 
@@ -193,26 +228,48 @@
      * Applique les permissions Emma selon le rôle
      */
     applyEmmaPermissions() {
-      // Stocker les permissions pour Emma
-      window.GOB_AUTH = {
-        user: this.currentUser,
-        permissions: this.permissions,
-        canSaveConversations: this.permissions.save_conversations,
-        canViewHistory: this.permissions.view_own_history,
-        canViewAllHistory: this.permissions.view_all_history
-      };
+      try {
+        // Vérifier que les permissions existent avant de les utiliser
+        if (!this.permissions) {
+          console.warn('⚠️ Permissions non disponibles - utilisation de permissions par défaut');
+          this.permissions = {
+            save_conversations: false,
+            view_own_history: false,
+            view_all_history: false
+          };
+        }
 
-      console.log('📋 Permissions Emma configurées:', window.GOB_AUTH);
+        // Stocker les permissions pour Emma
+        window.GOB_AUTH = {
+          user: this.currentUser,
+          permissions: this.permissions,
+          canSaveConversations: this.permissions?.save_conversations || false,
+          canViewHistory: this.permissions?.view_own_history || false,
+          canViewAllHistory: this.permissions?.view_all_history || false
+        };
 
-      // Si l'utilisateur ne peut pas sauvegarder les conversations
-      if (!this.permissions.save_conversations) {
-        console.log('⚠️ Utilisateur en mode lecture seule (conversations non sauvegardées)');
-      }
+        console.log('📋 Permissions Emma configurées:', window.GOB_AUTH);
 
-      // Si admin, afficher un indicateur (DÉSACTIVÉ)
-      if (this.permissions.view_all_history) {
-        console.log('🔓 Mode Admin: Accès à tous les historiques');
-        // this.showAdminIndicator(); // Désactivé - élément flottant retiré
+        // Si l'utilisateur ne peut pas sauvegarder les conversations
+        if (!this.permissions.save_conversations) {
+          console.log('⚠️ Utilisateur en mode lecture seule (conversations non sauvegardées)');
+        }
+
+        // Si admin, afficher un indicateur (DÉSACTIVÉ)
+        if (this.permissions.view_all_history) {
+          console.log('🔓 Mode Admin: Accès à tous les historiques');
+          // this.showAdminIndicator(); // Désactivé - élément flottant retiré
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'application des permissions Emma:', error);
+        // Créer un objet de permissions par défaut en cas d'erreur
+        window.GOB_AUTH = {
+          user: this.currentUser || null,
+          permissions: {},
+          canSaveConversations: false,
+          canViewHistory: false,
+          canViewAllHistory: false
+        };
       }
     }
 
@@ -296,12 +353,26 @@
   window.authGuard = new AuthGuard();
 
   // Initialiser automatiquement quand le DOM est prêt
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.authGuard.init();
-    });
-  } else {
-    window.authGuard.init();
+  // Utiliser un try-catch global pour éviter que les erreurs bloquent le chargement
+  try {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        // Initialiser de manière asynchrone pour ne pas bloquer le rendu
+        window.authGuard.init().catch(error => {
+          console.error('Erreur lors de l\'initialisation de Auth Guard:', error);
+          // Ne pas empêcher le chargement du dashboard en cas d'erreur
+        });
+      });
+    } else {
+      // Initialiser de manière asynchrone pour ne pas bloquer le rendu
+      window.authGuard.init().catch(error => {
+        console.error('Erreur lors de l\'initialisation de Auth Guard:', error);
+        // Ne pas empêcher le chargement du dashboard en cas d'erreur
+      });
+    }
+  } catch (error) {
+    console.error('Erreur critique lors de l\'initialisation de Auth Guard:', error);
+    // Ne pas empêcher le chargement du dashboard même en cas d'erreur critique
   }
 
 })();
