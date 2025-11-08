@@ -1138,6 +1138,33 @@ const fetchHybridData = async (symbol, dataType) => {
                 try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch(_) {}
             };
 
+            // Fonction pour déconnexion
+            const handleLogout = () => {
+                if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                    try {
+                        // Nettoyer le localStorage (garder le thème)
+                        const theme = localStorage.getItem('theme');
+                        localStorage.clear();
+                        if (theme) {
+                            localStorage.setItem('theme', theme);
+                        }
+                        
+                        // Nettoyer le sessionStorage
+                        sessionStorage.clear();
+                        
+                        // Fermer l'overlay
+                        setShowMoreTabsOverlay(false);
+                        
+                        // Recharger la page pour réinitialiser l'état
+                        window.location.reload();
+                    } catch (error) {
+                        console.error('Erreur lors de la déconnexion:', error);
+                        // Recharger quand même la page
+                        window.location.reload();
+                    }
+                }
+            };
+
             // Fonction pour gérer le changement d'onglet avec animations d'intro
             const handleTabChange = (tabId) => {
                 setActiveTab(tabId);
@@ -20535,6 +20562,41 @@ console.log('✅ Données hybrides récupérées:', {
                                                 </button>
                                             );
                                         })}
+
+                                        {/* Séparateur */}
+                                        <div className={`my-4 border-t ${
+                                            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                                        }`}></div>
+
+                                        {/* Bouton de déconnexion */}
+                                        <button
+                                            onClick={handleLogout}
+                                            className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group ${
+                                                isDarkMode
+                                                    ? 'bg-red-900/20 hover:bg-red-900/30 border-2 border-transparent hover:border-red-500/50'
+                                                    : 'bg-red-50 hover:bg-red-100 border-2 border-transparent hover:border-red-300'
+                                            }`}
+                                        >
+                                            <div className={`relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-300 ${
+                                                isDarkMode
+                                                    ? 'bg-red-600/30 text-red-400 group-hover:bg-red-600/50'
+                                                    : 'bg-red-100 text-red-600 group-hover:bg-red-200'
+                                            }`}>
+                                                <i className="iconoir-log-out text-2xl relative z-10 transition-all duration-300 group-hover:scale-110"></i>
+                                            </div>
+                                            <div className="flex-1 text-left">
+                                                <div className={`font-semibold ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>
+                                                    Déconnexion
+                                                </div>
+                                                <div className={`text-xs mt-1 ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}>
+                                                    Se déconnecter et réinitialiser la session
+                                                </div>
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
