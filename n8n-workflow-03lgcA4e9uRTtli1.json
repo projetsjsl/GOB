@@ -209,7 +209,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La réponse de /api/emma-n8n?action=briefing contient:\n// { success: true, action, timestamp, result: { briefing, tools_used, execution_time_ms, type, prompt_config } }\n// OU directement { briefing, tools_used, ... } si la réponse n'est pas enveloppée\nconst result = data.result || data;\nconst content = result.briefing || result.response || data.briefing || data.response || 'No content received';\n\nreturn [{\n  json: {\n    ...data,\n    ...result,\n    newsletter_content: content,\n    api_type: 'emma-agent', // Pour compatibilité avec le reste du workflow\n    generated_at: new Date().toISOString()\n  }\n}];"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La réponse de /api/chat contient:\n// { success: true, response: '...', ... }\nconst content = data.response || data.message || data.analysis || 'No content received';\n\nreturn [{\n  json: {\n    ...data,\n    newsletter_content: content,\n    api_type: 'emma-agent',\n    generated_at: new Date().toISOString()\n  }\n}];"
       },
       "id": "40676021-3728-41a7-a961-9ec5a4f31b19",
       "name": "Parse API Response",
@@ -502,12 +502,12 @@
             {
               "name": "Content-Type",
               "value": "application/json"
-            },
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"type\": $json.prompt_type === 'noon' ? 'midday' : $json.prompt_type,\n  \"tickers\": $json.tickers ? $json.tickers.split(', ').filter(t => t) : []\n} }}",
+        "jsonBody": "={{ {\n  \"message\": $json.message,\n  \"channel\": $json.channel || 'web',\n  \"user_id\": $json.user_id || 'n8n-automation'\n} }}",
         "options": {
           "response": {
             "response": {
