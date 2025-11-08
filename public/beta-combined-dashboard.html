@@ -483,6 +483,32 @@
 <body class="min-h-screen">
     <div id="root"></div>
     
+    <!-- Écran de chargement initial (affiché immédiatement) -->
+    <div id="auth-loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div class="text-center">
+            <div class="mb-6">
+                <img
+                    src="jlab.png"
+                    alt="JLab"
+                    class="w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-green-500 animate-pulse mx-auto"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                />
+                <div style="display:none; width: 288px; height: 288px; margin: 0 auto; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%;"></div>
+            </div>
+            <h2 class="text-white text-3xl md:text-4xl font-bold mb-2">JLab™</h2>
+            <p class="text-green-300 text-lg mb-4">Vérification de l'authentification...</p>
+            <div class="w-64 h-1 bg-gray-700 rounded-full overflow-hidden mx-auto">
+                <div class="h-full bg-gradient-to-r from-green-500 to-emerald-500" style="width: 60%; animation: loading-bar 1.5s ease-in-out infinite;"></div>
+            </div>
+        </div>
+    </div>
+    <style>
+        @keyframes loading-bar {
+            0%, 100% { width: 30%; }
+            50% { width: 70%; }
+        }
+    </style>
+    
     <!-- Auth Guard - Protection du dashboard (chargé AVANT React pour vérifier l'authentification) -->
     <script src="/js/auth-guard.js"></script>
     
@@ -21888,6 +21914,17 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
         // Attendre que auth-guard.js ait terminé la vérification avant de rendre React
         let dashboardRendered = false;
         
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('auth-loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.transition = 'opacity 0.3s ease-out';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 300);
+            }
+        }
+        
         function renderDashboard() {
             // Protection contre le double rendu
             if (dashboardRendered) {
@@ -21898,15 +21935,41 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
             // Vérifier une dernière fois si on n'a pas été redirigé
             if (window.location.pathname.includes('login.html')) {
                 console.log('?? Redirection vers login détectée avant rendu');
+                hideLoadingScreen();
                 return;
             }
             
             dashboardRendered = true;
             console.log('? Rendu du dashboard React...');
+            
+            // Masquer l'écran de chargement avant de rendre React
+            hideLoadingScreen();
+            
+            // Rendre le dashboard React
             ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
         }
         
         function initDashboard() {
+            // VÉRIFICATION IMMÉDIATE: Si on vient juste de se connecter, vérifier sessionStorage immédiatement
+            const userJson = sessionStorage.getItem('gob-user');
+            if (userJson && !window.location.pathname.includes('login.html')) {
+                try {
+                    const user = JSON.parse(userJson);
+                    console.log('? Session trouvée immédiatement - chargement rapide du dashboard...');
+                    // Attendre un court instant pour que auth-guard se synchronise, puis charger
+                    setTimeout(() => {
+                        if (!dashboardRendered) {
+                            renderDashboard();
+                        }
+                    }, 100);
+                } catch (parseError) {
+                    console.warn('?? Session invalide - redirection vers login');
+                    hideLoadingScreen();
+                    window.location.href = '/login.html';
+                    return;
+                }
+            }
+            
             // Vérifier si auth-guard est déjà initialisé (cas où le script React se charge après)
             if (window.authGuardInitialized && window.authGuardReady) {
                 const detail = window.lastAuthGuardEvent || {};
@@ -21916,6 +21979,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                     return;
                 } else if (window.location.pathname.includes('login.html')) {
                     console.log('?? Redirection vers login détectée');
+                    hideLoadingScreen();
                     return;
                 }
             }
@@ -21931,6 +21995,7 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                 // Vérifier si on a été redirigé vers login
                 if (window.location.pathname.includes('login.html')) {
                     console.log('?? Redirection vers login détectée dans l\'événement');
+                    hideLoadingScreen();
                     return;
                 }
                 
@@ -21947,10 +22012,12 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                             renderDashboard();
                         } catch (parseError) {
                             console.warn('? Session invalide - redirection vers login');
+                            hideLoadingScreen();
                             window.location.href = '/login.html';
                         }
                     } else {
                         console.warn('? Pas de session utilisateur - redirection vers login');
+                        hideLoadingScreen();
                         window.location.href = '/login.html';
                     }
                 }
@@ -21959,10 +22026,10 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
             // Attacher le listener (avec once pour éviter les doubles appels)
             window.addEventListener('authGuardInitialized', handleAuthGuardReady, { once: true });
             
-            // Timeout de sécurité (5 secondes) - fallback si l'événement ne se déclenche pas
+            // Timeout de sécurité (2 secondes) - fallback si l'événement ne se déclenche pas
             setTimeout(function() {
                 if (!dashboardRendered && !window.location.pathname.includes('login.html')) {
-                    console.warn('?? Timeout auth-guard (5s) - vérification de session...');
+                    console.warn('?? Timeout auth-guard (2s) - vérification de session...');
                     
                     if (window.authGuardInitialized && window.lastAuthGuardEvent) {
                         // Utiliser les données de l'événement si disponibles
@@ -21978,18 +22045,20 @@ console.log(' Donn?es hybrides r?cup?r?es:', {
                     if (userJson) {
                         try {
                             const user = JSON.parse(userJson);
-                            console.log('?? Session valide malgré timeout - chargement du dashboard (fallback timeout)...');
+                            console.log('? Session valide malgré timeout - chargement du dashboard (fallback timeout)...');
                             renderDashboard();
                         } catch (parseError) {
                             console.warn('? Session invalide - redirection vers login');
+                            hideLoadingScreen();
                             window.location.href = '/login.html';
                         }
                     } else {
                         console.warn('? Pas de session utilisateur - redirection vers login');
+                        hideLoadingScreen();
                         window.location.href = '/login.html';
                     }
                 }
-            }, 5000);
+            }, 2000);
         }
         
         // Démarrer l'initialisation
