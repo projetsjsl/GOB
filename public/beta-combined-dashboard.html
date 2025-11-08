@@ -2982,6 +2982,17 @@ const fetchHybridData = async (symbol, dataType) => {
 
             }, []); // Dépendance vide = une seule fois au montage
 
+            // Charger automatiquement les données de stocks dès que les tickers sont disponibles
+            useEffect(() => {
+                if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminée
+                if (tickers.length > 0 && Object.keys(stockData).length === 0) {
+                    console.log('💹 Chargement automatique des données de stocks au démarrage (tous les tickers)...');
+                    refreshAllStocks().catch(err => {
+                        console.error('❌ Erreur chargement stocks:', err);
+                    });
+                }
+            }, [tickers.length, initialLoadComplete]); // Se déclenche quand les tickers sont chargés (pas stockData pour éviter boucle)
+
             // Intro Emma: première visite de session (séparé du chargement)
             useEffect(() => {
                 if (activeTab === 'ask-emma' && !sessionStorage.getItem('emma-intro-shown')) {
@@ -3032,12 +3043,13 @@ const fetchHybridData = async (symbol, dataType) => {
             }, [activeTab, initialLoadComplete]); // Se déclenche au changement d'onglet
 
             // Charger les données de stocks une fois que les tickers sont disponibles
-            // OPTIMISATION: Charger seulement les 5 premiers tickers initialement pour améliorer les performances
+            // Charger TOUS les tickers pour que les sections Top Movers, Top Gainers, Top Losers et Analyses fonctionnent
             useEffect(() => {
-                if (activeTab === 'stocks-news' && tickers.length > 0 && Object.keys(stockData).length === 0) {
-                    console.log('💹 Chargement automatique des données de stocks pour stocks-news (optimisé: 5 premiers)...');
-                    // Charger seulement les 5 premiers tickers pour l'affichage initial
-                    const initialTickers = tickers.slice(0, 5);
+                // Charger les données même si on n'est pas sur l'onglet stocks-news pour que les sections soient prêtes
+                if (tickers.length > 0 && Object.keys(stockData).length === 0) {
+                    console.log('💹 Chargement automatique des données de stocks (tous les tickers pour sections complètes)...');
+                    // Charger TOUS les tickers pour que les sections Top Movers, Gainers, Losers et Analyses fonctionnent
+                    const initialTickers = tickers; // Charger tous les tickers, pas seulement les 5 premiers
                     if (initialTickers.length > 0) {
                         // Utiliser la fonction batch optimisée
                         const loadInitialStocks = async () => {
@@ -3089,7 +3101,7 @@ const fetchHybridData = async (symbol, dataType) => {
                         loadInitialStocks();
                     }
                 }
-            }, [activeTab, tickers.length]); // Se déclenche quand les tickers changent
+            }, [tickers.length]); // Se déclenche quand les tickers changent (pas besoin de activeTab)
 
             // Chargement automatique du calendrier économique à l'ouverture de l'onglet
             // OBSOLÈTE: EconomicCalendarTab gère maintenant son propre chargement de données
