@@ -88,6 +88,9 @@
         },
         "api/email-recipients.js": {
           "maxDuration": 10
+        },
+        "api/briefing-schedule.js": {
+          "maxDuration": 10
         }
   },
   "headers": [

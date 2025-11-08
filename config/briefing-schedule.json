@@ -1,0 +1,32 @@
+{
+  "morning": {
+    "enabled": true,
+    "hour": 7,
+    "minute": 20,
+    "timezone": "America/Montreal",
+    "cron_utc": "20 11 * * 1-5",
+    "description": "Briefing matinal - Marchés, actualités et focus sur nos tickers d'équipe"
+  },
+  "midday": {
+    "enabled": true,
+    "hour": 11,
+    "minute": 50,
+    "timezone": "America/Montreal",
+    "cron_utc": "50 15 * * 1-5",
+    "description": "Briefing de mi-journée - Performance matinale et perspectives pour l'après-midi"
+  },
+  "evening": {
+    "enabled": true,
+    "hour": 16,
+    "minute": 20,
+    "timezone": "America/Montreal",
+    "cron_utc": "20 20 * * 1-5",
+    "description": "Briefing de clôture - Bilan de journée et perspectives pour demain"
+  },
+  "config": {
+    "timezone": "America/Montreal",
+    "weekdays_only": true,
+    "auto_update_n8n": true
+  }
+}
+
