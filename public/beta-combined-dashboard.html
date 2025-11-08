@@ -17799,6 +17799,19 @@ console.log('✅ Données hybrides récupérées:', {
                 const [filterTicker, setFilterTicker] = useState('all'); // For earnings/dividends
                 const [filterTickerGroup, setFilterTickerGroup] = useState('all'); // all, team, watchlist, both
                 const [dateRange, setDateRange] = useState('week'); // today, week, month
+                const [filterLargeCapOnly, setFilterLargeCapOnly] = useState(true); // Par défaut activé pour earnings
+                
+                // Liste des tickers Large Cap (S&P 500 principaux)
+                const largeCapTickers = [
+                    'AAPL', 'MSFT', 'GOOGL', 'GOOG', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'UNH',
+                    'JNJ', 'V', 'XOM', 'WMT', 'JPM', 'MA', 'PG', 'CVX', 'HD', 'ABBV',
+                    'MRK', 'PEP', 'COST', 'AVGO', 'ADBE', 'TMO', 'CSCO', 'ACN', 'DHR', 'NFLX',
+                    'VZ', 'ABT', 'NKE', 'CMCSA', 'WFC', 'PM', 'TXN', 'LIN', 'NEE', 'DIS',
+                    'HON', 'QCOM', 'UPS', 'IBM', 'RTX', 'AMGN', 'T', 'SPGI', 'INTU', 'DE',
+                    'AMAT', 'LOW', 'SBUX', 'GS', 'CAT', 'AXP', 'BKNG', 'ADP', 'SYK', 'TJX',
+                    'GE', 'ISRG', 'VRTX', 'ZTS', 'MU', 'FI', 'C', 'MDT', 'GILD', 'REGN',
+                    'BLK', 'ETN', 'SHW', 'KLAC', 'WM', 'APH', 'LRCX', 'ADI', 'CDNS', 'SNPS'
+                ];
 
                 // Team and Watchlist tickers
                 const [teamTickers, setTeamTickers] = useState([]);
@@ -17882,6 +17895,8 @@ console.log('✅ Données hybrides récupérées:', {
                     // Reset ticker filters when switching tabs
                     setFilterTicker('all');
                     setFilterTickerGroup('all');
+                    // Activer le filtre Large Cap par défaut pour earnings uniquement
+                    setFilterLargeCapOnly(activeSubTab === 'earnings');
                 }, [activeSubTab]);
 
                 const fetchCalendarData = async () => {
@@ -18046,6 +18061,15 @@ console.log('✅ Données hybrides récupérées:', {
                             }
                         }
 
+                        // Large Cap filter (for earnings only, enabled by default)
+                        if (filterLargeCapOnly && activeSubTab === 'earnings') {
+                            const ticker = extractTicker(event.event);
+                            if (!ticker) return false;
+                            if (!largeCapTickers.includes(ticker)) {
+                                return false;
+                            }
+                        }
+
                         return true;
                     });
 
@@ -18203,12 +18227,36 @@ console.log('✅ Données hybrides récupérées:', {
                                             ))}
                                         </select>
                                     </div>
+
+                                    {/* Large Cap Filter - Only for Earnings */}
+                                    {activeSubTab === 'earnings' && (
+                                        <div className="flex items-center">
+                                            <label className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer transition-colors ${
+                                                isDarkMode
+                                                    ? filterLargeCapOnly ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                                    : filterLargeCapOnly ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+                                            } border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={filterLargeCapOnly}
+                                                    onChange={(e) => setFilterLargeCapOnly(e.target.checked)}
+                                                    className="w-4 h-4 cursor-pointer"
+                                                />
+                                                <span className="font-medium">Large Cap Only</span>
+                                            </label>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Active Filters Display */}
-                                {(searchQuery || filterImpact !== 'all' || filterCurrency !== 'all' || filterTicker !== 'all' || filterTickerGroup !== 'all') && (
+                                {(searchQuery || filterImpact !== 'all' || filterCurrency !== 'all' || filterTicker !== 'all' || filterTickerGroup !== 'all' || (activeSubTab === 'earnings' && filterLargeCapOnly)) && (
                                     <div className="flex flex-wrap gap-2 mt-3">
                                         <span className="text-xs text-gray-400">Active filters:</span>
+                                        {activeSubTab === 'earnings' && filterLargeCapOnly && (
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
+                                                📊 Large Cap Only
+                                            </span>
+                                        )}
                                         {searchQuery && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-gray-900 text-gray-200' : 'bg-gray-700 text-gray-200'}`}>
                                                 Search: "{searchQuery}"
@@ -18243,6 +18291,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                 setFilterCurrency('all');
                                                 setFilterTicker('all');
                                                 setFilterTickerGroup('all');
+                                                setFilterLargeCapOnly(activeSubTab === 'earnings'); // Réinitialiser à la valeur par défaut selon l'onglet
                                             }}
                                             className="text-xs text-red-400 hover:text-red-300 underline"
                                         >
