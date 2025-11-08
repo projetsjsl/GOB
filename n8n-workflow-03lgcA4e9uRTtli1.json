@@ -737,12 +737,24 @@
   "connections": {
     "Schedule Trigger (7h/12h/16h30 EST)": {
       "main": [
-        []
+        [
+          {
+            "node": "Fetch Prompts from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Webhook Trigger": {
       "main": [
-        []
+        [
+          {
+            "node": "Fetch Prompts from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Manual Trigger (Custom Prompt)": {
