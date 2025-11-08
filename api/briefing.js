@@ -156,28 +156,34 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. DÉTERMINER LE TYPE DE BRIEFING
-    let briefingType = req.query.type || req.body?.type;
+        // 1. DÉTERMINER LE TYPE DE BRIEFING
+        let briefingType = req.query.type || req.body?.type;
+        const customPrompt = req.body?.custom_prompt;
 
-    if (!briefingType) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing type parameter. Must be: morning, midday, or evening'
-      });
-    }
+        if (!briefingType && !customPrompt) {
+          return res.status(400).json({
+            success: false,
+            error: 'Missing type parameter. Must be: morning, midday, evening, or custom'
+          });
+        }
 
-    // Normaliser le type
-    if (briefingType === 'noon') {
-      briefingType = 'midday';
-    }
+        // Si custom_prompt est fourni, utiliser 'custom'
+        if (customPrompt) {
+          briefingType = 'custom';
+        }
 
-    const validTypes = ['morning', 'midday', 'evening'];
-    if (!validTypes.includes(briefingType)) {
-      return res.status(400).json({
-        success: false,
-        error: `Invalid type. Must be one of: ${validTypes.join(', ')}`
-      });
-    }
+        // Normaliser le type
+        if (briefingType === 'noon') {
+          briefingType = 'midday';
+        }
+
+        const validTypes = ['morning', 'midday', 'evening', 'custom'];
+        if (!validTypes.includes(briefingType)) {
+          return res.status(400).json({
+            success: false,
+            error: `Invalid type. Must be one of: ${validTypes.join(', ')}`
+          });
+        }
 
     console.log(`📧 Génération briefing ${briefingType}...`);
 
@@ -198,11 +204,18 @@ export default async function handler(req, res) {
 
     console.log(`📊 Tickers: ${allTickers.length} (team: ${teamTickers.length}, watchlist: ${watchlist.length})`);
 
-    // 4. PRÉPARER LE PROMPT
-    const prompt = promptConfig.prompt;
-    const fullPrompt = allTickers.length > 0
-      ? `${prompt}\n\nFocus sur ces tickers: ${allTickers.join(', ')}`
-      : prompt;
+        // 4. PRÉPARER LE PROMPT
+        let prompt;
+        if (briefingType === 'custom' && customPrompt) {
+          // Utiliser le prompt personnalisé
+          prompt = customPrompt;
+        } else {
+          prompt = promptConfig.prompt;
+        }
+        
+        const fullPrompt = allTickers.length > 0
+          ? `${prompt}\n\nFocus sur ces tickers: ${allTickers.join(', ')}`
+          : prompt;
 
     // 5. APPELER EMMA AGENT (comme /api/chat appelle /api/emma-agent)
     const emmaResponse = await callEmmaAgent(
