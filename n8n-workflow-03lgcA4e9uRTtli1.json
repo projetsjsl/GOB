@@ -586,7 +586,7 @@
               "conditions": {
                 "boolean": [
                   {
-                    "value1": "={{ $json.preview_mode === true && $json.approved !== true }}",
+                    "value1": "={{ $json.preview_mode === true || $json.approved !== true }}",
                     "value2": true
                   }
                 ]
@@ -598,7 +598,7 @@
               "conditions": {
                 "boolean": [
                   {
-                    "value1": "={{ $json.approved === true || $json.preview_mode === false }}",
+                    "value1": "={{ $json.preview_mode === false && $json.approved === true }}",
                     "value2": true
                   }
                 ]
