@@ -25,6 +25,25 @@ const cleanWorkflow = {
       parameters: node.parameters
     };
     
+    // CORRECTION: S'assurer que l'URL est correcte pour les nœuds HTTP Request
+    if (node.type === 'n8n-nodes-base.httpRequest' && cleanNode.parameters?.url) {
+      const url = cleanNode.parameters.url;
+      // Remplacer toute URL incorrecte par gob.vercel.app
+      if (url.includes('mypros.chat') || url.includes('your-app.vercel.app') || !url.includes('gob.vercel.app')) {
+        console.log(`   🔧 Correction URL dans ${node.name}: ${url}`);
+        // Si c'est /api/emma-agent, utiliser /api/chat à la place
+        if (url.includes('/api/emma-agent')) {
+          cleanNode.parameters.url = '=https://gob.vercel.app/api/chat';
+        } else if (url.includes('/api/')) {
+          // Garder le même endpoint mais corriger le domaine
+          cleanNode.parameters.url = url.replace(/https?:\/\/[^\/]+/, 'https://gob.vercel.app');
+        } else {
+          cleanNode.parameters.url = '=https://gob.vercel.app/api/chat';
+        }
+        console.log(`      → ${cleanNode.parameters.url}`);
+      }
+    }
+    
     // Ajouter credentials si présent
     if (node.credentials) {
       cleanNode.credentials = node.credentials;
