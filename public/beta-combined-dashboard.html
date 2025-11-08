@@ -5841,8 +5841,45 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
                     )}
 
+                    {/* Liste des tickers disponibles si aucune donnée Seeking Alpha */}
+                    {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length > 0 && (
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                📊 Tickers disponibles ({tickers.length})
+                            </h3>
+                            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Cliquez sur un ticker pour voir ses détails ou lancez le scraper pour collecter les données Seeking Alpha.
+                            </p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                {tickers.map((ticker) => (
+                                    <button
+                                        key={ticker}
+                                        onClick={() => setSelectedStock(ticker)}
+                                        className={`p-3 rounded-lg border transition-all hover:scale-105 ${
+                                            isDarkMode
+                                                ? 'bg-gray-700/50 border-gray-600 hover:border-green-500 text-white'
+                                                : 'bg-white border-gray-300 hover:border-green-500 text-gray-900'
+                                        }`}
+                                    >
+                                        <div className="font-mono font-bold text-lg">{ticker}</div>
+                                        {stockData[ticker] && (
+                                            <div className={`text-xs mt-1 ${
+                                                (stockData[ticker].dp || stockData[ticker].changePercent || 0) >= 0
+                                                    ? 'text-green-500' : 'text-red-500'
+                                            }`}>
+                                                ${(stockData[ticker].c || stockData[ticker].price || 0).toFixed(2)}
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Cartes d'analyse comme dans les images */}
-                    {!selectedStock && seekingAlphaData.stocks && (
+                    {!selectedStock && seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
                             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -6568,24 +6605,24 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
                     )}
 
-                    {/* Message si aucune donnée */}
-                    {(!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && (
+                    {/* Message si aucune donnée et aucun ticker */}
+                    {(!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length === 0 && (
                         <div className={`backdrop-blur-sm rounded-lg p-8 border transition-colors duration-300 ${
                             isDarkMode ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-300'
                         }`}>
                             <div className="text-center">
                                 <div className="text-5xl mb-4"><Icon emoji="📊" size={48} /></div>
                                 <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-yellow-200' : 'text-yellow-800'}`}>
-                                    Aucune donnée Seeking Alpha disponible
+                                    Aucun ticker disponible
                                 </h3>
                                 <p className={`mb-4 ${isDarkMode ? 'text-yellow-300' : 'text-yellow-700'}`}>
-                                    Utilisez les outils de scraping dans l'onglet Admin-JSLAI pour collecter les données.
+                                    Ajoutez des tickers dans l'onglet "Titres & Nouvelles" pour commencer.
                                 </p>
                                 <button
-                                    onClick={() => setActiveTab('admin-jsla')}
+                                    onClick={() => setActiveTab('stocks-news')}
                                     className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                 >
-                                    Aller à Admin-JSLAI →
+                                    Aller à Titres & Nouvelles →
                                 </button>
                             </div>
                         </div>
@@ -6683,15 +6720,72 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
                     )}
 
+                    {/* Liste des tickers disponibles si aucune donnée Seeking Alpha */}
+                    {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length > 0 && (
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                📊 Tickers disponibles ({tickers.length})
+                            </h3>
+                            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Cliquez sur un ticker pour voir ses détails ou lancez le scraper pour collecter les données Seeking Alpha.
+                            </p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                {tickers.map((ticker) => (
+                                    <button
+                                        key={ticker}
+                                        onClick={() => setSelectedStock(ticker)}
+                                        className={`p-3 rounded-lg border transition-all hover:scale-105 ${
+                                            isDarkMode
+                                                ? 'bg-gray-700/50 border-gray-600 hover:border-green-500 text-white'
+                                                : 'bg-white border-gray-300 hover:border-green-500 text-gray-900'
+                                        }`}
+                                    >
+                                        <div className="font-mono font-bold text-lg">{ticker}</div>
+                                        {stockData[ticker] && (
+                                            <div className={`text-xs mt-1 ${
+                                                (stockData[ticker].dp || stockData[ticker].changePercent || 0) >= 0
+                                                    ? 'text-green-500' : 'text-red-500'
+                                            }`}>
+                                                ${(stockData[ticker].c || stockData[ticker].price || 0).toFixed(2)}
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Affichage en  liste si pas de cartes */}
-                    {(!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && (
+                    {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length === 0 && (
+                        <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <Icon emoji="📋" size={24} />
+                                Analyses Seeking Alpha
+                            </h3>
+                            <div className="text-center py-8">
+                                <p className="text-gray-400 mb-4">Aucun ticker disponible. Ajoutez des tickers dans l'onglet "Titres & Nouvelles".</p>
+                                <button
+                                    onClick={() => setActiveTab('stocks-news')}
+                                    className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                >
+                                    Aller à Titres & Nouvelles →
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Affichage en liste avec données */}
+                    {!selectedStock && seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
                         <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                 <Icon emoji="📋" size={24} />
                                 Analyses Seeking Alpha
                             </h3>
                             <div className="space-y-4">
-                                {tickers.map((ticker, index) => {
+                                {seekingAlphaData.stocks.map((stock, index) => {
+                                    const ticker = stock.ticker;
                                     const claudeData = seekingAlphaStockData.stocks?.[ticker];
                                     const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
                                     const parsedData = seekingAlphaItem?.parsedData;
