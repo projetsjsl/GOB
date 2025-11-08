@@ -3105,8 +3105,8 @@ const fetchHybridData = async (symbol, dataType) => {
             // Utilisation d'icônes Iconoir vérifiées et disponibles
             const getTabIcon = (tabId) => {
                 const iconMap = {
-                    'stocks-news': 'iconoir-chart-line', // ✅ Icône valide
-                    'intellistocks': 'iconoir-trending-up', // ✅ Icône valide
+                    'stocks-news': 'iconoir-briefcase', // Portefeuille pour Titres & Nouvelles
+                    'intellistocks': 'iconoir-flask', // Laboratoire pour JLab™
                     'ask-emma': 'iconoir-chat-bubble', // ✅ Icône valide
                     'admin-jsla': 'iconoir-settings', // ✅ Icône valide
                     'dans-watchlist': 'iconoir-star', // ✅ Icône valide
@@ -3114,8 +3114,8 @@ const fetchHybridData = async (symbol, dataType) => {
                     'seeking-alpha': 'iconoir-graph-up', // ✅ Icône valide
                     'email-briefings': 'iconoir-antenna-signal', // ✅ Icône valide
                     'economic-calendar': 'iconoir-calendar', // ✅ Icône valide
-                    'investing-calendar': 'iconoir-flask', // ✅ Icône valide
-                    'yield-curve': 'iconoir-trending-up', // ✅ Utilise trending-up (icône valide)
+                    'investing-calendar': 'iconoir-calendar', // Calendrier pour Investing Calendar
+                    'yield-curve': 'iconoir-graph-up', // Graphique pour Yield Curve
                     'markets-economy': 'iconoir-globe' // ✅ Icône valide
                 };
                 // Retourner l'icône avec fallback
