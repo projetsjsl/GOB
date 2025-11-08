@@ -19078,7 +19078,7 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
 
                         {/* Graphiques Lightweight Charts */}
-                        <LightweightChartsSection isDarkMode={isDarkMode} />
+                        <LightweightChartsSection isDarkMode={isDarkMode} symbol={timelineSymbol} />
 
                     </div>
                 );
@@ -19087,19 +19087,144 @@ console.log('✅ Données hybrides récupérées:', {
             // ============================================================================
             // COMPOSANT LIGHTWEIGHT CHARTS
             // ============================================================================
-            const LightweightChartsSection = ({ isDarkMode }) => {
+            const LightweightChartsSection = ({ isDarkMode, symbol }) => {
                 const candlestickChartRef = useRef(null);
                 const lineChartRef = useRef(null);
                 const areaChartRef = useRef(null);
+                const [chartData, setChartData] = useState(null);
+                const [loading, setLoading] = useState(true);
+                const [error, setError] = useState(null);
+                const candleChartInstance = useRef(null);
+                const lineChartInstance = useRef(null);
+                const areaChartInstance = useRef(null);
 
+                // Extraire le symbole simple depuis le format TradingView (ex: NASDAQ:AAPL -> AAPL)
+                const getSimpleSymbol = (tvSymbol) => {
+                    if (!tvSymbol) return null;
+                    const parts = tvSymbol.split(':');
+                    return parts.length > 1 ? parts[1] : parts[0];
+                };
+
+                const simpleSymbol = getSimpleSymbol(symbol);
+
+                // Récupérer les données depuis l'API
                 useEffect(() => {
-                    if (!window.LightweightCharts) {
-                        console.error('Lightweight Charts library not loaded');
+                    if (!simpleSymbol) {
+                        setLoading(false);
                         return;
                     }
 
+                    const fetchChartData = async () => {
+                        setLoading(true);
+                        setError(null);
+                        try {
+                            const response = await fetch(`/api/marketdata?endpoint=intraday&symbol=${simpleSymbol}&interval=5min&outputsize=78`);
+                            if (!response.ok) {
+                                throw new Error(`Erreur API: ${response.status}`);
+                            }
+                            const data = await response.json();
+                            
+                            if (!data.values || data.values.length === 0) {
+                                throw new Error('Aucune donnée disponible');
+                            }
+
+                            // Convertir les données de l'API au format LightweightCharts
+                            const candleData = [];
+                            const lineData = [];
+                            const areaData = [];
+
+                            data.values.forEach(item => {
+                                const time = item.datetime || item.date || item.time;
+                                const open = parseFloat(item.open);
+                                const high = parseFloat(item.high);
+                                const low = parseFloat(item.low);
+                                const close = parseFloat(item.close);
+                                const volume = parseFloat(item.volume) || 0;
+
+                                if (time && !isNaN(open) && !isNaN(high) && !isNaN(low) && !isNaN(close)) {
+                                    // Convertir la date au format attendu par LightweightCharts
+                                    // Pour les données intraday, utiliser timestamp Unix en secondes
+                                    // Pour les données quotidiennes, utiliser format YYYY-MM-DD
+                                    let timeValue;
+                                    const interval = data.interval || '5min';
+                                    const isIntraday = interval.includes('min') || interval.includes('hour');
+                                    
+                                    if (typeof time === 'string') {
+                                        const date = new Date(time);
+                                        if (!isNaN(date.getTime())) {
+                                            // Pour intraday, utiliser timestamp Unix en secondes
+                                            // Pour daily, utiliser format YYYY-MM-DD
+                                            if (isIntraday) {
+                                                timeValue = Math.floor(date.getTime() / 1000);
+                                            } else {
+                                                timeValue = date.toISOString().split('T')[0];
+                                            }
+                                        } else {
+                                            return; // Skip si on ne peut pas parser la date
+                                        }
+                                    } else if (typeof time === 'number') {
+                                        // Si c'est déjà un timestamp Unix
+                                        if (isIntraday) {
+                                            // Si c'est en millisecondes, convertir en secondes
+                                            timeValue = time > 10000000000 ? Math.floor(time / 1000) : time;
+                                        } else {
+                                            // Pour daily, convertir en format YYYY-MM-DD
+                                            const date = new Date(time > 10000000000 ? time : time * 1000);
+                                            timeValue = date.toISOString().split('T')[0];
+                                        }
+                                    } else {
+                                        return; // Skip si format non reconnu
+                                    }
+                                    
+                                    candleData.push({
+                                        time: timeValue,
+                                        open: open,
+                                        high: high,
+                                        low: low,
+                                        close: close
+                                    });
+
+                                    lineData.push({
+                                        time: timeValue,
+                                        value: close
+                                    });
+
+                                    areaData.push({
+                                        time: timeValue,
+                                        value: volume
+                                    });
+                                }
+                            });
+
+                            setChartData({
+                                candle: candleData.reverse(), // Inverser pour avoir les plus anciennes en premier
+                                line: lineData.reverse(),
+                                area: areaData.reverse()
+                            });
+                            setLoading(false);
+                        } catch (err) {
+                            console.error('Erreur récupération données graphique:', err);
+                            setError(err.message);
+                            setLoading(false);
+                        }
+                    };
+
+                    fetchChartData();
+                }, [simpleSymbol]);
+
+                useEffect(() => {
+                    if (!window.LightweightCharts || !chartData || loading) {
+                        return;
+                    }
+
+                    // Nettoyer les anciennes instances
+                    if (candleChartInstance.current) {
+                        candleChartInstance.current.remove();
+                        candleChartInstance.current = null;
+                    }
+
                     // Candlestick Chart
-                    if (candlestickChartRef.current) {
+                    if (candlestickChartRef.current && chartData.candle.length > 0) {
                         const candleChart = window.LightweightCharts.createChart(candlestickChartRef.current, {
                             width: candlestickChartRef.current.clientWidth,
                             height: 400,
@@ -19124,33 +19249,33 @@ console.log('✅ Données hybrides récupérées:', {
                             wickDownColor: '#ef4444',
                         });
 
-                        // Données de démonstration (candlestick data)
-                        const candleData = [
-                            { time: '2024-01-01', open: 170, high: 175, low: 168, close: 173 },
-                            { time: '2024-01-02', open: 173, high: 178, low: 172, close: 176 },
-                            { time: '2024-01-03', open: 176, high: 180, low: 174, close: 175 },
-                            { time: '2024-01-04', open: 175, high: 177, low: 170, close: 171 },
-                            { time: '2024-01-05', open: 171, high: 174, low: 169, close: 172 },
-                            { time: '2024-01-08', open: 172, high: 179, low: 171, close: 178 },
-                            { time: '2024-01-09', open: 178, high: 182, low: 177, close: 181 },
-                            { time: '2024-01-10', open: 181, high: 184, low: 179, close: 180 },
-                            { time: '2024-01-11', open: 180, high: 183, low: 178, close: 182 },
-                            { time: '2024-01-12', open: 182, high: 186, low: 181, close: 185 },
-                        ];
-
-                        candleSeries.setData(candleData);
+                        candleSeries.setData(chartData.candle);
                         candleChart.timeScale().fitContent();
+                        candleChartInstance.current = candleChart;
 
-                        return () => candleChart.remove();
+                        return () => {
+                            if (candleChartInstance.current) {
+                                candleChartInstance.current.remove();
+                                candleChartInstance.current = null;
+                            }
+                        };
                     }
-                }, [isDarkMode]);
+                }, [chartData, isDarkMode, loading]);
 
                 useEffect(() => {
-                    if (!window.LightweightCharts) return;
+                    if (!window.LightweightCharts || !chartData || loading) {
+                        return;
+                    }
+
+                    // Nettoyer les anciennes instances
+                    if (lineChartInstance.current) {
+                        lineChartInstance.current.remove();
+                        lineChartInstance.current = null;
+                    }
 
                     // Line Chart
-                    if (lineChartRef.current) {
-                        const lineChartInstance = window.LightweightCharts.createChart(lineChartRef.current, {
+                    if (lineChartRef.current && chartData.line.length > 0) {
+                        const lineChart = window.LightweightCharts.createChart(lineChartRef.current, {
                             width: lineChartRef.current.clientWidth,
                             height: 300,
                             layout: {
@@ -19166,38 +19291,38 @@ console.log('✅ Données hybrides récupérées:', {
                             },
                         });
 
-                        const lineSeries = lineChartInstance.addLineSeries({
+                        const lineSeries = lineChart.addLineSeries({
                             color: '#3b82f6',
                             lineWidth: 2,
                         });
 
-                        // Données de démonstration (line data)
-                        const lineData = [
-                            { time: '2024-01-01', value: 170 },
-                            { time: '2024-01-02', value: 176 },
-                            { time: '2024-01-03', value: 175 },
-                            { time: '2024-01-04', value: 171 },
-                            { time: '2024-01-05', value: 172 },
-                            { time: '2024-01-08', value: 178 },
-                            { time: '2024-01-09', value: 181 },
-                            { time: '2024-01-10', value: 180 },
-                            { time: '2024-01-11', value: 182 },
-                            { time: '2024-01-12', value: 185 },
-                        ];
+                        lineSeries.setData(chartData.line);
+                        lineChart.timeScale().fitContent();
+                        lineChartInstance.current = lineChart;
 
-                        lineSeries.setData(lineData);
-                        lineChartInstance.timeScale().fitContent();
-
-                        return () => lineChartInstance.remove();
+                        return () => {
+                            if (lineChartInstance.current) {
+                                lineChartInstance.current.remove();
+                                lineChartInstance.current = null;
+                            }
+                        };
                     }
-                }, [isDarkMode]);
+                }, [chartData, isDarkMode, loading]);
 
                 useEffect(() => {
-                    if (!window.LightweightCharts) return;
+                    if (!window.LightweightCharts || !chartData || loading) {
+                        return;
+                    }
+
+                    // Nettoyer les anciennes instances
+                    if (areaChartInstance.current) {
+                        areaChartInstance.current.remove();
+                        areaChartInstance.current = null;
+                    }
 
                     // Area Chart
-                    if (areaChartRef.current) {
-                        const areaChartInstance = window.LightweightCharts.createChart(areaChartRef.current, {
+                    if (areaChartRef.current && chartData.area.length > 0) {
+                        const areaChart = window.LightweightCharts.createChart(areaChartRef.current, {
                             width: areaChartRef.current.clientWidth,
                             height: 300,
                             layout: {
@@ -19213,33 +19338,27 @@ console.log('✅ Données hybrides récupérées:', {
                             },
                         });
 
-                        const areaSeries = areaChartInstance.addAreaSeries({
+                        const areaSeries = areaChart.addAreaSeries({
                             topColor: 'rgba(139, 92, 246, 0.4)',
                             bottomColor: 'rgba(139, 92, 246, 0.0)',
                             lineColor: '#8b5cf6',
                             lineWidth: 2,
                         });
 
-                        // Données de démonstration (area data - volume)
-                        const areaData = [
-                            { time: '2024-01-01', value: 15000000 },
-                            { time: '2024-01-02', value: 18000000 },
-                            { time: '2024-01-03', value: 16000000 },
-                            { time: '2024-01-04', value: 20000000 },
-                            { time: '2024-01-05', value: 14000000 },
-                            { time: '2024-01-08', value: 22000000 },
-                            { time: '2024-01-09', value: 19000000 },
-                            { time: '2024-01-10', value: 17000000 },
-                            { time: '2024-01-11', value: 21000000 },
-                            { time: '2024-01-12', value: 23000000 },
-                        ];
+                        areaSeries.setData(chartData.area);
+                        areaChart.timeScale().fitContent();
+                        areaChartInstance.current = areaChart;
 
-                        areaSeries.setData(areaData);
-                        areaChartInstance.timeScale().fitContent();
-
-                        return () => areaChartInstance.remove();
+                        return () => {
+                            if (areaChartInstance.current) {
+                                areaChartInstance.current.remove();
+                                areaChartInstance.current = null;
+                            }
+                        };
                     }
-                }, [isDarkMode]);
+                }, [chartData, isDarkMode, loading]);
+
+                const displaySymbol = simpleSymbol || 'N/A';
 
                 return (
                     <div className="space-y-6">
@@ -19251,7 +19370,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    🕯️ Candlestick Chart - AAPL (Demo)
+                                    🕯️ Candlestick Chart - {displaySymbol}
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -19259,7 +19378,17 @@ console.log('✅ Données hybrides récupérées:', {
                                     Graphique en bougies japonaises avec données OHLC (Open, High, Low, Close)
                                 </p>
                             </div>
-                            <div ref={candlestickChartRef} className="w-full"></div>
+                            {loading && (
+                                <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    ⏳ Chargement des données...
+                                </div>
+                            )}
+                            {error && (
+                                <div className={`text-center py-8 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+                                    ⚠️ Erreur: {error}
+                                </div>
+                            )}
+                            {!loading && !error && <div ref={candlestickChartRef} className="w-full"></div>}
                         </div>
 
                         {/* Line Chart */}
@@ -19270,7 +19399,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    📈 Line Chart - Prix de Clôture
+                                    📈 Line Chart - Prix de Clôture ({displaySymbol})
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -19278,7 +19407,17 @@ console.log('✅ Données hybrides récupérées:', {
                                     Graphique linéaire simple pour suivi de prix en temps réel
                                 </p>
                             </div>
-                            <div ref={lineChartRef} className="w-full"></div>
+                            {loading && (
+                                <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    ⏳ Chargement des données...
+                                </div>
+                            )}
+                            {error && (
+                                <div className={`text-center py-8 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+                                    ⚠️ Erreur: {error}
+                                </div>
+                            )}
+                            {!loading && !error && <div ref={lineChartRef} className="w-full"></div>}
                         </div>
 
                         {/* Area Chart */}
@@ -19289,7 +19428,7 @@ console.log('✅ Données hybrides récupérées:', {
                                 <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                    📊 Area Chart - Volume de Trading
+                                    📊 Area Chart - Volume de Trading ({displaySymbol})
                                 </h2>
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -19297,7 +19436,17 @@ console.log('✅ Données hybrides récupérées:', {
                                     Graphique en zone remplie pour visualiser le volume de transactions
                                 </p>
                             </div>
-                            <div ref={areaChartRef} className="w-full"></div>
+                            {loading && (
+                                <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    ⏳ Chargement des données...
+                                </div>
+                            )}
+                            {error && (
+                                <div className={`text-center py-8 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+                                    ⚠️ Erreur: {error}
+                                </div>
+                            )}
+                            {!loading && !error && <div ref={areaChartRef} className="w-full"></div>}
                         </div>
                     </div>
                 );
