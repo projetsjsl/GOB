@@ -1,0 +1,227 @@
+{
+  "name": "Emma Briefing - Simplified (via /api/briefing)",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "20 11 * * 1-5"
+            },
+            {
+              "field": "cronExpression",
+              "expression": "50 15 * * 1-5"
+            },
+            {
+              "field": "cronExpression",
+              "expression": "20 20 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger (7h20/11h50/16h20 Montréal)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Déterminer le type de briefing selon l'heure\nconst now = new Date();\nconst hour = now.getUTCHours();\n\nlet briefingType;\n\n// 7h20 Montréal = 11h20 UTC (cron: 20 11)\n// 11h50 Montréal = 15h50 UTC (cron: 50 15)\n// 16h20 Montréal = 20h20 UTC (cron: 20 20)\n\nif (hour >= 11 && hour < 15) {\n  briefingType = 'morning';\n} else if (hour >= 15 && hour < 20) {\n  briefingType = 'midday';\n} else {\n  briefingType = 'evening';\n}\n\nreturn [{\n  json: {\n    type: briefingType,\n    triggered_at: now.toISOString(),\n    hour_utc: hour\n  }\n}];"
+      },
+      "id": "determine-type",
+      "name": "Determine Briefing Type",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://gob.vercel.app/api/briefing?type=' + $json.type }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "call-briefing-api",
+      "name": "Call /api/briefing",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.RESEND_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"from\": \"Emma En Direct <noreply@gobapps.com>\", \"to\": $env.BRIEFING_RECIPIENTS ? $env.BRIEFING_RECIPIENTS.split(',') : ['projetsjsl@gmail.com'], \"subject\": $json.subject, \"html\": $json.html_content } }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "send-email",
+      "name": "Send Email via Resend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.RESEND_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"from\": \"Emma En Direct <noreply@gobapps.com>\", \"to\": $env.ADMIN_EMAIL || 'projetsjsl@gmail.com', \"subject\": '✅ Briefing ' + $('Determine Briefing Type').item.json.type + ' envoyé avec succès', \"html\": '<h2>✅ Confirmation d\\'envoi</h2><p>Le briefing <strong>' + $('Determine Briefing Type').item.json.type + '</strong> a été envoyé avec succès.</p><p><strong>Sujet:</strong> ' + $('Call /api/briefing').item.json.subject + '</p><p><strong>Destinataires:</strong> ' + ($env.BRIEFING_RECIPIENTS || 'projetsjsl@gmail.com') + '</p><p><strong>Message ID:</strong> ' + $json.id + '</p><p><strong>Envoyé à:</strong> ' + new Date().toLocaleString('fr-FR') + '</p>' } }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "send-confirmation",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "tableId": "team_newsletters",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "prompt_type",
+              "fieldValue": "={{ $('Determine Briefing Type').item.json.type }}"
+            },
+            {
+              "fieldId": "api_used",
+              "fieldValue": "emma-agent"
+            },
+            {
+              "fieldId": "tickers",
+              "fieldValue": "={{ $('Call /api/briefing').item.json.metadata.tickers.join(', ') }}"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $('Call /api/briefing').item.json.content }}"
+            },
+            {
+              "fieldId": "sent_at",
+              "fieldValue": "={{ $('Call /api/briefing').item.json.metadata.generated_at }}"
+            }
+          ]
+        }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "WGwVmhxNX4mHZmVO",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (7h20/11h50/16h20 Montréal)": {
+      "main": [
+        [
+          {
+            "node": "Determine Briefing Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Briefing Type": {
+      "main": [
+        [
+          {
+            "node": "Call /api/briefing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call /api/briefing": {
+      "main": [
+        [
+          {
+            "node": "Send Email via Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email via Resend": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "notes": [
+    {
+      "content": "Workflow simplifié qui appelle /api/briefing au lieu d'appeler directement Perplexity/Gemini.\n\nAvantages:\n- Tous les prompts dans config/briefing-prompts.json (versionnés)\n- Utilise Emma Agent avec fallback automatique\n- Templates HTML différents par type (morning/midday/evening)\n- Confirmation email automatique après envoi\n\nVariables d'environnement requises:\n- RESEND_API_KEY\n- BRIEFING_RECIPIENTS (optionnel, défaut: projetsjsl@gmail.com)\n- ADMIN_EMAIL (pour confirmations, défaut: projetsjsl@gmail.com)",
+      "height": 300,
+      "width": 400,
+      "position": [250, 500]
+    }
+  ]
+}
+

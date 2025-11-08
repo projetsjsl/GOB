@@ -530,3 +530,4 @@ curl -X POST https://gob.vercel.app/api/chat \
 **Date**: 6 novembre 2025  
 **Version**: 1.0
 
+

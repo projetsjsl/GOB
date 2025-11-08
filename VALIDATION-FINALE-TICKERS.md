@@ -191,3 +191,4 @@ curl https://[votre-app].vercel.app/api/config/tickers
 
 **Tout est prêt ! 🚀**
 
+

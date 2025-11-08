@@ -175,3 +175,4 @@ Après avoir exécuté le script, vérifiez que tout fonctionne :
 - La colonne `active` permet de désactiver des tickers sans les supprimer
 - La colonne `priority` permet de trier les tickers par importance
 
+
