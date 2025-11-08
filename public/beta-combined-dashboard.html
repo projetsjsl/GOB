@@ -3114,19 +3114,34 @@ const fetchHybridData = async (symbol, dataType) => {
                                     const fundamental = fundamentals[tickerUpper];
                                     
                                     if (quote || fundamental) {
+                                        // FMP quote format: { price, change, changesPercentage, dayLow, dayHigh, open, volume, etc. }
+                                        // Finnhub format: { c, d, dp, h, l, o, v, etc. }
+                                        // Mapper les deux formats
+                                        const price = quote?.price || quote?.c || fundamental?.quote?.price || 0;
+                                        const change = quote?.change || quote?.d || fundamental?.quote?.change || 0;
+                                        const changePercent = quote?.changesPercentage || quote?.dp || fundamental?.quote?.changesPercentage || 0;
+                                        
                                         newStockData[ticker] = {
                                             symbol: tickerUpper,
-                                            c: quote?.c || fundamental?.quote?.price || 0,
-                                            d: quote?.d || fundamental?.quote?.change || 0,
-                                            dp: quote?.dp || fundamental?.quote?.changesPercentage || 0,
-                                            h: quote?.h || 0,
-                                            l: quote?.l || 0,
-                                            o: quote?.o || 0,
-                                            v: quote?.v || 0,
+                                            c: price, // Prix actuel
+                                            d: change, // Changement en $
+                                            dp: changePercent, // Changement en %
+                                            h: quote?.dayHigh || quote?.h || 0, // High du jour
+                                            l: quote?.dayLow || quote?.l || 0, // Low du jour
+                                            o: quote?.open || quote?.o || 0, // Prix d'ouverture
+                                            v: quote?.volume || quote?.v || 0, // Volume
+                                            price: price, // Alias pour compatibilité
+                                            change: change, // Alias pour compatibilité
+                                            changePercent: changePercent, // Alias pour compatibilité
                                             fundamentals: fundamental || null,
                                             recommendation: fundamental?.recommendation || null, // Inclure les recommandations d'analystes
                                             timestamp: new Date().toISOString()
                                         };
+                                        
+                                        // Log pour déboguer
+                                        if (price === 0) {
+                                            console.warn(`⚠️ Prix à 0 pour ${ticker}:`, { quote, fundamental });
+                                        }
                                     }
                                 });
                                 
