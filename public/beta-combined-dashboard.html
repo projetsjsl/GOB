@@ -19443,6 +19443,125 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
                         </div>
 
+                        {/* ========================================== */}
+                        {/* SECTION: 📈 OUTILS D'ANALYSE FONDAMENTALE  */}
+                        {/* ========================================== */}
+                        <div className="mb-2 md:mb-4">
+                            <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${
+                                isDarkMode ? 'border-orange-500' : 'border-orange-600'
+                            }`}>
+                                <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-orange-400' : 'text-orange-600'
+                                }`}>
+                                    📈 Outils d'Analyse Fondamentale
+                                </h3>
+                            </div>
+                        </div>
+
+                        {/* Widget FastGraphs */}
+                        <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                        }`}>
+                            <div className="mb-3 md:mb-6">
+                                <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    📊 FastGraphs - Analyse Fondamentale
+                                </h2>
+                                <p className={`text-xs md:text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    Outil d'analyse fondamentale pour investisseurs à long terme. Visualisez la valeur intrinsèque, les bénéfices, revenus, dividendes et ratios de valorisation.
+                                </p>
+                                <p className={`text-xs mt-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-orange-300' : 'text-orange-600'
+                                }`}>
+                                    💡 <a 
+                                        href="https://fastgraphs.com/blog/if-you-are-a-long-term-investor-you-need-to-watch-this-introducing-fast-graphs/" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="underline hover:opacity-80"
+                                    >
+                                        En savoir plus sur FastGraphs
+                                    </a>
+                                </p>
+                            </div>
+
+                            <div className="mb-4">
+                                <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-start md:items-center">
+                                    <label className={`text-sm font-medium transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Symbole:
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="fastgraphs-symbol"
+                                        defaultValue="AAPL"
+                                        placeholder="Ex: AAPL, MSFT, GOOGL"
+                                        className={`px-3 py-2 rounded-lg border-2 text-sm md:text-base transition-all duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-orange-500'
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-orange-500'
+                                        } focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50`}
+                                        style={{ minWidth: '200px' }}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            const symbolInput = document.getElementById('fastgraphs-symbol');
+                                            const symbol = symbolInput?.value?.toUpperCase().trim() || 'AAPL';
+                                            const iframe = document.getElementById('fastgraphs-iframe');
+                                            if (iframe) {
+                                                iframe.src = `https://www.fastgraphs.com/secure/chart.php?ticker=${symbol}`;
+                                            }
+                                        }}
+                                        className={`px-4 py-2 rounded-lg font-medium text-sm md:text-base transition-all duration-300 ${
+                                            isDarkMode
+                                                ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                                                : 'bg-orange-500 hover:bg-orange-600 text-white'
+                                        } focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50`}
+                                    >
+                                        Charger le graphique
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="rounded-lg overflow-hidden relative h-[600px] md:h-[700px] lg:h-[800px]" style={{ background: 'transparent' }}>
+                                <iframe
+                                    id="fastgraphs-iframe"
+                                    src="https://www.fastgraphs.com/secure/chart.php?ticker=AAPL"
+                                    width="100%"
+                                    height="100%"
+                                    frameBorder="0"
+                                    allowTransparency="true"
+                                    marginWidth="0"
+                                    marginHeight="0"
+                                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+                                    className="relative z-0"
+                                    style={{ minWidth: '100%', background: 'transparent' }}
+                                    title="FastGraphs - Analyse Fondamentale"
+                                />
+                            </div>
+                            
+                            <div className={`mt-3 text-xs text-center transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                <p>
+                                    FastGraphs est un outil d'analyse fondamentale pour investisseurs à long terme.{' '}
+                                    <a 
+                                        href="https://www.fastgraphs.com" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className={`underline transition-colors duration-300 ${
+                                            isDarkMode ? 'text-orange-400 hover:text-orange-300' : 'text-orange-600 hover:text-orange-800'
+                                        }`}
+                                    >
+                                        Visiter FastGraphs.com
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
                         {/* ========================================================================= */}
                         {/* BLOC UNIFIÉ: 📊 ANALYSE COMPLÈTE - 6 WIDGETS SYNCHRONISÉS                */}
                         {/* ========================================================================= */}
