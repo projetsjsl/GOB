@@ -20853,32 +20853,19 @@ console.log('✅ Données hybrides récupérées:', {
                         <source src="https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3" type="audio/mpeg" />
                     </audio>
 
-                    {/* Écran de chargement initial */}
+                    {/* Écran de chargement initial - Animation JLab */}
                     {showLoadingScreen && (
-                        <div className={`fixed inset-0 z-50 flex items-center justify-center ${
-                            isDarkMode ? 'bg-gray-900' : 'bg-white'
-                        }`}>
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
                             <div className="text-center">
-                                <div className="mb-8">
-                                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full border-4 ${
-                                        isDarkMode ? 'border-gray-600' : 'border-gray-300'
-                                    } border-t-blue-600 animate-spin`}></div>
-                                    <h2 className={`text-2xl font-bold mb-2 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>
-                                        GOB Dashboard
-                                    </h2>
-                                    <p className={`text-lg ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                    }`}>
-                                        Chargement des données...
-                                    </p>
+                                <div className="mb-6">
+                                    <img
+                                        src={'jlab.png'}
+                                        alt="JLab"
+                                        className="emma-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-green-500"
+                                    />
                                 </div>
-                                <div className={`text-sm ${
-                                    isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                                }`}>
-                                    ⏳ Initialisation en cours (3 secondes)
-                                </div>
+                                <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">JLab™</h2>
+                                <p className="text-green-300 text-lg">Laboratoire d'analyse financière • JSL AI</p>
                             </div>
                         </div>
                     )}
