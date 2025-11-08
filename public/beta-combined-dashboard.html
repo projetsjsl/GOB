@@ -888,6 +888,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const audioCtxRef = useRef(null);
             const tickerTapeRef = useRef(null);
             const stocksLoadingRef = useRef(false); // Pour éviter les chargements multiples
+            const batchLoadedRef = useRef(false); // Pour suivre si le batch a déjà chargé les données
 
             // États pour Emma (partagés entre AskEmmaTab et AdminJSLaiTab)
             const [emmaConnected, setEmmaConnected] = useState(false);
@@ -2988,13 +2989,21 @@ const fetchHybridData = async (symbol, dataType) => {
 
             // Charger automatiquement les données de stocks dès que les tickers sont disponibles
             // Ce useEffect est un fallback si le batch ne charge pas les données
+            // Il se déclenche seulement si les données ne sont pas complètes après un délai
             useEffect(() => {
                 if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminée
                 if (tickers.length === 0) return; // Pas de tickers à charger
                 if (stocksLoadingRef.current) return; // Déjà en cours de chargement
+                if (batchLoadedRef.current) return; // Le batch a déjà chargé les données
                 
                 // Attendre un peu pour laisser le batch charger d'abord
                 const checkAndLoad = setTimeout(() => {
+                    // Si le batch a déjà chargé, ne pas faire de fallback
+                    if (batchLoadedRef.current) {
+                        console.log('✅ Batch a déjà chargé les données, fallback non nécessaire');
+                        return;
+                    }
+                    
                     // Vérifier si on a des données pour tous les tickers
                     const tickersWithData = tickers.filter(ticker => {
                         const data = stockData[ticker];
@@ -3012,9 +3021,9 @@ const fetchHybridData = async (symbol, dataType) => {
                             stocksLoadingRef.current = false; // Réinitialiser même en cas d'erreur
                         });
                     } else {
-                        console.log(`✅ Données déjà disponibles pour ${tickersWithData.length}/${tickers.length} tickers`);
+                        console.log(`✅ Données déjà complètes pour ${tickersWithData.length}/${tickers.length} tickers (fallback non nécessaire)`);
                     }
-                }, 2000); // Attendre 2 secondes pour laisser le batch charger d'abord
+                }, 3000); // Attendre 3 secondes pour laisser le batch charger d'abord
                 
                 return () => clearTimeout(checkAndLoad);
             }, [tickers.length, initialLoadComplete]); // Se déclenche quand les tickers sont chargés
@@ -3133,6 +3142,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                 setStockData(prevData => ({ ...prevData, ...newStockData })); // Fusionner avec les données existantes
                                 setLastUpdate(new Date());
                                 stocksLoadingRef.current = false; // Réinitialiser après chargement
+                                batchLoadedRef.current = true; // Marquer que le batch a chargé les données
                                 console.log(`✅ ${Object.keys(newStockData).length} stocks chargés initialement`);
                             } else {
                                 console.warn('⚠️ Réponse batch invalide:', batchData);
