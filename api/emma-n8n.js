@@ -244,26 +244,66 @@ export default async function handler(req, res) {
 
 /**
  * Handle briefing generation
+ * Utilise maintenant config/briefing-prompts.json comme /api/briefing
  */
 async function handleBriefing(params) {
+    const { readFileSync } = await import('fs');
+    const { join, dirname } = await import('path');
+    const { fileURLToPath } = await import('url');
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+
+    // Charger la configuration depuis config/briefing-prompts.json
+    let briefingType = params.type || 'morning';
+    if (briefingType === 'noon') {
+        briefingType = 'midday';
+    }
+
+    const validTypes = ['morning', 'midday', 'evening'];
+    if (!validTypes.includes(briefingType)) {
+        throw new Error(`Invalid briefing type: ${briefingType}. Must be one of: ${validTypes.join(', ')}`);
+    }
+
+    // Charger config
+    const configPath = join(__dirname, '..', 'config', 'briefing-prompts.json');
+    const configContent = readFileSync(configPath, 'utf-8');
+    const config = JSON.parse(configContent);
+    const promptConfig = config[briefingType];
+
+    if (!promptConfig) {
+        throw new Error(`Configuration not found for type: ${briefingType}`);
+    }
+
+    // Utiliser le prompt depuis la config
+    const prompt = promptConfig.prompt;
+    const fullPrompt = params.tickers && params.tickers.length > 0
+        ? `${prompt}\n\nFocus sur ces tickers: ${params.tickers.join(', ')}`
+        : prompt;
+
     // Utiliser emma-agent existant pour briefings
     const { SmartAgent } = await import('./emma-agent.js');
     const agent = new SmartAgent();
 
-    const message = params.prompt || 'Génère un briefing de marché complet avec les dernières actualités et analyses.';
-
     const context = {
         output_mode: 'briefing',
-        briefing_type: params.type || 'morning',
-        tickers: params.tickers || []
+        briefing_type: briefingType,
+        tickers: params.tickers || [],
+        tools_priority: promptConfig.tools_priority || []
     };
 
-    const result = await agent.processRequest(message, context);
+    const result = await agent.processRequest(fullPrompt, context);
 
     return {
         briefing: result.response,
         tools_used: result.tools_used,
-        execution_time_ms: result.execution_time_ms
+        execution_time_ms: result.execution_time_ms,
+        type: briefingType,
+        prompt_config: {
+            name: promptConfig.name,
+            tone: promptConfig.tone,
+            length: promptConfig.length
+        }
     };
 }
 
