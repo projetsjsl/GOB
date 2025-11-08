@@ -1177,6 +1177,26 @@ const fetchHybridData = async (symbol, dataType) => {
             // Fonction pour charger les données du ticker (sans auto-refresh)
             const fetchTickerData = async () => {
                 try {
+                    // Vérifier d'abord les données préchargées depuis la page de login
+                    const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                    if (preloadedDataStr) {
+                        try {
+                            const preloadedData = JSON.parse(preloadedDataStr);
+                            const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                            const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                            if (preloadedData.tickerData && dataAge < MAX_AGE) {
+                                console.log('⚡ Utilisation des données préchargées pour les tickers');
+                                setTickerData(preloadedData.tickerData);
+                                addLog(`✅ Ticker chargé depuis préchargement: ${preloadedData.tickerData.length} instruments`, 'success');
+                                return;
+                            }
+                        } catch (e) {
+                            console.warn('⚠️ Erreur lecture données préchargées:', e);
+                        }
+                    }
+
+                    // Sinon, charger normalement depuis l'API
                     const symbols = [
                         // Indices US
                         { symbol: '^GSPC', name: 'S&P 500', type: 'index' },
@@ -1941,6 +1961,41 @@ const fetchHybridData = async (symbol, dataType) => {
             // Données Seeking Alpha (RAW DATA from Supabase)
             const fetchSeekingAlphaData = async () => {
                 try {
+                    // Vérifier d'abord les données préchargées depuis la page de login
+                    const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                    if (preloadedDataStr) {
+                        try {
+                            const preloadedData = JSON.parse(preloadedDataStr);
+                            const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                            const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                            if (preloadedData.seekingAlphaData && dataAge < MAX_AGE) {
+                                console.log('⚡ Utilisation des données Seeking Alpha préchargées');
+                                // Convertir au format attendu par le dashboard
+                                const formattedData = {
+                                    stocks: preloadedData.seekingAlphaData.stocks.map(item => ({
+                                        ticker: item.ticker,
+                                        title: item.title,
+                                        date: item.date,
+                                        url: item.url,
+                                        sentiment: item.sentiment,
+                                        author: item.author,
+                                        raw_text: '', // Pas disponible dans les données préchargées
+                                        parsedData: null
+                                    })),
+                                    timestamp: preloadedData.timestamp,
+                                    source: 'preloaded'
+                                };
+                                setSeekingAlphaData(formattedData);
+                                console.log(`✅ Seeking Alpha raw data chargée depuis préchargement: ${formattedData.stocks.length} stocks`);
+                                return;
+                            }
+                        } catch (e) {
+                            console.warn('⚠️ Erreur lecture données Seeking Alpha préchargées:', e);
+                        }
+                    }
+
+                    // Sinon, charger normalement depuis l'API
                     console.log('📊 Chargement des données brutes Seeking Alpha depuis Supabase...');
                     const response = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=raw&latest=true&limit=100`);
                     if (response.ok) {
@@ -1994,6 +2049,35 @@ const fetchHybridData = async (symbol, dataType) => {
             // Données Seeking Alpha ANALYZED (Gemini AI results from Supabase)
             const fetchSeekingAlphaStockData = async () => {
                 try {
+                    // Vérifier d'abord les données préchargées depuis la page de login
+                    const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
+                    if (preloadedDataStr) {
+                        try {
+                            const preloadedData = JSON.parse(preloadedDataStr);
+                            const dataAge = Date.now() - (preloadedData.timestamp || 0);
+                            const MAX_AGE = 5 * 60 * 1000; // 5 minutes
+
+                            if (preloadedData.seekingAlphaStockData && dataAge < MAX_AGE) {
+                                console.log('⚡ Utilisation des données Seeking Alpha Stock préchargées');
+                                // Convertir au format attendu par le dashboard
+                                let stocksObject = {};
+                                if (Array.isArray(preloadedData.seekingAlphaStockData)) {
+                                    preloadedData.seekingAlphaStockData.forEach(item => {
+                                        stocksObject[item.ticker] = item;
+                                    });
+                                } else {
+                                    stocksObject = preloadedData.seekingAlphaStockData;
+                                }
+                                setSeekingAlphaStockData(stocksObject);
+                                console.log(`✅ Seeking Alpha stock data chargée depuis préchargement: ${Object.keys(stocksObject).length} stocks`);
+                                return;
+                            }
+                        } catch (e) {
+                            console.warn('⚠️ Erreur lecture données Seeking Alpha Stock préchargées:', e);
+                        }
+                    }
+
+                    // Sinon, charger normalement depuis l'API
                     console.log('📊 Chargement des analyses Gemini depuis Supabase...');
                     const response = await fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=analysis&latest=true&limit=100`);
 

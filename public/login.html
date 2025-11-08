@@ -269,13 +269,122 @@
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
 
+    // Configuration du préchargement
+    const PRELOAD_STORAGE_KEY = 'preloaded-dashboard-data';
+    const API_BASE_URL = window.location.origin || '';
+
+    // Fonction de préchargement des données du dashboard
+    async function preloadDashboardData() {
+      console.log('🚀 Démarrage du préchargement des données...');
+      
+      const preloadData = {
+        timestamp: Date.now(),
+        tickerData: null,
+        seekingAlphaData: null,
+        seekingAlphaStockData: null,
+        status: 'loading'
+      };
+
+      try {
+        // 1. Précharger les données de ticker (indices, devises, obligations)
+        console.log('📊 Préchargement des tickers...');
+        const tickerSymbols = [
+          { symbol: '^GSPC', name: 'S&P 500', type: 'index' },
+          { symbol: '^DJI', name: 'DOW', type: 'index' },
+          { symbol: '^IXIC', name: 'NASDAQ', type: 'index' },
+          { symbol: '^GSPTSE', name: 'TSX', type: 'index' },
+          { symbol: 'CADUSD=X', name: 'CAD/USD', type: 'forex' },
+          { symbol: 'EURUSD=X', name: 'EUR/USD', type: 'forex' },
+          { symbol: 'GBPUSD=X', name: 'GBP/USD', type: 'forex' },
+          { symbol: '^TNX', name: 'US 10Y', type: 'bond' },
+          { symbol: '^FVX', name: 'US 5Y', type: 'bond' }
+        ];
+
+        const tickerPromises = tickerSymbols.map(async (item) => {
+          try {
+            const response = await fetch(`${API_BASE_URL}/api/marketdata?symbol=${encodeURIComponent(item.symbol)}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.success && data.data) {
+                const quote = data.data;
+                return {
+                  symbol: item.symbol,
+                  name: item.name,
+                  type: item.type,
+                  price: quote.c || quote.price || 0,
+                  change: quote.d || quote.change || 0,
+                  changePercent: quote.dp || quote.changePercent || 0
+                };
+              }
+            }
+          } catch (err) {
+            console.warn(`⚠️ Erreur préchargement ${item.symbol}:`, err);
+          }
+          return null;
+        });
+
+        const tickerResults = (await Promise.all(tickerPromises)).filter(r => r !== null);
+        preloadData.tickerData = tickerResults;
+        console.log(`✅ ${tickerResults.length} tickers préchargés`);
+
+        // 2. Précharger les données Seeking Alpha (en parallèle)
+        console.log('📈 Préchargement des données Seeking Alpha...');
+        const seekingAlphaPromises = [
+          fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=raw&latest=true&limit=100`)
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null),
+          fetch(`${API_BASE_URL}/api/seeking-alpha-scraping?type=analysis&latest=true&limit=100`)
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        ];
+
+        const [seekingAlphaRaw, seekingAlphaAnalysis] = await Promise.all(seekingAlphaPromises);
+        
+        if (seekingAlphaRaw && seekingAlphaRaw.success && seekingAlphaRaw.data) {
+          preloadData.seekingAlphaData = {
+            stocks: seekingAlphaRaw.data.map(item => ({
+              ticker: item.ticker,
+              title: item.title,
+              date: item.date,
+              url: item.url,
+              sentiment: item.sentiment,
+              author: item.author
+            }))
+          };
+          console.log(`✅ ${preloadData.seekingAlphaData.stocks.length} articles Seeking Alpha préchargés`);
+        }
+
+        if (seekingAlphaAnalysis && seekingAlphaAnalysis.success && seekingAlphaAnalysis.data) {
+          preloadData.seekingAlphaStockData = seekingAlphaAnalysis.data;
+          console.log(`✅ ${seekingAlphaAnalysis.data.length} analyses Seeking Alpha préchargées`);
+        }
+
+        preloadData.status = 'completed';
+        sessionStorage.setItem(PRELOAD_STORAGE_KEY, JSON.stringify(preloadData));
+        console.log('✅ Préchargement terminé avec succès!');
+
+      } catch (error) {
+        console.error('❌ Erreur lors du préchargement:', error);
+        preloadData.status = 'error';
+        preloadData.error = error.message;
+        sessionStorage.setItem(PRELOAD_STORAGE_KEY, JSON.stringify(preloadData));
+      }
+    }
+
     // Vérifier si déjà connecté
     window.addEventListener('DOMContentLoaded', () => {
       const currentUser = sessionStorage.getItem('gob-user');
       if (currentUser) {
         // Déjà connecté, rediriger
         window.location.href = '/beta-combined-dashboard.html';
+        return;
       }
+
+      // Démarrer le préchargement en arrière-plan
+      // Ne pas attendre - laisser tourner en parallèle pendant que l'utilisateur saisit ses identifiants
+      preloadDashboardData().catch(err => {
+        console.warn('⚠️ Préchargement échoué (non bloquant):', err);
+      });
     });
 
     // Détection Caps Lock
