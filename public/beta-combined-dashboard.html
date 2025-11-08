@@ -2955,7 +2955,9 @@ const fetchHybridData = async (symbol, dataType) => {
                     'seeking-alpha': 'iconoir-graph-up',
                     'email-briefings': 'iconoir-antenna-signal',
                     'economic-calendar': 'iconoir-calendar',
-                    'investing-calendar': 'iconoir-flask'
+                    'investing-calendar': 'iconoir-flask',
+                    'yield-curve': 'iconoir-chart-line-up',
+                    'markets-economy': 'iconoir-globe'
                 };
                 return iconMap[tabId] || 'iconoir-graph-up';
             };
@@ -20253,44 +20255,80 @@ console.log('✅ Données hybrides récupérées:', {
                         {/* Navigation Items */}
                         <nav className="flex-1 overflow-y-auto py-4">
                             {tabs.map(tab => {
-                                const icon = tab.label.match(/[\u{1F300}-\u{1F9FF}]/u)?.[0] || '📊';
+                                const iconClass = getTabIcon(tab.id);
+                                const isActive = activeTab === tab.id;
                                 return (
                                     <button
                                         key={tab.id}
                                         onMouseDown={withRipple}
                                         onClick={() => handleTabChange(tab.id)}
-                                        className={`w-full flex flex-col items-center justify-center py-4 px-2 btn-ripple relative transition-all duration-200 group ${
-                                            activeTab === tab.id
+                                        className={`w-full flex flex-col items-center justify-center py-4 px-2 btn-ripple relative transition-all duration-300 group ${
+                                            isActive
                                                 ? (isDarkMode
-                                                    ? 'text-green-400 bg-gray-900/50'
-                                                    : 'text-green-600 bg-green-50')
+                                                    ? 'text-green-400 bg-gradient-to-r from-gray-900/50 to-transparent'
+                                                    : 'text-green-600 bg-gradient-to-r from-green-50 to-transparent')
                                                 : (isDarkMode
-                                                    ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-900/30'
-                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50')
+                                                    ? 'text-gray-400 hover:text-green-300 hover:bg-gray-900/30'
+                                                    : 'text-gray-600 hover:text-green-700 hover:bg-gray-50')
                                         }`}
                                         title={tab.label}
                                     >
-                                        {/* Active indicator - left bar */}
-                                        {activeTab === tab.id && (
-                                            <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r ${
-                                                    isDarkMode ? 'bg-green-500' : 'bg-green-600'
-                                                }`}></div>
+                                        {/* Active indicator - left bar with glow */}
+                                        {isActive && (
+                                            <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 rounded-r transition-all duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' 
+                                                    : 'bg-green-600 shadow-[0_0_8px_rgba(22,163,74,0.4)]'
+                                            }`}></div>
                                         )}
 
-                                        {/* Icon */}
-                                        <span className="text-2xl mb-1">{icon}</span>
+                                        {/* Icon Container with enhanced styling */}
+                                        <div className={`relative mb-2 transition-all duration-300 ${
+                                            isActive 
+                                                ? 'scale-110' 
+                                                : 'scale-100 group-hover:scale-105'
+                                        }`}>
+                                            {/* Glow effect for active icon */}
+                                            {isActive && (
+                                                <div className={`absolute inset-0 rounded-full blur-md opacity-50 transition-all duration-300 ${
+                                                    isDarkMode ? 'bg-green-500' : 'bg-green-400'
+                                                }`} style={{
+                                                    transform: 'scale(1.5)',
+                                                    filter: 'blur(8px)'
+                                                }}></div>
+                                            )}
+                                            
+                                            {/* Icon with enhanced styling */}
+                                            <i className={`${iconClass} text-2xl relative z-10 transition-all duration-300 ${
+                                                isActive
+                                                    ? (isDarkMode 
+                                                        ? 'drop-shadow-[0_0_6px_rgba(34,197,94,0.8)]' 
+                                                        : 'drop-shadow-[0_0_4px_rgba(22,163,74,0.6)]')
+                                                    : 'drop-shadow-none'
+                                            }`} style={{
+                                                filter: isActive 
+                                                    ? (isDarkMode 
+                                                        ? 'drop-shadow(0 0 6px rgba(34,197,94,0.8))' 
+                                                        : 'drop-shadow(0 0 4px rgba(22,163,74,0.6))')
+                                                    : 'none'
+                                            }}></i>
+                                        </div>
 
                                         {/* Label (shown on hover) */}
-                                        <span className={`text-xs font-medium text-center leading-tight opacity-0 group-hover:opacity-100 transition-opacity ${
-                                            activeTab === tab.id ? 'opacity-100' : ''
+                                        <span className={`text-xs font-semibold text-center leading-tight transition-all duration-300 ${
+                                            isActive 
+                                                ? 'opacity-100' 
+                                                : 'opacity-0 group-hover:opacity-100'
                                         }`}>
                                             {tab.label.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim()}
                                         </span>
 
-                                        {/* Active dot indicator */}
-                                            {activeTab === tab.id && (
-                                            <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${
-                                                isDarkMode ? 'bg-green-400' : 'bg-green-600'
+                                        {/* Active dot indicator with pulse */}
+                                        {isActive && (
+                                            <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.8)]' 
+                                                    : 'bg-green-600 shadow-[0_0_4px_rgba(22,163,74,0.6)]'
                                             } animate-pulse`}></span>
                                         )}
                                     </button>
@@ -20308,13 +20346,14 @@ console.log('✅ Données hybrides récupérées:', {
                         <div className="flex items-center justify-around px-2 pb-safe">
                             {tabs.slice(0, 5).map(tab => {
                                 const iconClass = getTabIcon(tab.id);
+                                const isActive = activeTab === tab.id;
                                 return (
                                     <button
                                         key={tab.id}
                                         onMouseDown={withRipple}
                                         onClick={() => handleTabChange(tab.id)}
-                                        className={`flex-1 flex flex-col items-center justify-center py-3 px-1 btn-ripple relative transition-all duration-200 ${
-                                            activeTab === tab.id
+                                        className={`flex-1 flex flex-col items-center justify-center py-3 px-1 btn-ripple relative transition-all duration-300 group ${
+                                            isActive
                                                 ? (isDarkMode
                                                     ? 'text-green-400'
                                                     : 'text-green-600')
@@ -20323,21 +20362,44 @@ console.log('✅ Données hybrides récupérées:', {
                                                     : 'text-gray-600')
                                         }`}
                                     >
-                                        {/* Active indicator - top bar */}
-                                        {activeTab === tab.id && (
-                                            <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-b ${
-                                                isDarkMode ? 'bg-green-500' : 'bg-green-600'
+                                        {/* Active indicator - top bar with glow */}
+                                        {isActive && (
+                                            <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-16 h-1 rounded-b transition-all duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' 
+                                                    : 'bg-green-600 shadow-[0_0_6px_rgba(22,163,74,0.4)]'
                                             } animate-slide-down`}></div>
                                         )}
 
-                                        {/* Icon with Iconoir */}
-                                        <i className={`${iconClass} text-2xl mb-1 transition-transform duration-200 ${
-                                            activeTab === tab.id ? 'scale-110' : 'scale-100'
-                                        }`}></i>
+                                        {/* Icon Container with enhanced styling */}
+                                        <div className={`relative mb-1 transition-all duration-300 ${
+                                            isActive 
+                                                ? 'scale-110' 
+                                                : 'scale-100 group-hover:scale-105'
+                                        }`}>
+                                            {/* Glow effect for active icon */}
+                                            {isActive && (
+                                                <div className={`absolute inset-0 rounded-full blur-md opacity-40 transition-all duration-300 ${
+                                                    isDarkMode ? 'bg-green-500' : 'bg-green-400'
+                                                }`} style={{
+                                                    transform: 'scale(1.8)',
+                                                    filter: 'blur(10px)'
+                                                }}></div>
+                                            )}
+                                            
+                                            {/* Icon with enhanced styling */}
+                                            <i className={`${iconClass} text-2xl relative z-10 transition-all duration-300 ${
+                                                isActive
+                                                    ? (isDarkMode 
+                                                        ? 'drop-shadow-[0_0_8px_rgba(34,197,94,0.9)]' 
+                                                        : 'drop-shadow-[0_0_6px_rgba(22,163,74,0.7)]')
+                                                    : 'drop-shadow-none'
+                                            }`}></i>
+                                        </div>
 
                                         {/* Label */}
-                                        <span className={`text-xs font-medium text-center leading-tight ${
-                                            activeTab === tab.id ? 'font-bold' : ''
+                                        <span className={`text-xs font-semibold text-center leading-tight transition-all duration-300 ${
+                                            isActive ? 'font-bold' : ''
                                         }`}>
                                             {tab.label.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim().split(' ')[0]}
                                         </span>
@@ -20408,18 +20470,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     {/* Tabs List */}
                                     <div className="p-4">
                                         {tabs.slice(5).map((tab) => {
-                                            // Déterminer l'icône
-                                            let iconClass = 'iconoir-view-grid';
-                                            if (tab.id.includes('emma')) iconClass = 'iconoir-chat-bubble';
-                                            else if (tab.id.includes('watchlist')) iconClass = 'iconoir-star';
-                                            else if (tab.id.includes('calendar')) iconClass = 'iconoir-calendar';
-                                            else if (tab.id.includes('market')) iconClass = 'iconoir-graph-up';
-                                            else if (tab.id.includes('jlab')) iconClass = 'iconoir-lightbulb';
-                                            else if (tab.id.includes('admin')) iconClass = 'iconoir-settings';
-                                            else if (tab.id.includes('seeking')) iconClass = 'iconoir-search';
-                                            else if (tab.id.includes('team')) iconClass = 'iconoir-group';
-                                            else if (tab.id.includes('dan')) iconClass = 'iconoir-brain';
-
+                                            const iconClass = getTabIcon(tab.id);
                                             const isActive = activeTab === tab.id;
 
                                             return (
@@ -20429,24 +20480,43 @@ console.log('✅ Données hybrides récupérées:', {
                                                         handleTabChange(tab.id);
                                                         setShowMoreTabsOverlay(false);
                                                     }}
-                                                    className={`w-full flex items-center gap-4 p-4 rounded-lg mb-2 transition-all duration-200 ${
+                                                    className={`w-full flex items-center gap-4 p-4 rounded-xl mb-2 transition-all duration-300 group ${
                                                         isActive
                                                             ? isDarkMode
-                                                                ? 'bg-green-900 bg-opacity-30 border-2 border-green-500'
-                                                                : 'bg-green-50 border-2 border-green-500'
+                                                                ? 'bg-gradient-to-r from-green-900/40 to-green-800/20 border-2 border-green-500 shadow-lg shadow-green-500/20'
+                                                                : 'bg-gradient-to-r from-green-50 to-green-100/50 border-2 border-green-500 shadow-lg shadow-green-500/10'
                                                             : isDarkMode
-                                                                ? 'bg-gray-700 hover:bg-gray-650 border-2 border-transparent'
-                                                                : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
+                                                                ? 'bg-gray-700/50 hover:bg-gray-600/70 border-2 border-transparent hover:border-gray-600'
+                                                                : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent hover:border-gray-300'
                                                     }`}
                                                 >
-                                                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${
+                                                    <div className={`relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-300 ${
                                                         isActive
-                                                            ? 'bg-green-500 text-white'
-                                                            : isDarkMode
-                                                                ? 'bg-gray-600 text-gray-300'
-                                                                : 'bg-gray-200 text-gray-600'
+                                                            ? (isDarkMode
+                                                                ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/40'
+                                                                : 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30')
+                                                            : (isDarkMode
+                                                                ? 'bg-gray-600/50 text-gray-300 group-hover:bg-gray-500/70'
+                                                                : 'bg-gray-200 text-gray-600 group-hover:bg-gray-300')
                                                     }`}>
-                                                        <i className={`${iconClass} text-2xl`}></i>
+                                                        {/* Glow effect for active icon */}
+                                                        {isActive && (
+                                                            <div className={`absolute inset-0 rounded-xl blur-lg opacity-50 transition-all duration-300 ${
+                                                                isDarkMode ? 'bg-green-500' : 'bg-green-400'
+                                                            }`} style={{
+                                                                transform: 'scale(1.3)',
+                                                                filter: 'blur(12px)'
+                                                            }}></div>
+                                                        )}
+                                                        
+                                                        {/* Icon with enhanced styling */}
+                                                        <i className={`${iconClass} text-2xl relative z-10 transition-all duration-300 ${
+                                                            isActive
+                                                                ? (isDarkMode 
+                                                                    ? 'drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' 
+                                                                    : 'drop-shadow-[0_0_6px_rgba(255,255,255,0.4)]')
+                                                                : 'drop-shadow-none'
+                                                        } ${isActive ? 'scale-110' : 'scale-100 group-hover:scale-105'}`}></i>
                                                     </div>
                                                     <div className="flex-1 text-left">
                                                         <div className={`font-semibold ${
