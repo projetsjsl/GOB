@@ -551,13 +551,44 @@
       }
     }
 
-    // Vérifier si déjà connecté
-    window.addEventListener('DOMContentLoaded', () => {
-      const currentUser = sessionStorage.getItem('gob-user');
-      if (currentUser) {
-        // Déjà connecté, rediriger
-        window.location.href = '/beta-combined-dashboard.html';
-        return;
+    // Vérifier si déjà connecté (avec validation serveur pour éviter boucle infinie)
+    window.addEventListener('DOMContentLoaded', async () => {
+      const currentUserJson = sessionStorage.getItem('gob-user');
+      
+      // ✅ FIX BOUCLE INFINIE: Valider la session côté serveur avant de rediriger
+      if (currentUserJson) {
+        try {
+          const currentUser = JSON.parse(currentUserJson);
+          
+          // Valider la session auprès du serveur
+          const validationResponse = await fetch('/api/auth', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              action: 'validate',
+              username: currentUser.username
+            })
+          });
+
+          const validationData = await validationResponse.json();
+          
+          // ✅ Seulement rediriger si la session est VALIDE côté serveur
+          if (validationResponse.ok && validationData.success) {
+            console.log('✅ Session valide détectée - redirection vers dashboard');
+            window.location.href = '/beta-combined-dashboard.html';
+            return;
+          } else {
+            // Session invalide - nettoyer sessionStorage pour éviter la boucle
+            console.warn('⚠️ Session invalide détectée - nettoyage sessionStorage');
+            sessionStorage.removeItem('gob-user');
+          }
+        } catch (error) {
+          console.warn('⚠️ Erreur validation session:', error);
+          // En cas d'erreur, nettoyer la session pour éviter la boucle
+          sessionStorage.removeItem('gob-user');
+        }
       }
 
       // Démarrer le préchargement en arrière-plan

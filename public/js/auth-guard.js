@@ -442,10 +442,17 @@
   // Utiliser un try-catch global pour éviter que les erreurs bloquent le chargement
   try {
     const initAuthGuard = async () => {
+      // ✅ FIX BOUCLE INFINIE: Ne pas initialiser auth-guard sur la page de login
+      if (window.location.pathname.includes('login.html')) {
+        console.log('🔐 Auth Guard: Page de login détectée - initialisation ignorée');
+        signalAuthGuardReady(false, null, 'On login page');
+        return;
+      }
+      
       try {
         await window.authGuard.init();
         
-        // Vérifier si on a été redirigé vers login
+        // Vérifier si on a été redirigé vers login (double vérification)
         if (window.location.pathname.includes('login.html')) {
           console.log('🔐 Auth Guard: Redirection vers login détectée');
           signalAuthGuardReady(false, null, 'Redirected to login');
