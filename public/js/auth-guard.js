@@ -105,7 +105,10 @@
         } else {
           // Si currentUser n'est toujours pas défini à ce stade, c'est une erreur
           console.error('❌ Erreur: currentUser non défini après toutes les vérifications');
-          // Ne pas rediriger pour éviter une boucle, laisser le dashboard gérer
+          // ✅ FIX BOUCLE INFINIE: Ne pas rediriger immédiatement pour éviter une boucle
+          // Laisser le dashboard gérer la redirection via initAuthGuard
+          // Mais nettoyer sessionStorage pour éviter que login.html redirige à nouveau
+          sessionStorage.removeItem(AUTH_STORAGE_KEY);
           return; // Sortir ici pour éviter d'accéder à currentUser.display_name
         }
 
@@ -119,8 +122,24 @@
         // Créer le bouton de déconnexion (DÉSACTIVÉ)
         // this.createLogoutButton();
 
-        // Supprimer les éléments flottants s'ils existent déjà
-        this.removeFloatingElements();
+        // ✅ FIX BOUCLE INFINIE: Supprimer les éléments flottants seulement si le DOM est prêt
+        // Attendre que le DOM soit complètement chargé avant d'appeler removeFloatingElements
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          try {
+            this.removeFloatingElements();
+          } catch (error) {
+            console.warn('⚠️ Erreur lors de la suppression des éléments flottants (non bloquant):', error);
+          }
+        } else {
+          // Si le DOM n'est pas encore prêt, attendre qu'il le soit
+          document.addEventListener('DOMContentLoaded', () => {
+            try {
+              this.removeFloatingElements();
+            } catch (error) {
+              console.warn('⚠️ Erreur lors de la suppression des éléments flottants (non bloquant):', error);
+            }
+          });
+        }
 
         // Appliquer les permissions Emma
         this.applyEmmaPermissions();
@@ -253,30 +272,42 @@
 
     /**
      * Supprime les éléments flottants (déconnexion et GOB)
+     * ✅ FIX BOUCLE INFINIE: Ajout de vérifications de sécurité
      */
     removeFloatingElements() {
-      // Supprimer l'élément d'info utilisateur (GOB)
-      const userInfoDisplay = document.getElementById('user-info-display');
-      if (userInfoDisplay) {
-        userInfoDisplay.remove();
-        console.log('🗑️ Élément flottant GOB supprimé');
+      // Vérifier que le DOM est disponible
+      if (typeof document === 'undefined' || !document.body) {
+        console.warn('⚠️ DOM non disponible pour removeFloatingElements()');
+        return;
       }
 
-      // Supprimer le bouton de déconnexion
-      const logoutBtn = document.getElementById('logout-btn');
-      if (logoutBtn) {
-        logoutBtn.remove();
-        console.log('🗑️ Bouton de déconnexion flottant supprimé');
-      }
-
-      // Supprimer le badge admin s'il existe
-      const adminBadges = document.querySelectorAll('.fixed.bottom-4.right-4');
-      adminBadges.forEach(badge => {
-        if (badge.textContent.includes('Mode Admin')) {
-          badge.remove();
-          console.log('🗑️ Badge admin flottant supprimé');
+      try {
+        // Supprimer l'élément d'info utilisateur (GOB)
+        const userInfoDisplay = document.getElementById('user-info-display');
+        if (userInfoDisplay && userInfoDisplay.parentNode) {
+          userInfoDisplay.remove();
+          console.log('🗑️ Élément flottant GOB supprimé');
         }
-      });
+
+        // Supprimer le bouton de déconnexion
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn && logoutBtn.parentNode) {
+          logoutBtn.remove();
+          console.log('🗑️ Bouton de déconnexion flottant supprimé');
+        }
+
+        // Supprimer le badge admin s'il existe
+        const adminBadges = document.querySelectorAll('.fixed.bottom-4.right-4');
+        adminBadges.forEach(badge => {
+          if (badge && badge.parentNode && badge.textContent && badge.textContent.includes('Mode Admin')) {
+            badge.remove();
+            console.log('🗑️ Badge admin flottant supprimé');
+          }
+        });
+      } catch (error) {
+        // Ne pas faire échouer l'authentification si la suppression des éléments flottants échoue
+        console.warn('⚠️ Erreur lors de la suppression des éléments flottants (non bloquant):', error);
+      }
     }
 
     /**
@@ -379,7 +410,14 @@
      * Redirige vers la page de login
      */
     redirectToLogin() {
-      window.location.href = LOGIN_PAGE;
+      // ✅ FIX BOUCLE INFINIE: Nettoyer sessionStorage avant de rediriger
+      // pour éviter que login.html redirige à nouveau vers le dashboard
+      console.log('🔄 Nettoyage sessionStorage avant redirection vers login...');
+      sessionStorage.removeItem(AUTH_STORAGE_KEY);
+      // Attendre un court instant pour que le nettoyage soit effectif
+      setTimeout(() => {
+        window.location.href = LOGIN_PAGE;
+      }, 100);
     }
 
     /**
