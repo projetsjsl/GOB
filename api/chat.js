@@ -166,6 +166,11 @@ export default async function handler(req, res) {
       const isKnownInContacts = isKnownContact(userId);
       const hasName = userProfile.name && userProfile.name !== userId;
       const awaitingName = userProfile.metadata?.awaiting_name === true;
+      
+      // Protection anti-boucle: vérifier si on vient de demander le nom récemment
+      const lastNameRequestTime = userProfile.metadata?.last_name_request_time;
+      const now = Date.now();
+      const recentlyAsked = lastNameRequestTime && (now - parseInt(lastNameRequestTime)) < 300000; // 5 minutes
 
       // CAS 1: Utilisateur en train de donner son nom
       if (awaitingName) {
@@ -175,7 +180,8 @@ export default async function handler(req, res) {
         const userName = message.trim().split(/\s+/)[0]; // Premier mot
 
         try {
-          await updateUserProfile(userProfile.id, {
+          // Mettre à jour le profil AVANT de continuer
+          const updatedProfile = await updateUserProfile(userProfile.id, {
             name: userName,
             metadata: { ...userProfile.metadata, awaiting_name: false, has_been_introduced: true }
           });
@@ -185,11 +191,16 @@ export default async function handler(req, res) {
           const welcomeResponse = `Enchanté ${userName} ! 👋\n\nJe suis Emma, ton assistante IA financière 📊\n\nJe peux t'aider avec :\n📊 Analyses de marchés et actions\n📈 Données financières en temps réel\n📰 Nouvelles économiques\n💡 Conseils et insights\n\n💼 Tape SKILLS pour voir mes capacités avancées (calendriers, courbes, briefings, etc.)\n\nÉcris-moi au 1-438-544-EMMA 📱\n\nComment puis-je t'aider aujourd'hui ?`;
 
           // Sauvegarder dans la conversation
-          await saveConversationTurn(conversation.id, message, welcomeResponse, {
-            type: 'name_registration',
-            channel: channel
-          });
+          try {
+            await saveConversationTurn(conversation.id, message, welcomeResponse, {
+              type: 'name_registration',
+              channel: channel
+            });
+          } catch (saveError) {
+            console.error('[Chat API] Erreur sauvegarde conversation (non-bloquant):', saveError);
+          }
 
+          // ✅ RETOURNER IMMÉDIATEMENT pour éviter la boucle infinie
           return res.status(200).json({
             success: true,
             response: welcomeResponse,
@@ -197,27 +208,56 @@ export default async function handler(req, res) {
           });
         } catch (error) {
           console.error('[Chat API] Erreur enregistrement nom:', error);
-          // Continuer normalement en cas d'erreur
+          // ✅ Si erreur, retourner quand même une réponse pour éviter la boucle
+          // Ne pas continuer l'exécution car cela causerait une boucle infinie
+          const errorResponse = `Bonjour ! 👋\n\nJe suis Emma, ton assistante IA financière 📊\n\nComment puis-je t'aider aujourd'hui ?`;
+          
+          try {
+            await saveConversationTurn(conversation.id, message, errorResponse, {
+              type: 'name_registration_error',
+              channel: channel
+            });
+          } catch (saveError) {
+            // Ignorer erreur sauvegarde
+          }
+          
+          return res.status(200).json({
+            success: true,
+            response: errorResponse,
+            metadata: { name_registration_error: true }
+          });
         }
       }
 
       // CAS 2: Numéro inconnu sans nom - demander le nom
-      if (!isKnownInContacts && !hasName && !awaitingName) {
+      // ✅ Protection anti-boucle: ne pas redemander si on vient de le demander récemment
+      if (!isKnownInContacts && !hasName && !awaitingName && !recentlyAsked) {
         console.log(`[Chat API] Numéro inconnu détecté, demande du nom`);
 
         try {
-          await updateUserProfile(userProfile.id, {
-            metadata: { ...userProfile.metadata, awaiting_name: true }
+          // Mettre à jour le profil AVANT de continuer avec timestamp
+          const updatedProfile = await updateUserProfile(userProfile.id, {
+            metadata: { 
+              ...userProfile.metadata, 
+              awaiting_name: true,
+              last_name_request_time: now.toString() // Timestamp pour protection anti-boucle
+            }
           });
+          console.log(`[Chat API] Flag awaiting_name défini pour user ${userProfile.id}`);
 
           const askNameResponse = "Bonjour ! 👋\n\nAvant de commencer, pourrais-tu me dire ton prénom ? Ça me permettra de personnaliser nos échanges.";
 
           // Sauvegarder dans la conversation
-          await saveConversationTurn(conversation.id, message, askNameResponse, {
-            type: 'name_request',
-            channel: channel
-          });
+          try {
+            await saveConversationTurn(conversation.id, message, askNameResponse, {
+              type: 'name_request',
+              channel: channel
+            });
+          } catch (saveError) {
+            console.error('[Chat API] Erreur sauvegarde conversation (non-bloquant):', saveError);
+          }
 
+          // ✅ RETOURNER IMMÉDIATEMENT pour éviter la boucle infinie
           return res.status(200).json({
             success: true,
             response: askNameResponse,
@@ -225,7 +265,24 @@ export default async function handler(req, res) {
           });
         } catch (error) {
           console.error('[Chat API] Erreur demande nom:', error);
-          // Continuer normalement en cas d'erreur
+          // ✅ Si erreur, retourner quand même une réponse pour éviter la boucle
+          // Ne pas continuer l'exécution car cela causerait une boucle infinie
+          const errorResponse = "Bonjour ! 👋\n\nJe suis Emma, ton assistante IA financière 📊\n\nComment puis-je t'aider aujourd'hui ?";
+          
+          try {
+            await saveConversationTurn(conversation.id, message, errorResponse, {
+              type: 'name_request_error',
+              channel: channel
+            });
+          } catch (saveError) {
+            // Ignorer erreur sauvegarde
+          }
+          
+          return res.status(200).json({
+            success: true,
+            response: errorResponse,
+            metadata: { name_request_error: true }
+          });
         }
       }
     }
