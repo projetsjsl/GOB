@@ -2994,22 +2994,39 @@ const fetchHybridData = async (symbol, dataType) => {
             // Chargement automatique des tickers et nouvelles pour l'onglet stocks-news
             useEffect(() => {
                 if (activeTab === 'stocks-news' && initialLoadComplete) {
-                    // Charger les tickers si la liste est vide
+                    console.log('📊 Onglet Titres activé - Vérification des données...');
+                    console.log(`Tickers: ${tickers.length}, StockData: ${Object.keys(stockData).length}, News: ${newsData.length}`);
+                    
+                    // Toujours charger les tickers si la liste est vide
                     if (tickers.length === 0) {
                         console.log('📊 Chargement automatique des tickers pour stocks-news...');
-                        loadTickersFromSupabase();
+                        loadTickersFromSupabase().catch(err => {
+                            console.error('❌ Erreur chargement tickers:', err);
+                        });
                     }
                     
                     // Charger les nouvelles si la liste est vide
                     if (newsData.length === 0) {
                         console.log('📰 Chargement automatique des nouvelles pour stocks-news...');
-                        fetchNews();
+                        fetchNews().catch(err => {
+                            console.error('❌ Erreur chargement nouvelles:', err);
+                        });
+                    }
+
+                    // Charger les données de stocks si les tickers sont disponibles mais pas les données
+                    if (tickers.length > 0 && Object.keys(stockData).length === 0) {
+                        console.log('💹 Chargement automatique des données de stocks pour stocks-news...');
+                        refreshAllStocks().catch(err => {
+                            console.error('❌ Erreur chargement stocks:', err);
+                        });
                     }
 
                     // Charger les news par ticker si les données sont disponibles
                     if (tickers.length > 0 && Object.keys(stockData).length > 0 && Object.keys(tickerLatestNews).length === 0) {
                         console.log('📰 Chargement automatique des news par ticker...');
-                        fetchLatestNewsForTickers();
+                        fetchLatestNewsForTickers().catch(err => {
+                            console.error('❌ Erreur chargement news par ticker:', err);
+                        });
                     }
                 }
             }, [activeTab, initialLoadComplete]); // Se déclenche au changement d'onglet
@@ -3026,10 +3043,12 @@ const fetchHybridData = async (symbol, dataType) => {
                         const loadInitialStocks = async () => {
                             try {
                                 const symbolsQuery = initialTickers.join(',');
+                                console.log(`📡 Appel API batch pour: ${symbolsQuery}`);
                                 const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
                                 
                                 if (batchResponse.ok) {
                                     const batchData = await batchResponse.json();
+                                    console.log('📊 Réponse batch:', batchData);
                                     if (batchData.success && batchData.data) {
                                         const quotes = batchData.data.quote || {};
                                         const fundamentals = batchData.data.fundamentals || {};
@@ -3056,6 +3075,7 @@ const fetchHybridData = async (symbol, dataType) => {
                                             }
                                         });
                                         
+                                        console.log(`✅ Données chargées pour ${Object.keys(newStockData).length} tickers`);
                                         setStockData(newStockData);
                                         console.log(`✅ ${Object.keys(newStockData).length} stocks chargés initialement`);
                                     }
@@ -13738,6 +13758,38 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 return (
                 <div className="space-y-6">
+                    {/* Message d'état si pas de données */}
+                    {tickers.length === 0 && (
+                        <div className={`p-6 rounded-xl border-2 transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gray-800 border-yellow-500/30'
+                                : 'bg-yellow-50 border-yellow-200'
+                        }`}>
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className="text-2xl">⏳</span>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Chargement des données...
+                                </h3>
+                            </div>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Les titres et nouvelles sont en cours de chargement. Veuillez patienter quelques instants.
+                            </p>
+                            <button
+                                onClick={async () => {
+                                    await loadTickersFromSupabase();
+                                    await fetchNews();
+                                }}
+                                className={`mt-4 px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                                    isDarkMode
+                                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                }`}
+                            >
+                                🔄 Forcer le chargement
+                            </button>
+                        </div>
+                    )}
+
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
@@ -13944,7 +13996,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     )}
 
                     {/* ANALYSES & OPINIONS D'ANALYSTES */}
-                    {tickers.length > 0 && (
+                    {tickers.length > 0 && Object.keys(stockData).length > 0 && (
                         <div className={`mt-6 p-6 rounded-xl transition-colors duration-300 ${
                             isDarkMode
                                 ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
@@ -14117,6 +14169,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>📊 Titres - Vue Liste</h2>
 
+                                {tickers.length === 0 ? (
+                                    <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
+                                        <p className="text-sm">Les données sont en cours de chargement...</p>
+                                    </div>
+                                ) : Object.keys(stockData).length === 0 ? (
+                                    <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className="text-lg font-semibold mb-2">Chargement des données de marché...</p>
+                                        <p className="text-sm">Veuillez patienter quelques instants</p>
+                                    </div>
+                                ) : (
                                 <div className="space-y-3">
                                     {tickers.map((ticker) => {
                                         const data = stockData[ticker] || {};
@@ -14167,11 +14230,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     <div className={`font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                                                         {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
                                                     </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        );
+                                            );
                                     })}
                                 </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -14191,7 +14255,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 {tickers.length === 0 ? (
                                     <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                         <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
-                                        <p className="text-sm">Ajoutez des tickers pour voir les cartes</p>
+                                        <p className="text-sm">Les données sont en cours de chargement...</p>
+                                    </div>
+                                ) : Object.keys(stockData).length === 0 ? (
+                                    <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className="text-lg font-semibold mb-2">Chargement des données de marché...</p>
+                                        <p className="text-sm">Veuillez patienter quelques instants</p>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
