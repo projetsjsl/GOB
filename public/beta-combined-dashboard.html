@@ -795,6 +795,8 @@ const fetchHybridData = async (symbol, dataType) => {
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
             const [finvizNews, setFinvizNews] = useState({}); // Dernières news Finviz par ticker
+            const [tickerLatestNews, setTickerLatestNews] = useState({}); // News la plus récente par ticker
+            const [tickerMoveReasons, setTickerMoveReasons] = useState({}); // Raisons de mouvement par ticker
             const [seekingAlphaData, setSeekingAlphaData] = useState({});
             const [seekingAlphaStockData, setSeekingAlphaStockData] = useState({});
             const [economicCalendarData, setEconomicCalendarData] = useState([]);
@@ -1292,6 +1294,90 @@ const fetchHybridData = async (symbol, dataType) => {
                 console.log(`✅ Finviz news loaded for ${Object.keys(newsMap).length} tickers`);
             };
 
+            // Fonction pour récupérer la news la plus récente et pertinente pour chaque ticker
+            const fetchLatestNewsForTickers = async () => {
+                console.log('📰 Chargement des news récentes pour chaque ticker...');
+                const today = new Date().toISOString().split('T')[0];
+                const newsMap = {};
+
+                const newsPromises = tickers.map(async (ticker) => {
+                    try {
+                        // Essayer Finnhub company news d'abord (plus spécifique)
+                        const finnhubResponse = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${ticker}&from=${today}&to=${today}`);
+                        if (finnhubResponse.ok) {
+                            const finnhubData = await finnhubResponse.json();
+                            if (Array.isArray(finnhubData) && finnhubData.length > 0) {
+                                // Prendre la première news de la journée
+                                const latestNews = finnhubData[0];
+                                newsMap[ticker] = {
+                                    title: latestNews.headline || latestNews.title,
+                                    source: latestNews.source || 'Finnhub',
+                                    date: new Date(latestNews.datetime * 1000).toLocaleDateString('fr-FR'),
+                                    url: latestNews.url || '#'
+                                };
+                                return;
+                            }
+                        }
+
+                        // Fallback: utiliser Finviz news si disponible
+                        if (finvizNews[ticker]) {
+                            newsMap[ticker] = {
+                                title: finvizNews[ticker].headline || finvizNews[ticker].title,
+                                source: 'Finviz',
+                                date: finvizNews[ticker].date || 'Aujourd\'hui',
+                                url: finvizNews[ticker].link || '#'
+                            };
+                            return;
+                        }
+
+                        // Fallback: chercher dans les news générales
+                        const relevantNews = newsData.find(article => 
+                            article.title.toLowerCase().includes(ticker.toLowerCase()) ||
+                            article.description?.toLowerCase().includes(ticker.toLowerCase())
+                        );
+                        if (relevantNews) {
+                            newsMap[ticker] = {
+                                title: relevantNews.title,
+                                source: relevantNews.source?.name || 'Général',
+                                date: new Date(relevantNews.publishedAt).toLocaleDateString('fr-FR'),
+                                url: relevantNews.url || '#'
+                            };
+                        }
+                    } catch (error) {
+                        console.error(`Erreur récupération news pour ${ticker}:`, error);
+                    }
+                });
+
+                await Promise.all(newsPromises);
+                setTickerLatestNews(newsMap);
+                console.log(`✅ News récentes chargées pour ${Object.keys(newsMap).length} tickers`);
+            };
+
+            // Fonction pour extraire la raison du mouvement depuis les news
+            const extractMoveReason = (ticker, changePercent) => {
+                const news = tickerLatestNews[ticker];
+                if (!news) return null;
+
+                const title = news.title.toLowerCase();
+                const isPositive = changePercent > 0;
+
+                // Mots-clés pour les hausses
+                const positiveKeywords = ['gain', 'hausse', 'up', 'rise', 'surge', 'rally', 'beat', 'exceed', 'strong', 'growth', 'profit', 'earnings beat', 'upgrade', 'buy'];
+                // Mots-clés pour les baisses
+                const negativeKeywords = ['drop', 'fall', 'down', 'decline', 'loss', 'miss', 'weak', 'downgrade', 'sell', 'concern', 'warning', 'disappoint'];
+
+                // Vérifier si la news correspond au mouvement
+                const hasPositiveKeyword = positiveKeywords.some(kw => title.includes(kw));
+                const hasNegativeKeyword = negativeKeywords.some(kw => title.includes(kw));
+
+                if ((isPositive && hasPositiveKeyword) || (!isPositive && hasNegativeKeyword)) {
+                    // Extraire une phrase courte de la news (premiers 80 caractères)
+                    return news.title.length > 80 ? news.title.substring(0, 80) + '...' : news.title;
+                }
+
+                return news.title.length > 60 ? news.title.substring(0, 60) + '...' : news.title;
+            };
+
             const refreshAllStocks = async () => {
                 console.log('🔄 Actualisation des données stocks...');
                 setLoading(true);
@@ -1381,6 +1467,13 @@ const fetchHybridData = async (symbol, dataType) => {
                 setStockData(newStockData);
                 setLastUpdate(new Date());
                 setLoading(false);
+                
+                // Charger les news par ticker après le chargement des stocks
+                if (successCount > 0) {
+                    fetchLatestNewsForTickers().catch(err => {
+                        console.error('Erreur chargement news par ticker:', err);
+                    });
+                }
                 
                 const message = `Données mises à jour: ${successCount} succès, ${errorCount} erreurs`;
                 console.log(message);
@@ -2557,6 +2650,12 @@ const fetchHybridData = async (symbol, dataType) => {
                     if (newsData.length === 0) {
                         console.log('📰 Chargement automatique des nouvelles pour stocks-news...');
                         fetchNews();
+                    }
+
+                    // Charger les news par ticker si les données sont disponibles
+                    if (tickers.length > 0 && Object.keys(stockData).length > 0 && Object.keys(tickerLatestNews).length === 0) {
+                        console.log('📰 Chargement automatique des news par ticker...');
+                        fetchLatestNewsForTickers();
                     }
                 }
             }, [activeTab, initialLoadComplete]); // Se déclenche au changement d'onglet
@@ -13043,9 +13142,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </button>
                             </div>
                             <button
-                                onClick={() => {
-                                    refreshAllStocks();
-                                    fetchNews();
+                                onClick={async () => {
+                                    await refreshAllStocks();
+                                    await fetchNews();
+                                    await fetchLatestNewsForTickers();
                                 }}
                                 disabled={loading}
                                 className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${
@@ -13104,21 +13204,28 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         setActiveTab('intellistocks');
                                                     }}
                                                 >
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                                            isDarkMode ? 'bg-green-500/30 text-green-300' : 'bg-green-100 text-green-700'
-                                                        }`}>
-                                                            {idx + 1}
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                                isDarkMode ? 'bg-green-500/30 text-green-300' : 'bg-green-100 text-green-700'
+                                                            }`}>
+                                                                {idx + 1}
+                                                            </div>
+                                                            <img
+                                                                src={getCompanyLogo(item.ticker)}
+                                                                alt={item.ticker}
+                                                                className="w-6 h-6 rounded"
+                                                                onError={(e) => e.target.style.display = 'none'}
+                                                            />
+                                                            <span className={`font-mono font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                {item.ticker}
+                                                            </span>
                                                         </div>
-                                                        <img
-                                                            src={getCompanyLogo(item.ticker)}
-                                                            alt={item.ticker}
-                                                            className="w-6 h-6 rounded"
-                                                            onError={(e) => e.target.style.display = 'none'}
-                                                        />
-                                                        <span className={`font-mono font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            {item.ticker}
-                                                        </span>
+                                                        {extractMoveReason(item.ticker, item.change) && (
+                                                            <div className={`text-xs mt-1 ml-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                                📰 {extractMoveReason(item.ticker, item.change)}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-green-500 font-bold">
@@ -13160,21 +13267,28 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         setActiveTab('intellistocks');
                                                     }}
                                                 >
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                                            isDarkMode ? 'bg-red-500/30 text-red-300' : 'bg-red-100 text-red-700'
-                                                        }`}>
-                                                            {idx + 1}
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                                isDarkMode ? 'bg-red-500/30 text-red-300' : 'bg-red-100 text-red-700'
+                                                            }`}>
+                                                                {idx + 1}
+                                                            </div>
+                                                            <img
+                                                                src={getCompanyLogo(item.ticker)}
+                                                                alt={item.ticker}
+                                                                className="w-6 h-6 rounded"
+                                                                onError={(e) => e.target.style.display = 'none'}
+                                                            />
+                                                            <span className={`font-mono font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                {item.ticker}
+                                                            </span>
                                                         </div>
-                                                        <img
-                                                            src={getCompanyLogo(item.ticker)}
-                                                            alt={item.ticker}
-                                                            className="w-6 h-6 rounded"
-                                                            onError={(e) => e.target.style.display = 'none'}
-                                                        />
-                                                        <span className={`font-mono font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            {item.ticker}
-                                                        </span>
+                                                        {extractMoveReason(item.ticker, item.change) && (
+                                                            <div className={`text-xs mt-1 ml-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                                📰 {extractMoveReason(item.ticker, item.change)}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-red-500 font-bold">
@@ -13394,13 +13508,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         className="w-12 h-12 rounded-lg"
                                                         onError={(e) => e.target.style.display = 'none'}
                                                     />
-                                                    <div>
+                                                    <div className="flex-1">
                                                         <div className={`font-mono font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                                             {ticker}
                                                         </div>
                                                         <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                             {companyNames[ticker] || ticker}
                                                         </div>
+                                                        {tickerLatestNews[ticker] && (
+                                                            <div className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                                📰 <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -13464,13 +13583,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             className="w-14 h-14 rounded-xl"
                                                             onError={(e) => e.target.style.display = 'none'}
                                                         />
-                                                        <div>
+                                                        <div className="flex-1">
                                                             <div className={`font-mono font-bold text-xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                                                 {ticker}
                                                             </div>
                                                             <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                                 {companyNames[ticker] || ticker}
                                                             </div>
+                                                            {tickerLatestNews[ticker] && (
+                                                                <div className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                                    📰 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
 
