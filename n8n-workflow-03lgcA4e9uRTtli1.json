@@ -988,43 +988,21 @@
     },
     {
       "parameters": {
-        "mode": "rules",
-        "rules": {
-          "values": [
+        "conditions": {
+          "string": [
             {
-              "conditions": {
-                "string": [
-                  {
-                    "value1": "={{ $json.ai_model }}",
-                    "operation": "equals",
-                    "value2": "emma"
-                  }
-                ]
-              },
-              "renameOutput": true,
-              "outputKey": "🤖 Emma (Perplexity)"
-            },
-            {
-              "conditions": {
-                "string": [
-                  {
-                    "value1": "={{ $json.ai_model }}",
-                    "operation": "equals",
-                    "value2": "gemini"
-                  }
-                ]
-              },
-              "renameOutput": true,
-              "outputKey": "✨ Gemini Direct"
+              "value1": "={{ $json.ai_model }}",
+              "operation": "equals",
+              "value2": "emma"
             }
           ]
         },
         "options": {}
       },
       "id": "ai-model-selector-switch",
-      "name": "🤖 Choose AI Model",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3,
+      "name": "Choose AI Model (IF)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
       "position": [
         19264,
         4536
@@ -1470,24 +1448,6 @@
         ]
       ]
     },
-    "🤖 Choose AI Model": {
-      "main": [
-        [
-          {
-            "node": "Prepare API Request",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Call Gemini API",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "⚙️ AI Model Selector (Change AI_MODEL)": {
       "main": [
         [
@@ -1504,6 +1464,24 @@
         [
           {
             "node": "🤖 Choose AI Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose AI Model (IF)": {
+      "main": [
+        [
+          {
+            "node": "Prepare API Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Gemini API",
             "type": "main",
             "index": 0
           }
