@@ -980,7 +980,7 @@
       "main": [
         [
           {
-            "node": "Manual Config",
+            "node": "Fetch Prompts from API",
             "type": "main",
             "index": 0
           }
@@ -1297,7 +1297,7 @@
       "main": [
         [
           {
-            "node": "Preview or Send?",
+            "node": "Should Send Email?",
             "type": "main",
             "index": 0
           }
