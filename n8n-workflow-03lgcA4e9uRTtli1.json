@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-05T03:56:44.000Z",
+  "updatedAt": "2025-11-09T02:42:45.654Z",
   "createdAt": "2025-10-20T18:16:03.743Z",
   "id": "03lgcA4e9uRTtli1",
   "name": "Emma Newsletter - Automated Multi-API Financial News Distribution",
@@ -30,8 +30,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        17760,
-        4464
+        20608,
+        5632
       ]
     },
     {
@@ -46,8 +46,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        17760,
-        4656
+        20608,
+        5824
       ],
       "webhookId": "dad887b9-1a62-482a-9174-3b79f52a2bb5"
     },
@@ -58,8 +58,8 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        17760,
-        4272
+        20208,
+        5536
       ]
     },
     {
@@ -81,28 +81,27 @@
             {
               "id": "id-3",
               "name": "preview_mode",
-              "value": "true",
+              "value": false,
               "type": "boolean"
             },
             {
               "id": "id-4",
               "name": "approved",
-              "value": "false",
+              "value": true,
               "type": "boolean"
             }
           ]
         },
         "includeOtherFields": true,
-        "options": {},
-        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // Valeurs par défaut pour preview (peuvent être surchargées par les config nodes)\n  const previewMode = data.preview_mode !== undefined ? data.preview_mode : true; // Par défaut preview\n  const approved = data.approved !== undefined ? data.approved : false; // Par défaut non approuvé\n  \n  return {\n    json: {\n      ...data,\n      preview_mode: previewMode,\n      approved: approved,\n      // Préserver le prompt personnalisé\n      custom_prompt: data.custom_prompt || data.prompt || ''\n    }\n  };\n});"
+        "options": {}
       },
       "id": "c3ecb545-83ea-4db2-ba56-a7104a702733",
       "name": "Custom Prompt Input",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        17984,
-        4272
+        20608,
+        5440
       ]
     },
     {
@@ -118,8 +117,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        18208,
-        4464
+        20832,
+        5440
       ]
     },
     {
@@ -142,8 +141,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        18880,
-        4392
+        21280,
+        6208
       ],
       "credentials": {
         "supabaseApi": {
@@ -161,21 +160,21 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        19104,
-        4536
+        21504,
+        6208
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols from input 1 (tickers data)\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type;\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// Construire le message pour /api/chat (qui utilise emma-agent) ou Gemini\nconst fullPrompt = `${data.selected_prompt}\\n\\nFocus sur ces tickers: ${tickerList}`;\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation',\n    // Préserver ai_model depuis AI Model Config\n    ai_model: data.ai_model || 'emma'\n  }\n}];"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols from input 1 (tickers data)\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type;\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// Récupérer la clé API Gemini depuis les credentials n8n\n// Si les credentials ne sont pas disponibles, utiliser une variable de workflow\nlet geminiApiKey = '';\ntry {\n  // Essayer de récupérer depuis les credentials HTTP Header Auth\n  // Note: Vous devez créer des credentials \"Google Gemini API\" dans n8n\n  // avec le nom \"GEMINI_API_KEY\" dans les credentials\n  geminiApiKey = $credentials?.geminiApi?.apiKey || \n                 $workflow.getStaticData('global').geminiApiKey || \n                 '';\n  \n  if (!geminiApiKey) {\n    console.warn('⚠️  Clé API Gemini non trouvée dans les credentials. Utilisez les credentials n8n.');\n  }\n} catch (e) {\n  console.warn('⚠️  Erreur lors de la récupération de la clé API:', e.message);\n}\n\n// Construire le message pour /api/chat (qui utilise emma-agent) ou Gemini\nconst fullPrompt = `${data.selected_prompt}\\n\\nFocus sur ces tickers: ${tickerList}`;\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation',\n    // Préserver ai_model depuis AI Model Config\n    ai_model: data.ai_model || 'emma',\n    // Ajouter la clé API Gemini pour le nœud suivant\n    gemini_api_key: geminiApiKey\n  }\n}];"
       },
       "id": "c5d69e3d-82d3-4459-8c12-02af81d03cdd",
       "name": "Prepare API Request",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        19328,
-        4536
+        22752,
+        6112
       ]
     },
     {
@@ -187,21 +186,21 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20000,
-        4536
+        23200,
+        6208
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n// ============================================\n// VÉRIFICATION SÉCURITÉ - BLOQUE LES ENVOIS NON AUTORISÉS\n// ============================================\nif (data.preview_mode === true) {\n  throw new Error('❌ BLOQUÉ : Mode preview activé. Pour envoyer, définissez approved=true et preview_mode=false');\n}\n\nif (data.approved !== true) {\n  throw new Error('❌ BLOQUÉ : Email non approuvé. Pour envoyer, définissez approved=true');\n}\n\nconsole.log('✅ Vérification passée : approved=' + data.approved + ', preview_mode=' + data.preview_mode);\n\n\n\n// ============================================\n// COULEURS CENTRALISÉES DU THÈME GOB\n// Source: config/theme-colors.json\n// ============================================\nconst theme = {\n  colors: {\n    primary: '#6366f1',\n    primaryDark: '#4f46e5',\n    primaryLight: '#8b5cf6',\n    success: '#10b981',\n    text: {\n      dark: '#1f2937',\n      medium: '#4b5563',\n      light: '#6b7280',\n      muted: '#9ca3af'\n    },\n    background: {\n      white: '#ffffff',\n      light: '#f8fafc',\n      medium: '#f1f5f9',\n      dark: '#e2e8f0'\n    },\n    border: {\n      light: '#e5e7eb',\n      medium: '#d1d5db'\n    }\n  },\n  gradients: {\n    primary: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',\n    primaryAlt: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',\n    secondary: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'\n  },\n  email: {\n    fonts: {\n      primary: \"'Inter', 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif\"\n    },\n    spacing: {\n      containerMaxWidth: '700px',\n      padding: {\n        small: '20px',\n        medium: '30px',\n        large: '40px'\n      },\n      borderRadius: {\n        small: '8px',\n        medium: '12px',\n        large: '16px'\n      }\n    },\n    shadows: {\n      small: '0 2px 4px rgba(0, 0, 0, 0.05)',\n      medium: '0 4px 6px rgba(0, 0, 0, 0.1)',\n      large: '0 10px 25px rgba(99, 102, 241, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',\n      primary: '0 4px 12px rgba(99, 102, 241, 0.15)'\n    }\n  }\n};\n\n// Fonction pour convertir markdown en HTML\nfunction markdownToHtml(text) {\n  if (!text) return '';\n  \n  let html = text;\n  \n  // Convertir les tableaux markdown en HTML\n  const tableRegex = /\\|(.+)\\|\\n\\|([-|\\s]+)\\|\\n((?:\\|.+\\|\\n?)+)/g;\n  html = html.replace(tableRegex, (match, header, separator, rows) => {\n    const headers = header.split('|').map(h => h.trim()).filter(h => h);\n    const rowLines = rows.trim().split('\\n').filter(r => r.trim());\n    \n    let tableHtml = '<table style=\"width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; background: ' + theme.colors.background.white + ';\">';\n    \n    // En-têtes avec gradient primary\n    tableHtml += '<thead><tr style=\"background: ' + theme.gradients.primary + '; color: white;\">';\n    headers.forEach(h => {\n      tableHtml += `<th style=\"padding: 12px; text-align: left; border: 1px solid rgba(255,255,255,0.2); font-weight: 600; letter-spacing: 0.3px;\">${h.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')}</th>`;\n    });\n    tableHtml += '</tr></thead><tbody>';\n    \n    // Lignes avec alternance\n    rowLines.forEach((row, idx) => {\n      const cells = row.split('|').map(c => c.trim()).filter(c => c);\n      if (cells.length > 0 && !cells[0].match(/^[-|\\s]+$/)) {\n        const bgColor = idx % 2 === 0 ? theme.colors.background.white : theme.colors.background.light;\n        tableHtml += `<tr style=\"background: ${bgColor}; transition: background 0.2s;\">`;\n        cells.forEach(cell => {\n          let cellContent = cell.replace(/\\*\\*(.*?)\\*\\*/g, '<strong style=\"color: ' + theme.colors.primary + ';\">$1</strong>');\n          cellContent = cellContent.replace(/\\*(.*?)\\*/g, '<em>$1</em>');\n          cellContent = cellContent.replace(/🏆/g, '<span style=\"color: ' + theme.colors.success + '; font-size: 16px;\">🏆</span>');\n          tableHtml += `<td style=\"padding: 10px; border: 1px solid ${theme.colors.border.light}; color: ${theme.colors.text.dark};\">${cellContent}</td>`;\n        });\n        tableHtml += '</tr>';\n      }\n    });\n    \n    tableHtml += '</tbody></table>';\n    return tableHtml;\n  });\n  \n  // Convertir **gras** avec couleur primary\n  html = html.replace(/\\*\\*(.*?)\\*\\*/g, '<strong style=\"color: ' + theme.colors.primary + '; font-weight: 700;\">$1</strong>');\n  \n  // Convertir *italique*\n  html = html.replace(/\\*(?!\\*)(.*?)\\*(?!\\*)/g, '<em style=\"color: ' + theme.colors.text.medium + ';\">$1</em>');\n  \n  // Convertir les titres\n  html = html.replace(/^###\\s+(.+)$/gm, '<h3 style=\"margin-top: 24px; margin-bottom: 12px; color: ' + theme.colors.primary + '; font-size: 18px; font-weight: 600; border-left: 4px solid ' + theme.colors.primaryLight + '; padding-left: 12px;\">$1</h3>');\n  html = html.replace(/^##\\s+(.+)$/gm, '<h2 style=\"margin-top: 28px; margin-bottom: 16px; color: ' + theme.colors.primaryDark + '; font-size: 22px; font-weight: 700; border-bottom: 3px solid ' + theme.colors.primary + '; padding-bottom: 8px;\">$1</h2>');\n  html = html.replace(/^#\\s+(.+)$/gm, '<h1 style=\"margin-top: 32px; margin-bottom: 20px; color: ' + theme.colors.primaryDark + '; font-size: 26px; font-weight: 700;\">$1</h1>');\n  \n  // Convertir les listes\n  html = html.replace(/^[-•]\\s+(.+)$/gm, '<li style=\"margin-left: 20px; margin-bottom: 6px; color: ' + theme.colors.text.dark + '; position: relative; padding-left: 8px;\"><span style=\"position: absolute; left: -12px; color: ' + theme.colors.primary + ';\">•</span>$1</li>');\n  html = html.replace(/(<li.*?<\\/li>\\n?)+/g, '<ul style=\"margin: 16px 0; padding-left: 20px; list-style: none;\">$&</ul>');\n  \n  // Convertir les séparateurs\n  html = html.replace(/^---+$/gm, '<hr style=\"border: none; border-top: 2px solid ' + theme.colors.primary + '; margin: 24px 0; opacity: 0.3;\">');\n  \n  // Convertir les sauts de ligne\n  html = html.replace(/\\n\\n/g, '</p><p style=\"margin-bottom: 12px; color: ' + theme.colors.text.dark + '; line-height: 1.7;\">');\n  html = html.replace(/\\n/g, '<br>');\n  \n  // Encapsuler dans des paragraphes\n  if (!html.startsWith('<')) html = '<p style=\"margin-bottom: 12px; color: ' + theme.colors.text.dark + '; line-height: 1.7;\">' + html;\n  if (!html.endsWith('>')) html = html + '</p>';\n  \n  return html;\n}\n\n// Map prompt types to French\nconst promptTypeFrench = {\n  'morning': 'MATIN',\n  'noon': 'MIDI',\n  'evening': 'SOIR',\n  'custom': 'PERSONNALISÉE'\n};\n\nconst editionType = promptTypeFrench[data.prompt_type] || (data.prompt_type ? data.prompt_type.toUpperCase() : 'PERSONNALISÉE');\n\n// Formatage des métadonnées\nconst now = new Date();\nconst generationTime = now.toLocaleString('fr-FR', { \n  weekday: 'long', \n  year: 'numeric', \n  month: 'long', \n  day: 'numeric',\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'America/Montreal'\n});\n\nconst triggerType = data.trigger_type || 'Manuel';\nconst emmaModel = data.emma_model || 'perplexity';\nconst emmaTools = Array.isArray(data.emma_tools) ? data.emma_tools : [];\nconst emmaExecutionTime = data.emma_execution_time || 0;\nconst emmaConfidence = data.emma_confidence || null;\n\n// Convertir le contenu markdown en HTML\nconst formattedContent = markdownToHtml(data.newsletter_content || '');\n\nconst html = \\`\n<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Newsletter Financière Emma</title>\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body { \n      font-family: ${theme.email.fonts.primary}; \n      line-height: 1.7; \n      color: ${theme.colors.text.dark}; \n      background: linear-gradient(135deg, ${theme.colors.background.light} 0%, ${theme.colors.background.dark} 100%);\n      padding: ${theme.email.spacing.padding.small};\n    }\n    .container {\n      max-width: ${theme.email.spacing.containerMaxWidth};\n      margin: 0 auto;\n      background: ${theme.colors.background.white};\n      border-radius: ${theme.email.spacing.borderRadius.large};\n      overflow: hidden;\n      box-shadow: ${theme.email.shadows.large};\n    }\n    .header { \n      background: ${theme.gradients.primary}; \n      color: white; \n      padding: ${theme.email.spacing.padding.large} ${theme.email.spacing.padding.medium}; \n      text-align: center;\n      position: relative;\n      overflow: hidden;\n    }\n    .header::before {\n      content: '';\n      position: absolute;\n      top: -50%;\n      right: -50%;\n      width: 200%;\n      height: 200%;\n      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);\n      animation: shimmer 3s ease-in-out infinite;\n    }\n    @keyframes shimmer {\n      0%, 100% { transform: translate(0, 0) rotate(0deg); }\n      50% { transform: translate(-10px, -10px) rotate(5deg); }\n    }\n    .header h1 { \n      margin: 0; \n      font-size: 34px; \n      font-weight: 800;\n      letter-spacing: -0.5px;\n      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n      position: relative;\n      z-index: 1;\n    }\n    .subtitle { \n      margin-top: 12px; \n      opacity: 0.95; \n      font-size: 14px;\n      font-weight: 600;\n      letter-spacing: 0.5px;\n      text-transform: uppercase;\n      position: relative;\n      z-index: 1;\n    }\n    .metadata-box {\n      background: ${theme.colors.background.medium};\n      padding: 24px ${theme.email.spacing.padding.medium};\n      border-bottom: 3px solid ${theme.colors.primary};\n    }\n    .metadata-box table {\n      width: 100%;\n      border-collapse: collapse;\n      font-size: 13px;\n    }\n    .metadata-box td {\n      padding: 8px 12px;\n      border-bottom: 1px solid ${theme.colors.border.light};\n    }\n    .metadata-box td:first-child {\n      font-weight: 700;\n      color: ${theme.colors.primaryDark};\n      width: 150px;\n      font-size: 12px;\n      text-transform: uppercase;\n      letter-spacing: 0.5px;\n    }\n    .metadata-box td:last-child {\n      color: ${theme.colors.text.dark};\n      font-weight: 500;\n    }\n    .metadata-box .badge {\n      display: inline-block;\n      padding: 6px 14px;\n      border-radius: 20px;\n      font-size: 11px;\n      font-weight: 700;\n      background: ${theme.gradients.primary};\n      color: white;\n      text-transform: uppercase;\n      letter-spacing: 0.5px;\n      box-shadow: ${theme.email.shadows.primary};\n    }\n    .content { \n      background: ${theme.colors.background.white}; \n      padding: ${theme.email.spacing.padding.large} ${theme.email.spacing.padding.medium};\n    }\n    .analysis { \n      background: ${theme.colors.background.light}; \n      padding: 35px; \n      border-radius: ${theme.email.spacing.borderRadius.medium}; \n      margin-bottom: 25px; \n      border-left: 5px solid ${theme.colors.primary};\n      box-shadow: ${theme.email.shadows.medium};\n      line-height: 1.8;\n    }\n    .analysis p {\n      margin-bottom: 14px;\n      color: ${theme.colors.text.dark};\n    }\n    .analysis h2, .analysis h3 {\n      margin-top: 24px;\n      margin-bottom: 12px;\n    }\n    .analysis table {\n      margin: 20px 0;\n      overflow-x: auto;\n      display: block;\n    }\n    .ticker-box {\n      margin-top: 25px; \n      padding: 24px; \n      background: ${theme.gradients.primaryAlt};\n      border-radius: ${theme.email.spacing.borderRadius.medium};\n      border: 2px solid ${theme.colors.primary};\n      box-shadow: ${theme.email.shadows.primary};\n    }\n    .ticker-box strong {\n      color: white;\n      font-size: 16px;\n      display: block;\n      margin-bottom: 10px;\n      font-weight: 700;\n      text-transform: uppercase;\n      letter-spacing: 0.5px;\n    }\n    .ticker-list {\n      color: rgba(255, 255, 255, 0.95);\n      font-weight: 600;\n      font-size: 15px;\n    }\n    .footer { \n      text-align: center; \n      padding: ${theme.email.spacing.padding.medium};\n      background: ${theme.colors.background.medium};\n      border-top: 2px solid ${theme.colors.border.light};\n    }\n    .footer p {\n      margin: 8px 0;\n      font-size: 13px;\n      color: ${theme.colors.text.medium};\n    }\n    .footer .powered-by {\n      font-weight: 700;\n      color: ${theme.colors.primaryDark};\n      font-size: 14px;\n      text-transform: uppercase;\n      letter-spacing: 0.5px;\n    }\n    .footer .powered-by::before {\n      content: '⚡ ';\n      color: ${theme.colors.success};\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>📊 Newsletter Financière Emma</h1>\n      <div class=\"subtitle\">ÉDITION DU ${editionType} | ${now.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>\n    </div>\n    <div class=\"metadata-box\">\n      <table>\n        <tr>\n          <td>🕐 Heure de génération:</td>\n          <td><strong>${generationTime}</strong></td>\n        </tr>\n        <tr>\n          <td>⚡ Déclencheur:</td>\n          <td><span class=\"badge\">${triggerType}</span></td>\n        </tr>\n        <tr>\n          <td>🤖 Modèle Emma:</td>\n          <td><strong style=\"color: ${theme.colors.primaryDark};\">${emmaModel.toUpperCase()}</strong></td>\n        </tr>\n        ${emmaTools.length > 0 ? `<tr>\n          <td>🔧 Outils utilisés:</td>\n          <td><span style=\"color: ${theme.colors.text.medium};\">${emmaTools.join(', ')}</span></td>\n        </tr>` : ''}\n        ${emmaExecutionTime > 0 ? `<tr>\n          <td>⏱️ Temps d'exécution:</td>\n          <td><strong style=\"color: ${theme.colors.success};\">${(emmaExecutionTime / 1000).toFixed(1)}s</strong></td>\n        </tr>` : ''}\n        ${emmaConfidence !== null ? `<tr>\n          <td>📊 Confiance:</td>\n          <td><strong style=\"color: ${theme.colors.primaryDark};\">${(emmaConfidence * 100).toFixed(0)}%</strong></td>\n        </tr>` : ''}\n      </table>\n    </div>\n    <div class=\"content\">\n      <div class=\"analysis\">\n        ${formattedContent}\n      </div>\n      ${data.tickers ? `\n      <div class=\"ticker-box\">\n        <strong>📈 Tickers suivis :</strong>\n        <div class=\"ticker-list\">${data.tickers}</div>\n      </div>\n      ` : ''}\n    </div>\n    <div class=\"footer\">\n      <p class=\"powered-by\">Généré par Emma IA | Propulsé par ${emmaModel === 'perplexity' ? 'Perplexity' : 'Gemini'}</p>\n      <p>Ceci est une newsletter automatisée. Merci de ne pas répondre à cet email.</p>\n    </div>\n  </div>\n</body>\n</html>\n\\`;\n\nconst subjectMap = {\n  'morning': 'Matin',\n  'noon': 'Midi',\n  'evening': 'Soir',\n  'custom': 'Personnalisée'\n};\n\nconst subjectType = subjectMap[data.prompt_type] || data.prompt_type;\n\nreturn [{\n  json: {\n    ...data,\n    html_content: html,\n    subject: \\`Newsletter Emma - Mise à jour du ${subjectType}\\`\n  }\n}];"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// ============================================\n// VÉRIFICATION SÉCURITÉ - BLOQUE LES ENVOIS NON AUTORISÉS\n// ============================================\nif ($('Custom Prompt Input').first().json.preview_mode === true) {\n  throw new Error('❌ BLOQUÉ : Mode preview activé. Pour envoyer, définissez approved=true et preview_mode=false');\n}\n\nif ($('Custom Prompt Input').first().json.approved !== true) {\n  throw new Error('❌ BLOQUÉ : Email non approuvé. Pour envoyer, définissez approved=true');\n}\n\nconsole.log('✅ Vérification passée : approved=' + data.approved + ', preview_mode=' + data.preview_mode);\n\n// ============================================\n// COULEURS CENTRALISÉES DU THÈME GOB\n// ============================================\nconst theme = {\n  colors: {\n    primary: '#6366f1',\n    primaryDark: '#4f46e5',\n    primaryLight: '#8b5cf6',\n    success: '#10b981',\n    text: {\n      dark: '#1f2937',\n      medium: '#4b5563',\n      light: '#6b7280',\n      muted: '#9ca3af'\n    },\n    background: {\n      white: '#ffffff',\n      light: '#f8fafc',\n      medium: '#f1f5f9',\n      dark: '#e2e8f0'\n    },\n    border: {\n      light: '#e5e7eb',\n      medium: '#d1d5db'\n    }\n  },\n  gradients: {\n    primary: 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%)',\n    primaryAlt: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',\n    secondary: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'\n  },\n  email: {\n    fonts: {\n      primary: \"'Inter', 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif\"\n    },\n    spacing: {\n      containerMaxWidth: '900px',\n      padding: {\n        small: '20px',\n        medium: '30px',\n        large: '40px'\n      },\n      borderRadius: {\n        small: '8px',\n        medium: '12px',\n        large: '16px'\n      }\n    },\n    shadows: {\n      small: '0 2px 4px rgba(0, 0, 0, 0.05)',\n      medium: '0 4px 6px rgba(0, 0, 0, 0.1)',\n      large: '0 10px 25px rgba(99, 102, 241, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',\n      primary: '0 4px 12px rgba(99, 102, 241, 0.15)'\n    }\n  }\n};\n\n// Fonction pour convertir markdown en HTML\nfunction markdownToHtml(text) {\n  if (!text) return '';\n  \n  let html = text;\n  \n  // Convertir les tableaux markdown en HTML\n  const tableRegex = /\\|(.+)\\|\\n\\|([-|\\s]+)\\|\\n((?:\\|.+\\|\\n?)+)/g;\n  html = html.replace(tableRegex, function(match, header, separator, rows) {\n    const headers = header.split('|').map(function(h) { return h.trim(); }).filter(function(h) { return h; });\n    const rowLines = rows.trim().split('\\n').filter(function(r) { return r.trim(); });\n    \n    let tableHtml = '<table style=\"width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; background: ' + theme.colors.background.white + ';\">';\n    \n    // En-têtes avec gradient primary\n    tableHtml += '<thead><tr style=\"background: ' + theme.gradients.primary + '; color: white;\">';\n    headers.forEach(function(h) {\n      tableHtml += '<th style=\"padding: 12px; text-align: left; border: 1px solid rgba(255,255,255,0.2); font-weight: 600; letter-spacing: 0.3px;\">' + h.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') + '</th>';\n    });\n    tableHtml += '</tr></thead><tbody>';\n    \n    // Lignes avec alternance\n    rowLines.forEach(function(row, idx) {\n      const cells = row.split('|').map(function(c) { return c.trim(); }).filter(function(c) { return c; });\n      if (cells.length > 0 && !cells[0].match(/^[-|\\s]+$/)) {\n        const bgColor = idx % 2 === 0 ? theme.colors.background.white : theme.colors.background.light;\n        tableHtml += '<tr style=\"background: ' + bgColor + '; transition: background 0.2s;\">';\n        cells.forEach(function(cell) {\n          let cellContent = cell.replace(/\\*\\*(.*?)\\*\\*/g, '<strong style=\"color: ' + theme.colors.primary + ';\">$1</strong>');\n          cellContent = cellContent.replace(/\\*(.*?)\\*/g, '<em>$1</em>');\n          cellContent = cellContent.replace(/🏆/g, '<span style=\"color: ' + theme.colors.success + '; font-size: 16px;\">🏆</span>');\n          tableHtml += '<td style=\"padding: 10px; border: 1px solid ' + theme.colors.border.light + '; color: ' + theme.colors.text.dark + ';\">' + cellContent + '</td>';\n        });\n        tableHtml += '</tr>';\n      }\n    });\n    \n    tableHtml += '</tbody></table>';\n    return tableHtml;\n  });\n  \n  // Convertir **gras** avec couleur primary\n  html = html.replace(/\\*\\*(.*?)\\*\\*/g, '<strong style=\"color: ' + theme.colors.primary + '; font-weight: 700;\">$1</strong>');\n  \n  // Convertir *italique*\n  html = html.replace(/\\*(?!\\*)(.*?)\\*(?!\\*)/g, '<em style=\"color: ' + theme.colors.text.medium + ';\">$1</em>');\n  \n  // Convertir les titres\n  html = html.replace(/^###\\s+(.+)$/gm, '<h3 style=\"margin-top: 24px; margin-bottom: 12px; color: ' + theme.colors.primary + '; font-size: 18px; font-weight: 600; border-left: 4px solid ' + theme.colors.primaryLight + '; padding-left: 12px;\">$1</h3>');\n  html = html.replace(/^##\\s+(.+)$/gm, '<h2 style=\"margin-top: 28px; margin-bottom: 16px; color: ' + theme.colors.primaryDark + '; font-size: 22px; font-weight: 700; border-bottom: 3px solid ' + theme.colors.primary + '; padding-bottom: 8px;\">$1</h2>');\n  html = html.replace(/^#\\s+(.+)$/gm, '<h1 style=\"margin-top: 32px; margin-bottom: 20px; color: ' + theme.colors.primaryDark + '; font-size: 26px; font-weight: 700;\">$1</h1>');\n  \n  // Convertir les listes\n  html = html.replace(/^[-•]\\s+(.+)$/gm, '<li style=\"margin-left: 20px; margin-bottom: 6px; color: ' + theme.colors.text.dark + '; position: relative; padding-left: 8px;\"><span style=\"position: absolute; left: -12px; color: ' + theme.colors.primary + ';\">•</span>$1</li>');\n  html = html.replace(/(<li.*?<\\/li>\\n?)+/g, '<ul style=\"margin: 16px 0; padding-left: 20px; list-style: none;\">$&</ul>');\n  \n  // Convertir les séparateurs\n  html = html.replace(/^---+$/gm, '<hr style=\"border: none; border-top: 2px solid ' + theme.colors.primary + '; margin: 24px 0; opacity: 0.3;\">');\n  \n  // Convertir les sauts de ligne\n  html = html.replace(/\\n\\n/g, '</p><p style=\"margin-bottom: 12px; color: ' + theme.colors.text.dark + '; line-height: 1.7;\">');\n  html = html.replace(/\\n/g, '<br>');\n  \n  // Encapsuler dans des paragraphes\n  if (!html.startsWith('<')) html = '<p style=\"margin-bottom: 12px; color: ' + theme.colors.text.dark + '; line-height: 1.7;\">' + html;\n  if (!html.endsWith('>')) html = html + '</p>';\n  \n  return html;\n}\n\n// Map prompt types to French\nconst promptTypeFrench = {\n  'morning': 'MATIN',\n  'noon': 'MIDI',\n  'evening': 'SOIR',\n  'custom': 'PERSONNALISÉE'\n};\n\nconst editionType = promptTypeFrench[data.prompt_type] || (data.prompt_type ? data.prompt_type.toUpperCase() : 'PERSONNALISÉE');\n\n// Formatage des métadonnées\nconst now = new Date();\nconst generationTime = now.toLocaleString('fr-FR', { \n  weekday: 'long', \n  year: 'numeric', \n  month: 'long', \n  day: 'numeric',\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'America/Montreal'\n});\n\nconst triggerType = data.trigger_type || 'Manuel';\nconst emmaModel = data.emma_model || 'perplexity';\nconst emmaTools = Array.isArray(data.emma_tools) ? data.emma_tools : [];\n\n// Ajouter le preheader avant le container\nhtmlParts.push('  <!-- Preheader text (invisible mais visible dans l\\'apercu) -->');\nhtmlParts.push('  <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\">');\nhtmlParts.push('    ' + preheaderText);\nhtmlParts.push('  </div>');\nhtmlParts.push('  <div class=\"container\">');\n\n\n\n\n\n\nconst emmaExecutionTime = data.emma_execution_time || 0;\nconst emmaConfidence = data.emma_confidence || null;\n\n// Convertir le contenu markdown en HTML\nconst formattedContent = markdownToHtml(data.newsletter_content || '');\n\n// ============================================\n// CONSTRUCTION DU HTML (SANS BACKTICKS)\n// ============================================\n\n// Extraire le texte pour le preheader (aperçu dans la boîte de réception)\nfunction extractPreheaderText(content) {\n  if (!content) return 'Newsletter Financière Emma - Analyse de marché';\n  \n  // Enlever le markdown et extraire le premier paragraphe\n  let text = content\n    .replace(/^#+\\s+/gm, '') // Enlever les titres\n    .replace(/\\*\\*([^*]+)\\*\\*/g, '$1') // Enlever le gras\n    .replace(/\\*([^*]+)\\*/g, '$1') // Enlever l'italique\n    .replace(/\\|/g, ' ') // Enlever les tableaux\n    .replace(/\\n+/g, ' ') // Remplacer les sauts de ligne\n    .trim();\n  \n  // Prendre les 120 premiers caractères\n  if (text.length > 120) {\n    text = text.substring(0, 120).trim() + '...';\n  }\n  \n  return text || 'Newsletter Financière Emma - Analyse de marché';\n}\n\nconst preheaderText = extractPreheaderText(data.newsletter_content || '');\n\nconst htmlParts = [\n  '<!DOCTYPE html>',\n  '<html lang=\"fr\">',\n  '<head>',\n  '  <meta charset=\"utf-8\">',\n  '  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">',\n  '  <title>Newsletter Financière Emma</title>',\n  '  <style>',\n  '    * { margin: 0; padding: 0; box-sizing: border-box; }',\n  '    body { ',\n  '      font-family: ' + theme.email.fonts.primary + '; ',\n  '      line-height: 1.7; ',\n  '      color: ' + theme.colors.text.dark + '; ',\n  '      background: linear-gradient(135deg, ' + theme.colors.background.light + ' 0%, ' + theme.colors.background.dark + ' 100%);',\n  '      padding: ' + theme.email.spacing.padding.small + ';',\n  '    }',\n  '    .container {',\n  '      max-width: ' + theme.email.spacing.containerMaxWidth + ';',\n  '      margin: 0 auto;',\n  '      background: ' + theme.colors.background.white + ';',\n  '      border-radius: ' + theme.email.spacing.borderRadius.large + ';',\n  '      overflow: hidden;',\n  '      box-shadow: ' + theme.email.shadows.large + ';',\n  '    }',\n  '    .header { ',\n  '      background: ' + theme.gradients.primary + '; ',\n  '      color: white; ',\n  '      padding: ' + theme.email.spacing.padding.large + ' ' + theme.email.spacing.padding.medium + '; ',\n  '      text-align: center;',\n  '      position: relative;',\n  '      overflow: hidden;',\n  '    }',\n  '    .header::before {',\n  '      content: \"\";',\n  '      position: absolute;',\n  '      top: -50%;',\n  '      right: -50%;',\n  '      width: 200%;',\n  '      height: 200%;',\n  '      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);',\n  '      animation: shimmer 3s ease-in-out infinite;',\n  '    }',\n  '    @keyframes shimmer {',\n  '      0%, 100% { transform: translate(0, 0) rotate(0deg); }',\n  '      50% { transform: translate(-10px, -10px) rotate(5deg); }',\n  '    }',\n  '    .header h1 { ',\n  '      margin: 0; ',\n  '      font-size: 34px; ',\n  '      font-weight: 800;',\n  '      letter-spacing: -0.5px;',\n  '      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);',\n  '      position: relative;',\n  '      z-index: 1;',\n  '    }',\n  '    .subtitle { ',\n  '      margin-top: 12px; ',\n  '      opacity: 0.95; ',\n  '      font-size: 14px;',\n  '      font-weight: 600;',\n  '      letter-spacing: 0.5px;',\n  '      text-transform: uppercase;',\n  '      position: relative;',\n  '      z-index: 1;',\n  '    }',\n  '    .metadata-box {',\n  '      background: ' + theme.colors.background.medium + ';',\n  '      padding: 24px ' + theme.email.spacing.padding.medium + ';',\n  '      border-bottom: 3px solid ' + theme.colors.primary + ';',\n  '    }',\n  '    .metadata-box table {',\n  '      width: 100%;',\n  '      border-collapse: collapse;',\n  '      font-size: 13px;',\n  '    }',\n  '    .metadata-box td {',\n  '      padding: 8px 12px;',\n  '      border-bottom: 1px solid ' + theme.colors.border.light + ';',\n  '    }',\n  '    .metadata-box td:first-child {',\n  '      font-weight: 700;',\n  '      color: ' + theme.colors.primaryDark + ';',\n  '      width: 150px;',\n  '      font-size: 12px;',\n  '      text-transform: uppercase;',\n  '      letter-spacing: 0.5px;',\n  '    }',\n  '    .metadata-box td:last-child {',\n  '      color: ' + theme.colors.text.dark + ';',\n  '      font-weight: 500;',\n  '    }',\n  '    .metadata-box .badge {',\n  '      display: inline-block;',\n  '      padding: 6px 14px;',\n  '      border-radius: 20px;',\n  '      font-size: 11px;',\n  '      font-weight: 700;',\n  '      background: ' + theme.gradients.primary + ';',\n  '      color: white;',\n  '      text-transform: uppercase;',\n  '      letter-spacing: 0.5px;',\n  '      box-shadow: ' + theme.email.shadows.primary + ';',\n  '    }',\n  '    .content { ',\n  '      background: ' + theme.colors.background.white + '; ',\n  '      padding: ' + theme.email.spacing.padding.large + ' ' + theme.email.spacing.padding.medium + ';',\n  '    }',\n  '    .analysis { ',\n  '      background: ' + theme.colors.background.light + '; ',\n  '      padding: 35px; ',\n  '      border-radius: ' + theme.email.spacing.borderRadius.medium + '; ',\n  '      margin-bottom: 25px; ',\n  '      border-left: 5px solid ' + theme.colors.primary + ';',\n  '      box-shadow: ' + theme.email.shadows.medium + ';',\n  '      line-height: 1.8;',\n  '    }',\n  '    .analysis p {',\n  '      margin-bottom: 14px;',\n  '      color: ' + theme.colors.text.dark + ';',\n  '    }',\n  '    .analysis h2, .analysis h3 {',\n  '      margin-top: 24px;',\n  '      margin-bottom: 12px;',\n  '    }',\n  '    .analysis table {',\n  '      margin: 20px 0;',\n  '      overflow-x: auto;',\n  '      display: block;',\n  '    }',\n  '    .ticker-box {',\n  '      margin-top: 25px; ',\n  '      padding: 24px; ',\n  '      background: ' + theme.gradients.primaryAlt + ';',\n  '      border-radius: ' + theme.email.spacing.borderRadius.medium + ';',\n  '      border: 2px solid ' + theme.colors.primary + ';',\n  '      box-shadow: ' + theme.email.shadows.primary + ';',\n  '    }',\n  '    .ticker-box strong {',\n  '      color: white;',\n  '      font-size: 16px;',\n  '      display: block;',\n  '      margin-bottom: 10px;',\n  '      font-weight: 700;',\n  '      text-transform: uppercase;',\n  '      letter-spacing: 0.5px;',\n  '    }',\n  '    .ticker-list {',\n  '      color: rgba(255, 255, 255, 0.95);',\n  '      font-weight: 600;',\n  '      font-size: 15px;',\n  '    }',\n  '    .footer { ',\n  '      text-align: center; ',\n  '      padding: ' + theme.email.spacing.padding.medium + ';',\n  '      background: ' + theme.colors.background.medium + ';',\n  '      border-top: 2px solid ' + theme.colors.border.light + ';',\n  '    }',\n  '    .footer p {',\n  '      margin: 8px 0;',\n  '      font-size: 13px;',\n  '      color: ' + theme.colors.text.medium + ';',\n  '    }',\n  '    .footer .powered-by {',\n  '      font-weight: 700;',\n  '      color: ' + theme.colors.primaryDark + ';',\n  '      font-size: 14px;',\n  '      text-transform: uppercase;',\n  '      letter-spacing: 0.5px;',\n  '    }',\n  '    .footer .powered-by::before {',\n  '      content: \"⚡ \";',\n  '      color: ' + theme.colors.success + ';',\n  '    }',\n  '  </style>',\n  '</head>',\n  '<body>'\n\n  '  <!-- Preheader text (invisible mais visible dans l'apercu) -->',\n  '  <div style=\"display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;\">',\n  '    ' + preheaderText,\n  '  </div>',\n,\n  '  <div class=\"container\">',\n  '    <div class=\"header\">',\n  '      <h1>📊 Newsletter Financière Emma</h1>',\n  '      <div class=\"subtitle\">ÉDITION DU ' + editionType + ' | ' + now.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</div>',\n  '    </div>',\n  '    <div class=\"metadata-box\">',\n  '      <table>',\n  '        <tr>',\n  '          <td>🕐 Heure de génération:</td>',\n  '          <td><strong>' + generationTime + '</strong></td>',\n  '        </tr>',\n  '        <tr>',\n  '          <td>⚡ Déclencheur:</td>',\n  '          <td><span class=\"badge\">' + triggerType + '</span></td>',\n  '        </tr>',\n  '        <tr>',\n  '          <td>🤖 Modèle Emma:</td>',\n  '          <td><strong style=\"color: ' + theme.colors.primaryDark + ';\">' + emmaModel.toUpperCase() + '</strong></td>',\n  '        </tr>'\n];\n\n// Ajouter les lignes conditionnelles\nif (emmaTools.length > 0) {\n  htmlParts.push('        <tr>');\n  htmlParts.push('          <td>🔧 Outils utilisés:</td>');\n  htmlParts.push('          <td><span style=\"color: ' + theme.colors.text.medium + ';\">' + emmaTools.join(', ') + '</span></td>');\n  htmlParts.push('        </tr>');\n}\n\nif (emmaExecutionTime > 0) {\n  htmlParts.push('        <tr>');\n  htmlParts.push('          <td>⏱️ Temps d\\'exécution:</td>');\n  htmlParts.push('          <td><strong style=\"color: ' + theme.colors.success + ';\">' + (emmaExecutionTime / 1000).toFixed(1) + 's</strong></td>');\n  htmlParts.push('        </tr>');\n}\n\nif (emmaConfidence !== null) {\n  htmlParts.push('        <tr>');\n  htmlParts.push('          <td>📊 Confiance:</td>');\n  htmlParts.push('          <td><strong style=\"color: ' + theme.colors.primaryDark + ';\">' + (emmaConfidence * 100).toFixed(0) + '%</strong></td>');\n  htmlParts.push('        </tr>');\n}\n\n// Suite du HTML\nhtmlParts.push('      </table>');\nhtmlParts.push('    </div>');\nhtmlParts.push('    <div class=\"content\">');\nhtmlParts.push('      <div class=\"analysis\">');\nhtmlParts.push('        ' + formattedContent);\nhtmlParts.push('      </div>');\n\nif (data.tickers) {\n  htmlParts.push('      <div class=\"ticker-box\">');\n  htmlParts.push('        <strong>📈 Tickers suivis :</strong>');\n  htmlParts.push('        <div class=\"ticker-list\">' + data.tickers + '</div>');\n  htmlParts.push('      </div>');\n}\n\nhtmlParts.push('    </div>');\nhtmlParts.push('    <div class=\"footer\">');\nhtmlParts.push('      <p class=\"powered-by\">Généré par Emma IA | Propulsé par ' + (emmaModel === 'perplexity' ? 'Perplexity' : 'Gemini') + '</p>');\nhtmlParts.push('      <p>Ceci est une newsletter automatisée. Merci de ne pas répondre à cet email.</p>');\nhtmlParts.push('    </div>');\nhtmlParts.push('  </div>');\nhtmlParts.push('</body>');\nhtmlParts.push('</html>');\n\n// Joindre toutes les parties\nconst html = htmlParts.join('\\n');\n\nconst subjectMap = {\n  'morning': 'Matin',\n  'noon': 'Midi',\n  'evening': 'Soir',\n  'custom': 'Personnalisée'\n};\n\nconst subjectType = subjectMap[data.prompt_type] || data.prompt_type;\n\nreturn [{\n  json: {\n    ...data,\n    html_content: html,\n    subject: 'Newsletter Emma - Mise à jour du ' + subjectType\n  }\n}];"
       },
       "id": "9f33f73d-349d-48b3-8d6a-a49184737384",
       "name": "Generate HTML Newsletter",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20224,
-        4536
+        23872,
+        6400
       ]
     },
     {
@@ -237,8 +236,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        20448,
-        4536
+        24544,
+        6400
       ]
     },
     {
@@ -278,8 +277,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        20672,
-        4536
+        24768,
+        6400
       ],
       "credentials": {
         "supabaseApi": {
@@ -317,8 +316,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        20896,
-        4536
+        24992,
+        6400
       ],
       "credentials": {
         "supabaseApi": {
@@ -365,8 +364,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        18656,
-        4464
+        20832,
+        6016
       ]
     },
     {
@@ -388,8 +387,8 @@
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.3,
       "position": [
-        18432,
-        4680
+        20832,
+        6592
       ],
       "credentials": {
         "gmailOAuth2": {
@@ -410,8 +409,8 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        18432,
-        4872
+        20832,
+        6784
       ],
       "webhookId": "1d4fb668-97ac-440c-9a17-8656ae9083a8",
       "credentials": {
@@ -465,8 +464,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        18656,
-        4776
+        21056,
+        6688
       ]
     },
     {
@@ -498,13 +497,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        19552,
-        4536
+        22976,
+        6112
       ]
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "=https://gob-projetsjsls-projects.vercel.app/api/briefing-prompts",
         "sendHeaders": true,
         "headerParameters": {
@@ -528,8 +526,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        18528,
-        4464
+        21056,
+        5920
       ]
     },
     {
@@ -541,8 +539,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20320,
-        4536
+        23200,
+        6448
       ]
     },
     {
@@ -554,28 +552,27 @@
               "value2": true
             }
           ]
-        }
+        },
+        "options": {}
       },
       "id": "approval-check",
       "name": "Check Approval",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        19904,
-        4536
+        23648,
+        6448
       ]
     },
     {
-      "parameters": {
-        "message": "=📋 PRÉVISUALISATION DU BRIEFING\n\n✅ Le briefing a été généré avec succès.\n\n📊 Métadonnées :\n- Type : {{ $json.prompt_type }}\n- Modèle : {{ $json.emma_model }}\n- Outils utilisés : {{ $json.emma_tools.join(', ') }}\n- Temps d'exécution : {{ ($json.emma_execution_time / 1000).toFixed(1) }}s\n- Longueur : {{ $json.content_length }} caractères\n\n📝 Aperçu (500 premiers caractères) :\n{{ $json.content }}\n\n⚠️ Pour approuver et envoyer, modifiez le nœud \"Preview Briefing Content\" et définissez \"approved\" à true, puis réexécutez.\n\n💡 Astuce : Vous pouvez aussi modifier le prompt dans \"Custom Prompt Input\" et réexécuter pour tester différentes versions."
-      },
+      "parameters": {},
       "id": "preview-message",
       "name": "Preview Message",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        20640,
-        4536
+        23424,
+        6448
       ]
     },
     {
@@ -596,8 +593,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        20320,
-        4536
+        23648,
+        6208
       ]
     },
     {
@@ -609,21 +606,19 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20640,
-        4436
+        23872,
+        6160
       ]
     },
     {
-      "parameters": {
-        "message": "=📋 PRÉVISUALISATION\n\n{{ $json.preview_message }}\n\n⚠️ Pour envoyer, modifiez \"approved\" à true dans \"Custom Prompt Input\" et réexécutez."
-      },
+      "parameters": {},
       "id": "preview-stop",
       "name": "Preview Stop",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        20960,
-        4436
+        24096,
+        6160
       ]
     },
     {
@@ -638,8 +633,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        17760,
-        4072
+        20384,
+        5344
       ],
       "webhookId": "emma-preview-webhook"
     },
@@ -652,8 +647,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20544,
-        4536
+        20384,
+        7440
       ]
     },
     {
@@ -667,13 +662,12 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        20864,
-        4536
+        20608,
+        7440
       ]
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "=https://gob-projetsjsls-projects.vercel.app/api/email-recipients",
         "sendHeaders": true,
         "headerParameters": {
@@ -697,21 +691,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        20384,
-        4536
+        24096,
+        6400
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Récupérer le type de briefing depuis les données précédentes\nconst briefingType = $('Determine Time-Based Prompt').item.json.prompt_type || 'custom';\nconst previewMode = $('Custom Prompt Input').item.json.preview_mode || false;\n\n// Normaliser le type\nlet normalizedType = briefingType;\nif (normalizedType === 'noon') {\n  normalizedType = 'midday';\n}\n\n// Récupérer les destinataires depuis l'API\nconst recipientsData = data.recipients || [];\nconst previewEmail = data.preview_email || 'projetsjsl@gmail.com';\n\nlet emailList = [];\n\nif (previewMode === true) {\n  // Mode preview : utiliser l'email de preview\n  emailList = [previewEmail];\n} else {\n  // Mode envoi : utiliser les destinataires actifs du type\n  emailList = recipientsData\n    .filter(r => r.active && r[normalizedType])\n    .map(r => r.email);\n  \n  // Fallback si aucun destinataire trouvé\n  if (emailList.length === 0) {\n    emailList = [previewEmail];\n  }\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    recipients: emailList,\n    recipient_count: emailList.length,\n    briefing_type: normalizedType,\n    preview_mode: previewMode\n  }\n}));"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Les données viennent de \"Fetch Email Recipients\" qui retourne { recipients: [...], success: true }\n// On doit récupérer html_content, subject, prompt_type et preview_mode depuis \"Generate HTML Newsletter\"\n\n// Méthode 1 : Utiliser les données disponibles dans le flux actuel\nlet briefingType = data.prompt_type || data.briefing_type || 'custom';\nlet previewMode = data.preview_mode !== undefined ? data.preview_mode : false;\nlet htmlContent = data.html_content || '';\nlet subject = data.subject || '';\n\n// Méthode 2 : Essayer d'accéder aux nœuds précédents dans le flux d'exécution\n// Note: Dans n8n, $() permet d'accéder aux données des nœuds précédents\n// mais seulement si ces nœuds sont dans le flux d'exécution actuel\n\n// Essayer depuis \"Generate HTML Newsletter\" (juste avant \"Fetch Email Recipients\")\ntry {\n  const generateHtmlData = $('Generate HTML Newsletter').item?.json;\n  if (generateHtmlData) {\n    // IMPORTANT : Préserver html_content et subject depuis \"Generate HTML Newsletter\"\n    htmlContent = generateHtmlData.html_content || htmlContent;\n    subject = generateHtmlData.subject || subject;\n    \n    // Préserver aussi prompt_type et preview_mode\n    briefingType = generateHtmlData.prompt_type || briefingType;\n    previewMode = generateHtmlData.preview_mode !== undefined ? generateHtmlData.preview_mode : previewMode;\n    \n    console.log('✅ Données récupérées depuis Generate HTML Newsletter');\n  }\n} catch (e) {\n  console.warn('⚠️  Generate HTML Newsletter non accessible, tentative d\\'autres nœuds...');\n  \n  try {\n    // Essayer depuis \"Parse API Response\"\n    const parseApiData = $('Parse API Response').item?.json;\n    if (parseApiData) {\n      briefingType = parseApiData.prompt_type || briefingType;\n      previewMode = parseApiData.preview_mode !== undefined ? parseApiData.preview_mode : previewMode;\n      console.log('✅ Données récupérées depuis Parse API Response');\n    }\n  } catch (e2) {\n    console.warn('⚠️  Parse API Response non accessible, utilisation des valeurs par défaut');\n  }\n}\n\n// Normaliser le type\nlet normalizedType = briefingType;\nif (normalizedType === 'noon') {\n  normalizedType = 'midday';\n}\n\n// Récupérer les destinataires depuis l'API (données de \"Fetch Email Recipients\")\nconst recipientsData = data.recipients || [];\nconst previewEmail = data.preview_email || 'projetsjsl@gmail.com';\n\nlet emailList = [];\n\nif (previewMode === true) {\n  // Mode preview : utiliser l'email de preview\n  emailList = [previewEmail];\n  console.log('📧 Mode preview activé');\n} else {\n  // Mode envoi : utiliser les destinataires actifs du type\n  emailList = recipientsData\n    .filter(r => r.active && r[normalizedType])\n    .map(r => r.email);\n  \n  console.log(`📧 Mode envoi, type: ${normalizedType}, destinataires: ${emailList.length}`);\n  \n  // Fallback si aucun destinataire trouvé\n  if (emailList.length === 0) {\n    emailList = [previewEmail];\n    console.warn('⚠️  Aucun destinataire actif, utilisation de l\\'email de preview');\n  }\n}\n\n// Vérifier que html_content et subject sont présents\nif (!htmlContent) {\n  console.warn('⚠️  html_content manquant, le nœud Send Email via Resend pourrait échouer');\n}\nif (!subject) {\n  console.warn('⚠️  subject manquant, utilisation d\\'un sujet par défaut');\n  subject = subject || `Newsletter Emma - Mise à jour du ${normalizedType}`;\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    // Données de destinataires\n    recipients: emailList,\n    recipient_count: emailList.length,\n    briefing_type: normalizedType,\n    preview_mode: previewMode,\n    prompt_type: briefingType,\n    // IMPORTANT : Préserver html_content et subject pour \"Send Email via Resend\"\n    html_content: htmlContent,\n    subject: subject\n  }\n}));"
       },
       "id": "process-recipients-node",
       "name": "Process Recipients",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20544,
-        4536
+        24320,
+        6400
       ]
     },
     {
@@ -752,8 +746,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        18656,
-        4264
+        20832,
+        5632
       ]
     },
     {
@@ -794,8 +788,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        18656,
-        4364
+        20832,
+        5824
       ]
     },
     {
@@ -836,8 +830,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        18656,
-        4564
+        20832,
+        6208
       ]
     },
     {
@@ -878,8 +872,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        18656,
-        4664
+        20832,
+        6400
       ]
     },
     {
@@ -891,29 +885,31 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20160,
-        4536
+        23424,
+        6208
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $json.gemini_api_key }}"
+            }
+          ]
+        },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Content-Type",
               "value": "application/json"
-            }
-          ]
-        },
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "key",
-              "value": "={{ $env.GEMINI_API_KEY }}"
             }
           ]
         },
@@ -933,9 +929,15 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        19552,
-        4736
-      ]
+        22752,
+        6304
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "0D5m3nEBknRtHnmZ",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
     },
     {
       "parameters": {
@@ -946,30 +948,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20000,
-        4736
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{ $json.ai_model }}",
-              "operation": "equals",
-              "value2": "emma"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "ai-model-selector-switch",
-      "name": "Choose AI Model (IF)",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        19264,
-        4536
+        22976,
+        6304
       ]
     },
     {
@@ -981,9 +961,163 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        19264,
-        4536
+        21728,
+        6208
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// 🔑 EXTRACTION DE LA CLÉ API GEMINI DEPUIS LA RÉPONSE VERCEL\n// ═══════════════════════════════════════════════════════════\n//\n// Ce nœud extrait la clé API Gemini depuis la réponse de l'endpoint Vercel\n//\n// ✅ Configuration automatique - Aucune action requise !\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\nconst data = items[0].json;\n\nlet geminiApiKey = '';\n\ntry {\n  // La réponse de l'endpoint Vercel est dans $json\n  // Format: { apiKey: \"...\", configured: true, ... }\n  if (data.apiKey) {\n    geminiApiKey = data.apiKey;\n    console.log('✅ Clé API Gemini récupérée depuis Vercel');\n  } else if (data.error) {\n    throw new Error(`Erreur Vercel: ${data.message || data.error}`);\n  } else {\n    // Fallback : essayer depuis les credentials n8n\n    geminiApiKey = $workflow.getStaticData('global').geminiApiKey || '';\n    \n    if (!geminiApiKey) {\n      throw new Error('Clé API non trouvée. Vérifiez que GEMINI_API_KEY est configurée dans Vercel.');\n    }\n    \n    console.log('⚠️  Utilisation de la clé depuis les credentials n8n (fallback)');\n  }\n} catch (error) {\n  console.error('❌ Erreur:', error.message);\n  throw new Error(`❌ Impossible de récupérer la clé API Gemini: ${error.message}`);\n}\n\nif (!geminiApiKey) {\n  throw new Error('❌ Clé API Gemini vide');\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    gemini_api_key: geminiApiKey\n  }\n}));"
+      },
+      "id": "gemini-api-key-node",
+      "name": "Get Gemini API Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        22528,
+        6304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://gob-projetsjsls-projects.vercel.app/api/gemini-key?full=true",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fetch-gemini-api-key-node",
+      "name": "Fetch Gemini API Key from Vercel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        22240,
+        6304
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.ai_model }}",
+                    "rightValue": "emma",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e15020a5-785c-4bf2-be14-7a2a338e9c34"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Emma"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "602d5987-7966-46b0-bca6-1bc86f245316",
+                    "leftValue": "={{ $json.ai_model }}",
+                    "rightValue": "gemini",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Gemini"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        21952,
+        6208
+      ],
+      "id": "6f67bbb2-07a7-46be-9b7a-1735ba3e3c5b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        20384,
+        7120
+      ],
+      "id": "339cad82-0be3-4fbb-a420-f8e9a9d2f805",
+      "name": "When chat message received",
+      "webhookId": "9663354b-9871-49c0-aaee-3992c85a12ec"
+    },
+    {
+      "parameters": {
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        20608,
+        7008
+      ],
+      "id": "90188c41-16ed-4cc6-bf45-b473e44872ee",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        20688,
+        7232
+      ],
+      "id": "21c86760-5e53-4acd-b4a3-223a3b69c361",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "0D5m3nEBknRtHnmZ",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
     }
   ],
   "connections": {
@@ -1255,13 +1389,6 @@
             "type": "main",
             "index": 0
           }
-        ],
-        [
-          {
-            "node": "Preview Display",
-            "type": "main",
-            "index": 0
-          }
         ]
       ]
     },
@@ -1386,14 +1513,36 @@
       "main": [
         [
           {
-            "node": "Choose AI Model (IF)",
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Choose AI Model (IF)": {
+    "Get Gemini API Key": {
+      "main": [
+        [
+          {
+            "node": "Call Gemini API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Gemini API Key from Vercel": {
+      "main": [
+        [
+          {
+            "node": "Get Gemini API Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
       "main": [
         [
           {
@@ -1404,7 +1553,29 @@
         ],
         [
           {
-            "node": "Call Gemini API",
+            "node": "Fetch Gemini API Key from Vercel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
             "type": "main",
             "index": 0
           }
@@ -1434,10 +1605,58 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
-  "pinData": {},
-  "versionId": "93c08e11-d5f9-4bfe-a9fb-6ec3682e8e36",
-  "versionCounter": 67,
-  "triggerCount": 4,
+  "pinData": {
+    "Call /api/chat (Emma)": [
+      {
+        "json": {
+          "success": true,
+          "response": "Bonsoir n8n-automation,  \nVoici votre synthèse personnalisée de la séance boursière du vendredi 7 novembre 2025, marquée par une volatilité sectorielle contrastée et des mouvements significatifs sur plusieurs titres phares de votre univers d’investissement.\n\n---\n\n**1. Ouverture**  \nLa séance s’est ouverte sous le signe de l’incertitude, avec des marchés oscillant entre prises de bénéfices en début de journée et rebonds techniques sur les valeurs technologiques et santé en clôture. Les investisseurs restent attentifs aux prochaines publications et à la trajectoire des taux.\n\n---\n\n**2. Clôture des marchés**  \n- **S&P 500** : -0,3% à 5 086 points.  \n- **Nasdaq** : +0,5% à 17 120 points, soutenu par la tech.  \n- **TSX (Canada)** : -0,4% à 21 780 points.  \nLes volumes de transactions sont restés dans la moyenne, avec une accélération sur les bancaires et la tech en fin de séance (source : FMP Fundamentals, Polygon).\n\n---\n\n**3. Secteurs performants**\n- **En hausse :**  \n   - **Technologie** (+1,2%) : Alphabet (GOOGL) et le segment IA tirent le secteur, portés par des résultats supérieurs et des anticipations de croissance durable.\n   - **Énergie** (+1,1%) : Reprise des cours du pétrole, bénéfique pour les valeurs de services et d’infrastructure.\n   - **Santé** : Big pharma (JNJ, PFE) en rebond modéré, rotation vers la qualité en période d’incertitude macro.\n\n- **En baisse :**  \n   - **Télécoms** : BCE, VZ et T pénalisés par la pression sur les marges et la concurrence accrue (-1,5%).\n   - **Banques canadiennes** : BNS, TD sous pression (-0,7% à -1,1%), inquiétudes persistantes sur le crédit et la rentabilité.\n   - **Consommation discrétionnaire** : NKE, CVS affectés par la prudence des ménages.\n\n---\n\n**4. Tickers d’équipe – Bilan et analyse**\n- **GOOGL (Alphabet)** : +0,8% à 278,83$. P/E de 27,1x (vs secteur tech 28x), ROE très élevé à 35%. Marge nette impressionnante (32%), dette quasi nulle, moat technologique majeur, momentum IA solide.  \n- **BNS (Banque Scotia)** : -0,7% à 66,70$. P/E à 16,1x, ROE faible à 8,6%, payout ratio élevé (81%), dette/capitaux propres massive (5,8x). Pression sur la croissance et la qualité du crédit.  \n- **TD (Toronto Dominion)** : -1,1% à 80,90$. P/E attractif à 9,3x, ROE robuste à 17,2%, marge nette 17,8%. Mieux positionnée que BNS, mais secteur bancaire sous tension.  \n- **BCE (Télécom)** : -1,5% à 23,19$. P/E élevé à 50,3x, marge nette faible à 2,5%, payout ratio surdimensionné (>500%), dette élevée. Défensif mais risque sur la soutenabilité du dividende.  \n- **CNR (Core Natural Resources)** : Stable à 89,41$. P/E extrême à 227x, ROE quasi nul (<1%), mais faible endettement. Le marché reste prudent sur la visibilité bénéficiaire.\n\n---\n\n**5. Événements marquants**  \n- Alphabet profite d’un nouvel engouement IA, plusieurs analystes anticipant une « croissance exponentielle » à moyen terme.\n- Les banques canadiennes pâtissent d’une montée des provisions et des craintes sur l’immobilier commercial.\n- Les télécoms subissent une révision à la baisse des perspectives de marges et des avertissements de plusieurs opérateurs.\n\n---\n\n**6. Perspective demain**  \nÀ surveiller : résultats de sociétés santé (MDT, JNJ), discours de la Fed et chiffres d’inflation US qui pourraient infléchir la courbe des taux. Les investisseurs seront attentifs à la résilience des dividendes dans les télécoms et à la qualité des actifs bancaires.\n\n---\n\n**7. Conseil Emma**  \nFace à la volatilité, privilégiez les valeurs à moat défensif, faible endettement et génération de cash-flow solide (GOOGL, TD). Limitez l’exposition aux télécoms et aux banques à faible rentabilité ou fort levier, en privilégiant la sélectivité dans vos arbitrages.\n\n---\n\n**8. Fermeture**  \nMerci n8n-automation pour votre confiance. Je reste à disposition pour approfondir l’analyse de tout titre spécifique ou élaborer une allocation sectorielle détaillée demain matin. Bonne soirée et à demain pour un nouveau point marché.\n\n*Sources : FMP Fundamentals, FMP Ratios, Polygon, actualités sectorielles au 9 novembre 2025.*",
+          "conversationId": "4c39bb0a-5adb-49e2-b77f-7ec22cc2437e",
+          "metadata": {
+            "user_id": "2fc99cf6-3dd8-4129-82c9-73ee478abe12",
+            "name": "n8n-automation",
+            "conversation_id": "4c39bb0a-5adb-49e2-b77f-7ec22cc2437e",
+            "model": "perplexity",
+            "llmUsed": "perplexity",
+            "tools_used": [
+              "fmp-fundamentals",
+              "fmp-quote",
+              "fmp-ticker-news",
+              "fmp-ratios",
+              "fmp-key-metrics",
+              "fmp-ratings",
+              "earnings-calendar",
+              "polygon-stock-price"
+            ],
+            "toolsUsed": [
+              "fmp-fundamentals",
+              "fmp-quote",
+              "fmp-ticker-news",
+              "fmp-ratios",
+              "fmp-key-metrics",
+              "fmp-ratings",
+              "earnings-calendar",
+              "polygon-stock-price"
+            ],
+            "failedTools": [
+              "fmp-quote"
+            ],
+            "confidence": 0.685,
+            "dataConfidence": 0.52,
+            "intent": "comparative_analysis",
+            "execution_time_ms": 39903,
+            "executionTimeMs": 41625,
+            "emmaExecutionTimeMs": 39903,
+            "channel": "web",
+            "messageCount": 11
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "13c9ccfb-f815-4243-bf1f-4d307a305f74",
+  "versionCounter": 286,
+  "triggerCount": 5,
   "shared": [
     {
       "updatedAt": "2025-10-20T18:16:03.747Z",
@@ -1460,7 +1679,7 @@
             "userId": "cf0c4ec1-d247-4b12-bc83-04a5c23649fb",
             "projectId": "qfcAzmlYYK6RvGCQ",
             "user": {
-              "updatedAt": "2025-11-08T16:33:34.000Z",
+              "updatedAt": "2025-11-08T21:18:26.370Z",
               "createdAt": "2025-09-24T01:26:53.819Z",
               "id": "cf0c4ec1-d247-4b12-bc83-04a5c23649fb",
               "email": "projetsjsl@gmail.com",
@@ -1475,10 +1694,11 @@
                 "userActivatedAt": 1760990286412,
                 "npsSurvey": {
                   "waitingForResponse": true,
-                  "ignoredCount": 1,
-                  "lastShownAt": 1762023542884
+                  "ignoredCount": 2,
+                  "lastShownAt": 1762636703931
                 }
               },
+              "disabled": false,
               "mfaEnabled": false,
               "lastActiveAt": "2025-11-08",
               "isPending": false

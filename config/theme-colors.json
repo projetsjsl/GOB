@@ -135,7 +135,7 @@
       "monospace": "monospace"
     },
     "spacing": {
-      "containerMaxWidth": "700px",
+      "containerMaxWidth": "900px",
       "padding": {
         "small": "20px",
         "medium": "30px",
