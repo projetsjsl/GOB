@@ -93,7 +93,8 @@
           ]
         },
         "includeOtherFields": true,
-        "options": {}
+        "options": {},
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // Valeurs par défaut pour preview (peuvent être surchargées par les config nodes)\n  const previewMode = data.preview_mode !== undefined ? data.preview_mode : true; // Par défaut preview\n  const approved = data.approved !== undefined ? data.approved : false; // Par défaut non approuvé\n  \n  return {\n    json: {\n      ...data,\n      preview_mode: previewMode,\n      approved: approved,\n      // Préserver le prompt personnalisé\n      custom_prompt: data.custom_prompt || data.prompt || ''\n    }\n  };\n});"
       },
       "id": "c3ecb545-83ea-4db2-ba56-a7104a702733",
       "name": "Custom Prompt Input",
