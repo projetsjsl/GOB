@@ -1251,6 +1251,11 @@
             "node": "Determine Time-Based Prompt",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Get Active Tickers",
+            "type": "main",
+            "index": 0
           }
         ]
       ]

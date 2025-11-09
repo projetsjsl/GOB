@@ -6,6 +6,7 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { fetchMultipleRSSFeeds, getAvailableRSSFeeds } from '../lib/rss-parser.js';
 
 // Charger la config de scoring
 let scoringConfig;
@@ -73,6 +74,13 @@ export default async function handler(req, res) {
     // Source 3: Finviz News (si ticker fourni)
     if (searchQuery && searchQuery.length <= 5) {
       newsPromises.push(fetchFinvizNews(searchQuery, maxLimit));
+    }
+
+    // Source 4: RSS Feeds (blogs et sources premium)
+    // Sélectionner les flux RSS selon le contexte
+    const rssFeeds = selectRSSFeedsForContext(context);
+    if (rssFeeds.length > 0) {
+      newsPromises.push(fetchRSSNews(rssFeeds, maxLimit, searchQuery));
     }
 
     // Attendre toutes les réponses
@@ -418,5 +426,42 @@ function findSourceKey(sourceName) {
   }
 
   return null;
+}
+
+/**
+ * Sélectionne les flux RSS selon le contexte
+ */
+function selectRSSFeedsForContext(context) {
+  const contextFeeds = {
+    general: ['seeking_alpha', 'zero_hedge', 'marketwatch', 'cnbc', 'forbes'],
+    crypto: ['coindesk', 'cointelegraph', 'cryptoslate'],
+    analysis: ['seeking_alpha', 'the_big_picture', 'calculated_risk', 'the_capital_spectator'],
+    sectorial: ['seeking_alpha', 'zero_hedge', 'the_big_picture']
+  };
+
+  return contextFeeds[context] || contextFeeds.general;
+}
+
+/**
+ * Récupère news depuis flux RSS
+ */
+async function fetchRSSNews(feedKeys, limit, query) {
+  try {
+    const articles = await fetchMultipleRSSFeeds(feedKeys, Math.ceil(limit / feedKeys.length));
+    
+    // Filtrer par query si fourni
+    if (query && query.length > 5) {
+      const queryLower = query.toLowerCase();
+      return articles.filter(article => 
+        article.title.toLowerCase().includes(queryLower) ||
+        (article.summary && article.summary.toLowerCase().includes(queryLower))
+      );
+    }
+
+    return articles;
+  } catch (error) {
+    console.error('❌ RSS news fetch error:', error.message);
+    return [];
+  }
 }
 
