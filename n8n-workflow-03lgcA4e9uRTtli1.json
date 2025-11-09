@@ -933,51 +933,6 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "ai-model-choice",
-              "name": "ai_model",
-              "value": "emma",
-              "type": "string"
-            }
-          ]
-        },
-        "includeOtherFields": true,
-        "options": {}
-      },
-      "id": "ai-model-config-node",
-      "name": "AI Model Config",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        19168,
-        4536
-      ]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "boolean": [
-            {
-              "value1": "={{ $json.ai_model === 'emma' }}",
-              "value2": true
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "choose-ai-model-if",
-      "name": "Choose AI Model?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        19488,
-        4536
-      ]
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
         "sendHeaders": true,
@@ -1029,6 +984,74 @@
       "position": [
         20000,
         4736
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.ai_model || 'emma' }}",
+                    "operation": "equals",
+                    "value2": "emma"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "🤖 Emma (Perplexity)"
+            },
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.ai_model || 'emma' }}",
+                    "operation": "equals",
+                    "value2": "gemini"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "✨ Gemini Direct"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ai-model-selector-switch",
+      "name": "🤖 Choose AI Model",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        19264,
+        4536
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ai-model-simple",
+              "name": "ai_model",
+              "value": "emma",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "ai-model-config-simple",
+      "name": "⚙️ AI Model (emma/gemini)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        19104,
+        4536
       ]
     }
   ],
@@ -1103,7 +1126,7 @@
       "main": [
         [
           {
-            "node": "AI Model Config",
+            "node": "⚙️ AI Model (emma/gemini)",
             "type": "main",
             "index": 0
           }
@@ -1114,7 +1137,7 @@
       "main": [
         [
           {
-            "node": "Choose AI Model?",
+            "node": "Call /api/chat (Emma)",
             "type": "main",
             "index": 0
           }
@@ -1427,25 +1450,7 @@
       "main": [
         [
           {
-            "node": "Prepare API Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Choose AI Model?": {
-      "main": [
-        [
-          {
-            "node": "Call /api/chat (Emma)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Call Gemini API",
+            "node": "Choose AI Model (Visual)",
             "type": "main",
             "index": 0
           }
@@ -1468,6 +1473,35 @@
         [
           {
             "node": "Parse API Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ AI Model (emma/gemini)": {
+      "main": [
+        [
+          {
+            "node": "🤖 Choose AI Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Choose AI Model": {
+      "main": [
+        [
+          {
+            "node": "Prepare API Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Gemini API",
             "type": "main",
             "index": 0
           }
