@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "build": "echo 'Build completed - static files and serverless functions'",
     "validate-workflow": "node validate-n8n-workflow.js",
     "import-workflow": "node import-workflow-header-black-white.js"
   }
