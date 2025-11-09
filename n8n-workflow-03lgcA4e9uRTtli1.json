@@ -1035,7 +1035,7 @@
         "assignments": {
           "assignments": [
             {
-              "id": "ai-model-simple",
+              "id": "ai-model-dropdown",
               "name": "ai_model",
               "value": "emma",
               "type": "string"
@@ -1045,12 +1045,12 @@
         "includeOtherFields": true,
         "options": {}
       },
-      "id": "ai-model-config-simple",
-      "name": "⚙️ AI Model (emma/gemini)",
+      "id": "ai-model-config-dropdown",
+      "name": "⚙️ AI Model: emma ou gemini",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        19104,
+        19264,
         4536
       ]
     }
@@ -1479,17 +1479,6 @@
         ]
       ]
     },
-    "⚙️ AI Model (emma/gemini)": {
-      "main": [
-        [
-          {
-            "node": "🤖 Choose AI Model",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "🤖 Choose AI Model": {
       "main": [
         [
@@ -1502,6 +1491,17 @@
         [
           {
             "node": "Call Gemini API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ AI Model: emma ou gemini": {
+      "main": [
+        [
+          {
+            "node": "🤖 Choose AI Model",
             "type": "main",
             "index": 0
           }
