@@ -1147,20 +1147,20 @@
       "main": [
         [
           {
-            "node": "Custom Prompt Input",
+            "node": "🎯 Manual Briefing Selector (MODIFIEZ ICI)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Custom Prompt Input": {
+    "🎯 Manual Briefing Selector (MODIFIEZ ICI)": {
       "main": [
         [
           {
             "node": "Merge Triggers",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
@@ -1374,7 +1374,7 @@
       "main": [
         [
           {
-            "node": "Custom Prompt Input",
+            "node": "🎯 Manual Briefing Selector (MODIFIEZ ICI)",
             "type": "main",
             "index": 0
           }
