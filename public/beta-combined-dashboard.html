@@ -1561,6 +1561,13 @@ const fetchHybridData = async (symbol, dataType) => {
                             const successCount = Object.keys(preloadedData.titlesTabData.stockData).length;
                             console.log(`✅ ${successCount} données de marché chargées depuis préchargement`);
                             showMessage(`Données chargées depuis préchargement: ${successCount} titres`, 'success');
+                            
+                            // Charger les news même avec données préchargées
+                            if (tickers.length > 0) {
+                                fetchLatestNewsForTickers().catch(err => {
+                                    console.error('Erreur chargement news par ticker:', err);
+                                });
+                            }
                             return;
                         }
                     } catch (e) {
@@ -3064,6 +3071,7 @@ const fetchHybridData = async (symbol, dataType) => {
                     // Une fois les tickers chargés, charger les nouvelles
                     fetchNews();
                     // Le chargement des stocks sera déclenché automatiquement par le useEffect qui surveille tickers.length
+                    // Les news par ticker seront chargées automatiquement par le useEffect qui surveille tickers.length
                 }).catch(error => {
                     console.error('❌ Erreur lors du chargement initial:', error);
                 });
@@ -3076,6 +3084,16 @@ const fetchHybridData = async (symbol, dataType) => {
                 }, 500);
 
             }, []); // Dépendance vide = une seule fois au montage
+
+            // Charger les news par ticker quand les tickers changent
+            useEffect(() => {
+                if (tickers.length > 0 && Object.keys(stockData).length > 0) {
+                    console.log('📰 Chargement des news pour les tickers disponibles...');
+                    fetchLatestNewsForTickers().catch(err => {
+                        console.error('Erreur chargement news par ticker:', err);
+                    });
+                }
+            }, [tickers.length]); // Se déclenche quand le nombre de tickers change
 
             // Charger automatiquement les données de stocks dès que les tickers sont disponibles
             // Ce useEffect est un fallback si le batch ne charge pas les données
@@ -15248,7 +15266,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         setActiveTab('intellistocks');
                                                     }}
                                                 >
-                                                    <div className="flex-1">
+                                                    <div className="flex-1 min-h-[60px]">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                                                                 isDarkMode ? 'bg-green-500/30 text-green-300' : 'bg-green-100 text-green-700'
@@ -15265,20 +15283,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 {item.ticker}
                                                             </span>
                                                         </div>
-                                                        {extractMoveReason(item.ticker, item.change) && (
-                                                            <div className={`text-xs mt-1 ml-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                                {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
-                                                                    <span className="inline-flex items-center gap-1.5">
-                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                                                                            AI
+                                                        
+                                                        {/* Espace dédié pour les news avec placeholder */}
+                                                        <div className={`mt-2 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                            {extractMoveReason(item.ticker, item.change) ? (
+                                                                <div className={`text-xs flex items-start gap-2 ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>
+                                                                    {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
+                                                                        <span className="inline-flex items-center gap-1.5 flex-wrap">
+                                                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex-shrink-0">
+                                                                                AI
+                                                                            </span>
+                                                                            <span className="leading-relaxed">{extractMoveReason(item.ticker, item.change)}</span>
                                                                         </span>
-                                                                        <span>{extractMoveReason(item.ticker, item.change)}</span>
-                                                                    </span>
-                                                                ) : (
-                                                                    <span>📰 {extractMoveReason(item.ticker, item.change)}</span>
-                                                                )}
-                                                            </div>
-                                                        )}
+                                                                    ) : (
+                                                                        <span className="inline-flex items-start gap-1.5">
+                                                                            <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                            <span className="leading-relaxed">{extractMoveReason(item.ticker, item.change)}</span>
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                                    Chargement des explications...
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-green-500 font-bold">
@@ -15320,7 +15351,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         setActiveTab('intellistocks');
                                                     }}
                                                 >
-                                                    <div className="flex-1">
+                                                    <div className="flex-1 min-h-[60px]">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                                                                 isDarkMode ? 'bg-red-500/30 text-red-300' : 'bg-red-100 text-red-700'
@@ -15337,20 +15368,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 {item.ticker}
                                                             </span>
                                                         </div>
-                                                        {extractMoveReason(item.ticker, item.change) && (
-                                                            <div className={`text-xs mt-1 ml-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                                {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
-                                                                    <span className="inline-flex items-center gap-1.5">
-                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                                                                            AI
+                                                        
+                                                        {/* Espace dédié pour les news avec placeholder */}
+                                                        <div className={`mt-2 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                            {extractMoveReason(item.ticker, item.change) ? (
+                                                                <div className={`text-xs flex items-start gap-2 ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>
+                                                                    {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
+                                                                        <span className="inline-flex items-center gap-1.5 flex-wrap">
+                                                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex-shrink-0">
+                                                                                AI
+                                                                            </span>
+                                                                            <span className="leading-relaxed">{extractMoveReason(item.ticker, item.change)}</span>
                                                                         </span>
-                                                                        <span>{extractMoveReason(item.ticker, item.change)}</span>
-                                                                    </span>
-                                                                ) : (
-                                                                    <span>📰 {extractMoveReason(item.ticker, item.change)}</span>
-                                                                )}
-                                                            </div>
-                                                        )}
+                                                                    ) : (
+                                                                        <span className="inline-flex items-start gap-1.5">
+                                                                            <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                            <span className="leading-relaxed">{extractMoveReason(item.ticker, item.change)}</span>
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                                    Chargement des explications...
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     <div className="text-right">
                                                         <div className="text-red-500 font-bold">
@@ -15588,11 +15632,37 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                             {companyNames[ticker] || ticker}
                                                         </div>
-                                                        {tickerLatestNews[ticker] && (
-                                                            <div className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                                📰 <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
-                                                            </div>
-                                                        )}
+                                                        
+                                                        {/* Espace dédié pour les news avec extractMoveReason */}
+                                                        <div className={`mt-2 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                            {extractMoveReason(ticker, changePercent) ? (
+                                                                <div className={`text-xs flex items-start gap-2 ${
+                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                }`}>
+                                                                    {tickerMoveReasons[ticker]?.source === 'Finviz AI' ? (
+                                                                        <span className="inline-flex items-center gap-1.5 flex-wrap">
+                                                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex-shrink-0">
+                                                                                AI
+                                                                            </span>
+                                                                            <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="inline-flex items-start gap-1.5">
+                                                                            <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                            <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            ) : tickerLatestNews[ticker] ? (
+                                                                <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                                    📰 <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                                    Chargement des explications...
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -15675,11 +15745,37 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                                 {companyNames[ticker] || ticker}
                                                             </div>
-                                                            {tickerLatestNews[ticker] && (
-                                                                <div className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                                    📰 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
-                                                                </div>
-                                                            )}
+                                                            
+                                                            {/* Espace dédié pour les news avec extractMoveReason */}
+                                                            <div className={`mt-2 min-h-[24px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                                {extractMoveReason(ticker, changePercent) ? (
+                                                                    <div className={`text-xs flex items-start gap-2 ${
+                                                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                                    }`}>
+                                                                        {tickerMoveReasons[ticker]?.source === 'Finviz AI' ? (
+                                                                            <span className="inline-flex items-center gap-1.5 flex-wrap">
+                                                                                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex-shrink-0">
+                                                                                    AI
+                                                                                </span>
+                                                                                <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="inline-flex items-start gap-1.5">
+                                                                                <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                                <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                ) : tickerLatestNews[ticker] ? (
+                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                                        📰 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                                                        Chargement des explications...
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
 
