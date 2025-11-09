@@ -22,20 +22,43 @@ export default async function handler(req, res) {
     try {
         const { type } = req.query;
         
-        if (!type || !['morning', 'midday', 'evening'].includes(type)) {
+        if (!type) {
             return res.status(400).json({ 
-                error: 'Invalid briefing type. Must be: morning, midday, or evening' 
+                error: 'Missing type parameter. Must be: "matin"/"morning", "midi"/"midday", or "soir"/"evening"' 
+            });
+        }
+        
+        // ═══════════════════════════════════════════════════════════
+        // CONVERSION FRANÇAIS → ANGLAIS (pour compatibilité)
+        // ═══════════════════════════════════════════════════════════
+        const typeMapping = {
+          // Français → Anglais
+          'matin': 'morning',
+          'midi': 'midday',
+          'soir': 'evening',
+          // Anglais (compatibilité)
+          'morning': 'morning',
+          'midday': 'midday',
+          'evening': 'evening',
+          'noon': 'midday' // Ancien format
+        };
+        
+        const normalizedType = typeMapping[type.toLowerCase()];
+        
+        if (!normalizedType) {
+            return res.status(400).json({ 
+                error: `Invalid briefing type: "${type}". Must be: "matin"/"morning", "midi"/"midday", or "soir"/"evening"` 
             });
         }
 
-        console.log(`📧 Generating ${type} briefing...`);
+        console.log(`📧 Generating ${normalizedType} briefing (${type})...`);
 
         // 1. Charger la configuration du prompt
-        const promptConfig = await loadPromptConfig(type);
+        const promptConfig = await loadPromptConfig(normalizedType);
         
         // 2. Préparer le contexte pour Emma
         const context = {
-            briefing_type: type,
+            briefing_type: normalizedType,
             current_time: new Date().toISOString(),
             montreal_time: new Date().toLocaleString('fr-CA', { 
                 timeZone: 'America/Montreal',

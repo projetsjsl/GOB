@@ -71,26 +71,50 @@ export default async function handler(req, res) {
       const type = req.query.type;
 
       if (type) {
-        // Retourner un type spécifique
-        const validTypes = ['morning', 'midday', 'evening'];
-        if (!validTypes.includes(type)) {
+        // ═══════════════════════════════════════════════════════════
+        // CONVERSION FRANÇAIS → ANGLAIS (pour compatibilité)
+        // ═══════════════════════════════════════════════════════════
+        const typeMapping = {
+          // Français → Anglais
+          'matin': 'morning',
+          'midi': 'midday',
+          'soir': 'evening',
+          // Anglais (compatibilité)
+          'morning': 'morning',
+          'midday': 'midday',
+          'evening': 'evening',
+          'noon': 'midday' // Ancien format
+        };
+        
+        const normalizedType = typeMapping[type.toLowerCase()];
+        
+        if (!normalizedType) {
           return res.status(400).json({
             success: false,
-            error: `Invalid type. Must be one of: ${validTypes.join(', ')}`
+            error: `Invalid type: "${type}". Must be one of: "matin"/"morning", "midi"/"midday", "soir"/"evening"`
+          });
+        }
+        
+        const validTypes = ['morning', 'midday', 'evening'];
+        if (!validTypes.includes(normalizedType)) {
+          return res.status(400).json({
+            success: false,
+            error: `Invalid type after normalization. Must be one of: ${validTypes.join(', ')}`
           });
         }
 
-        const promptConfig = config[type];
+        const promptConfig = config[normalizedType];
         if (!promptConfig) {
           return res.status(404).json({
             success: false,
-            error: `Configuration not found for type: ${type}`
+            error: `Configuration not found for type: ${normalizedType}`
           });
         }
 
         return res.status(200).json({
           success: true,
-          type: type,
+          type: normalizedType,
+          original_type: type, // Conserver le type original pour référence
           config: promptConfig
         });
       }

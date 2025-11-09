@@ -172,16 +172,38 @@ export default async function handler(req, res) {
           briefingType = 'custom';
         }
 
-        // Normaliser le type
-        if (briefingType === 'noon') {
-          briefingType = 'midday';
+        // ═══════════════════════════════════════════════════════════
+        // CONVERSION FRANÇAIS → ANGLAIS (pour compatibilité)
+        // ═══════════════════════════════════════════════════════════
+        const typeMapping = {
+          // Français → Anglais
+          'matin': 'morning',
+          'midi': 'midday',
+          'soir': 'evening',
+          // Anglais (compatibilité)
+          'morning': 'morning',
+          'midday': 'midday',
+          'evening': 'evening',
+          'noon': 'midday' // Ancien format
+        };
+        
+        // Normaliser le type (français ou anglais → anglais)
+        const normalizedType = typeMapping[briefingType?.toLowerCase()];
+        
+        if (!normalizedType) {
+          return res.status(400).json({
+            success: false,
+            error: `Invalid type: "${briefingType}". Must be one of: "matin"/"morning", "midi"/"midday", "soir"/"evening", or "custom"`
+          });
         }
+        
+        briefingType = normalizedType;
 
         const validTypes = ['morning', 'midday', 'evening', 'custom'];
         if (!validTypes.includes(briefingType)) {
           return res.status(400).json({
             success: false,
-            error: `Invalid type. Must be one of: ${validTypes.join(', ')}`
+            error: `Invalid type after normalization. Must be one of: ${validTypes.join(', ')}`
           });
         }
 
