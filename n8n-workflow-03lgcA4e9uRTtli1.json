@@ -989,11 +989,6 @@
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
           "string": [
             {
               "value1": "={{ $json.ai_model }}",
@@ -1001,8 +996,7 @@
               "value2": "emma"
             }
           ]
-        },
-        "options": {}
+        }
       },
       "id": "ai-model-selector-switch",
       "name": "Choose AI Model (IF)",
