@@ -1333,7 +1333,7 @@
       "main": [
         [
           {
-            "node": "Choose AI Model (IF)",
+            "node": "Should Send Email?",
             "type": "main",
             "index": 0
           }
