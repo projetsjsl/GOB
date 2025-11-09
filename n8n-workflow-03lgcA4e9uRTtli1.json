@@ -1115,7 +1115,7 @@
       "main": [
         [
           {
-            "node": "⚙️ AI Model (emma/gemini)",
+            "node": "⚙️ AI Model Selector (Change AI_MODEL)",
             "type": "main",
             "index": 0
           }
@@ -1429,17 +1429,6 @@
         [
           {
             "node": "Preview Display",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Model Config": {
-      "main": [
-        [
-          {
-            "node": "Choose AI Model (Visual)",
             "type": "main",
             "index": 0
           }
