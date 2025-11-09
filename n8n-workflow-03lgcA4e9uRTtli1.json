@@ -627,43 +627,6 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://gob-projetsjsls-projects.vercel.app/api/chat",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "name": "Authorization",
-              "value": "Bearer re_XeAhe3ju_PAnnuMx3kmhgPKnDff8PatR6"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { \"message\": $json.selected_prompt || $json.custom_prompt, \"userId\": \"n8n-manual-trigger\", \"channel\": \"web\", \"context\": { \"output_mode\": \"briefing\", \"briefing_type\": $json.prompt_type || \"custom\", \"tickers\": $json.tickers || [] } } }}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
-        }
-      },
-      "id": "ai-agent-emma",
-      "name": "AI Agent (Emma)",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        19680,
-        4536
-      ]
-    },
-    {
-      "parameters": {
         "httpMethod": "POST",
         "path": "emma-newsletter/preview",
         "responseMode": "lastNode",

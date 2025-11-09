@@ -2078,6 +2078,13 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
             };
 
+            // Fonction pour changer le contexte des news (général, québécois, etc.)
+            const changeNewsContext = async (newContext) => {
+                setNewsContext(newContext);
+                // Recharger les news avec le nouveau contexte
+                await fetchNews();
+            };
+
             // Fonction pour filtrer les actualités
             const filterNews = (filterValue) => {
                 setNewsFilter(filterValue);
