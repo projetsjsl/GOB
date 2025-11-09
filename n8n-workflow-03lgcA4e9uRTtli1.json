@@ -1384,17 +1384,6 @@
       "main": [
         [
           {
-            "node": "Debug Before Switch",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "🔍 Debug Before Switch": {
-      "main": [
-        [
-          {
             "node": "Choose AI Model (IF)",
             "type": "main",
             "index": 0
