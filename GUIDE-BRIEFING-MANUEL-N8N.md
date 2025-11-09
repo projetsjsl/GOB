@@ -28,11 +28,11 @@
 2. **Modifier les paramètres** :
    ```json
    briefing_type: "matin"      // Options: "matin", "midi", "soir" (ou "morning", "midday", "evening")
-   prompt_type: "matin"        // Même valeur que briefing_type
    custom_prompt: ""           // Laisser vide pour utiliser le prompt depuis GitHub
    preview_mode: true          // true = prévisualisation, false = envoi direct
    approved: false             // false = prévisualisation, true = approuvé pour envoi
    ```
+   **Note** : `prompt_type` est généré automatiquement à partir de `briefing_type` (plus besoin de le définir manuellement)
 
 3. **Choisir le type de briefing** :
    - **Matin** : `briefing_type: "matin"` (ou `"morning"`)
@@ -59,11 +59,11 @@
 2. **Remplir le prompt personnalisé** :
    ```json
    briefing_type: "morning"    // Peut être n'importe quelle valeur
-   prompt_type: "custom"       // Important: "custom"
    custom_prompt: "Votre prompt personnalisé ici..."
    preview_mode: true
    approved: false
    ```
+   **Note** : `prompt_type` sera automatiquement défini à `"custom"` quand `custom_prompt` est fourni
 
 3. **Exécuter le workflow**
 
