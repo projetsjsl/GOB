@@ -581,10 +581,11 @@
     {
       "parameters": {
         "conditions": {
-          "boolean": [
+          "string": [
             {
-              "value1": "={{ ($json.preview_mode === false || $json.preview_mode === 'false') && ($json.approved === true || $json.approved === 'true') }}",
-              "value2": true
+              "value1": "={{ $json.preview_mode === false && $json.approved === true ? 'send' : 'preview' }}",
+              "operation": "equals",
+              "value2": "send"
             }
           ]
         },
