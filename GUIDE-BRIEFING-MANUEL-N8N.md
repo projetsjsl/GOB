@@ -29,10 +29,14 @@
    ```json
    briefing_type: "matin"      // Options: "matin", "midi", "soir" (ou "morning", "midday", "evening")
    custom_prompt: ""           // Laisser vide pour utiliser le prompt depuis GitHub
-   preview_mode: true          // true = prévisualisation, false = envoi direct
-   approved: false             // false = prévisualisation, true = approuvé pour envoi
+   preview_mode: true          // ⚠️ true = prévisualisation uniquement, false = envoi direct
+   approved: false             // ⚠️ false = bloqué, true = approuvé pour envoi
    ```
    **Note** : `prompt_type` est généré automatiquement à partir de `briefing_type` (plus besoin de le définir manuellement)
+   
+   ⚠️ **IMPORTANT - Pour envoyer le briefing** :
+   - Changez `preview_mode: false` ET `approved: true`
+   - Par défaut, le workflow est en mode prévisualisation pour éviter les envois accidentels
 
 3. **Choisir le type de briefing** :
    - **Matin** : `briefing_type: "matin"` (ou `"morning"`)
@@ -48,9 +52,13 @@
      4. Afficher la prévisualisation (si `preview_mode: true`)
 
 5. **Approuver et envoyer** (si satisfait) :
-   - Modifiez le nœud "🎯 Manual Briefing Selector"
-   - Changez `preview_mode: false` et `approved: true`
-   - Réexécutez le workflow
+   - ⚠️ **IMPORTANT** : Par défaut, le workflow est en mode prévisualisation pour éviter les envois accidentels
+   - Modifiez le nœud "🎯 Manual Briefing Selector (MODIFIEZ ICI)"
+   - **Changez les valeurs suivantes** :
+     - `preview_mode: false` (était `true`)
+     - `approved: true` (était `false`)
+   - Réexécutez le workflow depuis "Manual Trigger (Custom Prompt)"
+   - ✅ Le briefing sera maintenant envoyé aux destinataires
 
 ### **Méthode 2 : Utiliser un Prompt Personnalisé**
 
@@ -178,8 +186,19 @@ Preview / Send
 - Vérifiez les logs dans n8n pour voir quel prompt a été sélectionné
 - Les mots français sont automatiquement convertis en anglais pour l'API
 
+### **Erreur : "Mode preview activé. Pour envoyer, définissez approved=true et preview_mode=false"**
+- ⚠️ **C'est normal !** Le workflow bloque l'envoi par sécurité
+- **Solution** :
+  1. Ouvrez le nœud "🎯 Manual Briefing Selector (MODIFIEZ ICI)"
+  2. Modifiez les valeurs :
+     - `preview_mode`: Changez `true` → `false`
+     - `approved`: Changez `false` → `true`
+  3. Sauvegardez le nœud
+  4. Réexécutez le workflow depuis "Manual Trigger (Custom Prompt)"
+- ✅ Le briefing sera maintenant envoyé
+
 ### **Le briefing ne s'envoie pas**
-- Vérifiez que `preview_mode: false` ET `approved: true`
+- Vérifiez que `preview_mode: false` ET `approved: true` dans "🎯 Manual Briefing Selector (MODIFIEZ ICI)"
 - Vérifiez que le nœud "Should Send Email?" route vers "Generate HTML Newsletter"
 - Consultez les logs pour voir les valeurs de `preview_mode` et `approved`
 
