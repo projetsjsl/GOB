@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols from input 1 (tickers data)\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type;\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// Construire le message pour /api/chat (qui utilise emma-agent)\nconst fullPrompt = `${data.selected_prompt}\\n\\nFocus sur ces tickers: ${tickerList}`;\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation'\n  }\n}];"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols from input 1 (tickers data)\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type;\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// Construire le message pour /api/chat (qui utilise emma-agent) ou Gemini\nconst fullPrompt = `${data.selected_prompt}\\n\\nFocus sur ces tickers: ${tickerList}`;\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation',\n    // Préserver ai_model depuis AI Model Config\n    ai_model: data.ai_model || 'emma'\n  }\n}];"
       },
       "id": "c5d69e3d-82d3-4459-8c12-02af81d03cdd",
       "name": "Prepare API Request",
@@ -930,6 +930,106 @@
         20160,
         4536
       ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ai-model-choice",
+              "name": "ai_model",
+              "value": "emma",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "ai-model-config-node",
+      "name": "AI Model Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        19168,
+        4536
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.ai_model === 'emma' || $json.ai_model === undefined }}",
+              "value2": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "choose-ai-model-if",
+      "name": "Choose AI Model?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        19488,
+        4536
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": $json.message || $json.selected_prompt || \"Génère un briefing financier matinal.\"\n    }]\n  }],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"topK\": 40,\n    \"topP\": 0.95,\n    \"maxOutputTokens\": 2048\n  }\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "call-gemini-api-node",
+      "name": "Call Gemini API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        19552,
+        4736
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La réponse de Gemini a une structure différente\n// Structure Gemini: { candidates: [{ content: { parts: [{ text: \"...\" }] } }] }\nlet content = '';\nif (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {\n  content = data.candidates[0].content.parts.map(part => part.text).join('\\n');\n} else if (data.response) {\n  content = data.response;\n} else if (typeof data === 'string') {\n  content = data;\n}\n\n// Adapter au format attendu par Parse API Response\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    newsletter_content: content,\n    response: content,\n    message: content,\n    emma_model: 'gemini',\n    emma_tools: [],\n    emma_execution_time: 0,\n    trigger_type: item.json.trigger_type || 'Manuel',\n    prompt_type: item.json.prompt_type || 'custom',\n    generated_at: new Date().toISOString(),\n    // Préserver preview_mode et approved\n    preview_mode: item.json.preview_mode,\n    approved: item.json.approved\n  }\n}));"
+      },
+      "id": "parse-gemini-response",
+      "name": "Parse Gemini Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20000,
+        4736
+      ]
     }
   ],
   "connections": {
@@ -1014,7 +1114,7 @@
       "main": [
         [
           {
-            "node": "Call /api/chat (Emma)",
+            "node": "Choose AI Model?",
             "type": "main",
             "index": 0
           }
@@ -1317,6 +1417,57 @@
         [
           {
             "node": "Preview Display",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Model Config": {
+      "main": [
+        [
+          {
+            "node": "Prepare API Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose AI Model?": {
+      "main": [
+        [
+          {
+            "node": "Call /api/chat (Emma)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Gemini API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Gemini API": {
+      "main": [
+        [
+          {
+            "node": "Parse Gemini Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Gemini Response": {
+      "main": [
+        [
+          {
+            "node": "Parse API Response",
             "type": "main",
             "index": 0
           }
