@@ -1467,7 +1467,7 @@
       "main": [
         [
           {
-            "node": "🤖 Choose AI Model",
+            "node": "Choose AI Model (IF)",
             "type": "main",
             "index": 0
           }
