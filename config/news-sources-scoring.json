@@ -1,0 +1,558 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-01-16",
+  "criteria_weights": {
+    "reliability": 0.30,
+    "financial_relevance": 0.25,
+    "frequency": 0.15,
+    "accessibility": 0.15,
+    "coverage": 0.10,
+    "cost": 0.05
+  },
+  "contexts": {
+    "general": {
+      "description": "News générales du marché financier",
+      "preferred_sources": ["bloomberg", "wsj", "reuters", "cnbc", "marketwatch", "yahoo_finance"]
+    },
+    "crypto": {
+      "description": "Actualités cryptomonnaies",
+      "preferred_sources": ["coindesk", "cointelegraph", "cryptoslate"]
+    },
+    "sectorial": {
+      "description": "News sectorielles spécialisées",
+      "preferred_sources": ["seeking_alpha", "zero_hedge", "the_big_picture"]
+    },
+    "analysis": {
+      "description": "Analyses approfondies et opinions",
+      "preferred_sources": ["seeking_alpha", "calculated_risk", "the_capital_spectator", "strategy"]
+    }
+  },
+  "sources": {
+    "bloomberg": {
+      "name": "Bloomberg",
+      "category": "premium",
+      "scores": {
+        "reliability": 10,
+        "financial_relevance": 10,
+        "frequency": 10,
+        "accessibility": 3,
+        "coverage": 10,
+        "cost": 2
+      },
+      "calculated_score": 8.15,
+      "access_method": "aggregated_via_fmp_finnhub_finviz",
+      "direct_api": false,
+      "rss_available": false,
+      "cost": "premium_api_2000_plus_month",
+      "notes": "Source premium, accessible via agrégateurs uniquement"
+    },
+    "wsj": {
+      "name": "Wall Street Journal",
+      "category": "premium",
+      "scores": {
+        "reliability": 10,
+        "financial_relevance": 10,
+        "frequency": 9,
+        "accessibility": 3,
+        "coverage": 9,
+        "cost": 2
+      },
+      "calculated_score": 8.10,
+      "access_method": "aggregated_via_fmp_finnhub_finviz",
+      "direct_api": false,
+      "rss_available": false,
+      "cost": "premium_api_paid",
+      "notes": "Source premium, accessible via agrégateurs uniquement"
+    },
+    "reuters": {
+      "name": "Reuters",
+      "category": "premium",
+      "scores": {
+        "reliability": 10,
+        "financial_relevance": 10,
+        "frequency": 10,
+        "accessibility": 3,
+        "coverage": 10,
+        "cost": 2
+      },
+      "calculated_score": 8.15,
+      "access_method": "aggregated_via_fmp_finnhub_finviz",
+      "direct_api": false,
+      "rss_available": false,
+      "cost": "premium_api_paid",
+      "notes": "Source premium, accessible via agrégateurs uniquement"
+    },
+    "cnbc": {
+      "name": "CNBC",
+      "category": "premium",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 10,
+        "frequency": 9,
+        "accessibility": 7,
+        "coverage": 9,
+        "cost": 8
+      },
+      "calculated_score": 8.80,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible, bonne accessibilité"
+    },
+    "marketwatch": {
+      "name": "MarketWatch",
+      "category": "premium",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 10,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 9,
+        "cost": 8
+      },
+      "calculated_score": 8.90,
+      "access_method": "aggregated_via_fmp_finnhub_finviz_rss",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Excellente source, RSS disponible"
+    },
+    "fox_business": {
+      "name": "Fox Business",
+      "category": "premium",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 9,
+        "frequency": 8,
+        "accessibility": 7,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 8.20,
+      "access_method": "aggregated_via_fmp_finnhub_finviz_rss",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "bbc": {
+      "name": "BBC",
+      "category": "premium",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 7,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 8.25,
+      "access_method": "aggregated_via_fmp_finnhub_finviz_rss",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Moins spécialisé finance mais très fiable"
+    },
+    "nyt": {
+      "name": "The New York Times",
+      "category": "premium",
+      "scores": {
+        "reliability": 10,
+        "financial_relevance": 8,
+        "frequency": 9,
+        "accessibility": 4,
+        "coverage": 9,
+        "cost": 3
+      },
+      "calculated_score": 7.85,
+      "access_method": "aggregated_via_fmp_finnhub_finviz",
+      "direct_api": false,
+      "rss_available": false,
+      "cost": "premium_api_paid",
+      "notes": "Source premium, accès limité"
+    },
+    "yahoo_finance": {
+      "name": "Yahoo Finance",
+      "category": "premium",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 10,
+        "frequency": 9,
+        "accessibility": 9,
+        "coverage": 9,
+        "cost": 9
+      },
+      "calculated_score": 8.75,
+      "access_method": "aggregated_via_fmp_finnhub_finviz_api_rss",
+      "direct_api": true,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Excellente accessibilité, gratuit"
+    },
+    "seeking_alpha": {
+      "name": "Seeking Alpha",
+      "category": "blog",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 10,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 9,
+        "cost": 8
+      },
+      "calculated_score": 8.60,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Blog financier de référence, RSS disponible"
+    },
+    "zero_hedge": {
+      "name": "Zero Hedge",
+      "category": "blog",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 9,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 7.85,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Perspectives alternatives, RSS disponible"
+    },
+    "the_big_picture": {
+      "name": "The Big Picture",
+      "category": "blog",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 9,
+        "frequency": 7,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 8.10,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Analyse macroéconomique, RSS disponible"
+    },
+    "calculated_risk": {
+      "name": "Calculated Risk",
+      "category": "blog",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 9,
+        "frequency": 7,
+        "accessibility": 8,
+        "coverage": 7,
+        "cost": 8
+      },
+      "calculated_score": 7.95,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Analyse économique approfondie, RSS disponible"
+    },
+    "the_capital_spectator": {
+      "name": "The Capital Spectator",
+      "category": "blog",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 8,
+        "frequency": 7,
+        "accessibility": 8,
+        "coverage": 7,
+        "cost": 8
+      },
+      "calculated_score": 7.50,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "abnormal_returns": {
+      "name": "Abnormal Returns",
+      "category": "blog",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 8,
+        "frequency": 7,
+        "accessibility": 8,
+        "coverage": 7,
+        "cost": 8
+      },
+      "calculated_score": 7.50,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "stocktwits": {
+      "name": "Stocktwits",
+      "category": "social",
+      "scores": {
+        "reliability": 5,
+        "financial_relevance": 7,
+        "frequency": 9,
+        "accessibility": 4,
+        "coverage": 6,
+        "cost": 3
+      },
+      "calculated_score": 5.60,
+      "access_method": "api_paid",
+      "direct_api": true,
+      "rss_available": false,
+      "cost": "paid_99_plus_month",
+      "notes": "API payante, priorité basse"
+    },
+    "coindesk": {
+      "name": "CoinDesk",
+      "category": "crypto",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 6,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 7.70,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Source crypto de référence, RSS disponible"
+    },
+    "cointelegraph": {
+      "name": "Cointelegraph",
+      "category": "crypto",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 6,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 7.50,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "cryptoslate": {
+      "name": "CryptoSlate",
+      "category": "crypto",
+      "scores": {
+        "reliability": 6,
+        "financial_relevance": 6,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 7,
+        "cost": 8
+      },
+      "calculated_score": 6.80,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "barrons": {
+      "name": "Barron's",
+      "category": "premium",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 10,
+        "frequency": 8,
+        "accessibility": 4,
+        "coverage": 9,
+        "cost": 3
+      },
+      "calculated_score": 7.60,
+      "access_method": "aggregated_via_fmp_finnhub",
+      "direct_api": false,
+      "rss_available": false,
+      "cost": "premium_api_paid",
+      "notes": "Source premium, accessible via agrégateurs"
+    },
+    "forbes": {
+      "name": "Forbes",
+      "category": "premium",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 9,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 9,
+        "cost": 8
+      },
+      "calculated_score": 8.40,
+      "access_method": "aggregated_via_fmp_finnhub_rss",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "fortune": {
+      "name": "Fortune",
+      "category": "premium",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 9,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 8.30,
+      "access_method": "aggregated_via_fmp_finnhub_rss",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "investors_business_daily": {
+      "name": "Investor's Business Daily",
+      "category": "premium",
+      "scores": {
+        "reliability": 8,
+        "financial_relevance": 10,
+        "frequency": 8,
+        "accessibility": 4,
+        "coverage": 8,
+        "cost": 3
+      },
+      "calculated_score": 7.45,
+      "access_method": "aggregated_via_fmp_finnhub",
+      "direct_api": false,
+      "rss_available": false,
+      "cost": "premium_api_paid",
+      "notes": "Source premium, accessible via agrégateurs"
+    },
+    "motley_fool": {
+      "name": "Motley Fool",
+      "category": "premium",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 9,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 7.90,
+      "access_method": "aggregated_via_fmp_finnhub_rss",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "business_insider": {
+      "name": "Business Insider",
+      "category": "premium",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 8,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 9,
+        "cost": 8
+      },
+      "calculated_score": 7.95,
+      "access_method": "aggregated_via_fmp_finnhub_rss",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "RSS disponible"
+    },
+    "techcrunch": {
+      "name": "TechCrunch",
+      "category": "premium",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 7,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 8
+      },
+      "calculated_score": 7.60,
+      "access_method": "aggregated_via_fmp_finnhub_rss",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "notes": "Focus tech, RSS disponible"
+    },
+    "benzinga": {
+      "name": "Benzinga",
+      "category": "premium",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 9,
+        "frequency": 9,
+        "accessibility": 5,
+        "coverage": 8,
+        "cost": 4
+      },
+      "calculated_score": 7.20,
+      "access_method": "aggregated_via_fmp_finnhub",
+      "direct_api": false,
+      "rss_available": false,
+      "cost": "premium_api_paid",
+      "notes": "API payante, accessible via agrégateurs"
+    },
+    "zacks": {
+      "name": "Zacks",
+      "category": "premium",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 9,
+        "frequency": 8,
+        "accessibility": 5,
+        "coverage": 8,
+        "cost": 4
+      },
+      "calculated_score": 7.15,
+      "access_method": "aggregated_via_fmp_finnhub",
+      "direct_api": false,
+      "rss_available": false,
+      "cost": "premium_api_paid",
+      "notes": "API payante, accessible via agrégateurs"
+    }
+  },
+  "aggregators": {
+    "fmp": {
+      "name": "Financial Modeling Prep",
+      "sources_aggregated": ["bloomberg", "wsj", "reuters", "cnbc", "marketwatch", "yahoo_finance", "forbes", "fortune", "barrons", "business_insider", "techcrunch", "benzinga", "zacks", "motley_fool"],
+      "reliability": 8,
+      "accessibility": 9
+    },
+    "finnhub": {
+      "name": "Finnhub",
+      "sources_aggregated": ["bloomberg", "wsj", "reuters", "cnbc", "marketwatch", "yahoo_finance", "forbes", "fortune", "barrons", "business_insider", "techcrunch"],
+      "reliability": 8,
+      "accessibility": 9
+    },
+    "finviz": {
+      "name": "Finviz",
+      "sources_aggregated": ["bloomberg", "wsj", "marketwatch", "reuters", "cnbc", "fox_business", "bbc", "nyt", "yahoo_finance"],
+      "reliability": 7,
+      "accessibility": 6,
+      "method": "web_scraping"
+    }
+  }
+}
+
