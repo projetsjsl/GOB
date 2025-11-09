@@ -1042,6 +1042,19 @@
         19264,
         4536
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\nconsole.log('🔍 DEBUG - Données reçues par le Switch:');\nconsole.log('   ai_model:', data.ai_model, '(type:', typeof data.ai_model, ')');\nconsole.log('   ai_model === \"emma\":', data.ai_model === 'emma');\nconsole.log('   ai_model === \"gemini\":', data.ai_model === 'gemini');\nconsole.log('   Toutes les clés:', Object.keys(data));\n\n// Afficher aussi dans les données de sortie pour voir dans n8n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    _debug_ai_model: item.json.ai_model,\n    _debug_ai_model_type: typeof item.json.ai_model,\n    _debug_ai_model_equals_emma: item.json.ai_model === 'emma',\n    _debug_ai_model_equals_gemini: item.json.ai_model === 'gemini',\n    _debug_all_keys: Object.keys(item.json).join(', ')\n  }\n}));"
+      },
+      "id": "debug-before-ai-model-switch",
+      "name": "🔍 Debug Before Switch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        19104,
+        4536
+      ]
     }
   ],
   "connections": {
@@ -1476,6 +1489,17 @@
       ]
     },
     "⚙️ AI Model Selector (Change AI_MODEL)": {
+      "main": [
+        [
+          {
+            "node": "🔍 Debug Before Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 Debug Before Switch": {
       "main": [
         [
           {
