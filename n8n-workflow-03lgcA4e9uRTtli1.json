@@ -989,6 +989,11 @@
     {
       "parameters": {
         "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "string": [
             {
               "value1": "={{ $json.ai_model }}",
