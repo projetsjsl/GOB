@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "mkdir -p dist && cp -r public/* dist/ 2>/dev/null || true",
+    "build": "node build.js",
     "validate-workflow": "node validate-n8n-workflow.js",
     "import-workflow": "node import-workflow-header-black-white.js"
   }
