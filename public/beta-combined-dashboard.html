@@ -818,6 +818,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const [watchlistTickers, setWatchlistTickers] = useState([]);
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
+            const [newsContext, setNewsContext] = useState('general'); // general, quebec, french_canada, crypto, analysis
             const [githubUser, setGithubUser] = useState(null);
             const [finvizNews, setFinvizNews] = useState({}); // Dernières news Finviz par ticker
             const [tickerLatestNews, setTickerLatestNews] = useState({}); // News la plus récente par ticker
@@ -1611,9 +1612,9 @@ const fetchHybridData = async (symbol, dataType) => {
                 newStockData._errorCount = counters.errorCount;
             };
 
-            // Actualités avec stratégie multi-sources (NO DEMO DATA) - OPTIMISÉE avec appels parallèles
+            // Actualités via endpoint unifié (FMP, Finnhub, Finviz, RSS) - AMÉLIORÉ avec sources québécoises
             const fetchNews = async () => {
-                addLog('📰 Démarrage récupération actualités...', 'info');
+                addLog('📰 Démarrage récupération actualités via endpoint unifié...', 'info');
 
                 // Vérifier d'abord les données préchargées depuis la page de login
                 const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
@@ -1637,92 +1638,55 @@ const fetchHybridData = async (symbol, dataType) => {
 
                 const defaultTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA'];
                 const availableTickers = tickers.length > 0 ? tickers : defaultTickers;
-                const tickersQuery = availableTickers.slice(0, 5).join(',');
+                const tickersQuery = availableTickers.slice(0, 5).join(' OR ');
 
                 try {
-                    // OPTIMISATION: Appels parallèles aux 3 sources avec priorité
-                    const today = new Date().toISOString().split('T')[0];
-                    const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
-
-                    addLog('🔍 Tentative parallèle des 3 sources d\'actualités...', 'info');
+                    // Utiliser l'endpoint unifié qui agrège toutes les sources avec déduplication et scoring
+                    addLog(`🔍 Récupération depuis endpoint unifié (contexte: ${newsContext})...`, 'info');
                     
-                    const [fmpResult, finnhubMarketResult, finnhubCompanyResult] = await Promise.allSettled([
-                        // SOURCE 1: FMP General News (Primary)
-                        fetch(`${API_BASE_URL}/api/fmp?endpoint=news&limit=100`).then(r => r.ok ? r.json() : null),
-                        // SOURCE 2: Finnhub Market News (Fallback)
-                        fetch(`${API_BASE_URL}/api/finnhub?endpoint=market-news&category=general`).then(r => r.ok ? r.json() : null),
-                        // SOURCE 3: Finnhub Company News (Last Resort)
-                        fetch(`${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${availableTickers[0]}&from=${weekAgo}&to=${today}`).then(r => r.ok ? r.json() : null)
-                    ]);
-
-                    // Traiter les résultats par ordre de priorité
-                    let newsArticles = [];
-
-                    // Priorité 1: FMP
-                    if (fmpResult.status === 'fulfilled' && fmpResult.value) {
-                        const fmpNewsData = fmpResult.value.data || fmpResult.value.news || [];
-                        if (fmpNewsData.length > 0) {
-                            newsArticles = fmpNewsData.slice(0, 100).map(article => ({
-                                title: article.title,
-                                description: article.text || '',
-                                url: article.url || article.link || '#',
-                                publishedAt: article.publishedDate || new Date().toISOString(),
-                                source: { name: article.site || 'FMP' },
-                                sentiment: article.sentiment || 'neutral',
-                                category: 'general',
-                                image: article.image || null
-                            }));
-                            addLog(`✅ ${newsArticles.length} actualités chargées depuis FMP (Primary)`, 'success');
-                        }
+                    const response = await fetch(
+                        `${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=100&context=${newsContext}`
+                    );
+                    
+                    if (!response.ok) {
+                        throw new Error(`News API error: ${response.status}`);
                     }
-
-                    // Priorité 2: Finnhub Market (si FMP vide)
-                    if (newsArticles.length === 0 && finnhubMarketResult.status === 'fulfilled' && finnhubMarketResult.value) {
-                        const finnhubData = Array.isArray(finnhubMarketResult.value) ? finnhubMarketResult.value : [];
-                        if (finnhubData.length > 0) {
-                            newsArticles = finnhubData.slice(0, 100).map(article => ({
-                                title: article.headline,
-                                description: article.summary || '',
-                                url: article.url || '#',
-                                publishedAt: new Date(article.datetime * 1000).toISOString(),
-                                source: { name: article.source || 'Finnhub' },
-                                sentiment: article.sentiment || 'neutral',
-                                category: article.category || 'general'
-                            }));
-                            addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub Market News (Fallback)`, 'success');
-                        }
-                    }
-
-                    // Priorité 3: Finnhub Company (si les deux précédents vides)
-                    if (newsArticles.length === 0 && finnhubCompanyResult.status === 'fulfilled' && finnhubCompanyResult.value) {
-                        const finnhubData = Array.isArray(finnhubCompanyResult.value) ? finnhubCompanyResult.value : [];
-                        if (finnhubData.length > 0) {
-                            newsArticles = finnhubData.slice(0, 50).map(article => ({
-                                title: article.headline,
-                                description: article.summary || '',
-                                url: article.url || '#',
-                                publishedAt: new Date(article.datetime * 1000).toISOString(),
-                                source: { name: article.source || 'Finnhub' },
-                                sentiment: article.sentiment || 'neutral',
-                                category: availableTickers[0]
-                            }));
-                            addLog(`✅ ${newsArticles.length} actualités chargées depuis Finnhub Company News (Last Resort)`, 'success');
-                        }
-                    }
-
-                    if (newsArticles.length > 0) {
-                        const sortedNews = sortNewsByCredibility(newsArticles);
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.articles && data.articles.length > 0) {
+                        // Formater les articles pour compatibilité avec l'UI existante
+                        const formattedArticles = data.articles.map(article => ({
+                            title: article.title || article.headline,
+                            description: article.summary || '',
+                            url: article.url,
+                            publishedAt: article.published_at || article.datetime || article.date,
+                            source: { 
+                                name: article.source_original || article.source || article.source_provider || 'Unknown',
+                                provider: article.source_provider
+                            },
+                            relevance_score: article.relevance_score,
+                            sentiment: 'neutral', // Peut être enrichi plus tard
+                            category: article.category || 'general',
+                            image: article.image
+                        }));
+                        
+                        // Trier par score de pertinence (déjà trié par l'API, mais on peut re-trier pour être sûr)
+                        const sortedNews = formattedArticles.sort((a, b) => 
+                            (b.relevance_score || 0) - (a.relevance_score || 0)
+                        );
+                        
                         setNewsData(sortedNews);
                         setFilteredNews(sortedNews);
-                        addLog(`✅ ${sortedNews.length} actualités triées par crédibilité`, 'success');
+                        addLog(`✅ ${sortedNews.length} actualités chargées depuis ${data.sources?.join(', ') || 'sources multiples'} (contexte: ${newsContext})`, 'success');
                     } else {
-                        addLog('⚠️ Toutes les sources d\'actualités ont retourné des données vides', 'warning');
+                        addLog('⚠️ Aucune actualité trouvée', 'warning');
                         setNewsData([]);
                         setFilteredNews([]);
                     }
 
                 } catch (error) {
-                    addLog(`❌ ERREUR CRITIQUE: ${error.message}`, 'error');
+                    addLog(`❌ ERREUR: ${error.message}`, 'error');
                     addLog('💡 Vérifiez les clés API dans Admin JSLAI', 'warning');
                     setNewsData([]);
                     setFilteredNews([]);
