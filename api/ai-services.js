@@ -1082,6 +1082,68 @@ const topMoversCache = {
   ttl: 5 * 60 * 1000 // 5 minutes
 };
 
+// Helper pour sauvegarder dans le cache Supabase (write-through cache)
+async function saveToSupabaseCache(cacheType, data, updateTimes = []) {
+  try {
+    const API_BASE_URL = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_API_URL || 'https://gob-projetsjsls-projects.vercel.app';
+    
+    const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        type: cacheType,
+        date: new Date().toISOString().split('T')[0],
+        data: data,
+        update_times: updateTimes
+      })
+    });
+
+    if (response.ok) {
+      console.log(`✅ Cache Supabase sauvegardé: ${cacheType}`);
+      return true;
+    } else {
+      console.warn(`⚠️ Erreur sauvegarde cache Supabase: ${response.status}`);
+      return false;
+    }
+  } catch (error) {
+    console.warn(`⚠️ Erreur sauvegarde cache Supabase (non bloquant):`, error.message);
+    return false; // Non bloquant, on continue même si le cache échoue
+  }
+}
+
+// Helper pour récupérer depuis le cache Supabase
+async function getFromSupabaseCache(cacheType, date = null) {
+  try {
+    const API_BASE_URL = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_API_URL || 'https://gob-projetsjsls-projects.vercel.app';
+    
+    const cacheDate = date || new Date().toISOString().split('T')[0];
+    const response = await fetch(
+      `${API_BASE_URL}/api/supabase-daily-cache?type=${cacheType}&date=${cacheDate}`
+    );
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.success && result.cached && !result.expired) {
+        console.log(`✅ Cache Supabase trouvé: ${cacheType} (${result.age_hours}h)`);
+        return result.data;
+      } else if (result.success && result.cached && result.expired) {
+        console.log(`⚠️ Cache Supabase expiré: ${cacheType} (${result.age_hours}h)`);
+        return null; // Cache expiré, on va récupérer depuis l'API
+      }
+    }
+    return null;
+  } catch (error) {
+    console.warn(`⚠️ Erreur récupération cache Supabase (non bloquant):`, error.message);
+    return null; // Non bloquant, on continue avec l'API
+  }
+}
+
 // Helper pour fetch avec timeout
 const fetchWithTimeout = async (url, timeout = 8000) => {
   const controller = new AbortController();
@@ -1107,13 +1169,26 @@ const fetchWithTimeout = async (url, timeout = 8000) => {
 };
 
 async function getTopMovers() {
-  // Vérifier le cache d'abord
+  // 1. Vérifier le cache mémoire d'abord
   const now = Date.now();
   if (topMoversCache.data && topMoversCache.timestamp && 
       (now - topMoversCache.timestamp) < topMoversCache.ttl) {
-    console.log('📦 Top Movers: Cache hit');
+    console.log('📦 Top Movers: Cache mémoire hit');
     return {
       ...topMoversCache.data,
+      cached: true
+    };
+  }
+
+  // 2. Vérifier le cache Supabase
+  const supabaseCache = await getFromSupabaseCache('top_movers');
+  if (supabaseCache) {
+    console.log('📦 Top Movers: Cache Supabase hit');
+    // Mettre à jour le cache mémoire aussi
+    topMoversCache.data = supabaseCache;
+    topMoversCache.timestamp = now;
+    return {
+      ...supabaseCache,
       cached: true
     };
   }
@@ -1247,9 +1322,12 @@ async function getTopMovers() {
       executionTime
     };
     
-    // Mettre en cache
+    // Mettre en cache mémoire
     topMoversCache.data = result;
     topMoversCache.timestamp = now;
+    
+    // Sauvegarder dans Supabase (write-through cache)
+    await saveToSupabaseCache('top_movers', result.data || result);
     
     return result;
   } catch (error) {
