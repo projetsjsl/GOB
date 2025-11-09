@@ -840,6 +840,11 @@ const fetchHybridData = async (symbol, dataType) => {
             const [filteredNews, setFilteredNews] = useState([]); // Actualités filtrées
             const [frenchOnly, setFrenchOnly] = useState(false); // Filtre pour nouvelles en français
 
+            // États pour les slash commands
+            const [showSlashSuggestions, setShowSlashSuggestions] = useState(false);
+            const [slashSuggestions, setSlashSuggestions] = useState([]);
+            const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+
             // États pour la gestion du cache
             const [cacheSettings, setCacheSettings] = useState(() => {
                 const saved = localStorage.getItem('cacheSettings');
@@ -14998,21 +15003,156 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                             </div>
 
-                            {/* Input */}
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={emmaInput}
-                                    onChange={(e) => setEmmaInput(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && sendMessageToEmma()}
-                                    placeholder="Posez votre question à Emma..."
-                                    className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                    }`}
-                                    disabled={emmaLoading}
-                                />
+                            {/* Input avec suggestions slash commands */}
+                            <div className="relative flex gap-2">
+                                <div className="flex-1 relative">
+                                    <input
+                                        type="text"
+                                        value={emmaInput}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setEmmaInput(value);
+                                            
+                                            // Détecter si l'utilisateur tape un slash command
+                                            if (value.startsWith('/')) {
+                                                const query = value.slice(1).toLowerCase();
+                                                const commands = [
+                                                    { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
+                                                    { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
+                                                    { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
+                                                    { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
+                                                    { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
+                                                    { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
+                                                    { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
+                                                    { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
+                                                    { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
+                                                    { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
+                                                ];
+                                                
+                                                const filtered = commands.filter(c => 
+                                                    c.cmd.slice(1).toLowerCase().startsWith(query) || 
+                                                    c.desc.toLowerCase().includes(query)
+                                                );
+                                                
+                                                if (filtered.length > 0 && query.length > 0) {
+                                                    setSlashSuggestions(filtered);
+                                                    setShowSlashSuggestions(true);
+                                                    setSelectedSuggestionIndex(-1);
+                                                } else if (query.length === 0) {
+                                                    setSlashSuggestions(commands);
+                                                    setShowSlashSuggestions(true);
+                                                    setSelectedSuggestionIndex(-1);
+                                                } else {
+                                                    setShowSlashSuggestions(false);
+                                                }
+                                            } else {
+                                                setShowSlashSuggestions(false);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (showSlashSuggestions && slashSuggestions.length > 0) {
+                                                if (e.key === 'ArrowDown') {
+                                                    e.preventDefault();
+                                                    setSelectedSuggestionIndex(prev => 
+                                                        prev < slashSuggestions.length - 1 ? prev + 1 : prev
+                                                    );
+                                                } else if (e.key === 'ArrowUp') {
+                                                    e.preventDefault();
+                                                    setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+                                                } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+                                                    e.preventDefault();
+                                                    const selected = slashSuggestions[selectedSuggestionIndex];
+                                                    setEmmaInput(selected.cmd + ' ');
+                                                    setShowSlashSuggestions(false);
+                                                    setSelectedSuggestionIndex(-1);
+                                                } else if (e.key === 'Escape') {
+                                                    setShowSlashSuggestions(false);
+                                                    setSelectedSuggestionIndex(-1);
+                                                } else if (e.key === 'Enter' && !showSlashSuggestions) {
+                                                    sendMessageToEmma();
+                                                }
+                                            } else if (e.key === 'Enter') {
+                                                sendMessageToEmma();
+                                            }
+                                        }}
+                                        onFocus={() => {
+                                            if (emmaInput.startsWith('/')) {
+                                                const query = emmaInput.slice(1).toLowerCase();
+                                                const commands = [
+                                                    { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
+                                                    { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
+                                                    { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
+                                                    { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
+                                                    { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
+                                                    { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
+                                                    { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
+                                                    { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
+                                                    { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
+                                                    { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
+                                                ];
+                                                const filtered = query.length > 0 
+                                                    ? commands.filter(c => c.cmd.slice(1).toLowerCase().startsWith(query))
+                                                    : commands;
+                                                setSlashSuggestions(filtered);
+                                                setShowSlashSuggestions(filtered.length > 0);
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            // Délai pour permettre le clic sur une suggestion
+                                            setTimeout(() => setShowSlashSuggestions(false), 200);
+                                        }}
+                                        placeholder="Posez votre question à Emma... (Tapez / pour voir les commandes)"
+                                        className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${
+                                            isDarkMode 
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                        }`}
+                                        disabled={emmaLoading}
+                                    />
+                                    
+                                    {/* Suggestions de slash commands */}
+                                    {showSlashSuggestions && slashSuggestions.length > 0 && (
+                                        <div className={`absolute z-50 w-full mt-1 rounded-lg border shadow-lg max-h-64 overflow-y-auto ${
+                                            isDarkMode 
+                                                ? 'bg-gray-800 border-gray-700' 
+                                                : 'bg-white border-gray-300'
+                                        }`}>
+                                            {slashSuggestions.map((suggestion, index) => (
+                                                <div
+                                                    key={suggestion.cmd}
+                                                    onClick={() => {
+                                                        setEmmaInput(suggestion.cmd + ' ');
+                                                        setShowSlashSuggestions(false);
+                                                        setSelectedSuggestionIndex(-1);
+                                                    }}
+                                                    className={`px-4 py-2 cursor-pointer transition-colors ${
+                                                        index === selectedSuggestionIndex
+                                                            ? isDarkMode 
+                                                                ? 'bg-gray-700' 
+                                                                : 'bg-gray-100'
+                                                            : ''
+                                                    } ${
+                                                        isDarkMode 
+                                                            ? 'hover:bg-gray-700 text-gray-200' 
+                                                            : 'hover:bg-gray-50 text-gray-900'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-lg">{suggestion.icon}</span>
+                                                        <div className="flex-1">
+                                                            <div className="font-semibold text-sm">{suggestion.cmd}</div>
+                                                            <div className={`text-xs ${
+                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                            }`}>
+                                                                {suggestion.desc}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                                 <button
                                     data-emma-send-button
                                     onClick={() => {
