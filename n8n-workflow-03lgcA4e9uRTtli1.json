@@ -960,7 +960,7 @@
         "conditions": {
           "boolean": [
             {
-              "value1": "={{ $json.ai_model === 'emma' || $json.ai_model === undefined }}",
+              "value1": "={{ $json.ai_model === 'emma' }}",
               "value2": true
             }
           ]
