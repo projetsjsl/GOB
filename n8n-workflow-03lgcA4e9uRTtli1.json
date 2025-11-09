@@ -1032,23 +1032,12 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "ai-model-dropdown",
-              "name": "ai_model",
-              "value": "emma",
-              "type": "string"
-            }
-          ]
-        },
-        "includeOtherFields": true,
-        "options": {}
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// 🤖 SÉLECTEUR DE MODÈLE IA - MODIFIEZ ICI ⚙️\n// ═══════════════════════════════════════════════════════════\n//\n// 👇 MODIFIEZ LA VALEUR CI-DESSOUS 👇\n//\nconst AI_MODEL = 'emma';\n//\n// Options disponibles:\n//   - 'emma'    → Utilise Emma (Perplexity) via /api/chat\n//   - 'gemini'  → Utilise Gemini directement\n//\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ai_model: AI_MODEL,\n    _model_info: AI_MODEL === 'emma' \n      ? '🤖 Emma (Perplexity) - Recherche web en temps réel' \n      : '✨ Gemini Direct - Réponse rapide'\n  }\n}));"
       },
       "id": "ai-model-config-dropdown",
-      "name": "⚙️ AI Model: emma ou gemini",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "name": "⚙️ AI Model Selector (Change AI_MODEL)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         19264,
         4536
@@ -1497,7 +1486,7 @@
         ]
       ]
     },
-    "⚙️ AI Model: emma ou gemini": {
+    "⚙️ AI Model Selector (Change AI_MODEL)": {
       "main": [
         [
           {
