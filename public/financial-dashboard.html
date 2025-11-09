@@ -55,6 +55,7 @@
             const [stockData, setStockData] = useState({});
             const [newsData, setNewsData] = useState([]);
             const [newsContext, setNewsContext] = useState('general'); // general, quebec, french_canada, crypto, analysis
+            const [tickerMoveReasons, setTickerMoveReasons] = useState({}); // Explications "Why Is It Moving?" par ticker
             const [seekingAlphaData, setSeekingAlphaData] = useState({});
             const [loading, setLoading] = useState(false);
             const [message, setMessage] = useState(null);
@@ -148,6 +149,9 @@
                 setLastUpdate(new Date());
                 setLoading(false);
                 showMessage('Données mises à jour', 'success');
+                
+                // Charger les explications "Why Is It Moving?" après le chargement des stocks
+                fetchWhyMovingForTickers();
             };
 
             // Actualités via endpoint unifié (FMP, Finnhub, Finviz, RSS)
@@ -204,12 +208,46 @@
                 }
             };
 
+            // Fonction pour récupérer "Why Is It Moving?" pour chaque ticker
+            const fetchWhyMovingForTickers = async () => {
+                if (tickers.length === 0) return;
+                
+                const moveReasonsMap = {};
+                const promises = tickers.map(async (ticker) => {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/finviz-why-moving?ticker=${ticker}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.explanation) {
+                                moveReasonsMap[ticker] = {
+                                    explanation: data.explanation,
+                                    explanation_enriched: data.explanation_enriched,
+                                    date: data.date,
+                                    source: data.source || 'Finviz AI',
+                                    type: data.type || 'general'
+                                };
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Erreur récupération "Why Is It Moving?" pour ${ticker}:`, error);
+                    }
+                });
+                
+                await Promise.all(promises);
+                setTickerMoveReasons(moveReasonsMap);
+                console.log(`✅ "Why Is It Moving?" chargé pour ${Object.keys(moveReasonsMap).length} tickers`);
+            };
+
             // Initialisation
             useEffect(() => {
                 loadTickers();
                 refreshAllStocks();
                 fetchNews();
                 fetchSeekingAlphaData();
+                // Charger les explications "Why Is It Moving?" après un court délai
+                setTimeout(() => {
+                    fetchWhyMovingForTickers();
+                }, 2000);
                 // Suppression de l'auto-refresh: on ne met à jour que sur arrivée ou clic bouton
             }, []);
 
@@ -319,6 +357,28 @@
                                         <div>Plus haut: ${data.h?.toFixed(2) || 'N/A'}</div>
                                         <div>Plus bas: ${data.l?.toFixed(2) || 'N/A'}</div>
                                     </div>
+                                    
+                                    {/* Explication "Why Is It Moving?" */}
+                                    {tickerMoveReasons[ticker]?.explanation && (
+                                        <div className="mt-3 pt-3 border-t border-gray-700">
+                                            <div className="flex items-start gap-2">
+                                                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                                    AI
+                                                </span>
+                                                <div className="flex-1">
+                                                    <div className="text-xs text-gray-500 mb-1">
+                                                        Pourquoi ça bouge?
+                                                    </div>
+                                                    <div className="text-xs text-gray-300">
+                                                        {tickerMoveReasons[ticker].explanation_enriched || tickerMoveReasons[ticker].explanation}
+                                                    </div>
+                                                    <div className="text-[10px] text-gray-500 mt-1">
+                                                        {tickerMoveReasons[ticker].date} • {tickerMoveReasons[ticker].source}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}

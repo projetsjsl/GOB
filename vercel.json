@@ -58,6 +58,12 @@
     "api/finviz-news.js": {
       "maxDuration": 15
     },
+    "api/finviz-why-moving.js": {
+      "maxDuration": 15
+    },
+    "api/news.js": {
+      "maxDuration": 30
+    },
     "api/chat.js": {
       "maxDuration": 90
     },

@@ -959,7 +959,8 @@
               "value2": "emma"
             }
           ]
-        }
+        },
+        "options": {}
       },
       "id": "ai-model-selector-switch",
       "name": "Choose AI Model (IF)",

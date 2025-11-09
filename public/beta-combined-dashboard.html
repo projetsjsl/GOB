@@ -1333,8 +1333,9 @@ const fetchHybridData = async (symbol, dataType) => {
             };
 
             // Fonction pour récupérer la news la plus récente et pertinente pour chaque ticker
+            // AMÉLIORÉ avec "Why Is It Moving?" de Finviz
             const fetchLatestNewsForTickers = async () => {
-                console.log('📰 Chargement des news récentes pour chaque ticker...');
+                console.log('📰 Chargement des news récentes et explications de mouvement pour chaque ticker...');
                 
                 // Vérifier d'abord les données préchargées depuis la page de login
                 const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
@@ -1347,6 +1348,9 @@ const fetchHybridData = async (symbol, dataType) => {
                         if (preloadedData.titlesTabData?.tickerLatestNews && dataAge < MAX_AGE) {
                             console.log('⚡ Utilisation des nouvelles par ticker préchargées');
                             setTickerLatestNews(preloadedData.titlesTabData.tickerLatestNews);
+                            if (preloadedData.titlesTabData.tickerMoveReasons) {
+                                setTickerMoveReasons(preloadedData.titlesTabData.tickerMoveReasons);
+                            }
                             console.log(`✅ Nouvelles préchargées pour ${Object.keys(preloadedData.titlesTabData.tickerLatestNews).length} tickers`);
                             return;
                         }
@@ -1357,10 +1361,43 @@ const fetchHybridData = async (symbol, dataType) => {
                 
                 const today = new Date().toISOString().split('T')[0];
                 const newsMap = {};
+                const moveReasonsMap = {};
 
                 const newsPromises = tickers.map(async (ticker) => {
                     try {
-                        // Essayer Finnhub company news d'abord (plus spécifique)
+                        // PRIORITÉ 1: Finviz "Why Is It Moving?" (explication AI-driven)
+                        try {
+                            const whyMovingResponse = await fetch(`${API_BASE_URL}/api/finviz-why-moving?ticker=${ticker}`);
+                            if (whyMovingResponse.ok) {
+                                const whyMovingData = await whyMovingResponse.json();
+                                if (whyMovingData.success && whyMovingData.explanation) {
+                                    moveReasonsMap[ticker] = {
+                                        explanation: whyMovingData.explanation,
+                                        explanation_enriched: whyMovingData.explanation_enriched,
+                                        date: whyMovingData.date,
+                                        source: whyMovingData.source || 'Finviz AI',
+                                        type: whyMovingData.type || 'general',
+                                        timestamp: whyMovingData.timestamp
+                                    };
+                                    
+                                    // Utiliser aussi comme news principale
+                                    newsMap[ticker] = {
+                                        title: whyMovingData.explanation,
+                                        source: whyMovingData.source || 'Finviz AI',
+                                        date: whyMovingData.date,
+                                        url: '#',
+                                        type: whyMovingData.type,
+                                        isWhyMoving: true
+                                    };
+                                    console.log(`✅ "Why Is It Moving?" trouvé pour ${ticker}`);
+                                    return;
+                                }
+                            }
+                        } catch (whyMovingError) {
+                            console.warn(`⚠️ Finviz Why Moving non disponible pour ${ticker}:`, whyMovingError.message);
+                        }
+
+                        // PRIORITÉ 2: Finnhub company news (plus spécifique)
                         const finnhubResponse = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${ticker}&from=${today}&to=${today}`);
                         if (finnhubResponse.ok) {
                             const finnhubData = await finnhubResponse.json();
@@ -1373,11 +1410,22 @@ const fetchHybridData = async (symbol, dataType) => {
                                     date: new Date(latestNews.datetime * 1000).toLocaleDateString('fr-FR'),
                                     url: latestNews.url || '#'
                                 };
+                                
+                                // Extraire raison de mouvement depuis la news
+                                const moveReason = extractMoveReasonFromNews(latestNews.headline || latestNews.title);
+                                if (moveReason) {
+                                    moveReasonsMap[ticker] = {
+                                        explanation: moveReason,
+                                        source: latestNews.source || 'Finnhub',
+                                        type: 'news',
+                                        date: new Date(latestNews.datetime * 1000).toLocaleDateString('fr-FR')
+                                    };
+                                }
                                 return;
                             }
                         }
 
-                        // Fallback: utiliser Finviz news si disponible
+                        // PRIORITÉ 3: Finviz news si disponible
                         if (finvizNews[ticker]) {
                             newsMap[ticker] = {
                                 title: finvizNews[ticker].headline || finvizNews[ticker].title,
@@ -1385,10 +1433,20 @@ const fetchHybridData = async (symbol, dataType) => {
                                 date: finvizNews[ticker].date || 'Aujourd\'hui',
                                 url: finvizNews[ticker].link || '#'
                             };
+                            
+                            const moveReason = extractMoveReasonFromNews(finvizNews[ticker].headline || finvizNews[ticker].title);
+                            if (moveReason) {
+                                moveReasonsMap[ticker] = {
+                                    explanation: moveReason,
+                                    source: 'Finviz',
+                                    type: 'news',
+                                    date: finvizNews[ticker].date
+                                };
+                            }
                             return;
                         }
 
-                        // Fallback: chercher dans les news générales
+                        // PRIORITÉ 4: Chercher dans les news générales
                         const relevantNews = newsData.find(article => 
                             article.title.toLowerCase().includes(ticker.toLowerCase()) ||
                             article.description?.toLowerCase().includes(ticker.toLowerCase())
@@ -1400,6 +1458,16 @@ const fetchHybridData = async (symbol, dataType) => {
                                 date: new Date(relevantNews.publishedAt).toLocaleDateString('fr-FR'),
                                 url: relevantNews.url || '#'
                             };
+                            
+                            const moveReason = extractMoveReasonFromNews(relevantNews.title);
+                            if (moveReason) {
+                                moveReasonsMap[ticker] = {
+                                    explanation: moveReason,
+                                    source: relevantNews.source?.name || 'Général',
+                                    type: 'news',
+                                    date: new Date(relevantNews.publishedAt).toLocaleDateString('fr-FR')
+                                };
+                            }
                         }
                     } catch (error) {
                         console.error(`Erreur récupération news pour ${ticker}:`, error);
@@ -1408,11 +1476,43 @@ const fetchHybridData = async (symbol, dataType) => {
 
                 await Promise.all(newsPromises);
                 setTickerLatestNews(newsMap);
+                setTickerMoveReasons(moveReasonsMap);
                 console.log(`✅ News récentes chargées pour ${Object.keys(newsMap).length} tickers`);
+                console.log(`✅ Explications de mouvement pour ${Object.keys(moveReasonsMap).length} tickers`);
+            };
+
+            // Fonction helper pour extraire raison de mouvement depuis une news
+            const extractMoveReasonFromNews = (newsTitle) => {
+                if (!newsTitle) return null;
+                
+                // Si la news contient déjà une explication claire, l'utiliser
+                const title = newsTitle.toLowerCase();
+                
+                // Mots-clés indicateurs d'explication
+                const explanationKeywords = ['because', 'due to', 'after', 'following', 'amid', 'on', 'as', 'car', 'suite à', 'après', 'en raison de'];
+                const hasExplanation = explanationKeywords.some(kw => title.includes(kw));
+                
+                if (hasExplanation || title.length > 50) {
+                    // Prendre les premiers 100 caractères comme explication
+                    return newsTitle.length > 100 ? newsTitle.substring(0, 100) + '...' : newsTitle;
+                }
+                
+                return null;
             };
 
             // Fonction pour extraire la raison du mouvement depuis les news
+            // AMÉLIORÉ pour utiliser "Why Is It Moving?" de Finviz en priorité
             const extractMoveReason = (ticker, changePercent) => {
+                // PRIORITÉ 1: Utiliser l'explication "Why Is It Moving?" de Finviz si disponible
+                const whyMoving = tickerMoveReasons[ticker];
+                if (whyMoving && whyMoving.explanation) {
+                    // Utiliser l'explication enrichie par AI si disponible, sinon l'explication originale
+                    const explanation = whyMoving.explanation_enriched || whyMoving.explanation;
+                    // Limiter à 120 caractères pour l'affichage
+                    return explanation.length > 120 ? explanation.substring(0, 120) + '...' : explanation;
+                }
+
+                // PRIORITÉ 2: Utiliser la news récente avec analyse de correspondance au mouvement
                 const news = tickerLatestNews[ticker];
                 if (!news) return null;
 
@@ -1433,6 +1533,12 @@ const fetchHybridData = async (symbol, dataType) => {
                     return news.title.length > 80 ? news.title.substring(0, 80) + '...' : news.title;
                 }
 
+                // Si la news a le flag isWhyMoving (venant de Finviz), l'utiliser directement
+                if (news.isWhyMoving) {
+                    return news.title.length > 100 ? news.title.substring(0, 100) + '...' : news.title;
+                }
+
+                // Fallback: retourner la news même si pas de correspondance parfaite
                 return news.title.length > 60 ? news.title.substring(0, 60) + '...' : news.title;
             };
 
@@ -15161,7 +15267,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         </div>
                                                         {extractMoveReason(item.ticker, item.change) && (
                                                             <div className={`text-xs mt-1 ml-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                                📰 {extractMoveReason(item.ticker, item.change)}
+                                                                {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
+                                                                    <span className="inline-flex items-center gap-1.5">
+                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                                                            AI
+                                                                        </span>
+                                                                        <span>{extractMoveReason(item.ticker, item.change)}</span>
+                                                                    </span>
+                                                                ) : (
+                                                                    <span>📰 {extractMoveReason(item.ticker, item.change)}</span>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </div>
@@ -15224,7 +15339,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         </div>
                                                         {extractMoveReason(item.ticker, item.change) && (
                                                             <div className={`text-xs mt-1 ml-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                                📰 {extractMoveReason(item.ticker, item.change)}
+                                                                {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
+                                                                    <span className="inline-flex items-center gap-1.5">
+                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                                                            AI
+                                                                        </span>
+                                                                        <span>{extractMoveReason(item.ticker, item.change)}</span>
+                                                                    </span>
+                                                                ) : (
+                                                                    <span>📰 {extractMoveReason(item.ticker, item.change)}</span>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </div>
