@@ -1103,7 +1103,7 @@
       "main": [
         [
           {
-            "node": "Prepare API Request",
+            "node": "AI Model Config",
             "type": "main",
             "index": 0
           }
