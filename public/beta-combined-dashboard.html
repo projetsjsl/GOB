@@ -1990,7 +1990,7 @@ const fetchHybridData = async (symbol, dataType) => {
                         const cacheResult = await cacheResponse.json();
                         if (cacheResult.success && cacheResult.cached && !cacheResult.expired) {
                             const ageHours = parseFloat(cacheResult.age_hours || 0);
-                            if (ageHours < 6) { // Cache valide pendant 6 heures
+                            if (ageHours < 4) { // Cache valide pendant 4 heures
                                 console.log(`✅ Analyse Gemini depuis cache Supabase (${ageHours.toFixed(1)}h)`);
                                 showMessage(`Analyse chargée depuis le cache (${ageHours.toFixed(1)}h)`, 'success');
                                 return; // Utiliser le cache, pas besoin d'appeler Gemini
@@ -3390,20 +3390,24 @@ const fetchHybridData = async (symbol, dataType) => {
             }, [initialLoadComplete]); // Se déclenche après l'initialisation, indépendamment de l'onglet actif
 
             // Rafraîchir les données tickers lors de la navigation si elles sont anciennes
+            // Note: Les news ne sont PAS rafraîchies automatiquement (utilisent le cache 4h)
             useEffect(() => {
                 if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminée
                 if (tickers.length === 0) return; // Pas de tickers à rafraîchir
                 if (Object.keys(stockData).length === 0) return; // Pas de données à vérifier
 
-                // Vérifier l'âge des données (si > 10 minutes, rafraîchir)
+                // Vérifier l'âge des données tickers uniquement (si > 10 minutes, rafraîchir)
+                // Les news utilisent le cache Supabase (4h) et ne sont pas rafraîchies automatiquement
                 const MAX_DATA_AGE = 10 * 60 * 1000; // 10 minutes
                 const dataAge = lastUpdate ? (Date.now() - new Date(lastUpdate).getTime()) : Infinity;
 
                 if (dataAge > MAX_DATA_AGE) {
                     console.log(`🔄 Données tickers anciennes (${Math.round(dataAge / 60000)} min), rafraîchissement...`);
+                    // Rafraîchir seulement les données tickers, pas les news
                     refreshAllStocks().catch(err => {
                         console.error('❌ Erreur rafraîchissement données:', err);
                     });
+                    // Les news restent dans le cache Supabase (4h) et ne sont pas rafraîchies
                 }
             }, [activeTab, initialLoadComplete]); // Se déclenche lors du changement d'onglet
 

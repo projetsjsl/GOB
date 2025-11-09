@@ -9,7 +9,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const MAX_CACHE_AGE_HOURS = 2; // Cache valide pendant 2 heures
+const MAX_CACHE_AGE_HOURS = 4; // Cache valide pendant 4 heures
 
 export default async function handler(req, res) {
   // CORS Headers
