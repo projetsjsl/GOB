@@ -96,6 +96,21 @@ Ce document analyse l'état actuel des sources de news intégrées et évalue la
 
 **Conclusion**: Sources crypto non intégrées. Accessibles via RSS. Intégration recommandée si besoin crypto.
 
+### Sources Québécoises et Françaises Canadiennes
+
+| Source | Intégrée via | Méthode Actuelle | Faisabilité Directe | Score Pertinence |
+|--------|--------------|------------------|---------------------|------------------|
+| **Les Affaires** | ✅ Oui | RSS | ✅ RSS disponible | 8.8/10 |
+| **La Presse** | ✅ Oui | RSS | ✅ RSS disponible | 8.7/10 |
+| **Le Devoir** | ✅ Oui | RSS | ✅ RSS disponible | 8.5/10 |
+| **Radio-Canada Économie** | ✅ Oui | RSS | ✅ RSS disponible | 8.7/10 |
+| **Le Journal de Montréal** | ✅ Oui | RSS | ✅ RSS disponible | 7.5/10 |
+| **Le Soleil** | ✅ Oui | RSS | ✅ RSS disponible | 7.4/10 |
+| **TVA Nouvelles** | ✅ Oui | RSS | ✅ RSS disponible | 7.6/10 |
+| **BNN Bloomberg (FR)** | ✅ Oui | RSS | ✅ RSS disponible | 8.85/10 |
+
+**Conclusion**: Toutes les sources québécoises principales sont maintenant intégrées via RSS. Excellente couverture pour le marché québécois et canadien francophone. Utiliser le contexte `quebec` ou `french_canada` dans l'API.
+
 ### Sources Stock News (Sélection des plus pertinentes)
 
 | Source | Intégrée via | Méthode Actuelle | Faisabilité Directe | Score Pertinence |
@@ -143,7 +158,13 @@ Ce document analyse l'état actuel des sources de news intégrées et évalue la
 - **Effort**: Faible
 - **Impact**: Faible (si pas de focus crypto)
 
-2. **Parser RSS sources premium** (si RSS disponible)
+2. **Intégrer sources québécoises** ✅ **COMPLÉTÉ**
+- **Sources**: Les Affaires, La Presse, Le Devoir, Radio-Canada, BNN Bloomberg FR, etc.
+- **Faisabilité**: ✅ Élevée
+- **Effort**: Faible
+- **Impact**: Élevé pour marché québécois
+
+3. **Parser RSS sources premium** (si RSS disponible)
 - **Sources**: MarketWatch, CNBC, Forbes, Fortune
 - **Faisabilité**: ✅ Élevée
 - **Effort**: Faible

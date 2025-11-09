@@ -436,7 +436,9 @@ function selectRSSFeedsForContext(context) {
     general: ['seeking_alpha', 'zero_hedge', 'marketwatch', 'cnbc', 'forbes'],
     crypto: ['coindesk', 'cointelegraph', 'cryptoslate'],
     analysis: ['seeking_alpha', 'the_big_picture', 'calculated_risk', 'the_capital_spectator'],
-    sectorial: ['seeking_alpha', 'zero_hedge', 'the_big_picture']
+    sectorial: ['seeking_alpha', 'zero_hedge', 'the_big_picture'],
+    quebec: ['les_affaires', 'la_presse', 'le_devoir', 'radio_canada_economie', 'bnn_bloomberg_fr'],
+    french_canada: ['les_affaires', 'la_presse', 'le_devoir', 'radio_canada_economie', 'journal_montreal', 'le_soleil', 'tva_nouvelles']
   };
 
   return contextFeeds[context] || contextFeeds.general;

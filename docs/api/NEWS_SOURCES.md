@@ -85,6 +85,12 @@ GET /api/news?q=bitcoin&context=crypto&limit=15
 
 # News d'analyse
 GET /api/news?q=earnings&context=analysis&limit=10
+
+# News québécoises
+GET /api/news?q=quebec OR montreal&context=quebec&limit=20
+
+# News en français canadien
+GET /api/news?q=canada&context=french_canada&limit=15
 ```
 
 **Réponse**:
@@ -165,6 +171,8 @@ Le scoring s'adapte selon le contexte:
 - **`crypto`**: Sources cryptomonnaies (CoinDesk, Cointelegraph, CryptoSlate)
 - **`analysis`**: Blogs d'analyse (Seeking Alpha, The Big Picture, Calculated Risk)
 - **`sectorial`**: News sectorielles (Seeking Alpha, Zero Hedge)
+- **`quebec`**: Actualités financières québécoises (Les Affaires, La Presse, Le Devoir, Radio-Canada, BNN Bloomberg FR)
+- **`french_canada`**: Actualités en français canadien (toutes sources québécoises + régionales)
 
 ## 🔄 Déduplication
 
@@ -248,6 +256,17 @@ articles.forEach(article => {
 - **Business Insider**: `https://www.businessinsider.com/rss`
 - **TechCrunch**: `https://techcrunch.com/feed/`
 - **Motley Fool**: `https://www.fool.com/feeds/index.aspx`
+
+### Sources Québécoises et Françaises Canadiennes (RSS)
+
+- **Les Affaires**: `https://www.lesaffaires.com/rss` - Source financière québécoise de référence
+- **La Presse**: `https://www.lapresse.ca/rss/affaires.xml` - Source québécoise majeure
+- **Le Devoir**: `https://www.ledevoir.com/rss/economie.xml` - Source québécoise indépendante
+- **Radio-Canada Économie**: `https://ici.radio-canada.ca/rss/economie.xml` - Source publique québécoise
+- **Le Journal de Montréal**: `https://www.journaldemontreal.com/rss/affaires.xml` - Source québécoise populaire
+- **Le Soleil**: `https://www.lesoleil.com/rss/affaires.xml` - Source régionale québécoise
+- **TVA Nouvelles Économie**: `https://www.tvanouvelles.ca/rss/economie.xml` - Source québécoise TV
+- **BNN Bloomberg (FR)**: `https://www.bnnbloomberg.ca/fr/rss` - Source financière canadienne en français
 
 ## 🚀 Améliorations Futures
 

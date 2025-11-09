@@ -25,6 +25,14 @@
     "analysis": {
       "description": "Analyses approfondies et opinions",
       "preferred_sources": ["seeking_alpha", "calculated_risk", "the_capital_spectator", "strategy"]
+    },
+    "quebec": {
+      "description": "Actualités financières québécoises et françaises canadiennes",
+      "preferred_sources": ["les_affaires", "la_presse", "le_devoir", "radio_canada_economie", "bnn_bloomberg_fr"]
+    },
+    "french_canada": {
+      "description": "Actualités en français canadien",
+      "preferred_sources": ["les_affaires", "la_presse", "le_devoir", "radio_canada_economie", "journal_montreal", "le_soleil"]
     }
   },
   "sources": {
@@ -531,6 +539,158 @@
       "rss_available": false,
       "cost": "premium_api_paid",
       "notes": "API payante, accessible via agrégateurs"
+    },
+    "les_affaires": {
+      "name": "Les Affaires",
+      "category": "quebec",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 10,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 9
+      },
+      "calculated_score": 8.80,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "language": "fr-CA",
+      "notes": "Source financière québécoise de référence, RSS disponible"
+    },
+    "la_presse": {
+      "name": "La Presse",
+      "category": "quebec",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 8,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 9,
+        "cost": 9
+      },
+      "calculated_score": 8.70,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "language": "fr-CA",
+      "notes": "Source québécoise majeure, RSS disponible"
+    },
+    "le_devoir": {
+      "name": "Le Devoir",
+      "category": "quebec",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 8,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 9
+      },
+      "calculated_score": 8.50,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "language": "fr-CA",
+      "notes": "Source québécoise indépendante, RSS disponible"
+    },
+    "radio_canada_economie": {
+      "name": "Radio-Canada Économie",
+      "category": "quebec",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 8,
+        "frequency": 9,
+        "accessibility": 9,
+        "coverage": 9,
+        "cost": 9
+      },
+      "calculated_score": 8.70,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "language": "fr-CA",
+      "notes": "Source publique québécoise, RSS disponible"
+    },
+    "journal_montreal": {
+      "name": "Le Journal de Montréal",
+      "category": "quebec",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 7,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 9
+      },
+      "calculated_score": 7.50,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "language": "fr-CA",
+      "notes": "Source québécoise populaire, RSS disponible"
+    },
+    "le_soleil": {
+      "name": "Le Soleil",
+      "category": "quebec",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 7,
+        "frequency": 8,
+        "accessibility": 8,
+        "coverage": 7,
+        "cost": 9
+      },
+      "calculated_score": 7.40,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "language": "fr-CA",
+      "notes": "Source régionale québécoise, RSS disponible"
+    },
+    "tva_nouvelles": {
+      "name": "TVA Nouvelles Économie",
+      "category": "quebec",
+      "scores": {
+        "reliability": 7,
+        "financial_relevance": 7,
+        "frequency": 9,
+        "accessibility": 8,
+        "coverage": 8,
+        "cost": 9
+      },
+      "calculated_score": 7.60,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "language": "fr-CA",
+      "notes": "Source québécoise TV, RSS disponible"
+    },
+    "bnn_bloomberg_fr": {
+      "name": "BNN Bloomberg (FR)",
+      "category": "quebec",
+      "scores": {
+        "reliability": 9,
+        "financial_relevance": 10,
+        "frequency": 9,
+        "accessibility": 7,
+        "coverage": 9,
+        "cost": 8
+      },
+      "calculated_score": 8.85,
+      "access_method": "rss_available",
+      "direct_api": false,
+      "rss_available": true,
+      "cost": "free",
+      "language": "fr-CA",
+      "notes": "Source financière canadienne en français, RSS disponible"
     }
   },
   "aggregators": {

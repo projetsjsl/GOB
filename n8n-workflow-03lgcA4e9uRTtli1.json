@@ -1119,11 +1119,6 @@
             "node": "Call /api/chat (Emma)",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Parse API Response",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -1224,11 +1219,6 @@
             "node": "Get Active Tickers",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Determine Time-Based Prompt",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -1247,11 +1237,6 @@
     "Fetch Prompts from API": {
       "main": [
         [
-          {
-            "node": "Determine Time-Based Prompt",
-            "type": "main",
-            "index": 0
-          },
           {
             "node": "Get Active Tickers",
             "type": "main",
