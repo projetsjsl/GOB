@@ -1424,7 +1424,7 @@
       "main": [
         [
           {
-            "node": "Fetch Prompts from API",
+            "node": "Merge Triggers",
             "type": "main",
             "index": 0
           }
@@ -1435,7 +1435,7 @@
       "main": [
         [
           {
-            "node": "Fetch Prompts from API",
+            "node": "Merge Triggers",
             "type": "main",
             "index": 0
           }
@@ -1446,7 +1446,7 @@
       "main": [
         [
           {
-            "node": "Fetch Prompts from API",
+            "node": "Merge Triggers",
             "type": "main",
             "index": 0
           }
@@ -1457,7 +1457,7 @@
       "main": [
         [
           {
-            "node": "Fetch Prompts from API",
+            "node": "Merge Triggers",
             "type": "main",
             "index": 0
           }
