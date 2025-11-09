@@ -1,47 +1,9 @@
 {
-  "name": "gob",
-  "private": true,
+  "name": "gob-dashboard",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --open --host",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "test:calendar": "node test-calendar-apis.js",
-    "cron:edt": "bash scripts/change-cron-timezone.sh edt",
-    "cron:est": "bash scripts/change-cron-timezone.sh est"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.65.0",
-    "@google/generative-ai": "^0.21.0",
-    "@octokit/rest": "^22.0.0",
-    "@supabase/supabase-js": "^2.76.1",
-    "dotenv": "^17.2.3",
-    "iconoir-react": "^7.11.0",
-    "openai": "^4.0.0",
-    "pg": "^8.16.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "resend": "^3.2.0",
-    "twilio": "^4.19.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
-    "@typescript-eslint/eslint-plugin": "^6.14.0",
-    "@typescript-eslint/parser": "^6.14.0",
-    "@vitejs/plugin-react": "^4.2.1",
-    "autoprefixer": "^10.4.16",
-    "eslint": "^8.55.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "gh-pages": "^6.1.0",
-    "postcss": "^8.4.32",
-    "tailwindcss": "^3.4.0",
-    "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "validate-workflow": "node validate-n8n-workflow.js",
+    "import-workflow": "node import-workflow-header-black-white.js"
   }
 }
