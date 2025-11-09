@@ -840,6 +840,18 @@ const fetchHybridData = async (symbol, dataType) => {
             const [filteredNews, setFilteredNews] = useState([]); // Actualités filtrées
             const [frenchOnly, setFrenchOnly] = useState(false); // Filtre pour nouvelles en français
 
+            // États pour la gestion du cache
+            const [cacheSettings, setCacheSettings] = useState(() => {
+                const saved = localStorage.getItem('cacheSettings');
+                return saved ? JSON.parse(saved) : {
+                    maxAgeHours: 4,
+                    refreshOnNavigation: true,
+                    refreshIntervalMinutes: 10
+                };
+            });
+            const [cacheStatus, setCacheStatus] = useState({});
+            const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
+
 
             // États pour  l'interface Seeking Alpha
             const [githubToken, setGithubToken] = useState('');
@@ -1362,7 +1374,7 @@ const fetchHybridData = async (symbol, dataType) => {
                 // 1. Vérifier le cache Supabase d'abord
                 try {
                     const cacheResponse = await fetch(
-                        `${API_BASE_URL}/api/supabase-daily-cache?type=ticker_news&date=${new Date().toISOString().split('T')[0]}`
+                        `${API_BASE_URL}/api/supabase-daily-cache?type=ticker_news&date=${new Date().toISOString().split('T')[0]}&maxAgeHours=${cacheSettings.maxAgeHours || 4}`
                     );
 
                     if (cacheResponse.ok) {
@@ -1797,7 +1809,7 @@ const fetchHybridData = async (symbol, dataType) => {
                 // 1. Vérifier le cache Supabase d'abord
                 try {
                     const cacheResponse = await fetch(
-                        `${API_BASE_URL}/api/supabase-daily-cache?type=general_news&date=${new Date().toISOString().split('T')[0]}`
+                        `${API_BASE_URL}/api/supabase-daily-cache?type=general_news&date=${new Date().toISOString().split('T')[0]}&maxAgeHours=${cacheSettings.maxAgeHours || 4}`
                     );
 
                     if (cacheResponse.ok) {
@@ -1898,7 +1910,7 @@ const fetchHybridData = async (symbol, dataType) => {
                 try {
                     // 1. Vérifier le cache Supabase d'abord
                     const cacheResponse = await fetch(
-                        `${API_BASE_URL}/api/supabase-daily-cache?type=top_movers_news&date=${new Date().toISOString().split('T')[0]}`
+                        `${API_BASE_URL}/api/supabase-daily-cache?type=top_movers_news&date=${new Date().toISOString().split('T')[0]}&maxAgeHours=${cacheSettings.maxAgeHours || 4}`
                     );
 
                     if (cacheResponse.ok) {
@@ -1983,15 +1995,16 @@ const fetchHybridData = async (symbol, dataType) => {
                 // 1. Vérifier le cache Supabase Gemini d'abord
                 try {
                     const cacheResponse = await fetch(
-                        `${API_BASE_URL}/api/supabase-daily-cache?type=gemini_analysis&date=${new Date().toISOString().split('T')[0]}`
+                        `${API_BASE_URL}/api/supabase-daily-cache?type=gemini_analysis&date=${new Date().toISOString().split('T')[0]}&maxAgeHours=${cacheSettings.maxAgeHours || 4}`
                     );
 
                     if (cacheResponse.ok) {
                         const cacheResult = await cacheResponse.json();
                         if (cacheResult.success && cacheResult.cached && !cacheResult.expired) {
                             const ageHours = parseFloat(cacheResult.age_hours || 0);
-                            if (ageHours < 4) { // Cache valide pendant 4 heures
-                                console.log(`✅ Analyse Gemini depuis cache Supabase (${ageHours.toFixed(1)}h)`);
+                            const maxAge = cacheResult.max_age_hours || cacheSettings.maxAgeHours || 4;
+                            if (ageHours < maxAge) {
+                                console.log(`✅ Analyse Gemini depuis cache Supabase (${ageHours.toFixed(1)}h / ${maxAge}h)`);
                                 showMessage(`Analyse chargée depuis le cache (${ageHours.toFixed(1)}h)`, 'success');
                                 return; // Utiliser le cache, pas besoin d'appeler Gemini
                             }
@@ -3390,15 +3403,16 @@ const fetchHybridData = async (symbol, dataType) => {
             }, [initialLoadComplete]); // Se déclenche après l'initialisation, indépendamment de l'onglet actif
 
             // Rafraîchir les données tickers lors de la navigation si elles sont anciennes
-            // Note: Les news ne sont PAS rafraîchies automatiquement (utilisent le cache 4h)
+            // Note: Les news ne sont PAS rafraîchies automatiquement (utilisent le cache configuré)
             useEffect(() => {
                 if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminée
                 if (tickers.length === 0) return; // Pas de tickers à rafraîchir
                 if (Object.keys(stockData).length === 0) return; // Pas de données à vérifier
+                if (!cacheSettings.refreshOnNavigation) return; // Rafraîchissement désactivé
 
-                // Vérifier l'âge des données tickers uniquement (si > 10 minutes, rafraîchir)
-                // Les news utilisent le cache Supabase (4h) et ne sont pas rafraîchies automatiquement
-                const MAX_DATA_AGE = 10 * 60 * 1000; // 10 minutes
+                // Vérifier l'âge des données tickers uniquement (utilise l'intervalle configuré)
+                // Les news utilisent le cache Supabase et ne sont pas rafraîchies automatiquement
+                const MAX_DATA_AGE = (cacheSettings.refreshIntervalMinutes || 10) * 60 * 1000;
                 const dataAge = lastUpdate ? (Date.now() - new Date(lastUpdate).getTime()) : Infinity;
 
                 if (dataAge > MAX_DATA_AGE) {
@@ -3407,9 +3421,9 @@ const fetchHybridData = async (symbol, dataType) => {
                     refreshAllStocks().catch(err => {
                         console.error('❌ Erreur rafraîchissement données:', err);
                     });
-                    // Les news restent dans le cache Supabase (4h) et ne sont pas rafraîchies
+                    // Les news restent dans le cache Supabase et ne sont pas rafraîchies
                 }
-            }, [activeTab, initialLoadComplete]); // Se déclenche lors du changement d'onglet
+            }, [activeTab, initialLoadComplete, cacheSettings.refreshOnNavigation, cacheSettings.refreshIntervalMinutes]); // Se déclenche lors du changement d'onglet
 
             // Charger les données de stocks une fois que les tickers sont disponibles (méthode batch optimisée)
             // Charger TOUS les tickers pour que les sections Top Movers, Top Gainers, Top Losers et Analyses fonctionnent
@@ -4408,6 +4422,194 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 📦 Gestion du Cache Supabase */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                                <Icon emoji="📦" size={20} />
+                                Gestion du Cache Supabase
+                            </h3>
+                            <button
+                                onClick={async () => {
+                                    setLoadingCacheStatus(true);
+                                    try {
+                                        const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache?type=status&maxAgeHours=${cacheSettings.maxAgeHours || 4}`);
+                                        if (response.ok) {
+                                            const data = await response.json();
+                                            setCacheStatus(data.status || {});
+                                        }
+                                    } catch (error) {
+                                        console.error('Erreur récupération statut cache:', error);
+                                    } finally {
+                                        setLoadingCacheStatus(false);
+                                    }
+                                }}
+                                disabled={loadingCacheStatus}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                    loadingCacheStatus
+                                        ? 'bg-gray-500 text-white cursor-not-allowed'
+                                        : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                }`}
+                            >
+                                {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
+                            </button>
+                        </div>
+
+                        {/* Paramètres du Cache */}
+                        <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <div className="font-semibold mb-3 flex items-center gap-2">
+                                    <Icon emoji="⚙️" size={16} />
+                                    Paramètres du Cache
+                                </div>
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="block text-sm mb-2">
+                                            Durée du cache (heures): <span className="font-bold text-blue-600">{cacheSettings.maxAgeHours}h</span>
+                                        </label>
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="12"
+                                            value={cacheSettings.maxAgeHours}
+                                            onChange={(e) => {
+                                                const newSettings = { ...cacheSettings, maxAgeHours: parseInt(e.target.value) };
+                                                setCacheSettings(newSettings);
+                                                localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
+                                            }}
+                                            className="w-full"
+                                        />
+                                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>1h</span>
+                                            <span>6h</span>
+                                            <span>12h</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="refreshOnNavigation"
+                                            checked={cacheSettings.refreshOnNavigation}
+                                            onChange={(e) => {
+                                                const newSettings = { ...cacheSettings, refreshOnNavigation: e.target.checked };
+                                                setCacheSettings(newSettings);
+                                                localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
+                                            }}
+                                            className="rounded"
+                                        />
+                                        <label htmlFor="refreshOnNavigation" className="text-sm">
+                                            Rafraîchir les données tickers lors de la navigation
+                                        </label>
+                                    </div>
+                                    {cacheSettings.refreshOnNavigation && (
+                                        <div className="ml-6">
+                                            <label className="block text-sm mb-2">
+                                                Intervalle de rafraîchissement (minutes): <span className="font-bold text-blue-600">{cacheSettings.refreshIntervalMinutes} min</span>
+                                            </label>
+                                            <input
+                                                type="range"
+                                                min="5"
+                                                max="30"
+                                                step="5"
+                                                value={cacheSettings.refreshIntervalMinutes}
+                                                onChange={(e) => {
+                                                    const newSettings = { ...cacheSettings, refreshIntervalMinutes: parseInt(e.target.value) };
+                                                    setCacheSettings(newSettings);
+                                                    localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
+                                                }}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* État du Cache */}
+                            <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                <div className="font-semibold mb-3 flex items-center gap-2">
+                                    <Icon emoji="📊" size={16} />
+                                    État du Cache
+                                </div>
+                                <div className="space-y-2 text-xs">
+                                    {Object.keys(cacheStatus).length === 0 ? (
+                                        <div className={`text-center py-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Cliquez sur "Actualiser" pour voir l'état du cache
+                                        </div>
+                                    ) : (
+                                        Object.entries(cacheStatus).map(([type, status]) => (
+                                            <div key={type} className={`p-2 rounded border ${
+                                                status.expired
+                                                    ? isDarkMode ? 'bg-yellow-900/30 border-yellow-800' : 'bg-yellow-50 border-yellow-200'
+                                                    : isDarkMode ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'
+                                            }`}>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-semibold capitalize">{type.replace('_', ' ')}</span>
+                                                    <span className={`px-2 py-1 rounded text-xs ${
+                                                        status.expired
+                                                            ? 'bg-yellow-500 text-white'
+                                                            : 'bg-green-500 text-white'
+                                                    }`}>
+                                                        {status.expired ? '⚠️ Expiré' : '✅ Valide'}
+                                                    </span>
+                                                </div>
+                                                {status.age_hours && (
+                                                    <div className="mt-1 text-gray-600">
+                                                        Âge: {parseFloat(status.age_hours).toFixed(1)}h / {status.max_age_hours || cacheSettings.maxAgeHours}h max
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={async () => {
+                                        if (confirm('Vider tout le cache Supabase ? Les données seront rechargées depuis les APIs.')) {
+                                            try {
+                                                const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
+                                                    method: 'DELETE'
+                                                });
+                                                if (response.ok) {
+                                                    alert('Cache vidé avec succès');
+                                                    setCacheStatus({});
+                                                }
+                                            } catch (error) {
+                                                alert('Erreur lors du vidage du cache');
+                                            }
+                                        }
+                                    }}
+                                    className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                        isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
+                                    }`}
+                                >
+                                    🗑️ Vider le Cache
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const defaultSettings = {
+                                            maxAgeHours: 4,
+                                            refreshOnNavigation: true,
+                                            refreshIntervalMinutes: 10
+                                        };
+                                        setCacheSettings(defaultSettings);
+                                        localStorage.setItem('cacheSettings', JSON.stringify(defaultSettings));
+                                        alert('Paramètres réinitialisés aux valeurs par défaut');
+                                    }}
+                                    className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                        isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
+                                    }`}
+                                >
+                                    🔄 Réinitialiser
+                                </button>
                             </div>
                         </div>
                     </div>

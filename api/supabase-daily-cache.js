@@ -9,12 +9,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const MAX_CACHE_AGE_HOURS = 4; // Cache valide pendant 4 heures
+// Durée du cache par défaut (peut être modifiée via paramètre)
+const DEFAULT_MAX_CACHE_AGE_HOURS = 4; // Cache valide pendant 4 heures par défaut
 
 export default async function handler(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -39,16 +40,67 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       const { type, date } = req.query;
 
+      // Endpoint spécial pour récupérer le statut de tous les caches
+      if (type === 'status') {
+        const today = new Date().toISOString().split('T')[0];
+        const cacheTypes = ['top_movers', 'general_news', 'ticker_news', 'gemini_analysis', 'top_movers_news'];
+        const status = {};
+
+        for (const cacheType of cacheTypes) {
+          try {
+            const { data: cacheEntry } = await supabase
+              .from('daily_market_cache')
+              .select('*')
+              .eq('date', today)
+              .eq('cache_type', cacheType)
+              .single();
+
+            if (cacheEntry) {
+              const updatedAt = new Date(cacheEntry.updated_at);
+              const now = new Date();
+              const ageHours = (now - updatedAt) / (1000 * 60 * 60);
+            const maxAgeHours = parseInt(req.query.maxAgeHours) || DEFAULT_MAX_CACHE_AGE_HOURS;
+              status[cacheType] = {
+                exists: true,
+                age_hours: ageHours.toFixed(2),
+                expired: ageHours >= maxAgeHours,
+                updated_at: cacheEntry.updated_at,
+                max_age_hours: maxAgeHours
+              };
+            } else {
+              status[cacheType] = {
+                exists: false,
+                expired: true
+              };
+            }
+          } catch (error) {
+            status[cacheType] = {
+              exists: false,
+              error: error.message
+            };
+          }
+        }
+
+        const maxAgeHours = parseInt(req.query.maxAgeHours) || DEFAULT_MAX_CACHE_AGE_HOURS;
+        return res.status(200).json({
+          success: true,
+          status,
+          max_age_hours: maxAgeHours
+        });
+      }
+
       if (!type) {
         return res.status(400).json({
           success: false,
-          error: 'Paramètre "type" requis (ex: top_movers, general_news, etc.)'
+          error: 'Paramètre "type" requis (ex: top_movers, general_news, etc.) ou "status" pour le statut global'
         });
       }
 
       const cacheDate = date || new Date().toISOString().split('T')[0]; // Date du jour par défaut
+      // Récupérer la durée max du cache depuis les paramètres (défaut: 4h)
+      const maxAgeHours = parseInt(req.query.maxAgeHours) || DEFAULT_MAX_CACHE_AGE_HOURS;
 
-      console.log(`📦 Récupération cache: type=${type}, date=${cacheDate}`);
+      console.log(`📦 Récupération cache: type=${type}, date=${cacheDate}, maxAge=${maxAgeHours}h`);
 
       // Récupérer le cache depuis Supabase
       const { data: cacheEntry, error } = await supabase
@@ -73,24 +125,26 @@ export default async function handler(req, res) {
         const now = new Date();
         const ageHours = (now - updatedAt) / (1000 * 60 * 60);
 
-        if (ageHours < MAX_CACHE_AGE_HOURS) {
-          console.log(`✅ Cache trouvé et récent (${ageHours.toFixed(1)}h)`);
+        if (ageHours < maxAgeHours) {
+          console.log(`✅ Cache trouvé et récent (${ageHours.toFixed(1)}h, max: ${maxAgeHours}h)`);
           return res.status(200).json({
             success: true,
             cached: true,
             data: cacheEntry.data,
             updated_at: cacheEntry.updated_at,
-            age_hours: ageHours.toFixed(2)
+            age_hours: ageHours.toFixed(2),
+            max_age_hours: maxAgeHours
           });
         } else {
-          console.log(`⚠️ Cache expiré (${ageHours.toFixed(1)}h, max: ${MAX_CACHE_AGE_HOURS}h)`);
+          console.log(`⚠️ Cache expiré (${ageHours.toFixed(1)}h, max: ${maxAgeHours}h)`);
           return res.status(200).json({
             success: true,
             cached: false,
             expired: true,
             data: cacheEntry.data, // Retourner quand même les données expirées
             updated_at: cacheEntry.updated_at,
-            age_hours: ageHours.toFixed(2)
+            age_hours: ageHours.toFixed(2),
+            max_age_hours: maxAgeHours
           });
         }
       }
@@ -151,6 +205,36 @@ export default async function handler(req, res) {
         data: cacheEntry.data,
         updated_at: cacheEntry.updated_at
       });
+    }
+
+    // DELETE : Vider le cache
+    if (req.method === 'DELETE') {
+      const today = new Date().toISOString().split('T')[0];
+      
+      try {
+        const { error } = await supabase
+          .from('daily_market_cache')
+          .delete()
+          .eq('date', today);
+
+        if (error) {
+          throw error;
+        }
+
+        console.log('✅ Cache vidé pour la date:', today);
+        return res.status(200).json({
+          success: true,
+          message: 'Cache vidé avec succès',
+          date: today
+        });
+      } catch (error) {
+        console.error('❌ Erreur vidage cache:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Erreur lors du vidage du cache',
+          details: error.message
+        });
+      }
     }
 
     return res.status(405).json({
