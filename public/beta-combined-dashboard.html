@@ -15195,9 +15195,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     
                                     {/* Suggestions de slash commands */}
                                     {showSlashSuggestions && slashSuggestions.length > 0 && (
-                                        <div className={`absolute z-50 w-full mt-1 rounded-lg border shadow-lg max-h-64 overflow-y-auto ${
-                                            isDarkMode 
-                                                ? 'bg-gray-800 border-gray-700' 
+                                        <div className={`absolute z-[9999] w-full mt-1 rounded-lg border shadow-lg max-h-64 overflow-y-auto ${
+                                            isDarkMode
+                                                ? 'bg-gray-800 border-gray-700'
                                                 : 'bg-white border-gray-300'
                                         }`}>
                                             {slashSuggestions.map((suggestion, index) => (
@@ -15693,20 +15693,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ? 'bg-gray-900/30 border-gray-600' 
                                 : 'bg-gray-700/80 border-gray-600'
                         }`}>
-                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>ℹ️ À propos d'Emma</h3>
-                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-blue-200' : 'text-blue-800'
-                            }`}>
-                                <div>• <strong>Analyse Temps Réel :</strong> Données de marché avec sources vérifiées (Perplexity + FMP)</div>
-                                <div>• <strong>Analyse Fondamentale :</strong> P/E, ROE, DCF, ratios financiers complets</div>
-                                <div>• <strong>Actualités & Sentiment :</strong> News récentes avec analyse de sentiment</div>
-                                <div>• <strong>Comparaisons :</strong> Analyse comparative multi-titres (jusqu'à 5)</div>
-                                <div>• <strong>Insights Experts :</strong> Recommandations analystes, transactions d'initiés</div>
-                                <div className="pt-2 border-t border-blue-300"><strong>🎯 Confiance :</strong> Toutes les réponses incluent des sources citées et un score de fiabilité</div>
-                            </div>
-                        </div>
                     </div>
                 );
             });
