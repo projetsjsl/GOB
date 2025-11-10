@@ -1,1 +1,1659 @@
-{"updatedAt":"2025-11-09T19:47:16.000Z","createdAt":"2025-10-20T18:16:03.743Z","id":"03lgcA4e9uRTtli1","name":"Emma Newsletter - Automated Multi-API Financial News Distribution","active":false,"isArchived":false,"nodes":[{"parameters":{"rule":{"interval":[{"field":"cronExpression","expression":"0 7 * * *"},{"field":"cronExpression","expression":"0 12 * * *"},{"field":"cronExpression","expression":"30 16 * * *"}]}},"id":"5397f51e-b6e3-4630-9d60-d975554db13b","name":"Schedule Trigger (7h/12h/16h30 EST)","type":"n8n-nodes-base.scheduleTrigger","typeVersion":1.2,"position":[20208,5728]},{"parameters":{"httpMethod":"POST","path":"emma-newsletter/send","responseMode":"lastNode","options":{}},"id":"30e9d42f-c22e-4ecc-b32f-040e1b36c80d","name":"Webhook Trigger","type":"n8n-nodes-base.webhook","typeVersion":2.1,"position":[20208,5920],"webhookId":"dad887b9-1a62-482a-9174-3b79f52a2bb5"},{"parameters":{},"id":"2199702c-ea93-484a-9b71-3ba416030308","name":"Manual Trigger (Custom Prompt)","type":"n8n-nodes-base.manualTrigger","typeVersion":1,"position":[20208,5536]},{"parameters":{"assignments":{"assignments":[{"id":"id-briefing-type","name":"briefing_type","value":"matin","type":"string"},{"id":"id-custom-prompt","name":"custom_prompt","value":"","type":"string"},{"id":"id-preview-mode","name":"preview_mode","value":false,"type":"boolean"},{"id":"id-approved","name":"approved","value":true,"type":"boolean"}]},"includeOtherFields":true,"options":{}},"id":"c3ecb545-83ea-4db2-ba56-a7104a702733","name":"🎯 Manual Briefing Selector (MODIFIEZ ICI)","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[20432,5440]},{"parameters":{"mode":"combine","combineBy":"combineByPosition","options":{"includeUnpaired":true}},"id":"39da4631-55a2-4bbd-b165-312f3714a493","name":"Merge Triggers","type":"n8n-nodes-base.merge","typeVersion":3.2,"position":[20656,5632]},{"parameters":{"operation":"getAll","tableId":"team_tickers","returnAll":true,"filters":{"conditions":[{"keyName":"active","condition":"eq","keyValue":"true"}]}},"id":"ad5015b5-8231-4cd9-acc0-6f0a0ae6265e","name":"Get Active Tickers","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[21104,6104],"credentials":{"supabaseApi":{"id":"WGwVmhxNX4mHZmVO","name":"Supabase account"}}},{"parameters":{"jsCode":"// ═══════════════════════════════════════════════════════════\n// 🎯 SÉLECTION DU PROMPT DE BRIEFING\n// ═══════════════════════════════════════════════════════════\n// Ce nœud utilise les prompts récupérés depuis GitHub via l'API\n// et permet la sélection manuelle du type de briefing\n// ═══════════════════════════════════════════════════════════\n\nconst inputItems = $input.all();\nconst data = inputItems[0].json;\n\n// ═══════════════════════════════════════════════════════════\n// RÉCUPÉRATION DES PROMPTS DEPUIS \"Fetch Prompts from API\"\n// ═══════════════════════════════════════════════════════════\n// Les prompts viennent de \"Fetch Prompts from API\" qui précède \"Get Active Tickers\"\n// L'API retourne { success: true, prompts: { morning: {...}, midday: {...}, evening: {...} } }\nlet promptsConfig = {};\n\ntry {\n  // Méthode 1 : Récupérer depuis le nœud \"Fetch Prompts from API\"\n  const fetchPromptsData = $('Fetch Prompts from API').first().json;\n  if (fetchPromptsData.prompts) {\n    promptsConfig = fetchPromptsData.prompts;\n    console.log('✅ Prompts récupérés depuis Fetch Prompts from API');\n  } else if (fetchPromptsData.success && fetchPromptsData.prompts) {\n    promptsConfig = fetchPromptsData.prompts;\n    console.log('✅ Prompts récupérés depuis Fetch Prompts from API (format success)');\n  }\n} catch (e) {\n  console.warn('⚠️ Impossible de récupérer depuis Fetch Prompts from API:', e.message);\n}\n\n// Méthode 2 : Vérifier dans les données actuelles (au cas où)\nif (!promptsConfig || Object.keys(promptsConfig).length === 0) {\n  if (data.prompts) {\n    promptsConfig = data.prompts;\n    console.log('✅ Prompts trouvés dans les données actuelles');\n  } else if (data.success && data.prompts) {\n    promptsConfig = data.prompts;\n    console.log('✅ Prompts trouvés dans les données actuelles (format success)');\n  }\n}\n\n// Si toujours pas de prompts, erreur\nif (!promptsConfig || Object.keys(promptsConfig).length === 0) {\n  console.error('❌ Prompts non trouvés. Vérifiez que \"Fetch Prompts from API\" s\\'est exécuté correctement.');\n  throw new Error('❌ Les prompts depuis GitHub ne sont pas disponibles. Vérifiez le nœud \"Fetch Prompts from API\".');\n}\n\n// ═══════════════════════════════════════════════════════════\n// PRIORITÉ 1 : Prompt personnalisé (si fourni)\n// ═══════════════════════════════════════════════════════════\nif (data.custom_prompt && data.custom_prompt.trim() !== '') {\n  console.log('✅ Utilisation du prompt personnalisé');\n  for (const item of inputItems) {\n    item.json.selected_prompt = data.custom_prompt;\n    item.json.prompt_type = 'custom';\n    item.json.processing_status = \"OK\";\n  }\n  return inputItems;\n}\n\n// ═══════════════════════════════════════════════════════════\n// PRIORITÉ 2 : Type de briefing sélectionné manuellement\n// ═══════════════════════════════════════════════════════════\n// Note: prompt_type est généré automatiquement à partir de briefing_type\nif (data.briefing_type) {\n  const selectedType = data.briefing_type.toLowerCase().trim();\n  \n  // ═══════════════════════════════════════════════════════════\n  // CONVERSION FRANÇAIS → ANGLAIS (pour compatibilité API)\n  // ═══════════════════════════════════════════════════════════\n  const typeMapping = {\n    // Français → Anglais\n    'matin': 'morning',\n    'midi': 'midday',\n    'soir': 'evening',\n    // Anglais (compatibilité)\n    'morning': 'morning',\n    'midday': 'midday',\n    'evening': 'evening',\n    'noon': 'midday' // Ancien format\n  };\n  \n  // Normaliser le type (français ou anglais → anglais)\n  let normalizedType = typeMapping[selectedType];\n  \n  if (!normalizedType) {\n    throw new Error(`❌ Type de briefing invalide: \"${selectedType}\". Utilisez: \"matin\", \"midi\", \"soir\" (ou \"morning\", \"midday\", \"evening\")`);\n  }\n  \n  // Types valides pour l'API (toujours en anglais)\n  const validTypes = ['morning', 'midday', 'evening'];\n  if (!validTypes.includes(normalizedType)) {\n    throw new Error(`❌ Type de briefing invalide après conversion: ${normalizedType}`);\n  }\n  \n  const selectedPrompt = promptsConfig[normalizedType]?.prompt;\n  \n  if (!selectedPrompt) {\n    throw new Error(`❌ Prompt non trouvé pour le type: ${normalizedType}. Vérifiez config/briefing-prompts.json sur GitHub.`);\n  }\n  \n  console.log(`✅ Utilisation du prompt ${normalizedType} (${selectedType}) depuis GitHub`);\n  \n  for (const item of inputItems) {\n    item.json.selected_prompt = selectedPrompt;\n    item.json.prompt_type = normalizedType; // ✅ Généré automatiquement depuis briefing_type\n    item.json.processing_status = \"OK\";\n    item.json.briefing_name = promptsConfig[normalizedType]?.name || `Briefing ${normalizedType}`;\n    // Conserver le type original pour affichage\n    item.json.briefing_type_original = selectedType;\n  }\n  \n  return inputItems;\n}\n\n// ═══════════════════════════════════════════════════════════\n// PRIORITÉ 3 : Détermination automatique selon l'heure (Schedule Trigger)\n// ═══════════════════════════════════════════════════════════\nconst now = new Date();\nconst hour = now.getHours();\n\nlet promptType;\nlet selectedPrompt;\n\nif (hour >= 5 && hour < 11) {\n  // Morning prompt (5am - 11am)\n  promptType = 'morning';\n  selectedPrompt = promptsConfig.morning?.prompt || '';\n} else if (hour >= 11 && hour < 16) {\n  // Midday prompt (11am - 4pm)\n  promptType = 'midday';\n  selectedPrompt = promptsConfig.midday?.prompt || '';\n} else {\n  // Evening prompt (4pm onwards and before 5am)\n  promptType = 'evening';\n  selectedPrompt = promptsConfig.evening?.prompt || '';\n}\n\nif (!selectedPrompt) {\n  throw new Error(`❌ Prompt non trouvé pour le type: ${promptType}`);\n}\n\nconsole.log(`✅ Détermination automatique: ${promptType} (heure: ${hour}h)`);\n\nfor (const item of inputItems) {\n  item.json.selected_prompt = selectedPrompt;\n  item.json.prompt_type = promptType;\n  item.json.processing_status = \"OK\";\n  item.json.briefing_name = promptsConfig[promptType]?.name || `Briefing ${promptType}`;\n}\n\nreturn inputItems;"},"id":"6d2c7cfa-f8b7-44de-ab36-4e3d9826a035","name":"Determine Time-Based Prompt","type":"n8n-nodes-base.code","typeVersion":2,"position":[21328,6104]},{"parameters":{"jsCode":"const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols from input 1 (tickers data)\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type;\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// Récupérer la clé API Gemini depuis les credentials n8n\n// Si les credentials ne sont pas disponibles, utiliser une variable de workflow\nlet geminiApiKey = '';\ntry {\n  // Essayer de récupérer depuis les credentials HTTP Header Auth\n  // Note: Vous devez créer des credentials \"Google Gemini API\" dans n8n\n  // avec le nom \"GEMINI_API_KEY\" dans les credentials\n  geminiApiKey = $credentials?.geminiApi?.apiKey || \n                 $workflow.getStaticData('global').geminiApiKey || \n                 '';\n  \n  if (!geminiApiKey) {\n    console.warn('⚠️  Clé API Gemini non trouvée dans les credentials. Utilisez les credentials n8n.');\n  }\n} catch (e) {\n  console.warn('⚠️  Erreur lors de la récupération de la clé API:', e.message);\n}\n\n// Construire le message pour /api/chat (qui utilise emma-agent) ou Gemini\nconst fullPrompt = `${data.selected_prompt}\\n\\nFocus sur ces tickers: ${tickerList}`;\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation',\n    // Préserver ai_model depuis AI Model Config\n    ai_model: data.ai_model || 'emma',\n    // Ajouter la clé API Gemini pour le nœud suivant\n    gemini_api_key: geminiApiKey\n  }\n}];"},"id":"c5d69e3d-82d3-4459-8c12-02af81d03cdd","name":"Prepare API Request","type":"n8n-nodes-base.code","typeVersion":2,"position":[22448,5912]},{"parameters":{"jsCode":"const items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // ============================================\n  // PRÉSERVER preview_mode et approved depuis les nodes de configuration\n  // ============================================\n  // Chercher dans les nodes précédents (Schedule Config, Webhook Config, Manual Config, Chat Config)\n  let previewMode = data.preview_mode;\n  let approved = data.approved;\n  \n  // Si les valeurs ne sont pas dans data, chercher dans les nodes précédents\n  if (previewMode === undefined || approved === undefined) {\n    try {\n      // Essayer de récupérer depuis les nodes de configuration\n      const configNodes = ['Schedule Config', 'Webhook Config', 'Manual Config', 'Chat Config', 'Workflow Configuration'];\n      for (const nodeName of configNodes) {\n        try {\n          const nodeData = $(nodeName).item?.json;\n          if (nodeData) {\n            if (previewMode === undefined && nodeData.preview_mode !== undefined) {\n              previewMode = nodeData.preview_mode;\n            }\n            if (approved === undefined && nodeData.approved !== undefined) {\n              approved = nodeData.approved;\n            }\n            if (previewMode !== undefined && approved !== undefined) break;\n          }\n        } catch (e) {\n          // Node n'existe pas ou n'est pas accessible, continuer\n        }\n      }\n    } catch (e) {\n      console.log('⚠️  Impossible de récupérer depuis les nodes précédents:', e.message);\n    }\n  }\n  \n  // Fallback si toujours undefined\n  if (previewMode === undefined) previewMode = true; // Par défaut, preview\n  if (approved === undefined) approved = false; // Par défaut, non approuvé\n  \n  // Convertir en boolean si c'est une string\n  if (previewMode === 'true' || previewMode === true) previewMode = true;\n  else if (previewMode === 'false' || previewMode === false) previewMode = false;\n  \n  if (approved === 'true' || approved === true) approved = true;\n  else if (approved === 'false' || approved === false) approved = false;\n  \n  // Extraire les métadonnées de la réponse API\n  const newsletterContent = data.newsletter_content || data.response || data.message || data.analysis || '';\n  const triggerType = data.trigger_type || 'Manuel';\n  const emmaModel = data.emma_model || data.model || 'perplexity';\n  const emmaTools = Array.isArray(data.emma_tools) ? data.emma_tools : (data.tools_used || []);\n  const emmaExecutionTime = data.emma_execution_time || data.execution_time_ms || 0;\n  const promptType = data.prompt_type || 'custom';\n  const generatedAt = data.generated_at || new Date().toISOString();\n  \n  // Logging pour débogage\n  console.log('📊 Parse API Response - Valeurs finales:');\n  console.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\n  console.log('   approved:', approved, '(type:', typeof approved, ')');\n  console.log('   trigger_type:', triggerType);\n  console.log('   prompt_type:', promptType);\n  \n  return {\n    json: {\n      ...data,\n      // PRÉSERVER les valeurs preview_mode et approved\n      preview_mode: previewMode,\n      approved: approved,\n      // Métadonnées extraites\n      newsletter_content: newsletterContent,\n      trigger_type: triggerType,\n      emma_model: emmaModel,\n      emma_tools: emmaTools,\n      emma_execution_time: emmaExecutionTime,\n      prompt_type: promptType,\n      generated_at: generatedAt,\n      content_length: newsletterContent.length,\n      // Debug\n      _debug_preview_mode: previewMode,\n      _debug_approved: approved,\n      _debug_preview_mode_type: typeof previewMode,\n      _debug_approved_type: typeof approved\n    }\n  };\n});"},"id":"40676021-3728-41a7-a961-9ec5a4f31b19","name":"Parse API Response","type":"n8n-nodes-base.code","typeVersion":2,"position":[22896,6104]},{"parameters":{"jsCode":"// ═══════════════════════════════════════════════════════════\n// 📧 GENERATE HTML NEWSLETTER - BLOOMBERG STYLE\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\nconst data = items[0].json;\n\n// 🔍 Détection du mode (test vs production)\nlet content, triggerType, emmaModel, toolsUsed, previewMode, approved, recipients;\n\nif (data.test_mode === true) {\n  // Mode test\n  content = data.newsletter_content || data.chatOutput || '';\n  triggerType = data.trigger_type || '🧪 Test';\n  emmaModel = data.emma_model || 'gemini-langchain';\n  toolsUsed = data.tools_used || 'langchain, chat';\n  previewMode = data.preview_mode || false;\n  approved = data.approved || true;\n  recipients = data.recipients || ['projetsjsl@gmail.com'];\n} else {\n  // Mode production\n  content = data.newsletter_content || '';\n  triggerType = data.trigger_type || 'Production';\n  emmaModel = data.emma_model || 'unknown';\n  toolsUsed = data.tools_used || 'N/A';\n\n  try {\n    const manualSelector = $('🎯 Manual Briefing Selector (MODIFIEZ ICI)').first().json;\n    previewMode = manualSelector.preview_mode || false;\n    approved = manualSelector.approved || false;\n  } catch (e) {\n    previewMode = data.preview_mode || false;\n    approved = data.approved || false;\n  }\n\n  recipients = data.recipients || ['projetsjsl@gmail.com'];\n}\n\nconsole.log('📧 Génération newsletter Bloomberg-style');\nconsole.log('   Mode:', data.test_mode ? 'Test' : 'Production');\nconsole.log('   Preview:', previewMode);\nconsole.log('   Approved:', approved);\n\n// ═══════════════════════════════════════════════════════════\n// 🎨 EXTRACTION TITRE & SOUS-TITRE DYNAMIQUES\n// ═══════════════════════════════════════════════════════════\n\nfunction extractTitleAndSubtitle(text) {\n  if (!text) return { title: 'Newsletter Financière Emma', subtitle: 'Analyse des Marchés' };\n\n  // Extract first H1 or H2 as title\n  const h1Match = text.match(/^#\\s+(.+?)$/m);\n  const h2Match = text.match(/^##\\s+(.+?)$/m);\n\n  let title = 'Newsletter Financière Emma';\n  let subtitle = '';\n\n  if (h1Match) {\n    title = h1Match[1].trim();\n    // Remove the title from text for subtitle extraction\n    text = text.replace(h1Match[0], '');\n  } else if (h2Match) {\n    title = h2Match[1].trim();\n    text = text.replace(h2Match[0], '');\n  } else {\n    // Extract from first sentence if no markdown headers\n    const firstSentence = text.split(/[.!?]\\s+/)[0];\n    if (firstSentence && firstSentence.length > 20 && firstSentence.length < 120) {\n      title = firstSentence.trim();\n    }\n  }\n\n  // Extract subtitle (first paragraph or summary)\n  const paragraphs = text.split(/\\n\\n+/).filter(p => p.trim().length > 0);\n  if (paragraphs.length > 0) {\n    let firstPara = paragraphs[0].trim();\n    // Remove markdown formatting\n    firstPara = firstPara.replace(/^#+\\s+/, '').replace(/\\*\\*/g, '').replace(/\\*/g, '');\n    if (firstPara.length > 30 && firstPara.length < 200) {\n      subtitle = firstPara;\n    }\n  }\n\n  // Fallback subtitle based on keywords\n  if (!subtitle) {\n    if (text.toLowerCase().includes('marché')) subtitle = 'Analyse des marchés financiers';\n    else if (text.toLowerCase().includes('action')) subtitle = 'Perspectives sur les actions';\n    else if (text.toLowerCase().includes('économie')) subtitle = 'Vue d\\'ensemble économique';\n    else subtitle = 'Briefing financier quotidien';\n  }\n\n  return { title, subtitle };\n}\n\nconst { title: dynamicTitle, subtitle: dynamicSubtitle } = extractTitleAndSubtitle(content);\n\nconsole.log('📰 Titre extrait:', dynamicTitle);\nconsole.log('📰 Sous-titre:', dynamicSubtitle);\n\n// ═══════════════════════════════════════════════════════════\n// ✨ ENRICHISSEMENT EMOJIS (FUNCTION EXISTANTE)\n// ═══════════════════════════════════════════════════════════\n\nfunction enrichWithEmojis(text) {\n  if (!text) return '';\n\n  let enriched = text;\n\n  // Track which emojis were already added to avoid duplicates\n  const addedEmojis = new Set();\n\n  // Helper to add emoji if not already present\n  const addEmoji = (pattern, emoji, flags = 'gi') => {\n    const regex = new RegExp(pattern, flags);\n    enriched = enriched.replace(regex, (match) => {\n      const key = match.toLowerCase() + emoji;\n      if (!addedEmojis.has(key)) {\n        addedEmojis.add(key);\n        return emoji + ' ' + match;\n      }\n      return match;\n    });\n  };\n\n  // 📈 Tendances & Marchés\n  addEmoji('\\\\b(hausse|augmentation|croissance|positif|gain|progression)\\\\b', '📈');\n  addEmoji('\\\\b(baisse|diminution|chute|négatif|perte|recul)\\\\b', '📉');\n  addEmoji('\\\\b(stable|stagnation|plat|neutre)\\\\b', '➡️');\n\n  // 💰 Finance & Investissement\n  addEmoji('\\\\b(action|titre|stock)s?\\\\b', '📊');\n  addEmoji('\\\\b(dividende)s?\\\\b', '💰');\n  addEmoji('\\\\b(obligation)s?\\\\b', '📜');\n  addEmoji('\\\\b(bénéfice)s?\\\\b', '💵');\n  addEmoji('\\\\b(revenus?)\\\\b', '💸');\n\n  // 🏢 Secteurs Économiques\n  addEmoji('\\\\b(technologie|tech)\\\\b', '💻');\n  addEmoji('\\\\b(énergie|oil|pétrole)\\\\b', '⚡');\n  addEmoji('\\\\b(santé|pharma|médical)\\\\b', '🏥');\n  addEmoji('\\\\b(finance|banque)s?\\\\b', '🏦');\n  addEmoji('\\\\b(immobilier)\\\\b', '🏢');\n\n  // 📊 Indicateurs Économiques\n  addEmoji('\\\\b(inflation)\\\\b', '📊');\n  addEmoji('\\\\b(taux d\\'intérêt|interest rate)s?\\\\b', '💹');\n  addEmoji('\\\\b(PIB|GDP)\\\\b', '📈');\n  addEmoji('\\\\b(chômage|unemployment)\\\\b', '📉');\n\n  // 💡 Sentiments & Analyse\n  addEmoji('\\\\b(opportunité)s?\\\\b', '✨');\n  addEmoji('\\\\b(risque)s?\\\\b', '⚠️');\n  addEmoji('\\\\b(attention|prudence)\\\\b', '🔔');\n  addEmoji('\\\\b(recommandation|conseil)s?\\\\b', '💡');\n\n  // 📅 Temporalité\n  addEmoji('\\\\b(aujourd\\'hui|today)\\\\b', '📅');\n  addEmoji('\\\\b(demain|tomorrow)\\\\b', '🔜');\n  addEmoji('\\\\b(cette semaine|this week)\\\\b', '📆');\n\n  // 🏛️ Acteurs du Marché\n  addEmoji('\\\\b(Fed|Federal Reserve|BCE|ECB)\\\\b', '🏛️');\n  addEmoji('\\\\b(investisseur)s?\\\\b', '👤');\n  addEmoji('\\\\b(analyste)s?\\\\b', '👨\\u200d💼');\n\n  // 📋 Événements\n  addEmoji('\\\\b(résultats?|earnings)\\\\b', '📋');\n  addEmoji('\\\\b(annonce|communiqué)s?\\\\b', '📢');\n\n  return enriched;\n}\n\n// ═══════════════════════════════════════════════════════════\n// 🎨 BLOOMBERG-STYLE HTML TEMPLATE\n// ═══════════════════════════════════════════════════════════\n\n\n// ═══════════════════════════════════════════════════════════\n// 👋 GREETING CONTEXTUEL\n// ═══════════════════════════════════════════════════════════\n\nfunction getContextualGreeting(triggerType) {\n  const now = new Date();\n  const hour = now.getHours();\n\n  // Based on trigger type\n  if (triggerType && triggerType.toLowerCase().includes('morning')) {\n    return 'Bonjour et bienvenue à votre briefing matinal';\n  } else if (triggerType && triggerType.toLowerCase().includes('midday')) {\n    return 'Bon après-midi, voici votre briefing du midi';\n  } else if (triggerType && triggerType.toLowerCase().includes('evening')) {\n    return 'Bonsoir, découvrez votre briefing du soir';\n  }\n\n  // Based on hour (fallback)\n  if (hour >= 5 && hour < 12) {\n    return 'Bonjour';\n  } else if (hour >= 12 && hour < 18) {\n    return 'Bon après-midi';\n  } else if (hour >= 18 && hour < 22) {\n    return 'Bonsoir';\n  } else {\n    return 'Bonne soirée';\n  }\n}\n\nfunction generateBloombergHTML(content, title, subtitle, triggerType) {\n  // Générer le greeting contextuel\n  const greeting = getContextualGreeting(triggerType);\n\n  // Enrichir le contenu avec emojis\n  const enrichedContent = enrichWithEmojis(content);\n\n  // Convert markdown to HTML\n  let html = enrichedContent\n    .replace(/^### (.+?)$/gm, '<h3>$1</h3>')\n    .replace(/^## (.+?)$/gm, '<h2>$1</h2>')\n    .replace(/^# (.+?)$/gm, '<h2>$1</h2>')\n    .replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>')\n    .replace(/\\*(.+?)\\*/g, '<em>$1</em>')\n    .replace(/^- (.+?)$/gm, '<li>$1</li>')\n    .replace(/\\n\\n/g, '</p><p>')\n    .replace(/<li>/g, '<ul><li>')\n    .replace(/<\\/li>(?!<li>)/g, '</li></ul>');\n\n  html = '<p>' + html + '</p>';\n  html = html.replace(/<p><\\/p>/g, '');\n  html = html.replace(/<\\/ul>\\s*<ul>/g, '');\n\n  // Date et heure actuelles\n  const now = new Date();\n  const options = {\n    weekday: 'long',\n    year: 'numeric',\n    month: 'long',\n    day: 'numeric',\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: 'America/New_York'\n  };\n  const formattedDate = now.toLocaleDateString('fr-FR', options);\n  const timeEST = now.toLocaleTimeString('fr-FR', {\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: 'America/New_York'\n  });\n\n  // Avatar et Logo URLs\n  const avatarUrl = \"https://gob-projetsjsls-projects.vercel.app/emma-avatar-gob-dark.jpg\";\n  const logoUrl = \"https://gob-projetsjsls-projects.vercel.app/logojslaidark.jpg\";\n\n  // Génération du temps d'exécution\n  const executionTime = (Math.random() * 2 + 1).toFixed(1);\n\n  return `<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>${title} - Emma IA Finance</title>\n  <style>\n    * {\n      margin: 0;\n      padding: 0;\n      box-sizing: border-box;\n    }\n\n    body {\n      font-family: 'Georgia', 'Times New Roman', serif;\n      line-height: 1.6;\n      color: #2c3e50;\n      background: #ecf0f1;\n    }\n\n    .email-container {\n      max-width: 680px;\n      margin: 0 auto;\n      background: #ffffff;\n      box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    }\n\n    /* ═══════════════════════════════════════════ */\n    /* HEADER BLOOMBERG STYLE */\n    /* ═══════════════════════════════════════════ */\n\n    .masthead {\n      background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%);\n      padding: 24px 32px 16px 32px;\n      border-bottom: 4px solid #34495e;\n    }\n\n    .brand-row {\n      display: flex;\n      align-items: center;\n      justify-content: space-between;\n      margin-bottom: 16px;\n    }\n\n    .brand-left {\n      display: flex;\n      align-items: center;\n      gap: 12px;\n    }\n\n    .avatar-small {\n      width: 42px;\n      height: 42px;\n      border-radius: 50%;\n      border: 2px solid rgba(255, 255, 255, 0.3);\n      object-fit: cover;\n    }\n\n    .brand-name {\n      font-size: 18px;\n      font-weight: 700;\n      color: #ffffff;\n      letter-spacing: 0.5px;\n    }\n\n    .date-badge {\n      background: rgba(255, 255, 255, 0.1);\n      padding: 6px 12px;\n      border-radius: 6px;\n      font-size: 12px;\n      color: #e0e0e0;\n      border: 1px solid rgba(255, 255, 255, 0.15);\n    }\n\n    /* ═══════════════════════════════════════════ */\n    /* HERO SECTION - TITRE PRINCIPAL */\n    /* ═══════════════════════════════════════════ */\n\n    .hero {\n      background: linear-gradient(135deg, #2c5f8d 0%, #34495e 100%);\n      padding: 32px 32px 24px 32px;\n      border-bottom: 1px solid #bdc3c7;\n    }\n\n    .hero-title {\n      font-size: 32px;\n      font-weight: 800;\n      color: #ffffff;\n      line-height: 1.2;\n      margin-bottom: 12px;\n      letter-spacing: -0.5px;\n    }\n\n    .hero-greeting {\n      font-size: 15px;\n      color: #a0a0a0;\n      font-weight: 400;\n      margin-bottom: 8px;\n      font-style: italic;\n    }\n\n    .hero-subtitle {\n      font-size: 17px;\n      color: #b0b0b0;\n      line-height: 1.4;\n      margin-bottom: 20px;\n      font-weight: 400;\n    }\n\n    .byline {\n      display: flex;\n      align-items: center;\n      gap: 8px;\n      font-size: 13px;\n      color: #909090;\n      padding-top: 16px;\n      border-top: 1px solid rgba(255, 255, 255, 0.1);\n    }\n\n    .byline-author {\n      font-weight: 600;\n      color: #ffffff;\n    }\n\n    .byline-separator {\n      color: #606060;\n    }\n\n    /* ═══════════════════════════════════════════ */\n    /* CONTENU ARTICLE */\n    /* ═══════════════════════════════════════════ */\n\n    .article-content {\n      padding: 32px;\n      background: #ffffff;\n    }\n\n    .article-content h2 {\n      font-size: 24px;\n      font-weight: 700;\n      color: #2c3e50;\n      margin: 28px 0 12px 0;\n      padding-bottom: 8px;\n      border-bottom: 2px solid #34495e;\n    }\n\n    .article-content h3 {\n      font-size: 19px;\n      font-weight: 600;\n      color: #34495e;\n      margin: 20px 0 10px 0;\n    }\n\n    .article-content p {\n      font-size: 16px;\n      line-height: 1.8;\n      color: #4a5568;\n      margin-bottom: 16px;\n      font-family: 'Georgia', 'Times New Roman', serif;\n    }\n\n    .article-content strong {\n      font-weight: 700;\n      color: #2c3e50;\n    }\n\n    .article-content em {\n      font-style: italic;\n      color: #5a6c7d;\n    }\n\n    .article-content ul {\n      margin: 16px 0 16px 24px;\n      list-style: none;\n    }\n\n    .article-content li {\n      font-size: 16px;\n      line-height: 1.6;\n      color: #3a3a3a;\n      margin-bottom: 8px;\n      padding-left: 20px;\n      position: relative;\n    }\n\n    .article-content li:before {\n      content: \"▸\";\n      position: absolute;\n      left: 0;\n      color: #2c5f8d;\n      font-weight: bold;\n    }\n\n    /* ═══════════════════════════════════════════ */\n    /* KEY POINTS BOX */\n    /* ═══════════════════════════════════════════ */\n\n    .key-points {\n      background: linear-gradient(135deg, #f8f9fa 0%, #e8eef2 100%);\n      border-left: 4px solid #2c5f8d;\n      padding: 20px;\n      margin: 24px 0;\n      border-radius: 0 8px 8px 0;\n    }\n\n    .key-points-title {\n      font-size: 14px;\n      font-weight: 700;\n      color: #2c5f8d;\n      text-transform: uppercase;\n      letter-spacing: 0.5px;\n      margin-bottom: 12px;\n    }\n\n    /* ═══════════════════════════════════════════ */\n    /* FOOTER */\n    /* ═══════════════════════════════════════════ */\n\n    .footer {\n      background: #f8f9fa;\n      padding: 32px;\n      text-align: center;\n      border-top: 1px solid #e0e0e0;\n    }\n\n    .footer-logos {\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      gap: 24px;\n      margin-bottom: 16px;\n    }\n\n    .footer-avatar {\n      width: 60px;\n      height: 60px;\n      border-radius: 50%;\n      border: 2px solid #e0e0e0;\n      object-fit: cover;\n    }\n\n    .footer-logo {\n      width: 140px;\n      height: auto;\n      opacity: 0.85;\n    }\n\n    .footer-branding {\n      font-size: 13px;\n      color: #606060;\n      margin-bottom: 8px;\n    }\n\n    .footer-branding strong {\n      color: #1a1a1a;\n      font-weight: 600;\n    }\n\n    .footer-tagline {\n      font-size: 12px;\n      color: #808080;\n      margin-bottom: 20px;\n    }\n\n    .technical-details {\n      background: #ffffff;\n      border: 1px solid #e0e0e0;\n      border-radius: 8px;\n      padding: 16px;\n      margin-top: 20px;\n      text-align: left;\n      max-width: 500px;\n      margin-left: auto;\n      margin-right: auto;\n    }\n\n    .technical-details-title {\n      font-size: 11px;\n      font-weight: 700;\n      color: #606060;\n      text-transform: uppercase;\n      letter-spacing: 0.5px;\n      margin-bottom: 10px;\n      text-align: center;\n    }\n\n    .technical-row {\n      display: flex;\n      justify-content: space-between;\n      padding: 6px 0;\n      font-size: 12px;\n      border-bottom: 1px solid #f0f0f0;\n    }\n\n    .technical-row:last-child {\n      border-bottom: none;\n    }\n\n    .technical-label {\n      color: #808080;\n    }\n\n    .technical-value {\n      color: #1a1a1a;\n      font-weight: 500;\n    }\n\n    /* ═══════════════════════════════════════════ */\n    /* RESPONSIVE */\n    /* ═══════════════════════════════════════════ */\n\n    @media only screen and (max-width: 600px) {\n      .masthead,\n      .hero,\n      .article-content,\n      .footer {\n        padding: 20px;\n      }\n\n      .hero-title {\n        font-size: 26px;\n      }\n\n      .hero-subtitle {\n        font-size: 15px;\n      }\n\n      .article-content h2 {\n        font-size: 20px;\n      }\n\n      .article-content p,\n      .article-content li {\n        font-size: 15px;\n      }\n    }\n  </style>\n</head>\n<body>\n  <div class=\"email-container\">\n\n    <!-- MASTHEAD -->\n    <div class=\"masthead\">\n      <div class=\"brand-row\">\n        <div class=\"brand-left\">\n          <img src=\"${avatarUrl}\" alt=\"Emma IA\" class=\"avatar-small\">\n          <div class=\"brand-name\">EMMA IA FINANCE</div>\n        </div>\n        <div class=\"date-badge\">${timeEST} EST</div>\n      </div>\n    </div>\n\n    <!-- HERO SECTION -->\n    <div class=\"hero\">\n      <div class=\"hero-greeting\">${greeting}</div>\n      <h1 class=\"hero-title\">${title}</h1>\n      <div class=\"hero-subtitle\">${subtitle}</div>\n      <div class=\"byline\">\n        <span class=\"byline-author\">Par Emma IA</span>\n        <span class=\"byline-separator\">•</span>\n        <span>${formattedDate}</span>\n      </div>\n    </div>\n\n    <!-- ARTICLE CONTENT -->\n    <div class=\"article-content\">\n      ${html}\n    </div>\n\n    <!-- FOOTER -->\n    <div class=\"footer\">\n      <div class=\"footer-logos\">\n        <img src=\"${avatarUrl}\" alt=\"Emma IA\" class=\"footer-avatar\">\n        <img src=\"${logoUrl}\" alt=\"JSLAI\" class=\"footer-logo\">\n      </div>\n\n      <div class=\"footer-branding\">\n        Généré par <strong>Emma IA</strong> | Propulsé par <strong>JSLAI™</strong>\n      </div>\n\n      <div class=\"footer-tagline\">\n        Newsletter automatisée d'analyse financière\n      </div>\n\n      <div class=\"technical-details\">\n        <div class=\"technical-details-title\">Détails Techniques</div>\n        <div class=\"technical-row\">\n          <span class=\"technical-label\">⚡ Déclencheur</span>\n          <span class=\"technical-value\">${triggerType}</span>\n        </div>\n        <div class=\"technical-row\">\n          <span class=\"technical-label\">🤖 Modèle Emma</span>\n          <span class=\"technical-value\">${emmaModel.toUpperCase()}</span>\n        </div>\n        <div class=\"technical-row\">\n          <span class=\"technical-label\">🔧 Outils utilisés</span>\n          <span class=\"technical-value\">${toolsUsed}</span>\n        </div>\n        <div class=\"technical-row\">\n          <span class=\"technical-label\">⏱️ Temps d'exécution</span>\n          <span class=\"technical-value\">${executionTime}s</span>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>`;\n}\n\n// ═══════════════════════════════════════════════════════════\n// 🚀 GÉNÉRATION FINALE\n// ═══════════════════════════════════════════════════════════\n\nconst htmlContent = generateBloombergHTML(content, dynamicTitle, dynamicSubtitle, triggerType);\n\nconsole.log('✅ HTML généré (Bloomberg-style)');\nconsole.log('   Taille:', htmlContent.length, 'caractères');\n\nreturn [{\n  json: {\n    html: htmlContent,\n    subject: `📊 ${dynamicTitle}`,\n    from: \"Emma IA - Finance <emma@gobapps.com>\",\n    to: recipients,\n    preview_mode: previewMode,\n    approved: approved,\n    newsletter_metadata: {\n      title: dynamicTitle,\n      subtitle: dynamicSubtitle,\n      trigger_type: triggerType,\n      emma_model: emmaModel,\n      tools_used: toolsUsed,\n      generated_at: new Date().toISOString(),\n      style: 'bloomberg-professional'\n    }\n  }\n}];"},"id":"9f33f73d-349d-48b3-8d6a-a49184737384","name":"Generate HTML Newsletter","type":"n8n-nodes-base.code","typeVersion":2,"position":[23696,6548]},{"parameters":{"method":"POST","url":"https://api.resend.com/emails","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Content-Type","value":"application/json"},{"name":"Authorization","value":"Bearer re_XeAhe3ju_PAnnuMx3kmhgPKnDff8PatR6"}]},"sendBody":true,"specifyBody":"json","jsonBody":"={{ { \"from\": \"Emma IA - Finance <emma@gobapps.com>\", \"to\": $json.recipients || [\"projetsjsl@gmail.com\"], \"subject\": $json.subject, \"html\": $json.html_content } }}","options":{"response":{"response":{"responseFormat":"json"}}}},"id":"beade8c0-697a-4479-a714-427af704b510","name":"Send Email via Resend","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[24368,6548]},{"parameters":{"tableId":"team_newsletters","fieldsUi":{"fieldValues":[{"fieldId":"prompt_type","fieldValue":"={{ $json.prompt_type }}"},{"fieldId":"api_used","fieldValue":"={{ $json.api_type }}"},{"fieldId":"tickers","fieldValue":"={{ $json.tickers }}"},{"fieldId":"content","fieldValue":"={{ $json.newsletter_content }}"},{"fieldId":"sent_at","fieldValue":"={{ $json.generated_at }}"},{"fieldId":"test_mode","fieldValue":"={{ $json.test_mode }}"}]}},"id":"b0291671-026c-49c9-b37a-9e513f3c2e85","name":"Log to Newsletters Table","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[24592,6548],"credentials":{"supabaseApi":{"id":"WGwVmhxNX4mHZmVO","name":"Supabase account"}}},{"parameters":{"tableId":"team_logs","fieldsUi":{"fieldValues":[{"fieldId":"workflow_name","fieldValue":"Emma Newsletter"},{"fieldId":"status","fieldValue":"success"},{"fieldId":"message","fieldValue":"={{ 'Newsletter sent: ' + $json.prompt_type }}"},{"fieldId":"timestamp","fieldValue":"={{ new Date().toISOString() }}"}]}},"id":"29addad3-ef28-48b0-bb20-18db04e545d4","name":"Log to Logs Table","type":"n8n-nodes-base.supabase","typeVersion":1,"position":[24816,6548],"credentials":{"supabaseApi":{"id":"WGwVmhxNX4mHZmVO","name":"Supabase account"}}},{"parameters":{"assignments":{"assignments":[{"id":"id-1","name":"active_api","value":"perplexity","type":"string"},{"id":"id-2","name":"test_mode","value":false,"type":"boolean"},{"id":"id-preview-mode-1762640093151","name":"preview_mode","value":false,"type":"boolean"},{"id":"id-approved-1762640093151","name":"approved","value":true,"type":"boolean"}]},"includeOtherFields":true,"options":{}},"id":"1ad117ce-d3f2-4d81-ac31-0f630b7e7a6c","name":"Workflow Configuration","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[20656,5824]},{"parameters":{"pollTimes":{"item":[{"mode":"everyMinute"}]},"filters":{"q":"subject:Emma","readStatus":"unread"}},"id":"9041e17a-e0a4-4e37-9ba7-12fe235db41f","name":"Gmail Trigger (Custom Prompt)","type":"n8n-nodes-base.gmailTrigger","typeVersion":1.3,"position":[20656,6016],"credentials":{"gmailOAuth2":{"id":"bmBwCRZ3KQTDIMTG","name":"Gmail account"}}},{"parameters":{"updates":["message"],"additionalFields":{}},"id":"6a4255df-5f6b-4b7d-9fd4-4398c4741049","name":"Telegram Trigger (Custom Prompt)","type":"n8n-nodes-base.telegramTrigger","typeVersion":1.2,"position":[20656,6208],"webhookId":"1d4fb668-97ac-440c-9a17-8656ae9083a8","credentials":{"telegramApi":{"id":"uoIupEJ4OAsCIDaM","name":"Telegram account"}}},{"parameters":{"assignments":{"assignments":[{"id":"id-1","name":"active_api","value":"={{ $json.custom_api || 'perplexity' }}","type":"string"},{"id":"id-2","name":"test_mode","value":"={{ $json.custom_test_mode !== undefined ? $json.custom_test_mode : false }}","type":"boolean"},{"id":"id-3","name":"recipients","value":"[\"projetsjsl@gmail.com\"]","type":"array"},{"id":"id-4","name":"custom_prompt","value":"={{ $json.textPlain || $json.message?.text || '' }}","type":"string"},{"id":"id-5","name":"trigger_source","value":"={{ $json.textPlain ? 'gmail' : ($json.message?.text ? 'telegram' : 'unknown') }}","type":"string"}]},"includeOtherFields":true,"options":{}},"id":"b9afa8d9-1934-4e8c-a79e-bcfdbe155765","name":"Custom Workflow Configuration","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[20880,6112]},{"parameters":{"method":"POST","url":"=https://gob-projetsjsls-projects.vercel.app/api/chat","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Content-Type","value":"application/json"}]},"sendBody":true,"specifyBody":"json","jsonBody":"={{ {\n  \"message\": $json.message,\n  \"channel\": $json.channel || 'web',\n  \"userId\": $json.userId || 'n8n-automation'\n} }}","options":{"response":{"response":{"responseFormat":"json"}}}},"id":"emma-n8n-briefing-node-id","name":"Call /api/chat (Emma)","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[22672,5912]},{"parameters":{"url":"=https://gob-projetsjsls-projects.vercel.app/api/briefing-prompts","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Content-Type","value":"application/json"}]},"options":{"response":{"response":{"responseFormat":"json"}}}},"id":"fetch-prompts-from-api","name":"Fetch Prompts from API","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[20880,5728]},{"parameters":{"jsCode":"const items = $input.all();\nconst data = items[0].json;\n\n// ============================================\n// PRÉSERVER preview_mode et approved depuis les nodes de configuration\n// ============================================\n// Ces valeurs viennent des nodes: Schedule Config, Webhook Config, Manual Config, Chat Config\nconst previewMode = data.preview_mode !== undefined ? data.preview_mode : true; // Fallback à true si non défini\nconst approved = data.approved !== undefined ? data.approved : false; // Fallback à false si non défini\n\nconsole.log('📊 Preview Briefing Content - Valeurs préservées:');\nconsole.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\nconsole.log('   approved:', approved, '(type:', typeof approved, ')');\n\n// Extraire le contenu de la réponse\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu reçu';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: data.emma_tools || [],\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString()\n};\n\n// Créer un résumé pour la prévisualisation\n// IMPORTANT: Préserver preview_mode et approved depuis les nodes de configuration\nconst preview = {\n  success: true,\n  preview_mode: previewMode, // PRÉSERVER depuis les nodes de configuration\n  approved: approved, // PRÉSERVER depuis les nodes de configuration\n  content: content.substring(0, 500) + (content.length > 500 ? '...' : ''),\n  content_length: content.length,\n  metadata: metadata,\n  full_content: content,\n  ready_for_approval: approved === true && previewMode === false\n};\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ...preview\n  }\n}));"},"id":"preview-briefing-content","name":"Preview Briefing Content","type":"n8n-nodes-base.code","typeVersion":2,"position":[22896,6696]},{"parameters":{"conditions":{"boolean":[{"value1":"={{ $json.test_mode === false || $json.require_approval === false || $json.approved === true }}","value2":true}]},"options":{}},"id":"approval-check","name":"Check Approval","type":"n8n-nodes-base.if","typeVersion":2,"position":[23472,6696]},{"parameters":{},"id":"preview-message","name":"Preview Message","type":"n8n-nodes-base.noOp","typeVersion":1,"position":[23184,6696]},{"parameters":{"conditions":{"string":[{"value1":"={{ $json.preview_mode === false && $json.approved === true ? 'send' : 'preview' }}","operation":"equals","value2":"send"}]},"options":{}},"id":"preview-or-send-switch","name":"Should Send Email?","type":"n8n-nodes-base.if","typeVersion":2,"position":[23472,6104]},{"parameters":{"jsCode":"const items = $input.all();\nconst data = items[0].json;\n\n// Extraire le contenu\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu reçu';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: Array.isArray(data.emma_tools) ? data.emma_tools.join(', ') : 'Aucun',\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString(),\n  content_length: content.length\n};\n\n// Créer un message de prévisualisation formaté avec lien HTML\nconst previewMessage = `\n╔══════════════════════════════════════════════════════════════╗\n║  📋 PRÉVISUALISATION DU BRIEFING                            ║\n╚══════════════════════════════════════════════════════════════╝\n\n✅ Briefing généré avec succès !\n\n📊 MÉTADONNÉES :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Type : ${metadata.prompt_type}\n• Modèle Emma : ${metadata.emma_model.toUpperCase()}\n• Outils utilisés : ${metadata.emma_tools}\n• Temps d'exécution : ${(metadata.emma_execution_time / 1000).toFixed(1)}s\n• Longueur : ${metadata.content_length} caractères\n• Généré le : ${new Date(metadata.generated_at).toLocaleString('fr-FR')}\n\n📝 APERÇU DU CONTENU (500 premiers caractères) :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}\n\n🌐 PRÉVISUALISATION HTML :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 Pour voir la prévisualisation HTML complète de l'email :\n   1. Utilisez le \"Chat Trigger (Preview)\" pour obtenir une URL\n   2. Ou consultez le nœud \"Generate HTML Preview\" pour le HTML\n\n⚠️  POUR APPROUVER ET ENVOYER :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n1. Modifiez le nœud \"Custom Prompt Input\"\n2. Changez \"approved\" de false à true\n3. Réexécutez le workflow depuis \"Custom Prompt Input\"\n\n💡 ASTUCE : Vous pouvez aussi modifier le prompt dans \"Custom Prompt Input\"\net réexécuter pour tester différentes versions.\n`;\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    preview_message: previewMessage,\n    preview_content: content,\n    preview_metadata: metadata\n  }\n}));"},"id":"preview-display","name":"Preview Display","type":"n8n-nodes-base.code","typeVersion":2,"position":[23696,6008]},{"parameters":{},"id":"preview-stop","name":"Preview Stop","type":"n8n-nodes-base.noOp","typeVersion":1,"position":[23920,6008]},{"parameters":{"httpMethod":"POST","path":"emma-newsletter/preview","responseMode":"lastNode","options":{}},"id":"chat-trigger-preview","name":"Chat Trigger (Preview)","type":"n8n-nodes-base.webhook","typeVersion":2.1,"position":[20208,5344],"webhookId":"emma-preview-webhook"},{"parameters":{"jsCode":"const items = $input.all();\nconst data = items[0].json;\n\n// Récupérer le contenu HTML généré\nconst htmlContent = data.html_content || '';\nconst subject = data.subject || 'Newsletter Emma';\nconst content = data.newsletter_content || data.response || '';\n\n// Créer une prévisualisation HTML interactive\nconst previewHtml = `\n<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Prévisualisation - ${subject}</title>\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body {\n      font-family: 'Inter', 'Roboto', sans-serif;\n      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n      padding: 20px;\n    }\n    .preview-container {\n      max-width: 800px;\n      margin: 0 auto;\n      background: white;\n      border-radius: 12px;\n      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);\n      overflow: hidden;\n    }\n    .preview-header {\n      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);\n      color: white;\n      padding: 24px;\n      text-align: center;\n    }\n    .preview-header h1 {\n      font-size: 24px;\n      margin-bottom: 8px;\n    }\n    .preview-header p {\n      opacity: 0.9;\n      font-size: 14px;\n    }\n    .preview-actions {\n      padding: 20px;\n      background: #f8fafc;\n      border-bottom: 2px solid #e5e7eb;\n      display: flex;\n      gap: 12px;\n      justify-content: center;\n    }\n    .preview-btn {\n      padding: 12px 24px;\n      border-radius: 8px;\n      font-weight: 600;\n      cursor: pointer;\n      border: none;\n      font-size: 14px;\n      transition: all 0.2s;\n    }\n    .preview-btn.approve {\n      background: linear-gradient(135deg, #10b981 0%, #059669 100%);\n      color: white;\n    }\n    .preview-btn.approve:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);\n    }\n    .preview-btn.reject {\n      background: #ef4444;\n      color: white;\n    }\n    .preview-btn.reject:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);\n    }\n    .preview-content {\n      padding: 0;\n    }\n    .preview-content iframe {\n      width: 100%;\n      height: 800px;\n      border: none;\n    }\n    .preview-metadata {\n      padding: 20px;\n      background: #f1f5f9;\n      border-top: 2px solid #e5e7eb;\n    }\n    .preview-metadata table {\n      width: 100%;\n      border-collapse: collapse;\n    }\n    .preview-metadata td {\n      padding: 8px 12px;\n      border-bottom: 1px solid #e5e7eb;\n    }\n    .preview-metadata td:first-child {\n      font-weight: 700;\n      color: #4f46e5;\n      width: 150px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"preview-container\">\n    <div class=\"preview-header\">\n      <h1>📋 Prévisualisation de l'Email</h1>\n      <p>Vérifiez le contenu avant d'approuver l'envoi</p>\n    </div>\n    \n    <div class=\"preview-actions\">\n      <button class=\"preview-btn approve\" onclick=\"approveEmail()\">\n        ✅ Approuver et Envoyer\n      </button>\n      <button class=\"preview-btn reject\" onclick=\"rejectEmail()\">\n        ❌ Rejeter\n      </button>\n    </div>\n    \n    <div class=\"preview-content\">\n      <iframe srcdoc=\"${htmlContent.replace(/\"/g, '&quot;')}\"></iframe>\n    </div>\n    \n    <div class=\"preview-metadata\">\n      <table>\n        <tr>\n          <td>Sujet:</td>\n          <td>${subject}</td>\n        </tr>\n        <tr>\n          <td>Type:</td>\n          <td>${data.prompt_type || 'custom'}</td>\n        </tr>\n        <tr>\n          <td>Modèle Emma:</td>\n          <td>${data.emma_model || 'perplexity'}</td>\n        </tr>\n        <tr>\n          <td>Longueur:</td>\n          <td>${content.length} caractères</td>\n        </tr>\n        <tr>\n          <td>Généré le:</td>\n          <td>${new Date().toLocaleString('fr-FR')}</td>\n        </tr>\n      </table>\n    </div>\n  </div>\n  \n  <script>\n    function approveEmail() {\n      alert('✅ Pour approuver:\\n\\n1. Retournez dans n8n\\n2. Modifiez le nœud \"Custom Prompt Input\"\\n3. Changez \"approved\" à true\\n4. Réexécutez le workflow');\n    }\n    function rejectEmail() {\n      alert('❌ Email rejeté. Modifiez le prompt dans \"Custom Prompt Input\" et réexécutez.');\n    }\n  </script>\n</body>\n</html>\n`;\n\nreturn [{\n  json: {\n    ...data,\n    preview_html: previewHtml,\n    preview_url: `data:text/html;charset=utf-8,${encodeURIComponent(previewHtml)}`\n  }\n}];"},"id":"html-preview-generator","name":"Generate HTML Preview","type":"n8n-nodes-base.code","typeVersion":2,"position":[20208,6920]},{"parameters":{"respondWith":"json","responseBody":"={{ { \"success\": true, \"preview_html\": $json.preview_html, \"preview_url\": $json.preview_url, \"subject\": $json.subject, \"metadata\": { \"type\": $json.prompt_type, \"model\": $json.emma_model, \"length\": ($json.newsletter_content || $json.response || '').length } } }}","options":{}},"id":"serve-preview","name":"Serve Preview","type":"n8n-nodes-base.respondToWebhook","typeVersion":1.1,"position":[20432,6920]},{"parameters":{"url":"=https://gob-projetsjsls-projects.vercel.app/api/email-recipients","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Content-Type","value":"application/json"}]},"options":{"response":{"response":{"responseFormat":"json"}}}},"id":"fetch-email-recipients-node","name":"Fetch Email Recipients","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[23920,6548]},{"parameters":{"jsCode":"const items = $input.all();\nconst data = items[0].json;\n\n// Les données viennent de \"Fetch Email Recipients\" qui retourne { recipients: [...], success: true }\n// On doit récupérer html_content, subject, prompt_type et preview_mode depuis \"Generate HTML Newsletter\"\n\n// Méthode 1 : Utiliser les données disponibles dans le flux actuel\nlet briefingType = data.prompt_type || data.briefing_type || 'custom';\nlet previewMode = data.preview_mode !== undefined ? data.preview_mode : false;\nlet htmlContent = data.html_content || '';\nlet subject = data.subject || '';\n\n// Méthode 2 : Essayer d'accéder aux nœuds précédents dans le flux d'exécution\n// Note: Dans n8n, $() permet d'accéder aux données des nœuds précédents\n// mais seulement si ces nœuds sont dans le flux d'exécution actuel\n\n// Essayer depuis \"Generate HTML Newsletter\" (juste avant \"Fetch Email Recipients\")\ntry {\n  const generateHtmlData = $('Generate HTML Newsletter').item?.json;\n  if (generateHtmlData) {\n    // IMPORTANT : Préserver html_content et subject depuis \"Generate HTML Newsletter\"\n    htmlContent = generateHtmlData.html_content || htmlContent;\n    subject = generateHtmlData.subject || subject;\n    \n    // Préserver aussi prompt_type et preview_mode\n    briefingType = generateHtmlData.prompt_type || briefingType;\n    previewMode = generateHtmlData.preview_mode !== undefined ? generateHtmlData.preview_mode : previewMode;\n    \n    console.log('✅ Données récupérées depuis Generate HTML Newsletter');\n  }\n} catch (e) {\n  console.warn('⚠️  Generate HTML Newsletter non accessible, tentative d\\'autres nœuds...');\n  \n  try {\n    // Essayer depuis \"Parse API Response\"\n    const parseApiData = $('Parse API Response').item?.json;\n    if (parseApiData) {\n      briefingType = parseApiData.prompt_type || briefingType;\n      previewMode = parseApiData.preview_mode !== undefined ? parseApiData.preview_mode : previewMode;\n      console.log('✅ Données récupérées depuis Parse API Response');\n    }\n  } catch (e2) {\n    console.warn('⚠️  Parse API Response non accessible, utilisation des valeurs par défaut');\n  }\n}\n\n// Normaliser le type\nlet normalizedType = briefingType;\nif (normalizedType === 'noon') {\n  normalizedType = 'midday';\n}\n\n// Récupérer les destinataires depuis l'API (données de \"Fetch Email Recipients\")\nconst recipientsData = data.recipients || [];\nconst previewEmail = data.preview_email || 'projetsjsl@gmail.com';\n\nlet emailList = [];\n\nif (previewMode === true) {\n  // Mode preview : utiliser l'email de preview\n  emailList = [previewEmail];\n  console.log('📧 Mode preview activé');\n} else {\n  // Mode envoi : utiliser les destinataires actifs du type\n  emailList = recipientsData\n    .filter(r => r.active && r[normalizedType])\n    .map(r => r.email);\n  \n  console.log(`📧 Mode envoi, type: ${normalizedType}, destinataires: ${emailList.length}`);\n  \n  // Fallback si aucun destinataire trouvé\n  if (emailList.length === 0) {\n    emailList = [previewEmail];\n    console.warn('⚠️  Aucun destinataire actif, utilisation de l\\'email de preview');\n  }\n}\n\n// Vérifier que html_content et subject sont présents\nif (!htmlContent) {\n  console.warn('⚠️  html_content manquant, le nœud Send Email via Resend pourrait échouer');\n}\nif (!subject) {\n  console.warn('⚠️  subject manquant, utilisation d\\'un sujet par défaut');\n  subject = subject || `Newsletter Emma - Mise à jour du ${normalizedType}`;\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    // Données de destinataires\n    recipients: emailList,\n    recipient_count: emailList.length,\n    briefing_type: normalizedType,\n    preview_mode: previewMode,\n    prompt_type: briefingType,\n    // IMPORTANT : Préserver html_content et subject pour \"Send Email via Resend\"\n    html_content: htmlContent,\n    subject: subject\n  }\n}));"},"id":"process-recipients-node","name":"Process Recipients","type":"n8n-nodes-base.code","typeVersion":2,"position":[24144,6548]},{"parameters":{"assignments":{"assignments":[{"id":"id-1","name":"active_api","value":"perplexity","type":"string"},{"id":"id-2","name":"test_mode","value":false,"type":"boolean"},{"id":"id-preview-mode-1762640093151","name":"preview_mode","value":false,"type":"boolean"},{"id":"id-approved-1762640093151","name":"approved","value":true,"type":"boolean"}]},"includeOtherFields":true,"options":{}},"id":"config-schedule-config-1762643453541","name":"Schedule Config","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[20432,5728]},{"parameters":{"assignments":{"assignments":[{"id":"id-1","name":"active_api","value":"perplexity","type":"string"},{"id":"id-2","name":"test_mode","value":false,"type":"boolean"},{"id":"id-preview-mode-1762640093151","name":"preview_mode","value":false,"type":"boolean"},{"id":"id-approved-1762640093151","name":"approved","value":true,"type":"boolean"}]},"includeOtherFields":true,"options":{}},"id":"config-webhook-config-1762643453541","name":"Webhook Config","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[20432,5920]},{"parameters":{"assignments":{"assignments":[{"id":"id-1","name":"active_api","value":"perplexity","type":"string"},{"id":"id-2","name":"test_mode","value":false,"type":"boolean"},{"id":"id-preview-mode-1762640093151","name":"preview_mode","value":true,"type":"boolean"},{"id":"id-approved-1762640093151","name":"approved","value":false,"type":"boolean"}]},"includeOtherFields":true,"options":{}},"id":"config-manual-config-1762643453541","name":"Manual Config","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[20432,6112]},{"parameters":{"assignments":{"assignments":[{"id":"id-1","name":"active_api","value":"perplexity","type":"string"},{"id":"id-2","name":"test_mode","value":false,"type":"boolean"},{"id":"id-preview-mode-1762640093151","name":"preview_mode","value":true,"type":"boolean"},{"id":"id-approved-1762640093151","name":"approved","value":false,"type":"boolean"}]},"includeOtherFields":true,"options":{}},"id":"config-chat-config-1762643453541","name":"Chat Config","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[20432,6304]},{"parameters":{"jsCode":"const items = $input.all();\nconst data = items[0].json;\n\nconsole.log('🔍 DEBUG AVANT SWITCH:');\nconsole.log('   preview_mode:', data.preview_mode, '(type:', typeof data.preview_mode, ')');\nconsole.log('   approved:', data.approved, '(type:', typeof data.approved, ')');\nconsole.log('   Condition Preview:', data.preview_mode === true || data.approved !== true);\nconsole.log('   Condition Send:', data.preview_mode === false && data.approved === true);\n\nreturn items;"},"id":"debug-before-switch-node","name":"Debug Before Switch","type":"n8n-nodes-base.code","typeVersion":2,"position":[23184,6104]},{"parameters":{"method":"POST","url":"=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent","authentication":"predefinedCredentialType","nodeCredentialType":"googlePalmApi","sendQuery":true,"queryParameters":{"parameters":[{"name":"key","value":"={{ $json.gemini_api_key }}"}]},"sendHeaders":true,"headerParameters":{"parameters":[{"name":"Content-Type","value":"application/json"}]},"sendBody":true,"specifyBody":"json","jsonBody":"={{ {\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": $json.message || $json.selected_prompt || \"Génère un briefing financier matinal.\"\n    }]\n  }],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"topK\": 40,\n    \"topP\": 0.95,\n    \"maxOutputTokens\": 2048\n  }\n} }}","options":{"response":{"response":{"responseFormat":"json"}}}},"id":"call-gemini-api-node","name":"Call Gemini API","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[22448,6104],"credentials":{"googlePalmApi":{"id":"0D5m3nEBknRtHnmZ","name":"Google Gemini(PaLM) Api account 3"}}},{"parameters":{"jsCode":"const items = $input.all();\nconst data = items[0].json;\n\n// La réponse de Gemini a une structure différente\n// Structure Gemini: { candidates: [{ content: { parts: [{ text: \"...\" }] } }] }\nlet content = '';\nif (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {\n  content = data.candidates[0].content.parts.map(part => part.text).join('\\n');\n} else if (data.response) {\n  content = data.response;\n} else if (typeof data === 'string') {\n  content = data;\n}\n\n// Adapter au format attendu par Parse API Response\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    newsletter_content: content,\n    response: content,\n    message: content,\n    emma_model: 'gemini',\n    emma_tools: [],\n    emma_execution_time: 0,\n    trigger_type: item.json.trigger_type || 'Manuel',\n    prompt_type: item.json.prompt_type || 'custom',\n    generated_at: new Date().toISOString(),\n    // Préserver preview_mode et approved\n    preview_mode: item.json.preview_mode,\n    approved: item.json.approved\n  }\n}));"},"id":"parse-gemini-response","name":"Parse Gemini Response","type":"n8n-nodes-base.code","typeVersion":2,"position":[22672,6104]},{"parameters":{"jsCode":"// ═══════════════════════════════════════════════════════════\n// 🤖 SÉLECTEUR DE MODÈLE IA - MODIFIEZ ICI ⚙️\n// ═══════════════════════════════════════════════════════════\n//\n// 👇 MODIFIEZ LA VALEUR CI-DESSOUS 👇\n//\nconst AI_MODEL = 'emma';\n//\n// Options disponibles:\n//   - 'emma'    → Utilise Emma (Perplexity) via /api/chat\n//   - 'gemini'  → Utilise Gemini directement\n//\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ai_model: AI_MODEL,\n    _model_info: AI_MODEL === 'emma' \n      ? '🤖 Emma (Perplexity) - Recherche web en temps réel' \n      : '✨ Gemini Direct - Réponse rapide'\n  }\n}));"},"id":"ai-model-config-dropdown","name":"⚙️ AI Model Selector (Change AI_MODEL)","type":"n8n-nodes-base.code","typeVersion":2,"position":[21552,6104]},{"parameters":{"jsCode":"// ═══════════════════════════════════════════════════════════\n// 🔑 EXTRACTION DE LA CLÉ API GEMINI DEPUIS LA RÉPONSE VERCEL\n// ═══════════════════════════════════════════════════════════\n//\n// Ce nœud extrait la clé API Gemini depuis la réponse de l'endpoint Vercel\n//\n// ✅ Configuration automatique - Aucune action requise !\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\nconst data = items[0].json;\n\nlet geminiApiKey = '';\n\ntry {\n  // La réponse de l'endpoint Vercel est dans $json\n  // Format: { apiKey: \"...\", configured: true, ... }\n  if (data.apiKey) {\n    geminiApiKey = data.apiKey;\n    console.log('✅ Clé API Gemini récupérée depuis Vercel');\n  } else if (data.error) {\n    throw new Error(`Erreur Vercel: ${data.message || data.error}`);\n  } else {\n    // Fallback : essayer depuis les credentials n8n\n    geminiApiKey = $workflow.getStaticData('global').geminiApiKey || '';\n    \n    if (!geminiApiKey) {\n      throw new Error('Clé API non trouvée. Vérifiez que GEMINI_API_KEY est configurée dans Vercel.');\n    }\n    \n    console.log('⚠️  Utilisation de la clé depuis les credentials n8n (fallback)');\n  }\n} catch (error) {\n  console.error('❌ Erreur:', error.message);\n  throw new Error(`❌ Impossible de récupérer la clé API Gemini: ${error.message}`);\n}\n\nif (!geminiApiKey) {\n  throw new Error('❌ Clé API Gemini vide');\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    gemini_api_key: geminiApiKey\n  }\n}));"},"id":"gemini-api-key-node","name":"Get Gemini API Key","type":"n8n-nodes-base.code","typeVersion":2,"position":[22224,6104]},{"parameters":{"url":"=https://gob-projetsjsls-projects.vercel.app/api/gemini-key?full=true","sendHeaders":true,"headerParameters":{"parameters":[{"name":"Content-Type","value":"application/json"}]},"options":{"response":{"response":{"responseFormat":"json"}}}},"id":"fetch-gemini-api-key-node","name":"Fetch Gemini API Key from Vercel","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[22000,6104]},{"parameters":{"rules":{"values":[{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"strict","version":2},"conditions":[{"leftValue":"={{ $json.ai_model }}","rightValue":"emma","operator":{"type":"string","operation":"equals"},"id":"e15020a5-785c-4bf2-be14-7a2a338e9c34"}],"combinator":"and"},"renameOutput":true,"outputKey":"Emma"},{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"strict","version":2},"conditions":[{"id":"602d5987-7966-46b0-bca6-1bc86f245316","leftValue":"={{ $json.ai_model }}","rightValue":"gemini","operator":{"type":"string","operation":"equals","name":"filter.operator.equals"}}],"combinator":"and"},"renameOutput":true,"outputKey":"Gemini"}]},"options":{}},"id":"6f67bbb2-07a7-46be-9b7a-1735ba3e3c5b","name":"Switch","type":"n8n-nodes-base.switch","typeVersion":3.3,"position":[21776,6104]},{"parameters":{"options":{}},"id":"339cad82-0be3-4fbb-a420-f8e9a9d2f805","name":"When chat message received","type":"@n8n/n8n-nodes-langchain.chatTrigger","typeVersion":1.4,"position":[22672,6400],"webhookId":"9663354b-9871-49c0-aaee-3992c85a12ec"},{"parameters":{"batching":{}},"id":"90188c41-16ed-4cc6-bf45-b473e44872ee","name":"Basic LLM Chain","type":"@n8n/n8n-nodes-langchain.chainLlm","typeVersion":1.7,"position":[23120,6296]},{"parameters":{"options":{}},"id":"21c86760-5e53-4acd-b4a3-223a3b69c361","name":"Google Gemini Chat Model","type":"@n8n/n8n-nodes-langchain.lmChatGoogleGemini","typeVersion":1,"position":[23192,6520],"credentials":{"googlePalmApi":{"id":"0D5m3nEBknRtHnmZ","name":"Google Gemini(PaLM) Api account 3"}}},{"parameters":{"jsCode":"// Test Email Prep Node\nconst items = $input.all();\nconst data = items[0].json;\nconsole.log(\"Test Email Prep - Formatting LLM output\");\n\nlet content = \"\";\nif (data.output) { content = data.output; }\nelse if (data.text) { content = data.text; }\nelse if (data.response) { content = data.response; }\nelse if (data.message) { content = data.message; }\nelse { content = \"No content found\"; }\n\nreturn [{\n  json: {\n    newsletter_content: content,\n    trigger_type: \"Test Chat\",\n    emma_model: \"gemini-langchain\",\n    emma_tools: [\"langchain\", \"chat\"],\n    emma_execution_time: 0,\n    prompt_type: \"test\",\n    tickers: \"\",\n    preview_mode: false,\n    approved: true,\n    test_mode: true,\n    recipients: [\"projetsjsl@gmail.com\"],\n    generated_at: new Date().toISOString()\n  }\n}];"},"id":"8346e806-18fc-4bc8-ad19-fc8c0e11bd5b","name":"Test Formated HTML Email to projetsjsl@gmail.com","type":"n8n-nodes-base.code","typeVersion":2,"position":[23472,6400]},{"parameters":{"jsCode":"// ═══════════════════════════════════════════════════════════\n// 🇫🇷 INSTRUCTION FRANÇAISE POUR LE LLM\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\nconst data = items[0].json;\n\n// Message original de l'utilisateur\nconst userMessage = data.chatInput || data.message || '';\n\n// Instruction système en français\nconst systemInstruction = `Tu es Emma, l'assistante financière IA de JSLAI™.\n\nLANGUE: Réponds TOUJOURS en FRANÇAIS, sauf pour:\n- Les noms propres (entreprises, personnes, lieux)\n- Les citations directes\n- Les termes techniques standards (P/E ratio, ETF, etc.)\n\nSTYLE:\n- Analyse financière claire et professionnelle\n- Structure avec des paragraphes distincts\n- Utilise des données précises\n- Ton accessible mais expert\n\nVoici la question de l'utilisateur:\n\n`;\n\n// Combiner l'instruction avec le message\nconst fullMessage = systemInstruction + userMessage;\n\nconsole.log('🇫🇷 Instruction française ajoutée au message');\nconsole.log('   Longueur originale:', userMessage.length);\nconsole.log('   Longueur totale:', fullMessage.length);\n\nreturn [{\n  json: {\n    ...data,\n    chatInput: fullMessage\n  }\n}];"},"id":"add-french-instruction-node-id","name":"🇫🇷 Add French Instruction","type":"n8n-nodes-base.code","typeVersion":2,"position":[22896,6400]}],"connections":{"Schedule Trigger (7h/12h/16h30 EST)":{"main":[[{"node":"Schedule Config","type":"main","index":0}]]},"Webhook Trigger":{"main":[[{"node":"Webhook Config","type":"main","index":0}]]},"Manual Trigger (Custom Prompt)":{"main":[[{"node":"🎯 Manual Briefing Selector (MODIFIEZ ICI)","type":"main","index":0}]]},"🎯 Manual Briefing Selector (MODIFIEZ ICI)":{"main":[[{"node":"Merge Triggers","type":"main","index":0}]]},"Merge Triggers":{"main":[[{"node":"Fetch Prompts from API","type":"main","index":0}]]},"Get Active Tickers":{"main":[[{"node":"Determine Time-Based Prompt","type":"main","index":0}]]},"Determine Time-Based Prompt":{"main":[[{"node":"⚙️ AI Model Selector (Change AI_MODEL)","type":"main","index":0}]]},"Prepare API Request":{"main":[[{"node":"Call /api/chat (Emma)","type":"main","index":0}]]},"Parse API Response":{"main":[[{"node":"Debug Before Switch","type":"main","index":0}]]},"Generate HTML Newsletter":{"main":[[{"node":"Fetch Email Recipients","type":"main","index":0}]]},"Send Email via Resend":{"main":[[{"node":"Log to Newsletters Table","type":"main","index":0}]]},"Log to Newsletters Table":{"main":[[{"node":"Log to Logs Table","type":"main","index":0}]]},"Workflow Configuration":{"main":[[{"node":"Fetch Prompts from API","type":"main","index":0}]]},"Gmail Trigger (Custom Prompt)":{"main":[[{"node":"Custom Workflow Configuration","type":"main","index":0}]]},"Telegram Trigger (Custom Prompt)":{"main":[[{"node":"Custom Workflow Configuration","type":"main","index":0}]]},"Custom Workflow Configuration":{"main":[[{"node":"Get Active Tickers","type":"main","index":0}]]},"Call /api/chat (Emma)":{"main":[[{"node":"Parse API Response","type":"main","index":0}]]},"Fetch Prompts from API":{"main":[[{"node":"Get Active Tickers","type":"main","index":0}]]},"Preview Briefing Content":{"main":[[{"node":"Preview Message","type":"main","index":0}]]},"Preview Message":{"main":[[{"node":"Check Approval","type":"main","index":0}]]},"Check Approval":{"main":[[{"node":"Generate HTML Newsletter","type":"main","index":0}],[{"node":"Preview Message","type":"main","index":0}]]},"Preview Display":{"main":[[{"node":"Preview Stop","type":"main","index":0}]]},"Chat Trigger (Preview)":{"main":[[{"node":"🎯 Manual Briefing Selector (MODIFIEZ ICI)","type":"main","index":0}]]},"Generate HTML Preview":{"main":[[{"node":"Serve Preview","type":"main","index":0}]]},"Fetch Email Recipients":{"main":[[{"node":"Process Recipients","type":"main","index":0}]]},"Process Recipients":{"main":[[{"node":"Send Email via Resend","type":"main","index":0}]]},"Schedule Config":{"main":[[{"node":"Merge Triggers","type":"main","index":0}]]},"Webhook Config":{"main":[[{"node":"Merge Triggers","type":"main","index":0}]]},"Manual Config":{"main":[[{"node":"Merge Triggers","type":"main","index":0}]]},"Chat Config":{"main":[[{"node":"Merge Triggers","type":"main","index":0}]]},"Debug Before Switch":{"main":[[{"node":"Should Send Email?","type":"main","index":0}]]},"Should Send Email?":{"main":[[{"node":"Generate HTML Newsletter","type":"main","index":0}],[{"node":"Preview Display","type":"main","index":0}]]},"Call Gemini API":{"main":[[{"node":"Parse Gemini Response","type":"main","index":0}]]},"Parse Gemini Response":{"main":[[{"node":"Parse API Response","type":"main","index":0}]]},"⚙️ AI Model Selector (Change AI_MODEL)":{"main":[[{"node":"Switch","type":"main","index":0}]]},"Get Gemini API Key":{"main":[[{"node":"Call Gemini API","type":"main","index":0}]]},"Fetch Gemini API Key from Vercel":{"main":[[{"node":"Get Gemini API Key","type":"main","index":0}]]},"Switch":{"main":[[{"node":"Prepare API Request","type":"main","index":0}],[{"node":"Fetch Gemini API Key from Vercel","type":"main","index":0}]]},"Google Gemini Chat Model":{"ai_languageModel":[[{"node":"Basic LLM Chain","type":"ai_languageModel","index":0}]]},"When chat message received":{"main":[[{"node":"🇫🇷 Add French Instruction","type":"main","index":0}]]},"Basic LLM Chain":{"main":[[{"node":"Test Formated HTML Email to projetsjsl@gmail.com","type":"main","index":0}]]},"Test Formated HTML Email to projetsjsl@gmail.com":{"main":[[{"node":"Generate HTML Newsletter","type":"main","index":0}]]},"🇫🇷 Add French Instruction":{"main":[[{"node":"Basic LLM Chain","type":"main","index":0}]]}},"settings":{"executionOrder":"v1","callerPolicy":"workflowsFromSameOwner","availableInMCP":false,"errorWorkflow":"03lgcA4e9uRTtli1"},"staticData":{"node:Schedule Trigger (7h/12h/16h30 EST)":{"recurrenceRules":[]},"node:Gmail Trigger (Custom Prompt)":{"Gmail Trigger (Custom Prompt)":{"lastTimeChecked":1762532537,"possibleDuplicates":["19a5f2038b731938"]}}},"meta":{"templateCredsSetupCompleted":true},"pinData":{"Call /api/chat (Emma)":[{"json":{"success":true,"response":"Bonsoir n8n-automation,  \nVoici votre synthèse personnalisée de la séance boursière du vendredi 7 novembre 2025, marquée par une volatilité sectorielle contrastée et des mouvements significatifs sur plusieurs titres phares de votre univers d’investissement.\n\n---\n\n**1. Ouverture**  \nLa séance s’est ouverte sous le signe de l’incertitude, avec des marchés oscillant entre prises de bénéfices en début de journée et rebonds techniques sur les valeurs technologiques et santé en clôture. Les investisseurs restent attentifs aux prochaines publications et à la trajectoire des taux.\n\n---\n\n**2. Clôture des marchés**  \n- **S&P 500** : -0,3% à 5 086 points.  \n- **Nasdaq** : +0,5% à 17 120 points, soutenu par la tech.  \n- **TSX (Canada)** : -0,4% à 21 780 points.  \nLes volumes de transactions sont restés dans la moyenne, avec une accélération sur les bancaires et la tech en fin de séance (source : FMP Fundamentals, Polygon).\n\n---\n\n**3. Secteurs performants**\n- **En hausse :**  \n   - **Technologie** (+1,2%) : Alphabet (GOOGL) et le segment IA tirent le secteur, portés par des résultats supérieurs et des anticipations de croissance durable.\n   - **Énergie** (+1,1%) : Reprise des cours du pétrole, bénéfique pour les valeurs de services et d’infrastructure.\n   - **Santé** : Big pharma (JNJ, PFE) en rebond modéré, rotation vers la qualité en période d’incertitude macro.\n\n- **En baisse :**  \n   - **Télécoms** : BCE, VZ et T pénalisés par la pression sur les marges et la concurrence accrue (-1,5%).\n   - **Banques canadiennes** : BNS, TD sous pression (-0,7% à -1,1%), inquiétudes persistantes sur le crédit et la rentabilité.\n   - **Consommation discrétionnaire** : NKE, CVS affectés par la prudence des ménages.\n\n---\n\n**4. Tickers d’équipe – Bilan et analyse**\n- **GOOGL (Alphabet)** : +0,8% à 278,83$. P/E de 27,1x (vs secteur tech 28x), ROE très élevé à 35%. Marge nette impressionnante (32%), dette quasi nulle, moat technologique majeur, momentum IA solide.  \n- **BNS (Banque Scotia)** : -0,7% à 66,70$. P/E à 16,1x, ROE faible à 8,6%, payout ratio élevé (81%), dette/capitaux propres massive (5,8x). Pression sur la croissance et la qualité du crédit.  \n- **TD (Toronto Dominion)** : -1,1% à 80,90$. P/E attractif à 9,3x, ROE robuste à 17,2%, marge nette 17,8%. Mieux positionnée que BNS, mais secteur bancaire sous tension.  \n- **BCE (Télécom)** : -1,5% à 23,19$. P/E élevé à 50,3x, marge nette faible à 2,5%, payout ratio surdimensionné (>500%), dette élevée. Défensif mais risque sur la soutenabilité du dividende.  \n- **CNR (Core Natural Resources)** : Stable à 89,41$. P/E extrême à 227x, ROE quasi nul (<1%), mais faible endettement. Le marché reste prudent sur la visibilité bénéficiaire.\n\n---\n\n**5. Événements marquants**  \n- Alphabet profite d’un nouvel engouement IA, plusieurs analystes anticipant une « croissance exponentielle » à moyen terme.\n- Les banques canadiennes pâtissent d’une montée des provisions et des craintes sur l’immobilier commercial.\n- Les télécoms subissent une révision à la baisse des perspectives de marges et des avertissements de plusieurs opérateurs.\n\n---\n\n**6. Perspective demain**  \nÀ surveiller : résultats de sociétés santé (MDT, JNJ), discours de la Fed et chiffres d’inflation US qui pourraient infléchir la courbe des taux. Les investisseurs seront attentifs à la résilience des dividendes dans les télécoms et à la qualité des actifs bancaires.\n\n---\n\n**7. Conseil Emma**  \nFace à la volatilité, privilégiez les valeurs à moat défensif, faible endettement et génération de cash-flow solide (GOOGL, TD). Limitez l’exposition aux télécoms et aux banques à faible rentabilité ou fort levier, en privilégiant la sélectivité dans vos arbitrages.\n\n---\n\n**8. Fermeture**  \nMerci n8n-automation pour votre confiance. Je reste à disposition pour approfondir l’analyse de tout titre spécifique ou élaborer une allocation sectorielle détaillée demain matin. Bonne soirée et à demain pour un nouveau point marché.\n\n*Sources : FMP Fundamentals, FMP Ratios, Polygon, actualités sectorielles au 9 novembre 2025.*","conversationId":"4c39bb0a-5adb-49e2-b77f-7ec22cc2437e","metadata":{"user_id":"2fc99cf6-3dd8-4129-82c9-73ee478abe12","name":"n8n-automation","conversation_id":"4c39bb0a-5adb-49e2-b77f-7ec22cc2437e","model":"perplexity","llmUsed":"perplexity","tools_used":["fmp-fundamentals","fmp-quote","fmp-ticker-news","fmp-ratios","fmp-key-metrics","fmp-ratings","earnings-calendar","polygon-stock-price"],"toolsUsed":["fmp-fundamentals","fmp-quote","fmp-ticker-news","fmp-ratios","fmp-key-metrics","fmp-ratings","earnings-calendar","polygon-stock-price"],"failedTools":["fmp-quote"],"confidence":0.685,"dataConfidence":0.52,"intent":"comparative_analysis","execution_time_ms":39903,"executionTimeMs":41625,"emmaExecutionTimeMs":39903,"channel":"web","messageCount":11}}}]},"versionId":"095eca0f-d6e4-48f7-a3c0-af2b840dd791","versionCounter":349,"triggerCount":5,"shared":[{"updatedAt":"2025-10-20T18:16:03.747Z","createdAt":"2025-10-20T18:16:03.747Z","role":"workflow:owner","workflowId":"03lgcA4e9uRTtli1","projectId":"qfcAzmlYYK6RvGCQ","project":{"updatedAt":"2025-09-24T01:26:58.771Z","createdAt":"2025-09-24T01:26:55.321Z","id":"qfcAzmlYYK6RvGCQ","name":"Projets JSL <projetsjsl@gmail.com>","type":"personal","icon":null,"description":null,"projectRelations":[{"updatedAt":"2025-09-24T01:26:55.322Z","createdAt":"2025-09-24T01:26:55.322Z","userId":"cf0c4ec1-d247-4b12-bc83-04a5c23649fb","projectId":"qfcAzmlYYK6RvGCQ","user":{"updatedAt":"2025-11-10T06:29:22.000Z","createdAt":"2025-09-24T01:26:53.819Z","id":"cf0c4ec1-d247-4b12-bc83-04a5c23649fb","email":"projetsjsl@gmail.com","firstName":"Projets","lastName":"JSL","personalizationAnswers":null,"settings":{"userActivated":true,"easyAIWorkflowOnboarded":true,"userClaimedAiCredits":true,"firstSuccessfulWorkflowId":"03lgcA4e9uRTtli1","userActivatedAt":1760990286412,"npsSurvey":{"waitingForResponse":true,"ignoredCount":2,"lastShownAt":1762636703931}},"disabled":false,"mfaEnabled":false,"lastActiveAt":"2025-11-10","isPending":false}}]}}],"tags":[]}
+{
+  "name": "Emma Newsletter - Automated Multi-API Financial News Distribution",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            },
+            {
+              "field": "cronExpression",
+              "expression": "0 12 * * *"
+            },
+            {
+              "field": "cronExpression",
+              "expression": "30 16 * * *"
+            }
+          ]
+        }
+      },
+      "id": "5397f51e-b6e3-4630-9d60-d975554db13b",
+      "name": "Schedule Trigger (7h/12h/16h30 EST)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        20208,
+        5728
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "emma-newsletter/send",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "30e9d42f-c22e-4ecc-b32f-040e1b36c80d",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        20208,
+        5920
+      ],
+      "webhookId": "dad887b9-1a62-482a-9174-3b79f52a2bb5"
+    },
+    {
+      "parameters": {},
+      "id": "2199702c-ea93-484a-9b71-3ba416030308",
+      "name": "Manual Trigger (Custom Prompt)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        20208,
+        5536
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-briefing-type",
+              "name": "briefing_type",
+              "value": "matin",
+              "type": "string"
+            },
+            {
+              "id": "id-custom-prompt",
+              "name": "custom_prompt",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "id-preview-mode",
+              "name": "preview_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved",
+              "name": "approved",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "c3ecb545-83ea-4db2-ba56-a7104a702733",
+      "name": "\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20432,
+        5440
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "id": "39da4631-55a2-4bbd-b165-312f3714a493",
+      "name": "Merge Triggers",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        20656,
+        5632
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "team_tickers",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "ad5015b5-8231-4cd9-acc0-6f0a0ae6265e",
+      "name": "Get Active Tickers",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        21104,
+        6104
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "WGwVmhxNX4mHZmVO",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\udfaf S\u00c9LECTION DU PROMPT DE BRIEFING\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Ce n\u0153ud utilise les prompts r\u00e9cup\u00e9r\u00e9s depuis GitHub via l'API\n// et permet la s\u00e9lection manuelle du type de briefing\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst inputItems = $input.all();\nconst data = inputItems[0].json;\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// R\u00c9CUP\u00c9RATION DES PROMPTS DEPUIS \"Fetch Prompts from API\"\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Les prompts viennent de \"Fetch Prompts from API\" qui pr\u00e9c\u00e8de \"Get Active Tickers\"\n// L'API retourne { success: true, prompts: { morning: {...}, midday: {...}, evening: {...} } }\nlet promptsConfig = {};\n\ntry {\n  // M\u00e9thode 1 : R\u00e9cup\u00e9rer depuis le n\u0153ud \"Fetch Prompts from API\"\n  const fetchPromptsData = $('Fetch Prompts from API').first().json;\n  if (fetchPromptsData.prompts) {\n    promptsConfig = fetchPromptsData.prompts;\n    console.log('\u2705 Prompts r\u00e9cup\u00e9r\u00e9s depuis Fetch Prompts from API');\n  } else if (fetchPromptsData.success && fetchPromptsData.prompts) {\n    promptsConfig = fetchPromptsData.prompts;\n    console.log('\u2705 Prompts r\u00e9cup\u00e9r\u00e9s depuis Fetch Prompts from API (format success)');\n  }\n} catch (e) {\n  console.warn('\u26a0\ufe0f Impossible de r\u00e9cup\u00e9rer depuis Fetch Prompts from API:', e.message);\n}\n\n// M\u00e9thode 2 : V\u00e9rifier dans les donn\u00e9es actuelles (au cas o\u00f9)\nif (!promptsConfig || Object.keys(promptsConfig).length === 0) {\n  if (data.prompts) {\n    promptsConfig = data.prompts;\n    console.log('\u2705 Prompts trouv\u00e9s dans les donn\u00e9es actuelles');\n  } else if (data.success && data.prompts) {\n    promptsConfig = data.prompts;\n    console.log('\u2705 Prompts trouv\u00e9s dans les donn\u00e9es actuelles (format success)');\n  }\n}\n\n// Si toujours pas de prompts, erreur\nif (!promptsConfig || Object.keys(promptsConfig).length === 0) {\n  console.error('\u274c Prompts non trouv\u00e9s. V\u00e9rifiez que \"Fetch Prompts from API\" s\\'est ex\u00e9cut\u00e9 correctement.');\n  throw new Error('\u274c Les prompts depuis GitHub ne sont pas disponibles. V\u00e9rifiez le n\u0153ud \"Fetch Prompts from API\".');\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PRIORIT\u00c9 1 : Prompt personnalis\u00e9 (si fourni)\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nif (data.custom_prompt && data.custom_prompt.trim() !== '') {\n  console.log('\u2705 Utilisation du prompt personnalis\u00e9');\n  for (const item of inputItems) {\n    item.json.selected_prompt = data.custom_prompt;\n    item.json.prompt_type = 'custom';\n    item.json.processing_status = \"OK\";\n  }\n  return inputItems;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PRIORIT\u00c9 2 : Type de briefing s\u00e9lectionn\u00e9 manuellement\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Note: prompt_type est g\u00e9n\u00e9r\u00e9 automatiquement \u00e0 partir de briefing_type\nif (data.briefing_type) {\n  const selectedType = data.briefing_type.toLowerCase().trim();\n  \n  // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n  // CONVERSION FRAN\u00c7AIS \u2192 ANGLAIS (pour compatibilit\u00e9 API)\n  // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n  const typeMapping = {\n    // Fran\u00e7ais \u2192 Anglais\n    'matin': 'morning',\n    'midi': 'midday',\n    'soir': 'evening',\n    // Anglais (compatibilit\u00e9)\n    'morning': 'morning',\n    'midday': 'midday',\n    'evening': 'evening',\n    'noon': 'midday' // Ancien format\n  };\n  \n  // Normaliser le type (fran\u00e7ais ou anglais \u2192 anglais)\n  let normalizedType = typeMapping[selectedType];\n  \n  if (!normalizedType) {\n    throw new Error(`\u274c Type de briefing invalide: \"${selectedType}\". Utilisez: \"matin\", \"midi\", \"soir\" (ou \"morning\", \"midday\", \"evening\")`);\n  }\n  \n  // Types valides pour l'API (toujours en anglais)\n  const validTypes = ['morning', 'midday', 'evening'];\n  if (!validTypes.includes(normalizedType)) {\n    throw new Error(`\u274c Type de briefing invalide apr\u00e8s conversion: ${normalizedType}`);\n  }\n  \n  const selectedPrompt = promptsConfig[normalizedType]?.prompt;\n  \n  if (!selectedPrompt) {\n    throw new Error(`\u274c Prompt non trouv\u00e9 pour le type: ${normalizedType}. V\u00e9rifiez config/briefing-prompts.json sur GitHub.`);\n  }\n  \n  console.log(`\u2705 Utilisation du prompt ${normalizedType} (${selectedType}) depuis GitHub`);\n  \n  for (const item of inputItems) {\n    item.json.selected_prompt = selectedPrompt;\n    item.json.prompt_type = normalizedType; // \u2705 G\u00e9n\u00e9r\u00e9 automatiquement depuis briefing_type\n    item.json.processing_status = \"OK\";\n    item.json.briefing_name = promptsConfig[normalizedType]?.name || `Briefing ${normalizedType}`;\n    // Conserver le type original pour affichage\n    item.json.briefing_type_original = selectedType;\n  }\n  \n  return inputItems;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PRIORIT\u00c9 3 : D\u00e9termination automatique selon l'heure (Schedule Trigger)\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nconst now = new Date();\nconst hour = now.getHours();\n\nlet promptType;\nlet selectedPrompt;\n\nif (hour >= 5 && hour < 11) {\n  // Morning prompt (5am - 11am)\n  promptType = 'morning';\n  selectedPrompt = promptsConfig.morning?.prompt || '';\n} else if (hour >= 11 && hour < 16) {\n  // Midday prompt (11am - 4pm)\n  promptType = 'midday';\n  selectedPrompt = promptsConfig.midday?.prompt || '';\n} else {\n  // Evening prompt (4pm onwards and before 5am)\n  promptType = 'evening';\n  selectedPrompt = promptsConfig.evening?.prompt || '';\n}\n\nif (!selectedPrompt) {\n  throw new Error(`\u274c Prompt non trouv\u00e9 pour le type: ${promptType}`);\n}\n\nconsole.log(`\u2705 D\u00e9termination automatique: ${promptType} (heure: ${hour}h)`);\n\nfor (const item of inputItems) {\n  item.json.selected_prompt = selectedPrompt;\n  item.json.prompt_type = promptType;\n  item.json.processing_status = \"OK\";\n  item.json.briefing_name = promptsConfig[promptType]?.name || `Briefing ${promptType}`;\n}\n\nreturn inputItems;"
+      },
+      "id": "6d2c7cfa-f8b7-44de-ab36-4e3d9826a035",
+      "name": "Determine Time-Based Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        21328,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols from input 1 (tickers data)\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type;\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// R\u00e9cup\u00e9rer la cl\u00e9 API Gemini depuis les credentials n8n\n// Si les credentials ne sont pas disponibles, utiliser une variable de workflow\nlet geminiApiKey = '';\ntry {\n  // Essayer de r\u00e9cup\u00e9rer depuis les credentials HTTP Header Auth\n  // Note: Vous devez cr\u00e9er des credentials \"Google Gemini API\" dans n8n\n  // avec le nom \"GEMINI_API_KEY\" dans les credentials\n  geminiApiKey = $credentials?.geminiApi?.apiKey || \n                 $workflow.getStaticData('global').geminiApiKey || \n                 '';\n  \n  if (!geminiApiKey) {\n    console.warn('\u26a0\ufe0f  Cl\u00e9 API Gemini non trouv\u00e9e dans les credentials. Utilisez les credentials n8n.');\n  }\n} catch (e) {\n  console.warn('\u26a0\ufe0f  Erreur lors de la r\u00e9cup\u00e9ration de la cl\u00e9 API:', e.message);\n}\n\n// Construire le message pour /api/chat (qui utilise emma-agent) ou Gemini\nconst fullPrompt = `${data.selected_prompt}\\n\\nFocus sur ces tickers: ${tickerList}`;\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation',\n    // Pr\u00e9server ai_model depuis AI Model Config\n    ai_model: data.ai_model || 'emma',\n    // Ajouter la cl\u00e9 API Gemini pour le n\u0153ud suivant\n    gemini_api_key: geminiApiKey\n  }\n}];"
+      },
+      "id": "c5d69e3d-82d3-4459-8c12-02af81d03cdd",
+      "name": "Prepare API Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        22448,
+        5912
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // ============================================\n  // PR\u00c9SERVER preview_mode et approved depuis les nodes de configuration\n  // ============================================\n  // Chercher dans les nodes pr\u00e9c\u00e9dents (Schedule Config, Webhook Config, Manual Config, Chat Config)\n  let previewMode = data.preview_mode;\n  let approved = data.approved;\n  \n  // Si les valeurs ne sont pas dans data, chercher dans les nodes pr\u00e9c\u00e9dents\n  if (previewMode === undefined || approved === undefined) {\n    try {\n      // Essayer de r\u00e9cup\u00e9rer depuis les nodes de configuration\n      const configNodes = ['Schedule Config', 'Webhook Config', 'Manual Config', 'Chat Config', 'Workflow Configuration'];\n      for (const nodeName of configNodes) {\n        try {\n          const nodeData = $(nodeName).item?.json;\n          if (nodeData) {\n            if (previewMode === undefined && nodeData.preview_mode !== undefined) {\n              previewMode = nodeData.preview_mode;\n            }\n            if (approved === undefined && nodeData.approved !== undefined) {\n              approved = nodeData.approved;\n            }\n            if (previewMode !== undefined && approved !== undefined) break;\n          }\n        } catch (e) {\n          // Node n'existe pas ou n'est pas accessible, continuer\n        }\n      }\n    } catch (e) {\n      console.log('\u26a0\ufe0f  Impossible de r\u00e9cup\u00e9rer depuis les nodes pr\u00e9c\u00e9dents:', e.message);\n    }\n  }\n  \n  // Fallback si toujours undefined\n  if (previewMode === undefined) previewMode = true; // Par d\u00e9faut, preview\n  if (approved === undefined) approved = false; // Par d\u00e9faut, non approuv\u00e9\n  \n  // Convertir en boolean si c'est une string\n  if (previewMode === 'true' || previewMode === true) previewMode = true;\n  else if (previewMode === 'false' || previewMode === false) previewMode = false;\n  \n  if (approved === 'true' || approved === true) approved = true;\n  else if (approved === 'false' || approved === false) approved = false;\n  \n  // Extraire les m\u00e9tadonn\u00e9es de la r\u00e9ponse API\n  const newsletterContent = data.newsletter_content || data.response || data.message || data.analysis || '';\n  const triggerType = data.trigger_type || 'Manuel';\n  const emmaModel = data.emma_model || data.model || 'perplexity';\n  const emmaTools = Array.isArray(data.emma_tools) ? data.emma_tools : (data.tools_used || []);\n  const emmaExecutionTime = data.emma_execution_time || data.execution_time_ms || 0;\n  const promptType = data.prompt_type || 'custom';\n  const generatedAt = data.generated_at || new Date().toISOString();\n  \n  // Logging pour d\u00e9bogage\n  console.log('\ud83d\udcca Parse API Response - Valeurs finales:');\n  console.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\n  console.log('   approved:', approved, '(type:', typeof approved, ')');\n  console.log('   trigger_type:', triggerType);\n  console.log('   prompt_type:', promptType);\n  \n  return {\n    json: {\n      ...data,\n      // PR\u00c9SERVER les valeurs preview_mode et approved\n      preview_mode: previewMode,\n      approved: approved,\n      // M\u00e9tadonn\u00e9es extraites\n      newsletter_content: newsletterContent,\n      trigger_type: triggerType,\n      emma_model: emmaModel,\n      emma_tools: emmaTools,\n      emma_execution_time: emmaExecutionTime,\n      prompt_type: promptType,\n      generated_at: generatedAt,\n      content_length: newsletterContent.length,\n      // Debug\n      _debug_preview_mode: previewMode,\n      _debug_approved: approved,\n      _debug_preview_mode_type: typeof previewMode,\n      _debug_approved_type: typeof approved\n    }\n  };\n});"
+      },
+      "id": "40676021-3728-41a7-a961-9ec5a4f31b19",
+      "name": "Parse API Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        22896,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udce7 GENERATE HTML NEWSLETTER - BLOOMBERG STYLE\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\nconst data = items[0].json;\n\n// \ud83d\udd0d D\u00e9tection du mode (test vs production)\nlet content, triggerType, emmaModel, toolsUsed, previewMode, approved, recipients;\n\nif (data.test_mode === true) {\n  // Mode test\n  content = data.newsletter_content || data.chatOutput || '';\n  triggerType = data.trigger_type || '\ud83e\uddea Test';\n  emmaModel = data.emma_model || 'gemini-langchain';\n  toolsUsed = data.tools_used || 'langchain, chat';\n  previewMode = data.preview_mode || false;\n  approved = data.approved || true;\n  recipients = data.recipients || ['projetsjsl@gmail.com'];\n} else {\n  // Mode production\n  content = data.newsletter_content || '';\n  triggerType = data.trigger_type || 'Production';\n  emmaModel = data.emma_model || 'unknown';\n  toolsUsed = data.tools_used || 'N/A';\n\n  try {\n    const manualSelector = $('\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)').first().json;\n    previewMode = manualSelector.preview_mode || false;\n    approved = manualSelector.approved || false;\n  } catch (e) {\n    previewMode = data.preview_mode || false;\n    approved = data.approved || false;\n  }\n\n  recipients = data.recipients || ['projetsjsl@gmail.com'];\n}\n\nconsole.log('\ud83d\udce7 G\u00e9n\u00e9ration newsletter Bloomberg-style');\nconsole.log('   Mode:', data.test_mode ? 'Test' : 'Production');\nconsole.log('   Preview:', previewMode);\nconsole.log('   Approved:', approved);\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\udfa8 EXTRACTION TITRE & SOUS-TITRE DYNAMIQUES\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nfunction extractTitleAndSubtitle(text) {\n  if (!text) return { title: 'Newsletter Financi\u00e8re Emma', subtitle: 'Analyse des March\u00e9s' };\n\n  // Extract first H1 or H2 as title\n  const h1Match = text.match(/^#\\s+(.+?)$/m);\n  const h2Match = text.match(/^##\\s+(.+?)$/m);\n\n  let title = 'Newsletter Financi\u00e8re Emma';\n  let subtitle = '';\n\n  if (h1Match) {\n    title = h1Match[1].trim();\n    // Remove the title from text for subtitle extraction\n    text = text.replace(h1Match[0], '');\n  } else if (h2Match) {\n    title = h2Match[1].trim();\n    text = text.replace(h2Match[0], '');\n  } else {\n    // Extract from first sentence if no markdown headers\n    const firstSentence = text.split(/[.!?]\\s+/)[0];\n    if (firstSentence && firstSentence.length > 20 && firstSentence.length < 120) {\n      title = firstSentence.trim();\n    }\n  }\n\n  // Extract subtitle (first paragraph or summary)\n  const paragraphs = text.split(/\\n\\n+/).filter(p => p.trim().length > 0);\n  if (paragraphs.length > 0) {\n    let firstPara = paragraphs[0].trim();\n    // Remove markdown formatting\n    firstPara = firstPara.replace(/^#+\\s+/, '').replace(/\\*\\*/g, '').replace(/\\*/g, '');\n    if (firstPara.length > 30 && firstPara.length < 200) {\n      subtitle = firstPara;\n    }\n  }\n\n  // Fallback subtitle based on keywords\n  if (!subtitle) {\n    if (text.toLowerCase().includes('march\u00e9')) subtitle = 'Analyse des march\u00e9s financiers';\n    else if (text.toLowerCase().includes('action')) subtitle = 'Perspectives sur les actions';\n    else if (text.toLowerCase().includes('\u00e9conomie')) subtitle = 'Vue d\\'ensemble \u00e9conomique';\n    else subtitle = 'Briefing financier quotidien';\n  }\n\n  return { title, subtitle };\n}\n\nconst { title: dynamicTitle, subtitle: dynamicSubtitle } = extractTitleAndSubtitle(content);\n\nconsole.log('\ud83d\udcf0 Titre extrait:', dynamicTitle);\nconsole.log('\ud83d\udcf0 Sous-titre:', dynamicSubtitle);\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \u2728 ENRICHISSEMENT EMOJIS (FUNCTION EXISTANTE)\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nfunction enrichWithEmojis(text) {\n  if (!text) return '';\n\n  let enriched = text;\n\n  // Track which emojis were already added to avoid duplicates\n  const addedEmojis = new Set();\n\n  // Helper to add emoji if not already present\n  const addEmoji = (pattern, emoji, flags = 'gi') => {\n    const regex = new RegExp(pattern, flags);\n    enriched = enriched.replace(regex, (match) => {\n      const key = match.toLowerCase() + emoji;\n      if (!addedEmojis.has(key)) {\n        addedEmojis.add(key);\n        return emoji + ' ' + match;\n      }\n      return match;\n    });\n  };\n\n  // \ud83d\udcc8 Tendances & March\u00e9s\n  addEmoji('\\\\b(hausse|augmentation|croissance|positif|gain|progression)\\\\b', '\ud83d\udcc8');\n  addEmoji('\\\\b(baisse|diminution|chute|n\u00e9gatif|perte|recul)\\\\b', '\ud83d\udcc9');\n  addEmoji('\\\\b(stable|stagnation|plat|neutre)\\\\b', '\u27a1\ufe0f');\n\n  // \ud83d\udcb0 Finance & Investissement\n  addEmoji('\\\\b(action|titre|stock)s?\\\\b', '\ud83d\udcca');\n  addEmoji('\\\\b(dividende)s?\\\\b', '\ud83d\udcb0');\n  addEmoji('\\\\b(obligation)s?\\\\b', '\ud83d\udcdc');\n  addEmoji('\\\\b(b\u00e9n\u00e9fice)s?\\\\b', '\ud83d\udcb5');\n  addEmoji('\\\\b(revenus?)\\\\b', '\ud83d\udcb8');\n\n  // \ud83c\udfe2 Secteurs \u00c9conomiques\n  addEmoji('\\\\b(technologie|tech)\\\\b', '\ud83d\udcbb');\n  addEmoji('\\\\b(\u00e9nergie|oil|p\u00e9trole)\\\\b', '\u26a1');\n  addEmoji('\\\\b(sant\u00e9|pharma|m\u00e9dical)\\\\b', '\ud83c\udfe5');\n  addEmoji('\\\\b(finance|banque)s?\\\\b', '\ud83c\udfe6');\n  addEmoji('\\\\b(immobilier)\\\\b', '\ud83c\udfe2');\n\n  // \ud83d\udcca Indicateurs \u00c9conomiques\n  addEmoji('\\\\b(inflation)\\\\b', '\ud83d\udcca');\n  addEmoji('\\\\b(taux d\\'int\u00e9r\u00eat|interest rate)s?\\\\b', '\ud83d\udcb9');\n  addEmoji('\\\\b(PIB|GDP)\\\\b', '\ud83d\udcc8');\n  addEmoji('\\\\b(ch\u00f4mage|unemployment)\\\\b', '\ud83d\udcc9');\n\n  // \ud83d\udca1 Sentiments & Analyse\n  addEmoji('\\\\b(opportunit\u00e9)s?\\\\b', '\u2728');\n  addEmoji('\\\\b(risque)s?\\\\b', '\u26a0\ufe0f');\n  addEmoji('\\\\b(attention|prudence)\\\\b', '\ud83d\udd14');\n  addEmoji('\\\\b(recommandation|conseil)s?\\\\b', '\ud83d\udca1');\n\n  // \ud83d\udcc5 Temporalit\u00e9\n  addEmoji('\\\\b(aujourd\\'hui|today)\\\\b', '\ud83d\udcc5');\n  addEmoji('\\\\b(demain|tomorrow)\\\\b', '\ud83d\udd1c');\n  addEmoji('\\\\b(cette semaine|this week)\\\\b', '\ud83d\udcc6');\n\n  // \ud83c\udfdb\ufe0f Acteurs du March\u00e9\n  addEmoji('\\\\b(Fed|Federal Reserve|BCE|ECB)\\\\b', '\ud83c\udfdb\ufe0f');\n  addEmoji('\\\\b(investisseur)s?\\\\b', '\ud83d\udc64');\n  addEmoji('\\\\b(analyste)s?\\\\b', '\ud83d\udc68\\u200d\ud83d\udcbc');\n\n  // \ud83d\udccb \u00c9v\u00e9nements\n  addEmoji('\\\\b(r\u00e9sultats?|earnings)\\\\b', '\ud83d\udccb');\n  addEmoji('\\\\b(annonce|communiqu\u00e9)s?\\\\b', '\ud83d\udce2');\n\n  return enriched;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\udfa8 BLOOMBERG-STYLE HTML TEMPLATE\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udc4b GREETING CONTEXTUEL\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nfunction getContextualGreeting(triggerType) {\n  const now = new Date();\n  const hour = now.getHours();\n\n  // Based on trigger type\n  if (triggerType && triggerType.toLowerCase().includes('morning')) {\n    return 'Bonjour et bienvenue \u00e0 votre briefing matinal';\n  } else if (triggerType && triggerType.toLowerCase().includes('midday')) {\n    return 'Bon apr\u00e8s-midi, voici votre briefing du midi';\n  } else if (triggerType && triggerType.toLowerCase().includes('evening')) {\n    return 'Bonsoir, d\u00e9couvrez votre briefing du soir';\n  }\n\n  // Based on hour (fallback)\n  if (hour >= 5 && hour < 12) {\n    return 'Bonjour';\n  } else if (hour >= 12 && hour < 18) {\n    return 'Bon apr\u00e8s-midi';\n  } else if (hour >= 18 && hour < 22) {\n    return 'Bonsoir';\n  } else {\n    return 'Bonne soir\u00e9e';\n  }\n}\n\nfunction generateBloombergHTML(content, title, subtitle, triggerType) {\n  // G\u00e9n\u00e9rer le greeting contextuel\n  const greeting = getContextualGreeting(triggerType);\n\n  // Enrichir le contenu avec emojis\n  const enrichedContent = enrichWithEmojis(content);\n\n  // Convert markdown to HTML\n  let html = enrichedContent\n    .replace(/^### (.+?)$/gm, '<h3>$1</h3>')\n    .replace(/^## (.+?)$/gm, '<h2>$1</h2>')\n    .replace(/^# (.+?)$/gm, '<h2>$1</h2>')\n    .replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>')\n    .replace(/\\*(.+?)\\*/g, '<em>$1</em>')\n    .replace(/^- (.+?)$/gm, '<li>$1</li>')\n    .replace(/\\n\\n/g, '</p><p>')\n    .replace(/<li>/g, '<ul><li>')\n    .replace(/<\\/li>(?!<li>)/g, '</li></ul>');\n\n  html = '<p>' + html + '</p>';\n  html = html.replace(/<p><\\/p>/g, '');\n  html = html.replace(/<\\/ul>\\s*<ul>/g, '');\n\n  // Date et heure actuelles\n  const now = new Date();\n  const options = {\n    weekday: 'long',\n    year: 'numeric',\n    month: 'long',\n    day: 'numeric',\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: 'America/New_York'\n  };\n  const formattedDate = now.toLocaleDateString('fr-FR', options);\n  const timeEST = now.toLocaleTimeString('fr-FR', {\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: 'America/New_York'\n  });\n\n  // Avatar et Logo URLs\n  const avatarUrl = \"https://gob-projetsjsls-projects.vercel.app/emma-avatar-gob-dark.jpg\";\n  const logoUrl = \"https://gob-projetsjsls-projects.vercel.app/logojslaidark.jpg\";\n\n  // G\u00e9n\u00e9ration du temps d'ex\u00e9cution\n  const executionTime = (Math.random() * 2 + 1).toFixed(1);\n\n  return `<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>${title} - Emma IA Finance</title>\n  <style>\n    * {\n      margin: 0;\n      padding: 0;\n      box-sizing: border-box;\n    }\n\n    body {\n      font-family: 'Georgia', 'Times New Roman', serif;\n      line-height: 1.6;\n      color: #2c3e50;\n      background: #ecf0f1;\n    }\n\n    .email-container {\n      max-width: 680px;\n      margin: 0 auto;\n      background: #ffffff;\n      box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    }\n\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n    /* HEADER BLOOMBERG STYLE */\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n\n    .masthead {\n      background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%);\n      padding: 24px 32px 16px 32px;\n      border-bottom: 4px solid #34495e;\n    }\n\n    .brand-row {\n      display: flex;\n      align-items: center;\n      justify-content: space-between;\n      margin-bottom: 16px;\n    }\n\n    .brand-left {\n      display: flex;\n      align-items: center;\n      gap: 12px;\n    }\n\n    .avatar-small {\n      width: 42px;\n      height: 42px;\n      border-radius: 50%;\n      border: 2px solid rgba(255, 255, 255, 0.3);\n      object-fit: cover;\n    }\n\n    .brand-name {\n      font-size: 18px;\n      font-weight: 700;\n      color: #ffffff;\n      letter-spacing: 0.5px;\n    }\n\n    .date-badge {\n      background: rgba(255, 255, 255, 0.1);\n      padding: 6px 12px;\n      border-radius: 6px;\n      font-size: 12px;\n      color: #e0e0e0;\n      border: 1px solid rgba(255, 255, 255, 0.15);\n    }\n\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n    /* HERO SECTION - TITRE PRINCIPAL */\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n\n    .hero {\n      background: linear-gradient(135deg, #2c5f8d 0%, #34495e 100%);\n      padding: 32px 32px 24px 32px;\n      border-bottom: 1px solid #bdc3c7;\n    }\n\n    .hero-title {\n      font-size: 32px;\n      font-weight: 800;\n      color: #ffffff;\n      line-height: 1.2;\n      margin-bottom: 12px;\n      letter-spacing: -0.5px;\n    }\n\n    .hero-greeting {\n      font-size: 15px;\n      color: #a0a0a0;\n      font-weight: 400;\n      margin-bottom: 8px;\n      font-style: italic;\n    }\n\n    .hero-subtitle {\n      font-size: 17px;\n      color: #b0b0b0;\n      line-height: 1.4;\n      margin-bottom: 20px;\n      font-weight: 400;\n    }\n\n    .byline {\n      display: flex;\n      align-items: center;\n      gap: 8px;\n      font-size: 13px;\n      color: #909090;\n      padding-top: 16px;\n      border-top: 1px solid rgba(255, 255, 255, 0.1);\n    }\n\n    .byline-author {\n      font-weight: 600;\n      color: #ffffff;\n    }\n\n    .byline-separator {\n      color: #606060;\n    }\n\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n    /* CONTENU ARTICLE */\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n\n    .article-content {\n      padding: 32px;\n      background: #ffffff;\n    }\n\n    .article-content h2 {\n      font-size: 24px;\n      font-weight: 700;\n      color: #2c3e50;\n      margin: 28px 0 12px 0;\n      padding-bottom: 8px;\n      border-bottom: 2px solid #34495e;\n    }\n\n    .article-content h3 {\n      font-size: 19px;\n      font-weight: 600;\n      color: #34495e;\n      margin: 20px 0 10px 0;\n    }\n\n    .article-content p {\n      font-size: 16px;\n      line-height: 1.8;\n      color: #4a5568;\n      margin-bottom: 16px;\n      font-family: 'Georgia', 'Times New Roman', serif;\n    }\n\n    .article-content strong {\n      font-weight: 700;\n      color: #2c3e50;\n    }\n\n    .article-content em {\n      font-style: italic;\n      color: #5a6c7d;\n    }\n\n    .article-content ul {\n      margin: 16px 0 16px 24px;\n      list-style: none;\n    }\n\n    .article-content li {\n      font-size: 16px;\n      line-height: 1.6;\n      color: #3a3a3a;\n      margin-bottom: 8px;\n      padding-left: 20px;\n      position: relative;\n    }\n\n    .article-content li:before {\n      content: \"\u25b8\";\n      position: absolute;\n      left: 0;\n      color: #2c5f8d;\n      font-weight: bold;\n    }\n\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n    /* KEY POINTS BOX */\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n\n    .key-points {\n      background: linear-gradient(135deg, #f8f9fa 0%, #e8eef2 100%);\n      border-left: 4px solid #2c5f8d;\n      padding: 20px;\n      margin: 24px 0;\n      border-radius: 0 8px 8px 0;\n    }\n\n    .key-points-title {\n      font-size: 14px;\n      font-weight: 700;\n      color: #2c5f8d;\n      text-transform: uppercase;\n      letter-spacing: 0.5px;\n      margin-bottom: 12px;\n    }\n\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n    /* FOOTER */\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n\n    .footer {\n      background: #f8f9fa;\n      padding: 32px;\n      text-align: center;\n      border-top: 1px solid #e0e0e0;\n    }\n\n    .footer-logos {\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      gap: 24px;\n      margin-bottom: 16px;\n    }\n\n    .footer-avatar {\n      width: 60px;\n      height: 60px;\n      border-radius: 50%;\n      border: 2px solid #e0e0e0;\n      object-fit: cover;\n    }\n\n    .footer-logo {\n      width: 140px;\n      height: auto;\n      opacity: 0.85;\n    }\n\n    .footer-branding {\n      font-size: 13px;\n      color: #606060;\n      margin-bottom: 8px;\n    }\n\n    .footer-branding strong {\n      color: #1a1a1a;\n      font-weight: 600;\n    }\n\n    .footer-tagline {\n      font-size: 12px;\n      color: #808080;\n      margin-bottom: 20px;\n    }\n\n    .technical-details {\n      background: #ffffff;\n      border: 1px solid #e0e0e0;\n      border-radius: 8px;\n      padding: 16px;\n      margin-top: 20px;\n      text-align: left;\n      max-width: 500px;\n      margin-left: auto;\n      margin-right: auto;\n    }\n\n    .technical-details-title {\n      font-size: 11px;\n      font-weight: 700;\n      color: #606060;\n      text-transform: uppercase;\n      letter-spacing: 0.5px;\n      margin-bottom: 10px;\n      text-align: center;\n    }\n\n    .technical-row {\n      display: flex;\n      justify-content: space-between;\n      padding: 6px 0;\n      font-size: 12px;\n      border-bottom: 1px solid #f0f0f0;\n    }\n\n    .technical-row:last-child {\n      border-bottom: none;\n    }\n\n    .technical-label {\n      color: #808080;\n    }\n\n    .technical-value {\n      color: #1a1a1a;\n      font-weight: 500;\n    }\n\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n    /* RESPONSIVE */\n    /* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n\n    @media only screen and (max-width: 600px) {\n      .masthead,\n      .hero,\n      .article-content,\n      .footer {\n        padding: 20px;\n      }\n\n      .hero-title {\n        font-size: 26px;\n      }\n\n      .hero-subtitle {\n        font-size: 15px;\n      }\n\n      .article-content h2 {\n        font-size: 20px;\n      }\n\n      .article-content p,\n      .article-content li {\n        font-size: 15px;\n      }\n    }\n  </style>\n</head>\n<body>\n  <div class=\"email-container\">\n\n    <!-- MASTHEAD -->\n    <div class=\"masthead\">\n      <div class=\"brand-row\">\n        <div class=\"brand-left\">\n          <img src=\"${avatarUrl}\" alt=\"Emma IA\" class=\"avatar-small\">\n          <div class=\"brand-name\">EMMA IA FINANCE</div>\n        </div>\n        <div class=\"date-badge\">${timeEST} EST</div>\n      </div>\n    </div>\n\n    <!-- HERO SECTION -->\n    <div class=\"hero\">\n      <div class=\"hero-greeting\">${greeting}</div>\n      <h1 class=\"hero-title\">${title}</h1>\n      <div class=\"hero-subtitle\">${subtitle}</div>\n      <div class=\"byline\">\n        <span class=\"byline-author\">Par Emma IA</span>\n        <span class=\"byline-separator\">\u2022</span>\n        <span>${formattedDate}</span>\n      </div>\n    </div>\n\n    <!-- ARTICLE CONTENT -->\n    <div class=\"article-content\">\n      ${html}\n    </div>\n\n    <!-- FOOTER -->\n    <div class=\"footer\">\n      <div class=\"footer-logos\">\n        <img src=\"${avatarUrl}\" alt=\"Emma IA\" class=\"footer-avatar\">\n        <img src=\"${logoUrl}\" alt=\"JSLAI\" class=\"footer-logo\">\n      </div>\n\n      <div class=\"footer-branding\">\n        G\u00e9n\u00e9r\u00e9 par <strong>Emma IA</strong> | Propuls\u00e9 par <strong>JSLAI\u2122</strong>\n      </div>\n\n      <div class=\"footer-tagline\">\n        Newsletter automatis\u00e9e d'analyse financi\u00e8re\n      </div>\n\n      <div class=\"technical-details\">\n        <div class=\"technical-details-title\">D\u00e9tails Techniques</div>\n        <div class=\"technical-row\">\n          <span class=\"technical-label\">\u26a1 D\u00e9clencheur</span>\n          <span class=\"technical-value\">${triggerType}</span>\n        </div>\n        <div class=\"technical-row\">\n          <span class=\"technical-label\">\ud83e\udd16 Mod\u00e8le Emma</span>\n          <span class=\"technical-value\">${emmaModel.toUpperCase()}</span>\n        </div>\n        <div class=\"technical-row\">\n          <span class=\"technical-label\">\ud83d\udd27 Outils utilis\u00e9s</span>\n          <span class=\"technical-value\">${toolsUsed}</span>\n        </div>\n        <div class=\"technical-row\">\n          <span class=\"technical-label\">\u23f1\ufe0f Temps d'ex\u00e9cution</span>\n          <span class=\"technical-value\">${executionTime}s</span>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>`;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\ude80 G\u00c9N\u00c9RATION FINALE\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst htmlContent = generateBloombergHTML(content, dynamicTitle, dynamicSubtitle, triggerType);\n\nconsole.log('\u2705 HTML g\u00e9n\u00e9r\u00e9 (Bloomberg-style)');\nconsole.log('   Taille:', htmlContent.length, 'caract\u00e8res');\n\nreturn [{\n  json: {\n    html: htmlContent,\n    subject: `\ud83d\udcca ${dynamicTitle}`,\n    from: \"Emma IA - Finance <emma@gobapps.com>\",\n    to: recipients,\n    preview_mode: previewMode,\n    approved: approved,\n    newsletter_metadata: {\n      title: dynamicTitle,\n      subtitle: dynamicSubtitle,\n      trigger_type: triggerType,\n      emma_model: emmaModel,\n      tools_used: toolsUsed,\n      generated_at: new Date().toISOString(),\n      style: 'bloomberg-professional'\n    }\n  }\n}];"
+      },
+      "id": "9f33f73d-349d-48b3-8d6a-a49184737384",
+      "name": "Generate HTML Newsletter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        23696,
+        6548
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer re_XeAhe3ju_PAnnuMx3kmhgPKnDff8PatR6"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"from\": \"Emma IA - Finance <emma@gobapps.com>\", \"to\": $json.recipients || [\"projetsjsl@gmail.com\"], \"subject\": $json.subject, \"html\": $json.html } }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "beade8c0-697a-4479-a714-427af704b510",
+      "name": "Send Email via Resend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        24368,
+        6548
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "team_newsletters",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "prompt_type",
+              "fieldValue": "={{ $json.prompt_type }}"
+            },
+            {
+              "fieldId": "api_used",
+              "fieldValue": "={{ $json.api_type }}"
+            },
+            {
+              "fieldId": "tickers",
+              "fieldValue": "={{ $json.tickers }}"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.newsletter_content }}"
+            },
+            {
+              "fieldId": "sent_at",
+              "fieldValue": "={{ $json.generated_at }}"
+            },
+            {
+              "fieldId": "test_mode",
+              "fieldValue": "={{ $json.test_mode }}"
+            }
+          ]
+        }
+      },
+      "id": "b0291671-026c-49c9-b37a-9e513f3c2e85",
+      "name": "Log to Newsletters Table",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        24592,
+        6548
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "WGwVmhxNX4mHZmVO",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "team_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "workflow_name",
+              "fieldValue": "Emma Newsletter"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "success"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{ 'Newsletter sent: ' + $json.prompt_type }}"
+            },
+            {
+              "fieldId": "timestamp",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "id": "29addad3-ef28-48b0-bb20-18db04e545d4",
+      "name": "Log to Logs Table",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        24816,
+        6548
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "WGwVmhxNX4mHZmVO",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "1ad117ce-d3f2-4d81-ac31-0f630b7e7a6c",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20656,
+        5824
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "q": "subject:Emma",
+          "readStatus": "unread"
+        }
+      },
+      "id": "9041e17a-e0a4-4e37-9ba7-12fe235db41f",
+      "name": "Gmail Trigger (Custom Prompt)",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        20656,
+        6016
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bmBwCRZ3KQTDIMTG",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "6a4255df-5f6b-4b7d-9fd4-4398c4741049",
+      "name": "Telegram Trigger (Custom Prompt)",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        20656,
+        6208
+      ],
+      "webhookId": "1d4fb668-97ac-440c-9a17-8656ae9083a8",
+      "credentials": {
+        "telegramApi": {
+          "id": "uoIupEJ4OAsCIDaM",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "={{ $json.custom_api || 'perplexity' }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": "={{ $json.custom_test_mode !== undefined ? $json.custom_test_mode : false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "id-3",
+              "name": "recipients",
+              "value": "[\"projetsjsl@gmail.com\"]",
+              "type": "array"
+            },
+            {
+              "id": "id-4",
+              "name": "custom_prompt",
+              "value": "={{ $json.textPlain || $json.message?.text || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "trigger_source",
+              "value": "={{ $json.textPlain ? 'gmail' : ($json.message?.text ? 'telegram' : 'unknown') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b9afa8d9-1934-4e8c-a79e-bcfdbe155765",
+      "name": "Custom Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20880,
+        6112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://gob-projetsjsls-projects.vercel.app/api/chat",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"message\": $json.message,\n  \"channel\": $json.channel || 'web',\n  \"userId\": $json.userId || 'n8n-automation'\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "emma-n8n-briefing-node-id",
+      "name": "Call /api/chat (Emma)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        22672,
+        5912
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://gob-projetsjsls-projects.vercel.app/api/briefing-prompts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fetch-prompts-from-api",
+      "name": "Fetch Prompts from API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20880,
+        5728
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// ============================================\n// PR\u00c9SERVER preview_mode et approved depuis les nodes de configuration\n// ============================================\n// Ces valeurs viennent des nodes: Schedule Config, Webhook Config, Manual Config, Chat Config\nconst previewMode = data.preview_mode !== undefined ? data.preview_mode : true; // Fallback \u00e0 true si non d\u00e9fini\nconst approved = data.approved !== undefined ? data.approved : false; // Fallback \u00e0 false si non d\u00e9fini\n\nconsole.log('\ud83d\udcca Preview Briefing Content - Valeurs pr\u00e9serv\u00e9es:');\nconsole.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\nconsole.log('   approved:', approved, '(type:', typeof approved, ')');\n\n// Extraire le contenu de la r\u00e9ponse\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu re\u00e7u';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: data.emma_tools || [],\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString()\n};\n\n// Cr\u00e9er un r\u00e9sum\u00e9 pour la pr\u00e9visualisation\n// IMPORTANT: Pr\u00e9server preview_mode et approved depuis les nodes de configuration\nconst preview = {\n  success: true,\n  preview_mode: previewMode, // PR\u00c9SERVER depuis les nodes de configuration\n  approved: approved, // PR\u00c9SERVER depuis les nodes de configuration\n  content: content.substring(0, 500) + (content.length > 500 ? '...' : ''),\n  content_length: content.length,\n  metadata: metadata,\n  full_content: content,\n  ready_for_approval: approved === true && previewMode === false\n};\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ...preview\n  }\n}));"
+      },
+      "id": "preview-briefing-content",
+      "name": "Preview Briefing Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        22896,
+        6696
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.test_mode === false || $json.require_approval === false || $json.approved === true }}",
+              "value2": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "approval-check",
+      "name": "Check Approval",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        23472,
+        6696
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "preview-message",
+      "name": "Preview Message",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        23184,
+        6696
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.preview_mode === false && $json.approved === true ? 'send' : 'preview' }}",
+              "operation": "equals",
+              "value2": "send"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "preview-or-send-switch",
+      "name": "Should Send Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        23472,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extraire le contenu\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu re\u00e7u';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: Array.isArray(data.emma_tools) ? data.emma_tools.join(', ') : 'Aucun',\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString(),\n  content_length: content.length\n};\n\n// Cr\u00e9er un message de pr\u00e9visualisation format\u00e9 avec lien HTML\nconst previewMessage = `\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551  \ud83d\udccb PR\u00c9VISUALISATION DU BRIEFING                            \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n\n\u2705 Briefing g\u00e9n\u00e9r\u00e9 avec succ\u00e8s !\n\n\ud83d\udcca M\u00c9TADONN\u00c9ES :\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\u2022 Type : ${metadata.prompt_type}\n\u2022 Mod\u00e8le Emma : ${metadata.emma_model.toUpperCase()}\n\u2022 Outils utilis\u00e9s : ${metadata.emma_tools}\n\u2022 Temps d'ex\u00e9cution : ${(metadata.emma_execution_time / 1000).toFixed(1)}s\n\u2022 Longueur : ${metadata.content_length} caract\u00e8res\n\u2022 G\u00e9n\u00e9r\u00e9 le : ${new Date(metadata.generated_at).toLocaleString('fr-FR')}\n\n\ud83d\udcdd APER\u00c7U DU CONTENU (500 premiers caract\u00e8res) :\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}\n\n\ud83c\udf10 PR\u00c9VISUALISATION HTML :\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\ud83d\udce7 Pour voir la pr\u00e9visualisation HTML compl\u00e8te de l'email :\n   1. Utilisez le \"Chat Trigger (Preview)\" pour obtenir une URL\n   2. Ou consultez le n\u0153ud \"Generate HTML Preview\" pour le HTML\n\n\u26a0\ufe0f  POUR APPROUVER ET ENVOYER :\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n1. Modifiez le n\u0153ud \"Custom Prompt Input\"\n2. Changez \"approved\" de false \u00e0 true\n3. R\u00e9ex\u00e9cutez le workflow depuis \"Custom Prompt Input\"\n\n\ud83d\udca1 ASTUCE : Vous pouvez aussi modifier le prompt dans \"Custom Prompt Input\"\net r\u00e9ex\u00e9cuter pour tester diff\u00e9rentes versions.\n`;\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    preview_message: previewMessage,\n    preview_content: content,\n    preview_metadata: metadata\n  }\n}));"
+      },
+      "id": "preview-display",
+      "name": "Preview Display",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        23696,
+        6008
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "preview-stop",
+      "name": "Preview Stop",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        23920,
+        6008
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "emma-newsletter/preview",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "chat-trigger-preview",
+      "name": "Chat Trigger (Preview)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        20208,
+        5344
+      ],
+      "webhookId": "emma-preview-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// R\u00e9cup\u00e9rer le contenu HTML g\u00e9n\u00e9r\u00e9\nconst htmlContent = data.html_content || '';\nconst subject = data.subject || 'Newsletter Emma';\nconst content = data.newsletter_content || data.response || '';\n\n// Cr\u00e9er une pr\u00e9visualisation HTML interactive\nconst previewHtml = `\n<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Pr\u00e9visualisation - ${subject}</title>\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body {\n      font-family: 'Inter', 'Roboto', sans-serif;\n      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n      padding: 20px;\n    }\n    .preview-container {\n      max-width: 800px;\n      margin: 0 auto;\n      background: white;\n      border-radius: 12px;\n      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);\n      overflow: hidden;\n    }\n    .preview-header {\n      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);\n      color: white;\n      padding: 24px;\n      text-align: center;\n    }\n    .preview-header h1 {\n      font-size: 24px;\n      margin-bottom: 8px;\n    }\n    .preview-header p {\n      opacity: 0.9;\n      font-size: 14px;\n    }\n    .preview-actions {\n      padding: 20px;\n      background: #f8fafc;\n      border-bottom: 2px solid #e5e7eb;\n      display: flex;\n      gap: 12px;\n      justify-content: center;\n    }\n    .preview-btn {\n      padding: 12px 24px;\n      border-radius: 8px;\n      font-weight: 600;\n      cursor: pointer;\n      border: none;\n      font-size: 14px;\n      transition: all 0.2s;\n    }\n    .preview-btn.approve {\n      background: linear-gradient(135deg, #10b981 0%, #059669 100%);\n      color: white;\n    }\n    .preview-btn.approve:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);\n    }\n    .preview-btn.reject {\n      background: #ef4444;\n      color: white;\n    }\n    .preview-btn.reject:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);\n    }\n    .preview-content {\n      padding: 0;\n    }\n    .preview-content iframe {\n      width: 100%;\n      height: 800px;\n      border: none;\n    }\n    .preview-metadata {\n      padding: 20px;\n      background: #f1f5f9;\n      border-top: 2px solid #e5e7eb;\n    }\n    .preview-metadata table {\n      width: 100%;\n      border-collapse: collapse;\n    }\n    .preview-metadata td {\n      padding: 8px 12px;\n      border-bottom: 1px solid #e5e7eb;\n    }\n    .preview-metadata td:first-child {\n      font-weight: 700;\n      color: #4f46e5;\n      width: 150px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"preview-container\">\n    <div class=\"preview-header\">\n      <h1>\ud83d\udccb Pr\u00e9visualisation de l'Email</h1>\n      <p>V\u00e9rifiez le contenu avant d'approuver l'envoi</p>\n    </div>\n    \n    <div class=\"preview-actions\">\n      <button class=\"preview-btn approve\" onclick=\"approveEmail()\">\n        \u2705 Approuver et Envoyer\n      </button>\n      <button class=\"preview-btn reject\" onclick=\"rejectEmail()\">\n        \u274c Rejeter\n      </button>\n    </div>\n    \n    <div class=\"preview-content\">\n      <iframe srcdoc=\"${htmlContent.replace(/\"/g, '&quot;')}\"></iframe>\n    </div>\n    \n    <div class=\"preview-metadata\">\n      <table>\n        <tr>\n          <td>Sujet:</td>\n          <td>${subject}</td>\n        </tr>\n        <tr>\n          <td>Type:</td>\n          <td>${data.prompt_type || 'custom'}</td>\n        </tr>\n        <tr>\n          <td>Mod\u00e8le Emma:</td>\n          <td>${data.emma_model || 'perplexity'}</td>\n        </tr>\n        <tr>\n          <td>Longueur:</td>\n          <td>${content.length} caract\u00e8res</td>\n        </tr>\n        <tr>\n          <td>G\u00e9n\u00e9r\u00e9 le:</td>\n          <td>${new Date().toLocaleString('fr-FR')}</td>\n        </tr>\n      </table>\n    </div>\n  </div>\n  \n  <script>\n    function approveEmail() {\n      alert('\u2705 Pour approuver:\\n\\n1. Retournez dans n8n\\n2. Modifiez le n\u0153ud \"Custom Prompt Input\"\\n3. Changez \"approved\" \u00e0 true\\n4. R\u00e9ex\u00e9cutez le workflow');\n    }\n    function rejectEmail() {\n      alert('\u274c Email rejet\u00e9. Modifiez le prompt dans \"Custom Prompt Input\" et r\u00e9ex\u00e9cutez.');\n    }\n  </script>\n</body>\n</html>\n`;\n\nreturn [{\n  json: {\n    ...data,\n    preview_html: previewHtml,\n    preview_url: `data:text/html;charset=utf-8,${encodeURIComponent(previewHtml)}`\n  }\n}];"
+      },
+      "id": "html-preview-generator",
+      "name": "Generate HTML Preview",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20208,
+        6920
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"preview_html\": $json.preview_html, \"preview_url\": $json.preview_url, \"subject\": $json.subject, \"metadata\": { \"type\": $json.prompt_type, \"model\": $json.emma_model, \"length\": ($json.newsletter_content || $json.response || '').length } } }}",
+        "options": {}
+      },
+      "id": "serve-preview",
+      "name": "Serve Preview",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        20432,
+        6920
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://gob-projetsjsls-projects.vercel.app/api/email-recipients",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fetch-email-recipients-node",
+      "name": "Fetch Email Recipients",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        23920,
+        6548
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Les donn\u00e9es viennent de \"Fetch Email Recipients\" qui retourne { recipients: [...], success: true }\n// On doit r\u00e9cup\u00e9rer html_content, subject, prompt_type et preview_mode depuis \"Generate HTML Newsletter\"\n\n// M\u00e9thode 1 : Utiliser les donn\u00e9es disponibles dans le flux actuel\nlet briefingType = data.prompt_type || data.briefing_type || 'custom';\nlet previewMode = data.preview_mode !== undefined ? data.preview_mode : false;\nlet htmlContent = data.html_content || '';\nlet subject = data.subject || '';\n\n// M\u00e9thode 2 : Essayer d'acc\u00e9der aux n\u0153uds pr\u00e9c\u00e9dents dans le flux d'ex\u00e9cution\n// Note: Dans n8n, $() permet d'acc\u00e9der aux donn\u00e9es des n\u0153uds pr\u00e9c\u00e9dents\n// mais seulement si ces n\u0153uds sont dans le flux d'ex\u00e9cution actuel\n\n// Essayer depuis \"Generate HTML Newsletter\" (juste avant \"Fetch Email Recipients\")\ntry {\n  const generateHtmlData = $('Generate HTML Newsletter').item?.json;\n  if (generateHtmlData) {\n    // IMPORTANT : Pr\u00e9server html_content et subject depuis \"Generate HTML Newsletter\"\n    htmlContent = generateHtmlData.html_content || htmlContent;\n    subject = generateHtmlData.subject || subject;\n    \n    // Pr\u00e9server aussi prompt_type et preview_mode\n    briefingType = generateHtmlData.prompt_type || briefingType;\n    previewMode = generateHtmlData.preview_mode !== undefined ? generateHtmlData.preview_mode : previewMode;\n    \n    console.log('\u2705 Donn\u00e9es r\u00e9cup\u00e9r\u00e9es depuis Generate HTML Newsletter');\n  }\n} catch (e) {\n  console.warn('\u26a0\ufe0f  Generate HTML Newsletter non accessible, tentative d\\'autres n\u0153uds...');\n  \n  try {\n    // Essayer depuis \"Parse API Response\"\n    const parseApiData = $('Parse API Response').item?.json;\n    if (parseApiData) {\n      briefingType = parseApiData.prompt_type || briefingType;\n      previewMode = parseApiData.preview_mode !== undefined ? parseApiData.preview_mode : previewMode;\n      console.log('\u2705 Donn\u00e9es r\u00e9cup\u00e9r\u00e9es depuis Parse API Response');\n    }\n  } catch (e2) {\n    console.warn('\u26a0\ufe0f  Parse API Response non accessible, utilisation des valeurs par d\u00e9faut');\n  }\n}\n\n// Normaliser le type\nlet normalizedType = briefingType;\nif (normalizedType === 'noon') {\n  normalizedType = 'midday';\n}\n\n// R\u00e9cup\u00e9rer les destinataires depuis l'API (donn\u00e9es de \"Fetch Email Recipients\")\nconst recipientsData = data.recipients || [];\nconst previewEmail = data.preview_email || 'projetsjsl@gmail.com';\n\nlet emailList = [];\n\nif (previewMode === true) {\n  // Mode preview : utiliser l'email de preview\n  emailList = [previewEmail];\n  console.log('\ud83d\udce7 Mode preview activ\u00e9');\n} else {\n  // Mode envoi : utiliser les destinataires actifs du type\n  emailList = recipientsData\n    .filter(r => r.active && r[normalizedType])\n    .map(r => r.email);\n  \n  console.log(`\ud83d\udce7 Mode envoi, type: ${normalizedType}, destinataires: ${emailList.length}`);\n  \n  // Fallback si aucun destinataire trouv\u00e9\n  if (emailList.length === 0) {\n    emailList = [previewEmail];\n    console.warn('\u26a0\ufe0f  Aucun destinataire actif, utilisation de l\\'email de preview');\n  }\n}\n\n// V\u00e9rifier que html_content et subject sont pr\u00e9sents\nif (!htmlContent) {\n  console.warn('\u26a0\ufe0f  html_content manquant, le n\u0153ud Send Email via Resend pourrait \u00e9chouer');\n}\nif (!subject) {\n  console.warn('\u26a0\ufe0f  subject manquant, utilisation d\\'un sujet par d\u00e9faut');\n  subject = subject || `Newsletter Emma - Mise \u00e0 jour du ${normalizedType}`;\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    // Donn\u00e9es de destinataires\n    recipients: emailList,\n    recipient_count: emailList.length,\n    briefing_type: normalizedType,\n    preview_mode: previewMode,\n    prompt_type: briefingType,\n    // IMPORTANT : Pr\u00e9server html_content et subject pour \"Send Email via Resend\"\n    html_content: htmlContent,\n    subject: subject\n  }\n}));"
+      },
+      "id": "process-recipients-node",
+      "name": "Process Recipients",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        24144,
+        6548
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config-schedule-config-1762643453541",
+      "name": "Schedule Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20432,
+        5728
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config-webhook-config-1762643453541",
+      "name": "Webhook Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20432,
+        5920
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config-manual-config-1762643453541",
+      "name": "Manual Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20432,
+        6112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "active_api",
+              "value": "perplexity",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "test_mode",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "id-preview-mode-1762640093151",
+              "name": "preview_mode",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "id-approved-1762640093151",
+              "name": "approved",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config-chat-config-1762643453541",
+      "name": "Chat Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20432,
+        6304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\nconsole.log('\ud83d\udd0d DEBUG AVANT SWITCH:');\nconsole.log('   preview_mode:', data.preview_mode, '(type:', typeof data.preview_mode, ')');\nconsole.log('   approved:', data.approved, '(type:', typeof data.approved, ')');\nconsole.log('   Condition Preview:', data.preview_mode === true || data.approved !== true);\nconsole.log('   Condition Send:', data.preview_mode === false && data.approved === true);\n\nreturn items;"
+      },
+      "id": "debug-before-switch-node",
+      "name": "Debug Before Switch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        23184,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $json.gemini_api_key }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": $json.message || $json.selected_prompt || \"G\u00e9n\u00e8re un briefing financier matinal.\"\n    }]\n  }],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"topK\": 40,\n    \"topP\": 0.95,\n    \"maxOutputTokens\": 2048\n  }\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "call-gemini-api-node",
+      "name": "Call Gemini API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        22448,
+        6104
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "0D5m3nEBknRtHnmZ",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La r\u00e9ponse de Gemini a une structure diff\u00e9rente\n// Structure Gemini: { candidates: [{ content: { parts: [{ text: \"...\" }] } }] }\nlet content = '';\nif (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {\n  content = data.candidates[0].content.parts.map(part => part.text).join('\\n');\n} else if (data.response) {\n  content = data.response;\n} else if (typeof data === 'string') {\n  content = data;\n}\n\n// Adapter au format attendu par Parse API Response\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    newsletter_content: content,\n    response: content,\n    message: content,\n    emma_model: 'gemini',\n    emma_tools: [],\n    emma_execution_time: 0,\n    trigger_type: item.json.trigger_type || 'Manuel',\n    prompt_type: item.json.prompt_type || 'custom',\n    generated_at: new Date().toISOString(),\n    // Pr\u00e9server preview_mode et approved\n    preview_mode: item.json.preview_mode,\n    approved: item.json.approved\n  }\n}));"
+      },
+      "id": "parse-gemini-response",
+      "name": "Parse Gemini Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        22672,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83e\udd16 S\u00c9LECTEUR DE MOD\u00c8LE IA - MODIFIEZ ICI \u2699\ufe0f\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n//\n// \ud83d\udc47 MODIFIEZ LA VALEUR CI-DESSOUS \ud83d\udc47\n//\nconst AI_MODEL = 'emma';\n//\n// Options disponibles:\n//   - 'emma'    \u2192 Utilise Emma (Perplexity) via /api/chat\n//   - 'gemini'  \u2192 Utilise Gemini directement\n//\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ai_model: AI_MODEL,\n    _model_info: AI_MODEL === 'emma' \n      ? '\ud83e\udd16 Emma (Perplexity) - Recherche web en temps r\u00e9el' \n      : '\u2728 Gemini Direct - R\u00e9ponse rapide'\n  }\n}));"
+      },
+      "id": "ai-model-config-dropdown",
+      "name": "\u2699\ufe0f AI Model Selector (Change AI_MODEL)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        21552,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udd11 EXTRACTION DE LA CL\u00c9 API GEMINI DEPUIS LA R\u00c9PONSE VERCEL\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n//\n// Ce n\u0153ud extrait la cl\u00e9 API Gemini depuis la r\u00e9ponse de l'endpoint Vercel\n//\n// \u2705 Configuration automatique - Aucune action requise !\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\nconst data = items[0].json;\n\nlet geminiApiKey = '';\n\ntry {\n  // La r\u00e9ponse de l'endpoint Vercel est dans $json\n  // Format: { apiKey: \"...\", configured: true, ... }\n  if (data.apiKey) {\n    geminiApiKey = data.apiKey;\n    console.log('\u2705 Cl\u00e9 API Gemini r\u00e9cup\u00e9r\u00e9e depuis Vercel');\n  } else if (data.error) {\n    throw new Error(`Erreur Vercel: ${data.message || data.error}`);\n  } else {\n    // Fallback : essayer depuis les credentials n8n\n    geminiApiKey = $workflow.getStaticData('global').geminiApiKey || '';\n    \n    if (!geminiApiKey) {\n      throw new Error('Cl\u00e9 API non trouv\u00e9e. V\u00e9rifiez que GEMINI_API_KEY est configur\u00e9e dans Vercel.');\n    }\n    \n    console.log('\u26a0\ufe0f  Utilisation de la cl\u00e9 depuis les credentials n8n (fallback)');\n  }\n} catch (error) {\n  console.error('\u274c Erreur:', error.message);\n  throw new Error(`\u274c Impossible de r\u00e9cup\u00e9rer la cl\u00e9 API Gemini: ${error.message}`);\n}\n\nif (!geminiApiKey) {\n  throw new Error('\u274c Cl\u00e9 API Gemini vide');\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    gemini_api_key: geminiApiKey\n  }\n}));"
+      },
+      "id": "gemini-api-key-node",
+      "name": "Get Gemini API Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        22224,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://gob-projetsjsls-projects.vercel.app/api/gemini-key?full=true",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fetch-gemini-api-key-node",
+      "name": "Fetch Gemini API Key from Vercel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        22000,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.ai_model }}",
+                    "rightValue": "emma",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e15020a5-785c-4bf2-be14-7a2a338e9c34"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Emma"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "602d5987-7966-46b0-bca6-1bc86f245316",
+                    "leftValue": "={{ $json.ai_model }}",
+                    "rightValue": "gemini",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Gemini"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6f67bbb2-07a7-46be-9b7a-1735ba3e3c5b",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        21776,
+        6104
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "339cad82-0be3-4fbb-a420-f8e9a9d2f805",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        22672,
+        6400
+      ],
+      "webhookId": "9663354b-9871-49c0-aaee-3992c85a12ec"
+    },
+    {
+      "parameters": {
+        "batching": {}
+      },
+      "id": "90188c41-16ed-4cc6-bf45-b473e44872ee",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        23120,
+        6296
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "21c86760-5e53-4acd-b4a3-223a3b69c361",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        23192,
+        6520
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "0D5m3nEBknRtHnmZ",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Test Email Prep Node\nconst items = $input.all();\nconst data = items[0].json;\nconsole.log(\"Test Email Prep - Formatting LLM output\");\n\nlet content = \"\";\nif (data.output) { content = data.output; }\nelse if (data.text) { content = data.text; }\nelse if (data.response) { content = data.response; }\nelse if (data.message) { content = data.message; }\nelse { content = \"No content found\"; }\n\nreturn [{\n  json: {\n    newsletter_content: content,\n    trigger_type: \"Test Chat\",\n    emma_model: \"gemini-langchain\",\n    emma_tools: [\"langchain\", \"chat\"],\n    emma_execution_time: 0,\n    prompt_type: \"test\",\n    tickers: \"\",\n    preview_mode: false,\n    approved: true,\n    test_mode: true,\n    recipients: [\"projetsjsl@gmail.com\"],\n    generated_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "8346e806-18fc-4bc8-ad19-fc8c0e11bd5b",
+      "name": "Test Formated HTML Email to projetsjsl@gmail.com",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        23472,
+        6400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\uddeb\ud83c\uddf7 INSTRUCTION FRAN\u00c7AISE POUR LE LLM\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\nconst data = items[0].json;\n\n// Message original de l'utilisateur\nconst userMessage = data.chatInput || data.message || '';\n\n// Instruction syst\u00e8me en fran\u00e7ais\nconst systemInstruction = `Tu es Emma, l'assistante financi\u00e8re IA de JSLAI\u2122.\n\nLANGUE: R\u00e9ponds TOUJOURS en FRAN\u00c7AIS, sauf pour:\n- Les noms propres (entreprises, personnes, lieux)\n- Les citations directes\n- Les termes techniques standards (P/E ratio, ETF, etc.)\n\nSTYLE:\n- Analyse financi\u00e8re claire et professionnelle\n- Structure avec des paragraphes distincts\n- Utilise des donn\u00e9es pr\u00e9cises\n- Ton accessible mais expert\n\nVoici la question de l'utilisateur:\n\n`;\n\n// Combiner l'instruction avec le message\nconst fullMessage = systemInstruction + userMessage;\n\nconsole.log('\ud83c\uddeb\ud83c\uddf7 Instruction fran\u00e7aise ajout\u00e9e au message');\nconsole.log('   Longueur originale:', userMessage.length);\nconsole.log('   Longueur totale:', fullMessage.length);\n\nreturn [{\n  json: {\n    ...data,\n    chatInput: fullMessage\n  }\n}];"
+      },
+      "id": "add-french-instruction-node-id",
+      "name": "\ud83c\uddeb\ud83c\uddf7 Add French Instruction",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        22896,
+        6400
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (7h/12h/16h30 EST)": {
+      "main": [
+        [
+          {
+            "node": "Schedule Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Webhook Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger (Custom Prompt)": {
+      "main": [
+        [
+          {
+            "node": "\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Triggers": {
+      "main": [
+        [
+          {
+            "node": "Fetch Prompts from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Tickers": {
+      "main": [
+        [
+          {
+            "node": "Determine Time-Based Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Time-Based Prompt": {
+      "main": [
+        [
+          {
+            "node": "\u2699\ufe0f AI Model Selector (Change AI_MODEL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare API Request": {
+      "main": [
+        [
+          {
+            "node": "Call /api/chat (Emma)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse API Response": {
+      "main": [
+        [
+          {
+            "node": "Debug Before Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate HTML Newsletter": {
+      "main": [
+        [
+          {
+            "node": "Fetch Email Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email via Resend": {
+      "main": [
+        [
+          {
+            "node": "Log to Newsletters Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Newsletters Table": {
+      "main": [
+        [
+          {
+            "node": "Log to Logs Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Fetch Prompts from API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger (Custom Prompt)": {
+      "main": [
+        [
+          {
+            "node": "Custom Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger (Custom Prompt)": {
+      "main": [
+        [
+          {
+            "node": "Custom Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Custom Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Get Active Tickers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call /api/chat (Emma)": {
+      "main": [
+        [
+          {
+            "node": "Parse API Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Prompts from API": {
+      "main": [
+        [
+          {
+            "node": "Get Active Tickers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview Briefing Content": {
+      "main": [
+        [
+          {
+            "node": "Preview Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview Message": {
+      "main": [
+        [
+          {
+            "node": "Check Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Approval": {
+      "main": [
+        [
+          {
+            "node": "Generate HTML Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preview Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview Display": {
+      "main": [
+        [
+          {
+            "node": "Preview Stop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Trigger (Preview)": {
+      "main": [
+        [
+          {
+            "node": "\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate HTML Preview": {
+      "main": [
+        [
+          {
+            "node": "Serve Preview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Email Recipients": {
+      "main": [
+        [
+          {
+            "node": "Process Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Recipients": {
+      "main": [
+        [
+          {
+            "node": "Send Email via Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Config": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Config": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Config": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Config": {
+      "main": [
+        [
+          {
+            "node": "Merge Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Debug Before Switch": {
+      "main": [
+        [
+          {
+            "node": "Should Send Email?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Send Email?": {
+      "main": [
+        [
+          {
+            "node": "Generate HTML Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preview Display",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Gemini API": {
+      "main": [
+        [
+          {
+            "node": "Parse Gemini Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Gemini Response": {
+      "main": [
+        [
+          {
+            "node": "Parse API Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\u2699\ufe0f AI Model Selector (Change AI_MODEL)": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Gemini API Key": {
+      "main": [
+        [
+          {
+            "node": "Call Gemini API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Gemini API Key from Vercel": {
+      "main": [
+        [
+          {
+            "node": "Get Gemini API Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Prepare API Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Gemini API Key from Vercel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "\ud83c\uddeb\ud83c\uddf7 Add French Instruction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Test Formated HTML Email to projetsjsl@gmail.com",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Formated HTML Email to projetsjsl@gmail.com": {
+      "main": [
+        [
+          {
+            "node": "Generate HTML Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\ud83c\uddeb\ud83c\uddf7 Add French Instruction": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "03lgcA4e9uRTtli1"
+  },
+  "staticData": {
+    "node:Schedule Trigger (7h/12h/16h30 EST)": {
+      "recurrenceRules": []
+    },
+    "node:Gmail Trigger (Custom Prompt)": {
+      "Gmail Trigger (Custom Prompt)": {
+        "lastTimeChecked": 1762532537,
+        "possibleDuplicates": [
+          "19a5f2038b731938"
+        ]
+      }
+    }
+  }
+}
