@@ -29,6 +29,16 @@ async function build() {
     // Copier récursivement tous les fichiers de public vers dist
     await cp(PUBLIC_DIR, DIST_DIR, { recursive: true });
     console.log(`✅ Fichiers copiés de ${PUBLIC_DIR}/ vers ${DIST_DIR}/`);
+    
+    // Copier index.html de la racine vers dist
+    const INDEX_HTML = 'index.html';
+    if (existsSync(INDEX_HTML)) {
+      await cp(INDEX_HTML, join(DIST_DIR, INDEX_HTML));
+      console.log(`✅ ${INDEX_HTML} copié vers ${DIST_DIR}/`);
+    } else {
+      console.warn(`⚠️ ${INDEX_HTML} n'existe pas à la racine`);
+    }
+    
     console.log('✅ Build terminé avec succès');
     
   } catch (error) {
