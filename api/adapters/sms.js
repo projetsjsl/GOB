@@ -55,16 +55,23 @@ export default async function handler(req, res) {
 
   try {
     console.log('[SMS Adapter] Webhook Twilio reçu');
+    console.log('[SMS Adapter] Method:', req.method);
+    console.log('[SMS Adapter] Content-Type:', req.headers['content-type']);
+    console.log('[SMS Adapter] Body type:', typeof req.body);
+    console.log('[SMS Adapter] Body keys:', req.body ? Object.keys(req.body) : 'null');
 
     // 1. PARSER LES DONNÉES TWILIO
     // Twilio envoie les données en application/x-www-form-urlencoded
     let twilioData;
 
-    if (req.body.From && req.body.Body) {
+    // Vercel parse automatiquement application/x-www-form-urlencoded en objet
+    if (req.body && typeof req.body === 'object' && (req.body.From || req.body.Body)) {
       // Déjà parsé par Vercel
       twilioData = req.body;
+      console.log('[SMS Adapter] Body déjà parsé par Vercel');
     } else if (typeof req.body === 'string') {
       // Parser manuellement si nécessaire
+      console.log('[SMS Adapter] Parsing manuel du body string');
       const params = new URLSearchParams(req.body);
       twilioData = {
         From: params.get('From'),
@@ -72,8 +79,26 @@ export default async function handler(req, res) {
         Body: params.get('Body'),
         MessageSid: params.get('MessageSid')
       };
+    } else if (req.body && typeof req.body === 'object') {
+      // Essayer d'extraire directement les propriétés
+      twilioData = {
+        From: req.body.From || req.body.from,
+        To: req.body.To || req.body.to,
+        Body: req.body.Body || req.body.body || req.body.message,
+        MessageSid: req.body.MessageSid || req.body.messageSid || req.body.SmsMessageSid
+      };
+      console.log('[SMS Adapter] Extraction directe des propriétés');
     } else {
-      throw new Error('Invalid Twilio webhook format');
+      console.error('[SMS Adapter] Format body invalide:', {
+        type: typeof req.body,
+        body: req.body,
+        headers: req.headers
+      });
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid Twilio webhook format',
+        details: 'Body is not in expected format'
+      });
     }
 
     const { From: senderPhone, Body: messageBody, MessageSid } = twilioData;
