@@ -4447,7 +4447,12 @@ STRUCTURE JSON OBLIGATOIRE:
                         const res = await fetch('/api/admin/sms-control');
                         if (!res.ok) throw new Error('Impossible de charger la configuration SMS');
                         const data = await res.json();
-                        setEnvValues(data.env || {});
+                        const env = data.env || {};
+                        if (!env.MODE) env.MODE = 'prod_cloud';
+                        if (!env.TEST_MODE) env.TEST_MODE = 'false';
+                        if (!env.EMMA_WEBHOOK_URL) env.EMMA_WEBHOOK_URL = 'https://projetsjsl.app.n8n.cloud/webhook/gob-sms-webhook-test';
+                        if (!env.PUBLIC_URL) env.PUBLIC_URL = 'https://gob-kmay.onrender.com';
+                        setEnvValues(env);
                         setServerState(data.server || { running: false, info: null, logs: [] });
                         setWebhookStatus(data.webhookStatus);
                     } catch (error) {
