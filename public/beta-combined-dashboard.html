@@ -4429,6 +4429,12 @@ STRUCTURE JSON OBLIGATOIRE:
                 }
             };
 
+            const fieldVisibility = {
+                test: ['MODE', 'TEST_MODE', 'EMMA_WEBHOOK_URL', 'N8N_WEBHOOK_BASE_URL', 'PUBLIC_URL', 'PORT'],
+                prod_local: ['MODE', 'TEST_MODE', 'EMMA_WEBHOOK_URL', 'N8N_WEBHOOK_BASE_URL', 'PUBLIC_URL', 'PORT', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER'],
+                prod_cloud: ['MODE', 'TEST_MODE', 'EMMA_WEBHOOK_URL', 'N8N_WEBHOOK_BASE_URL', 'PUBLIC_URL', 'PORT', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER']
+            };
+
             const EmmaSmsPanel = () => {
                 const [loading, setLoading] = useState(true);
                 const [envValues, setEnvValues] = useState({});
@@ -4610,6 +4616,11 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         <div>
                                                             <div className="font-semibold">{preset.label}</div>
                                                             <div className="text-xs opacity-70">{preset.description}</div>
+                                                            <div className="text-xs opacity-80">
+                                                                {key === 'test' && '💲 Gratuit (aucun SMS Twilio).'}
+                                                                {key === 'prod_local' && '💲 SMS facturés par Twilio (ton tunnel local).'}
+                                                                {key === 'prod_cloud' && '💲 SMS Twilio + hébergeur (Render/Railway).'}
+                                                            </div>
                                                         </div>
                                                     </label>
                                                 );
@@ -4637,6 +4648,7 @@ STRUCTURE JSON OBLIGATOIRE:
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {smsEnvFieldMeta.map((field) => (
+                                        fieldVisibility[(envValues.MODE || 'test')]?.includes(field.key) && (
                                         <div key={field.key} className="space-y-1">
                                             <label className="text-sm font-semibold">{field.label}</label>
                                             <div>
@@ -4665,7 +4677,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                             </div>
                                             {field.helper && <p className="text-xs opacity-70">{field.helper}</p>}
                                         </div>
-                                    ))}
+                                    )))}
                                 </div>
 
                                 <div className="flex flex-wrap items-center gap-3">
