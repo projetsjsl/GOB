@@ -1,5 +1,10 @@
 {
+  "updatedAt": "2025-11-11T14:48:38.000Z",
+  "createdAt": "2025-10-20T18:16:03.743Z",
+  "id": "03lgcA4e9uRTtli1",
   "name": "Emma Newsletter - Automated Multi-API Financial News Distribution",
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -25,8 +30,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        20208,
-        5728
+        2208,
+        896
       ]
     },
     {
@@ -41,8 +46,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        20208,
-        5920
+        2208,
+        1088
       ],
       "webhookId": "dad887b9-1a62-482a-9174-3b79f52a2bb5"
     },
@@ -53,8 +58,8 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        20208,
-        5536
+        2208,
+        704
       ]
     },
     {
@@ -91,12 +96,12 @@
         "options": {}
       },
       "id": "c3ecb545-83ea-4db2-ba56-a7104a702733",
-      "name": "\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)",
+      "name": "🎯 Manual Briefing Selector (MODIFIEZ ICI)",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        20432,
-        5440
+        2432,
+        608
       ]
     },
     {
@@ -112,8 +117,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        20656,
-        5632
+        2656,
+        800
       ]
     },
     {
@@ -136,8 +141,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        21104,
-        6104
+        3104,
+        1272
       ],
       "credentials": {
         "supabaseApi": {
@@ -148,54 +153,54 @@
     },
     {
       "parameters": {
-        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\udfaf S\u00c9LECTION DU PROMPT DE BRIEFING\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Ce n\u0153ud utilise les prompts r\u00e9cup\u00e9r\u00e9s depuis GitHub via l'API\n// et permet la s\u00e9lection manuelle du type de briefing\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst inputItems = $input.all();\nconst data = inputItems[0].json;\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// R\u00c9CUP\u00c9RATION DES PROMPTS DEPUIS \"Fetch Prompts from API\"\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Les prompts viennent de \"Fetch Prompts from API\" qui pr\u00e9c\u00e8de \"Get Active Tickers\"\n// L'API retourne { success: true, prompts: { morning: {...}, midday: {...}, evening: {...} } }\nlet promptsConfig = {};\n\ntry {\n  // M\u00e9thode 1 : R\u00e9cup\u00e9rer depuis le n\u0153ud \"Fetch Prompts from API\"\n  const fetchPromptsData = $('Fetch Prompts from API').first().json;\n  if (fetchPromptsData.prompts) {\n    promptsConfig = fetchPromptsData.prompts;\n    console.log('\u2705 Prompts r\u00e9cup\u00e9r\u00e9s depuis Fetch Prompts from API');\n  } else if (fetchPromptsData.success && fetchPromptsData.prompts) {\n    promptsConfig = fetchPromptsData.prompts;\n    console.log('\u2705 Prompts r\u00e9cup\u00e9r\u00e9s depuis Fetch Prompts from API (format success)');\n  }\n} catch (e) {\n  console.warn('\u26a0\ufe0f Impossible de r\u00e9cup\u00e9rer depuis Fetch Prompts from API:', e.message);\n}\n\n// M\u00e9thode 2 : V\u00e9rifier dans les donn\u00e9es actuelles (au cas o\u00f9)\nif (!promptsConfig || Object.keys(promptsConfig).length === 0) {\n  if (data.prompts) {\n    promptsConfig = data.prompts;\n    console.log('\u2705 Prompts trouv\u00e9s dans les donn\u00e9es actuelles');\n  } else if (data.success && data.prompts) {\n    promptsConfig = data.prompts;\n    console.log('\u2705 Prompts trouv\u00e9s dans les donn\u00e9es actuelles (format success)');\n  }\n}\n\n// Si toujours pas de prompts, erreur\nif (!promptsConfig || Object.keys(promptsConfig).length === 0) {\n  console.error('\u274c Prompts non trouv\u00e9s. V\u00e9rifiez que \"Fetch Prompts from API\" s\\'est ex\u00e9cut\u00e9 correctement.');\n  throw new Error('\u274c Les prompts depuis GitHub ne sont pas disponibles. V\u00e9rifiez le n\u0153ud \"Fetch Prompts from API\".');\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PRIORIT\u00c9 1 : Prompt personnalis\u00e9 (si fourni)\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nif (data.custom_prompt && data.custom_prompt.trim() !== '') {\n  console.log('\u2705 Utilisation du prompt personnalis\u00e9');\n  for (const item of inputItems) {\n    item.json.selected_prompt = data.custom_prompt;\n    item.json.prompt_type = 'custom';\n    item.json.processing_status = \"OK\";\n  }\n  return inputItems;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PRIORIT\u00c9 2 : Type de briefing s\u00e9lectionn\u00e9 manuellement\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Note: prompt_type est g\u00e9n\u00e9r\u00e9 automatiquement \u00e0 partir de briefing_type\nif (data.briefing_type) {\n  const selectedType = data.briefing_type.toLowerCase().trim();\n  \n  // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n  // CONVERSION FRAN\u00c7AIS \u2192 ANGLAIS (pour compatibilit\u00e9 API)\n  // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n  const typeMapping = {\n    // Fran\u00e7ais \u2192 Anglais\n    'matin': 'morning',\n    'midi': 'midday',\n    'soir': 'evening',\n    // Anglais (compatibilit\u00e9)\n    'morning': 'morning',\n    'midday': 'midday',\n    'evening': 'evening',\n    'noon': 'midday' // Ancien format\n  };\n  \n  // Normaliser le type (fran\u00e7ais ou anglais \u2192 anglais)\n  let normalizedType = typeMapping[selectedType];\n  \n  if (!normalizedType) {\n    throw new Error(`\u274c Type de briefing invalide: \"${selectedType}\". Utilisez: \"matin\", \"midi\", \"soir\" (ou \"morning\", \"midday\", \"evening\")`);\n  }\n  \n  // Types valides pour l'API (toujours en anglais)\n  const validTypes = ['morning', 'midday', 'evening'];\n  if (!validTypes.includes(normalizedType)) {\n    throw new Error(`\u274c Type de briefing invalide apr\u00e8s conversion: ${normalizedType}`);\n  }\n  \n  const selectedPrompt = promptsConfig[normalizedType]?.prompt;\n  \n  if (!selectedPrompt) {\n    throw new Error(`\u274c Prompt non trouv\u00e9 pour le type: ${normalizedType}. V\u00e9rifiez config/briefing-prompts.json sur GitHub.`);\n  }\n  \n  console.log(`\u2705 Utilisation du prompt ${normalizedType} (${selectedType}) depuis GitHub`);\n  \n  for (const item of inputItems) {\n    item.json.selected_prompt = selectedPrompt;\n    item.json.prompt_type = normalizedType; // \u2705 G\u00e9n\u00e9r\u00e9 automatiquement depuis briefing_type\n    item.json.processing_status = \"OK\";\n    item.json.briefing_name = promptsConfig[normalizedType]?.name || `Briefing ${normalizedType}`;\n    // Conserver le type original pour affichage\n    item.json.briefing_type_original = selectedType;\n  }\n  \n  return inputItems;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// PRIORIT\u00c9 3 : D\u00e9termination automatique selon l'heure (Schedule Trigger)\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nconst now = new Date();\nconst hour = now.getHours();\n\nlet promptType;\nlet selectedPrompt;\n\nif (hour >= 5 && hour < 11) {\n  // Morning prompt (5am - 11am)\n  promptType = 'morning';\n  selectedPrompt = promptsConfig.morning?.prompt || '';\n} else if (hour >= 11 && hour < 16) {\n  // Midday prompt (11am - 4pm)\n  promptType = 'midday';\n  selectedPrompt = promptsConfig.midday?.prompt || '';\n} else {\n  // Evening prompt (4pm onwards and before 5am)\n  promptType = 'evening';\n  selectedPrompt = promptsConfig.evening?.prompt || '';\n}\n\nif (!selectedPrompt) {\n  throw new Error(`\u274c Prompt non trouv\u00e9 pour le type: ${promptType}`);\n}\n\nconsole.log(`\u2705 D\u00e9termination automatique: ${promptType} (heure: ${hour}h)`);\n\nfor (const item of inputItems) {\n  item.json.selected_prompt = selectedPrompt;\n  item.json.prompt_type = promptType;\n  item.json.processing_status = \"OK\";\n  item.json.briefing_name = promptsConfig[promptType]?.name || `Briefing ${promptType}`;\n}\n\nreturn inputItems;"
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// 🎯 SÉLECTION DU PROMPT DE BRIEFING\n// ═══════════════════════════════════════════════════════════\n// Ce nœud utilise les prompts récupérés depuis GitHub via l'API\n// et permet la sélection manuelle du type de briefing\n// ═══════════════════════════════════════════════════════════\n\nconst inputItems = $input.all();\nconst data = inputItems[0].json;\n\n// ═══════════════════════════════════════════════════════════\n// RÉCUPÉRATION DES PROMPTS DEPUIS \"Fetch Prompts from API\"\n// ═══════════════════════════════════════════════════════════\n// Les prompts viennent de \"Fetch Prompts from API\" qui précède \"Get Active Tickers\"\n// L'API retourne { success: true, prompts: { morning: {...}, midday: {...}, evening: {...} } }\nlet promptsConfig = {};\n\ntry {\n  // Méthode 1 : Récupérer depuis le nœud \"Fetch Prompts from API\"\n  const fetchPromptsData = $('Fetch Prompts from API').first().json;\n  if (fetchPromptsData.prompts) {\n    promptsConfig = fetchPromptsData.prompts;\n    console.log('✅ Prompts récupérés depuis Fetch Prompts from API');\n  } else if (fetchPromptsData.success && fetchPromptsData.prompts) {\n    promptsConfig = fetchPromptsData.prompts;\n    console.log('✅ Prompts récupérés depuis Fetch Prompts from API (format success)');\n  }\n} catch (e) {\n  console.warn('⚠️ Impossible de récupérer depuis Fetch Prompts from API:', e.message);\n}\n\n// Méthode 2 : Vérifier dans les données actuelles (au cas où)\nif (!promptsConfig || Object.keys(promptsConfig).length === 0) {\n  if (data.prompts) {\n    promptsConfig = data.prompts;\n    console.log('✅ Prompts trouvés dans les données actuelles');\n  } else if (data.success && data.prompts) {\n    promptsConfig = data.prompts;\n    console.log('✅ Prompts trouvés dans les données actuelles (format success)');\n  }\n}\n\n// Si toujours pas de prompts, erreur\nif (!promptsConfig || Object.keys(promptsConfig).length === 0) {\n  console.error('❌ Prompts non trouvés. Vérifiez que \"Fetch Prompts from API\" s\\'est exécuté correctement.');\n  throw new Error('❌ Les prompts depuis GitHub ne sont pas disponibles. Vérifiez le nœud \"Fetch Prompts from API\".');\n}\n\n// ═══════════════════════════════════════════════════════════\n// PRIORITÉ 1 : Prompt personnalisé (si fourni)\n// ═══════════════════════════════════════════════════════════\nif (data.custom_prompt && data.custom_prompt.trim() !== '') {\n  console.log('✅ Utilisation du prompt personnalisé');\n  for (const item of inputItems) {\n    item.json.selected_prompt = data.custom_prompt;\n    item.json.prompt_type = 'custom';\n    item.json.processing_status = \"OK\";\n  }\n  return inputItems;\n}\n\n// ═══════════════════════════════════════════════════════════\n// PRIORITÉ 2 : Type de briefing sélectionné manuellement\n// ═══════════════════════════════════════════════════════════\n// Note: prompt_type est généré automatiquement à partir de briefing_type\nif (data.briefing_type) {\n  const selectedType = data.briefing_type.toLowerCase().trim();\n  \n  // ═══════════════════════════════════════════════════════════\n  // CONVERSION FRANÇAIS → ANGLAIS (pour compatibilité API)\n  // ═══════════════════════════════════════════════════════════\n  const typeMapping = {\n    // Français → Anglais\n    'matin': 'morning',\n    'midi': 'midday',\n    'soir': 'evening',\n    // Anglais (compatibilité)\n    'morning': 'morning',\n    'midday': 'midday',\n    'evening': 'evening',\n    'noon': 'midday' // Ancien format\n  };\n  \n  // Normaliser le type (français ou anglais → anglais)\n  let normalizedType = typeMapping[selectedType];\n  \n  if (!normalizedType) {\n    throw new Error(`❌ Type de briefing invalide: \"${selectedType}\". Utilisez: \"matin\", \"midi\", \"soir\" (ou \"morning\", \"midday\", \"evening\")`);\n  }\n  \n  // Types valides pour l'API (toujours en anglais)\n  const validTypes = ['morning', 'midday', 'evening'];\n  if (!validTypes.includes(normalizedType)) {\n    throw new Error(`❌ Type de briefing invalide après conversion: ${normalizedType}`);\n  }\n  \n  const selectedPrompt = promptsConfig[normalizedType]?.prompt;\n  \n  if (!selectedPrompt) {\n    throw new Error(`❌ Prompt non trouvé pour le type: ${normalizedType}. Vérifiez config/briefing-prompts.json sur GitHub.`);\n  }\n  \n  console.log(`✅ Utilisation du prompt ${normalizedType} (${selectedType}) depuis GitHub`);\n  \n  for (const item of inputItems) {\n    item.json.selected_prompt = selectedPrompt;\n    item.json.prompt_type = normalizedType; // ✅ Généré automatiquement depuis briefing_type\n    item.json.processing_status = \"OK\";\n    item.json.briefing_name = promptsConfig[normalizedType]?.name || `Briefing ${normalizedType}`;\n    // Conserver le type original pour affichage\n    item.json.briefing_type_original = selectedType;\n  }\n  \n  return inputItems;\n}\n\n// ═══════════════════════════════════════════════════════════\n// PRIORITÉ 3 : Détermination automatique selon l'heure (Schedule Trigger)\n// ═══════════════════════════════════════════════════════════\nconst now = new Date();\nconst hour = now.getHours();\n\nlet promptType;\nlet selectedPrompt;\n\nif (hour >= 5 && hour < 11) {\n  // Morning prompt (5am - 11am)\n  promptType = 'morning';\n  selectedPrompt = promptsConfig.morning?.prompt || '';\n} else if (hour >= 11 && hour < 16) {\n  // Midday prompt (11am - 4pm)\n  promptType = 'midday';\n  selectedPrompt = promptsConfig.midday?.prompt || '';\n} else {\n  // Evening prompt (4pm onwards and before 5am)\n  promptType = 'evening';\n  selectedPrompt = promptsConfig.evening?.prompt || '';\n}\n\nif (!selectedPrompt) {\n  throw new Error(`❌ Prompt non trouvé pour le type: ${promptType}`);\n}\n\nconsole.log(`✅ Détermination automatique: ${promptType} (heure: ${hour}h)`);\n\nfor (const item of inputItems) {\n  item.json.selected_prompt = selectedPrompt;\n  item.json.prompt_type = promptType;\n  item.json.processing_status = \"OK\";\n  item.json.briefing_name = promptsConfig[promptType]?.name || `Briefing ${promptType}`;\n}\n\nreturn inputItems;"
       },
       "id": "6d2c7cfa-f8b7-44de-ab36-4e3d9826a035",
       "name": "Determine Time-Based Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        21328,
-        6104
+        3328,
+        1272
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type || 'custom';\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// DEFAULT PROMPT si non fourni\nconst defaultPrompt = \"Fournir une analyse financi\u00e8re concise des march\u00e9s et actions suivantes.\";\nconst selectedPrompt = data.selected_prompt || defaultPrompt;\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\udfaf ENHANCED PROMPT WITH STRUCTURE INSTRUCTIONS\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst structuredInstructions = `\n\nSTRUCTURE REQUISE POUR LE BRIEFING:\n\nCommence toujours par une analyse d\u00e9taill\u00e9e et exhaustive des march\u00e9s et tickers demand\u00e9s. Sois COMPLET et D\u00c9TAILL\u00c9 - ce briefing doit \u00eatre riche en informations.\n\nDans ton analyse, inclus naturellement:\n\n1. **Points cl\u00e9s marquants** - Mentionne 3-4 faits saillants avec donn\u00e9es chiffr\u00e9es (indices, %, variations) en haut de ton analyse sous forme de bullets courts. Ces points seront extraits pour le TL;DR.\n\n2. **Analyse approfondie** - Fournis une analyse compl\u00e8te et d\u00e9taill\u00e9e des mouvements du march\u00e9, tendances sectorielles, actualit\u00e9s importantes. Ne te limite PAS - \u00e9cris au moins 500-800 mots. Structure avec des sections claires (## Titres de sections).\n\n3. **Perspective contrarian** - Vers la fin, inclus une section \"Point de vigilance\" ou \"Perspective Emma\" o\u00f9 tu challenges le consensus du march\u00e9 ou identifies un risque sous-estim\u00e9. Pose une question provocatrice si pertinent. Cette section sera extraite pour Emma's Take.\n\n4. **Indicateurs techniques** - Mentionne des niveaux de support/r\u00e9sistance, RSI, moyennes mobiles pour les tickers principaux si applicable.\n\nR\u00c8GLES D'\u00c9CRITURE:\n- Ton professionnel mais accessible\n- Utilise des donn\u00e9es chiffr\u00e9es pr\u00e9cises\n- Cite les sources quand pertinent\n- Structure claire avec titres de sections\n- N'h\u00e9site pas \u00e0 \u00eatre long et exhaustif (800-1200 mots est id\u00e9al)\n- Inclus des emojis contextuels pour la lisibilit\u00e9\n\nEXEMPLE DE STRUCTURE:\n\n# [Titre accrocheur bas\u00e9 sur l'actualit\u00e9 du jour]\n\n**Points Cl\u00e9s:**\n\u2022 S&P 500 +0.8% port\u00e9 par le secteur tech\n\u2022 Fed minutes confirment pivot dovish - taux terminal 5.25%\n\u2022 Apple bat les attentes Q4: $1.64 EPS vs $1.60 attendu\n\n## March\u00e9s en Bref\n\n[Analyse d\u00e9taill\u00e9e de la session, mouvements principaux...]\n\n## Secteur Technologique\n\n[Analyse approfondie du secteur avec donn\u00e9es...]\n\n## Perspectives Macro\n\n[Contexte \u00e9conomique, Fed, inflation...]\n\n## Point de Vigilance - Emma's Take\n\nAlors que l'optimisme r\u00e8gne sur les march\u00e9s tech, les niveaux de dette corporate atteignent des sommets historiques. Avec la remont\u00e9e des taux, combien de temps avant que cette fragilit\u00e9 ne se manifeste dans les bilans?\n\n## Mouvements \u00e0 Surveiller\n\n- **AAPL**: Test de r\u00e9sistance \u00e0 $200 (RSI: 68, proche surachat)\n- **MSFT**: Support solide \u00e0 $380, opportunit\u00e9 d'accumulation\n- **TSLA**: Prudence, RSI \u00e0 78 (surachat), prise de profits recommand\u00e9e\n\n`;\n\n// Construire le message complet\nconst fullPrompt = `${selectedPrompt}\n\n${structuredInstructions}\n\nFocus sur ces tickers: ${tickerList || 'AAPL, MSFT, GOOGL, NVDA'}\n\nType de briefing: ${briefingType}\n`;\n\nconsole.log('\ud83d\udccb Prepare API Request:');\nconsole.log('   selected_prompt:', selectedPrompt.substring(0, 100));\nconsole.log('   tickers:', tickerList);\nconsole.log('   message length:', fullPrompt.length);\nconsole.log('   \u2705 Enhanced instructions for structured output');\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation',\n    ai_model: data.ai_model || 'emma'\n  }\n}];"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extract ticker symbols\nconst tickers = items.filter(item => item.json.ticker).map(item => item.json.ticker);\nconst tickerList = tickers.join(', ');\n\n// Normaliser le type de briefing\nlet briefingType = data.prompt_type || 'custom';\nif (briefingType === 'noon') {\n  briefingType = 'midday';\n}\n\n// DEFAULT PROMPT si non fourni\nconst defaultPrompt = \"Fournir une analyse financière concise des marchés et actions suivantes.\";\nconst selectedPrompt = data.selected_prompt || defaultPrompt;\n\n// ═══════════════════════════════════════════════════════════\n// 🎯 ENHANCED PROMPT WITH STRUCTURE INSTRUCTIONS\n// ═══════════════════════════════════════════════════════════\n\nconst structuredInstructions = `\n\nSTRUCTURE REQUISE POUR LE BRIEFING:\n\nCommence toujours par une analyse détaillée et exhaustive des marchés et tickers demandés. Sois COMPLET et DÉTAILLÉ - ce briefing doit être riche en informations.\n\nDans ton analyse, inclus naturellement:\n\n1. **Points clés marquants** - Mentionne 3-4 faits saillants avec données chiffrées (indices, %, variations) en haut de ton analyse sous forme de bullets courts. Ces points seront extraits pour le TL;DR.\n\n2. **Analyse approfondie** - Fournis une analyse complète et détaillée des mouvements du marché, tendances sectorielles, actualités importantes. Ne te limite PAS - écris au moins 500-800 mots. Structure avec des sections claires (## Titres de sections).\n\n3. **Perspective contrarian** - Vers la fin, inclus une section \"Point de vigilance\" ou \"Perspective Emma\" où tu challenges le consensus du marché ou identifies un risque sous-estimé. Pose une question provocatrice si pertinent. Cette section sera extraite pour Emma's Take.\n\n4. **Indicateurs techniques** - Mentionne des niveaux de support/résistance, RSI, moyennes mobiles pour les tickers principaux si applicable.\n\nRÈGLES D'ÉCRITURE:\n- Ton professionnel mais accessible\n- Utilise des données chiffrées précises\n- Cite les sources quand pertinent\n- Structure claire avec titres de sections\n- N'hésite pas à être long et exhaustif (800-1200 mots est idéal)\n- Inclus des emojis contextuels pour la lisibilité\n\nEXEMPLE DE STRUCTURE:\n\n# [Titre accrocheur basé sur l'actualité du jour]\n\n**Points Clés:**\n• S&P 500 +0.8% porté par le secteur tech\n• Fed minutes confirment pivot dovish - taux terminal 5.25%\n• Apple bat les attentes Q4: $1.64 EPS vs $1.60 attendu\n\n## Marchés en Bref\n\n[Analyse détaillée de la session, mouvements principaux...]\n\n## Secteur Technologique\n\n[Analyse approfondie du secteur avec données...]\n\n## Perspectives Macro\n\n[Contexte économique, Fed, inflation...]\n\n## Point de Vigilance - Emma's Take\n\nAlors que l'optimisme règne sur les marchés tech, les niveaux de dette corporate atteignent des sommets historiques. Avec la remontée des taux, combien de temps avant que cette fragilité ne se manifeste dans les bilans?\n\n## Mouvements à Surveiller\n\n- **AAPL**: Test de résistance à $200 (RSI: 68, proche surachat)\n- **MSFT**: Support solide à $380, opportunité d'accumulation\n- **TSLA**: Prudence, RSI à 78 (surachat), prise de profits recommandée\n\n`;\n\n// Construire le message complet\nconst fullPrompt = `${selectedPrompt}\n\n${structuredInstructions}\n\nFocus sur ces tickers: ${tickerList || 'AAPL, MSFT, GOOGL, NVDA'}\n\nType de briefing: ${briefingType}\n`;\n\nconsole.log('📋 Prepare API Request:');\nconsole.log('   selected_prompt:', selectedPrompt.substring(0, 100));\nconsole.log('   tickers:', tickerList);\nconsole.log('   message length:', fullPrompt.length);\nconsole.log('   ✅ Enhanced instructions for structured output');\n\nreturn [{\n  json: {\n    ...data,\n    tickers: tickerList,\n    briefing_type: briefingType,\n    message: fullPrompt,\n    channel: 'web',\n    userId: 'n8n-automation',\n    ai_model: data.ai_model || 'emma'\n  }\n}];"
       },
       "id": "c5d69e3d-82d3-4459-8c12-02af81d03cdd",
       "name": "Prepare API Request",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        22448,
-        5912
+        4448,
+        1080
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // ============================================\n  // PR\u00c9SERVER preview_mode et approved depuis les nodes de configuration\n  // ============================================\n  // Chercher dans les nodes pr\u00e9c\u00e9dents (Schedule Config, Webhook Config, Manual Config, Chat Config)\n  let previewMode = data.preview_mode;\n  let approved = data.approved;\n  \n  // Si les valeurs ne sont pas dans data, chercher dans les nodes pr\u00e9c\u00e9dents\n  if (previewMode === undefined || approved === undefined) {\n    try {\n      // Essayer de r\u00e9cup\u00e9rer depuis les nodes de configuration\n      const configNodes = ['Schedule Config', 'Webhook Config', 'Manual Config', 'Chat Config', 'Workflow Configuration'];\n      for (const nodeName of configNodes) {\n        try {\n          const nodeData = $(nodeName).item?.json;\n          if (nodeData) {\n            if (previewMode === undefined && nodeData.preview_mode !== undefined) {\n              previewMode = nodeData.preview_mode;\n            }\n            if (approved === undefined && nodeData.approved !== undefined) {\n              approved = nodeData.approved;\n            }\n            if (previewMode !== undefined && approved !== undefined) break;\n          }\n        } catch (e) {\n          // Node n'existe pas ou n'est pas accessible, continuer\n        }\n      }\n    } catch (e) {\n      console.log('\u26a0\ufe0f  Impossible de r\u00e9cup\u00e9rer depuis les nodes pr\u00e9c\u00e9dents:', e.message);\n    }\n  }\n  \n  // Fallback si toujours undefined\n  if (previewMode === undefined) previewMode = true; // Par d\u00e9faut, preview\n  if (approved === undefined) approved = false; // Par d\u00e9faut, non approuv\u00e9\n  \n  // Convertir en boolean si c'est une string\n  if (previewMode === 'true' || previewMode === true) previewMode = true;\n  else if (previewMode === 'false' || previewMode === false) previewMode = false;\n  \n  if (approved === 'true' || approved === true) approved = true;\n  else if (approved === 'false' || approved === false) approved = false;\n  \n  // Extraire les m\u00e9tadonn\u00e9es de la r\u00e9ponse API\n  const newsletterContent = data.newsletter_content || data.response || data.message || data.analysis || data.content || \"\";\n\n  console.log(\"\ud83d\udccb Parse API Response - Content extraction:\");\n  console.log(\"   All data keys:\", Object.keys(data));\n  console.log(\"   newsletter_content:\", data.newsletter_content ? \"EXISTS (\" + data.newsletter_content.length + \" chars)\" : \"MISSING\");\n  console.log(\"   response:\", data.response ? \"EXISTS (\" + data.response.length + \" chars)\" : \"MISSING\");\n  console.log(\"   Final newsletterContent length:\", newsletterContent.length);\n\n  const triggerType = data.trigger_type || 'Manuel';\n  const emmaModel = data.emma_model || data.model || 'perplexity';\n  const emmaTools = Array.isArray(data.emma_tools) ? data.emma_tools : (data.tools_used || []);\n  const emmaExecutionTime = data.emma_execution_time || data.execution_time_ms || 0;\n  const promptType = data.prompt_type || 'custom';\n  const generatedAt = data.generated_at || new Date().toISOString();\n  \n  // Logging pour d\u00e9bogage\n  console.log('\ud83d\udcca Parse API Response - Valeurs finales:');\n  console.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\n  console.log('   approved:', approved, '(type:', typeof approved, ')');\n  console.log('   trigger_type:', triggerType);\n  console.log('   prompt_type:', promptType);\n  \n  return {\n    json: {\n      ...data,\n      // PR\u00c9SERVER les valeurs preview_mode et approved\n      preview_mode: previewMode,\n      approved: approved,\n      // M\u00e9tadonn\u00e9es extraites\n      newsletter_content: newsletterContent,\n      trigger_type: triggerType,\n      emma_model: emmaModel,\n      emma_tools: emmaTools,\n      emma_execution_time: emmaExecutionTime,\n      prompt_type: promptType,\n      generated_at: generatedAt,\n      content_length: newsletterContent.length,\n      // Debug\n      _debug_preview_mode: previewMode,\n      _debug_approved: approved,\n      _debug_preview_mode_type: typeof previewMode,\n      _debug_approved_type: typeof approved\n    }\n  };\n});"
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // ============================================\n  // PRÉSERVER preview_mode et approved depuis les nodes de configuration\n  // ============================================\n  // Chercher dans les nodes précédents (Schedule Config, Webhook Config, Manual Config, Chat Config)\n  let previewMode = data.preview_mode;\n  let approved = data.approved;\n  \n  // Si les valeurs ne sont pas dans data, chercher dans les nodes précédents\n  if (previewMode === undefined || approved === undefined) {\n    try {\n      // Essayer de récupérer depuis les nodes de configuration\n      const configNodes = ['Schedule Config', 'Webhook Config', 'Manual Config', 'Chat Config', 'Workflow Configuration'];\n      for (const nodeName of configNodes) {\n        try {\n          const nodeData = $(nodeName).item?.json;\n          if (nodeData) {\n            if (previewMode === undefined && nodeData.preview_mode !== undefined) {\n              previewMode = nodeData.preview_mode;\n            }\n            if (approved === undefined && nodeData.approved !== undefined) {\n              approved = nodeData.approved;\n            }\n            if (previewMode !== undefined && approved !== undefined) break;\n          }\n        } catch (e) {\n          // Node n'existe pas ou n'est pas accessible, continuer\n        }\n      }\n    } catch (e) {\n      console.log('⚠️  Impossible de récupérer depuis les nodes précédents:', e.message);\n    }\n  }\n  \n  // Fallback si toujours undefined\n  if (previewMode === undefined) previewMode = true; // Par défaut, preview\n  if (approved === undefined) approved = false; // Par défaut, non approuvé\n  \n  // Convertir en boolean si c'est une string\n  if (previewMode === 'true' || previewMode === true) previewMode = true;\n  else if (previewMode === 'false' || previewMode === false) previewMode = false;\n  \n  if (approved === 'true' || approved === true) approved = true;\n  else if (approved === 'false' || approved === false) approved = false;\n  \n  // Extraire les métadonnées de la réponse API\n  const newsletterContent = data.newsletter_content || data.response || data.message || data.analysis || data.content || \"\";\n\n  console.log(\"📋 Parse API Response - Content extraction:\");\n  console.log(\"   All data keys:\", Object.keys(data));\n  console.log(\"   newsletter_content:\", data.newsletter_content ? \"EXISTS (\" + data.newsletter_content.length + \" chars)\" : \"MISSING\");\n  console.log(\"   response:\", data.response ? \"EXISTS (\" + data.response.length + \" chars)\" : \"MISSING\");\n  console.log(\"   Final newsletterContent length:\", newsletterContent.length);\n\n  const triggerType = data.trigger_type || 'Manuel';\n  const emmaModel = data.emma_model || data.model || 'perplexity';\n  const emmaTools = Array.isArray(data.emma_tools) ? data.emma_tools : (data.tools_used || []);\n  const emmaExecutionTime = data.emma_execution_time || data.execution_time_ms || 0;\n  const promptType = data.prompt_type || 'custom';\n  const generatedAt = data.generated_at || new Date().toISOString();\n  \n  // Logging pour débogage\n  console.log('📊 Parse API Response - Valeurs finales:');\n  console.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\n  console.log('   approved:', approved, '(type:', typeof approved, ')');\n  console.log('   trigger_type:', triggerType);\n  console.log('   prompt_type:', promptType);\n  \n  return {\n    json: {\n      ...data,\n      // PRÉSERVER les valeurs preview_mode et approved\n      preview_mode: previewMode,\n      approved: approved,\n      // Métadonnées extraites\n      newsletter_content: newsletterContent,\n      trigger_type: triggerType,\n      emma_model: emmaModel,\n      emma_tools: emmaTools,\n      emma_execution_time: emmaExecutionTime,\n      prompt_type: promptType,\n      generated_at: generatedAt,\n      content_length: newsletterContent.length,\n      // Debug\n      _debug_preview_mode: previewMode,\n      _debug_approved: approved,\n      _debug_preview_mode_type: typeof previewMode,\n      _debug_approved_type: typeof approved\n    }\n  };\n});"
       },
       "id": "40676021-3728-41a7-a961-9ec5a4f31b19",
       "name": "Parse API Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        22896,
-        6104
+        4896,
+        1272
       ]
     },
     {
       "parameters": {
-        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\udfa8 GENERATE BLOOMBERG-STYLE HTML NEWSLETTER - ENHANCED VERSION\n// Version: 2.0 - Visual Upgrade + Best Practices Integration\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\nconst data = items[0].json;\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udcca EXTRACT TITLE AND SUBTITLE\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nfunction extractTitleAndSubtitle(content) {\n  const lines = content.split('\\n');\n  let title = '';\n  let subtitle = '';\n  \n  // Extract title from first # or ##\n  for (const line of lines) {\n    if (line.trim().startsWith('# ') && !title) {\n      title = line.replace(/^#\\s+/, '').trim();\n      break;\n    } else if (line.trim().startsWith('## ') && !title) {\n      title = line.replace(/^##\\s+/, '').trim();\n      break;\n    }\n  }\n  \n  // Extract subtitle from first paragraph\n  for (const line of lines) {\n    if (line.trim() && !line.startsWith('#') && !line.startsWith('*') && !line.startsWith('-') && line.length > 30) {\n      subtitle = line.trim().substring(0, 150);\n      if (subtitle.length === 150) subtitle += '...';\n      break;\n    }\n  }\n  \n  // Fallback titles\n  if (!title) {\n    if (content.toLowerCase().includes('march\u00e9s') || content.toLowerCase().includes('march\u00e9')) {\n      title = 'Analyse des March\u00e9s Financiers';\n    } else if (content.toLowerCase().includes('action')) {\n      title = 'Revue des Actions et Titres';\n    } else if (content.toLowerCase().includes('\u00e9conomie')) {\n      title = 'Perspectives \u00c9conomiques';\n    } else {\n      title = 'Briefing Financier Emma IA';\n    }\n  }\n  \n  if (!subtitle) {\n    subtitle = 'Analyse d\u00e9taill\u00e9e et insights pour investisseurs avertis';\n  }\n  \n  return { title, subtitle };\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udc4b CONTEXTUAL GREETING\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nfunction getContextualGreeting(triggerType) {\n  const greetings = {\n    'morning': '\ud83c\udf05 Bonjour et bienvenue \u00e0 votre briefing matinal',\n    'midday': '\u2600\ufe0f Bon apr\u00e8s-midi, voici votre briefing du midi',\n    'noon': '\u2600\ufe0f Bon apr\u00e8s-midi, voici votre briefing du midi',\n    'evening': '\ud83c\udf06 Bonsoir, d\u00e9couvrez votre briefing du soir'\n  };\n  \n  const greeting = greetings[triggerType];\n  if (greeting) return greeting;\n  \n  // Fallback based on hour\n  const hour = new Date().getHours();\n  if (hour >= 5 && hour < 12) return '\ud83c\udf05 Bonjour et bienvenue \u00e0 votre briefing matinal';\n  if (hour >= 12 && hour < 18) return '\u2600\ufe0f Bon apr\u00e8s-midi, voici votre briefing du midi';\n  return '\ud83c\udf06 Bonsoir, d\u00e9couvrez votre briefing du soir';\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udcca EXTRACT KEY STATS FROM CONTENT\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nfunction extractKeyStats(content) {\n  const stats = [];\n  \n  // Look for common patterns: \"S&P 500: +0.5%\", \"AAPL $150 +2%\", etc.\n  const patterns = [\n    /S&P\\s*500[:\\s]+([+-]?\\d+\\.?\\d*%)/i,\n    /NASDAQ[:\\s]+([+-]?\\d+\\.?\\d*%)/i,\n    /DOW[:\\s]+([+-]?\\d+\\.?\\d*%)/i,\n    /VIX[:\\s]+([\\d.]+)/i\n  ];\n  \n  patterns.forEach((pattern, idx) => {\n    const match = content.match(pattern);\n    if (match) {\n      const labels = ['S&P 500', 'NASDAQ', 'DOW', 'VIX'];\n      stats.push({ label: labels[idx], value: match[1] });\n    }\n  });\n  \n  return stats;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\udfaf EXTRACT TL;DR BULLET POINTS\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nfunction extractTLDR(content) {\n  const lines = content.split('\\n');\n  const bullets = [];\n  \n  // Look for first 3 important bullet points or sentences\n  for (const line of lines) {\n    const trimmed = line.trim();\n    if ((trimmed.startsWith('\u2022') || trimmed.startsWith('-') || trimmed.startsWith('*')) && trimmed.length > 20) {\n      bullets.push(trimmed.replace(/^[\u2022\\-\\*]\\s*/, ''));\n      if (bullets.length >= 3) break;\n    }\n  }\n  \n  // If not enough bullets, extract first 3 meaningful sentences\n  if (bullets.length < 3) {\n    const sentences = content.match(/[^.!?]+[.!?]+/g) || [];\n    sentences.forEach(sentence => {\n      if (bullets.length < 3 && sentence.length > 30 && sentence.length < 200) {\n        bullets.push(sentence.trim());\n      }\n    });\n  }\n  \n  return bullets.slice(0, 3);\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83e\udd16 GENERATE EMMA'S TAKE (PLACEHOLDER - TO BE ENHANCED BY AI)\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nfunction generateEmmasTake(content) {\n  // This should ideally come from the AI prompt, but we can extract or provide default\n  // Look for sections with \"Emma\" or contrarian views\n  const lines = content.split('\\n');\n  for (const line of lines) {\n    if (line.toLowerCase().includes('emma') || line.toLowerCase().includes('attention') || line.toLowerCase().includes('toutefois')) {\n      return line.trim();\n    }\n  }\n  \n  return \"Les march\u00e9s refl\u00e8tent un optimisme qui pourrait sous-estimer certains risques structurels. Surveillance accrue recommand\u00e9e sur les corr\u00e9lations cross-asset.\";\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udca1 GENERATE ACTION ITEMS (PLACEHOLDER - TO BE ENHANCED BY AI)\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nfunction generateActionItems(content) {\n  // Extract tickers mentioned in content\n  const tickerPattern = /\\b[A-Z]{2,5}\\b/g;\n  const tickers = [...new Set(content.match(tickerPattern) || [])].slice(0, 3);\n  \n  const actions = [];\n  \n  if (tickers.length > 0) {\n    actions.push({\n      type: 'SURVEILLER',\n      ticker: tickers[0],\n      action: `Suivre les niveaux de support/r\u00e9sistance`,\n      rationale: 'Momentum technique favorable'\n    });\n  }\n  \n  if (tickers.length > 1) {\n    actions.push({\n      type: 'OPPORTUNIT\u00c9',\n      ticker: tickers[1],\n      action: 'Zone d\\'accumulation potentielle',\n      rationale: 'Valorisation attractive vs. historique'\n    });\n  }\n  \n  actions.push({\n    type: 'PRUDENCE',\n    ticker: 'MARCH\u00c9',\n    action: 'Gestion du risque active',\n    rationale: 'Volatilit\u00e9 attendue court terme'\n  });\n  \n  return actions;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\udfa8 GENERATE ENHANCED HTML\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nfunction generateEnhancedBloombergHTML(newsletterContent, metadata) {\n  const { title, subtitle } = extractTitleAndSubtitle(newsletterContent);\n  const greeting = getContextualGreeting(metadata.trigger_type || 'morning');\n  const keyStats = extractKeyStats(newsletterContent);\n  const tldrPoints = extractTLDR(newsletterContent);\n  const emmasTake = generateEmmasTake(newsletterContent);\n  const actionItems = generateActionItems(newsletterContent);\n  \n  const formattedDate = new Date().toLocaleDateString('fr-FR', { \n    weekday: 'long', \n    year: 'numeric', \n    month: 'long', \n    day: 'numeric' \n  });\n  \n  const currentTime = new Date().toLocaleTimeString('en-US', { \n    hour: '2-digit', \n    minute: '2-digit',\n    timeZone: 'America/New_York',\n    hour12: false\n  });\n\n  // Enhanced content with better formatting\n  let enhancedContent = newsletterContent\n    .replace(/#{1,6}\\s+(.*)/g, '<h2 style=\"color: #2c3e50; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 12px; border-bottom: 3px solid #e8eef5; font-size: 24px;\">$1</h2>')\n    .replace(/\\*\\*\\*(.+?)\\*\\*\\*/g, '<strong style=\"color: #1e3a5f; font-weight: 700;\">$1</strong>')\n    .replace(/\\*\\*(.+?)\\*\\*/g, '<strong style=\"color: #2c5f8d; font-weight: 600;\">$1</strong>')\n    .replace(/\\*(.+?)\\*/g, '<em style=\"color: #4a5568;\">$1</em>')\n    .replace(/\\n\\n/g, '</p><p style=\"margin: 16px 0; line-height: 1.8; color: #2c3e50;\">')\n    .replace(/\\n/g, '<br>');\n  \n  enhancedContent = '<p style=\"margin: 16px 0; line-height: 1.8; color: #2c3e50;\">' + enhancedContent + '</p>';\n\n  return `\n<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>${title} - Emma IA Finance</title>\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body { \n      font-family: Georgia, 'Times New Roman', serif; \n      background-color: #f8f9fa; \n      padding: 20px;\n      line-height: 1.8;\n    }\n    .email-container { \n      max-width: 680px; \n      margin: 0 auto; \n      background: #ffffff; \n      box-shadow: 0 4px 20px rgba(0,0,0,0.08);\n      border-radius: 8px;\n      overflow: hidden;\n    }\n    \n    /* Masthead */\n    .masthead {\n      background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%);\n      padding: 20px 32px;\n      display: flex;\n      align-items: center;\n      justify-content: space-between;\n      border-bottom: 4px solid #34495e;\n    }\n    .masthead-left {\n      display: flex;\n      align-items: center;\n      gap: 12px;\n    }\n    .masthead-avatar {\n      width: 42px;\n      height: 42px;\n      border-radius: 50%;\n      border: 2px solid #ffffff;\n    }\n    .masthead-title {\n      color: #ffffff;\n      font-size: 18px;\n      font-weight: 700;\n      letter-spacing: 0.5px;\n    }\n    .masthead-time {\n      background: rgba(255,255,255,0.15);\n      padding: 6px 14px;\n      border-radius: 20px;\n      color: #ffffff;\n      font-size: 13px;\n      font-weight: 600;\n      backdrop-filter: blur(10px);\n    }\n    \n    /* Hero Section */\n    .hero {\n      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);\n      padding: 48px 32px;\n      text-align: center;\n      color: #ffffff;\n    }\n    .hero-greeting {\n      font-size: 16px;\n      font-weight: 400;\n      margin-bottom: 16px;\n      opacity: 0.9;\n      font-style: italic;\n    }\n    .hero-title {\n      font-size: 36px;\n      font-weight: 800;\n      margin-bottom: 16px;\n      line-height: 1.3;\n      color: #ffffff;\n      text-shadow: 0 2px 4px rgba(0,0,0,0.2);\n    }\n    .hero-subtitle {\n      font-size: 18px;\n      font-weight: 400;\n      line-height: 1.6;\n      opacity: 0.85;\n      margin-bottom: 20px;\n    }\n    .hero-byline {\n      font-size: 14px;\n      font-weight: 400;\n      opacity: 0.75;\n      border-top: 1px solid rgba(255,255,255,0.2);\n      padding-top: 16px;\n      margin-top: 16px;\n    }\n    \n    /* Key Stats Box */\n    .key-stats-box {\n      background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%);\n      margin: -20px 32px 32px 32px;\n      padding: 24px;\n      border-radius: 8px;\n      box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);\n      position: relative;\n      z-index: 10;\n    }\n    .key-stats-title {\n      color: #ffffff;\n      font-size: 14px;\n      font-weight: 700;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n      margin-bottom: 16px;\n      opacity: 0.9;\n    }\n    .stats-grid {\n      display: grid;\n      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));\n      gap: 16px;\n    }\n    .stat-item {\n      background: rgba(255,255,255,0.1);\n      padding: 12px 16px;\n      border-radius: 6px;\n      border-left: 3px solid #ffffff;\n    }\n    .stat-label {\n      color: rgba(255,255,255,0.8);\n      font-size: 12px;\n      font-weight: 600;\n      margin-bottom: 4px;\n    }\n    .stat-value {\n      color: #ffffff;\n      font-size: 20px;\n      font-weight: 700;\n    }\n    \n    /* TL;DR Box */\n    .tldr-box {\n      background: linear-gradient(135deg, #f8f9fa 0%, #e8eef5 100%);\n      border-left: 6px solid #2c5f8d;\n      margin: 32px;\n      padding: 24px 28px;\n      border-radius: 0 8px 8px 0;\n      box-shadow: 0 2px 8px rgba(0,0,0,0.06);\n    }\n    .tldr-title {\n      color: #1e3a5f;\n      font-size: 16px;\n      font-weight: 800;\n      text-transform: uppercase;\n      letter-spacing: 1.5px;\n      margin-bottom: 16px;\n      display: flex;\n      align-items: center;\n      gap: 8px;\n    }\n    .tldr-subtitle {\n      color: #4a5568;\n      font-size: 13px;\n      font-weight: 400;\n      margin-bottom: 16px;\n      font-style: italic;\n    }\n    .tldr-list {\n      list-style: none;\n      padding: 0;\n    }\n    .tldr-item {\n      padding: 12px 0;\n      border-bottom: 1px solid rgba(44, 95, 141, 0.15);\n      color: #2c3e50;\n      font-size: 15px;\n      line-height: 1.6;\n      display: flex;\n      gap: 12px;\n    }\n    .tldr-item:last-child {\n      border-bottom: none;\n    }\n    .tldr-bullet {\n      color: #2c5f8d;\n      font-weight: 700;\n      font-size: 18px;\n      flex-shrink: 0;\n    }\n    \n    /* Main Content */\n    .content {\n      padding: 32px;\n      color: #2c3e50;\n      font-size: 17px;\n      line-height: 1.8;\n    }\n    \n    /* Emma's Take Callout */\n    .emmas-take-box {\n      background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);\n      margin: 32px;\n      padding: 28px;\n      border-radius: 8px;\n      border: 3px solid #1e3a5f;\n      box-shadow: 0 4px 16px rgba(30, 58, 95, 0.25);\n      position: relative;\n    }\n    .emmas-take-badge {\n      background: #2c5f8d;\n      color: #ffffff;\n      padding: 6px 14px;\n      border-radius: 20px;\n      font-size: 12px;\n      font-weight: 700;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n      display: inline-block;\n      margin-bottom: 16px;\n    }\n    .emmas-take-content {\n      color: #ffffff;\n      font-size: 18px;\n      line-height: 1.7;\n      font-style: italic;\n      position: relative;\n      padding-left: 24px;\n      border-left: 4px solid rgba(255,255,255,0.3);\n    }\n    .emmas-take-quote {\n      position: absolute;\n      left: -8px;\n      top: -8px;\n      font-size: 48px;\n      color: rgba(255,255,255,0.2);\n      font-family: Georgia, serif;\n    }\n    \n    /* Action Items Table */\n    .action-items-section {\n      margin: 32px;\n    }\n    .action-items-title {\n      color: #1e3a5f;\n      font-size: 20px;\n      font-weight: 800;\n      margin-bottom: 20px;\n      padding-bottom: 12px;\n      border-bottom: 3px solid #e8eef5;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n    }\n    .action-items-table {\n      width: 100%;\n      border-collapse: separate;\n      border-spacing: 0 12px;\n    }\n    .action-item-row {\n      background: #f8f9fa;\n      border-radius: 6px;\n      overflow: hidden;\n    }\n    .action-item-type {\n      padding: 16px;\n      font-weight: 700;\n      font-size: 12px;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n      width: 140px;\n    }\n    .action-item-type.watch { background: #3498db; color: #ffffff; }\n    .action-item-type.opportunity { background: #27ae60; color: #ffffff; }\n    .action-item-type.caution { background: #e67e22; color: #ffffff; }\n    .action-item-details {\n      padding: 16px;\n    }\n    .action-item-ticker {\n      font-weight: 700;\n      color: #1e3a5f;\n      font-size: 16px;\n      margin-bottom: 4px;\n    }\n    .action-item-action {\n      color: #2c3e50;\n      font-size: 15px;\n      margin-bottom: 4px;\n    }\n    .action-item-rationale {\n      color: #5a6c7d;\n      font-size: 13px;\n      font-style: italic;\n    }\n    \n    /* Footer */\n    .footer {\n      background: #f8f9fa;\n      padding: 32px;\n      border-top: 3px solid #e8eef5;\n      text-align: center;\n    }\n    .footer-branding {\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      gap: 20px;\n      margin-bottom: 20px;\n    }\n    .footer-avatar {\n      width: 60px;\n      height: 60px;\n      border-radius: 50%;\n      border: 3px solid #2c5f8d;\n    }\n    .footer-logo {\n      height: 50px;\n      width: auto;\n    }\n    .footer-text {\n      color: #5a6c7d;\n      font-size: 14px;\n      margin-bottom: 16px;\n      line-height: 1.6;\n    }\n    .footer-details {\n      background: #ffffff;\n      border: 2px solid #e8eef5;\n      border-radius: 8px;\n      padding: 20px;\n      margin-top: 20px;\n      text-align: left;\n    }\n    .footer-details-title {\n      color: #2c3e50;\n      font-size: 13px;\n      font-weight: 700;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n      margin-bottom: 12px;\n    }\n    .footer-detail-item {\n      color: #5a6c7d;\n      font-size: 12px;\n      margin: 6px 0;\n      display: flex;\n      justify-content: space-between;\n      padding: 4px 0;\n      border-bottom: 1px solid #f0f0f0;\n    }\n    .footer-detail-label {\n      font-weight: 600;\n      color: #4a5568;\n    }\n    \n    /* Responsive */\n    @media only screen and (max-width: 600px) {\n      .email-container { border-radius: 0; }\n      .masthead, .hero, .content, .key-stats-box, .tldr-box, .emmas-take-box, .action-items-section, .footer {\n        padding: 20px;\n      }\n      .hero-title { font-size: 28px; }\n      .stats-grid { grid-template-columns: 1fr; }\n      .footer-branding { flex-direction: column; }\n    }\n  </style>\n</head>\n<body>\n  <div class=\"email-container\">\n    \n    <!-- Masthead -->\n    <div class=\"masthead\">\n      <div class=\"masthead-left\">\n        <img src=\"https://i.ibb.co/VYgymNZ/emma-avatar.png\" alt=\"Emma\" class=\"masthead-avatar\">\n        <div class=\"masthead-title\">EMMA IA FINANCE</div>\n      </div>\n      <div class=\"masthead-time\">${currentTime} EST</div>\n    </div>\n    \n    <!-- Hero Section -->\n    <div class=\"hero\">\n      <div class=\"hero-greeting\">${greeting}</div>\n      <h1 class=\"hero-title\">${title}</h1>\n      <div class=\"hero-subtitle\">${subtitle}</div>\n      <div class=\"hero-byline\">\n        Par <strong>Emma IA</strong> \u2022 ${formattedDate}\n      </div>\n    </div>\n    \n    ${keyStats.length > 0 ? `\n    <!-- Key Stats Box -->\n    <div class=\"key-stats-box\">\n      <div class=\"key-stats-title\">\ud83d\udcca Indicateurs Cl\u00e9s</div>\n      <div class=\"stats-grid\">\n        ${keyStats.map(stat => `\n          <div class=\"stat-item\">\n            <div class=\"stat-label\">${stat.label}</div>\n            <div class=\"stat-value\">${stat.value}</div>\n          </div>\n        `).join('')}\n      </div>\n    </div>\n    ` : ''}\n    \n    ${tldrPoints.length > 0 ? `\n    <!-- TL;DR Box -->\n    <div class=\"tldr-box\">\n      <div class=\"tldr-title\">\n        \ud83c\udfaf L'ESSENTIEL\n      </div>\n      <div class=\"tldr-subtitle\">Les 3 points cl\u00e9s \u00e0 retenir - Lecture 30 secondes</div>\n      <ul class=\"tldr-list\">\n        ${tldrPoints.map(point => `\n          <li class=\"tldr-item\">\n            <span class=\"tldr-bullet\">\u2022</span>\n            <span>${point}</span>\n          </li>\n        `).join('')}\n      </ul>\n    </div>\n    ` : ''}\n    \n    <!-- Main Content -->\n    <div class=\"content\">\n      ${enhancedContent}\n    </div>\n    \n    <!-- Emma's Take -->\n    <div class=\"emmas-take-box\">\n      <span class=\"emmas-take-badge\">\ud83e\udd16 Emma's Take</span>\n      <div class=\"emmas-take-content\">\n        <span class=\"emmas-take-quote\">\"</span>\n        ${emmasTake}\n      </div>\n    </div>\n    \n    <!-- Action Items -->\n    <div class=\"action-items-section\">\n      <div class=\"action-items-title\">\ud83d\udca1 Action Items</div>\n      <table class=\"action-items-table\">\n        ${actionItems.map(item => `\n          <tr class=\"action-item-row\">\n            <td class=\"action-item-type ${item.type.toLowerCase()}\">${item.type}</td>\n            <td class=\"action-item-details\">\n              <div class=\"action-item-ticker\">${item.ticker}</div>\n              <div class=\"action-item-action\">${item.action}</div>\n              <div class=\"action-item-rationale\">${item.rationale}</div>\n            </td>\n          </tr>\n        `).join('')}\n      </table>\n    </div>\n    \n    <!-- Footer -->\n    <div class=\"footer\">\n      <div class=\"footer-branding\">\n        <img src=\"https://i.ibb.co/VYgymNZ/emma-avatar.png\" alt=\"Emma\" class=\"footer-avatar\">\n        <img src=\"https://i.ibb.co/MRLqJyk/jslai-logo.png\" alt=\"JSLAI\" class=\"footer-logo\">\n      </div>\n      <p class=\"footer-text\">\n        <strong>G\u00e9n\u00e9r\u00e9 par Emma IA</strong> - Intelligence artificielle financi\u00e8re propuls\u00e9e par <strong>JSLAI\u2122</strong>\n      </p>\n      <div class=\"footer-details\">\n        <div class=\"footer-details-title\">\ud83d\udccb D\u00e9tails Techniques</div>\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Mod\u00e8le IA:</span>\n          <span>${metadata.emma_model || 'gemini-2.0-flash'}</span>\n        </div>\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Outils utilis\u00e9s:</span>\n          <span>${(metadata.emma_tools || []).join(', ') || 'Analyse multi-sources'}</span>\n        </div>\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Temps d'ex\u00e9cution:</span>\n          <span>${metadata.emma_execution_time || 'N/A'}s</span>\n        </div>\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Type de briefing:</span>\n          <span>${metadata.prompt_type || metadata.trigger_type || 'custom'}</span>\n        </div>\n        ${metadata.tickers ? `\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Tickers analys\u00e9s:</span>\n          <span>${metadata.tickers}</span>\n        </div>\n        ` : ''}\n      </div>\n    </div>\n    \n  </div>\n</body>\n</html>\n`;\n}\n\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\ude80 MAIN EXECUTION\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n// Get newsletter content\nlet content = data.newsletter_content || data.chatOutput || data.content || data.text || data.output || '';\n\nif (!content) {\n  console.log('\u274c No content found in input data');\n  console.log('Available keys:', Object.keys(data));\n  content = 'Contenu indisponible. Veuillez r\u00e9essayer.';\n}\n\n// Prepare metadata\nconst metadata = {\n  trigger_type: data.trigger_type || data.prompt_type || 'morning',\n  emma_model: data.emma_model || 'gemini-2.0-flash',\n  emma_tools: data.emma_tools || [],\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  tickers: data.tickers || ''\n};\n\n// Generate HTML\nconst html = generateEnhancedBloombergHTML(content, metadata);\n\n// Prepare output\nconst output = {\n  html: html,\n  subject: `${extractTitleAndSubtitle(content).title} - Emma IA`,\n  from: 'emma@gobapps.com',\n  recipients: data.recipients || ['projetsjsl@gmail.com'],\n  ...data\n};\n\nconsole.log('\u2705 Enhanced Bloomberg HTML generated');\nconsole.log('   Title:', extractTitleAndSubtitle(content).title);\nconsole.log('   TL;DR points:', extractTLDR(content).length);\nconsole.log('   Key stats:', extractKeyStats(content).length);\nconsole.log('   HTML length:', html.length, 'chars');\n\nreturn [{ json: output }];\n"
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// 🎨 GENERATE BLOOMBERG-STYLE HTML NEWSLETTER - ENHANCED VERSION\n// Version: 2.0 - Visual Upgrade + Best Practices Integration\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\nconst data = items[0].json;\n\n// ═══════════════════════════════════════════════════════════\n// 📊 EXTRACT TITLE AND SUBTITLE\n// ═══════════════════════════════════════════════════════════\nfunction extractTitleAndSubtitle(content) {\n  const lines = content.split('\\n');\n  let title = '';\n  let subtitle = '';\n  \n  // Extract title from first # or ##\n  for (const line of lines) {\n    if (line.trim().startsWith('# ') && !title) {\n      title = line.replace(/^#\\s+/, '').trim();\n      break;\n    } else if (line.trim().startsWith('## ') && !title) {\n      title = line.replace(/^##\\s+/, '').trim();\n      break;\n    }\n  }\n  \n  // Extract subtitle from first paragraph\n  for (const line of lines) {\n    if (line.trim() && !line.startsWith('#') && !line.startsWith('*') && !line.startsWith('-') && line.length > 30) {\n      subtitle = line.trim().substring(0, 150);\n      if (subtitle.length === 150) subtitle += '...';\n      break;\n    }\n  }\n  \n  // Fallback titles\n  if (!title) {\n    if (content.toLowerCase().includes('marchés') || content.toLowerCase().includes('marché')) {\n      title = 'Analyse des Marchés Financiers';\n    } else if (content.toLowerCase().includes('action')) {\n      title = 'Revue des Actions et Titres';\n    } else if (content.toLowerCase().includes('économie')) {\n      title = 'Perspectives Économiques';\n    } else {\n      title = 'Briefing Financier Emma IA';\n    }\n  }\n  \n  if (!subtitle) {\n    subtitle = 'Analyse détaillée et insights pour investisseurs avertis';\n  }\n  \n  return { title, subtitle };\n}\n\n// ═══════════════════════════════════════════════════════════\n// 👋 CONTEXTUAL GREETING\n// ═══════════════════════════════════════════════════════════\nfunction getContextualGreeting(triggerType) {\n  const greetings = {\n    'morning': '🌅 Bonjour et bienvenue à votre briefing matinal',\n    'midday': '☀️ Bon après-midi, voici votre briefing du midi',\n    'noon': '☀️ Bon après-midi, voici votre briefing du midi',\n    'evening': '🌆 Bonsoir, découvrez votre briefing du soir'\n  };\n  \n  const greeting = greetings[triggerType];\n  if (greeting) return greeting;\n  \n  // Fallback based on hour\n  const hour = new Date().getHours();\n  if (hour >= 5 && hour < 12) return '🌅 Bonjour et bienvenue à votre briefing matinal';\n  if (hour >= 12 && hour < 18) return '☀️ Bon après-midi, voici votre briefing du midi';\n  return '🌆 Bonsoir, découvrez votre briefing du soir';\n}\n\n// ═══════════════════════════════════════════════════════════\n// 📊 EXTRACT KEY STATS FROM CONTENT\n// ═══════════════════════════════════════════════════════════\nfunction extractKeyStats(content) {\n  const stats = [];\n  \n  // Look for common patterns: \"S&P 500: +0.5%\", \"AAPL $150 +2%\", etc.\n  const patterns = [\n    /S&P\\s*500[:\\s]+([+-]?\\d+\\.?\\d*%)/i,\n    /NASDAQ[:\\s]+([+-]?\\d+\\.?\\d*%)/i,\n    /DOW[:\\s]+([+-]?\\d+\\.?\\d*%)/i,\n    /VIX[:\\s]+([\\d.]+)/i\n  ];\n  \n  patterns.forEach((pattern, idx) => {\n    const match = content.match(pattern);\n    if (match) {\n      const labels = ['S&P 500', 'NASDAQ', 'DOW', 'VIX'];\n      stats.push({ label: labels[idx], value: match[1] });\n    }\n  });\n  \n  return stats;\n}\n\n// ═══════════════════════════════════════════════════════════\n// 🎯 EXTRACT TL;DR BULLET POINTS\n// ═══════════════════════════════════════════════════════════\nfunction extractTLDR(content) {\n  const lines = content.split('\\n');\n  const bullets = [];\n  \n  // Look for first 3 important bullet points or sentences\n  for (const line of lines) {\n    const trimmed = line.trim();\n    if ((trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('*')) && trimmed.length > 20) {\n      bullets.push(trimmed.replace(/^[•\\-\\*]\\s*/, ''));\n      if (bullets.length >= 3) break;\n    }\n  }\n  \n  // If not enough bullets, extract first 3 meaningful sentences\n  if (bullets.length < 3) {\n    const sentences = content.match(/[^.!?]+[.!?]+/g) || [];\n    sentences.forEach(sentence => {\n      if (bullets.length < 3 && sentence.length > 30 && sentence.length < 200) {\n        bullets.push(sentence.trim());\n      }\n    });\n  }\n  \n  return bullets.slice(0, 3);\n}\n\n// ═══════════════════════════════════════════════════════════\n// 🤖 GENERATE EMMA'S TAKE (PLACEHOLDER - TO BE ENHANCED BY AI)\n// ═══════════════════════════════════════════════════════════\nfunction generateEmmasTake(content) {\n  // This should ideally come from the AI prompt, but we can extract or provide default\n  // Look for sections with \"Emma\" or contrarian views\n  const lines = content.split('\\n');\n  for (const line of lines) {\n    if (line.toLowerCase().includes('emma') || line.toLowerCase().includes('attention') || line.toLowerCase().includes('toutefois')) {\n      return line.trim();\n    }\n  }\n  \n  return \"Les marchés reflètent un optimisme qui pourrait sous-estimer certains risques structurels. Surveillance accrue recommandée sur les corrélations cross-asset.\";\n}\n\n// ═══════════════════════════════════════════════════════════\n// 💡 GENERATE ACTION ITEMS (PLACEHOLDER - TO BE ENHANCED BY AI)\n// ═══════════════════════════════════════════════════════════\nfunction generateActionItems(content) {\n  // Extract tickers mentioned in content\n  const tickerPattern = /\\b[A-Z]{2,5}\\b/g;\n  const tickers = [...new Set(content.match(tickerPattern) || [])].slice(0, 3);\n  \n  const actions = [];\n  \n  if (tickers.length > 0) {\n    actions.push({\n      type: 'SURVEILLER',\n      ticker: tickers[0],\n      action: `Suivre les niveaux de support/résistance`,\n      rationale: 'Momentum technique favorable'\n    });\n  }\n  \n  if (tickers.length > 1) {\n    actions.push({\n      type: 'OPPORTUNITÉ',\n      ticker: tickers[1],\n      action: 'Zone d\\'accumulation potentielle',\n      rationale: 'Valorisation attractive vs. historique'\n    });\n  }\n  \n  actions.push({\n    type: 'PRUDENCE',\n    ticker: 'MARCHÉ',\n    action: 'Gestion du risque active',\n    rationale: 'Volatilité attendue court terme'\n  });\n  \n  return actions;\n}\n\n// ═══════════════════════════════════════════════════════════\n// 🎨 GENERATE ENHANCED HTML\n// ═══════════════════════════════════════════════════════════\nfunction generateEnhancedBloombergHTML(newsletterContent, metadata) {\n  const { title, subtitle } = extractTitleAndSubtitle(newsletterContent);\n  const greeting = getContextualGreeting(metadata.trigger_type || 'morning');\n  const keyStats = extractKeyStats(newsletterContent);\n  const tldrPoints = extractTLDR(newsletterContent);\n  const emmasTake = generateEmmasTake(newsletterContent);\n  const actionItems = generateActionItems(newsletterContent);\n  \n  const formattedDate = new Date().toLocaleDateString('fr-FR', { \n    weekday: 'long', \n    year: 'numeric', \n    month: 'long', \n    day: 'numeric' \n  });\n  \n  const currentTime = new Date().toLocaleTimeString('en-US', { \n    hour: '2-digit', \n    minute: '2-digit',\n    timeZone: 'America/New_York',\n    hour12: false\n  });\n\n  // Enhanced content with better formatting\n  let enhancedContent = newsletterContent\n    .replace(/#{1,6}\\s+(.*)/g, '<h2 style=\"color: #2c3e50; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 12px; border-bottom: 3px solid #e8eef5; font-size: 24px;\">$1</h2>')\n    .replace(/\\*\\*\\*(.+?)\\*\\*\\*/g, '<strong style=\"color: #1e3a5f; font-weight: 700;\">$1</strong>')\n    .replace(/\\*\\*(.+?)\\*\\*/g, '<strong style=\"color: #2c5f8d; font-weight: 600;\">$1</strong>')\n    .replace(/\\*(.+?)\\*/g, '<em style=\"color: #4a5568;\">$1</em>')\n    .replace(/\\n\\n/g, '</p><p style=\"margin: 16px 0; line-height: 1.8; color: #2c3e50;\">')\n    .replace(/\\n/g, '<br>');\n  \n  enhancedContent = '<p style=\"margin: 16px 0; line-height: 1.8; color: #2c3e50;\">' + enhancedContent + '</p>';\n\n  return `\n<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>${title} - Emma IA Finance</title>\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body { \n      font-family: Georgia, 'Times New Roman', serif; \n      background-color: #f8f9fa; \n      padding: 20px;\n      line-height: 1.8;\n    }\n    .email-container { \n      max-width: 680px; \n      margin: 0 auto; \n      background: #ffffff; \n      box-shadow: 0 4px 20px rgba(0,0,0,0.08);\n      border-radius: 8px;\n      overflow: hidden;\n    }\n    \n    /* Masthead */\n    .masthead {\n      background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%);\n      padding: 20px 32px;\n      display: flex;\n      align-items: center;\n      justify-content: space-between;\n      border-bottom: 4px solid #34495e;\n    }\n    .masthead-left {\n      display: flex;\n      align-items: center;\n      gap: 12px;\n    }\n    .masthead-avatar {\n      width: 42px;\n      height: 42px;\n      border-radius: 50%;\n      border: 2px solid #ffffff;\n    }\n    .masthead-title {\n      color: #ffffff;\n      font-size: 18px;\n      font-weight: 700;\n      letter-spacing: 0.5px;\n    }\n    .masthead-time {\n      background: rgba(255,255,255,0.15);\n      padding: 6px 14px;\n      border-radius: 20px;\n      color: #ffffff;\n      font-size: 13px;\n      font-weight: 600;\n      backdrop-filter: blur(10px);\n    }\n    \n    /* Hero Section */\n    .hero {\n      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);\n      padding: 48px 32px;\n      text-align: center;\n      color: #ffffff;\n    }\n    .hero-greeting {\n      font-size: 16px;\n      font-weight: 400;\n      margin-bottom: 16px;\n      opacity: 0.9;\n      font-style: italic;\n    }\n    .hero-title {\n      font-size: 36px;\n      font-weight: 800;\n      margin-bottom: 16px;\n      line-height: 1.3;\n      color: #ffffff;\n      text-shadow: 0 2px 4px rgba(0,0,0,0.2);\n    }\n    .hero-subtitle {\n      font-size: 18px;\n      font-weight: 400;\n      line-height: 1.6;\n      opacity: 0.85;\n      margin-bottom: 20px;\n    }\n    .hero-byline {\n      font-size: 14px;\n      font-weight: 400;\n      opacity: 0.75;\n      border-top: 1px solid rgba(255,255,255,0.2);\n      padding-top: 16px;\n      margin-top: 16px;\n    }\n    \n    /* Key Stats Box */\n    .key-stats-box {\n      background: linear-gradient(135deg, #1e3a5f 0%, #2c5f8d 100%);\n      margin: -20px 32px 32px 32px;\n      padding: 24px;\n      border-radius: 8px;\n      box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);\n      position: relative;\n      z-index: 10;\n    }\n    .key-stats-title {\n      color: #ffffff;\n      font-size: 14px;\n      font-weight: 700;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n      margin-bottom: 16px;\n      opacity: 0.9;\n    }\n    .stats-grid {\n      display: grid;\n      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));\n      gap: 16px;\n    }\n    .stat-item {\n      background: rgba(255,255,255,0.1);\n      padding: 12px 16px;\n      border-radius: 6px;\n      border-left: 3px solid #ffffff;\n    }\n    .stat-label {\n      color: rgba(255,255,255,0.8);\n      font-size: 12px;\n      font-weight: 600;\n      margin-bottom: 4px;\n    }\n    .stat-value {\n      color: #ffffff;\n      font-size: 20px;\n      font-weight: 700;\n    }\n    \n    /* TL;DR Box */\n    .tldr-box {\n      background: linear-gradient(135deg, #f8f9fa 0%, #e8eef5 100%);\n      border-left: 6px solid #2c5f8d;\n      margin: 32px;\n      padding: 24px 28px;\n      border-radius: 0 8px 8px 0;\n      box-shadow: 0 2px 8px rgba(0,0,0,0.06);\n    }\n    .tldr-title {\n      color: #1e3a5f;\n      font-size: 16px;\n      font-weight: 800;\n      text-transform: uppercase;\n      letter-spacing: 1.5px;\n      margin-bottom: 16px;\n      display: flex;\n      align-items: center;\n      gap: 8px;\n    }\n    .tldr-subtitle {\n      color: #4a5568;\n      font-size: 13px;\n      font-weight: 400;\n      margin-bottom: 16px;\n      font-style: italic;\n    }\n    .tldr-list {\n      list-style: none;\n      padding: 0;\n    }\n    .tldr-item {\n      padding: 12px 0;\n      border-bottom: 1px solid rgba(44, 95, 141, 0.15);\n      color: #2c3e50;\n      font-size: 15px;\n      line-height: 1.6;\n      display: flex;\n      gap: 12px;\n    }\n    .tldr-item:last-child {\n      border-bottom: none;\n    }\n    .tldr-bullet {\n      color: #2c5f8d;\n      font-weight: 700;\n      font-size: 18px;\n      flex-shrink: 0;\n    }\n    \n    /* Main Content */\n    .content {\n      padding: 32px;\n      color: #2c3e50;\n      font-size: 17px;\n      line-height: 1.8;\n    }\n    \n    /* Emma's Take Callout */\n    .emmas-take-box {\n      background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);\n      margin: 32px;\n      padding: 28px;\n      border-radius: 8px;\n      border: 3px solid #1e3a5f;\n      box-shadow: 0 4px 16px rgba(30, 58, 95, 0.25);\n      position: relative;\n    }\n    .emmas-take-badge {\n      background: #2c5f8d;\n      color: #ffffff;\n      padding: 6px 14px;\n      border-radius: 20px;\n      font-size: 12px;\n      font-weight: 700;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n      display: inline-block;\n      margin-bottom: 16px;\n    }\n    .emmas-take-content {\n      color: #ffffff;\n      font-size: 18px;\n      line-height: 1.7;\n      font-style: italic;\n      position: relative;\n      padding-left: 24px;\n      border-left: 4px solid rgba(255,255,255,0.3);\n    }\n    .emmas-take-quote {\n      position: absolute;\n      left: -8px;\n      top: -8px;\n      font-size: 48px;\n      color: rgba(255,255,255,0.2);\n      font-family: Georgia, serif;\n    }\n    \n    /* Action Items Table */\n    .action-items-section {\n      margin: 32px;\n    }\n    .action-items-title {\n      color: #1e3a5f;\n      font-size: 20px;\n      font-weight: 800;\n      margin-bottom: 20px;\n      padding-bottom: 12px;\n      border-bottom: 3px solid #e8eef5;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n    }\n    .action-items-table {\n      width: 100%;\n      border-collapse: separate;\n      border-spacing: 0 12px;\n    }\n    .action-item-row {\n      background: #f8f9fa;\n      border-radius: 6px;\n      overflow: hidden;\n    }\n    .action-item-type {\n      padding: 16px;\n      font-weight: 700;\n      font-size: 12px;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n      width: 140px;\n    }\n    .action-item-type.watch { background: #3498db; color: #ffffff; }\n    .action-item-type.opportunity { background: #27ae60; color: #ffffff; }\n    .action-item-type.caution { background: #e67e22; color: #ffffff; }\n    .action-item-details {\n      padding: 16px;\n    }\n    .action-item-ticker {\n      font-weight: 700;\n      color: #1e3a5f;\n      font-size: 16px;\n      margin-bottom: 4px;\n    }\n    .action-item-action {\n      color: #2c3e50;\n      font-size: 15px;\n      margin-bottom: 4px;\n    }\n    .action-item-rationale {\n      color: #5a6c7d;\n      font-size: 13px;\n      font-style: italic;\n    }\n    \n    /* Footer */\n    .footer {\n      background: #f8f9fa;\n      padding: 32px;\n      border-top: 3px solid #e8eef5;\n      text-align: center;\n    }\n    .footer-branding {\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      gap: 20px;\n      margin-bottom: 20px;\n    }\n    .footer-avatar {\n      width: 60px;\n      height: 60px;\n      border-radius: 50%;\n      border: 3px solid #2c5f8d;\n    }\n    .footer-logo {\n      height: 50px;\n      width: auto;\n    }\n    .footer-text {\n      color: #5a6c7d;\n      font-size: 14px;\n      margin-bottom: 16px;\n      line-height: 1.6;\n    }\n    .footer-details {\n      background: #ffffff;\n      border: 2px solid #e8eef5;\n      border-radius: 8px;\n      padding: 20px;\n      margin-top: 20px;\n      text-align: left;\n    }\n    .footer-details-title {\n      color: #2c3e50;\n      font-size: 13px;\n      font-weight: 700;\n      text-transform: uppercase;\n      letter-spacing: 1px;\n      margin-bottom: 12px;\n    }\n    .footer-detail-item {\n      color: #5a6c7d;\n      font-size: 12px;\n      margin: 6px 0;\n      display: flex;\n      justify-content: space-between;\n      padding: 4px 0;\n      border-bottom: 1px solid #f0f0f0;\n    }\n    .footer-detail-label {\n      font-weight: 600;\n      color: #4a5568;\n    }\n    \n    /* Responsive */\n    @media only screen and (max-width: 600px) {\n      .email-container { border-radius: 0; }\n      .masthead, .hero, .content, .key-stats-box, .tldr-box, .emmas-take-box, .action-items-section, .footer {\n        padding: 20px;\n      }\n      .hero-title { font-size: 28px; }\n      .stats-grid { grid-template-columns: 1fr; }\n      .footer-branding { flex-direction: column; }\n    }\n  </style>\n</head>\n<body>\n  <div class=\"email-container\">\n    \n    <!-- Masthead -->\n    <div class=\"masthead\">\n      <div class=\"masthead-left\">\n        <img src=\"https://i.ibb.co/VYgymNZ/emma-avatar.png\" alt=\"Emma\" class=\"masthead-avatar\">\n        <div class=\"masthead-title\">EMMA IA FINANCE</div>\n      </div>\n      <div class=\"masthead-time\">${currentTime} EST</div>\n    </div>\n    \n    <!-- Hero Section -->\n    <div class=\"hero\">\n      <div class=\"hero-greeting\">${greeting}</div>\n      <h1 class=\"hero-title\">${title}</h1>\n      <div class=\"hero-subtitle\">${subtitle}</div>\n      <div class=\"hero-byline\">\n        Par <strong>Emma IA</strong> • ${formattedDate}\n      </div>\n    </div>\n    \n    ${keyStats.length > 0 ? `\n    <!-- Key Stats Box -->\n    <div class=\"key-stats-box\">\n      <div class=\"key-stats-title\">📊 Indicateurs Clés</div>\n      <div class=\"stats-grid\">\n        ${keyStats.map(stat => `\n          <div class=\"stat-item\">\n            <div class=\"stat-label\">${stat.label}</div>\n            <div class=\"stat-value\">${stat.value}</div>\n          </div>\n        `).join('')}\n      </div>\n    </div>\n    ` : ''}\n    \n    ${tldrPoints.length > 0 ? `\n    <!-- TL;DR Box -->\n    <div class=\"tldr-box\">\n      <div class=\"tldr-title\">\n        🎯 L'ESSENTIEL\n      </div>\n      <div class=\"tldr-subtitle\">Les 3 points clés à retenir - Lecture 30 secondes</div>\n      <ul class=\"tldr-list\">\n        ${tldrPoints.map(point => `\n          <li class=\"tldr-item\">\n            <span class=\"tldr-bullet\">•</span>\n            <span>${point}</span>\n          </li>\n        `).join('')}\n      </ul>\n    </div>\n    ` : ''}\n    \n    <!-- Main Content -->\n    <div class=\"content\">\n      ${enhancedContent}\n    </div>\n    \n    <!-- Emma's Take -->\n    <div class=\"emmas-take-box\">\n      <span class=\"emmas-take-badge\">🤖 Emma's Take</span>\n      <div class=\"emmas-take-content\">\n        <span class=\"emmas-take-quote\">\"</span>\n        ${emmasTake}\n      </div>\n    </div>\n    \n    <!-- Action Items -->\n    <div class=\"action-items-section\">\n      <div class=\"action-items-title\">💡 Action Items</div>\n      <table class=\"action-items-table\">\n        ${actionItems.map(item => `\n          <tr class=\"action-item-row\">\n            <td class=\"action-item-type ${item.type.toLowerCase()}\">${item.type}</td>\n            <td class=\"action-item-details\">\n              <div class=\"action-item-ticker\">${item.ticker}</div>\n              <div class=\"action-item-action\">${item.action}</div>\n              <div class=\"action-item-rationale\">${item.rationale}</div>\n            </td>\n          </tr>\n        `).join('')}\n      </table>\n    </div>\n    \n    <!-- Footer -->\n    <div class=\"footer\">\n      <div class=\"footer-branding\">\n        <img src=\"https://i.ibb.co/VYgymNZ/emma-avatar.png\" alt=\"Emma\" class=\"footer-avatar\">\n        <img src=\"https://i.ibb.co/MRLqJyk/jslai-logo.png\" alt=\"JSLAI\" class=\"footer-logo\">\n      </div>\n      <p class=\"footer-text\">\n        <strong>Généré par Emma IA</strong> - Intelligence artificielle financière propulsée par <strong>JSLAI™</strong>\n      </p>\n      <div class=\"footer-details\">\n        <div class=\"footer-details-title\">📋 Détails Techniques</div>\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Modèle IA:</span>\n          <span>${metadata.emma_model || 'gemini-2.0-flash'}</span>\n        </div>\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Outils utilisés:</span>\n          <span>${(metadata.emma_tools || []).join(', ') || 'Analyse multi-sources'}</span>\n        </div>\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Temps d'exécution:</span>\n          <span>${metadata.emma_execution_time || 'N/A'}s</span>\n        </div>\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Type de briefing:</span>\n          <span>${metadata.prompt_type || metadata.trigger_type || 'custom'}</span>\n        </div>\n        ${metadata.tickers ? `\n        <div class=\"footer-detail-item\">\n          <span class=\"footer-detail-label\">Tickers analysés:</span>\n          <span>${metadata.tickers}</span>\n        </div>\n        ` : ''}\n      </div>\n    </div>\n    \n  </div>\n</body>\n</html>\n`;\n}\n\n// ═══════════════════════════════════════════════════════════\n// 🚀 MAIN EXECUTION\n// ═══════════════════════════════════════════════════════════\n\n// Get newsletter content\nlet content = data.newsletter_content || data.chatOutput || data.content || data.text || data.output || '';\n\nif (!content) {\n  console.log('❌ No content found in input data');\n  console.log('Available keys:', Object.keys(data));\n  content = 'Contenu indisponible. Veuillez réessayer.';\n}\n\n// Prepare metadata\nconst metadata = {\n  trigger_type: data.trigger_type || data.prompt_type || 'morning',\n  emma_model: data.emma_model || 'gemini-2.0-flash',\n  emma_tools: data.emma_tools || [],\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  tickers: data.tickers || ''\n};\n\n// Generate HTML\nconst html = generateEnhancedBloombergHTML(content, metadata);\n\n// Prepare output\nconst output = {\n  html: html,\n  subject: `${extractTitleAndSubtitle(content).title} - Emma IA`,\n  from: 'emma@gobapps.com',\n  recipients: data.recipients || ['projetsjsl@gmail.com'],\n  ...data\n};\n\nconsole.log('✅ Enhanced Bloomberg HTML generated');\nconsole.log('   Title:', extractTitleAndSubtitle(content).title);\nconsole.log('   TL;DR points:', extractTLDR(content).length);\nconsole.log('   Key stats:', extractKeyStats(content).length);\nconsole.log('   HTML length:', html.length, 'chars');\n\nreturn [{ json: output }];\n"
       },
       "id": "9f33f73d-349d-48b3-8d6a-a49184737384",
       "name": "Generate HTML Newsletter",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        23696,
-        6548
+        5696,
+        1716
       ]
     },
     {
@@ -231,8 +236,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        24368,
-        6548
+        6592,
+        1716
       ]
     },
     {
@@ -272,8 +277,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        24592,
-        6548
+        6816,
+        1716
       ],
       "credentials": {
         "supabaseApi": {
@@ -311,8 +316,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        24816,
-        6548
+        7040,
+        1716
       ],
       "credentials": {
         "supabaseApi": {
@@ -359,8 +364,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        20656,
-        5824
+        2656,
+        992
       ]
     },
     {
@@ -382,8 +387,8 @@
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.3,
       "position": [
-        20656,
-        6016
+        2656,
+        1184
       ],
       "credentials": {
         "gmailOAuth2": {
@@ -404,8 +409,8 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        20656,
-        6208
+        2656,
+        1376
       ],
       "webhookId": "1d4fb668-97ac-440c-9a17-8656ae9083a8",
       "credentials": {
@@ -459,8 +464,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        20880,
-        6112
+        2880,
+        1280
       ]
     },
     {
@@ -492,8 +497,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        22672,
-        5912
+        4672,
+        1080
       ]
     },
     {
@@ -521,21 +526,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        20880,
-        5728
+        2880,
+        896
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// ============================================\n// PR\u00c9SERVER preview_mode et approved depuis les nodes de configuration\n// ============================================\n// Ces valeurs viennent des nodes: Schedule Config, Webhook Config, Manual Config, Chat Config\nconst previewMode = data.preview_mode !== undefined ? data.preview_mode : true; // Fallback \u00e0 true si non d\u00e9fini\nconst approved = data.approved !== undefined ? data.approved : false; // Fallback \u00e0 false si non d\u00e9fini\n\nconsole.log('\ud83d\udcca Preview Briefing Content - Valeurs pr\u00e9serv\u00e9es:');\nconsole.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\nconsole.log('   approved:', approved, '(type:', typeof approved, ')');\n\n// Extraire le contenu de la r\u00e9ponse\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu re\u00e7u';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: data.emma_tools || [],\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString()\n};\n\n// Cr\u00e9er un r\u00e9sum\u00e9 pour la pr\u00e9visualisation\n// IMPORTANT: Pr\u00e9server preview_mode et approved depuis les nodes de configuration\nconst preview = {\n  success: true,\n  preview_mode: previewMode, // PR\u00c9SERVER depuis les nodes de configuration\n  approved: approved, // PR\u00c9SERVER depuis les nodes de configuration\n  content: content.substring(0, 500) + (content.length > 500 ? '...' : ''),\n  content_length: content.length,\n  metadata: metadata,\n  full_content: content,\n  ready_for_approval: approved === true && previewMode === false\n};\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ...preview\n  }\n}));"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// ============================================\n// PRÉSERVER preview_mode et approved depuis les nodes de configuration\n// ============================================\n// Ces valeurs viennent des nodes: Schedule Config, Webhook Config, Manual Config, Chat Config\nconst previewMode = data.preview_mode !== undefined ? data.preview_mode : true; // Fallback à true si non défini\nconst approved = data.approved !== undefined ? data.approved : false; // Fallback à false si non défini\n\nconsole.log('📊 Preview Briefing Content - Valeurs préservées:');\nconsole.log('   preview_mode:', previewMode, '(type:', typeof previewMode, ')');\nconsole.log('   approved:', approved, '(type:', typeof approved, ')');\n\n// Extraire le contenu de la réponse\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu reçu';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: data.emma_tools || [],\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString()\n};\n\n// Créer un résumé pour la prévisualisation\n// IMPORTANT: Préserver preview_mode et approved depuis les nodes de configuration\nconst preview = {\n  success: true,\n  preview_mode: previewMode, // PRÉSERVER depuis les nodes de configuration\n  approved: approved, // PRÉSERVER depuis les nodes de configuration\n  content: content.substring(0, 500) + (content.length > 500 ? '...' : ''),\n  content_length: content.length,\n  metadata: metadata,\n  full_content: content,\n  ready_for_approval: approved === true && previewMode === false\n};\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ...preview\n  }\n}));"
       },
       "id": "preview-briefing-content",
       "name": "Preview Briefing Content",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        22896,
-        6696
+        4896,
+        1864
       ]
     },
     {
@@ -555,8 +560,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        23472,
-        6696
+        5472,
+        1864
       ]
     },
     {
@@ -566,8 +571,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        23184,
-        6696
+        5184,
+        1864
       ]
     },
     {
@@ -588,21 +593,21 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        23472,
-        6104
+        5472,
+        1272
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extraire le contenu\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu re\u00e7u';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: Array.isArray(data.emma_tools) ? data.emma_tools.join(', ') : 'Aucun',\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString(),\n  content_length: content.length\n};\n\n// Cr\u00e9er un message de pr\u00e9visualisation format\u00e9 avec lien HTML\nconst previewMessage = `\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551  \ud83d\udccb PR\u00c9VISUALISATION DU BRIEFING                            \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n\n\u2705 Briefing g\u00e9n\u00e9r\u00e9 avec succ\u00e8s !\n\n\ud83d\udcca M\u00c9TADONN\u00c9ES :\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\u2022 Type : ${metadata.prompt_type}\n\u2022 Mod\u00e8le Emma : ${metadata.emma_model.toUpperCase()}\n\u2022 Outils utilis\u00e9s : ${metadata.emma_tools}\n\u2022 Temps d'ex\u00e9cution : ${(metadata.emma_execution_time / 1000).toFixed(1)}s\n\u2022 Longueur : ${metadata.content_length} caract\u00e8res\n\u2022 G\u00e9n\u00e9r\u00e9 le : ${new Date(metadata.generated_at).toLocaleString('fr-FR')}\n\n\ud83d\udcdd APER\u00c7U DU CONTENU (500 premiers caract\u00e8res) :\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}\n\n\ud83c\udf10 PR\u00c9VISUALISATION HTML :\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\ud83d\udce7 Pour voir la pr\u00e9visualisation HTML compl\u00e8te de l'email :\n   1. Utilisez le \"Chat Trigger (Preview)\" pour obtenir une URL\n   2. Ou consultez le n\u0153ud \"Generate HTML Preview\" pour le HTML\n\n\u26a0\ufe0f  POUR APPROUVER ET ENVOYER :\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n1. Modifiez le n\u0153ud \"Custom Prompt Input\"\n2. Changez \"approved\" de false \u00e0 true\n3. R\u00e9ex\u00e9cutez le workflow depuis \"Custom Prompt Input\"\n\n\ud83d\udca1 ASTUCE : Vous pouvez aussi modifier le prompt dans \"Custom Prompt Input\"\net r\u00e9ex\u00e9cuter pour tester diff\u00e9rentes versions.\n`;\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    preview_message: previewMessage,\n    preview_content: content,\n    preview_metadata: metadata\n  }\n}));"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Extraire le contenu\nconst content = data.newsletter_content || data.response || data.message || 'Aucun contenu reçu';\nconst metadata = {\n  trigger_type: data.trigger_type || 'Manuel',\n  emma_model: data.emma_model || 'perplexity',\n  emma_tools: Array.isArray(data.emma_tools) ? data.emma_tools.join(', ') : 'Aucun',\n  emma_execution_time: data.emma_execution_time || 0,\n  prompt_type: data.prompt_type || 'custom',\n  generated_at: data.generated_at || new Date().toISOString(),\n  content_length: content.length\n};\n\n// Créer un message de prévisualisation formaté avec lien HTML\nconst previewMessage = `\n╔══════════════════════════════════════════════════════════════╗\n║  📋 PRÉVISUALISATION DU BRIEFING                            ║\n╚══════════════════════════════════════════════════════════════╝\n\n✅ Briefing généré avec succès !\n\n📊 MÉTADONNÉES :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• Type : ${metadata.prompt_type}\n• Modèle Emma : ${metadata.emma_model.toUpperCase()}\n• Outils utilisés : ${metadata.emma_tools}\n• Temps d'exécution : ${(metadata.emma_execution_time / 1000).toFixed(1)}s\n• Longueur : ${metadata.content_length} caractères\n• Généré le : ${new Date(metadata.generated_at).toLocaleString('fr-FR')}\n\n📝 APERÇU DU CONTENU (500 premiers caractères) :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}\n\n🌐 PRÉVISUALISATION HTML :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 Pour voir la prévisualisation HTML complète de l'email :\n   1. Utilisez le \"Chat Trigger (Preview)\" pour obtenir une URL\n   2. Ou consultez le nœud \"Generate HTML Preview\" pour le HTML\n\n⚠️  POUR APPROUVER ET ENVOYER :\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n1. Modifiez le nœud \"Custom Prompt Input\"\n2. Changez \"approved\" de false à true\n3. Réexécutez le workflow depuis \"Custom Prompt Input\"\n\n💡 ASTUCE : Vous pouvez aussi modifier le prompt dans \"Custom Prompt Input\"\net réexécuter pour tester différentes versions.\n`;\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    preview_message: previewMessage,\n    preview_content: content,\n    preview_metadata: metadata\n  }\n}));"
       },
       "id": "preview-display",
       "name": "Preview Display",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        23696,
-        6008
+        5696,
+        1176
       ]
     },
     {
@@ -612,8 +617,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        23920,
-        6008
+        5920,
+        1176
       ]
     },
     {
@@ -628,22 +633,22 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        20208,
-        5344
+        2208,
+        512
       ],
       "webhookId": "emma-preview-webhook"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// R\u00e9cup\u00e9rer le contenu HTML g\u00e9n\u00e9r\u00e9\nconst htmlContent = data.html_content || '';\nconst subject = data.subject || 'Newsletter Emma';\nconst content = data.newsletter_content || data.response || '';\n\n// Cr\u00e9er une pr\u00e9visualisation HTML interactive\nconst previewHtml = `\n<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Pr\u00e9visualisation - ${subject}</title>\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body {\n      font-family: 'Inter', 'Roboto', sans-serif;\n      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n      padding: 20px;\n    }\n    .preview-container {\n      max-width: 800px;\n      margin: 0 auto;\n      background: white;\n      border-radius: 12px;\n      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);\n      overflow: hidden;\n    }\n    .preview-header {\n      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);\n      color: white;\n      padding: 24px;\n      text-align: center;\n    }\n    .preview-header h1 {\n      font-size: 24px;\n      margin-bottom: 8px;\n    }\n    .preview-header p {\n      opacity: 0.9;\n      font-size: 14px;\n    }\n    .preview-actions {\n      padding: 20px;\n      background: #f8fafc;\n      border-bottom: 2px solid #e5e7eb;\n      display: flex;\n      gap: 12px;\n      justify-content: center;\n    }\n    .preview-btn {\n      padding: 12px 24px;\n      border-radius: 8px;\n      font-weight: 600;\n      cursor: pointer;\n      border: none;\n      font-size: 14px;\n      transition: all 0.2s;\n    }\n    .preview-btn.approve {\n      background: linear-gradient(135deg, #10b981 0%, #059669 100%);\n      color: white;\n    }\n    .preview-btn.approve:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);\n    }\n    .preview-btn.reject {\n      background: #ef4444;\n      color: white;\n    }\n    .preview-btn.reject:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);\n    }\n    .preview-content {\n      padding: 0;\n    }\n    .preview-content iframe {\n      width: 100%;\n      height: 800px;\n      border: none;\n    }\n    .preview-metadata {\n      padding: 20px;\n      background: #f1f5f9;\n      border-top: 2px solid #e5e7eb;\n    }\n    .preview-metadata table {\n      width: 100%;\n      border-collapse: collapse;\n    }\n    .preview-metadata td {\n      padding: 8px 12px;\n      border-bottom: 1px solid #e5e7eb;\n    }\n    .preview-metadata td:first-child {\n      font-weight: 700;\n      color: #4f46e5;\n      width: 150px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"preview-container\">\n    <div class=\"preview-header\">\n      <h1>\ud83d\udccb Pr\u00e9visualisation de l'Email</h1>\n      <p>V\u00e9rifiez le contenu avant d'approuver l'envoi</p>\n    </div>\n    \n    <div class=\"preview-actions\">\n      <button class=\"preview-btn approve\" onclick=\"approveEmail()\">\n        \u2705 Approuver et Envoyer\n      </button>\n      <button class=\"preview-btn reject\" onclick=\"rejectEmail()\">\n        \u274c Rejeter\n      </button>\n    </div>\n    \n    <div class=\"preview-content\">\n      <iframe srcdoc=\"${htmlContent.replace(/\"/g, '&quot;')}\"></iframe>\n    </div>\n    \n    <div class=\"preview-metadata\">\n      <table>\n        <tr>\n          <td>Sujet:</td>\n          <td>${subject}</td>\n        </tr>\n        <tr>\n          <td>Type:</td>\n          <td>${data.prompt_type || 'custom'}</td>\n        </tr>\n        <tr>\n          <td>Mod\u00e8le Emma:</td>\n          <td>${data.emma_model || 'perplexity'}</td>\n        </tr>\n        <tr>\n          <td>Longueur:</td>\n          <td>${content.length} caract\u00e8res</td>\n        </tr>\n        <tr>\n          <td>G\u00e9n\u00e9r\u00e9 le:</td>\n          <td>${new Date().toLocaleString('fr-FR')}</td>\n        </tr>\n      </table>\n    </div>\n  </div>\n  \n  <script>\n    function approveEmail() {\n      alert('\u2705 Pour approuver:\\n\\n1. Retournez dans n8n\\n2. Modifiez le n\u0153ud \"Custom Prompt Input\"\\n3. Changez \"approved\" \u00e0 true\\n4. R\u00e9ex\u00e9cutez le workflow');\n    }\n    function rejectEmail() {\n      alert('\u274c Email rejet\u00e9. Modifiez le prompt dans \"Custom Prompt Input\" et r\u00e9ex\u00e9cutez.');\n    }\n  </script>\n</body>\n</html>\n`;\n\nreturn [{\n  json: {\n    ...data,\n    preview_html: previewHtml,\n    preview_url: `data:text/html;charset=utf-8,${encodeURIComponent(previewHtml)}`\n  }\n}];"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Récupérer le contenu HTML généré\nconst htmlContent = data.html_content || '';\nconst subject = data.subject || 'Newsletter Emma';\nconst content = data.newsletter_content || data.response || '';\n\n// Créer une prévisualisation HTML interactive\nconst previewHtml = `\n<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Prévisualisation - ${subject}</title>\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body {\n      font-family: 'Inter', 'Roboto', sans-serif;\n      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n      padding: 20px;\n    }\n    .preview-container {\n      max-width: 800px;\n      margin: 0 auto;\n      background: white;\n      border-radius: 12px;\n      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);\n      overflow: hidden;\n    }\n    .preview-header {\n      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);\n      color: white;\n      padding: 24px;\n      text-align: center;\n    }\n    .preview-header h1 {\n      font-size: 24px;\n      margin-bottom: 8px;\n    }\n    .preview-header p {\n      opacity: 0.9;\n      font-size: 14px;\n    }\n    .preview-actions {\n      padding: 20px;\n      background: #f8fafc;\n      border-bottom: 2px solid #e5e7eb;\n      display: flex;\n      gap: 12px;\n      justify-content: center;\n    }\n    .preview-btn {\n      padding: 12px 24px;\n      border-radius: 8px;\n      font-weight: 600;\n      cursor: pointer;\n      border: none;\n      font-size: 14px;\n      transition: all 0.2s;\n    }\n    .preview-btn.approve {\n      background: linear-gradient(135deg, #10b981 0%, #059669 100%);\n      color: white;\n    }\n    .preview-btn.approve:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);\n    }\n    .preview-btn.reject {\n      background: #ef4444;\n      color: white;\n    }\n    .preview-btn.reject:hover {\n      transform: translateY(-2px);\n      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);\n    }\n    .preview-content {\n      padding: 0;\n    }\n    .preview-content iframe {\n      width: 100%;\n      height: 800px;\n      border: none;\n    }\n    .preview-metadata {\n      padding: 20px;\n      background: #f1f5f9;\n      border-top: 2px solid #e5e7eb;\n    }\n    .preview-metadata table {\n      width: 100%;\n      border-collapse: collapse;\n    }\n    .preview-metadata td {\n      padding: 8px 12px;\n      border-bottom: 1px solid #e5e7eb;\n    }\n    .preview-metadata td:first-child {\n      font-weight: 700;\n      color: #4f46e5;\n      width: 150px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"preview-container\">\n    <div class=\"preview-header\">\n      <h1>📋 Prévisualisation de l'Email</h1>\n      <p>Vérifiez le contenu avant d'approuver l'envoi</p>\n    </div>\n    \n    <div class=\"preview-actions\">\n      <button class=\"preview-btn approve\" onclick=\"approveEmail()\">\n        ✅ Approuver et Envoyer\n      </button>\n      <button class=\"preview-btn reject\" onclick=\"rejectEmail()\">\n        ❌ Rejeter\n      </button>\n    </div>\n    \n    <div class=\"preview-content\">\n      <iframe srcdoc=\"${htmlContent.replace(/\"/g, '&quot;')}\"></iframe>\n    </div>\n    \n    <div class=\"preview-metadata\">\n      <table>\n        <tr>\n          <td>Sujet:</td>\n          <td>${subject}</td>\n        </tr>\n        <tr>\n          <td>Type:</td>\n          <td>${data.prompt_type || 'custom'}</td>\n        </tr>\n        <tr>\n          <td>Modèle Emma:</td>\n          <td>${data.emma_model || 'perplexity'}</td>\n        </tr>\n        <tr>\n          <td>Longueur:</td>\n          <td>${content.length} caractères</td>\n        </tr>\n        <tr>\n          <td>Généré le:</td>\n          <td>${new Date().toLocaleString('fr-FR')}</td>\n        </tr>\n      </table>\n    </div>\n  </div>\n  \n  <script>\n    function approveEmail() {\n      alert('✅ Pour approuver:\\n\\n1. Retournez dans n8n\\n2. Modifiez le nœud \"Custom Prompt Input\"\\n3. Changez \"approved\" à true\\n4. Réexécutez le workflow');\n    }\n    function rejectEmail() {\n      alert('❌ Email rejeté. Modifiez le prompt dans \"Custom Prompt Input\" et réexécutez.');\n    }\n  </script>\n</body>\n</html>\n`;\n\nreturn [{\n  json: {\n    ...data,\n    preview_html: previewHtml,\n    preview_url: `data:text/html;charset=utf-8,${encodeURIComponent(previewHtml)}`\n  }\n}];"
       },
       "id": "html-preview-generator",
       "name": "Generate HTML Preview",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        20208,
-        6920
+        2208,
+        2088
       ]
     },
     {
@@ -657,8 +662,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        20432,
-        6920
+        2432,
+        2088
       ]
     },
     {
@@ -686,21 +691,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        23920,
-        6548
+        5920,
+        1716
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Les donn\u00e9es viennent de \"Fetch Email Recipients\" qui retourne { recipients: [...], success: true }\n// On doit r\u00e9cup\u00e9rer html_content, subject, prompt_type et preview_mode depuis \"Generate HTML Newsletter\"\n\n// M\u00e9thode 1 : Utiliser les donn\u00e9es disponibles dans le flux actuel\nlet briefingType = data.prompt_type || data.briefing_type || 'custom';\nlet previewMode = data.preview_mode !== undefined ? data.preview_mode : false;\nlet htmlContent = data.html || '';\nlet subject = data.subject || '';\n\n// M\u00e9thode 2 : Essayer d'acc\u00e9der aux n\u0153uds pr\u00e9c\u00e9dents dans le flux d'ex\u00e9cution\n// Note: Dans n8n, $() permet d'acc\u00e9der aux donn\u00e9es des n\u0153uds pr\u00e9c\u00e9dents\n// mais seulement si ces n\u0153uds sont dans le flux d'ex\u00e9cution actuel\n\n// Essayer depuis \"Generate HTML Newsletter\" (juste avant \"Fetch Email Recipients\")\ntry {\n  const generateHtmlData = $('Generate HTML Newsletter').item?.json;\n  if (generateHtmlData) {\n    // IMPORTANT : Pr\u00e9server html_content et subject depuis \"Generate HTML Newsletter\"\n    htmlContent = generateHtmlData.html || htmlContent;\n    subject = generateHtmlData.subject || subject;\n    \n    // Pr\u00e9server aussi prompt_type et preview_mode\n    briefingType = generateHtmlData.prompt_type || briefingType;\n    previewMode = generateHtmlData.preview_mode !== undefined ? generateHtmlData.preview_mode : previewMode;\n    \n    console.log('\u2705 Donn\u00e9es r\u00e9cup\u00e9r\u00e9es depuis Generate HTML Newsletter');\n  }\n} catch (e) {\n  console.warn('\u26a0\ufe0f  Generate HTML Newsletter non accessible, tentative d\\'autres n\u0153uds...');\n  \n  try {\n    // Essayer depuis \"Parse API Response\"\n    const parseApiData = $('Parse API Response').item?.json;\n    if (parseApiData) {\n      briefingType = parseApiData.prompt_type || briefingType;\n      previewMode = parseApiData.preview_mode !== undefined ? parseApiData.preview_mode : previewMode;\n      console.log('\u2705 Donn\u00e9es r\u00e9cup\u00e9r\u00e9es depuis Parse API Response');\n    }\n  } catch (e2) {\n    console.warn('\u26a0\ufe0f  Parse API Response non accessible, utilisation des valeurs par d\u00e9faut');\n  }\n}\n\n// Normaliser le type\nlet normalizedType = briefingType;\nif (normalizedType === 'noon') {\n  normalizedType = 'midday';\n}\n\n// R\u00e9cup\u00e9rer les destinataires depuis l'API (donn\u00e9es de \"Fetch Email Recipients\")\nconst recipientsData = data.recipients || [];\nconst previewEmail = data.preview_email || 'projetsjsl@gmail.com';\n\nlet emailList = [];\n\nif (previewMode === true) {\n  // Mode preview : utiliser l'email de preview\n  emailList = [previewEmail];\n  console.log('\ud83d\udce7 Mode preview activ\u00e9');\n} else {\n  // Mode envoi : utiliser les destinataires actifs du type\n  emailList = recipientsData\n    .filter(r => r.active && r[normalizedType])\n    .map(r => r.email);\n  \n  console.log(`\ud83d\udce7 Mode envoi, type: ${normalizedType}, destinataires: ${emailList.length}`);\n  \n  // Fallback si aucun destinataire trouv\u00e9\n  if (emailList.length === 0) {\n    emailList = [previewEmail];\n    console.warn('\u26a0\ufe0f  Aucun destinataire actif, utilisation de l\\'email de preview');\n  }\n}\n\n// V\u00e9rifier que html_content et subject sont pr\u00e9sents\nif (!htmlContent) {\n  console.warn('\u26a0\ufe0f  html_content manquant, le n\u0153ud Send Email via Resend pourrait \u00e9chouer');\n}\nif (!subject) {\n  console.warn('\u26a0\ufe0f  subject manquant, utilisation d\\'un sujet par d\u00e9faut');\n  subject = subject || `Newsletter Emma - Mise \u00e0 jour du ${normalizedType}`;\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    // Donn\u00e9es de destinataires\n    recipients: emailList,\n    recipient_count: emailList.length,\n    briefing_type: normalizedType,\n    preview_mode: previewMode,\n    prompt_type: briefingType,\n    // IMPORTANT : Pr\u00e9server html_content et subject pour \"Send Email via Resend\"\n    html: htmlContent,\n    subject: subject\n  }\n}));"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// Les données viennent de \"Fetch Email Recipients\" qui retourne { recipients: [...], success: true }\n// On doit récupérer html_content, subject, prompt_type et preview_mode depuis \"Generate HTML Newsletter\"\n\n// Méthode 1 : Utiliser les données disponibles dans le flux actuel\nlet briefingType = data.prompt_type || data.briefing_type || 'custom';\nlet previewMode = data.preview_mode !== undefined ? data.preview_mode : false;\nlet htmlContent = data.html || '';\nlet subject = data.subject || '';\n\n// Méthode 2 : Essayer d'accéder aux nœuds précédents dans le flux d'exécution\n// Note: Dans n8n, $() permet d'accéder aux données des nœuds précédents\n// mais seulement si ces nœuds sont dans le flux d'exécution actuel\n\n// Essayer depuis \"Generate HTML Newsletter\" (juste avant \"Fetch Email Recipients\")\ntry {\n  const generateHtmlData = $('Generate HTML Newsletter').item?.json;\n  if (generateHtmlData) {\n    // IMPORTANT : Préserver html_content et subject depuis \"Generate HTML Newsletter\"\n    htmlContent = generateHtmlData.html || htmlContent;\n    subject = generateHtmlData.subject || subject;\n    \n    // Préserver aussi prompt_type et preview_mode\n    briefingType = generateHtmlData.prompt_type || briefingType;\n    previewMode = generateHtmlData.preview_mode !== undefined ? generateHtmlData.preview_mode : previewMode;\n    \n    console.log('✅ Données récupérées depuis Generate HTML Newsletter');\n  }\n} catch (e) {\n  console.warn('⚠️  Generate HTML Newsletter non accessible, tentative d\\'autres nœuds...');\n  \n  try {\n    // Essayer depuis \"Parse API Response\"\n    const parseApiData = $('Parse API Response').item?.json;\n    if (parseApiData) {\n      briefingType = parseApiData.prompt_type || briefingType;\n      previewMode = parseApiData.preview_mode !== undefined ? parseApiData.preview_mode : previewMode;\n      console.log('✅ Données récupérées depuis Parse API Response');\n    }\n  } catch (e2) {\n    console.warn('⚠️  Parse API Response non accessible, utilisation des valeurs par défaut');\n  }\n}\n\n// Normaliser le type\nlet normalizedType = briefingType;\nif (normalizedType === 'noon') {\n  normalizedType = 'midday';\n}\n\n// Récupérer les destinataires depuis l'API (données de \"Fetch Email Recipients\")\nconst recipientsData = data.recipients || [];\nconst previewEmail = data.preview_email || 'projetsjsl@gmail.com';\n\nlet emailList = [];\n\nif (previewMode === true) {\n  // Mode preview : utiliser l'email de preview\n  emailList = [previewEmail];\n  console.log('📧 Mode preview activé');\n} else {\n  // Mode envoi : utiliser les destinataires actifs du type\n  emailList = recipientsData\n    .filter(r => r.active && r[normalizedType])\n    .map(r => r.email);\n  \n  console.log(`📧 Mode envoi, type: ${normalizedType}, destinataires: ${emailList.length}`);\n  \n  // Fallback si aucun destinataire trouvé\n  if (emailList.length === 0) {\n    emailList = [previewEmail];\n    console.warn('⚠️  Aucun destinataire actif, utilisation de l\\'email de preview');\n  }\n}\n\n// Vérifier que html_content et subject sont présents\nif (!htmlContent) {\n  console.warn('⚠️  html_content manquant, le nœud Send Email via Resend pourrait échouer');\n}\nif (!subject) {\n  console.warn('⚠️  subject manquant, utilisation d\\'un sujet par défaut');\n  subject = subject || `Newsletter Emma - Mise à jour du ${normalizedType}`;\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    // Données de destinataires\n    recipients: emailList,\n    recipient_count: emailList.length,\n    briefing_type: normalizedType,\n    preview_mode: previewMode,\n    prompt_type: briefingType,\n    // IMPORTANT : Préserver html_content et subject pour \"Send Email via Resend\"\n    html: htmlContent,\n    subject: subject\n  }\n}));"
       },
       "id": "process-recipients-node",
       "name": "Process Recipients",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        24144,
-        6548
+        6144,
+        1716
       ]
     },
     {
@@ -741,8 +746,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        20432,
-        5728
+        2432,
+        896
       ]
     },
     {
@@ -783,8 +788,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        20432,
-        5920
+        2432,
+        1088
       ]
     },
     {
@@ -825,8 +830,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        20432,
-        6112
+        2432,
+        1280
       ]
     },
     {
@@ -867,21 +872,21 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        20432,
-        6304
+        2432,
+        1472
       ]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\nconsole.log('\ud83d\udd0d DEBUG AVANT SWITCH:');\nconsole.log('   preview_mode:', data.preview_mode, '(type:', typeof data.preview_mode, ')');\nconsole.log('   approved:', data.approved, '(type:', typeof data.approved, ')');\nconsole.log('   Condition Preview:', data.preview_mode === true || data.approved !== true);\nconsole.log('   Condition Send:', data.preview_mode === false && data.approved === true);\n\nreturn items;"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\nconsole.log('🔍 DEBUG AVANT SWITCH:');\nconsole.log('   preview_mode:', data.preview_mode, '(type:', typeof data.preview_mode, ')');\nconsole.log('   approved:', data.approved, '(type:', typeof data.approved, ')');\nconsole.log('   Condition Preview:', data.preview_mode === true || data.approved !== true);\nconsole.log('   Condition Send:', data.preview_mode === false && data.approved === true);\n\nreturn items;"
       },
       "id": "debug-before-switch-node",
       "name": "Debug Before Switch",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        23184,
-        6104
+        5184,
+        1272
       ]
     },
     {
@@ -910,7 +915,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": $json.message || $json.selected_prompt || \"G\u00e9n\u00e8re un briefing financier matinal.\"\n    }]\n  }],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"topK\": 40,\n    \"topP\": 0.95,\n    \"maxOutputTokens\": 2048\n  }\n} }}",
+        "jsonBody": "={{ {\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": $json.message || $json.selected_prompt || \"Génère un briefing financier matinal.\"\n    }]\n  }],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"topK\": 40,\n    \"topP\": 0.95,\n    \"maxOutputTokens\": 2048\n  }\n} }}",
         "options": {
           "response": {
             "response": {
@@ -924,8 +929,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        22448,
-        6104
+        4448,
+        1272
       ],
       "credentials": {
         "googlePalmApi": {
@@ -936,41 +941,41 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La r\u00e9ponse de Gemini a une structure diff\u00e9rente\n// Structure Gemini: { candidates: [{ content: { parts: [{ text: \"...\" }] } }] }\nlet content = '';\nif (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {\n  content = data.candidates[0].content.parts.map(part => part.text).join('\\n');\n} else if (data.response) {\n  content = data.response;\n} else if (typeof data === 'string') {\n  content = data;\n}\n\n// Adapter au format attendu par Parse API Response\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    newsletter_content: content,\n    response: content,\n    message: content,\n    emma_model: 'gemini',\n    emma_tools: [],\n    emma_execution_time: 0,\n    trigger_type: item.json.trigger_type || 'Manuel',\n    prompt_type: item.json.prompt_type || 'custom',\n    generated_at: new Date().toISOString(),\n    // Pr\u00e9server preview_mode et approved\n    preview_mode: item.json.preview_mode,\n    approved: item.json.approved\n  }\n}));"
+        "jsCode": "const items = $input.all();\nconst data = items[0].json;\n\n// La réponse de Gemini a une structure différente\n// Structure Gemini: { candidates: [{ content: { parts: [{ text: \"...\" }] } }] }\nlet content = '';\nif (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {\n  content = data.candidates[0].content.parts.map(part => part.text).join('\\n');\n} else if (data.response) {\n  content = data.response;\n} else if (typeof data === 'string') {\n  content = data;\n}\n\n// Adapter au format attendu par Parse API Response\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    newsletter_content: content,\n    response: content,\n    message: content,\n    emma_model: 'gemini',\n    emma_tools: [],\n    emma_execution_time: 0,\n    trigger_type: item.json.trigger_type || 'Manuel',\n    prompt_type: item.json.prompt_type || 'custom',\n    generated_at: new Date().toISOString(),\n    // Préserver preview_mode et approved\n    preview_mode: item.json.preview_mode,\n    approved: item.json.approved\n  }\n}));"
       },
       "id": "parse-gemini-response",
       "name": "Parse Gemini Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        22672,
-        6104
+        4672,
+        1272
       ]
     },
     {
       "parameters": {
-        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83e\udd16 S\u00c9LECTEUR DE MOD\u00c8LE IA - MODIFIEZ ICI \u2699\ufe0f\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n//\n// \ud83d\udc47 MODIFIEZ LA VALEUR CI-DESSOUS \ud83d\udc47\n//\nconst AI_MODEL = 'emma';\n//\n// Options disponibles:\n//   - 'emma'    \u2192 Utilise Emma (Perplexity) via /api/chat\n//   - 'gemini'  \u2192 Utilise Gemini directement\n//\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ai_model: AI_MODEL,\n    _model_info: AI_MODEL === 'emma' \n      ? '\ud83e\udd16 Emma (Perplexity) - Recherche web en temps r\u00e9el' \n      : '\u2728 Gemini Direct - R\u00e9ponse rapide'\n  }\n}));"
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// 🤖 SÉLECTEUR DE MODÈLE IA - MODIFIEZ ICI ⚙️\n// ═══════════════════════════════════════════════════════════\n//\n// 👇 MODIFIEZ LA VALEUR CI-DESSOUS 👇\n//\nconst AI_MODEL = 'emma';\n//\n// Options disponibles:\n//   - 'emma'    → Utilise Emma (Perplexity) via /api/chat\n//   - 'gemini'  → Utilise Gemini directement\n//\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    ai_model: AI_MODEL,\n    _model_info: AI_MODEL === 'emma' \n      ? '🤖 Emma (Perplexity) - Recherche web en temps réel' \n      : '✨ Gemini Direct - Réponse rapide'\n  }\n}));"
       },
       "id": "ai-model-config-dropdown",
-      "name": "\u2699\ufe0f AI Model Selector (Change AI_MODEL)",
+      "name": "⚙️ AI Model Selector (Change AI_MODEL)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        21552,
-        6104
+        3552,
+        1272
       ]
     },
     {
       "parameters": {
-        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udd11 EXTRACTION DE LA CL\u00c9 API GEMINI DEPUIS LA R\u00c9PONSE VERCEL\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n//\n// Ce n\u0153ud extrait la cl\u00e9 API Gemini depuis la r\u00e9ponse de l'endpoint Vercel\n//\n// \u2705 Configuration automatique - Aucune action requise !\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\nconst data = items[0].json;\n\nlet geminiApiKey = '';\n\ntry {\n  // La r\u00e9ponse de l'endpoint Vercel est dans $json\n  // Format: { apiKey: \"...\", configured: true, ... }\n  if (data.apiKey) {\n    geminiApiKey = data.apiKey;\n    console.log('\u2705 Cl\u00e9 API Gemini r\u00e9cup\u00e9r\u00e9e depuis Vercel');\n  } else if (data.error) {\n    throw new Error(`Erreur Vercel: ${data.message || data.error}`);\n  } else {\n    // Fallback : essayer depuis les credentials n8n\n    geminiApiKey = $workflow.getStaticData('global').geminiApiKey || '';\n    \n    if (!geminiApiKey) {\n      throw new Error('Cl\u00e9 API non trouv\u00e9e. V\u00e9rifiez que GEMINI_API_KEY est configur\u00e9e dans Vercel.');\n    }\n    \n    console.log('\u26a0\ufe0f  Utilisation de la cl\u00e9 depuis les credentials n8n (fallback)');\n  }\n} catch (error) {\n  console.error('\u274c Erreur:', error.message);\n  throw new Error(`\u274c Impossible de r\u00e9cup\u00e9rer la cl\u00e9 API Gemini: ${error.message}`);\n}\n\nif (!geminiApiKey) {\n  throw new Error('\u274c Cl\u00e9 API Gemini vide');\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    gemini_api_key: geminiApiKey\n  }\n}));"
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// 🔑 EXTRACTION DE LA CLÉ API GEMINI DEPUIS LA RÉPONSE VERCEL\n// ═══════════════════════════════════════════════════════════\n//\n// Ce nœud extrait la clé API Gemini depuis la réponse de l'endpoint Vercel\n//\n// ✅ Configuration automatique - Aucune action requise !\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\nconst data = items[0].json;\n\nlet geminiApiKey = '';\n\ntry {\n  // La réponse de l'endpoint Vercel est dans $json\n  // Format: { apiKey: \"...\", configured: true, ... }\n  if (data.apiKey) {\n    geminiApiKey = data.apiKey;\n    console.log('✅ Clé API Gemini récupérée depuis Vercel');\n  } else if (data.error) {\n    throw new Error(`Erreur Vercel: ${data.message || data.error}`);\n  } else {\n    // Fallback : essayer depuis les credentials n8n\n    geminiApiKey = $workflow.getStaticData('global').geminiApiKey || '';\n    \n    if (!geminiApiKey) {\n      throw new Error('Clé API non trouvée. Vérifiez que GEMINI_API_KEY est configurée dans Vercel.');\n    }\n    \n    console.log('⚠️  Utilisation de la clé depuis les credentials n8n (fallback)');\n  }\n} catch (error) {\n  console.error('❌ Erreur:', error.message);\n  throw new Error(`❌ Impossible de récupérer la clé API Gemini: ${error.message}`);\n}\n\nif (!geminiApiKey) {\n  throw new Error('❌ Clé API Gemini vide');\n}\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    gemini_api_key: geminiApiKey\n  }\n}));"
       },
       "id": "gemini-api-key-node",
       "name": "Get Gemini API Key",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        22224,
-        6104
+        4224,
+        1272
       ]
     },
     {
@@ -998,8 +1003,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        22000,
-        6104
+        4000,
+        1272
       ]
     },
     {
@@ -1064,8 +1069,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        21776,
-        6104
+        3776,
+        1272
       ]
     },
     {
@@ -1077,8 +1082,8 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        22672,
-        6400
+        4672,
+        1568
       ],
       "webhookId": "9663354b-9871-49c0-aaee-3992c85a12ec"
     },
@@ -1091,8 +1096,8 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.7,
       "position": [
-        23120,
-        6296
+        5120,
+        1464
       ]
     },
     {
@@ -1104,8 +1109,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        23192,
-        6520
+        5192,
+        1688
       ],
       "credentials": {
         "googlePalmApi": {
@@ -1116,42 +1121,146 @@
     },
     {
       "parameters": {
-        "jsCode": "// Test Email Prep Node - ENHANCED DEBUGGING\nconst items = $input.all();\nconst data = items[0].json;\n\nconsole.log(\"\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\");\nconsole.log(\"\ud83d\udccb Test Email Prep - Input Data:\");\nconsole.log(\"\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\");\nconsole.log(\"All keys:\", Object.keys(data));\nconsole.log(\"Full data:\", JSON.stringify(data, null, 2));\n\nlet content = \"\";\nif (data.output) {\n  content = data.output;\n  console.log(\"\u2705 Content found in: data.output\");\n}\nelse if (data.text) {\n  content = data.text;\n  console.log(\"\u2705 Content found in: data.text\");\n}\nelse if (data.response) {\n  content = data.response;\n  console.log(\"\u2705 Content found in: data.response\");\n}\nelse if (data.message) {\n  content = data.message;\n  console.log(\"\u2705 Content found in: data.message\");\n}\nelse {\n  content = \"No content found - available keys: \" + Object.keys(data).join(\", \");\n  console.log(\"\u274c Content NOT found!\");\n}\n\nconsole.log(\"\ud83d\udcdd Content length:\", content.length);\nconsole.log(\"\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\");\n\nreturn [{\n  json: {\n    newsletter_content: content,\n    trigger_type: \"Test Chat\",\n    emma_model: \"gemini-langchain\",\n    emma_tools: [\"langchain\", \"chat\"],\n    emma_execution_time: 0,\n    prompt_type: \"test\",\n    tickers: \"\",\n    preview_mode: false,\n    approved: true,\n    test_mode: true,\n    recipients: [\"projetsjsl@gmail.com\"],\n    generated_at: new Date().toISOString()\n  }\n}];"
+        "jsCode": "// Test Email Prep Node - ENHANCED DEBUGGING\nconst items = $input.all();\nconst data = items[0].json;\n\nconsole.log(\"═══════════════════════════════════\");\nconsole.log(\"📋 Test Email Prep - Input Data:\");\nconsole.log(\"═══════════════════════════════════\");\nconsole.log(\"All keys:\", Object.keys(data));\nconsole.log(\"Full data:\", JSON.stringify(data, null, 2));\n\nlet content = \"\";\nif (data.output) {\n  content = data.output;\n  console.log(\"✅ Content found in: data.output\");\n}\nelse if (data.text) {\n  content = data.text;\n  console.log(\"✅ Content found in: data.text\");\n}\nelse if (data.response) {\n  content = data.response;\n  console.log(\"✅ Content found in: data.response\");\n}\nelse if (data.message) {\n  content = data.message;\n  console.log(\"✅ Content found in: data.message\");\n}\nelse {\n  content = \"No content found - available keys: \" + Object.keys(data).join(\", \");\n  console.log(\"❌ Content NOT found!\");\n}\n\nconsole.log(\"📝 Content length:\", content.length);\nconsole.log(\"═══════════════════════════════════\");\n\nreturn [{\n  json: {\n    newsletter_content: content,\n    trigger_type: \"Test Chat\",\n    emma_model: \"gemini-langchain\",\n    emma_tools: [\"langchain\", \"chat\"],\n    emma_execution_time: 0,\n    prompt_type: \"test\",\n    tickers: \"\",\n    preview_mode: false,\n    approved: true,\n    test_mode: true,\n    recipients: [\"projetsjsl@gmail.com\"],\n    generated_at: new Date().toISOString()\n  }\n}];"
       },
       "id": "8346e806-18fc-4bc8-ad19-fc8c0e11bd5b",
       "name": "Test Formated HTML Email to projetsjsl@gmail.com",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        23472,
-        6400
+        5472,
+        1568
       ]
     },
     {
       "parameters": {
-        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83c\uddeb\ud83c\uddf7 INSTRUCTION FRAN\u00c7AISE POUR LE LLM\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\nconst data = items[0].json;\n\n// Message original de l'utilisateur\nconst userMessage = data.chatInput || data.message || '';\n\n// Instruction syst\u00e8me en fran\u00e7ais\nconst systemInstruction = `Tu es Emma, l'assistante financi\u00e8re IA de JSLAI\u2122.\n\nLANGUE: R\u00e9ponds TOUJOURS en FRAN\u00c7AIS, sauf pour:\n- Les noms propres (entreprises, personnes, lieux)\n- Les citations directes\n- Les termes techniques standards (P/E ratio, ETF, etc.)\n\nSTYLE:\n- Analyse financi\u00e8re claire et professionnelle\n- Structure avec des paragraphes distincts\n- Utilise des donn\u00e9es pr\u00e9cises\n- Ton accessible mais expert\n\nVoici la question de l'utilisateur:\n\n`;\n\n// Combiner l'instruction avec le message\nconst fullMessage = systemInstruction + userMessage;\n\nconsole.log('\ud83c\uddeb\ud83c\uddf7 Instruction fran\u00e7aise ajout\u00e9e au message');\nconsole.log('   Longueur originale:', userMessage.length);\nconsole.log('   Longueur totale:', fullMessage.length);\n\nreturn [{\n  json: {\n    ...data,\n    chatInput: fullMessage\n  }\n}];"
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// 🇫🇷 INSTRUCTION FRANÇAISE POUR LE LLM\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\nconst data = items[0].json;\n\n// Message original de l'utilisateur\nconst userMessage = data.chatInput || data.message || '';\n\n// Instruction système en français\nconst systemInstruction = `Tu es Emma, l'assistante financière IA de JSLAI™.\n\nLANGUE: Réponds TOUJOURS en FRANÇAIS, sauf pour:\n- Les noms propres (entreprises, personnes, lieux)\n- Les citations directes\n- Les termes techniques standards (P/E ratio, ETF, etc.)\n\nSTYLE:\n- Analyse financière claire et professionnelle\n- Structure avec des paragraphes distincts\n- Utilise des données précises\n- Ton accessible mais expert\n\nVoici la question de l'utilisateur:\n\n`;\n\n// Combiner l'instruction avec le message\nconst fullMessage = systemInstruction + userMessage;\n\nconsole.log('🇫🇷 Instruction française ajoutée au message');\nconsole.log('   Longueur originale:', userMessage.length);\nconsole.log('   Longueur totale:', fullMessage.length);\n\nreturn [{\n  json: {\n    ...data,\n    chatInput: fullMessage\n  }\n}];"
       },
       "id": "add-french-instruction-node-id",
-      "name": "\ud83c\uddeb\ud83c\uddf7 Add French Instruction",
+      "name": "🇫🇷 Add French Instruction",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        22896,
-        6400
+        4896,
+        1568
       ]
     },
     {
       "parameters": {
-        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// \ud83d\udc1b DEBUG NODE - Voir EXACTEMENT ce qui arrive \u00e0 Send Email\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nconst items = $input.all();\nconst data = items[0].json;\n\nconsole.log(\"\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\");\nconsole.log(\"\ud83d\udc1b DEBUG AVANT SEND EMAIL\");\nconsole.log(\"\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\");\nconsole.log(\"Toutes les cl\u00e9s disponibles:\", Object.keys(data));\nconsole.log(\"\");\n\n// V\u00e9rifier CHAQUE champ important\nconst checks = {\n    'html': data.html,\n    'html_content': data.html_content,\n    'subject': data.subject,\n    'from': data.from,\n    'to': data.to,\n    'recipients': data.recipients\n};\n\nfor (const [key, value] of Object.entries(checks)) {\n    if (value !== undefined) {\n        const preview = typeof value === 'string' ? value.substring(0, 100) : JSON.stringify(value);\n        console.log(`\u2705 ${key}: ${preview}...`);\n    } else {\n        console.log(`\u274c ${key}: MISSING`);\n    }\n}\n\nconsole.log(\"\");\nconsole.log(\"Type de data.html:\", typeof data.html);\nconsole.log(\"Longueur data.html:\", data.html ? data.html.length : 0);\nconsole.log(\"\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\");\n\n// IMPORTANT: Retourner les donn\u00e9es SANS MODIFICATION\nreturn items;\n"
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// 🐛 DEBUG NODE - Voir EXACTEMENT ce qui arrive à Send Email\n// ═══════════════════════════════════════════════════════════\n\nconst items = $input.all();\nconst data = items[0].json;\n\nconsole.log(\"═══════════════════════════════════════════════════════════\");\nconsole.log(\"🐛 DEBUG AVANT SEND EMAIL\");\nconsole.log(\"═══════════════════════════════════════════════════════════\");\nconsole.log(\"Toutes les clés disponibles:\", Object.keys(data));\nconsole.log(\"\");\n\n// Vérifier CHAQUE champ important\nconst checks = {\n    'html': data.html,\n    'html_content': data.html_content,\n    'subject': data.subject,\n    'from': data.from,\n    'to': data.to,\n    'recipients': data.recipients\n};\n\nfor (const [key, value] of Object.entries(checks)) {\n    if (value !== undefined) {\n        const preview = typeof value === 'string' ? value.substring(0, 100) : JSON.stringify(value);\n        console.log(`✅ ${key}: ${preview}...`);\n    } else {\n        console.log(`❌ ${key}: MISSING`);\n    }\n}\n\nconsole.log(\"\");\nconsole.log(\"Type de data.html:\", typeof data.html);\nconsole.log(\"Longueur data.html:\", data.html ? data.html.length : 0);\nconsole.log(\"═══════════════════════════════════════════════════════════\");\n\n// IMPORTANT: Retourner les données SANS MODIFICATION\nreturn items;\n"
       },
       "id": "debug-before-send-email",
-      "name": "\ud83d\udc1b DEBUG Before Send Email",
+      "name": "🐛 DEBUG Before Send Email",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2200,
-        500
+        6368,
+        1716
       ]
+    },
+    {
+      "name": "SMS Webhook Twilio",
+      "id": "sms-webhook-prod",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        24400,
+        5600
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gob-sms-webhook",
+        "options": {},
+        "responseMode": "responseNode"
+      },
+      "webhookId": "gob-sms-twilio"
+    },
+    {
+      "name": "SMS Webhook Test",
+      "id": "sms-webhook-test",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        24400,
+        5850
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gob-sms-webhook-test",
+        "options": {},
+        "responseMode": "responseNode"
+      },
+      "webhookId": "gob-sms-test"
+    },
+    {
+      "name": "SMS Extract Data",
+      "id": "sms-extract-data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        24850,
+        5725
+      ],
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "from_phone",
+              "value": "={{ $json.body.From }}"
+            },
+            {
+              "name": "to_phone",
+              "value": "={{ $json.body.To }}"
+            },
+            {
+              "name": "message_body",
+              "value": "={{ $json.body.Body }}"
+            },
+            {
+              "name": "message_sid",
+              "value": "={{ $json.body.MessageSid }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "name": "SMS Call Adapter",
+      "id": "sms-call-adapter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        25300,
+        5725
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gobapps.com/api/adapters/sms",
+        "authentication": "none",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "string"
+            }
+          }
+        },
+        "bodyParametersJson": "={{ JSON.stringify({\\n  From: $json.from_phone,\\n  To: $json.to_phone,\\n  Body: $json.message_body,\\n  MessageSid: $json.message_sid\\n}) }}"
+      }
+    },
+    {
+      "name": "SMS Respond",
+      "id": "sms-respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        25750,
+        5725
+      ],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.body || $json }}"
+      }
     }
   ],
   "connections": {
@@ -1181,14 +1290,14 @@
       "main": [
         [
           {
-            "node": "\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)",
+            "node": "🎯 Manual Briefing Selector (MODIFIEZ ICI)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)": {
+    "🎯 Manual Briefing Selector (MODIFIEZ ICI)": {
       "main": [
         [
           {
@@ -1225,7 +1334,7 @@
       "main": [
         [
           {
-            "node": "\u2699\ufe0f AI Model Selector (Change AI_MODEL)",
+            "node": "⚙️ AI Model Selector (Change AI_MODEL)",
             "type": "main",
             "index": 0
           }
@@ -1408,7 +1517,7 @@
       "main": [
         [
           {
-            "node": "\ud83c\udfaf Manual Briefing Selector (MODIFIEZ ICI)",
+            "node": "🎯 Manual Briefing Selector (MODIFIEZ ICI)",
             "type": "main",
             "index": 0
           }
@@ -1441,7 +1550,7 @@
       "main": [
         [
           {
-            "node": "\ud83d\udc1b DEBUG Before Send Email",
+            "node": "🐛 DEBUG Before Send Email",
             "type": "main",
             "index": 0
           }
@@ -1543,7 +1652,7 @@
         ]
       ]
     },
-    "\u2699\ufe0f AI Model Selector (Change AI_MODEL)": {
+    "⚙️ AI Model Selector (Change AI_MODEL)": {
       "main": [
         [
           {
@@ -1609,7 +1718,7 @@
       "main": [
         [
           {
-            "node": "\ud83c\uddeb\ud83c\uddf7 Add French Instruction",
+            "node": "🇫🇷 Add French Instruction",
             "type": "main",
             "index": 0
           }
@@ -1638,7 +1747,7 @@
         ]
       ]
     },
-    "\ud83c\uddeb\ud83c\uddf7 Add French Instruction": {
+    "🇫🇷 Add French Instruction": {
       "main": [
         [
           {
@@ -1649,11 +1758,55 @@
         ]
       ]
     },
-    "\ud83d\udc1b DEBUG Before Send Email": {
+    "🐛 DEBUG Before Send Email": {
       "main": [
         [
           {
             "node": "Send Email via Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS Webhook Twilio": {
+      "main": [
+        [
+          {
+            "node": "SMS Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS Webhook Test": {
+      "main": [
+        [
+          {
+            "node": "SMS Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS Extract Data": {
+      "main": [
+        [
+          {
+            "node": "SMS Call Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS Call Adapter": {
+      "main": [
+        [
+          {
+            "node": "SMS Respond",
             "type": "main",
             "index": 0
           }
@@ -1679,5 +1832,112 @@
         ]
       }
     }
-  }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Call /api/chat (Emma)": [
+      {
+        "json": {
+          "success": true,
+          "response": "Bonsoir n8n-automation,  \nVoici votre synthèse personnalisée de la séance boursière du vendredi 7 novembre 2025, marquée par une volatilité sectorielle contrastée et des mouvements significatifs sur plusieurs titres phares de votre univers d’investissement.\n\n---\n\n**1. Ouverture**  \nLa séance s’est ouverte sous le signe de l’incertitude, avec des marchés oscillant entre prises de bénéfices en début de journée et rebonds techniques sur les valeurs technologiques et santé en clôture. Les investisseurs restent attentifs aux prochaines publications et à la trajectoire des taux.\n\n---\n\n**2. Clôture des marchés**  \n- **S&P 500** : -0,3% à 5 086 points.  \n- **Nasdaq** : +0,5% à 17 120 points, soutenu par la tech.  \n- **TSX (Canada)** : -0,4% à 21 780 points.  \nLes volumes de transactions sont restés dans la moyenne, avec une accélération sur les bancaires et la tech en fin de séance (source : FMP Fundamentals, Polygon).\n\n---\n\n**3. Secteurs performants**\n- **En hausse :**  \n   - **Technologie** (+1,2%) : Alphabet (GOOGL) et le segment IA tirent le secteur, portés par des résultats supérieurs et des anticipations de croissance durable.\n   - **Énergie** (+1,1%) : Reprise des cours du pétrole, bénéfique pour les valeurs de services et d’infrastructure.\n   - **Santé** : Big pharma (JNJ, PFE) en rebond modéré, rotation vers la qualité en période d’incertitude macro.\n\n- **En baisse :**  \n   - **Télécoms** : BCE, VZ et T pénalisés par la pression sur les marges et la concurrence accrue (-1,5%).\n   - **Banques canadiennes** : BNS, TD sous pression (-0,7% à -1,1%), inquiétudes persistantes sur le crédit et la rentabilité.\n   - **Consommation discrétionnaire** : NKE, CVS affectés par la prudence des ménages.\n\n---\n\n**4. Tickers d’équipe – Bilan et analyse**\n- **GOOGL (Alphabet)** : +0,8% à 278,83$. P/E de 27,1x (vs secteur tech 28x), ROE très élevé à 35%. Marge nette impressionnante (32%), dette quasi nulle, moat technologique majeur, momentum IA solide.  \n- **BNS (Banque Scotia)** : -0,7% à 66,70$. P/E à 16,1x, ROE faible à 8,6%, payout ratio élevé (81%), dette/capitaux propres massive (5,8x). Pression sur la croissance et la qualité du crédit.  \n- **TD (Toronto Dominion)** : -1,1% à 80,90$. P/E attractif à 9,3x, ROE robuste à 17,2%, marge nette 17,8%. Mieux positionnée que BNS, mais secteur bancaire sous tension.  \n- **BCE (Télécom)** : -1,5% à 23,19$. P/E élevé à 50,3x, marge nette faible à 2,5%, payout ratio surdimensionné (>500%), dette élevée. Défensif mais risque sur la soutenabilité du dividende.  \n- **CNR (Core Natural Resources)** : Stable à 89,41$. P/E extrême à 227x, ROE quasi nul (<1%), mais faible endettement. Le marché reste prudent sur la visibilité bénéficiaire.\n\n---\n\n**5. Événements marquants**  \n- Alphabet profite d’un nouvel engouement IA, plusieurs analystes anticipant une « croissance exponentielle » à moyen terme.\n- Les banques canadiennes pâtissent d’une montée des provisions et des craintes sur l’immobilier commercial.\n- Les télécoms subissent une révision à la baisse des perspectives de marges et des avertissements de plusieurs opérateurs.\n\n---\n\n**6. Perspective demain**  \nÀ surveiller : résultats de sociétés santé (MDT, JNJ), discours de la Fed et chiffres d’inflation US qui pourraient infléchir la courbe des taux. Les investisseurs seront attentifs à la résilience des dividendes dans les télécoms et à la qualité des actifs bancaires.\n\n---\n\n**7. Conseil Emma**  \nFace à la volatilité, privilégiez les valeurs à moat défensif, faible endettement et génération de cash-flow solide (GOOGL, TD). Limitez l’exposition aux télécoms et aux banques à faible rentabilité ou fort levier, en privilégiant la sélectivité dans vos arbitrages.\n\n---\n\n**8. Fermeture**  \nMerci n8n-automation pour votre confiance. Je reste à disposition pour approfondir l’analyse de tout titre spécifique ou élaborer une allocation sectorielle détaillée demain matin. Bonne soirée et à demain pour un nouveau point marché.\n\n*Sources : FMP Fundamentals, FMP Ratios, Polygon, actualités sectorielles au 9 novembre 2025.*",
+          "conversationId": "4c39bb0a-5adb-49e2-b77f-7ec22cc2437e",
+          "metadata": {
+            "user_id": "2fc99cf6-3dd8-4129-82c9-73ee478abe12",
+            "name": "n8n-automation",
+            "conversation_id": "4c39bb0a-5adb-49e2-b77f-7ec22cc2437e",
+            "model": "perplexity",
+            "llmUsed": "perplexity",
+            "tools_used": [
+              "fmp-fundamentals",
+              "fmp-quote",
+              "fmp-ticker-news",
+              "fmp-ratios",
+              "fmp-key-metrics",
+              "fmp-ratings",
+              "earnings-calendar",
+              "polygon-stock-price"
+            ],
+            "toolsUsed": [
+              "fmp-fundamentals",
+              "fmp-quote",
+              "fmp-ticker-news",
+              "fmp-ratios",
+              "fmp-key-metrics",
+              "fmp-ratings",
+              "earnings-calendar",
+              "polygon-stock-price"
+            ],
+            "failedTools": [
+              "fmp-quote"
+            ],
+            "confidence": 0.685,
+            "dataConfidence": 0.52,
+            "intent": "comparative_analysis",
+            "execution_time_ms": 39903,
+            "executionTimeMs": 41625,
+            "emmaExecutionTimeMs": 39903,
+            "channel": "web",
+            "messageCount": 11
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "94567182-906a-4bc2-8a29-e8d84e8ffad1",
+  "versionCounter": 358,
+  "triggerCount": 5,
+  "shared": [
+    {
+      "updatedAt": "2025-10-20T18:16:03.747Z",
+      "createdAt": "2025-10-20T18:16:03.747Z",
+      "role": "workflow:owner",
+      "workflowId": "03lgcA4e9uRTtli1",
+      "projectId": "qfcAzmlYYK6RvGCQ",
+      "project": {
+        "updatedAt": "2025-09-24T01:26:58.771Z",
+        "createdAt": "2025-09-24T01:26:55.321Z",
+        "id": "qfcAzmlYYK6RvGCQ",
+        "name": "Projets JSL <projetsjsl@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-09-24T01:26:55.322Z",
+            "createdAt": "2025-09-24T01:26:55.322Z",
+            "userId": "cf0c4ec1-d247-4b12-bc83-04a5c23649fb",
+            "projectId": "qfcAzmlYYK6RvGCQ",
+            "user": {
+              "updatedAt": "2025-11-11T05:47:39.000Z",
+              "createdAt": "2025-09-24T01:26:53.819Z",
+              "id": "cf0c4ec1-d247-4b12-bc83-04a5c23649fb",
+              "email": "projetsjsl@gmail.com",
+              "firstName": "Projets",
+              "lastName": "JSL",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "userClaimedAiCredits": true,
+                "firstSuccessfulWorkflowId": "03lgcA4e9uRTtli1",
+                "userActivatedAt": 1760990286412,
+                "npsSurvey": {
+                  "waitingForResponse": true,
+                  "ignoredCount": 2,
+                  "lastShownAt": 1762636703931
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2025-11-11",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": []
 }

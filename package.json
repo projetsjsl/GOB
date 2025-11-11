@@ -5,14 +5,20 @@
   "scripts": {
     "build": "node build.js",
     "validate-workflow": "node validate-n8n-workflow.js",
-    "import-workflow": "node import-workflow-header-black-white.js"
+    "import-workflow": "node import-workflow-header-black-white.js",
+    "sms:test-server": "node test-sms-server.js",
+    "sms:scenarios": "node test-scenarios.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
-    "@octokit/rest": "^20.0.0",
     "@anthropic-ai/sdk": "^0.17.0",
-    "twilio": "^4.20.0",
+    "@google/generative-ai": "^0.21.0",
+    "@octokit/rest": "^20.0.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "axios": "^1.13.2",
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "resend": "^3.0.0",
-    "@google/generative-ai": "^0.21.0"
+    "twilio": "^4.20.0"
   }
 }
