@@ -65,17 +65,32 @@ npm run sms:scenarios
    - Le serveur relaie la requête vers `/api/adapters/sms`.
    - Emma répond, le serveur renvoie la TwiML à Twilio (et log dans le dashboard).
 
-## 6. Tests automatisés
+## 6. Déploiement Render/Railway (optionnel)
+
+Pour éviter d’avoir à lancer le serveur en local, vous pouvez déployer `test-sms-server.js` sur une plateforme Node (Render, Railway, Fly.io, VM, etc.).
+
+1. **Repo** : `npm start` lance maintenant `node test-sms-server.js` (Render l’utilise par défaut).
+2. **Deploy Render** :
+   - Type : *Web Service* (Node, branch `main`).
+   - Build command : `npm install`
+   - Start command : `npm start`
+   - Health check path : `/health`
+   - Variables : `MODE`, `TEST_MODE`, `EMMA_WEBHOOK_URL`, `PUBLIC_URL`, `TWILIO_*`, `N8N_WEBHOOK_BASE_URL`, etc.
+3. Une fois l’URL Render obtenue (ex: `https://gob-xxxx.onrender.com`), mettez-la dans le panneau Admin (champ `PUBLIC_URL`) et, si besoin, adaptez `EMMA_WEBHOOK_URL`/les webhooks Twilio.
+
+`render.yaml` dans le repo donne un exemple de configuration “Blueprint”.
+
+## 7. Tests automatisés
 
 `test-scenarios.js` couvre les commandes réelles (MARCHE, ANALYSE, NEWS, WATCHLIST, SKILLS, etc.) et vérifie la présence de mots clés. Résultats directement dans le terminal.
 
-## 7. Migration / Compatibilité
+## 8. Migration / Compatibilité
 
 - Les workflows n8n et `/api/adapters/sms` restent inchangés : aucun duplicat de logique.
 - Le serveur test envoie exactement le même payload Twilio (`application/x-www-form-urlencoded`).
 - Les nouvelles commandes Emma sont automatiquement disponibles (le dashboard ne fait que relayer).
 
-## 8. Prochaines étapes suggérées
+## 9. Prochaines étapes suggérées
 
 - Ajouter des scénarios personnalisés (fichier `test-scenarios.js`).
 - Activer `VALIDATE_TWILIO_SIGNATURE=true` une fois déployé derrière HTTPS.

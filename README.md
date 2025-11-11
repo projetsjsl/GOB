@@ -17,6 +17,7 @@ Dashboard financier complet avec JLab™ (ex-JStocks™) pour le Groupe Ouellet 
   # Mode prod local (Twilio + ngrok)
   MODE=prod_local PUBLIC_URL=https://<ngrok>.ngrok.io npm run sms:test-server
   ```
+- Le script `npm start` lance automatiquement `test-sms-server.js` (utile pour Render/Railway ou tout hébergeur Node).
 - Dashboard: `http://localhost:3000` (modifiable via `TEST_SMS_PORT` / `PORT`).
 - Scénarios automatiques alignés sur les vraies commandes Emma : `npm run sms:scenarios`.
 - Guide complet: [`integration-guide.md`](./integration-guide.md) – connections n8n, Twilio, variables d'environnement.

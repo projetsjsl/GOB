@@ -1,0 +1,13 @@
+services:
+  - name: GOB
+    type: web
+    env: node
+    plan: starter
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "10000"

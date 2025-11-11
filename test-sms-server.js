@@ -405,7 +405,6 @@ function generateNumber(country='US'){
   document.getElementById('from').value=(formats[country]||formats.US)();
 }
 function setMessage(message){document.getElementById('body').value=message;}
-setTimeout(()=>location.reload(),15000);
 </script>
 </body>
 </html>
