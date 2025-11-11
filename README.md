@@ -22,7 +22,7 @@ Dashboard financier complet avec JLab™ (ex-JStocks™) pour le Groupe Ouellet 
 - Scénarios automatiques alignés sur les vraies commandes Emma : `npm run sms:scenarios`.
 - Guide complet: [`integration-guide.md`](./integration-guide.md) – connections n8n, Twilio, variables d'environnement.
 - Nouveau webhook n8n dédié aux tests `gob-sms-webhook-test` (dans `n8n-workflows/sms-workflow.json`) pour isoler les simulations tout en gardant la logique centralisée.
-- **Panneau Admin (Dashboard → Admin JSLAI → Emma SMS)** : interface graphique pour changer les variables `.env`, démarrer/arrêter le serveur test, lancer les scénarios et vérifier les webhooks Twilio/n8n sans toucher aux fichiers.
+- **Panneau Admin (Dashboard → Admin JSLAI → Emma SMS)** : interface graphique pour changer les variables `.env`, démarrer/arrêter le serveur test, lancer les scénarios et vérifier les webhooks Twilio/n8n sans toucher aux fichiers. Le dashboard Render (conversations, formulaire SMS) est également embarqué directement dans cet onglet dès que `PUBLIC_URL` pointe vers ton instance Render/Railway.
 
 ### 🚀 Démarrage Rapide
 - **[Guide principal](./docs/user-guides/LISEZ_MOI_AU_REVEIL.md)** - Tout ce qu'il faut savoir

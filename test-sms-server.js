@@ -38,6 +38,15 @@ const app = express();
 app.set('trust proxy', true);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
 
 const MODE = (process.env.MODE || 'test').toLowerCase();
 const PORT = Number(process.env.PORT || process.env.TEST_SMS_PORT || 3000);

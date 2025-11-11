@@ -80,6 +80,8 @@ Pour éviter d’avoir à lancer le serveur en local, vous pouvez déployer `tes
 
 `render.yaml` dans le repo donne un exemple de configuration “Blueprint”.
 
+> **Astuce** : quand `PUBLIC_URL` est défini, l’onglet Admin JSLAI embarque automatiquement le dashboard Render (formulaire + conversations) via fetch, sans rechargement global.
+
 ## 7. Tests automatisés
 
 `test-scenarios.js` couvre les commandes réelles (MARCHE, ANALYSE, NEWS, WATCHLIST, SKILLS, etc.) et vérifie la présence de mots clés. Résultats directement dans le terminal.

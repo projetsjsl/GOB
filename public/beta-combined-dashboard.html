@@ -611,7 +611,7 @@ const fetchHybridData = async (symbol, dataType) => {
 
 // Fonction generateMockDataForType SUPPRIMÉE - Plus de données simulées
 
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, useCallback } = React;
 
             // Composant d'icônes SVG inline (remplace Lucide) - Défini globalement
             // Iconoir Icon Component (remplace LucideIcon)
@@ -4419,6 +4419,7 @@ STRUCTURE JSON OBLIGATOIRE:
                 const [scenarioOutput, setScenarioOutput] = useState('');
                 const [scenarioLoading, setScenarioLoading] = useState(false);
                 const [serverLoading, setServerLoading] = useState(false);
+                const publicUrl = (envValues.PUBLIC_URL || '').trim();
 
                 const fetchStatus = useCallback(async () => {
                     try {
@@ -4669,12 +4670,12 @@ STRUCTURE JSON OBLIGATOIRE:
                                     </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                    <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                                        <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="📡" size={16}/> Webhook n8n</h4>
-                                        <p className="text-xs break-all mb-2">{envValues.EMMA_WEBHOOK_URL || 'Non défini'}</p>
-                                        {webhookStatus && statusBadge(webhookStatus.status === 'ok' ? 'n8n OK' : webhookStatus.status.toUpperCase(), webhookStatus.status === 'ok' ? 'success' : 'error')}
-                                        <p className="text-xs opacity-70 mt-1">{webhookStatus?.message}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+                                <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="📡" size={16}/> Webhook n8n</h4>
+                                <p className="text-xs break-all mb-2">{envValues.EMMA_WEBHOOK_URL || 'Non défini'}</p>
+                                {webhookStatus && statusBadge(webhookStatus.status === 'ok' ? 'n8n OK' : webhookStatus.status.toUpperCase(), webhookStatus.status === 'ok' ? 'success' : 'error')}
+                                <p className="text-xs opacity-70 mt-1">{webhookStatus?.message}</p>
                                     </div>
                                     <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
                                         <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="🔌" size={16}/> Serveur local</h4>
@@ -4701,16 +4702,44 @@ STRUCTURE JSON OBLIGATOIRE:
                                     </ol>
                                 </div>
 
+                                <div className={`rounded-lg border p-4 ${isDarkMode ? 'border-gray-800 bg-gray-900 text-white' : 'border-gray-200 bg-white text-gray-900'}`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div>
+                                            <h4 className="text-lg font-semibold flex items-center gap-2">
+                                                <Icon emoji="🖥️" size={16}/> Dashboard Remote
+                                            </h4>
+                                            <p className="text-xs opacity-70 break-all">{publicUrl || '(PUBLIC_URL non défini)'}</p>
+                                        </div>
+                                        <button
+                                            onClick={fetchStatus}
+                                            className={`px-3 py-2 rounded-lg text-sm font-medium ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                                            🔄 Recharger
+                                        </button>
+                                    </div>
+                                    {publicUrl && publicUrl.startsWith('http') ? (
+                                        <iframe
+                                            src={publicUrl}
+                                            title="Emma SMS Dashboard"
+                                            className="w-full rounded-lg border"
+                                            style={{ minHeight: '600px', border: '1px solid rgba(0,0,0,0.1)' }}
+                                        />
+                                    ) : (
+                                        <p className="text-sm opacity-75">
+                                            Définissez `PUBLIC_URL` pour afficher le dashboard Render/Railway ici.
+                                        </p>
+                                    )}
+                                </div>
+
                                 {scenarioOutput && (
                                     <div className={`rounded-lg border p-3 text-xs whitespace-pre-wrap ${isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50'}`}>
                                         {scenarioOutput}
                                     </div>
                                 )}
-                            </div>
-                        )}
                     </div>
-                );
-            };
+                )}
+            </div>
+        );
+    };
 
             // ============================================================================
             // COMPOSANT ADMIN-JSLAI
