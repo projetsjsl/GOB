@@ -43,6 +43,28 @@ const saveEnvFile = async (envObj) => {
   await fs.writeFile(ENV_PATH, content, 'utf-8');
 };
 
+const importantKeys = [
+  'MODE',
+  'TEST_MODE',
+  'EMMA_WEBHOOK_URL',
+  'N8N_WEBHOOK_BASE_URL',
+  'PUBLIC_URL',
+  'PORT',
+  'TWILIO_ACCOUNT_SID',
+  'TWILIO_AUTH_TOKEN',
+  'TWILIO_PHONE_NUMBER'
+];
+
+const mergeWithProcessEnv = (envObj) => {
+  const merged = { ...envObj };
+  importantKeys.forEach((key) => {
+    if (!merged[key] && process.env[key]) {
+      merged[key] = process.env[key];
+    }
+  });
+  return merged;
+};
+
 const getEnv = async () => {
   const content = await readEnvFile();
   return parseEnv(content);
@@ -152,7 +174,7 @@ const handler = async (req, res) => {
 
   try {
     if (req.method === 'GET') {
-      const env = await getEnv();
+      const env = mergeWithProcessEnv(await getEnv());
       const server = getServerState();
       const webhookStatus = await checkWebhook(env.EMMA_WEBHOOK_URL);
       return res.status(200).json({ env, server, webhookStatus });
