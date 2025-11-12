@@ -1560,6 +1560,41 @@ const fetchHybridData = async (symbol, dataType) => {
                 await Promise.all(newsPromises);
                 setTickerLatestNews(newsMap);
                 setTickerMoveReasons(moveReasonsMap);
+                // Fallback: garantir une explication pour chaque ticker (même sans news)
+                const buildFallbackExplanation = (ticker) => {
+                    const dataPoint = stockData?.[ticker] || {};
+                    const name = dataPoint?.name || ticker;
+                    const changePct = typeof dataPoint?.changePercent === 'number'
+                        ? dataPoint.changePercent
+                        : typeof dataPoint?.change === 'number'
+                            ? dataPoint.change
+                            : null;
+                    const direction = (changePct || 0) >= 0 ? 'hausse' : 'baisse';
+                    const magnitude = changePct !== null ? Math.abs(changePct).toFixed(2) : '0.00';
+                    return `Aucune actualité détectée pour ${name}. Variation technique de ${direction} ${magnitude}% observée aujourd'hui (flux de marché, arbitrage ou prise de bénéfices).`;
+                };
+
+                tickers.forEach((ticker) => {
+                    if (!moveReasonsMap[ticker]) {
+                        moveReasonsMap[ticker] = {
+                            explanation: buildFallbackExplanation(ticker),
+                            source: 'Emma IA (fallback)',
+                            type: 'fallback',
+                            date: new Date().toLocaleDateString('fr-FR')
+                        };
+                    }
+
+                    if (!newsMap[ticker]) {
+                        newsMap[ticker] = {
+                            title: moveReasonsMap[ticker].explanation,
+                            source: 'Emma IA',
+                            date: new Date().toLocaleDateString('fr-FR'),
+                            url: '#',
+                            type: 'fallback'
+                        };
+                    }
+                });
+
                 console.log(`✅ News récentes chargées pour ${Object.keys(newsMap).length} tickers`);
                 console.log(`✅ Explications de mouvement pour ${Object.keys(moveReasonsMap).length} tickers`);
 
