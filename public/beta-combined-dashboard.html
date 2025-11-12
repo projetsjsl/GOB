@@ -14,7 +14,22 @@
     <!-- Cache bust: 2025-10-15 21:00 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <!-- Avenir Pro 85 Heavy alternative: Montserrat Heavy (900) ou Avenir Next si disponible -->
+    <style>
+        @font-face {
+            font-family: 'Avenir Pro 85 Heavy';
+            src: local('Avenir Next Heavy'), local('Avenir-Heavy'), local('AvenirNext-Heavy');
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        .avenir-heavy {
+            font-family: 'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+    </style>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
@@ -4391,15 +4406,15 @@ STRUCTURE JSON OBLIGATOIRE:
             // Emma SMS Panel (Admin)
             // =====================================================================
             const smsEnvFieldMeta = [
-                { key: 'MODE', label: 'Mode de fonctionnement', placeholder: 'test | prod_local | prod_cloud', helper: 'Détermine les endpoints utilisés par le serveur test.' },
-                { key: 'TEST_MODE', label: 'TEST_MODE', placeholder: 'true/false', helper: 'true = aucun SMS réel n’est envoyé.' },
-                { key: 'EMMA_WEBHOOK_URL', label: 'Webhook Emma (n8n)', placeholder: 'https://projetsjsl.app.n8n.cloud/webhook/gob-sms-webhook-test' },
-                { key: 'N8N_WEBHOOK_BASE_URL', label: 'Base URL n8n', placeholder: 'https://projetsjsl.app.n8n.cloud' },
-                { key: 'PUBLIC_URL', label: 'URL publique (ngrok/production)', placeholder: 'https://xxxx.ngrok.io' },
-                { key: 'PORT', label: 'Port serveur', placeholder: '3000' },
-                { key: 'TWILIO_ACCOUNT_SID', label: 'Twilio Account SID', placeholder: 'ACxxxxxxxx' },
-                { key: 'TWILIO_AUTH_TOKEN', label: 'Twilio Auth Token', placeholder: '••••••••' },
-                { key: 'TWILIO_PHONE_NUMBER', label: 'Twilio Phone Number', placeholder: '+1xxxxxxxxxx' }
+                { key: 'MODE', label: 'Mode Emma SMS (MODE)', placeholder: 'test | prod_local | prod_cloud', helper: 'Choix global entre test gratuit et production.' },
+                { key: 'TEST_MODE', label: 'SMS facturés ? (TEST_MODE)', placeholder: 'true/false', helper: 'true = aucun SMS réel n’est envoyé.' },
+                { key: 'EMMA_WEBHOOK_URL', label: 'Webhook Emma (n8n)', placeholder: 'https://projetsjsl.app.n8n.cloud/webhook/gob-sms-webhook-test', helper: 'URL exacte attendue par le workflow n8n Emma.' },
+                { key: 'N8N_WEBHOOK_BASE_URL', label: 'n8n · Base URL', placeholder: 'https://projetsjsl.app.n8n.cloud', helper: 'Racine utilisée pour construire les webhooks.' },
+                { key: 'PUBLIC_URL', label: 'URL publique du serveur', placeholder: 'https://xxxx.ngrok.io', helper: 'Render/Railway/ngrok — exposée dans l’onglet Admin et Twilio.' },
+                { key: 'PORT', label: 'Port serveur local', placeholder: '3000' },
+                { key: 'TWILIO_ACCOUNT_SID', label: 'Twilio Account SID', placeholder: 'ACxxxxxxxx', helper: 'Uniquement requis pour les SMS réels.' },
+                { key: 'TWILIO_AUTH_TOKEN', label: 'Twilio Auth Token', placeholder: '••••••••', helper: 'Ne pas modifier en mode test.' },
+                { key: 'TWILIO_PHONE_NUMBER', label: 'Numéro Twilio émetteur', placeholder: '+1xxxxxxxxxx', helper: 'Numéro affiché aux clients en production.' }
             ];
 
             const modePresets = {
@@ -20663,7 +20678,7 @@ console.log('✅ Données hybrides récupérées:', {
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="text-2xl">📅</div>
-                                    <h2 className="text-2xl font-bold">Financial Calendar</h2>
+                                    <h2 className="text-2xl font-bold">Calendrier financier</h2>
                                 </div>
                                 <button
                                     onClick={handleRefresh}
@@ -20677,7 +20692,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     <div className={`w-4 h-4 ${loading || isRefreshing ? 'animate-spin' : ''}`}>
                                         🔄
                                     </div>
-                                    Refresh
+                                    Actualiser
                                 </button>
                             </div>
 
@@ -20692,7 +20707,7 @@ console.log('✅ Données hybrides récupérées:', {
                                     <div className="col-span-1 md:col-span-2">
                                         <input
                                             type="text"
-                                            placeholder="🔍 Search events..."
+                                            placeholder="🔍 Rechercher un événement..."
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             className={`w-full px-3 py-2 rounded-md text-sm ${
@@ -20721,10 +20736,10 @@ console.log('✅ Données hybrides récupérées:', {
                                                         : 'bg-white text-gray-900 border-gray-300'
                                                 } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                             >
-                                                <option value="all">All Stocks</option>
-                                                <option value="team">👥 Team ({teamTickers.length})</option>
-                                                <option value="watchlist">⭐ Watchlist ({watchlistTickers.length})</option>
-                                                <option value="both">🎯 Team + Watchlist ({teamTickers.length + watchlistTickers.length})</option>
+                                                <option value="all">Tous les titres</option>
+                                                <option value="team">👥 Équipe ({teamTickers.length})</option>
+                                                <option value="watchlist">⭐ Liste de suivi ({watchlistTickers.length})</option>
+                                                <option value="both">🎯 Équipe + Liste ({teamTickers.length + watchlistTickers.length})</option>
                                             </select>
                                         </div>
                                     )}
@@ -20744,7 +20759,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                     filterTickerGroup !== 'all' ? 'opacity-50 cursor-not-allowed' : ''
                                                 }`}
                                             >
-                                                <option value="all">Specific Ticker ({availableTickers.length})</option>
+                                                <option value="all">Sélectionner un ticker ({availableTickers.length})</option>
                                                 {availableTickers.map(ticker => (
                                                     <option key={ticker} value={ticker}>
                                                         {ticker}
@@ -20764,11 +20779,11 @@ console.log('✅ Données hybrides récupérées:', {
                                                     ? 'bg-gray-700 text-white border-gray-600'
                                                     : 'bg-white text-gray-900 border-gray-300'
                                             } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                        >
-                                            <option value="all">All Impact</option>
-                                            <option value="3">🔴 High Impact</option>
-                                            <option value="2">🟠 Medium Impact</option>
-                                            <option value="1">🟡 Low Impact</option>
+                                            >
+                                                <option value="all">Tous les impacts</option>
+                                                <option value="3">🔴 Impact élevé</option>
+                                                <option value="2">🟠 Impact moyen</option>
+                                                <option value="1">🟡 Impact faible</option>
                                         </select>
                                     </div>
 
@@ -20782,11 +20797,11 @@ console.log('✅ Données hybrides récupérées:', {
                                                     ? 'bg-gray-700 text-white border-gray-600'
                                                     : 'bg-white text-gray-900 border-gray-300'
                                             } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                        >
-                                            <option value="all">All Currencies</option>
-                                            {availableCurrencies.map(curr => (
-                                                <option key={curr} value={curr}>
-                                                    {getCurrencyFlag(curr)} {curr}
+                                            >
+                                                <option value="all">Toutes les devises</option>
+                                                {availableCurrencies.map(curr => (
+                                                    <option key={curr} value={curr}>
+                                                        {getCurrencyFlag(curr)} {curr}
                                                 </option>
                                             ))}
                                         </select>
@@ -20806,7 +20821,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                     onChange={(e) => setFilterLargeCapOnly(e.target.checked)}
                                                     className="w-4 h-4 cursor-pointer"
                                                 />
-                                                <span className="font-medium">Large Cap Only</span>
+                                                <span className="font-medium">Grandes capitalisations seulement</span>
                                             </label>
                                         </div>
                                     )}
@@ -20815,37 +20830,37 @@ console.log('✅ Données hybrides récupérées:', {
                                 {/* Active Filters Display */}
                                 {(searchQuery || filterImpact !== 'all' || filterCurrency !== 'all' || filterTicker !== 'all' || filterTickerGroup !== 'all' || (activeSubTab === 'earnings' && filterLargeCapOnly)) && (
                                     <div className="flex flex-wrap gap-2 mt-3">
-                                        <span className="text-xs text-gray-400">Active filters:</span>
+                                        <span className="text-xs text-gray-400">Filtres actifs :</span>
                                         {activeSubTab === 'earnings' && filterLargeCapOnly && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
-                                                📊 Large Cap Only
+                                                📊 Grandes capitalisations
                                             </span>
                                         )}
                                         {searchQuery && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-gray-900 text-gray-200' : 'bg-gray-700 text-gray-200'}`}>
-                                                Search: "{searchQuery}"
+                                                Recherche : "{searchQuery}"
                                             </span>
                                         )}
                                         {filterTickerGroup !== 'all' && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-cyan-900 text-cyan-200' : 'bg-cyan-100 text-cyan-800'}`}>
-                                                {filterTickerGroup === 'team' ? '👥 Team Tickers' :
-                                                 filterTickerGroup === 'watchlist' ? '⭐ Watchlist Tickers' :
-                                                 '🎯 Team + Watchlist'}
+                                                {filterTickerGroup === 'team' ? '👥 Tickers équipe' :
+                                                 filterTickerGroup === 'watchlist' ? '⭐ Tickers liste de suivi' :
+                                                 '🎯 Équipe + Liste de suivi'}
                                             </span>
                                         )}
                                         {filterTicker !== 'all' && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-purple-900 text-purple-200' : 'bg-purple-100 text-purple-800'}`}>
-                                                Ticker: {filterTicker}
+                                                Ticker : {filterTicker}
                                             </span>
                                         )}
                                         {filterImpact !== 'all' && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800'}`}>
-                                                Impact: {filterImpact === '3' ? 'High' : filterImpact === '2' ? 'Medium' : 'Low'}
+                                                Impact : {filterImpact === '3' ? 'Élevé' : filterImpact === '2' ? 'Moyen' : 'Faible'}
                                             </span>
                                         )}
                                         {filterCurrency !== 'all' && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800'}`}>
-                                                Currency: {filterCurrency}
+                                                Devise : {filterCurrency}
                                             </span>
                                         )}
                                         <button
@@ -20859,7 +20874,7 @@ console.log('✅ Données hybrides récupérées:', {
                                             }}
                                             className="text-xs text-red-400 hover:text-red-300 underline"
                                         >
-                                            Clear all
+                                            Réinitialiser
                                         </button>
                                     </div>
                                 )}
@@ -23653,8 +23668,8 @@ console.log('✅ Données hybrides récupérées:', {
                                     <div className="border-l border-green-500/30 pl-6 flex-1">
                                         <div className="flex items-center gap-4">
                                             <div>
-                                                <h1 className="text-2xl font-black tracking-tight font-['Inter'] text-white">
-                                                    TERMINAL FINANCIER
+                                                <h1 className="text-2xl font-black tracking-tight text-white" style={{fontFamily: "'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif", fontWeight: 900, letterSpacing: '-0.02em'}}>
+                                                    TERMINAL FINANCIER <span className="avenir-heavy" style={{color: '#4ade80', fontWeight: 900}}>EMMA</span>
                                                     <span className="ml-3 text-xs font-normal px-2 py-1 rounded bg-green-500/20 text-green-300">BÊTA</span>
                                                 </h1>
                                                 <p className="text-xs font-medium tracking-wider mt-1 font-['Inter'] text-gray-400">
