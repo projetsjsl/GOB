@@ -67,6 +67,12 @@ class SmartAgent {
                 return this._handleClarification(intentData, userMessage);
             }
 
+            // 🎭 GESTION DIRECTE: Messages non-financiers (expressions émotionnelles, emails, etc.)
+            if (intentData && intentData.skip_financial_analysis) {
+                console.log('🎭 Non-financial message detected - generating conversational response');
+                return this._handleConversationalMessage(intentData, userMessage, context);
+            }
+
             // GESTION DIRECTE: Demande de watchlist/portfolio (réponse immédiate sans outils)
             if (intentData && intentData.intent === 'portfolio') {
                 console.log('📊 Portfolio/Watchlist request detected - responding directly');
@@ -293,6 +299,59 @@ class SmartAgent {
             model: 'direct',
             execution_time_ms: 10,
             is_reliable: true
+        };
+    }
+
+    /**
+     * Gestion des messages conversationnels non-financiers
+     * Répond de manière naturelle aux expressions émotionnelles, emails, etc.
+     */
+    _handleConversationalMessage(intentData, userMessage, context) {
+        console.log('🎭 Handling conversational message:', intentData.intent);
+
+        const userName = context.user_name || 'Utilisateur';
+        const messageLower = userMessage.toLowerCase().trim();
+        let response = '';
+
+        // 1. EXPRESSIONS ÉMOTIONNELLES
+        if (intentData.intent === 'general_conversation' && intentData.response_type === 'conversational') {
+            // Réponses appropriées selon l'expression
+            if (['wow', 'super', 'incroyable', 'génial', 'genial', 'fantastique', 'excellent', 'parfait', 'cool', 'nice', 'great', 'awesome', 'amazing', 'bravo'].some(expr => messageLower.includes(expr))) {
+                response = `Merci ! 😊 Je suis contente que ça te plaise !\n\nComment puis-je t'aider avec tes analyses financières aujourd'hui ? 📊`;
+            } else if (['merci', 'thanks', 'thank you'].some(expr => messageLower.includes(expr))) {
+                response = `De rien ${userName} ! 😊\n\nN'hésite pas si tu as d'autres questions sur les marchés financiers. Je suis là pour t'aider ! 📈`;
+            } else if (['ok', 'okay', 'd\'accord', 'daccord', 'parfait', 'bien', 'bon'].some(expr => messageLower.includes(expr))) {
+                response = `Parfait ! 👍\n\nQue veux-tu analyser aujourd'hui ? Je peux t'aider avec des analyses d'actions, des actualités, des indicateurs techniques, etc. 📊`;
+            } else if (['oui', 'yes', 'si'].some(expr => messageLower === expr)) {
+                response = `Super ! 😊\n\nSur quoi veux-tu que je t'aide ? Tu peux me demander une analyse, des actualités, ou toute autre question financière. 📈`;
+            } else if (['non', 'no'].some(expr => messageLower === expr)) {
+                response = `D'accord, pas de problème ! 😊\n\nSi tu changes d'avis, je suis là pour t'aider avec tes analyses financières. 📊`;
+            } else {
+                // Réponse générique pour autres expressions conversationnelles
+                response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA financière. Je peux t'aider avec :\n📊 Analyses d'actions\n📈 Données financières\n📰 Actualités de marché\n💡 Conseils et insights\n\nComment puis-je t'aider aujourd'hui ?`;
+            }
+        }
+
+        // 2. EMAILS FOURNIS
+        else if (intentData.intent === 'information_provided' && intentData.information_type === 'email') {
+            response = `Merci ${userName} ! 📧\n\nJ'ai bien noté ton email : ${userMessage}\n\nComment puis-je t'aider avec tes analyses financières aujourd'hui ? 📊`;
+        }
+
+        // 3. FALLBACK: Réponse conversationnelle générique
+        else {
+            response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA financière. Je peux t'aider avec des analyses d'actions, des actualités de marché, des indicateurs techniques, et bien plus !\n\nQue veux-tu analyser aujourd'hui ? 📈`;
+        }
+
+        return {
+            success: true,
+            response: response,
+            intent: intentData.intent,
+            confidence: intentData.confidence || 0.95,
+            tools_used: [],
+            model: 'conversational',
+            execution_time_ms: 5,
+            is_reliable: true,
+            skip_financial_analysis: true
         };
     }
 
