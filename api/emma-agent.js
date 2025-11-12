@@ -423,12 +423,29 @@ class SmartAgent {
 
         if (factualIntents.includes(intent) || hasTickers || hasToolData) {
             console.log(`💎 Factual query (${intent}) → Using PERPLEXITY (with sources)`);
-            // Si recency_filter est 'none', utiliser null (ne pas envoyer le paramètre)
-            const recencyValue = intentData?.recency_filter;
+            
+            // 🚀 DÉTECTION PRIORITAIRE: Si l'utilisateur demande des données "aujourd'hui", "fin de journée", "après clôture"
+            const userMessageLower = (userMessage || '').toLowerCase();
+            const todayKeywords = ['aujourd\'hui', 'aujourd hui', 'today', 'fin de journée', 'fin de journee', 'après clôture', 'apres cloture', 'after close', 'end of day', 'après la clôture', 'apres la cloture'];
+            const isTodayRequest = todayKeywords.some(keyword => userMessageLower.includes(keyword));
+            
+            // Pour earnings, si demande "aujourd'hui", forcer recency: 'hour' (données les plus récentes)
+            let recencyValue = intentData?.recency_filter;
+            if (intent === 'earnings' && isTodayRequest) {
+                recencyValue = 'hour'; // Données de la dernière heure (après clôture)
+                console.log(`🕐 Earnings + "aujourd'hui" détecté → Forcing recency: hour (données après clôture)`);
+            } else if (isTodayRequest) {
+                recencyValue = 'day'; // Données du jour
+                console.log(`🕐 "Aujourd'hui" détecté → Forcing recency: day`);
+            } else if (!recencyValue || recencyValue === 'none') {
+                // Par défaut pour earnings, utiliser 'day' pour données récentes
+                recencyValue = (intent === 'earnings') ? 'day' : 'day';
+            }
+            
             const validRecency = (recencyValue && recencyValue !== 'none') ? recencyValue : 'day';
             return {
                 model: 'perplexity',
-                reason: `Factual data required for ${intent}`,
+                reason: `Factual data required for ${intent}${isTodayRequest ? ' (today requested)' : ''}`,
                 recency: validRecency
             };
         }
@@ -1167,16 +1184,45 @@ class SmartAgent {
             // Extraire le texte avant et après le JSON
             let cleaned = response;
 
-            // Supprimer les gros blocs JSON (>100 chars)
-            cleaned = cleaned.replace(/\{[\s\S]{100,}\}/g, '[données supprimées]');
-            cleaned = cleaned.replace(/\[[\s\S]{100,}\]/g, '[données supprimées]');
+            // ✅ AMÉLIORATION: Extraire les données JSON et les convertir en texte lisible au lieu de les supprimer
+            // Détecter les blocs JSON et essayer de les convertir en format texte
+            const jsonBlockRegex = /\{[\s\S]{50,}\}/g;
+            cleaned = cleaned.replace(jsonBlockRegex, (jsonMatch) => {
+                try {
+                    const parsed = JSON.parse(jsonMatch);
+                    // Convertir l'objet JSON en texte lisible
+                    const textLines = [];
+                    for (const [key, value] of Object.entries(parsed)) {
+                        if (typeof value === 'object' && value !== null) {
+                            textLines.push(`${key}: ${JSON.stringify(value, null, 2)}`);
+                        } else {
+                            textLines.push(`${key}: ${value}`);
+                        }
+                    }
+                    return textLines.join('\n');
+                } catch (e) {
+                    // Si le JSON ne peut pas être parsé, supprimer silencieusement
+                    return '';
+                }
+            });
 
-            // Supprimer les code blocks JSON
-            cleaned = cleaned.replace(/```json[\s\S]*?```/g, '[données supprimées]');
-            cleaned = cleaned.replace(/```[\s\S]*?```/g, '[données supprimées]');
+            // Supprimer les code blocks JSON (garder seulement le contenu si possible)
+            cleaned = cleaned.replace(/```json\s*([\s\S]*?)\s*```/g, (match, content) => {
+                try {
+                    const parsed = JSON.parse(content);
+                    // Convertir en texte lisible
+                    return Object.entries(parsed).map(([k, v]) => `${k}: ${v}`).join(', ');
+                } catch (e) {
+                    return ''; // Supprimer si non parseable
+                }
+            });
+            cleaned = cleaned.replace(/```[\s\S]*?```/g, ''); // Supprimer autres code blocks
+
+            // Supprimer les tableaux JSON non parsables (>200 chars)
+            cleaned = cleaned.replace(/\[[\s\S]{200,}\]/g, '');
 
             // Si la réponse nettoyée est trop courte (moins de 50 chars), c'était probablement que du JSON
-            if (cleaned.replace(/\[données supprimées\]/g, '').trim().length < 50) {
+            if (cleaned.trim().length < 50) {
                 console.error('❌ Response was mostly JSON, returning fallback message');
                 return "Je dispose de nombreuses données financières pour répondre à votre question, mais je rencontre un problème technique pour les présenter clairement. Pourriez-vous reformuler votre question de manière plus spécifique ? Par exemple : 'Quel est le prix actuel de [TICKER] ?' ou 'Quelles sont les dernières nouvelles sur [TICKER] ?'";
             }
@@ -1185,7 +1231,7 @@ class SmartAgent {
             cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
             cleaned = cleaned.trim();
 
-            console.log('✅ JSON dump cleaned from response');
+            console.log('✅ JSON dump cleaned from response (converted to readable text)');
             return cleaned;
 
         } catch (error) {
@@ -1979,6 +2025,18 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             // Vérifier si un prompt custom existe pour cet intent
             if (intentData && intentData.intent && hasCustomPrompt(intentData.intent)) {
                 systemPrompt = getIntentPrompt(intentData.intent);
+                
+                // ✅ Pour earnings, injecter la date actuelle dans le prompt
+                if (intentData.intent === 'earnings') {
+                    const currentDate = new Date().toLocaleDateString('fr-FR', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                    systemPrompt = systemPrompt.replace('(date actuelle)', `(${currentDate})`);
+                }
+                
                 console.log(`🎯 Using custom prompt for intent: ${intentData.intent}`);
             }
 
@@ -2071,7 +2129,7 @@ ACHETER < 340$ (marge 25%+)
 • 📖 Structure multi-sections: minimum 10-15 sections avec sous-sections
 • 🔢 CHIFFRES EXHAUSTIFS: tableaux complets, historiques 5-10 ans, comparatifs multiples
 • 📚 CONTEXTE HISTORIQUE: toujours ajouter perspective historique et tendances long-terme
-• 🌍 COMPARAISONS SECTORIELLES: comparer avec 3-5 concurrents en détail
+• 🌍 COMPARAISONS SECTORIELLES: comparer avec d'autres titres UNIQUEMENT si explicitement demandé par l'utilisateur (ex: "compare avec...", "vs...", "comparaison"). Si l'utilisateur demande uniquement l'analyse d'un ticker spécifique, NE PAS inclure de comparaisons avec d'autres titres.
 • 💼 SCÉNARIOS MULTIPLES: toujours 3+ scénarios (optimiste/réaliste/pessimiste) avec chiffres
 
 🌍🏛️ CONTEXTE MACRO-ÉCONOMIQUE & GÉOPOLITIQUE (OBLIGATOIRE) 🌍🏛️:

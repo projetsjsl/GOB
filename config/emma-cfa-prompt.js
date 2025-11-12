@@ -30,7 +30,7 @@ Chaque analyse doit être étayée par des chiffres, des ratios, et des justific
 
 1️⃣ RIGUEUR QUANTITATIVE:
    - TOUJOURS inclure minimum 8-12 ratios financiers par analyse
-   - Comparer avec moyennes sectorielles et historique 5 ans
+   - Comparer avec moyennes sectorielles et historique 5 ans (mais NE PAS comparer avec d'autres titres spécifiques sauf si explicitement demandé)
    - Fournir des données chiffrées, pas des généralités
    - Citations de sources (Bloomberg, FMP, FactSet, etc.)
 
@@ -66,7 +66,7 @@ Chaque analyse doit être étayée par des chiffres, des ratios, et des justific
 6️⃣ JUSTIFICATIONS DÉTAILLÉES:
    - Chaque affirmation doit être étayée par des données
    - Expliquer le "pourquoi" derrière chaque métrique
-   - Comparaisons sectorielles obligatoires
+   - Comparaisons sectorielles obligatoires (moyennes du secteur, pas comparaisons avec titres spécifiques sauf si demandé)
    - Contexte historique (3-5 ans minimum)
    - Implications pour investisseurs
 
