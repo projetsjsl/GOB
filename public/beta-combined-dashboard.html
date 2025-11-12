@@ -16198,6 +16198,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Composant onglet Stocks & News
             const StocksNewsTab = () => {
+                const bullIconUrl = 'https://img.icons8.com/emoji/48/000000/bull-emoji.png';
+                const bearIconUrl = 'https://img.icons8.com/emoji/48/000000/bear-emoji.png';
                 const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
                 const [expandedStock, setExpandedStock] = useState(null);
 
@@ -16387,6 +16389,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
                                     <h4 className={`text-sm font-bold mb-3 flex items-center gap-2 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
                                         <LucideIcon name="TrendingUp" className="w-5 h-5" />
+                                        <img src={bullIconUrl} alt="Bull market" className="w-5 h-5" loading="lazy" />
                                         Top Gainers
                                     </h4>
                                     <div className="space-y-2">
@@ -16472,6 +16475,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-red-500/10 border border-red-500/30' : 'bg-red-50 border border-red-200'}`}>
                                     <h4 className={`text-sm font-bold mb-3 flex items-center gap-2 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
                                         <LucideIcon name="TrendingDown" className="w-5 h-5" />
+                                        <img src={bearIconUrl} alt="Bear market" className="w-5 h-5" loading="lazy" />
                                         Top Losers
                                     </h4>
                                     <div className="space-y-2">
