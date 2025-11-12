@@ -17489,30 +17489,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     )}
 
-                    <div className="fixed bottom-10 right-6 z-50 flex flex-col items-end gap-2 pointer-events-none">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold border pointer-events-auto ${
-                            isDarkMode ? 'bg-blue-500 text-white border-blue-300' : 'bg-blue-600 text-white border-blue-400'
-                        }`}>
-                            Emma IA
-                        </span>
-                        <div className={`px-4 py-2 rounded-full text-sm shadow-lg border pointer-events-auto ${
-                            isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
-                        }`}>
-                            Bonjour {userDisplayName} !
-                        </div>
-                        <button
-                            onClick={openAskEmma}
-                            className="pointer-events-auto flex flex-col items-center gap-2 focus:outline-none"
-                            aria-label="Ouvrir Emma IA"
-                        >
-                            <img
-                                src={assistantAvatar}
-                                alt="Emma avatar"
-                                className={`w-24 h-24 rounded-full shadow-2xl border-2 ${isDarkMode ? 'border-emerald-400' : 'border-white'} object-cover`}
-                            />
-                        </button>
-                    </div>
-
                 </div>
             );
         };
