@@ -20667,6 +20667,47 @@ console.log('✅ Données hybrides récupérées:', {
                     return match ? match[1] : null;
                 };
 
+                // Helper: Determine event category for sorting
+                const getEventCategory = (event) => {
+                    // Extract ticker if available (for earnings/dividends)
+                    const ticker = extractTicker(event.event);
+                    
+                    // 1. Tickers d'équipe (priorité la plus haute)
+                    if (ticker && teamTickers.includes(ticker)) {
+                        return 1; // Team tickers
+                    }
+                    
+                    // 2. Données Canada (CAD currency ou ticker .TO)
+                    if (event.currency === 'CAD' || (ticker && ticker.endsWith('.TO'))) {
+                        return 2; // Canada
+                    }
+                    
+                    // 3. Données US (USD currency et ticker US)
+                    if (event.currency === 'USD' && (!ticker || !ticker.endsWith('.TO'))) {
+                        return 3; // US
+                    }
+                    
+                    // 4. Autres données
+                    return 4; // Other
+                };
+
+                // Helper: Sort events within a day
+                const sortEvents = (events) => {
+                    return [...events].sort((a, b) => {
+                        // First sort by category (team → Canada → US → other)
+                        const categoryA = getEventCategory(a);
+                        const categoryB = getEventCategory(b);
+                        if (categoryA !== categoryB) {
+                            return categoryA - categoryB;
+                        }
+                        
+                        // Within same category, sort by time
+                        const timeA = a.time || '';
+                        const timeB = b.time || '';
+                        return timeA.localeCompare(timeB);
+                    });
+                };
+
                 // Filter calendar data based on user selections (Finviz-style)
                 const filteredCalendarData = (Array.isArray(calendarData) ? calendarData : []).map(day => {
                     const filteredEvents = (Array.isArray(day.events) ? day.events : []).filter(event => {
@@ -20724,7 +20765,10 @@ console.log('✅ Données hybrides récupérées:', {
                         return true;
                     });
 
-                    return { ...day, events: filteredEvents };
+                    // Sort events: Team tickers → Canada → US → Other
+                    const sortedEvents = sortEvents(filteredEvents);
+                    
+                    return { ...day, events: sortedEvents };
                 }).filter(day => day.events.length > 0); // Remove days with no events
 
                 // Get unique currencies from data for filter dropdown
