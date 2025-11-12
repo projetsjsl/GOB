@@ -521,10 +521,15 @@
     <div id="root"></div>
     
     <script type="text/babel" data-presets="react">
-        // Vérification que Babel fonctionne
-        console.log('🔧 Babel chargé:', typeof Babel !== 'undefined');
-        console.log('🔧 React chargé:', typeof React !== 'undefined');
-        console.log('🔧 ReactDOM chargé:', typeof ReactDOM !== 'undefined');
+        if (window.__GOB_DASHBOARD_MOUNTED) {
+            console.warn('⚠️ Beta Dashboard déjà initialisé, exécution ignorée.');
+        } else {
+            window.__GOB_DASHBOARD_MOUNTED = true;
+
+            // Vérification que Babel fonctionne
+            console.log('🔧 Babel chargé:', typeof Babel !== 'undefined');
+            console.log('🔧 React chargé:', typeof React !== 'undefined');
+            console.log('🔧 ReactDOM chargé:', typeof ReactDOM !== 'undefined');
         
         // Gestion d'erreur si Babel ne fonctionne pas
         if (typeof Babel === 'undefined') {
@@ -24570,6 +24575,7 @@ console.log('✅ Données hybrides récupérées:', {
         // Fonction fallback SUPPRIMÉE - Plus de contenu demo
 
         ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+        }
     </script>
     
     
