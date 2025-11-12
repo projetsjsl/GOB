@@ -17372,7 +17372,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         return (
                                             <div
                                                 key={index}
-                                                className={`p-6 rounded-xl cursor-pointer transition-all hover:scale-[1.02] ${
+                                                role="button"
+                                                tabIndex={0}
+                                                onClick={() => {
+                                                    if (article.url) {
+                                                        window.open(article.url, '_blank', 'noopener,noreferrer');
+                                                    }
+                                                }}
+                                                onKeyDown={(event) => {
+                                                    if ((event.key === 'Enter' || event.key === ' ') && article.url) {
+                                                        event.preventDefault();
+                                                        window.open(article.url, '_blank', 'noopener,noreferrer');
+                                                    }
+                                                }}
+                                                className={`p-6 rounded-xl cursor-pointer transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                                                     isDarkMode
                                                         ? 'bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:from-gray-700/70 hover:to-gray-800/70 border border-gray-600'
                                                         : 'bg-gradient-to-br from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 border border-gray-200 shadow-lg'
@@ -17436,7 +17449,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         Lire
                                                     </a>
                                                     <button
-                                                        onClick={() => {
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
                                                             summarizeWithEmma(article.url, article.title);
                                                         }}
                                                         className={`flex-1 px-3 py-2 rounded-lg text-center text-sm font-semibold transition-all ${
