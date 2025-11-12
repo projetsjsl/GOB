@@ -363,7 +363,7 @@ class SmartAgent {
      * - Gemini (15%): Questions conceptuelles/éducatives (gratuit)
      * - Claude (5%): Rédaction premium (briefings, lettres clients)
      */
-    _selectModel(intentData, outputMode, toolsData) {
+    _selectModel(intentData, outputMode, toolsData, userMessage = '') {
         console.log('🎯 SmartRouter: Selecting optimal model...');
 
         // BRIEFING MODE: Toujours Claude pour qualité premium
@@ -930,7 +930,7 @@ class SmartAgent {
             const conversationContext = this.conversationHistory.slice(-5); // 5 derniers échanges
 
             // 🎯 SMART ROUTER: Sélectionner le meilleur modèle
-            const modelSelection = this._selectModel(intentData, outputMode, toolsData);
+            const modelSelection = this._selectModel(intentData, outputMode, toolsData, userMessage);
             console.log(`🤖 Selected model: ${modelSelection.model} (${modelSelection.reason})`);
 
             // Construire le prompt approprié
@@ -1039,8 +1039,8 @@ class SmartAgent {
         } catch (error) {
             console.error('❌ Response generation failed:', error);
 
-            // Réponse de fallback basée sur les données des outils
-            const fallbackResponse = this._generateFallbackResponse(userMessage, toolResults, outputMode, context);
+            // Réponse de fallback basée sur les données des outils (utilise Gemini pour générer une vraie réponse)
+            const fallbackResponse = await this._generateFallbackResponse(userMessage, toolResults, outputMode, context);
             return {
                 response: fallbackResponse,
                 validation: { passed: false, confidence: 0.3, reason: 'Fallback response' }
@@ -2403,7 +2403,15 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
 
             // Vérifier que la clé API est définie
             if (!process.env.PERPLEXITY_API_KEY) {
-                console.error('❌ PERPLEXITY_API_KEY not configured - falling back to Gemini');
+                console.error('\n' + '='.repeat(60));
+                console.error('❌ PERPLEXITY_API_KEY NOT CONFIGURED');
+                console.error('='.repeat(60));
+                console.error('🔑 La clé API Perplexity n\'est pas configurée dans les variables d\'environnement');
+                console.error('   → Solution: Ajouter PERPLEXITY_API_KEY dans Vercel Environment Variables');
+                console.error('   → Format attendu: pplx-...');
+                console.error('   → Vérifiez: Vercel Dashboard → Settings → Environment Variables');
+                console.error('='.repeat(60) + '\n');
+                console.log('🔄 Falling back to Gemini...');
                 throw new Error('PERPLEXITY_API_KEY not configured');
             }
 
@@ -2523,14 +2531,45 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
                 clearTimeout(timeout);
             }
 
+            // 🔍 DIAGNOSTIC DÉTAILLÉ des erreurs Perplexity
+            console.error('\n' + '='.repeat(60));
+            console.error('❌ ERREUR PERPLEXITY - DIAGNOSTIC');
+            console.error('='.repeat(60));
+            console.error(`Type d'erreur: ${error.name || 'Unknown'}`);
+            console.error(`Message: ${error.message || 'No message'}`);
+            console.error(`Intent: ${intentData?.intent || 'unknown'}`);
+            console.error(`Canal: ${context.user_channel || 'web'}`);
+            console.error(`Timeout configuré: ${timeoutDuration/1000}s`);
+
             // Gestion spécifique des erreurs de timeout
             if (error.name === 'AbortError' || error.message?.includes('aborted')) {
-                console.warn(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s (intent: ${intentData?.intent || 'unknown'})`);
+                console.error(`⏱️  TIMEOUT: Perplexity n'a pas répondu dans les ${timeoutDuration/1000}s`);
+                console.error('   → L\'API est trop lente ou surchargée');
+                console.error('   → Solution: Augmenter le timeout ou simplifier la requête');
                 console.log('🔄 Falling back to Gemini due to timeout...');
+            } else if (error.message?.includes('PERPLEXITY_API_KEY')) {
+                console.error('🔑 CLÉ API MANQUANTE: PERPLEXITY_API_KEY non configurée');
+                console.error('   → Solution: Ajouter PERPLEXITY_API_KEY dans Vercel Environment Variables');
+                console.error('   → Format attendu: pplx-...');
+            } else if (error.message?.includes('401')) {
+                console.error('🔑 AUTHENTIFICATION ÉCHOUÉE: Clé API invalide ou expirée');
+                console.error('   → Solution: Vérifier/regénérer la clé dans Perplexity Dashboard');
+            } else if (error.message?.includes('429')) {
+                console.error('⏱️  QUOTA DÉPASSÉ: Trop de requêtes envoyées');
+                console.error('   → Solution: Attendre quelques minutes ou upgrade plan Perplexity');
+            } else if (error.message?.includes('400')) {
+                console.error('📝 REQUÊTE INVALIDE: Format de requête incorrect');
+                console.error('   → Solution: Vérifier le modèle (sonar-pro) et le format des messages');
+            } else if (error.message?.includes('503')) {
+                console.error('🔧 SERVICE INDISPONIBLE: API Perplexity temporairement down');
+                console.error('   → Solution: Réessayer dans quelques instants');
             } else {
-                console.error('❌ Perplexity API error:', error);
-                console.log('🔄 Falling back to Gemini due to Perplexity error');
+                console.error('❌ ERREUR INCONNUE:', error);
+                if (error.stack) {
+                    console.error('Stack:', error.stack.substring(0, 500));
+                }
             }
+            console.error('='.repeat(60) + '\n');
 
             // ✅ VRAI FALLBACK: Appeler Gemini au lieu de throw
             console.log('🔄 Calling Gemini as fallback...');
@@ -2803,13 +2842,18 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
 
     /**
      * Réponse de fallback si Perplexity échoue (adapté selon mode)
+     * Utilise Gemini pour générer une vraie réponse en français au lieu d'afficher du JSON brut
      */
-    _generateFallbackResponse(userMessage, toolResults, outputMode = 'chat', context = {}) {
+    async _generateFallbackResponse(userMessage, toolResults, outputMode = 'chat', context = {}) {
         const successfulResults = toolResults.filter(r => r.success && r.data);
 
         if (successfulResults.length === 0) {
             if (outputMode === 'data') {
                 return '{}';
+            }
+            // 📱 SMS: Message d'erreur court si aucune donnée disponible
+            if (context.user_channel === 'sms') {
+                return "⚠️ Service temporairement indisponible. Emma reviendra dans quelques instants. Pour une réponse immédiate, visitez gobapps.com";
             }
             return "Désolé, je n'ai pas pu récupérer de données fiables pour répondre à votre question. Veuillez réessayer.";
         }
@@ -2825,33 +2869,60 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
             return JSON.stringify(dataObj, null, 2);
         }
 
-        // Mode CHAT ou BRIEFING: retourner texte formaté
-        // 📱 SMS: Réponse ultra-courte (erreur de service, pas de dump de données)
-        if (context.user_channel === 'sms') {
-            return "⚠️ Service temporairement indisponible. Emma reviendra dans quelques instants. Pour une réponse immédiate, visitez gobapps.com";
+        // Mode CHAT ou BRIEFING: Utiliser Gemini pour générer une vraie réponse en français
+        try {
+            // Construire un prompt avec les données disponibles
+            const toolsDataSummary = successfulResults.map(result => {
+                const summary = this._summarizeToolData(result.tool_id, result.data);
+                return `**${result.tool_id}**: ${summary}`;
+            }).join('\n\n');
+
+            const fallbackPrompt = `Tu es Emma, analyste financière experte. L'utilisateur a posé cette question: "${userMessage}"
+
+J'ai récupéré les données suivantes depuis plusieurs sources:
+
+${toolsDataSummary}
+
+INSTRUCTIONS CRITIQUES:
+- ❌ NE JAMAIS afficher du JSON brut ou du code dans ta réponse
+- ✅ INTERPRÈTE et SYNTHÉTISE les données en français naturel
+- ✅ Sois conversationnelle et professionnelle
+- ✅ Explique les chiffres de manière claire et accessible
+- ✅ Si tu vois des données de prix, ratios, ou actualités, analyse-les et explique-les
+- ✅ Réponds directement à la question de l'utilisateur en utilisant ces données
+
+${context.user_channel === 'sms' ? '📱 Mode SMS: Réponse courte et concise (max 400 caractères)' : '🌐 Mode Web: Réponse détaillée et complète'}
+
+Génère une réponse professionnelle en français basée sur ces données:`;
+
+            // Utiliser Gemini pour générer la réponse
+            const geminiResponse = await this._call_gemini(fallbackPrompt, outputMode, context);
+            
+            // Nettoyer le JSON si présent
+            const cleanedResponse = this._sanitizeJsonInResponse(geminiResponse);
+            
+            return cleanedResponse;
+
+        } catch (error) {
+            console.error('❌ Erreur génération fallback avec Gemini:', error);
+            
+            // Fallback ultime: réponse basique sans JSON
+            if (context.user_channel === 'sms') {
+                // Pour SMS, réponse très courte
+                const firstResult = successfulResults[0];
+                if (firstResult.tool_id.includes('price') || firstResult.tool_id.includes('quote')) {
+                    const price = firstResult.data?.price || firstResult.data?.data?.price;
+                    const ticker = firstResult.data?.ticker || firstResult.data?.data?.ticker || 'l\'action';
+                    if (price) {
+                        return `👩🏻 ${ticker} se négocie à ${price}$. Données disponibles. Pour + de détails: gobapps.com`;
+                    }
+                }
+                return "👩🏻 Données disponibles. Pour une analyse complète, visite gobapps.com";
+            }
+            
+            // Pour Web, message informatif sans JSON
+            return `J'ai récupéré des données depuis ${successfulResults.length} source(s), mais je n'ai pas pu générer une analyse complète. Les données incluent: ${successfulResults.map(r => r.tool_id).join(', ')}.\n\nVeuillez reformuler votre question ou visitez gobapps.com pour plus d'informations.`;
         }
-
-        // Mode WEB: Réponse concise avec données résumées
-        let response = "Voici les informations disponibles :\n\n";
-
-        // Limiter à 3 outils max pour éviter les réponses trop longues
-        const limitedResults = successfulResults.slice(0, 3);
-
-        limitedResults.forEach(result => {
-            // Utiliser le résumé au lieu du JSON complet
-            const summary = this._summarizeToolData(result.tool_id, result.data);
-            // Limiter chaque résumé à 200 chars
-            const shortSummary = summary.length > 200 ? summary.substring(0, 200) + '...' : summary;
-            response += `**${result.tool_id}**: ${shortSummary}\n\n`;
-        });
-
-        if (successfulResults.length > 3) {
-            response += `... et ${successfulResults.length - 3} autres sources de données.\n\n`;
-        }
-
-        response += "Note: Réponse partielle. Pour une analyse complète, reformulez votre question.";
-
-        return response;
     }
 
     /**
