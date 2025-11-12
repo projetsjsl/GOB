@@ -2403,7 +2403,15 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
 
             // Vérifier que la clé API est définie
             if (!process.env.PERPLEXITY_API_KEY) {
-                console.error('❌ PERPLEXITY_API_KEY not configured - falling back to Gemini');
+                console.error('\n' + '='.repeat(60));
+                console.error('❌ PERPLEXITY_API_KEY NOT CONFIGURED');
+                console.error('='.repeat(60));
+                console.error('🔑 La clé API Perplexity n\'est pas configurée dans les variables d\'environnement');
+                console.error('   → Solution: Ajouter PERPLEXITY_API_KEY dans Vercel Environment Variables');
+                console.error('   → Format attendu: pplx-...');
+                console.error('   → Vérifiez: Vercel Dashboard → Settings → Environment Variables');
+                console.error('='.repeat(60) + '\n');
+                console.log('🔄 Falling back to Gemini...');
                 throw new Error('PERPLEXITY_API_KEY not configured');
             }
 
@@ -2523,14 +2531,45 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
                 clearTimeout(timeout);
             }
 
+            // 🔍 DIAGNOSTIC DÉTAILLÉ des erreurs Perplexity
+            console.error('\n' + '='.repeat(60));
+            console.error('❌ ERREUR PERPLEXITY - DIAGNOSTIC');
+            console.error('='.repeat(60));
+            console.error(`Type d'erreur: ${error.name || 'Unknown'}`);
+            console.error(`Message: ${error.message || 'No message'}`);
+            console.error(`Intent: ${intentData?.intent || 'unknown'}`);
+            console.error(`Canal: ${context.user_channel || 'web'}`);
+            console.error(`Timeout configuré: ${timeoutDuration/1000}s`);
+
             // Gestion spécifique des erreurs de timeout
             if (error.name === 'AbortError' || error.message?.includes('aborted')) {
-                console.warn(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s (intent: ${intentData?.intent || 'unknown'})`);
+                console.error(`⏱️  TIMEOUT: Perplexity n'a pas répondu dans les ${timeoutDuration/1000}s`);
+                console.error('   → L\'API est trop lente ou surchargée');
+                console.error('   → Solution: Augmenter le timeout ou simplifier la requête');
                 console.log('🔄 Falling back to Gemini due to timeout...');
+            } else if (error.message?.includes('PERPLEXITY_API_KEY')) {
+                console.error('🔑 CLÉ API MANQUANTE: PERPLEXITY_API_KEY non configurée');
+                console.error('   → Solution: Ajouter PERPLEXITY_API_KEY dans Vercel Environment Variables');
+                console.error('   → Format attendu: pplx-...');
+            } else if (error.message?.includes('401')) {
+                console.error('🔑 AUTHENTIFICATION ÉCHOUÉE: Clé API invalide ou expirée');
+                console.error('   → Solution: Vérifier/regénérer la clé dans Perplexity Dashboard');
+            } else if (error.message?.includes('429')) {
+                console.error('⏱️  QUOTA DÉPASSÉ: Trop de requêtes envoyées');
+                console.error('   → Solution: Attendre quelques minutes ou upgrade plan Perplexity');
+            } else if (error.message?.includes('400')) {
+                console.error('📝 REQUÊTE INVALIDE: Format de requête incorrect');
+                console.error('   → Solution: Vérifier le modèle (sonar-pro) et le format des messages');
+            } else if (error.message?.includes('503')) {
+                console.error('🔧 SERVICE INDISPONIBLE: API Perplexity temporairement down');
+                console.error('   → Solution: Réessayer dans quelques instants');
             } else {
-                console.error('❌ Perplexity API error:', error);
-                console.log('🔄 Falling back to Gemini due to Perplexity error');
+                console.error('❌ ERREUR INCONNUE:', error);
+                if (error.stack) {
+                    console.error('Stack:', error.stack.substring(0, 500));
+                }
             }
+            console.error('='.repeat(60) + '\n');
 
             // ✅ VRAI FALLBACK: Appeler Gemini au lieu de throw
             console.log('🔄 Calling Gemini as fallback...');
