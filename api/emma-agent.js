@@ -1039,8 +1039,8 @@ class SmartAgent {
         } catch (error) {
             console.error('❌ Response generation failed:', error);
 
-            // Réponse de fallback basée sur les données des outils
-            const fallbackResponse = this._generateFallbackResponse(userMessage, toolResults, outputMode, context);
+            // Réponse de fallback basée sur les données des outils (utilise Gemini pour générer une vraie réponse)
+            const fallbackResponse = await this._generateFallbackResponse(userMessage, toolResults, outputMode, context);
             return {
                 response: fallbackResponse,
                 validation: { passed: false, confidence: 0.3, reason: 'Fallback response' }
@@ -2803,8 +2803,9 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
 
     /**
      * Réponse de fallback si Perplexity échoue (adapté selon mode)
+     * Utilise Gemini pour générer une vraie réponse en français au lieu d'afficher du JSON brut
      */
-    _generateFallbackResponse(userMessage, toolResults, outputMode = 'chat', context = {}) {
+    async _generateFallbackResponse(userMessage, toolResults, outputMode = 'chat', context = {}) {
         const successfulResults = toolResults.filter(r => r.success && r.data);
 
         if (successfulResults.length === 0) {
@@ -2829,53 +2830,60 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
             return JSON.stringify(dataObj, null, 2);
         }
 
-        // Mode CHAT ou BRIEFING: retourner texte formaté
-        // 📱 SMS: Réponse courte basée sur les données disponibles
-        if (context.user_channel === 'sms') {
-            // Générer une réponse courte pour SMS basée sur les données disponibles
-            let smsResponse = "👩🏻 ";
+        // Mode CHAT ou BRIEFING: Utiliser Gemini pour générer une vraie réponse en français
+        try {
+            // Construire un prompt avec les données disponibles
+            const toolsDataSummary = successfulResults.map(result => {
+                const summary = this._summarizeToolData(result.tool_id, result.data);
+                return `**${result.tool_id}**: ${summary}`;
+            }).join('\n\n');
+
+            const fallbackPrompt = `Tu es Emma, analyste financière experte. L'utilisateur a posé cette question: "${userMessage}"
+
+J'ai récupéré les données suivantes depuis plusieurs sources:
+
+${toolsDataSummary}
+
+INSTRUCTIONS CRITIQUES:
+- ❌ NE JAMAIS afficher du JSON brut ou du code dans ta réponse
+- ✅ INTERPRÈTE et SYNTHÉTISE les données en français naturel
+- ✅ Sois conversationnelle et professionnelle
+- ✅ Explique les chiffres de manière claire et accessible
+- ✅ Si tu vois des données de prix, ratios, ou actualités, analyse-les et explique-les
+- ✅ Réponds directement à la question de l'utilisateur en utilisant ces données
+
+${context.user_channel === 'sms' ? '📱 Mode SMS: Réponse courte et concise (max 400 caractères)' : '🌐 Mode Web: Réponse détaillée et complète'}
+
+Génère une réponse professionnelle en français basée sur ces données:`;
+
+            // Utiliser Gemini pour générer la réponse
+            const geminiResponse = await this._call_gemini(fallbackPrompt, outputMode, context);
             
-            // Prendre le premier résultat réussi et le résumer
-            const firstResult = successfulResults[0];
-            const summary = this._summarizeToolData(firstResult.tool_id, firstResult.data);
+            // Nettoyer le JSON si présent
+            const cleanedResponse = this._sanitizeJsonInResponse(geminiResponse);
             
-            // Limiter à ~400 caractères pour SMS (1 SMS = ~160 chars, on vise 2-3 SMS max)
-            const maxLength = 400;
-            if (summary.length > maxLength) {
-                smsResponse += summary.substring(0, maxLength - 3) + '...';
-            } else {
-                smsResponse += summary;
+            return cleanedResponse;
+
+        } catch (error) {
+            console.error('❌ Erreur génération fallback avec Gemini:', error);
+            
+            // Fallback ultime: réponse basique sans JSON
+            if (context.user_channel === 'sms') {
+                // Pour SMS, réponse très courte
+                const firstResult = successfulResults[0];
+                if (firstResult.tool_id.includes('price') || firstResult.tool_id.includes('quote')) {
+                    const price = firstResult.data?.price || firstResult.data?.data?.price;
+                    const ticker = firstResult.data?.ticker || firstResult.data?.data?.ticker || 'l\'action';
+                    if (price) {
+                        return `👩🏻 ${ticker} se négocie à ${price}$. Données disponibles. Pour + de détails: gobapps.com`;
+                    }
+                }
+                return "👩🏻 Données disponibles. Pour une analyse complète, visite gobapps.com";
             }
             
-            // Ajouter indication si plusieurs sources disponibles
-            if (successfulResults.length > 1) {
-                smsResponse += `\n\n(${successfulResults.length} sources disponibles)`;
-            }
-            
-            return smsResponse;
+            // Pour Web, message informatif sans JSON
+            return `J'ai récupéré des données depuis ${successfulResults.length} source(s), mais je n'ai pas pu générer une analyse complète. Les données incluent: ${successfulResults.map(r => r.tool_id).join(', ')}.\n\nVeuillez reformuler votre question ou visitez gobapps.com pour plus d'informations.`;
         }
-
-        // Mode WEB: Réponse concise avec données résumées
-        let response = "Voici les informations disponibles :\n\n";
-
-        // Limiter à 3 outils max pour éviter les réponses trop longues
-        const limitedResults = successfulResults.slice(0, 3);
-
-        limitedResults.forEach(result => {
-            // Utiliser le résumé au lieu du JSON complet
-            const summary = this._summarizeToolData(result.tool_id, result.data);
-            // Limiter chaque résumé à 200 chars
-            const shortSummary = summary.length > 200 ? summary.substring(0, 200) + '...' : summary;
-            response += `**${result.tool_id}**: ${shortSummary}\n\n`;
-        });
-
-        if (successfulResults.length > 3) {
-            response += `... et ${successfulResults.length - 3} autres sources de données.\n\n`;
-        }
-
-        response += "Note: Réponse partielle. Pour une analyse complète, reformulez votre question.";
-
-        return response;
     }
 
     /**
