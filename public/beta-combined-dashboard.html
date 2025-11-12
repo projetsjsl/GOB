@@ -3458,15 +3458,15 @@ const fetchHybridData = async (symbol, dataType) => {
 
             }, []); // Dépendance vide = une seule fois au montage
 
-            // Charger les news par ticker quand les tickers changent
+            // Charger les news par ticker quand les tickers changent ET que les news générales sont disponibles
             useEffect(() => {
-                if (tickers.length > 0 && Object.keys(stockData).length > 0) {
-                    console.log('📰 Chargement des news pour les tickers disponibles...');
+                if (tickers.length > 0 && Object.keys(stockData).length > 0 && newsData.length > 0) {
+                    console.log('📰 Chargement des news pour les tickers disponibles (news générales prêtes)...');
                     fetchLatestNewsForTickers().catch(err => {
                         console.error('Erreur chargement news par ticker:', err);
                     });
                 }
-            }, [tickers.length]); // Se déclenche quand le nombre de tickers change
+            }, [tickers.length, newsData.length]); // Se déclenche quand le nombre de tickers change OU quand les news générales sont chargées
 
             // Charger automatiquement les données de stocks dès que les tickers sont disponibles
             // Ce useEffect est un fallback si le batch ne charge pas les données
@@ -3542,13 +3542,14 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
 
                 // Charger les news par ticker si les données sont disponibles (indépendamment de l'onglet actif)
-                if (tickers.length > 0 && Object.keys(stockData).length > 0 && Object.keys(tickerLatestNews).length === 0) {
-                    console.log('📰 Chargement automatique des news par ticker (en arrière-plan)...');
+                // ATTENTION: Attendre que les news générales soient chargées pour avoir un meilleur fallback
+                if (tickers.length > 0 && Object.keys(stockData).length > 0 && newsData.length > 0 && Object.keys(tickerLatestNews).length === 0) {
+                    console.log('📰 Chargement automatique des news par ticker (en arrière-plan, news générales disponibles)...');
                     fetchLatestNewsForTickers().catch(err => {
                         console.error('❌ Erreur chargement news par ticker:', err);
                     });
                 }
-            }, [initialLoadComplete]); // Se déclenche après l'initialisation, indépendamment de l'onglet actif
+            }, [initialLoadComplete, newsData.length]); // Se déclenche après l'initialisation ET quand les news générales sont chargées
 
             // Rafraîchir les données tickers lors de la navigation si elles sont anciennes
             // Note: Les news ne sont PAS rafraîchies automatiquement (utilisent le cache configuré)
