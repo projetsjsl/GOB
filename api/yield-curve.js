@@ -37,6 +37,19 @@ const CANADA_RATES = {
   '30Y': 'IRCANTBS30Y'  // 30 ans
 };
 
+const CANADA_FALLBACK = [
+  { maturity: '1M', rate: 4.85 },
+  { maturity: '3M', rate: 4.72 },
+  { maturity: '6M', rate: 4.55 },
+  { maturity: '1Y', rate: 4.32 },
+  { maturity: '2Y', rate: 4.10 },
+  { maturity: '3Y', rate: 3.95 },
+  { maturity: '5Y', rate: 3.72 },
+  { maturity: '7Y', rate: 3.58 },
+  { maturity: '10Y', rate: 3.41 },
+  { maturity: '30Y', rate: 3.25 }
+];
+
 // Convertir la maturité en mois pour le tri
 function maturityToMonths(maturity) {
   const value = parseFloat(maturity);
@@ -216,13 +229,23 @@ async function getCanadaRates() {
   }
 
   // Convertir en array et trier par maturité
-  const ratesArray = Object.entries(rates)
+  let ratesArray = Object.entries(rates)
     .map(([maturity, rate]) => ({
       maturity,
       rate,
       months: maturityToMonths(maturity)
     }))
     .sort((a, b) => a.months - b.months);
+
+  if (ratesArray.length === 0) {
+    console.warn('⚠️ Aucun taux Canada via API - utilisation des valeurs par défaut');
+    ratesArray = CANADA_FALLBACK.map(item => ({
+      maturity: item.maturity,
+      rate: item.rate,
+      months: maturityToMonths(item.maturity)
+    }));
+    fetchDate = new Date().toISOString().split('T')[0];
+  }
 
   return {
     country: 'Canada',
