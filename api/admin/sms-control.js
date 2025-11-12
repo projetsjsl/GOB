@@ -57,9 +57,23 @@ const importantKeys = [
 
 const mergeWithProcessEnv = (envObj) => {
   const merged = { ...envObj };
+  
+  // Valeurs par défaut si non définies
+  const defaults = {
+    MODE: 'test',
+    TEST_MODE: 'true',
+    N8N_WEBHOOK_BASE_URL: 'https://projetsjsl.app.n8n.cloud',
+    EMMA_WEBHOOK_URL: 'https://projetsjsl.app.n8n.cloud/webhook/gob-sms-webhook-test',
+    PUBLIC_URL: 'https://gob-kmay.onrender.com',
+    PORT: '3000'
+  };
+  
   importantKeys.forEach((key) => {
+    // Priorité: envObj → process.env → default
     if (!merged[key] && process.env[key]) {
       merged[key] = process.env[key];
+    } else if (!merged[key] && defaults[key]) {
+      merged[key] = defaults[key];
     }
   });
   return merged;
