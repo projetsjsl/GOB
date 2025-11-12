@@ -2811,6 +2811,10 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
             if (outputMode === 'data') {
                 return '{}';
             }
+            // 📱 SMS: Message d'erreur court si aucune donnée disponible
+            if (context.user_channel === 'sms') {
+                return "⚠️ Service temporairement indisponible. Emma reviendra dans quelques instants. Pour une réponse immédiate, visitez gobapps.com";
+            }
             return "Désolé, je n'ai pas pu récupérer de données fiables pour répondre à votre question. Veuillez réessayer.";
         }
 
@@ -2826,9 +2830,29 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
         }
 
         // Mode CHAT ou BRIEFING: retourner texte formaté
-        // 📱 SMS: Réponse ultra-courte (erreur de service, pas de dump de données)
+        // 📱 SMS: Réponse courte basée sur les données disponibles
         if (context.user_channel === 'sms') {
-            return "⚠️ Service temporairement indisponible. Emma reviendra dans quelques instants. Pour une réponse immédiate, visitez gobapps.com";
+            // Générer une réponse courte pour SMS basée sur les données disponibles
+            let smsResponse = "👩🏻 ";
+            
+            // Prendre le premier résultat réussi et le résumer
+            const firstResult = successfulResults[0];
+            const summary = this._summarizeToolData(firstResult.tool_id, firstResult.data);
+            
+            // Limiter à ~400 caractères pour SMS (1 SMS = ~160 chars, on vise 2-3 SMS max)
+            const maxLength = 400;
+            if (summary.length > maxLength) {
+                smsResponse += summary.substring(0, maxLength - 3) + '...';
+            } else {
+                smsResponse += summary;
+            }
+            
+            // Ajouter indication si plusieurs sources disponibles
+            if (successfulResults.length > 1) {
+                smsResponse += `\n\n(${successfulResults.length} sources disponibles)`;
+            }
+            
+            return smsResponse;
         }
 
         // Mode WEB: Réponse concise avec données résumées
