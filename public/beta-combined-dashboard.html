@@ -859,14 +859,7 @@ const fetchHybridData = async (symbol, dataType) => {
             const [newsFilter, setNewsFilter] = useState('all'); // Filtre pour les actualités
             const [filteredNews, setFilteredNews] = useState([]); // Actualités filtrées
             const [frenchOnly, setFrenchOnly] = useState(false); // Filtre pour nouvelles en français
-
-            const userDisplayName = githubUser?.name || githubUser?.login || 'toi';
-            const assistantAvatar = isDarkMode ? '/emma-avatar-gob-light.jpg' : '/emma-avatar-gob-dark.jpg';
-            const openAskEmma = () => {
-                setActiveTab('ask-emma');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-
+*** End Patch
             // États pour les slash commands
             const [showSlashSuggestions, setShowSlashSuggestions] = useState(false);
             const [slashSuggestions, setSlashSuggestions] = useState([]);
@@ -914,6 +907,13 @@ const fetchHybridData = async (symbol, dataType) => {
                 } catch (_) {}
                 return true; // défaut: dark
             });
+
+            const userDisplayName = githubUser?.name || githubUser?.login || 'toi';
+            const assistantAvatar = isDarkMode ? '/emma-avatar-gob-light.jpg' : '/emma-avatar-gob-dark.jpg';
+            const openAskEmma = () => {
+                setActiveTab('ask-emma');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
 
             // Professional Mode State
             const [isProfessionalMode, setIsProfessionalMode] = useState(() => {
@@ -17400,9 +17400,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                     )}
 
+                    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 pointer-events-none">
+                        <div className={`px-4 py-2 rounded-full text-sm shadow-lg border pointer-events-auto ${
+                            isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
+                        }`}>
+                            Bonjour {userDisplayName} !
+                        </div>
+                        <button
+                            onClick={openAskEmma}
+                            className="relative focus:outline-none pointer-events-auto"
+                            aria-label="Parler à Emma"
+                        >
+                            <img
+                                src={assistantAvatar}
+                                alt="Emma avatar"
+                                className="w-16 h-16 rounded-full shadow-2xl border-2 border-white object-cover"
+                            />
+                            <span className={`absolute -top-2 -left-2 px-2 py-1 rounded-full text-xs font-semibold border ${
+                                isDarkMode ? 'bg-blue-500 text-white border-blue-300' : 'bg-blue-600 text-white border-blue-400'
+                            }`}>
+                                Ask Emma
+                            </span>
+                        </button>
+                    </div>
+
                 </div>
             );
-            };
+        };
 
             // ============================================
             // COMPOSANT INTELLISTOCKS
