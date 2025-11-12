@@ -1542,27 +1542,56 @@ const fetchHybridData = async (symbol, dataType) => {
                             return;
                         }
 
-                        // PRIORITÉ 4: Chercher dans les news générales
-                        const relevantNews = newsData.find(article => 
-                            article.title.toLowerCase().includes(ticker.toLowerCase()) ||
-                            article.description?.toLowerCase().includes(ticker.toLowerCase())
-                        );
-                        if (relevantNews) {
-                            newsMap[ticker] = {
-                                title: relevantNews.title,
-                                source: relevantNews.source?.name || 'Général',
-                                date: new Date(relevantNews.publishedAt).toLocaleDateString('fr-FR'),
-                                url: relevantNews.url || '#'
-                            };
+                        // PRIORITÉ 4: Chercher dans les news générales (amélioré avec recherche plus large)
+                        if (newsData && newsData.length > 0) {
+                            // Recherche exacte d'abord
+                            let relevantNews = newsData.find(article => 
+                                article.title?.toLowerCase().includes(ticker.toLowerCase()) ||
+                                article.description?.toLowerCase().includes(ticker.toLowerCase())
+                            );
                             
-                            const moveReason = extractMoveReasonFromNews(relevantNews.title);
-                            if (moveReason) {
-                                moveReasonsMap[ticker] = {
-                                    explanation: moveReason,
+                            // Si pas trouvé, chercher dans le contenu complet
+                            if (!relevantNews) {
+                                relevantNews = newsData.find(article => {
+                                    const fullText = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                                    return fullText.includes(ticker.toLowerCase());
+                                });
+                            }
+                            
+                            // Si toujours pas trouvé, chercher des variations du ticker (sans .TO, etc.)
+                            if (!relevantNews && ticker.includes('.')) {
+                                const baseTicker = ticker.split('.')[0];
+                                relevantNews = newsData.find(article => {
+                                    const fullText = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                                    return fullText.includes(baseTicker.toLowerCase());
+                                });
+                            }
+                            
+                            if (relevantNews) {
+                                newsMap[ticker] = {
+                                    title: relevantNews.title,
                                     source: relevantNews.source?.name || 'Général',
-                                    type: 'news',
-                                    date: new Date(relevantNews.publishedAt).toLocaleDateString('fr-FR')
+                                    date: new Date(relevantNews.publishedAt || relevantNews.publishedDate || Date.now()).toLocaleDateString('fr-FR'),
+                                    url: relevantNews.url || '#'
                                 };
+                                
+                                const moveReason = extractMoveReasonFromNews(relevantNews.title);
+                                if (moveReason) {
+                                    moveReasonsMap[ticker] = {
+                                        explanation: moveReason,
+                                        source: relevantNews.source?.name || 'Général',
+                                        type: 'news',
+                                        date: new Date(relevantNews.publishedAt || relevantNews.publishedDate || Date.now()).toLocaleDateString('fr-FR')
+                                    };
+                                } else {
+                                    // Utiliser le titre complet comme explication si pas d'extraction possible
+                                    moveReasonsMap[ticker] = {
+                                        explanation: relevantNews.title.length > 100 ? relevantNews.title.substring(0, 100) + '...' : relevantNews.title,
+                                        source: relevantNews.source?.name || 'Général',
+                                        type: 'news',
+                                        date: new Date(relevantNews.publishedAt || relevantNews.publishedDate || Date.now()).toLocaleDateString('fr-FR')
+                                    };
+                                }
                             }
                         }
                     } catch (error) {
@@ -1665,7 +1694,28 @@ const fetchHybridData = async (symbol, dataType) => {
                 }
 
                 // PRIORITÉ 2: Utiliser la news récente avec analyse de correspondance au mouvement
-                const news = tickerLatestNews[ticker];
+                let news = tickerLatestNews[ticker];
+                
+                // FALLBACK: Si pas de news spécifique, chercher dans les news générales
+                if (!news && newsData && newsData.length > 0) {
+                    const relevantNews = newsData.find(article => {
+                        const title = (article.title || '').toLowerCase();
+                        const desc = (article.description || '').toLowerCase();
+                        const tickerLower = ticker.toLowerCase();
+                        return title.includes(tickerLower) || desc.includes(tickerLower) || 
+                               title.includes(tickerLower.split('.')[0]) || desc.includes(tickerLower.split('.')[0]);
+                    });
+                    
+                    if (relevantNews) {
+                        news = {
+                            title: relevantNews.title,
+                            source: relevantNews.source?.name || 'Général',
+                            date: new Date(relevantNews.publishedAt || relevantNews.publishedDate || Date.now()).toLocaleDateString('fr-FR'),
+                            url: relevantNews.url || '#'
+                        };
+                    }
+                }
+                
                 if (!news) {
                     const directionLabel = changePercent > 0 ? 'hausse' : 'baisse';
                     return `Variation en ${directionLabel} de ${Math.abs(changePercent).toFixed(2)}% sans actualité confirmée.`;
