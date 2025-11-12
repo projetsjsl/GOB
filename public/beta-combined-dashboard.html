@@ -907,7 +907,7 @@ const fetchHybridData = async (symbol, dataType) => {
                 return true; // défaut: dark
             });
 
-            const userDisplayName = githubUser?.name || githubUser?.login || 'toi';
+            const userDisplayName = githubUser?.login || githubUser?.name || 'toi';
             const assistantAvatar = isDarkMode ? '/emma-avatar-gob-light.jpg' : '/emma-avatar-gob-dark.jpg';
             const openAskEmma = () => {
                 setActiveTab('ask-emma');
