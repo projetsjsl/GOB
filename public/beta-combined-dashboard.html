@@ -860,6 +860,13 @@ const fetchHybridData = async (symbol, dataType) => {
             const [filteredNews, setFilteredNews] = useState([]); // Actualités filtrées
             const [frenchOnly, setFrenchOnly] = useState(false); // Filtre pour nouvelles en français
 
+            const userDisplayName = githubUser?.name || githubUser?.login || 'toi';
+            const assistantAvatar = isDarkMode ? '/emma-avatar-gob-light.jpg' : '/emma-avatar-gob-dark.jpg';
+            const openAskEmma = () => {
+                setActiveTab('ask-emma');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
             // États pour les slash commands
             const [showSlashSuggestions, setShowSlashSuggestions] = useState(false);
             const [slashSuggestions, setSlashSuggestions] = useState([]);
@@ -4558,7 +4565,7 @@ STRUCTURE JSON OBLIGATOIRE:
 
                 return (
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
+                        isDarkMode ? 'bg-gray-900 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
                     }`}>
                         <div className="flex items-center justify-between mb-4">
                             <div>
@@ -4588,7 +4595,7 @@ STRUCTURE JSON OBLIGATOIRE:
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-3">
-                                        <label className="text-sm font-semibold flex items-center justify-between">
+                                        <label className={`text-sm font-semibold flex items-center justify-between ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             Mode (presets)
                                             {statusBadge(serverState.running ? 'Serveur actif' : 'Serveur arrêté', serverState.running ? 'success' : 'warning')}
                                         </label>
@@ -4600,10 +4607,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         key={key}
                                                         className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition ${
                                                             active
-                                                                ? 'border-blue-500 bg-blue-50'
+                                                                ? 'border-blue-500 bg-blue-50 text-blue-900'
                                                                 : isDarkMode
-                                                                    ? 'border-gray-700 bg-gray-800'
-                                                                    : 'border-gray-200 bg-white'
+                                                                    ? 'border-gray-600 bg-gray-800 text-white'
+                                                                    : 'border-gray-200 bg-white text-gray-800'
                                                         }`}
                                                     >
                                                         <input
@@ -24331,8 +24338,32 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
                     )}
 
+                    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 pointer-events-none">
+                        <div className={`px-4 py-2 rounded-full text-sm shadow-lg border pointer-events-auto ${
+                            isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
+                        }`}>
+                            Bonjour {userDisplayName} !
+                        </div>
+                        <button
+                            onClick={openAskEmma}
+                            className="relative focus:outline-none pointer-events-auto"
+                            aria-label="Parler à Emma"
+                            style={{ transition: 'transform 0.2s ease' }}
+                        >
+                            <img
+                                src={assistantAvatar}
+                                alt="Emma avatar"
+                                className="w-16 h-16 rounded-full shadow-2xl border-2 border-white object-cover"
+                            />
+                            <span className={`absolute -top-2 -left-2 px-2 py-1 rounded-full text-xs font-semibold border ${
+                                isDarkMode ? 'bg-blue-500 text-white border-blue-300' : 'bg-blue-600 text-white border-blue-400'
+                            }`}>
+                                Ask Emma
+                            </span>
+                        </button>
+                    </div>
                 </div>
-            );
+        );
         };
 
         // Fonction fallback SUPPRIMÉE - Plus de contenu demo
