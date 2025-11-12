@@ -922,7 +922,20 @@ const fetchHybridData = async (symbol, dataType) => {
                 return true; // défaut: dark
             });
 
-            const userDisplayName = githubUser?.login || githubUser?.name || 'toi';
+            // Récupérer le login ID de l'utilisateur connecté depuis sessionStorage
+            const getUserLoginId = () => {
+                try {
+                    const userJson = sessionStorage.getItem('gob-user');
+                    if (userJson) {
+                        const user = JSON.parse(userJson);
+                        return user.username || user.display_name || githubUser?.login || githubUser?.name || 'toi';
+                    }
+                } catch (e) {
+                    console.warn('Erreur récupération utilisateur:', e);
+                }
+                return githubUser?.login || githubUser?.name || 'toi';
+            };
+            const userDisplayName = getUserLoginId();
             const assistantAvatar = isDarkMode ? '/emma-avatar-gob-light.jpg' : '/emma-avatar-gob-dark.jpg';
             const openAskEmma = () => {
                 setActiveTab('ask-emma');
