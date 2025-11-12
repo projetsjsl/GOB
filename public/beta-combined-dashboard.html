@@ -1618,7 +1618,10 @@ const fetchHybridData = async (symbol, dataType) => {
 
                 // PRIORITÉ 2: Utiliser la news récente avec analyse de correspondance au mouvement
                 const news = tickerLatestNews[ticker];
-                if (!news) return null;
+                if (!news) {
+                    const directionLabel = changePercent > 0 ? 'hausse' : 'baisse';
+                    return `Variation en ${directionLabel} de ${Math.abs(changePercent).toFixed(2)}% sans actualité confirmée.`;
+                }
 
                 const title = news.title.toLowerCase();
                 const isPositive = changePercent > 0;
@@ -4477,6 +4480,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         const env = data.env || {};
                         if (!env.MODE) env.MODE = 'test';
                         if (!env.TEST_MODE) env.TEST_MODE = 'true';
+                        if (!env.N8N_WEBHOOK_BASE_URL) env.N8N_WEBHOOK_BASE_URL = 'https://projetsjsl.app.n8n.cloud';
                         if (!env.EMMA_WEBHOOK_URL) env.EMMA_WEBHOOK_URL = 'https://projetsjsl.app.n8n.cloud/webhook/gob-sms-webhook-test';
                         if (!env.PUBLIC_URL) env.PUBLIC_URL = 'https://gob-kmay.onrender.com';
                         setEnvValues(env);
@@ -4578,8 +4582,8 @@ STRUCTURE JSON OBLIGATOIRE:
                 );
 
                 return (
-                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-900'
+                    <div className={`rounded-lg p-4 border shadow-lg transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900'
                     }`}>
                         <div className="flex items-center justify-between mb-4">
                             <div>
@@ -4621,9 +4625,11 @@ STRUCTURE JSON OBLIGATOIRE:
                                                         key={key}
                                                         className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition ${
                                                             active
-                                                                ? 'border-blue-500 bg-blue-50 text-blue-900'
+                                                                ? isDarkMode
+                                                                    ? 'border-emerald-400 bg-emerald-900/30 text-emerald-100'
+                                                                    : 'border-blue-500 bg-blue-50 text-blue-900'
                                                                 : isDarkMode
-                                                                    ? 'border-gray-600 bg-gray-800 text-white'
+                                                                    ? 'border-gray-700 bg-gray-800 text-gray-100 hover:border-gray-500'
                                                                     : 'border-gray-200 bg-white text-gray-800'
                                                         }`}
                                                     >
@@ -4650,7 +4656,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-semibold">TEST_MODE</label>
+                                        <label className="text-sm font-semibold">Mode Twilio (TEST_MODE)</label>
                                         <div className="flex items-center gap-4">
                                             {['true', 'false'].map((value) => (
                                                 <label key={value} className="flex items-center gap-2 text-sm">
@@ -4679,7 +4685,11 @@ STRUCTURE JSON OBLIGATOIRE:
                                                     value={envValues[field.key] || ''}
                                                     onChange={(e) => handleEnvChange(field.key, e.target.value)}
                                                     placeholder={field.placeholder}
-                                                    className={`w-full rounded-lg border px-3 py-2 text-sm ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300'}`}
+                                                    className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
+                                                        isDarkMode
+                                                            ? 'bg-gray-900/70 border-gray-700 text-gray-100 placeholder-gray-500'
+                                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                                                    }`}
                                                 />
                                                 {field.key === 'EMMA_WEBHOOK_URL' && (
                                                     <datalist id="emma-webhook-options">
@@ -17422,18 +17432,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </div>
                         <button
                             onClick={openAskEmma}
-                            className="relative focus:outline-none pointer-events-auto"
-                            aria-label="Parler à Emma"
+                            className="pointer-events-auto flex flex-col items-center gap-2 focus:outline-none"
+                            aria-label="Ouvrir Emma IA"
                         >
                             <img
                                 src={assistantAvatar}
                                 alt="Emma avatar"
-                                className="w-16 h-16 rounded-full shadow-2xl border-2 border-white object-cover"
+                                className={`w-16 h-16 rounded-full shadow-2xl border-2 ${isDarkMode ? 'border-emerald-400' : 'border-white'} object-cover`}
                             />
-                            <span className={`absolute -top-2 -left-2 px-2 py-1 rounded-full text-xs font-semibold border ${
-                                isDarkMode ? 'bg-blue-500 text-white border-blue-300' : 'bg-blue-600 text-white border-blue-400'
+                            <span className={`px-4 py-1 rounded-full text-xs font-semibold border ${
+                                isDarkMode ? 'bg-emerald-600/40 text-emerald-100 border-emerald-400/60' : 'bg-emerald-500/20 text-emerald-700 border-emerald-300'
                             }`}>
-                                Ask Emma
+                                Emma
                             </span>
                         </button>
                     </div>
@@ -22430,6 +22440,31 @@ console.log('✅ Données hybrides récupérées:', {
 
                 // S'assurer que isDarkMode est accessible (fallback si non défini)
                 const darkMode = typeof isDarkMode !== 'undefined' ? isDarkMode : true;
+
+                const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
+                const renderRateTable = (title, dataset, badgeEmoji) => (
+                    <div className={`p-4 rounded-lg border ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2 font-semibold">
+                                <span>{badgeEmoji}</span>
+                                <span>{title}</span>
+                            </div>
+                            <span className="text-xs opacity-70">{dataset?.date || '—'}</span>
+                        </div>
+                        {dataset?.rates?.length ? (
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                {dataset.rates.map(rate => (
+                                    <div key={`${title}-${rate.maturity}`} className="flex items-center justify-between border-b border-dashed border-gray-600/30 pb-1">
+                                        <span className="uppercase tracking-tight">{rate.maturity}</span>
+                                        <span className="font-semibold">{formatRate(rate.rate)}%</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-sm opacity-70">Données non disponibles.</p>
+                        )}
+                    </div>
+                );
                 
                 console.log('📊 YieldCurveTab monté, isDarkMode:', darkMode);
 
@@ -22739,6 +22774,11 @@ console.log('✅ Données hybrides récupérées:', {
                                         </p>
                                     </div>
                                 )}
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                    {yieldData.data.us && renderRateTable('US Treasury', yieldData.data.us, '🇺🇸')}
+                                    {yieldData.data.canada && renderRateTable('Obligations Canada', yieldData.data.canada, '🇨🇦')}
+                                </div>
 
                                 {/* Tableau des maturités */}
                                 <div className={`p-6 rounded-lg transition-colors duration-300 ${
