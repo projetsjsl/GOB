@@ -841,7 +841,9 @@ Comment puis-je t'aider ? 🚀`;
         // Adapter la réponse cachée pour le canal
         let adaptedCachedResponse;
         try {
-          adaptedCachedResponse = adaptForChannel(cachedData.response, channel, emmaContext);
+          // ✅ adaptForChannel peut retourner une Promise pour email (async)
+          const adaptedResult = adaptForChannel(cachedData.response, channel, emmaContext);
+          adaptedCachedResponse = adaptedResult instanceof Promise ? await adaptedResult : adaptedResult;
         } catch (error) {
           console.error('[Chat API] Erreur adaptation réponse cachée:', error);
           adaptedCachedResponse = cachedData.response;
@@ -951,11 +953,16 @@ Comment puis-je t'aider ? 🚀`;
       console.log(`[Chat API] 🔧 Premiers 200 chars AVANT: ${emmaResponse.response.substring(0, 200)}`);
       
       // Passer le contexte + citations pour SMS (liens TradingView + sources amicales)
+      // ✅ Ajouter tickers pour emails (logos d'entreprises)
       const adaptContext = {
         ...emmaContext,
-        citations: emmaResponse.response.citations || []  // 📰 Ajouter citations pour formatage amical
+        citations: emmaResponse.response.citations || [],  // 📰 Ajouter citations pour formatage amical
+        tickers: emmaResponse.metadata?.intent?.tickers || emmaContext.tickers || []  // 🏢 Tickers pour logos emails
       };
-      adaptedResponse = adaptForChannel(emmaResponse.response, channel, adaptContext);
+      
+      // ✅ adaptForChannel peut retourner une Promise pour email (async)
+      const adaptedResult = adaptForChannel(emmaResponse.response, channel, adaptContext);
+      adaptedResponse = adaptedResult instanceof Promise ? await adaptedResult : adaptedResult;
       
       console.log(`[Chat API] ✅ APRÈS adaptation - Channel: ${channel}, Longueur: ${adaptedResponse.length} chars`);
       console.log(`[Chat API] ✅ Premiers 200 chars APRÈS: ${adaptedResponse.substring(0, 200)}`);
