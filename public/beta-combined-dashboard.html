@@ -16198,10 +16198,27 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Composant onglet Stocks & News
             const StocksNewsTab = () => {
-                const bullIconUrl = 'https://img.icons8.com/emoji/48/000000/bull-emoji.png';
-                const bearIconUrl = 'https://img.icons8.com/emoji/48/000000/bear-emoji.png';
                 const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
                 const [expandedStock, setExpandedStock] = useState(null);
+
+                const renderMarketBadge = (type) => {
+                    const isBull = type === 'bull';
+                    return (
+                        <span
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${
+                                isBull
+                                    ? isDarkMode
+                                        ? 'bg-lime-900/70 border-lime-500/40 text-lime-300'
+                                        : 'bg-lime-100 border-lime-400 text-lime-700'
+                                    : isDarkMode
+                                        ? 'bg-rose-900/70 border-rose-500/40 text-rose-200'
+                                        : 'bg-rose-100 border-rose-300 text-rose-700'
+                            }`}
+                        >
+                            {isBull ? '🐂' : '🐻'}
+                        </span>
+                    );
+                };
 
                 // Helper functions for news credibility scoring (définies dans le composant)
                 const getNewsCredibilityScore = (sourceName) => {
@@ -16387,9 +16404,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Top Gainers */}
                                 <div className={`p-3 sm:p-4 rounded-lg ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
-                                    <h4 className={`text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-2 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
+                                    <h4 className={`text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-3 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
                                         <LucideIcon name="TrendingUp" className="w-5 h-5" />
-                                        <img src={bullIconUrl} alt="Bull market" className="w-5 h-5" loading="lazy" />
+                                        {renderMarketBadge('bull')}
                                         Top Gainers
                                     </h4>
                                     <div className="space-y-2.5 sm:space-y-2">
@@ -16473,9 +16490,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                                 {/* Top Losers */}
                                 <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-red-500/10 border border-red-500/30' : 'bg-red-50 border border-red-200'}`}>
-                                    <h4 className={`text-sm font-bold mb-3 flex items-center gap-2 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
+                                    <h4 className={`text-sm font-bold mb-3 flex items-center gap-3 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
                                         <LucideIcon name="TrendingDown" className="w-5 h-5" />
-                                        <img src={bearIconUrl} alt="Bear market" className="w-5 h-5" loading="lazy" />
+                                        {renderMarketBadge('bear')}
                                         Top Losers
                                     </h4>
                                     <div className="space-y-2">
