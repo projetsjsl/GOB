@@ -2071,7 +2071,7 @@ ACHETER < 340$ (marge 25%+)
 • 📖 Structure multi-sections: minimum 10-15 sections avec sous-sections
 • 🔢 CHIFFRES EXHAUSTIFS: tableaux complets, historiques 5-10 ans, comparatifs multiples
 • 📚 CONTEXTE HISTORIQUE: toujours ajouter perspective historique et tendances long-terme
-• 🌍 COMPARAISONS SECTORIELLES: comparer avec 3-5 concurrents en détail
+• 🌍 COMPARAISONS SECTORIELLES: comparer avec d'autres titres UNIQUEMENT si explicitement demandé par l'utilisateur (ex: "compare avec...", "vs...", "comparaison"). Si l'utilisateur demande uniquement l'analyse d'un ticker spécifique, NE PAS inclure de comparaisons avec d'autres titres.
 • 💼 SCÉNARIOS MULTIPLES: toujours 3+ scénarios (optimiste/réaliste/pessimiste) avec chiffres
 
 🌍🏛️ CONTEXTE MACRO-ÉCONOMIQUE & GÉOPOLITIQUE (OBLIGATOIRE) 🌍🏛️:
