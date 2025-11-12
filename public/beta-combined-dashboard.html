@@ -1404,8 +1404,8 @@ const fetchHybridData = async (symbol, dataType) => {
                 console.log(`✅ Finviz news loaded for ${Object.keys(newsMap).length} tickers`);
             };
 
-            // Fonction pour récupérer la news la plus récente et pertinente pour chaque ticker
-            // AMÉLIORÉ avec "Why Is It Moving?" de Finviz
+            // Fonction SIMPLIFIÉE pour récupérer les news par ticker
+            // Utilise l'API unifiée /api/news qui agrège déjà toutes les sources (FMP, Finnhub, Finviz, RSS)
             const fetchLatestNewsForTickers = async () => {
                 console.log('📰 Chargement des news récentes et explications de mouvement pour chaque ticker...');
                 
@@ -1455,7 +1455,6 @@ const fetchHybridData = async (symbol, dataType) => {
                     console.warn('⚠️ Erreur récupération cache (non bloquant):', error.message);
                 }
                 
-                const today = new Date().toISOString().split('T')[0];
                 const newsMap = {};
                 const moveReasonsMap = {};
 
@@ -1493,105 +1492,33 @@ const fetchHybridData = async (symbol, dataType) => {
                             console.warn(`⚠️ Finviz Why Moving non disponible pour ${ticker}:`, whyMovingError.message);
                         }
 
-                        // PRIORITÉ 2: Finnhub company news (plus spécifique)
-                        const finnhubResponse = await fetch(`${API_BASE_URL}/api/finnhub?endpoint=company-news&symbol=${ticker}&from=${today}&to=${today}`);
-                        if (finnhubResponse.ok) {
-                            const finnhubData = await finnhubResponse.json();
-                            if (Array.isArray(finnhubData) && finnhubData.length > 0) {
-                                // Prendre la première news de la journée
-                                const latestNews = finnhubData[0];
+                        // PRIORITÉ 2: API unifiée /api/news qui agrège FMP, Finnhub, Finviz, RSS
+                        // Cette API fait déjà tout le travail d'agrégation et de déduplication
+                        const unifiedNewsResponse = await fetch(`${API_BASE_URL}/api/news?ticker=${ticker}&limit=5`);
+                        if (unifiedNewsResponse.ok) {
+                            const unifiedNewsData = await unifiedNewsResponse.json();
+                            if (unifiedNewsData.success && unifiedNewsData.articles && unifiedNewsData.articles.length > 0) {
+                                // Prendre la première news (la plus récente et pertinente, déjà triée par l'API)
+                                const latestNews = unifiedNewsData.articles[0];
                                 newsMap[ticker] = {
-                                    title: latestNews.headline || latestNews.title,
-                                    source: latestNews.source || 'Finnhub',
-                                    date: new Date(latestNews.datetime * 1000).toLocaleDateString('fr-FR'),
+                                    title: latestNews.title || latestNews.headline,
+                                    source: latestNews.source?.name || latestNews.source_original || latestNews.source || 'API Unifiée',
+                                    date: latestNews.published_at || latestNews.publishedAt || latestNews.date || new Date().toLocaleDateString('fr-FR'),
                                     url: latestNews.url || '#'
                                 };
                                 
-                                // Extraire raison de mouvement depuis la news
-                                const moveReason = extractMoveReasonFromNews(latestNews.headline || latestNews.title);
-                                if (moveReason) {
-                                    moveReasonsMap[ticker] = {
-                                        explanation: moveReason,
-                                        source: latestNews.source || 'Finnhub',
-                                        type: 'news',
-                                        date: new Date(latestNews.datetime * 1000).toLocaleDateString('fr-FR')
-                                    };
-                                }
-                                return;
-                            }
-                        }
-
-                        // PRIORITÉ 3: Finviz news si disponible
-                        if (finvizNews[ticker]) {
-                            newsMap[ticker] = {
-                                title: finvizNews[ticker].headline || finvizNews[ticker].title,
-                                source: 'Finviz',
-                                date: finvizNews[ticker].date || 'Aujourd\'hui',
-                                url: finvizNews[ticker].link || '#'
-                            };
-                            
-                            const moveReason = extractMoveReasonFromNews(finvizNews[ticker].headline || finvizNews[ticker].title);
-                            if (moveReason) {
+                                // Extraire ou utiliser le titre comme explication
+                                const moveReason = extractMoveReasonFromNews(latestNews.title || latestNews.headline);
                                 moveReasonsMap[ticker] = {
-                                    explanation: moveReason,
-                                    source: 'Finviz',
+                                    explanation: moveReason || ((latestNews.title || latestNews.headline).length > 120 
+                                        ? (latestNews.title || latestNews.headline).substring(0, 120) + '...' 
+                                        : (latestNews.title || latestNews.headline)),
+                                    source: latestNews.source?.name || latestNews.source_original || latestNews.source || 'API Unifiée',
                                     type: 'news',
-                                    date: finvizNews[ticker].date
+                                    date: latestNews.published_at || latestNews.publishedAt || latestNews.date || new Date().toLocaleDateString('fr-FR')
                                 };
-                            }
-                            return;
-                        }
-
-                        // PRIORITÉ 4: Chercher dans les news générales (amélioré avec recherche plus large)
-                        if (newsData && newsData.length > 0) {
-                            // Recherche exacte d'abord
-                            let relevantNews = newsData.find(article => 
-                                article.title?.toLowerCase().includes(ticker.toLowerCase()) ||
-                                article.description?.toLowerCase().includes(ticker.toLowerCase())
-                            );
-                            
-                            // Si pas trouvé, chercher dans le contenu complet
-                            if (!relevantNews) {
-                                relevantNews = newsData.find(article => {
-                                    const fullText = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
-                                    return fullText.includes(ticker.toLowerCase());
-                                });
-                            }
-                            
-                            // Si toujours pas trouvé, chercher des variations du ticker (sans .TO, etc.)
-                            if (!relevantNews && ticker.includes('.')) {
-                                const baseTicker = ticker.split('.')[0];
-                                relevantNews = newsData.find(article => {
-                                    const fullText = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
-                                    return fullText.includes(baseTicker.toLowerCase());
-                                });
-                            }
-                            
-                            if (relevantNews) {
-                                newsMap[ticker] = {
-                                    title: relevantNews.title,
-                                    source: relevantNews.source?.name || 'Général',
-                                    date: new Date(relevantNews.publishedAt || relevantNews.publishedDate || Date.now()).toLocaleDateString('fr-FR'),
-                                    url: relevantNews.url || '#'
-                                };
-                                
-                                const moveReason = extractMoveReasonFromNews(relevantNews.title);
-                                if (moveReason) {
-                                    moveReasonsMap[ticker] = {
-                                        explanation: moveReason,
-                                        source: relevantNews.source?.name || 'Général',
-                                        type: 'news',
-                                        date: new Date(relevantNews.publishedAt || relevantNews.publishedDate || Date.now()).toLocaleDateString('fr-FR')
-                                    };
-                                } else {
-                                    // Utiliser le titre complet comme explication si pas d'extraction possible
-                                    moveReasonsMap[ticker] = {
-                                        explanation: relevantNews.title.length > 100 ? relevantNews.title.substring(0, 100) + '...' : relevantNews.title,
-                                        source: relevantNews.source?.name || 'Général',
-                                        type: 'news',
-                                        date: new Date(relevantNews.publishedAt || relevantNews.publishedDate || Date.now()).toLocaleDateString('fr-FR')
-                                    };
-                                }
+                                console.log(`✅ News trouvée via API unifiée pour ${ticker}: ${(latestNews.title || latestNews.headline)?.substring(0, 50)}...`);
+                                return;
                             }
                         }
                     } catch (error) {
