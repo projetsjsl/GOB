@@ -363,7 +363,7 @@ class SmartAgent {
      * - Gemini (15%): Questions conceptuelles/éducatives (gratuit)
      * - Claude (5%): Rédaction premium (briefings, lettres clients)
      */
-    _selectModel(intentData, outputMode, toolsData) {
+    _selectModel(intentData, outputMode, toolsData, userMessage = '') {
         console.log('🎯 SmartRouter: Selecting optimal model...');
 
         // BRIEFING MODE: Toujours Claude pour qualité premium
@@ -930,7 +930,7 @@ class SmartAgent {
             const conversationContext = this.conversationHistory.slice(-5); // 5 derniers échanges
 
             // 🎯 SMART ROUTER: Sélectionner le meilleur modèle
-            const modelSelection = this._selectModel(intentData, outputMode, toolsData);
+            const modelSelection = this._selectModel(intentData, outputMode, toolsData, userMessage);
             console.log(`🤖 Selected model: ${modelSelection.model} (${modelSelection.reason})`);
 
             // Construire le prompt approprié
