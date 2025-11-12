@@ -937,6 +937,7 @@ const fetchHybridData = async (symbol, dataType) => {
             };
             const userDisplayName = getUserLoginId();
             const assistantAvatar = isDarkMode ? '/emma-avatar-gob-light.jpg' : '/emma-avatar-gob-dark.jpg';
+            const [showEmmaAvatar, setShowEmmaAvatar] = useState(true);
             const openAskEmma = () => {
                 setActiveTab('ask-emma');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1500,26 +1501,29 @@ const fetchHybridData = async (symbol, dataType) => {
                             if (unifiedNewsData.success && unifiedNewsData.articles && unifiedNewsData.articles.length > 0) {
                                 // Prendre la première news (la plus récente et pertinente, déjà triée par l'API)
                                 const latestNews = unifiedNewsData.articles[0];
-                                newsMap[ticker] = {
-                                    title: latestNews.title || latestNews.headline,
-                                    source: latestNews.source?.name || latestNews.source_original || latestNews.source || 'API Unifiée',
-                                    date: latestNews.published_at || latestNews.publishedAt || latestNews.date || new Date().toLocaleDateString('fr-FR'),
-                                    url: latestNews.url || '#'
-                                };
+                                const newsTitle = latestNews.title || latestNews.headline || '';
                                 
-                                // Extraire ou utiliser le titre comme explication
-                                const moveReason = extractMoveReasonFromNews(latestNews.title || latestNews.headline);
-                                moveReasonsMap[ticker] = {
-                                    explanation: moveReason || ((latestNews.title || latestNews.headline).length > 120 
-                                        ? (latestNews.title || latestNews.headline).substring(0, 120) + '...' 
-                                        : (latestNews.title || latestNews.headline)),
-                                    source: latestNews.source?.name || latestNews.source_original || latestNews.source || 'API Unifiée',
-                                    type: 'news',
-                                    date: latestNews.published_at || latestNews.publishedAt || latestNews.date || new Date().toLocaleDateString('fr-FR')
-                                };
-                                console.log(`✅ News trouvée via API unifiée pour ${ticker}: ${(latestNews.title || latestNews.headline)?.substring(0, 50)}...`);
-                                return;
+                                if (newsTitle) {
+                                    newsMap[ticker] = {
+                                        title: newsTitle,
+                                        source: latestNews.source?.name || latestNews.source_original || latestNews.source || 'API Unifiée',
+                                        date: latestNews.published_at || latestNews.publishedAt || latestNews.date || new Date().toLocaleDateString('fr-FR'),
+                                        url: latestNews.url || '#'
+                                    };
+                                    
+                                    // Utiliser directement le titre comme explication (déjà filtré par l'API)
+                                    moveReasonsMap[ticker] = {
+                                        explanation: newsTitle.length > 120 ? newsTitle.substring(0, 120) + '...' : newsTitle,
+                                        source: latestNews.source?.name || latestNews.source_original || latestNews.source || 'API Unifiée',
+                                        type: 'news',
+                                        date: latestNews.published_at || latestNews.publishedAt || latestNews.date || new Date().toLocaleDateString('fr-FR')
+                                    };
+                                    console.log(`✅ News trouvée via API unifiée pour ${ticker}: ${newsTitle.substring(0, 50)}...`);
+                                    return;
+                                }
                             }
+                        } else {
+                            console.warn(`⚠️ API unifiée non disponible pour ${ticker}: ${unifiedNewsResponse.status}`);
                         }
                     } catch (error) {
                         console.error(`Erreur récupération news pour ${ticker}:`, error);
@@ -1527,6 +1531,15 @@ const fetchHybridData = async (symbol, dataType) => {
                 });
 
                 await Promise.all(newsPromises);
+                
+                console.log(`📊 Résultats récupération news:`, {
+                    tickersDemandés: tickers.length,
+                    newsTrouvées: Object.keys(newsMap).length,
+                    explicationsTrouvées: Object.keys(moveReasonsMap).length,
+                    tickersAvecNews: Object.keys(newsMap),
+                    tickersAvecExplications: Object.keys(moveReasonsMap)
+                });
+                
                 setTickerLatestNews(newsMap);
                 setTickerMoveReasons(moveReasonsMap);
                 // Fallback: garantir une explication pour chaque ticker (même sans news)
@@ -1620,58 +1633,36 @@ const fetchHybridData = async (symbol, dataType) => {
                     return explanation.length > 120 ? explanation.substring(0, 120) + '...' : explanation;
                 }
 
-                // PRIORITÉ 2: Utiliser la news récente avec analyse de correspondance au mouvement
+                // PRIORITÉ 2: Utiliser la news récente depuis tickerLatestNews
                 let news = tickerLatestNews[ticker];
                 
-                // FALLBACK: Si pas de news spécifique, chercher dans les news générales
+                // Si on a une news dans tickerLatestNews, l'utiliser directement (déjà filtrée par l'API)
+                if (news && news.title) {
+                    // Afficher le titre complet ou tronqué
+                    return news.title.length > 120 ? news.title.substring(0, 120) + '...' : news.title;
+                }
+                
+                // PRIORITÉ 3: Chercher dans les news générales si pas de news spécifique
                 if (!news && newsData && newsData.length > 0) {
+                    const tickerLower = ticker.toLowerCase();
+                    const tickerBase = tickerLower.split('.')[0]; // Pour les tickers .TO, .US, etc.
+                    
                     const relevantNews = newsData.find(article => {
-                        const title = (article.title || '').toLowerCase();
-                        const desc = (article.description || '').toLowerCase();
-                        const tickerLower = ticker.toLowerCase();
+                        const title = (article.title || article.headline || '').toLowerCase();
+                        const desc = (article.description || article.summary || '').toLowerCase();
                         return title.includes(tickerLower) || desc.includes(tickerLower) || 
-                               title.includes(tickerLower.split('.')[0]) || desc.includes(tickerLower.split('.')[0]);
+                               title.includes(tickerBase) || desc.includes(tickerBase);
                     });
                     
                     if (relevantNews) {
-                        news = {
-                            title: relevantNews.title,
-                            source: relevantNews.source?.name || 'Général',
-                            date: new Date(relevantNews.publishedAt || relevantNews.publishedDate || Date.now()).toLocaleDateString('fr-FR'),
-                            url: relevantNews.url || '#'
-                        };
+                        const newsTitle = relevantNews.title || relevantNews.headline || '';
+                        return newsTitle.length > 120 ? newsTitle.substring(0, 120) + '...' : newsTitle;
                     }
                 }
                 
-                if (!news) {
-                    const directionLabel = changePercent > 0 ? 'hausse' : 'baisse';
-                    return `Variation en ${directionLabel} de ${Math.abs(changePercent).toFixed(2)}% sans actualité confirmée.`;
-                }
-
-                const title = news.title.toLowerCase();
-                const isPositive = changePercent > 0;
-
-                // Mots-clés pour les hausses
-                const positiveKeywords = ['gain', 'hausse', 'up', 'rise', 'surge', 'rally', 'beat', 'exceed', 'strong', 'growth', 'profit', 'earnings beat', 'upgrade', 'buy'];
-                // Mots-clés pour les baisses
-                const negativeKeywords = ['drop', 'fall', 'down', 'decline', 'loss', 'miss', 'weak', 'downgrade', 'sell', 'concern', 'warning', 'disappoint'];
-
-                // Vérifier si la news correspond au mouvement
-                const hasPositiveKeyword = positiveKeywords.some(kw => title.includes(kw));
-                const hasNegativeKeyword = negativeKeywords.some(kw => title.includes(kw));
-
-                if ((isPositive && hasPositiveKeyword) || (!isPositive && hasNegativeKeyword)) {
-                    // Extraire une phrase courte de la news (premiers 80 caractères)
-                    return news.title.length > 80 ? news.title.substring(0, 80) + '...' : news.title;
-                }
-
-                // Si la news a le flag isWhyMoving (venant de Finviz), l'utiliser directement
-                if (news.isWhyMoving) {
-                    return news.title.length > 100 ? news.title.substring(0, 100) + '...' : news.title;
-                }
-
-                // Fallback: retourner la news même si pas de correspondance parfaite
-                return news.title.length > 60 ? news.title.substring(0, 60) + '...' : news.title;
+                // FALLBACK: Message générique seulement si vraiment aucune news trouvée
+                const directionLabel = changePercent > 0 ? 'hausse' : 'baisse';
+                return `Variation en ${directionLabel} de ${Math.abs(changePercent).toFixed(2)}% sans actualité confirmée.`;
             };
 
             const refreshAllStocks = async () => {
@@ -22614,6 +22605,10 @@ console.log('✅ Données hybrides récupérées:', {
                 // Créer/mettre à jour le graphique Chart.js
                 useEffect(() => {
                     if (!yieldData || !chartRef.current) return;
+                    if (typeof Chart === 'undefined') {
+                        console.error('❌ Chart.js n\'est pas chargé');
+                        return;
+                    }
 
                     // Détruire l'ancien graphique
                     if (chartInstance.current) {
@@ -22869,8 +22864,8 @@ console.log('✅ Données hybrides récupérées:', {
                                     <div className={`p-6 rounded-lg transition-colors duration-300 ${
                                         darkMode ? 'bg-gray-800' : 'bg-white'
                                     }`}>
-                                        <div style={{ height: '400px' }}>
-                                            <canvas ref={chartRef}></canvas>
+                                        <div style={{ height: '400px', position: 'relative' }}>
+                                            <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
                                         </div>
                                     </div>
                                 ) : (
@@ -24531,30 +24526,43 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
                     )}
 
-                    <div className="fixed bottom-10 right-6 z-50 flex flex-col items-end gap-0.5 pointer-events-none">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold border pointer-events-auto ${
-                            isDarkMode ? 'bg-blue-500 text-white border-blue-300' : 'bg-blue-600 text-white border-blue-400'
-                        }`}>
-                            Emma IA
-                        </span>
-                        <div className={`px-4 py-2 rounded-full text-sm shadow-lg border pointer-events-auto -mt-0.5 ${
-                            isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
-                        }`}>
-                            Bonjour {userDisplayName} !
+                    {showEmmaAvatar && (
+                        <div className="fixed bottom-10 right-6 z-50 flex flex-col items-end gap-0.5 pointer-events-none">
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold border pointer-events-auto ${
+                                isDarkMode ? 'bg-blue-500 text-white border-blue-300' : 'bg-blue-600 text-white border-blue-400'
+                            }`}>
+                                Emma IA
+                            </span>
+                            <div className={`px-4 py-2 rounded-full text-sm shadow-lg border pointer-events-auto -mt-0.5 ${
+                                isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'
+                            }`}>
+                                Bonjour {userDisplayName} !
+                            </div>
+                            <button
+                                onClick={openAskEmma}
+                                className="relative focus:outline-none pointer-events-auto -mt-1"
+                                aria-label="Parler à Emma"
+                                style={{ transition: 'transform 0.2s ease' }}
+                            >
+                                <img
+                                    src={assistantAvatar}
+                                    alt="Emma avatar"
+                                    className="w-24 h-24 rounded-full shadow-2xl border-2 border-white object-cover"
+                                />
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowEmmaAvatar(false);
+                                    }}
+                                    className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg border-2 border-white"
+                                    aria-label="Fermer Emma"
+                                    title="Fermer"
+                                >
+                                    ×
+                                </button>
+                            </button>
                         </div>
-                        <button
-                            onClick={openAskEmma}
-                            className="relative focus:outline-none pointer-events-auto -mt-1"
-                            aria-label="Parler à Emma"
-                            style={{ transition: 'transform 0.2s ease' }}
-                        >
-                            <img
-                                src={assistantAvatar}
-                                alt="Emma avatar"
-                                className="w-24 h-24 rounded-full shadow-2xl border-2 border-white object-cover"
-                            />
-                        </button>
-                    </div>
+                    )}
                 </div>
         );
         };
