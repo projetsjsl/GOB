@@ -14,6 +14,9 @@ import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
 import { CFA_SYSTEM_PROMPT } from '../config/emma-cfa-prompt.js';
 import { getIntentPrompt, hasCustomPrompt } from '../config/intent-prompts.js';
 import { geminiFetchWithRetry } from '../lib/utils/gemini-retry.js';
+import { ContextMemory } from '../lib/context-memory.js';
+import { ResponseValidator } from '../lib/response-validator.js';
+import { DynamicPromptsSystem } from '../lib/dynamic-prompts.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -30,6 +33,12 @@ class SmartAgent {
         this.intentAnalyzer = new HybridIntentAnalyzer();
         this.supabase = null; // Lazy initialization
         this.usageStatsLoaded = false;
+
+        // ✨ NOUVEAU: Systèmes cognitifs avancés pour ergonomie conversationnelle
+        this.contextMemory = new ContextMemory();
+        this.responseValidator = new ResponseValidator();
+        this.promptSystem = new DynamicPromptsSystem();
+        console.log('🧠 Advanced cognitive systems initialized (Context Memory, Response Validator, Dynamic Prompts)');
     }
 
     /**
@@ -59,6 +68,27 @@ class SmartAgent {
             // 0. COGNITIVE SCAFFOLDING: Analyse d'intention avec Perplexity
             const intentData = await this._analyzeIntent(userMessage, context);
             console.log('🧠 Intent analysis:', intentData ? intentData.intent : 'fallback to keyword scoring');
+
+            // ✨ NOUVEAU: Mise à jour de la mémoire contextuelle
+            const enrichedContext = this.contextMemory.updateContext(userMessage, intentData);
+            console.log(`📎 Context Memory updated:`, enrichedContext.context_summary);
+            console.log(`📎 Primary entity:`, enrichedContext.primary_entity);
+            console.log(`📎 Topic changed:`, enrichedContext.topic_changed);
+
+            // ✨ NOUVEAU: Inférer informations manquantes si besoin (tickers depuis contexte)
+            if (intentData && (!intentData.tickers || intentData.tickers.length === 0) &&
+                enrichedContext.resolved_references && Object.keys(enrichedContext.resolved_references).length > 0) {
+                const inferred = this.contextMemory.inferMissingContext(userMessage, intentData);
+                if (inferred.tickers && inferred.tickers.length > 0) {
+                    console.log(`🔮 Tickers inferred from context:`, inferred.tickers);
+                    intentData.tickers = [...(intentData.tickers || []), ...inferred.tickers];
+                    intentData.confidence = Math.min(intentData.confidence || 0.7, inferred.confidence);
+                    console.log(`✅ Intent data enriched with context: ${inferred.tickers.join(', ')} (confidence: ${inferred.confidence})`);
+                }
+            }
+
+            // Enrichir le contexte passé aux étapes suivantes
+            context.enriched_context = enrichedContext;
 
             // ✅ CLARIFICATIONS ACTIVÉES - Emma peut poser des questions de suivi quand nécessaire
             // Si l'intention n'est pas claire (confidence < 0.5), Emma demande des précisions
