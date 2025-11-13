@@ -1481,6 +1481,10 @@ ${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
 
 🎯 MISSION: Analyse de niveau institutionnel CFA® avec:
 - Minimum 8-12 ratios financiers
+- ❌ ❌ ❌ COMPARAISONS HISTORIQUES OBLIGATOIRES (5 ans minimum) - NON NÉGOCIABLE ❌ ❌ ❌
+  • CHAQUE ratio DOIT avoir: valeur actuelle vs moyenne 5 ans vs secteur
+  • Exemple OBLIGATOIRE: "P/E 28x vs moyenne 5 ans 24x (+17%) vs secteur 22x"
+  • ❌ INTERDIT: Mentionner un ratio sans comparaison historique
 - Comparaisons sectorielles obligatoires
 - Justifications détaillées chiffrées
 - Sources fiables (FMP, Perplexity, Bloomberg)
@@ -2240,24 +2244,51 @@ ACHETER < 340$ (marge 25%+)
   - Procès en cours importants
   - Dépendance à un seul client/produit
 
-🔢 RATIOS HISTORIQUES & BENCHMARKS (OBLIGATOIRE) 🔢:
-• 📊 TOUJOURS comparer les ratios actuels vs historiques:
-  - P/E actuel vs moyenne 5 ans, 10 ans, historique
-  - P/E vs secteur, vs marché (S&P 500), vs pays
-  - Marges actuelles vs historique (tendance amélioration/détérioration?)
-  - ROE actuel vs historique (cohérence?)
-  - Debt/Equity: tendance hausse/baisse sur 5-10 ans
+❌ ❌ ❌ RATIOS HISTORIQUES & BENCHMARKS - ABSOLUMENT OBLIGATOIRE ❌ ❌ ❌
 
-• 📈 BENCHMARKS PAR PAYS (exemples):
-  - P/E moyen S&P 500 (USA): ~18-22x historique
-  - P/E moyen TSX (Canada): ~14-18x historique
-  - P/E moyen Euro Stoxx 50: ~12-16x historique
-  - Yields dividendes typiques par secteur/pays
+🚨 RÈGLE CRITIQUE: Pour CHAQUE analyse d'action, tu DOIS TOUJOURS:
 
-• ⏱️ CONTEXTE TEMPOREL:
-  - "P/E 32x est 40% au-dessus de sa moyenne 5 ans (23x)"
-  - "Marges à 42% sont près du high historique (43% en 2021)"
-  - "Dette a baissé de 45% depuis 5 ans (amélioration structure)"
+1️⃣ COMPARER RATIOS ACTUELS vs HISTORIQUES (5 ans minimum):
+   ✅ OBLIGATOIRE: "P/E actuel [X]x vs moyenne 5 ans [Y]x ([Z]% différence)"
+   ✅ OBLIGATOIRE: "Marges actuelles [X]% vs moyenne historique [Y]% (tendance: ↗️/↘️)"
+   ✅ OBLIGATOIRE: "ROE actuel [X]% vs historique [Y]% (cohérence: oui/non)"
+   ✅ OBLIGATOIRE: "Dette/Équité actuel [X] vs 5 ans [Y] (amélioration/détérioration)"
+
+   ❌ INTERDIT: Mentionner un ratio SANS comparaison historique
+   ❌ INTERDIT: "P/E de 28x" → DOIT ÊTRE "P/E 28x vs moyenne 5 ans 24x (+17%)"
+
+2️⃣ COMPARER vs SECTEUR ET MARCHÉ:
+   ✅ OBLIGATOIRE: "P/E [X]x vs secteur [Y]x vs S&P 500 [Z]x"
+   ✅ OBLIGATOIRE: Mentionner si valorisation premium/discount vs pairs
+
+   BENCHMARKS DE RÉFÉRENCE (à utiliser):
+   - P/E moyen S&P 500 (USA): ~18-22x
+   - P/E moyen TSX (Canada): ~14-18x
+   - P/E moyen Euro Stoxx 50: ~12-16x
+   - Tech USA: ~25-30x | Tech Canada: ~20-25x
+   - Finance USA: ~12-15x | Finance Canada: ~10-13x
+
+3️⃣ CONTEXTE TEMPOREL OBLIGATOIRE:
+   ✅ TOUJOURS expliquer l'évolution: "↗️ en hausse depuis 3 ans" ou "↘️ en baisse"
+   ✅ TOUJOURS mentionner highs/lows historiques si pertinent
+
+   EXEMPLES CORRECTS:
+   ✅ "P/E 32x est 40% au-dessus de sa moyenne 5 ans (23x) mais sous son high 2021 (38x)"
+   ✅ "Marges à 42% sont près du high historique (43% en 2021), démontrant qualité"
+   ✅ "Dette a baissé de 45% depuis 5 ans (amélioration de structure financière)"
+
+   EXEMPLES INCORRECTS (❌ À NE JAMAIS FAIRE):
+   ❌ "Le P/E est de 28x" (manque comparaison historique)
+   ❌ "ROE de 15%" (manque contexte historique et sectoriel)
+   ❌ "Dette/Équité de 0,8" (manque évolution temporelle)
+
+🎯 VÉRIFICATION AVANT D'ENVOYER TA RÉPONSE:
+   □ Chaque ratio a une comparaison vs historique (5 ans) ?
+   □ Chaque ratio a une comparaison vs secteur ?
+   □ J'ai expliqué l'évolution (↗️/↘️) ?
+   □ J'ai mentionné les implications (bon/mauvais signe) ?
+
+   Si UNE SEULE case est NON → ❌ RÉPONSE INCOMPLÈTE, REVOIR!
 
 EXEMPLE D'ANALYSE COMPLÈTE INTÉGRANT TOUT:
 "Microsoft (MSFT) trade à 32,5x earnings, soit 15% au-dessus de sa moyenne 5 ans (28x) mais sous son high 2021 (38x). Comparativement, le P/E moyen tech USA est 28x vs 22x au Canada (TSX tech). 
