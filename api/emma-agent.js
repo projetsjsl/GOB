@@ -343,33 +343,36 @@ class SmartAgent {
         const messageLower = userMessage.toLowerCase().trim();
         let response = '';
 
-        // 1. EXPRESSIONS ÉMOTIONNELLES
+        // ✅ FIX: Uniquement pour expressions purement conversationnelles (sans questions réelles)
+        // Les questions générales réelles sont gérées par _shouldUsePerplexityOnly() + Perplexity
+        
+        // 1. EXPRESSIONS ÉMOTIONNELLES COURTES (sans question)
         if (intentData.intent === 'general_conversation' && intentData.response_type === 'conversational') {
-            // Réponses appropriées selon l'expression
+            // Réponses appropriées selon l'expression - SANS forcer contexte financier
             if (['wow', 'super', 'incroyable', 'génial', 'genial', 'fantastique', 'excellent', 'parfait', 'cool', 'nice', 'great', 'awesome', 'amazing', 'bravo'].some(expr => messageLower.includes(expr))) {
-                response = `Merci ! 😊 Je suis contente que ça te plaise !\n\nComment puis-je t'aider avec tes analyses financières aujourd'hui ? 📊`;
+                response = `Merci ! 😊 Je suis contente que ça te plaise !\n\nComment puis-je t'aider aujourd'hui ?`;
             } else if (['merci', 'thanks', 'thank you'].some(expr => messageLower.includes(expr))) {
-                response = `De rien ${userName} ! 😊\n\nN'hésite pas si tu as d'autres questions sur les marchés financiers. Je suis là pour t'aider ! 📈`;
+                response = `De rien ${userName} ! 😊\n\nN'hésite pas si tu as d'autres questions. Je suis là pour t'aider !`;
             } else if (['ok', 'okay', 'd\'accord', 'daccord', 'parfait', 'bien', 'bon'].some(expr => messageLower.includes(expr))) {
-                response = `Parfait ! 👍\n\nQue veux-tu analyser aujourd'hui ? Je peux t'aider avec des analyses d'actions, des actualités, des indicateurs techniques, etc. 📊`;
+                response = `Parfait ! 👍\n\nQue veux-tu faire maintenant ?`;
             } else if (['oui', 'yes', 'si'].some(expr => messageLower === expr)) {
-                response = `Super ! 😊\n\nSur quoi veux-tu que je t'aide ? Tu peux me demander une analyse, des actualités, ou toute autre question financière. 📈`;
+                response = `Super ! 😊\n\nSur quoi veux-tu que je t'aide ?`;
             } else if (['non', 'no'].some(expr => messageLower === expr)) {
-                response = `D'accord, pas de problème ! 😊\n\nSi tu changes d'avis, je suis là pour t'aider avec tes analyses financières. 📊`;
+                response = `D'accord, pas de problème ! 😊\n\nSi tu changes d'avis, je suis là pour t'aider.`;
             } else {
                 // Réponse générique pour autres expressions conversationnelles
-                response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA financière. Je peux t'aider avec :\n📊 Analyses d'actions\n📈 Données financières\n📰 Actualités de marché\n💡 Conseils et insights\n\nComment puis-je t'aider aujourd'hui ?`;
+                response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA. Je peux t'aider avec des questions financières, générales, et bien plus !\n\nComment puis-je t'aider aujourd'hui ?`;
             }
         }
 
         // 2. EMAILS FOURNIS
         else if (intentData.intent === 'information_provided' && intentData.information_type === 'email') {
-            response = `Merci ${userName} ! 📧\n\nJ'ai bien noté ton email : ${userMessage}\n\nComment puis-je t'aider avec tes analyses financières aujourd'hui ? 📊`;
+            response = `Merci ${userName} ! 📧\n\nJ'ai bien noté ton email : ${userMessage}\n\nComment puis-je t'aider aujourd'hui ?`;
         }
 
-        // 3. FALLBACK: Réponse conversationnelle générique
+        // 3. FALLBACK: Réponse conversationnelle générique (sans forcer finance)
         else {
-            response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA financière. Je peux t'aider avec des analyses d'actions, des actualités de marché, des indicateurs techniques, et bien plus !\n\nQue veux-tu analyser aujourd'hui ? 📈`;
+            response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA. Je peux t'aider avec des questions financières, générales, et bien plus !\n\nQue veux-tu savoir ?`;
         }
 
         return {
@@ -533,60 +536,7 @@ class SmartAgent {
             return { usePerplexityOnly: true, reason: `Intent "${intent}" ne nécessite pas de données` };
         }
         
-        // ✅ PERPLEXITY SEUL: Questions générales/non-financières (DÉTECTION PRIORITAIRE)
-        // 🎯 Permet à Emma de sortir du cadre strictement financier
-        const generalNonFinancialKeywords = [
-            // Questions générales de connaissance
-            'qu\'est-ce que', 'quest-ce que', 'c\'est quoi', 'cest quoi', 'définition', 'definition',
-            'explique', 'explique-moi', 'explique moi', 'comment fonctionne', 'comment ça marche',
-            'pourquoi', 'comment', 'quand', 'où', 'qui', 'quelle est la différence', 'difference entre',
-            // Questions scientifiques/techniques
-            'physique', 'chimie', 'biologie', 'mathématiques', 'math', 'science', 'sciences',
-            'technologie', 'tech', 'informatique', 'programmation', 'code', 'coding',
-            'histoire', 'géographie', 'culture', 'art', 'littérature', 'philosophie',
-            // Questions pratiques/vie quotidienne
-            'cuisine', 'recette', 'voyage', 'santé', 'sante', 'sport', 'fitness', 'médical', 'medical',
-            'éducation', 'education', 'apprendre', 'formation', 'tutoriel', 'guide',
-            'météo', 'meteo', 'climat', 'environnement', 'écologie', 'ecologie',
-            // Questions business/générales (non-financières spécifiques)
-            'marketing', 'vente', 'management', 'leadership', 'communication', 'productivité',
-            'entrepreneuriat', 'startup', 'innovation', 'stratégie business', 'business model',
-            // Questions personnelles/conversationnelles
-            'bonjour', 'salut', 'hello', 'hi', 'comment vas-tu', 'ça va', 'cava',
-            'merci', 'de rien', 'au revoir', 'bye', 'bonne journée', 'bonne soirée',
-            'aide', 'help', 'peux-tu', 'peux tu', 'capable de', 'fonctionnalités',
-            // Questions culturelles/actualités générales
-            'actualités', 'actualites', 'news', 'nouvelles', 'événements', 'evenements',
-            'culture', 'société', 'societe', 'politique générale', 'sport', 'divertissement',
-            'cinéma', 'cinema', 'musique', 'livre', 'livres', 'film', 'films',
-            // Questions éducatives générales
-            'apprendre', 'comprendre', 'expliquer', 'enseigner', 'cours', 'leçon', 'lecon',
-            'tutoriel', 'guide', 'méthode', 'methode', 'technique', 'astuce', 'conseil',
-            // Questions de comparaison générale
-            'meilleur', 'meilleure', 'meilleurs', 'meilleures', 'best', 'top', 'comparer',
-            'vs', 'versus', 'différence', 'difference', 'avantages', 'inconvénients', 'inconvenients',
-            // Questions de recommandation générale
-            'recommandation', 'recommandations', 'conseil', 'conseils', 'suggestion', 'suggestions',
-            'avis', 'opinion', 'que penses-tu', 'penses-tu que', 'crois-tu que'
-        ];
-        
-        // Détection: Si aucun ticker ET aucun mot financier spécifique → probablement question générale
-        const hasFinancialKeyword = [
-            ...fundKeywords, ...macroKeywords, ...strategyKeywords, ...sectorKeywords,
-            ...cryptoKeywords, ...commodityKeywords, ...forexKeywords, ...bondKeywords,
-            ...realEstateKeywords, ...privateEquityKeywords, ...warrantKeywords,
-            ...calculationKeywords, ...regulatoryKeywords, ...esgKeywords, ...arbitrageKeywords,
-            ...methodologyKeywords, ...structuredProductsKeywords, ...riskManagementKeywords,
-            ...behavioralKeywords, ...maKeywords, ...ipoKeywords, ...geopoliticalKeywords, ...taxKeywords
-        ].some(keywords => keywords.some(kw => message.includes(kw)));
-        
-        const hasGeneralKeyword = generalNonFinancialKeywords.some(kw => message.includes(kw));
-        
-        // Si question générale ET pas de mots financiers ET pas de tickers → Perplexity seul
-        if (hasGeneralKeyword && !hasFinancialKeyword && extractedTickers.length === 0) {
-            return { usePerplexityOnly: true, reason: 'Question générale/non-financière - Perplexity peut répondre naturellement' };
-        }
-        
+        // ✅ DÉFINIR TOUS LES KEYWORDS EN PREMIER (FIX: Ordre d'évaluation)
         // ✅ PERPLEXITY SEUL: Questions sur fonds/ETF/portefeuille
         const fundKeywords = [
             'fonds', 'fond', 'mutual fund', 'fonds mutuels', 'fonds d\'investissement',
@@ -995,29 +945,61 @@ class SmartAgent {
             return { usePerplexityOnly: true, reason: 'Question fiscale - Perplexity peut expliquer les règles' };
         }
         
-        // ✅ PERPLEXITY SEUL: Questions générales/conceptuelles
-        const generalKeywords = [
+        // ✅ PERPLEXITY SEUL: Questions générales/non-financières (DÉTECTION APRÈS TOUS LES KEYWORDS FINANCIERS)
+        // 🎯 Permet à Emma de sortir du cadre strictement financier
+        // FIX: Retirer keywords ambigus qui peuvent être financiers (startup, marketing, management, news avec ticker)
+        const generalNonFinancialKeywords = [
+            // Questions générales de connaissance
             'qu\'est-ce que', 'quest-ce que', 'c\'est quoi', 'cest quoi', 'définition', 'definition',
-            'comment fonctionne', 'explique', 'explique-moi', 'pourquoi', 'comment',
-            'différence entre', 'difference entre', 'comparer', 'comparaison',
-            'avantages', 'inconvénients', 'inconvenients', 'pour et contre', 'pros and cons',
-            'meilleur', 'meilleure', 'meilleurs', 'meilleures', 'best', 'top',
-            'recommandation', 'conseil', 'avis', 'opinion', 'suggestion'
+            'explique', 'explique-moi', 'explique moi', 'comment fonctionne', 'comment ça marche',
+            'pourquoi', 'comment', 'quand', 'où', 'qui', 'quelle est la différence', 'difference entre',
+            // Questions scientifiques/techniques
+            'physique', 'chimie', 'biologie', 'mathématiques', 'math', 'science', 'sciences',
+            'technologie', 'tech', 'informatique', 'programmation', 'code', 'coding',
+            'histoire', 'géographie', 'culture', 'art', 'littérature', 'philosophie',
+            // Questions pratiques/vie quotidienne
+            'cuisine', 'recette', 'voyage', 'santé', 'sante', 'sport', 'fitness', 'médical', 'medical',
+            'éducation', 'education', 'apprendre', 'formation', 'tutoriel', 'guide',
+            'météo', 'meteo', 'climat', 'environnement', 'écologie', 'ecologie',
+            // Questions personnelles/conversationnelles
+            'bonjour', 'salut', 'hello', 'hi', 'comment vas-tu', 'ça va', 'cava',
+            'merci', 'de rien', 'au revoir', 'bye', 'bonne journée', 'bonne soirée',
+            'aide', 'help', 'peux-tu', 'peux tu', 'capable de', 'fonctionnalités',
+            // Questions culturelles/divertissement (sans actualités financières)
+            'culture', 'société', 'societe', 'politique générale', 'divertissement',
+            'cinéma', 'cinema', 'musique', 'livre', 'livres', 'film', 'films',
+            // Questions éducatives générales
+            'apprendre', 'comprendre', 'expliquer', 'enseigner', 'cours', 'leçon', 'lecon',
+            'tutoriel', 'guide', 'méthode', 'methode', 'technique', 'astuce', 'conseil',
+            // Questions de comparaison générale (sans contexte financier)
+            'meilleur', 'meilleure', 'meilleurs', 'meilleures', 'best', 'top', 'comparer',
+            'vs', 'versus', 'différence', 'difference', 'avantages', 'inconvénients', 'inconvenients',
+            // Questions de recommandation générale
+            'recommandation', 'recommandations', 'conseil', 'conseils', 'suggestion', 'suggestions',
+            'avis', 'opinion', 'que penses-tu', 'penses-tu que', 'crois-tu que'
         ];
-        if (generalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
-            return { usePerplexityOnly: true, reason: 'Question conceptuelle - Perplexity peut expliquer sans données précises' };
+        
+        // Détection: Si aucun ticker ET aucun mot financier spécifique → probablement question générale
+        const hasFinancialKeyword = [
+            fundKeywords, macroKeywords, strategyKeywords, sectorKeywords,
+            cryptoKeywords, commodityKeywords, forexKeywords, bondKeywords,
+            realEstateKeywords, privateEquityKeywords, warrantKeywords,
+            calculationKeywords, regulatoryKeywords, esgKeywords, arbitrageKeywords,
+            methodologyKeywords, structuredProductsKeywords, riskManagementKeywords,
+            behavioralKeywords, maKeywords, ipoKeywords, geopoliticalKeywords, taxKeywords
+        ].some(keywords => keywords.some(kw => message.includes(kw)));
+        
+        const hasGeneralKeyword = generalNonFinancialKeywords.some(kw => message.includes(kw));
+        
+        // Si question générale ET pas de mots financiers ET pas de tickers → Perplexity seul
+        // FIX: Vérifier aussi si 'news'/'actualités' sans ticker (pour éviter conflit avec intent news)
+        const isNewsGeneral = (message.includes('actualités') || message.includes('actualites') || message.includes('news') || message.includes('nouvelles')) && extractedTickers.length === 0;
+        
+        if (hasGeneralKeyword && !hasFinancialKeyword && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question générale/non-financière - Perplexity peut répondre naturellement' };
         }
         
-        // ✅ PERPLEXITY SEUL: Actualités générales (pas ticker spécifique)
-        const newsKeywords = [
-            'actualités', 'actualites', 'nouvelles', 'news', 'information', 'infos',
-            'quoi de neuf', 'quoi de neuf en bourse', 'marché aujourd\'hui', 'marche aujourdhui',
-            'tendances', 'tendances du marché', 'tendances marche', 'market trends',
-            'événements', 'evenements', 'events', 'breaking news', 'flash info'
-        ];
-        if (newsKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
-            return { usePerplexityOnly: true, reason: 'Actualités générales - Perplexity a accès aux sources récentes' };
-        }
+        // ✅ FIX: Code redondant supprimé - déjà géré par generalNonFinancialKeywords ci-dessus
         
         // ✅ PERPLEXITY SEUL: Questions historiques/comparaisons temporelles
         const historicalKeywords = [
@@ -1209,11 +1191,16 @@ class SmartAgent {
             console.log(`🧠 PERPLEXITY ONLY: ${perplexityDecision.reason}`);
             console.log(`   → Pas d'outils nécessaires, Perplexity répondra directement`);
             
-            // 🎯 Marquer comme question générale si détectée
+            // 🎯 Marquer le contexte pour adaptation du prompt
+            context.perplexity_only_reason = perplexityDecision.reason;
+            
             if (perplexityDecision.reason.includes('générale/non-financière')) {
                 context.is_general_question = true;
-                context.perplexity_only_reason = perplexityDecision.reason;
                 console.log(`   → Question générale/non-financière détectée - prompt adapté`);
+            }
+            
+            if (perplexityDecision.reason.includes('fonds')) {
+                console.log(`   → Question sur fonds détectée - prompt spécialisé sera utilisé`);
             }
             
             return []; // Retourner liste vide - Emma utilisera Perplexity seul
@@ -1222,14 +1209,8 @@ class SmartAgent {
             console.log(`   → Sélection des outils appropriés...`);
         }
 
-        // 🚫 SKIP OUTILS pour greetings et questions simples qui n'ont PAS besoin de données
-        const intent = intentData?.intent || context.intent_data?.intent || 'unknown';
-        const noToolsIntents = ['greeting', 'help', 'capabilities'];
-
-        if (noToolsIntents.includes(intent)) {
-            console.log(`👋 Intent "${intent}" detected - NO TOOLS NEEDED (will respond directly)`);
-            return []; // Retourner liste vide - Emma répondra sans données
-        }
+        // ✅ FIX: Vérification déjà faite dans _shouldUsePerplexityOnly() - pas besoin de répéter
+        // Si on arrive ici, c'est que des outils sont nécessaires
 
         // Si intent analysis a suggéré des outils, leur donner la priorité
         const suggestedTools = context.suggested_tools || [];
