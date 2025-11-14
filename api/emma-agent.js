@@ -925,9 +925,11 @@ class SmartAgent {
         }
 
         // 2. Extract tickers from message using centralized TickerExtractor utility
+        // ✅ Mode strict activé pour éviter faux positifs (TU, ME, AU, etc.)
         const extractedTickers = TickerExtractor.extract(userMessage, {
             includeCompanyNames: true,
-            filterCommonWords: true
+            filterCommonWords: true,
+            strictContext: false // Flexibilité pour garder compatibilité
         });
 
         extractedTickers.forEach(ticker => tickers.add(ticker));
@@ -2035,8 +2037,12 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             return intentData.tickers[0];
         }
         
-        // 2. Extraire tickers du message
-        const tickers = TickerExtractor.extract(userMessage, { includeCompanyNames: true });
+        // 2. Extraire tickers du message (mode strict pour éviter faux positifs)
+        const tickers = TickerExtractor.extract(userMessage, { 
+            includeCompanyNames: true,
+            filterCommonWords: true,
+            strictContext: false // Pas trop strict pour garder flexibilité
+        });
         if (tickers.length > 0) {
             return tickers[0];
         }
