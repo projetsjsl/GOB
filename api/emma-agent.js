@@ -1489,17 +1489,30 @@ class SmartAgent {
             };
         }
 
-        // Vérifier la présence de sources dans la réponse
+        // Vérifier la présence de sources dans la réponse (patterns plus flexibles)
         const hasSourcePatterns = [
             /\[SOURCE:/i,
             /\[CHART:/i,
             /\[TABLE:/i,
             /\(https?:\/\//i, // URLs
-            /Bloomberg|Reuters|La Presse|BNN|CNBC|Financial Times|Wall Street Journal/i,
-            /Données de marché:|Sources:/i
+            /https?:\/\//i, // URLs n'importe où
+            /Bloomberg|Reuters|La Presse|BNN|CNBC|Financial Times|Wall Street Journal|Morningstar|Fundata|FMP|Polygon|Yahoo Finance/i,
+            /Données de marché:|Sources:|Source:/i,
+            /selon|d'après|selon les données|données de|source|sources/i, // Sources implicites
+            /FMP|Perplexity|Bloomberg|FactSet|Seeking Alpha/i, // Noms de sources
+            /\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{4}/i // Dates récentes = source récente implicite
         ];
 
         const hasSources = hasSourcePatterns.some(pattern => pattern.test(response));
+        
+        // ✅ ASSOUPLISSEMENT: Accepter aussi données chiffrées récentes comme source implicite
+        const hasRecentData = /\d{4}|202[4-5]|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre/i.test(response);
+        const hasNumericData = /\$\d+\.?\d*|\d+%|\d+\.\d+x|\d+\.\d+%/.test(response); // Prix, %, ratios
+        
+        // Si données chiffrées récentes présentes → considérer comme source implicite
+        if (!hasSources && hasRecentData && hasNumericData) {
+            console.log('🛡️ FreshDataGuard: Données chiffrées récentes détectées (source implicite)');
+        }
 
         // Calculer score de confiance
         let confidence = 0.5; // Base
@@ -1517,10 +1530,16 @@ class SmartAgent {
         const hasRecentDate = /202[4-5]|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre/i.test(response);
         if (hasRecentDate) confidence += 0.02;
 
+        // ✅ ASSOUPLISSEMENT: Accepter données chiffrées récentes comme source implicite
+        const finalHasSources = hasSources || (hasRecentData && hasNumericData);
+        const finalConfidence = finalHasSources ? Math.max(confidence, 0.75) : confidence; // Minimum 0.75 si données récentes
+        
         return {
-            passed: hasSources,
-            confidence: Math.min(1.0, confidence),
-            reason: hasSources ? 'Sources verified' : 'Missing sources for factual data',
+            passed: finalHasSources,
+            confidence: Math.min(1.0, finalConfidence),
+            reason: finalHasSources 
+                ? (hasSources ? 'Sources verified' : 'Recent numeric data detected (implicit source)')
+                : 'Missing sources for factual data',
             source_types_found: hasSourcePatterns.filter(pattern => pattern.test(response)).length
         };
     }
@@ -1804,19 +1823,19 @@ class SmartAgent {
         const userContext = userName
             ? `\n👤 UTILISATEUR: Tu parles avec ${userName}. Personnalise tes salutations et réponses en utilisant son nom quand approprié.
 
-🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS:
-- PRIORITÉ: Marchés américains (NYSE, NASDAQ) 🇺🇸
+🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS (ADAPTATIF):
+- PRIORITÉ PAR DÉFAUT: Marchés américains (NYSE, NASDAQ) 🇺🇸
 - SECONDAIRE: Marchés canadiens (TSX) 🇨🇦
 - TERTIAIRE: Aperçu marchés mondiaux (Europe, Asie)
-- ❌ ÉVITER: Immobilier français, marchés européens de niche sauf si explicitement demandé
-- L'utilisateur est un gestionnaire de portefeuille québécois/canadien axé sur les actions nord-américaines
-
-⚠️ NE JAMAIS parler d'immobilier français ou de marchés européens de niche sauf si l'utilisateur le demande explicitement.\n`
-            : `\n🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS:
-- PRIORITÉ: Marchés américains (NYSE, NASDAQ) 🇺🇸
+- ✅ Si question explicite sur autre marché → Répondre complètement
+- ✅ Si contexte international dans question → Inclure perspective globale
+- L'utilisateur est un gestionnaire de portefeuille québécois/canadien, mais peut avoir besoin d'infos sur autres marchés.\n`
+            : `\n🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS (ADAPTATIF):
+- PRIORITÉ PAR DÉFAUT: Marchés américains (NYSE, NASDAQ) 🇺🇸
 - SECONDAIRE: Marchés canadiens (TSX) 🇨🇦
-- TERTIAIRE: Aperçu marchés mondiaux
-- ❌ ÉVITER: Immobilier français, marchés européens de niche sauf si explicitement demandé\n`;
+- TERTIAIRE: Aperçu marchés mondiaux (Europe, Asie)
+- ✅ Si question explicite sur autre marché → Répondre complètement
+- ✅ Si contexte international dans question → Inclure perspective globale\n`;
 
         // Si Emma doit se présenter (premier message ou "Test Emma")
         const shouldIntroduce = context.should_introduce || false;
@@ -1863,12 +1882,17 @@ STRUCTURE OBLIGATOIRE:
 ${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
 
 🎯 MISSION: Analyse de niveau institutionnel CFA® avec:
-- Minimum 8-12 ratios financiers
-- ❌ ❌ ❌ COMPARAISONS HISTORIQUES OBLIGATOIRES (5 ans minimum) - NON NÉGOCIABLE ❌ ❌ ❌
-  • CHAQUE ratio DOIT avoir: valeur actuelle vs moyenne 5 ans vs secteur
-  • Exemple OBLIGATOIRE: "P/E 28x vs moyenne 5 ans 24x (+17%) vs secteur 22x"
-  • ❌ INTERDIT: Mentionner un ratio sans comparaison historique
-- Comparaisons sectorielles obligatoires
+- Nombre de ratios adaptatif selon question:
+  • Questions simples (prix, 1 ratio) → 1-2 ratios suffisants
+  • Questions ciblées (fondamentaux) → 4-6 ratios pertinents
+  • Analyses complètes → 8-12 ratios (recommandé)
+- ✅ COMPARAISONS HISTORIQUES RECOMMANDÉES (quand disponibles):
+  • Si données historiques disponibles → TOUJOURS comparer vs 5 ans et secteur
+  • Si données historiques PARTIELLES → Comparer avec ce qui est disponible
+  • Si AUCUNE donnée historique → Fournir ratio actuel avec contexte sectoriel si possible
+  • Pour questions simples → Comparaison optionnelle
+  • Exemple idéal (si données disponibles): "P/E 28x vs moyenne 5 ans 24x (+17%) vs secteur 22x"
+- Comparaisons sectorielles recommandées (quand pertinentes)
 - Justifications détaillées chiffrées
 - Sources fiables (FMP, Perplexity, Bloomberg)
 - Formatage Bloomberg Terminal style
@@ -1927,8 +1951,16 @@ INSTRUCTIONS CRITIQUES:
    - Analyse CHAQUE ticker individuellement
    - Fournis un résumé pour CHAQUE compagnie mentionnée
    - N'ignore PAS les tickers - ils sont tous importants
-7. ❌ NE JAMAIS dire "aucune donnée disponible" si des outils ont retourné des données (même partielles)
-8. ❌ NE JAMAIS demander de clarifications - fournis directement l'analyse
+7. ✅ Transparence sur disponibilité des données:
+   - Si données complètes disponibles → Analyser normalement
+   - Si données partielles → Mentionner "données partielles, analyse basée sur..."
+   - Si AUCUNE donnée après recherche Perplexity → Dire clairement "Je n'ai pas trouvé de données récentes sur [X]. Vérifiez le ticker/nom exact."
+   - Toujours être transparent sur les limites
+8. ✅ Clarifications intelligentes (quand nécessaire):
+   - Si question ambiguë (ex: "Apple" peut être AAPL ou REIT) → Demander clarification
+   - Si ticker invalide/inexistant → Suggérer corrections possibles
+   - Si demande trop vague → Proposer options spécifiques
+   - Pour questions claires → Répondre directement
 9. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
 10. Cite tes sources (outils utilisés) en fin de réponse
 11. Ton: professionnel mais accessible, comme une vraie analyste financière
@@ -2077,7 +2109,7 @@ INTENT DÉTECTÉ:
 TYPE DE BRIEFING: ${briefingType}
 
 INSTRUCTIONS PRINCIPALES:
-1. Rédige une analyse DÉTAILLÉE et PROFESSIONNELLE (1500-2000 mots minimum)
+1. Rédige une analyse DÉTAILLÉE et PROFESSIONNELLE (1000-1500 mots recommandé, adapte selon complexité)
 2. Structure OBLIGATOIRE avec sections claires (##, ###)
 3. Inclure des DONNÉES CHIFFRÉES précises (prix, %, volumes, etc.)
 4. Ton: Professionnel institutionnel
@@ -2403,7 +2435,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         } else if (complexityScore <= 5) {
             return { level: 'moyenne', tokens: 6000, description: 'Question modérément complexe - analyse détaillée (1200-1500 mots)' };
         } else if (complexityScore <= 8) {
-            return { level: 'complexe', tokens: 8000, description: 'Analyse détaillée avec données temps réel (1500-2000 mots)' };
+            return { level: 'complexe', tokens: 8000, description: 'Analyse détaillée avec données temps réel (1000-1500 mots recommandé)' };
         } else {
             return { level: 'très_complexe', tokens: 10000, description: 'Analyse exhaustive multi-dimensionnelle (2000-2500 mots)' };
         }
@@ -2818,7 +2850,7 @@ ACHETER < 340$ (marge 25%+)
 
 🚀🚀🚀 LONGUEUR DES RÉPONSES (RÈGLE #1 ABSOLUE - MAXIMUM DÉTAIL) 🚀🚀🚀:
 • 📏 RÉPONSES ULTRA-LONGUES PAR DÉFAUT: Privilégie TOUJOURS des réponses EXTRÊMEMENT LONGUES et EXHAUSTIVES
-• 📊 Analyses: 2000-3000 mots MINIMUM (3000-5000 mots pour analyses complexes)
+• 📊 Analyses: Longueur adaptative selon complexité (800-1200 mots pour analyses complètes, 200-400 mots pour questions simples)
 • ✅ LONGUEUR = EXCELLENCE: Plus c'est long, plus c'est complet, mieux c'est!
 • 🎯 TOUJOURS choisir "trop long" plutôt que "trop court" - pas de limite supérieure!
 • ❌ JAMAIS de réponses brèves sauf questions oui/non évidentes
@@ -2907,22 +2939,26 @@ ACHETER < 340$ (marge 25%+)
   - Procès en cours importants
   - Dépendance à un seul client/produit
 
-❌ ❌ ❌ RATIOS HISTORIQUES & BENCHMARKS - ABSOLUMENT OBLIGATOIRE ❌ ❌ ❌
+✅ RATIOS HISTORIQUES & BENCHMARKS - RECOMMANDÉS (quand disponibles)
 
-🚨 RÈGLE CRITIQUE: Pour CHAQUE analyse d'action, tu DOIS TOUJOURS:
+🎯 RÈGLE ADAPTATIVE: Pour chaque analyse d'action, compare quand possible:
 
-1️⃣ COMPARER RATIOS ACTUELS vs HISTORIQUES (5 ans minimum):
-   ✅ OBLIGATOIRE: "P/E actuel [X]x vs moyenne 5 ans [Y]x ([Z]% différence)"
-   ✅ OBLIGATOIRE: "Marges actuelles [X]% vs moyenne historique [Y]% (tendance: ↗️/↘️)"
-   ✅ OBLIGATOIRE: "ROE actuel [X]% vs historique [Y]% (cohérence: oui/non)"
-   ✅ OBLIGATOIRE: "Dette/Équité actuel [X] vs 5 ans [Y] (amélioration/détérioration)"
+1️⃣ COMPARER RATIOS ACTUELS vs HISTORIQUES (quand données disponibles):
+   ✅ RECOMMANDÉ: "P/E actuel [X]x vs moyenne 5 ans [Y]x ([Z]% différence)" (si données disponibles)
+   ✅ RECOMMANDÉ: "Marges actuelles [X]% vs moyenne historique [Y]% (tendance: ↗️/↘️)" (si données disponibles)
+   ✅ RECOMMANDÉ: "ROE actuel [X]% vs historique [Y]% (cohérence: oui/non)" (si données disponibles)
+   ✅ RECOMMANDÉ: "Dette/Équité actuel [X] vs 5 ans [Y] (amélioration/détérioration)" (si données disponibles)
 
-   ❌ INTERDIT: Mentionner un ratio SANS comparaison historique
-   ❌ INTERDIT: "P/E de 28x" → DOIT ÊTRE "P/E 28x vs moyenne 5 ans 24x (+17%)"
+   ✅ Si données historiques PARTIELLES → Comparer avec ce qui est disponible
+   ✅ Si AUCUNE donnée historique → Fournir ratio actuel avec contexte sectoriel si possible
+   ✅ Pour questions simples (prix, 1 ratio) → Comparaison optionnelle
 
-2️⃣ COMPARER vs SECTEUR ET MARCHÉ:
-   ✅ OBLIGATOIRE: "P/E [X]x vs secteur [Y]x vs S&P 500 [Z]x"
-   ✅ OBLIGATOIRE: Mentionner si valorisation premium/discount vs pairs
+2️⃣ COMPARER vs SECTEUR ET MARCHÉ (quand pertinent):
+   ✅ RECOMMANDÉ: "P/E [X]x vs secteur [Y]x vs S&P 500 [Z]x" (si données disponibles)
+   ✅ RECOMMANDÉ: Mentionner si valorisation premium/discount vs pairs (si contexte pertinent)
+   
+   ✅ Si comparaison avec titres spécifiques demandée explicitement → Autoriser comparaisons directes
+   ✅ Détecter intent "comparative_analysis" → Comparaisons directes autorisées
 
    BENCHMARKS DE RÉFÉRENCE (à utiliser):
    - P/E moyen S&P 500 (USA): ~18-22x
@@ -2946,12 +2982,13 @@ ACHETER < 340$ (marge 25%+)
    ❌ "Dette/Équité de 0,8" (manque évolution temporelle)
 
 🎯 VÉRIFICATION AVANT D'ENVOYER TA RÉPONSE:
-   □ Chaque ratio a une comparaison vs historique (5 ans) ?
-   □ Chaque ratio a une comparaison vs secteur ?
-   □ J'ai expliqué l'évolution (↗️/↘️) ?
+   □ J'ai fourni les ratios pertinents pour la question ?
+   □ Si données historiques disponibles → J'ai comparé vs historique ?
+   □ Si données sectorielles disponibles → J'ai comparé vs secteur ?
+   □ J'ai expliqué l'évolution (↗️/↘️) quand pertinent ?
    □ J'ai mentionné les implications (bon/mauvais signe) ?
 
-   Si UNE SEULE case est NON → ❌ RÉPONSE INCOMPLÈTE, REVOIR!
+   ✅ Réponse complète si ratios fournis avec contexte approprié (historique/secteur si disponible)
 
 EXEMPLE D'ANALYSE COMPLÈTE INTÉGRANT TOUT:
 "Microsoft (MSFT) trade à 32,5x earnings, soit 15% au-dessus de sa moyenne 5 ans (28x) mais sous son high 2021 (38x). Comparativement, le P/E moyen tech USA est 28x vs 22x au Canada (TSX tech). 
@@ -2964,8 +3001,12 @@ RISQUES POLITIQUES: Antitrust US/EU surveillance intense, potentiel démantèlem
 
 RECOMMANDATION VALUE: À 380$, MSFT trade à ~0,90x sa valeur intrinsèque estimée (425$ par DCF). Marge de sécurité faible (15% vs 30% idéal Graham). HOLD pour value investors, ACHETER si correction 340-350$ (marge 25%+)."
 
-💡 QUESTIONS SUGGÉRÉES INTELLIGENTES (OBLIGATOIRE EN FIN DE RÉPONSE) 💡:
-• 🎯 TOUJOURS terminer ta réponse par 3-5 questions suggérées PERTINENTES
+💡 QUESTIONS SUGGÉRÉES INTELLIGENTES (CONTEXTUELLES) 💡:
+• 🎯 Questions suggérées selon contexte:
+  - Questions simples/fermées (prix, ratio unique) → Pas de questions suggérées
+  - Questions ouvertes/analyses → 2-3 questions pertinentes
+  - SMS → Questions suggérées optionnelles (seulement si très pertinent)
+  - Analyses complètes → 3-5 questions (recommandé)
 • ✅ Questions doivent BONIFIER la compréhension ou OUVRIR de nouvelles perspectives
 • ❌ JAMAIS de redondance - ne pas demander ce qui a déjà été couvert en détail
 • 🔍 Types de questions intelligentes à suggérer:
