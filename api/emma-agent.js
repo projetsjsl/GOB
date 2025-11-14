@@ -1524,20 +1524,32 @@ INSTRUCTIONS CRITIQUES:
    - RACONTE l'histoire derrière les chiffres, ne les liste pas
    - Utilise des PHRASES COMPLÈTES et des PARAGRAPHES lisibles
 
-3. ✅ TOUJOURS fournir une réponse COMPLÈTE et UTILE basée sur les données disponibles
-4. ✅ Utilise TOUTES les données fournies par les outils, MÊME si marquées "[⚠️ SOURCE PARTIELLE]"
+3. 🚨🚨🚨 RÈGLE ABSOLUE: RÉPONDRE UNIQUEMENT À LA DEMANDE DE L'UTILISATEUR 🚨🚨🚨
+   - ❌ INTERDIT ABSOLU: Donner des informations sur une entreprise/ticker DIFFÉRENT de celui demandé
+   - ❌ INTERDIT: Si l'utilisateur demande "Amaxx", NE PAS donner d'informations sur "RE" ou autre entreprise
+   - ✅ SI le ticker/entreprise demandé n'est PAS dans les données des outils:
+     → TU DOIS utiliser Perplexity (qui est déjà intégré) pour chercher des informations sur CETTE entreprise spécifique
+     → Perplexity a accès à des millions de sources et peut trouver des informations sur n'importe quelle entreprise
+     → Ne JAMAIS dire "aucune donnée disponible" sans avoir cherché via Perplexity
+   - ✅ SI tu ne trouves vraiment aucune information après recherche Perplexity:
+     → Dis clairement que tu n'as pas trouvé d'informations sur cette entreprise spécifique
+     → Suggère de vérifier le nom/ticker exact
+     → NE DONNE PAS d'informations sur d'autres entreprises à la place
+
+4. ✅ TOUJOURS fournir une réponse COMPLÈTE et UTILE basée sur les données disponibles
+5. ✅ Utilise TOUTES les données fournies par les outils, MÊME si marquées "[⚠️ SOURCE PARTIELLE]"
    - Les données partielles sont MEILLEURES que pas de données du tout
    - Analyse ce qui est disponible et fournis des insights basés sur ces données
-5. ✅ Si un outil a retourné des données pour PLUSIEURS tickers (news_by_ticker, fundamentals_by_ticker):
+6. ✅ Si un outil a retourné des données pour PLUSIEURS tickers (news_by_ticker, fundamentals_by_ticker):
    - Analyse CHAQUE ticker individuellement
    - Fournis un résumé pour CHAQUE compagnie mentionnée
    - N'ignore PAS les tickers - ils sont tous importants
-6. ❌ NE JAMAIS dire "aucune donnée disponible" si des outils ont retourné des données (même partielles)
-7. ❌ NE JAMAIS demander de clarifications - fournis directement l'analyse
-8. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
-9. Cite tes sources (outils utilisés) en fin de réponse
-10. Ton: professionnel mais accessible, comme une vraie analyste financière
-${intentData ? `11. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
+7. ❌ NE JAMAIS dire "aucune donnée disponible" si des outils ont retourné des données (même partielles)
+8. ❌ NE JAMAIS demander de clarifications - fournis directement l'analyse
+9. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
+10. Cite tes sources (outils utilisés) en fin de réponse
+11. Ton: professionnel mais accessible, comme une vraie analyste financière
+${intentData ? `12. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
 
 📊 GRAPHIQUES ET VISUALISATIONS - ANALYSE CONTEXTUALISÉE:
 
@@ -2014,6 +2026,87 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         }
     }
 
+    /**
+     * Extrait l'entité (ticker/entreprise) demandée par l'utilisateur
+     */
+    _extractRequestedEntity(userMessage, intentData) {
+        // 1. Vérifier les tickers dans intentData
+        if (intentData?.tickers && intentData.tickers.length > 0) {
+            return intentData.tickers[0];
+        }
+        
+        // 2. Extraire tickers du message
+        const tickers = TickerExtractor.extract(userMessage, { includeCompanyNames: true });
+        if (tickers.length > 0) {
+            return tickers[0];
+        }
+        
+        // 3. Chercher des noms d'entreprises dans le message (mots capitalisés qui ne sont pas des mots communs)
+        const words = userMessage.split(/\s+/);
+        for (const word of words) {
+            const cleanWord = word.replace(/[.,!?;:()]/g, '').trim();
+            if (cleanWord.length >= 3 && /^[A-Z][a-z]+/.test(cleanWord)) {
+                // Mot capitalisé qui pourrait être un nom d'entreprise
+                const lowerWord = cleanWord.toLowerCase();
+                if (!TickerExtractor.COMMON_WORDS.includes(cleanWord.toUpperCase())) {
+                    return cleanWord;
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Vérifie si une entité est présente dans les résultats des outils
+     */
+    _checkIfEntityInToolResults(entity, toolResults) {
+        if (!entity || !toolResults || toolResults.length === 0) {
+            return false;
+        }
+        
+        const entityUpper = entity.toUpperCase();
+        
+        // Vérifier dans chaque résultat d'outil
+        for (const result of toolResults) {
+            if (!result.data) continue;
+            
+            const dataStr = JSON.stringify(result.data).toUpperCase();
+            
+            // Chercher le ticker/entité dans les données
+            if (dataStr.includes(entityUpper)) {
+                return true;
+            }
+            
+            // Vérifier aussi les clés de données (ex: "AAPL": {...})
+            if (result.data[entityUpper] || result.data[entity]) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Extrait les citations d'une réponse Perplexity
+     */
+    _extractCitations(content) {
+        const citations = [];
+        
+        // Pattern pour URLs dans le texte
+        const urlRegex = /https?:\/\/[^\s\)]+/g;
+        const urls = content.match(urlRegex) || [];
+        
+        urls.forEach(url => {
+            citations.push({
+                url: url,
+                title: url.split('/').pop() || url
+            });
+        });
+        
+        return citations;
+    }
+
     async _call_perplexity(prompt, outputMode = 'chat', recency = 'month', userMessage = '', intentData = null, toolResults = [], context = {}) {
         // ✅ Variables pour gestion de timeout (déclarées avant try pour être accessibles dans catch)
         let timeout = null;
@@ -2072,6 +2165,83 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 }
                 
                 console.log(`🎯 Using custom prompt for intent: ${intentData.intent}`);
+            }
+
+            // 🚨 DÉTECTION: Si l'utilisateur demande une entreprise/ticker qui n'est PAS dans les données des outils
+            // → Forcer une recherche Perplexity spécifique pour cette entreprise
+            const userMessageLower = (userMessage || '').toLowerCase();
+            const requestedEntity = this._extractRequestedEntity(userMessage, intentData);
+            const hasDataForRequestedEntity = this._checkIfEntityInToolResults(requestedEntity, toolResults);
+            
+            // Si l'utilisateur demande une entreprise spécifique mais qu'on n'a pas de données pour elle
+            if (requestedEntity && !hasDataForRequestedEntity && outputMode === 'chat') {
+                console.log(`🔍 Entité demandée "${requestedEntity}" non trouvée dans les données des outils → Forcer recherche Perplexity`);
+                
+                // Construire un prompt spécifique pour chercher cette entreprise
+                const searchPrompt = `Tu es Emma, analyste financière experte. L'utilisateur demande des informations sur "${requestedEntity}".
+
+⚠️ CRITIQUE: Cette entreprise/ticker n'a pas été trouvé dans les sources de données standard (FMP, Polygon, etc.).
+
+TU DOIS:
+1. Chercher des informations sur "${requestedEntity}" via tes sources (Perplexity a accès à des millions de sources)
+2. Trouver le ticker exact si c'est un nom d'entreprise (ex: "Amaxx" pourrait être "AMXX" ou un autre ticker)
+3. Fournir des informations financières complètes: prix, ratios, fondamentaux, actualités récentes
+4. Si tu trouves que "${requestedEntity}" correspond à un ticker différent, mentionne-le clairement
+5. Si vraiment aucune information n'existe, dis-le clairement mais NE DONNE PAS d'informations sur d'autres entreprises
+
+❌ INTERDIT ABSOLU: Donner des informations sur une entreprise DIFFÉRENTE de "${requestedEntity}"
+
+Question de l'utilisateur: ${userMessage}
+
+Fournis une analyse complète de "${requestedEntity}" avec toutes les informations financières disponibles.`;
+
+                // Utiliser ce prompt spécialisé au lieu du prompt normal
+                const searchRequestBody = {
+                    model: 'sonar-pro',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Tu es Emma, analyste financière experte. Tu as accès à des millions de sources via Perplexity pour trouver des informations sur n\'importe quelle entreprise.'
+                        },
+                        {
+                            role: 'user',
+                            content: searchPrompt
+                        }
+                    ],
+                    max_tokens: maxTokens,
+                    temperature: 0.1,
+                    search_recency_filter: recency,
+                    search_domain_filter: ['finance.yahoo.com', 'bloomberg.com', 'reuters.com', 'marketwatch.com', 'cnbc.com', 'wsj.com', 'ft.com', 'theglobeandmail.com', 'lapresse.ca']
+                };
+
+                // Appel Perplexity avec prompt spécialisé
+                const searchResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(searchRequestBody),
+                    signal: AbortSignal.timeout(timeoutDuration)
+                });
+
+                if (searchResponse.ok) {
+                    const searchData = await searchResponse.json();
+                    const searchContent = searchData.choices?.[0]?.message?.content || '';
+                    const searchCitations = this._extractCitations(searchContent);
+                    
+                    console.log(`✅ Recherche Perplexity réussie pour "${requestedEntity}"`);
+                    
+                    return {
+                        content: searchContent,
+                        citations: searchCitations,
+                        model: 'perplexity',
+                        recency: recency,
+                        searched_entity: requestedEntity
+                    };
+                } else {
+                    console.warn(`⚠️ Recherche Perplexity échouée pour "${requestedEntity}", continuer avec prompt normal`);
+                }
             }
 
             const requestBody = {
