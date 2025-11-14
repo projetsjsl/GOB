@@ -2190,22 +2190,32 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 
                 if (isFundQuestion) {
                     // Questions sur fonds: demander tableaux, quartiles, exemples concrets
+                    // Format inspiré des meilleures réponses Perplexity
                     searchPrompt = `${userMessage}
 
-Fournis une analyse financière complète et détaillée incluant:
-- Tableaux synthétiques avec données chiffrées (rendements, quartiles, etc.)
-- Exemples de fonds spécifiques avec leurs performances
-- Échelles de classement et méthodologie (quartiles Morningstar, etc.)
-- Comparaisons entre différents fonds de la même catégorie
-- Sources détaillées avec liens vers les documents officiels
+Fournis une analyse financière complète et structurée selon ce format:
 
-Structure ta réponse avec:
-- Des tableaux clairs et comparatifs
-- Des exemples concrets de fonds avec leurs codes/tickers
-- Des explications sur les méthodologies de classement
-- Des sources complètes et vérifiables
+1. RÉSUMÉ EN TÊTE: Commence par un résumé concis (2-3 phrases) qui répond directement à la question avec les chiffres clés.
 
-Sois exhaustif, précis et cite toutes tes sources.`;
+2. SECTIONS DÉTAILLÉES avec exemples concrets:
+- Pour chaque catégorie/quartile, donne des exemples de fonds spécifiques avec leurs codes/tickers
+- Inclus les rendements exacts (1 an, 3 ans, 5 ans, 10 ans si disponibles)
+- Mentionne le quartile Morningstar de chaque fonds
+- Compare les performances entre différents fonds
+
+3. TABLEAU COMPARATIF SYNTHÉTIQUE:
+Crée un tableau clair avec colonnes: Fonds | Rendement 5 ans (%) | Quartile Morningstar | Notes
+Inclus les principaux fonds de la catégorie demandée.
+
+4. INFORMATIONS CONTEXTUELLES:
+- Explications sur la méthodologie de classement (quartiles, étoiles Morningstar)
+- Utilité des quartiles pour la sélection de fonds
+- Variations selon stratégie, frais, gestion active/passive
+
+5. SOURCES COMPLÈTES:
+Cite toutes tes sources avec liens vers documents officiels (Morningstar, Fundata, sites des manufacturiers)
+
+Structure ta réponse de manière professionnelle et facile à lire. Sois exhaustif, précis et cite toutes tes sources avec numérotation [1][2][3] etc.`;
                 } else {
                     // Questions générales: prompt simple
                     searchPrompt = `${userMessage}
