@@ -2179,7 +2179,36 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 
                 // Construire un prompt naturel et ouvert pour Perplexity (comme une requête directe)
                 // Moins de contraintes = meilleurs résultats de Perplexity
-                const searchPrompt = `${userMessage}
+                // Pour les questions sur fonds/quartiles, inclure des instructions spécifiques
+                const isFundQuestion = userMessageLower.includes('fonds') || 
+                                      userMessageLower.includes('quartile') || 
+                                      userMessageLower.includes('rendement') ||
+                                      userMessageLower.includes('équilibré') ||
+                                      userMessageLower.includes('equilibre');
+                
+                let searchPrompt = userMessage;
+                
+                if (isFundQuestion) {
+                    // Questions sur fonds: demander tableaux, quartiles, exemples concrets
+                    searchPrompt = `${userMessage}
+
+Fournis une analyse financière complète et détaillée incluant:
+- Tableaux synthétiques avec données chiffrées (rendements, quartiles, etc.)
+- Exemples de fonds spécifiques avec leurs performances
+- Échelles de classement et méthodologie (quartiles Morningstar, etc.)
+- Comparaisons entre différents fonds de la même catégorie
+- Sources détaillées avec liens vers les documents officiels
+
+Structure ta réponse avec:
+- Des tableaux clairs et comparatifs
+- Des exemples concrets de fonds avec leurs codes/tickers
+- Des explications sur les méthodologies de classement
+- Des sources complètes et vérifiables
+
+Sois exhaustif, précis et cite toutes tes sources.`;
+                } else {
+                    // Questions générales: prompt simple
+                    searchPrompt = `${userMessage}
 
 Fournis une analyse financière complète et détaillée incluant:
 - Nature de l'entreprise/fonds (type, secteur, description)
@@ -2192,6 +2221,7 @@ Fournis une analyse financière complète et détaillée incluant:
 - Recommandations d'analyse
 
 Sois exhaustif et cite tes sources.`;
+                }
 
                 // Utiliser ce prompt spécialisé au lieu du prompt normal
                 // Prompt minimal pour laisser Perplexity faire son travail naturellement
