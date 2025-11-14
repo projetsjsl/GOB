@@ -47,6 +47,9 @@
       "maxDuration": 15,
       "memory": 1024
     },
+    "api/admin/emma-config.js": {
+      "maxDuration": 10
+    },
     "api/ai-services.js": {
       "maxDuration": 120
     },

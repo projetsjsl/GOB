@@ -343,33 +343,36 @@ class SmartAgent {
         const messageLower = userMessage.toLowerCase().trim();
         let response = '';
 
-        // 1. EXPRESSIONS ÉMOTIONNELLES
+        // ✅ FIX: Uniquement pour expressions purement conversationnelles (sans questions réelles)
+        // Les questions générales réelles sont gérées par _shouldUsePerplexityOnly() + Perplexity
+        
+        // 1. EXPRESSIONS ÉMOTIONNELLES COURTES (sans question)
         if (intentData.intent === 'general_conversation' && intentData.response_type === 'conversational') {
-            // Réponses appropriées selon l'expression
+            // Réponses appropriées selon l'expression - SANS forcer contexte financier
             if (['wow', 'super', 'incroyable', 'génial', 'genial', 'fantastique', 'excellent', 'parfait', 'cool', 'nice', 'great', 'awesome', 'amazing', 'bravo'].some(expr => messageLower.includes(expr))) {
-                response = `Merci ! 😊 Je suis contente que ça te plaise !\n\nComment puis-je t'aider avec tes analyses financières aujourd'hui ? 📊`;
+                response = `Merci ! 😊 Je suis contente que ça te plaise !\n\nComment puis-je t'aider aujourd'hui ?`;
             } else if (['merci', 'thanks', 'thank you'].some(expr => messageLower.includes(expr))) {
-                response = `De rien ${userName} ! 😊\n\nN'hésite pas si tu as d'autres questions sur les marchés financiers. Je suis là pour t'aider ! 📈`;
+                response = `De rien ${userName} ! 😊\n\nN'hésite pas si tu as d'autres questions. Je suis là pour t'aider !`;
             } else if (['ok', 'okay', 'd\'accord', 'daccord', 'parfait', 'bien', 'bon'].some(expr => messageLower.includes(expr))) {
-                response = `Parfait ! 👍\n\nQue veux-tu analyser aujourd'hui ? Je peux t'aider avec des analyses d'actions, des actualités, des indicateurs techniques, etc. 📊`;
+                response = `Parfait ! 👍\n\nQue veux-tu faire maintenant ?`;
             } else if (['oui', 'yes', 'si'].some(expr => messageLower === expr)) {
-                response = `Super ! 😊\n\nSur quoi veux-tu que je t'aide ? Tu peux me demander une analyse, des actualités, ou toute autre question financière. 📈`;
+                response = `Super ! 😊\n\nSur quoi veux-tu que je t'aide ?`;
             } else if (['non', 'no'].some(expr => messageLower === expr)) {
-                response = `D'accord, pas de problème ! 😊\n\nSi tu changes d'avis, je suis là pour t'aider avec tes analyses financières. 📊`;
+                response = `D'accord, pas de problème ! 😊\n\nSi tu changes d'avis, je suis là pour t'aider.`;
             } else {
                 // Réponse générique pour autres expressions conversationnelles
-                response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA financière. Je peux t'aider avec :\n📊 Analyses d'actions\n📈 Données financières\n📰 Actualités de marché\n💡 Conseils et insights\n\nComment puis-je t'aider aujourd'hui ?`;
+                response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA. Je peux t'aider avec des questions financières, générales, et bien plus !\n\nComment puis-je t'aider aujourd'hui ?`;
             }
         }
 
         // 2. EMAILS FOURNIS
         else if (intentData.intent === 'information_provided' && intentData.information_type === 'email') {
-            response = `Merci ${userName} ! 📧\n\nJ'ai bien noté ton email : ${userMessage}\n\nComment puis-je t'aider avec tes analyses financières aujourd'hui ? 📊`;
+            response = `Merci ${userName} ! 📧\n\nJ'ai bien noté ton email : ${userMessage}\n\nComment puis-je t'aider aujourd'hui ?`;
         }
 
-        // 3. FALLBACK: Réponse conversationnelle générique
+        // 3. FALLBACK: Réponse conversationnelle générique (sans forcer finance)
         else {
-            response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA financière. Je peux t'aider avec des analyses d'actions, des actualités de marché, des indicateurs techniques, et bien plus !\n\nQue veux-tu analyser aujourd'hui ? 📈`;
+            response = `Merci pour ton message ! 😊\n\nJe suis Emma, ton assistante IA. Je peux t'aider avec des questions financières, générales, et bien plus !\n\nQue veux-tu savoir ?`;
         }
 
         return {
@@ -505,21 +508,709 @@ class SmartAgent {
     }
 
     /**
+     * Détecte si Perplexity seul est suffisant pour répondre
+     * ⚠️ CRITIQUE: Détermine quand utiliser Perplexity vs APIs complémentaires
+     * 
+     * Perplexity est suffisant pour:
+     * - Questions générales/conceptuelles (fonds, économie, explications)
+     * - Analyses qualitatives (comparaisons, stratégies)
+     * - Actualités/résumés (Perplexity a accès à sources récentes)
+     * - Questions macro-économiques
+     * 
+     * APIs sont nécessaires pour:
+     * - Prix en temps réel précis (exact, pas approximatif)
+     * - Ratios financiers exacts (P/E, ROE, etc. - données structurées)
+     * - Données fondamentales précises (revenus, bénéfices, etc.)
+     * - Indicateurs techniques (RSI, MACD - calculs précis)
+     * - Calendriers (earnings, economic - données structurées)
+     * - Watchlist/portfolio (données utilisateur)
+     */
+    _shouldUsePerplexityOnly(userMessage, context, intentData) {
+        const message = userMessage.toLowerCase();
+        const intent = intentData?.intent || context.intent_data?.intent || 'unknown';
+        const extractedTickers = context.extracted_tickers || context.tickers || [];
+        
+        // 🚫 SKIP OUTILS pour greetings et questions simples
+        const noToolsIntents = ['greeting', 'help', 'capabilities', 'general_conversation'];
+        if (noToolsIntents.includes(intent)) {
+            return { usePerplexityOnly: true, reason: `Intent "${intent}" ne nécessite pas de données` };
+        }
+        
+        // ✅ DÉFINIR TOUS LES KEYWORDS EN PREMIER (FIX: Ordre d'évaluation)
+        // ✅ PERPLEXITY SEUL: Questions sur fonds/ETF/portefeuille
+        const fundKeywords = [
+            'fonds', 'fond', 'mutual fund', 'fonds mutuels', 'fonds d\'investissement',
+            'quartile', 'quartiles', 'rendement', 'rendements', 'performance des fonds',
+            'catégorie de fonds', 'categorie de fonds', 'fonds équilibrés', 'fonds equilibres',
+            'etf', 'etfs', 'fonds indiciels', 'fonds actifs', 'fonds passifs',
+            'fonds canadiens', 'fonds américains', 'fonds internationaux', 'fonds européens',
+            'fonds obligataires', 'fonds actions', 'fonds diversifiés', 'fonds sectoriels',
+            'fonds de croissance', 'fonds de valeur', 'fonds de dividendes', 'fonds de revenu',
+            'fonds indexés', 'fonds indiciels', 'fonds à capital garanti', 'fonds alternatifs',
+            'fonds de couverture', 'hedge fund', 'fonds de private equity', 'fonds immobiliers',
+            'reit', 'reits', 'fiducie de placement', 'fiducie immobilière',
+            'frais de gestion', 'frais de fonds', 'mer', 'ter', 'expense ratio',
+            'rating morningstar', 'étoiles morningstar', 'star rating', 'quartile morningstar'
+        ];
+        if (fundKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur fonds - Perplexity a accès aux données Morningstar/Fundata' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions macro-économiques générales
+        const macroKeywords = [
+            'inflation', 'taux directeur', 'fed', 'banque centrale', 'pib', 'gdp',
+            'chômage', 'chomage', 'emploi', 'récession', 'recession', 'croissance économique',
+            'politique monétaire', 'monetaire', 'taux d\'intérêt', 'interet', 'taux',
+            'courbe des taux', 'yield curve', 'spread', 'obligations', 'treasury',
+            'banque du canada', 'boc', 'ecb', 'banque centrale européenne', 'boj', 'banque du japon',
+            'politique budgétaire', 'fiscal', 'déficit', 'deficit', 'dette publique', 'dette souveraine',
+            'indicateurs économiques', 'indicateur macro', 'indicateurs macroéconomiques',
+            'consommation', 'production industrielle', 'pmi', 'ism', 'indice manufacturier',
+            'commerce extérieur', 'balance commerciale', 'exportations', 'importations',
+            'devise', 'devises', 'taux de change', 'forex', 'fx', 'parité', 'cours des devises',
+            'marché obligataire', 'marché obligataire', 'bonds', 'obligations d\'état',
+            'taux réel', 'taux nominal', 'prime de risque', 'risk premium', 'spread de crédit'
+        ];
+        if (macroKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            // Exception: Si demande spécifique de courbe des taux → API nécessaire
+            if (message.includes('courbe des taux') || message.includes('yield curve') || message.includes('treasury')) {
+                return { usePerplexityOnly: false, reason: 'Courbe des taux nécessite données structurées précises' };
+            }
+            return { usePerplexityOnly: true, reason: 'Question macro-économique - Perplexity a accès aux données récentes' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur stratégies d'investissement
+        const strategyKeywords = [
+            'stratégie', 'strategie', 'stratégie d\'investissement', 'strategie d\'investissement',
+            'allocation d\'actifs', 'asset allocation', 'diversification', 'rééquilibrage', 'reequilibrage',
+            'value investing', 'growth investing', 'dividend investing', 'momentum investing',
+            'contrarian', 'contrarian investing', 'dollar cost averaging', 'dca',
+            'lump sum', 'investissement régulier', 'investissement systématique',
+            'buy and hold', 'trading actif', 'day trading', 'swing trading', 'position trading',
+            'hedging', 'couverture', 'protection de portefeuille', 'risk management',
+            'gestion des risques', 'stop loss', 'take profit', 'position sizing',
+            'pyramiding', 'averaging down', 'averaging up', 'scaling in', 'scaling out',
+            'sector rotation', 'rotation sectorielle', 'style rotation', 'rotation de style',
+            'market timing', 'timing de marché', 'tactical allocation', 'allocation tactique'
+        ];
+        if (strategyKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur stratégie - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur secteurs/industries
+        const sectorKeywords = [
+            'secteur', 'industrie', 'secteurs performants', 'secteurs en hausse', 'secteurs en baisse',
+            'secteur technologique', 'secteur techno', 'tech sector', 'secteur financier',
+            'secteur santé', 'healthcare sector', 'secteur énergétique', 'energy sector',
+            'secteur consommation', 'consumer sector', 'secteur industriel', 'industrial sector',
+            'secteur matériaux', 'materials sector', 'secteur immobilier', 'real estate sector',
+            'secteur utilities', 'secteur services publics', 'secteur télécom', 'telecom sector',
+            'secteur défensif', 'defensive sector', 'secteur cyclique', 'cyclical sector',
+            'analyse sectorielle', 'sector analysis', 'performance sectorielle', 'sector performance',
+            'rotation sectorielle', 'sector rotation', 'poids sectoriel', 'sector weight'
+        ];
+        if (sectorKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur secteurs - Perplexity a accès aux analyses sectorielles' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur crypto/blockchain
+        const cryptoKeywords = [
+            'crypto', 'cryptomonnaie', 'cryptomonnaies', 'bitcoin', 'btc', 'ethereum', 'eth',
+            'blockchain', 'defi', 'nft', 'altcoin', 'altcoins', 'stablecoin', 'stablecoins',
+            'mining', 'minage', 'staking', 'yield farming', 'liquidity pool', 'pool de liquidité',
+            'exchange', 'bourse crypto', 'wallet', 'portefeuille crypto', 'cold storage',
+            'halving', 'fork', 'hard fork', 'soft fork', 'consensus', 'proof of stake', 'pos',
+            'proof of work', 'pow', 'gas fee', 'frais de transaction', 'transaction fee'
+        ];
+        if (cryptoKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur crypto - Perplexity a accès aux données crypto récentes' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur commodities/matières premières
+        const commodityKeywords = [
+            'commodities', 'commodity', 'matières premières', 'matiere premiere',
+            'or', 'argent', 'pétrole', 'petrole', 'oil', 'gaz naturel', 'natural gas',
+            'blé', 'maïs', 'soja', 'café', 'cacao', 'sucre', 'cotton', 'coton',
+            'cuivre', 'nickel', 'zinc', 'aluminium', 'fer', 'acier', 'steel',
+            'prix des matières premières', 'commodity prices', 'futures', 'contrats à terme',
+            'contango', 'backwardation', 'spread de commodities', 'commodity spread',
+            'crude oil', 'wti', 'brent', 'gold', 'silver', 'platinum', 'palladium',
+            'wheat', 'corn', 'soybean', 'coffee', 'cocoa', 'sugar', 'cotton',
+            'copper', 'nickel', 'zinc', 'aluminum', 'iron ore', 'steel',
+            'commodity index', 'indice matières premières', 'gci', 'goldman sachs commodity index'
+        ];
+        if (commodityKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur commodities - Perplexity a accès aux données de marché' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Forex/Devises
+        const forexKeywords = [
+            'forex', 'fx', 'devise', 'devises', 'taux de change', 'exchange rate',
+            'currency', 'currencies', 'parité', 'cours des devises', 'currency pair',
+            'usd', 'eur', 'gbp', 'jpy', 'cad', 'chf', 'aud', 'nzd', 'cny',
+            'dollar', 'euro', 'livre', 'yen', 'franc suisse', 'dollar australien',
+            'dollar canadien', 'yuan', 'renminbi', 'currency market', 'marché des changes',
+            'carry trade', 'currency hedging', 'couverture de change', 'currency risk',
+            'currency exposure', 'exposition aux devises', 'fx risk', 'risque de change',
+            'currency correlation', 'corrélation devises', 'currency volatility', 'volatilité devises'
+        ];
+        if (forexKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur forex - Perplexity a accès aux données de change' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Obligations/Bonds détaillées
+        const bondKeywords = [
+            'obligations', 'bonds', 'obligation', 'bond', 'corporate bonds', 'obligations corporatives',
+            'government bonds', 'obligations d\'état', 'treasury bonds', 'obligations du trésor',
+            'municipal bonds', 'obligations municipales', 'high yield', 'junk bonds',
+            'investment grade', 'obligations investment grade', 'credit rating', 'notation crédit',
+            'yield', 'rendement obligataire', 'coupon', 'coupon rate', 'taux de coupon',
+            'duration', 'durée', 'convexity', 'convexité', 'spread', 'credit spread',
+            'yield to maturity', 'ytm', 'rendement à l\'échéance', 'yield curve', 'courbe des taux',
+            'bond ladder', 'échelle d\'obligations', 'bond portfolio', 'portefeuille obligataire',
+            'fixed income', 'revenu fixe', 'fixed income securities', 'titres à revenu fixe',
+            'bond market', 'marché obligataire', 'bond index', 'indice obligataire',
+            'sovereign bonds', 'obligations souveraines', 'emerging market bonds', 'obligations marchés émergents'
+        ];
+        if (bondKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            // Exception: Si demande spécifique de courbe des taux → API nécessaire
+            if (message.includes('courbe des taux') || message.includes('yield curve') || message.includes('treasury rates')) {
+                return { usePerplexityOnly: false, reason: 'Courbe des taux nécessite données structurées précises' };
+            }
+            return { usePerplexityOnly: true, reason: 'Question sur obligations - Perplexity a accès aux données obligataires' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Immobilier/Real Estate
+        const realEstateKeywords = [
+            'immobilier', 'real estate', 'reit', 'reits', 'fiducie immobilière',
+            'fiducie de placement', 'real estate investment trust',
+            'propriété', 'propriete', 'property', 'commercial real estate', 'immobilier commercial',
+            'residential real estate', 'immobilier résidentiel', 'real estate market', 'marché immobilier',
+            'cap rate', 'taux de capitalisation', 'cap rate', 'noi', 'net operating income',
+            'revenu net d\'exploitation', 'real estate valuation', 'valorisation immobilière',
+            'real estate cycle', 'cycle immobilier', 'property management', 'gestion immobilière',
+            'real estate investment', 'investissement immobilier', 'real estate portfolio',
+            'portefeuille immobilier', 'real estate trends', 'tendances immobilières'
+        ];
+        if (realEstateKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur immobilier - Perplexity a accès aux données immobilières' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Private Equity/Venture Capital
+        const privateEquityKeywords = [
+            'private equity', 'capital-investissement', 'capital investissement',
+            'venture capital', 'vc', 'capital de risque', 'startup', 'startups',
+            'unicorn', 'licorne', 'series a', 'series b', 'series c', 'funding round',
+            'tour de table', 'levée de fonds', 'fundraising', 'valuation startup',
+            'valorisation startup', 'exit', 'sortie', 'ipo', 'acquisition',
+            'private equity fund', 'fonds de private equity', 'pe fund',
+            'venture capital fund', 'fonds de capital de risque', 'vc fund',
+            'lbo', 'leveraged buyout', 'rachat par effet de levier', 'mbo', 'management buyout'
+        ];
+        if (privateEquityKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur private equity - Perplexity a accès aux données PE/VC' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Warrants/Convertibles
+        const warrantKeywords = [
+            'warrant', 'warrants', 'certificat', 'certificats', 'warrant d\'achat',
+            'warrant de vente', 'call warrant', 'put warrant', 'warrant call',
+            'warrant put', 'warrant price', 'prix warrant', 'warrant premium',
+            'prime warrant', 'warrant leverage', 'effet de levier warrant',
+            'convertible', 'convertibles', 'convertible bond', 'obligation convertible',
+            'convertible preferred', 'actions privilégiées convertibles',
+            'conversion ratio', 'ratio de conversion', 'conversion price', 'prix de conversion',
+            'conversion premium', 'prime de conversion', 'forced conversion', 'conversion forcée'
+        ];
+        if (warrantKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur warrants/convertibles - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Calculs/Simulations
+        const calculationKeywords = [
+            'calculer', 'calcul', 'simulation', 'simuler', 'scénario', 'scenario',
+            'projection', 'prévision', 'prevision', 'forecast', 'estimation',
+            'dcf', 'discounted cash flow', 'actualisation des flux', 'valeur actuelle nete',
+            'van', 'npv', 'net present value', 'irr', 'taux de rendement interne',
+            'taux de rendement', 'payback period', 'période de récupération',
+            'wacc', 'coût moyen pondéré du capital', 'weighted average cost of capital',
+            'terminal value', 'valeur terminale', 'perpetuity', 'perpétuité',
+            'sensitivity analysis', 'analyse de sensibilité', 'scenario analysis',
+            'analyse de scénarios', 'monte carlo', 'monte carlo simulation',
+            'backtesting', 'backtest', 'test historique', 'simulation historique',
+            'stress test', 'test de résistance', 'stress testing'
+        ];
+        if (calculationKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur calculs/simulations - Perplexity peut expliquer les méthodologies' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Réglementation/Compliance
+        const regulatoryKeywords = [
+            'réglementation', 'regulation', 'compliance', 'conformité', 'régulateur',
+            'regulateur', 'sec', 'securities and exchange commission', 'amf',
+            'autorité des marchés financiers', 'cvmf', 'cvm', 'osfi', 'cdic',
+            'fdic', 'federal deposit insurance', 'assurance dépôts',
+            'réglementation financière', 'financial regulation', 'règles boursières',
+            'stock exchange rules', 'règles de bourse', 'market regulation',
+            'régulation des marchés', 'insider trading', 'délit d\'initié',
+            'market manipulation', 'manipulation de marché', 'disclosure', 'divulgation',
+            'financial reporting', 'rapports financiers', 'gaap', 'ifrs',
+            'normes comptables', 'accounting standards', 'audit', 'vérification',
+            'kpi', 'key performance indicators', 'indicateurs de performance clés'
+        ];
+        if (regulatoryKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question réglementaire - Perplexity a accès aux règles et régulations' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur ESG/Durabilité
+        const esgKeywords = [
+            'esg', 'environmental social governance', 'environnemental social gouvernance',
+            'durabilité', 'durabilite', 'sustainability', 'responsabilité sociale',
+            'responsabilite sociale', 'corporate social responsibility', 'csr',
+            'rse', 'responsabilité sociale d\'entreprise', 'carbon footprint',
+            'empreinte carbone', 'green bonds', 'obligations vertes', 'sustainable investing',
+            'investissement durable', 'impact investing', 'investissement à impact',
+            'climate risk', 'risque climatique', 'transition énergétique', 'energy transition',
+            'renewable energy', 'énergie renouvelable', 'clean energy', 'énergie propre',
+            'esg rating', 'notation esg', 'esg score', 'score esg', 'esg factors',
+            'facteurs esg', 'esg integration', 'intégration esg', 'esg disclosure',
+            'divulgation esg', 'climate change', 'changement climatique', 'net zero',
+            'carboneutralité', 'carbon neutral', 'paris agreement', 'accord de paris'
+        ];
+        if (esgKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question ESG - Perplexity a accès aux données ESG récentes' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Arbitrage/Pairs Trading
+        const arbitrageKeywords = [
+            'arbitrage', 'arbitrage opportunity', 'opportunité d\'arbitrage',
+            'pairs trading', 'trading de paires', 'statistical arbitrage', 'arbitrage statistique',
+            'market neutral', 'neutre marché', 'long short', 'long/short',
+            'hedge fund strategy', 'stratégie hedge fund', 'relative value',
+            'valeur relative', 'spread trading', 'trading de spread', 'convergence',
+            'divergence', 'mean reversion', 'retour à la moyenne', 'momentum',
+            'momentum trading', 'contrarian strategy', 'stratégie contrarian',
+            'quantitative strategy', 'stratégie quantitative', 'quant trading',
+            'algorithmic trading', 'trading algorithmique', 'high frequency trading', 'hft'
+        ];
+        if (arbitrageKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur arbitrage - Perplexity peut expliquer les stratégies' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Méthodologies d'Analyse
+        const methodologyKeywords = [
+            'méthodologie', 'methodologie', 'methodology', 'approche', 'approach',
+            'dcf', 'discounted cash flow', 'actualisation des flux de trésorerie',
+            'multiples', 'valuation multiples', 'multiples de valorisation',
+            'comparable companies', 'entreprises comparables', 'comps', 'peer group',
+            'groupe de pairs', 'precedent transactions', 'transactions précédentes',
+            'sum of parts', 'somme des parties', 'sotp', 'sum of the parts',
+            'lbo model', 'modèle lbo', 'acquisition model', 'modèle d\'acquisition',
+            'three statement model', 'modèle trois états financiers', 'integrated model',
+            'modèle intégré', 'financial modeling', 'modélisation financière',
+            'pro forma', 'proforma', 'pro forma analysis', 'analyse pro forma',
+            'sensitivity table', 'tableau de sensibilité', 'data table', 'table de données',
+            'valuation methodology', 'méthodologie de valorisation', 'valuation approach',
+            'approche de valorisation', 'asset based valuation', 'valorisation basée actifs',
+            'income approach', 'approche revenus', 'market approach', 'approche marché'
+        ];
+        if (methodologyKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question méthodologique - Perplexity peut expliquer les approches' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Structured Products
+        const structuredProductsKeywords = [
+            'structured products', 'produits structurés', 'structured note',
+            'note structurée', 'principal protected', 'capital protégé',
+            'participation note', 'note de participation', 'reverse convertible',
+            'obligation convertible inversée', 'autocallable', 'autocall',
+            'barrier option', 'option barrière', 'knock in', 'knock out',
+            'structured deposit', 'dépôt structuré', 'market linked', 'lié au marché',
+            'equity linked', 'lié aux actions', 'commodity linked', 'lié aux matières premières',
+            'currency linked', 'lié aux devises', 'hybrid product', 'produit hybride'
+        ];
+        if (structuredProductsKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur produits structurés - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Gestion de Risque Avancée
+        const riskManagementKeywords = [
+            'gestion de risque', 'risk management', 'gestion des risques',
+            'var', 'value at risk', 'valeur à risque', 'cvar', 'conditional var',
+            'var conditionnelle', 'stress testing', 'test de résistance',
+            'scenario analysis', 'analyse de scénarios', 'sensitivity analysis',
+            'analyse de sensibilité', 'monte carlo', 'simulation monte carlo',
+            'risk metrics', 'métriques de risque', 'risk adjusted return',
+            'rendement ajusté au risque', 'sharpe ratio', 'sortino ratio',
+            'information ratio', 'calmar ratio', 'max drawdown', 'perte maximale',
+            'downside deviation', 'déviation négative', 'upside capture',
+            'capture haussière', 'downside capture', 'capture baissière',
+            'tracking error', 'erreur de suivi', 'beta', 'alpha', 'correlation',
+            'corrélation', 'diversification', 'diversification ratio', 'ratio de diversification',
+            'portfolio risk', 'risque portefeuille', 'systematic risk', 'risque systématique',
+            'idiosyncratic risk', 'risque idiosyncratique', 'tail risk', 'risque de queue',
+            'black swan', 'cygne noir', 'fat tail', 'queue épaisse'
+        ];
+        if (riskManagementKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur gestion de risque - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Behavioral Finance
+        const behavioralKeywords = [
+            'behavioral finance', 'finance comportementale', 'psychologie des marchés',
+            'market psychology', 'psychologie de marché', 'investor behavior',
+            'comportement investisseur', 'cognitive bias', 'biais cognitif',
+            'confirmation bias', 'biais de confirmation', 'anchoring', 'ancrage',
+            'overconfidence', 'surappréciation', 'herd behavior', 'comportement grégaire',
+            'fomo', 'fear of missing out', 'peur de rater', 'fear and greed index',
+            'indice peur et cupidité', 'sentiment', 'sentiment de marché',
+            'market sentiment', 'investor sentiment', 'sentiment investisseur',
+            'contrarian investing', 'investissement contrarian', 'value investing',
+            'investissement value', 'growth investing', 'investissement croissance',
+            'momentum investing', 'investissement momentum', 'behavioral economics',
+            'économie comportementale'
+        ];
+        if (behavioralKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur finance comportementale - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur M&A/Fusions-Acquisitions
+        const maKeywords = [
+            'fusion', 'acquisition', 'm&a', 'merger', 'mergers and acquisitions',
+            'fusions acquisitions', 'takeover', 'rachat', 'hostile takeover',
+            'opa', 'offre publique d\'achat', 'ope', 'offre publique d\'échange',
+            'tender offer', 'offre publique', 'merger arbitrage', 'arbitrage de fusion',
+            'deal structure', 'structure transaction', 'synergy', 'synergie',
+            'due diligence', 'diligence raisonnable', 'integration', 'intégration',
+            'post merger integration', 'intégration post fusion', 'deal valuation',
+            'valorisation transaction', 'acquisition premium', 'prime d\'acquisition',
+            'deal multiples', 'multiples transaction', 'transaction multiples'
+        ];
+        if (maKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur M&A - Perplexity a accès aux données de transactions' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur IPO/Introduction en Bourse
+        const ipoKeywords = [
+            'ipo', 'introduction en bourse', 'public offering', 'offre publique',
+            'initial public offering', 'première introduction', 'going public',
+            'entrée en bourse', 'listing', 'cotation', 'debut trading',
+            'première cotation', 'ipo pricing', 'prix ipo', 'ipo valuation',
+            'valorisation ipo', 'underpricing', 'sous-évaluation', 'ipo performance',
+            'performance ipo', 'aftermarket performance', 'performance après introduction',
+            'lock up period', 'période de blocage', 'insider lockup', 'blocage initiés',
+            'ipo process', 'processus ipo', 'roadshow', 'roadshow ipo',
+            'book building', 'construction du carnet', 'ipo allocation', 'allocation ipo'
+        ];
+        if (ipoKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur IPO - Perplexity a accès aux données d\'introductions' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions géopolitiques/événements
+        const geopoliticalKeywords = [
+            'géopolitique', 'geopolitique', 'géopolitique', 'guerre', 'conflit', 'sanctions',
+            'élections', 'elections', 'politique', 'gouvernement', 'régulation', 'regulation',
+            'trade war', 'guerre commerciale', 'tarifs', 'douanes', 'protectionnisme',
+            'brexit', 'union européenne', 'ue', 'eu', 'otan', 'nato',
+            'relations internationales', 'tensions', 'diplomatie', 'alliances',
+            'impact géopolitique', 'geopolitical impact', 'risque géopolitique', 'geopolitical risk'
+        ];
+        if (geopoliticalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question géopolitique - Perplexity a accès aux analyses récentes' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur options/derivés
+        const optionsKeywords = [
+            'options', 'option', 'call', 'put', 'strike', 'prix d\'exercice',
+            'prime', 'option premium', 'delta', 'gamma', 'theta', 'vega', 'greeks',
+            'covered call', 'protective put', 'collar', 'strangle', 'straddle',
+            'spread', 'bull spread', 'bear spread', 'butterfly', 'iron condor',
+            'derivés', 'derives', 'derivatives', 'warrants', 'certificats',
+            'leverage', 'effet de levier', 'marge', 'margin', 'futures', 'contrats à terme'
+        ];
+        if (optionsKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur options - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur taxes/fiscalité
+        const taxKeywords = [
+            'impôt', 'impot', 'taxe', 'fiscalité', 'fiscalite', 'fiscal',
+            'tfsa', 'celi', 'reer', 'rrsp', 'régime enregistré', 'regime enregistre',
+            'gain en capital', 'capital gain', 'dividende', 'dividend', 'revenu d\'intérêt',
+            'déduction', 'deduction', 'crédit d\'impôt', 'credit d\'impot', 'exemption',
+            'planification fiscale', 'tax planning', 'optimisation fiscale', 'tax optimization',
+            'retraite', 'retirement', 'épargne retraite', 'epargne retraite', 'pension'
+        ];
+        if (taxKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question fiscale - Perplexity peut expliquer les règles' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions générales/non-financières (DÉTECTION APRÈS TOUS LES KEYWORDS FINANCIERS)
+        // 🎯 Permet à Emma de sortir du cadre strictement financier
+        // FIX: Retirer keywords ambigus qui peuvent être financiers (startup, marketing, management, news avec ticker)
+        const generalNonFinancialKeywords = [
+            // Questions générales de connaissance
+            'qu\'est-ce que', 'quest-ce que', 'c\'est quoi', 'cest quoi', 'définition', 'definition',
+            'explique', 'explique-moi', 'explique moi', 'comment fonctionne', 'comment ça marche',
+            'pourquoi', 'comment', 'quand', 'où', 'qui', 'quelle est la différence', 'difference entre',
+            // Questions scientifiques/techniques
+            'physique', 'chimie', 'biologie', 'mathématiques', 'math', 'science', 'sciences',
+            'technologie', 'tech', 'informatique', 'programmation', 'code', 'coding',
+            'histoire', 'géographie', 'culture', 'art', 'littérature', 'philosophie',
+            // Questions pratiques/vie quotidienne
+            'cuisine', 'recette', 'voyage', 'santé', 'sante', 'sport', 'fitness', 'médical', 'medical',
+            'éducation', 'education', 'apprendre', 'formation', 'tutoriel', 'guide',
+            'météo', 'meteo', 'climat', 'environnement', 'écologie', 'ecologie',
+            // Questions personnelles/conversationnelles
+            'bonjour', 'salut', 'hello', 'hi', 'comment vas-tu', 'ça va', 'cava',
+            'merci', 'de rien', 'au revoir', 'bye', 'bonne journée', 'bonne soirée',
+            'aide', 'help', 'peux-tu', 'peux tu', 'capable de', 'fonctionnalités',
+            // Questions culturelles/divertissement (sans actualités financières)
+            'culture', 'société', 'societe', 'politique générale', 'divertissement',
+            'cinéma', 'cinema', 'musique', 'livre', 'livres', 'film', 'films',
+            // Questions éducatives générales
+            'apprendre', 'comprendre', 'expliquer', 'enseigner', 'cours', 'leçon', 'lecon',
+            'tutoriel', 'guide', 'méthode', 'methode', 'technique', 'astuce', 'conseil',
+            // Questions de comparaison générale (sans contexte financier)
+            'meilleur', 'meilleure', 'meilleurs', 'meilleures', 'best', 'top', 'comparer',
+            'vs', 'versus', 'différence', 'difference', 'avantages', 'inconvénients', 'inconvenients',
+            // Questions de recommandation générale
+            'recommandation', 'recommandations', 'conseil', 'conseils', 'suggestion', 'suggestions',
+            'avis', 'opinion', 'que penses-tu', 'penses-tu que', 'crois-tu que'
+        ];
+        
+        // Détection: Si aucun ticker ET aucun mot financier spécifique → probablement question générale
+        const hasFinancialKeyword = [
+            fundKeywords, macroKeywords, strategyKeywords, sectorKeywords,
+            cryptoKeywords, commodityKeywords, forexKeywords, bondKeywords,
+            realEstateKeywords, privateEquityKeywords, warrantKeywords,
+            calculationKeywords, regulatoryKeywords, esgKeywords, arbitrageKeywords,
+            methodologyKeywords, structuredProductsKeywords, riskManagementKeywords,
+            behavioralKeywords, maKeywords, ipoKeywords, geopoliticalKeywords, taxKeywords
+        ].some(keywords => keywords.some(kw => message.includes(kw)));
+        
+        const hasGeneralKeyword = generalNonFinancialKeywords.some(kw => message.includes(kw));
+        
+        // Si question générale ET pas de mots financiers ET pas de tickers → Perplexity seul
+        // FIX: Vérifier aussi si 'news'/'actualités' sans ticker (pour éviter conflit avec intent news)
+        const isNewsGeneral = (message.includes('actualités') || message.includes('actualites') || message.includes('news') || message.includes('nouvelles')) && extractedTickers.length === 0;
+        
+        if (hasGeneralKeyword && !hasFinancialKeyword && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question générale/non-financière - Perplexity peut répondre naturellement' };
+        }
+        
+        // ✅ FIX: Code redondant supprimé - déjà géré par generalNonFinancialKeywords ci-dessus
+        
+        // ✅ PERPLEXITY SEUL: Questions historiques/comparaisons temporelles
+        const historicalKeywords = [
+            'historique', 'histoire', 'évolution', 'evolution', 'tendance historique',
+            'performance historique', 'historical performance', 'crise', 'crash', 'bulle',
+            'krach', 'crise financière', 'financial crisis', 'récession', 'recession',
+            'dépression', 'depression', 'boom', 'expansion', 'cycle économique', 'economic cycle',
+            'crise de 2008', 'dot-com', 'tech bubble', 'bulle technologique', 'black monday',
+            'flash crash', 'correction', 'bear market', 'marché baissier', 'bull market', 'marché haussier'
+        ];
+        if (historicalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question historique - Perplexity a accès aux données historiques' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Prix en temps réel précis
+        const priceKeywords = [
+            'prix', 'cours', 'cotation', 'quote', 'se négocie', 'trading at', 'valeur actuelle',
+            'prix actuel', 'cours actuel', 'dernier prix', 'last price', 'prix de clôture',
+            'closing price', 'prix d\'ouverture', 'opening price', 'prix haut', 'high',
+            'prix bas', 'low', 'prix moyen', 'average price', 'vwap', 'volume weighted',
+            'market cap', 'capitalisation', 'market capitalization', 'valorisation boursière'
+        ];
+        if (priceKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Prix temps réel nécessite données précises (FMP/Polygon)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Ratios financiers exacts
+        const ratioKeywords = [
+            'pe ratio', 'p/e', 'p/b', 'p/s', 'p/fcf', 'peg', 'ev/ebitda', 'ev/sales',
+            'roe', 'roa', 'roic', 'roce', 'debt/equity', 'debt to equity', 'current ratio',
+            'quick ratio', 'cash ratio', 'debt ratio', 'equity ratio', 'ratio',
+            'marges', 'margins', 'gross margin', 'operating margin', 'net margin',
+            'profit margin', 'marge brute', 'marge opérationnelle', 'marge nette',
+            'turnover', 'rotation', 'asset turnover', 'inventory turnover', 'receivables turnover',
+            'days sales outstanding', 'dso', 'days payables outstanding', 'dpo',
+            'cash conversion cycle', 'ccc', 'working capital', 'fonds de roulement'
+        ];
+        if (ratioKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Ratios financiers nécessitent données structurées précises (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Indicateurs techniques
+        const technicalKeywords = [
+            'rsi', 'macd', 'sma', 'ema', 'wma', 'vwap', 'atr', 'adx', 'obv', 'mfi',
+            'moyennes mobiles', 'moving averages', 'support', 'résistance', 'resistance',
+            'bollinger', 'bollinger bands', 'stochastic', 'williams %r', 'cci',
+            'momentum', 'rate of change', 'roc', 'parabolic sar', 'sar',
+            'fibonacci', 'fibonacci retracement', 'fibonacci extension',
+            'ichimoku', 'ichimoku cloud', 'pivot point', 'pivot points',
+            'volume', 'volume profile', 'on balance volume', 'accumulation distribution',
+            'chaikin oscillator', 'money flow index', 'relative strength', 'relative strength index'
+        ];
+        if (technicalKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Indicateurs techniques nécessitent calculs précis (Twelve Data)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Dividendes
+        const dividendKeywords = [
+            'dividende', 'dividend', 'dividend yield', 'rendement', 'yield',
+            'payout ratio', 'taux de distribution', 'dividend per share', 'dps',
+            'dividend history', 'historique des dividendes', 'ex-dividend date',
+            'date ex-dividende', 'payment date', 'date de paiement', 'dividend growth',
+            'croissance des dividendes', 'dividend aristocrat', 'dividend king'
+        ];
+        if (dividendKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Dividendes nécessitent données précises (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Calendriers
+        const calendarKeywords = [
+            'calendrier', 'calendar', 'résultats', 'resultats', 'earnings',
+            'prochains résultats', 'next earnings', 'earnings date', 'date de résultats',
+            'earnings call', 'conférence résultats', 'guidance', 'prévisions', 'previsions',
+            'forecast', 'outlook', 'perspectives', 'expectations', 'attentes',
+            'economic calendar', 'calendrier économique', 'événements économiques',
+            'evenements economiques', 'economic events', 'fed meeting', 'réunion fed',
+            'cpi', 'inflation data', 'données inflation', 'employment report', 'rapport emploi',
+            'gdp release', 'publication pib', 'retail sales', 'ventes au détail'
+        ];
+        if (calendarKeywords.some(kw => message.includes(kw))) {
+            return { usePerplexityOnly: false, reason: 'Calendriers nécessitent données structurées (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Watchlist/Portfolio
+        const portfolioKeywords = [
+            'watchlist', 'portefeuille', 'portfolio', 'mes actions', 'mes titres',
+            'mes tickers', 'ma liste', 'liste de suivi', 'positions', 'holdings',
+            'diversification', 'allocation', 'poids', 'weight', 'exposition', 'exposure',
+            'performance portefeuille', 'portfolio performance', 'rendement portefeuille',
+            'portfolio return', 'beta portefeuille', 'portfolio beta', 'corrélation', 'correlation'
+        ];
+        if (portfolioKeywords.some(kw => message.includes(kw))) {
+            return { usePerplexityOnly: false, reason: 'Watchlist nécessite données utilisateur (Supabase)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Analyse complète avec ticker spécifique
+        const analysisKeywords = [
+            'analyse complète', 'comprehensive analysis', 'analyse approfondie', 'deep dive',
+            'due diligence', 'évaluation complète', 'evaluation complete', 'full analysis',
+            'analyse détaillée', 'detailed analysis', 'rapport complet', 'full report',
+            'analyse fondamentale complète', 'complete fundamental analysis'
+        ];
+        if (extractedTickers.length > 0 && analysisKeywords.some(kw => message.includes(kw))) {
+            return { usePerplexityOnly: false, reason: 'Analyse complète nécessite toutes les métriques précises (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Données fondamentales précises
+        const fundamentalsKeywords = [
+            'fondamentaux', 'fundamentals', 'revenus', 'revenue', 'sales', 'ventes',
+            'bénéfices', 'benefices', 'earnings', 'profit', 'net income', 'revenu net',
+            'eps', 'earnings per share', 'bpa', 'bénéfice par action', 'benefice par action',
+            'cash flow', 'flux de trésorerie', 'free cash flow', 'fcf', 'flux de trésorerie libre',
+            'operating cash flow', 'ocf', 'cash from operations', 'cash from investing',
+            'cash from financing', 'ebitda', 'ebit', 'operating income', 'revenu opérationnel',
+            'gross profit', 'profit brut', 'operating profit', 'profit opérationnel',
+            'net profit', 'profit net', 'margins', 'marges', 'balance sheet', 'bilan',
+            'income statement', 'compte de résultat', 'cash flow statement', 'tableau des flux',
+            'assets', 'actifs', 'liabilities', 'passifs', 'equity', 'capitaux propres',
+            'book value', 'valeur comptable', 'tangible book value', 'valeur comptable tangible',
+            'debt', 'dette', 'long term debt', 'dette long terme', 'short term debt', 'dette court terme',
+            'working capital', 'fonds de roulement', 'current assets', 'actifs courants',
+            'current liabilities', 'passifs courants', 'inventory', 'inventaire', 'receivables', 'créances'
+        ];
+        if (fundamentalsKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Données fondamentales nécessitent précision (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Recommandations analystes
+        const analystKeywords = [
+            'recommandation', 'recommendation', 'rating', 'note', 'consensus',
+            'analystes', 'analysts', 'consensus analystes', 'analyst consensus',
+            'price target', 'objectif de prix', 'target price', 'prix cible',
+            'buy', 'sell', 'hold', 'strong buy', 'strong sell', 'outperform', 'underperform',
+            'upgrade', 'downgrade', 'mise à niveau', 'rétrogradation', 'coverage', 'couverture'
+        ];
+        if (analystKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Recommandations analystes nécessitent données structurées (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Options/Derivés avec ticker
+        const optionsTickerKeywords = [
+            'options', 'option', 'call', 'put', 'strike', 'prix d\'exercice',
+            'prime', 'option premium', 'delta', 'gamma', 'theta', 'vega', 'greeks',
+            'implied volatility', 'volatilité implicite', 'iv', 'open interest',
+            'volume options', 'volume d\'options', 'options chain', 'chaîne d\'options',
+            'covered call', 'protective put', 'collar', 'strangle', 'straddle'
+        ];
+        if (optionsTickerKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Options nécessitent données de marché précises' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Performance historique précise
+        const performanceKeywords = [
+            'performance', 'rendement', 'return', 'ytd', 'year to date', 'année en cours',
+            '1 an', '1 year', '3 ans', '3 years', '5 ans', '5 years', '10 ans', '10 years',
+            '52 semaines', '52 weeks', '52w high', '52w low', '52 semaines haut', '52 semaines bas',
+            'all time high', 'ath', 'sommet historique', 'all time low', 'atl', 'creux historique',
+            'volatilité', 'volatility', 'beta', 'alpha', 'sharpe ratio', 'sortino ratio',
+            'max drawdown', 'perte maximale', 'downside deviation', 'upside capture',
+            'downside capture', 'tracking error', 'information ratio'
+        ];
+        if (performanceKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Performance historique nécessite données précises (FMP)' };
+        }
+        
+        // ✅ PERPLEXITY SEUL par défaut pour questions générales sans ticker
+        if (extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question générale sans ticker spécifique - Perplexity suffisant' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES par défaut si ticker présent
+        return { usePerplexityOnly: false, reason: 'Ticker spécifique détecté - APIs nécessaires pour données précises' };
+    }
+
+    /**
      * Sélection intelligente des outils basée sur scoring
      * (Enrichi par l'analyse d'intention si disponible)
+     * ⚠️ AMÉLIORATION: Décision intelligente Perplexity vs APIs
      */
     async _plan_with_scoring(userMessage, context) {
         const message = userMessage.toLowerCase();
         const availableTools = this.toolsConfig.tools.filter(tool => tool.enabled);
+        const intentData = context.intent_data || {};
 
-        // 🚫 SKIP OUTILS pour greetings et questions simples qui n'ont PAS besoin de données
-        const intent = context.intent_data?.intent || 'unknown';
-        const noToolsIntents = ['greeting', 'help', 'capabilities'];
-
-        if (noToolsIntents.includes(intent)) {
-            console.log(`👋 Intent "${intent}" detected - NO TOOLS NEEDED (will respond directly)`);
-            return []; // Retourner liste vide - Emma répondra sans données
+        // ✅ NOUVEAU: Décision intelligente Perplexity vs APIs
+        const perplexityDecision = this._shouldUsePerplexityOnly(userMessage, context, intentData);
+        
+        if (perplexityDecision.usePerplexityOnly) {
+            console.log(`🧠 PERPLEXITY ONLY: ${perplexityDecision.reason}`);
+            console.log(`   → Pas d'outils nécessaires, Perplexity répondra directement`);
+            
+            // 🎯 Marquer le contexte pour adaptation du prompt
+            context.perplexity_only_reason = perplexityDecision.reason;
+            
+            if (perplexityDecision.reason.includes('générale/non-financière')) {
+                context.is_general_question = true;
+                console.log(`   → Question générale/non-financière détectée - prompt adapté`);
+            }
+            
+            if (perplexityDecision.reason.includes('fonds')) {
+                console.log(`   → Question sur fonds détectée - prompt spécialisé sera utilisé`);
+            }
+            
+            return []; // Retourner liste vide - Emma utilisera Perplexity seul
+        } else {
+            console.log(`📊 APIs NÉCESSAIRES: ${perplexityDecision.reason}`);
+            console.log(`   → Sélection des outils appropriés...`);
         }
+
+        // ✅ FIX: Vérification déjà faite dans _shouldUsePerplexityOnly() - pas besoin de répéter
+        // Si on arrive ici, c'est que des outils sont nécessaires
 
         // Si intent analysis a suggéré des outils, leur donner la priorité
         const suggestedTools = context.suggested_tools || [];
@@ -925,9 +1616,11 @@ class SmartAgent {
         }
 
         // 2. Extract tickers from message using centralized TickerExtractor utility
+        // ✅ Mode strict activé pour éviter faux positifs (TU, ME, AU, etc.)
         const extractedTickers = TickerExtractor.extract(userMessage, {
             includeCompanyNames: true,
-            filterCommonWords: true
+            filterCommonWords: true,
+            strictContext: false // Flexibilité pour garder compatibilité
         });
 
         extractedTickers.forEach(ticker => tickers.add(ticker));
@@ -1106,17 +1799,30 @@ class SmartAgent {
             };
         }
 
-        // Vérifier la présence de sources dans la réponse
+        // Vérifier la présence de sources dans la réponse (patterns plus flexibles)
         const hasSourcePatterns = [
             /\[SOURCE:/i,
             /\[CHART:/i,
             /\[TABLE:/i,
             /\(https?:\/\//i, // URLs
-            /Bloomberg|Reuters|La Presse|BNN|CNBC|Financial Times|Wall Street Journal/i,
-            /Données de marché:|Sources:/i
+            /https?:\/\//i, // URLs n'importe où
+            /Bloomberg|Reuters|La Presse|BNN|CNBC|Financial Times|Wall Street Journal|Morningstar|Fundata|FMP|Polygon|Yahoo Finance/i,
+            /Données de marché:|Sources:|Source:/i,
+            /selon|d'après|selon les données|données de|source|sources/i, // Sources implicites
+            /FMP|Perplexity|Bloomberg|FactSet|Seeking Alpha/i, // Noms de sources
+            /\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{4}/i // Dates récentes = source récente implicite
         ];
 
         const hasSources = hasSourcePatterns.some(pattern => pattern.test(response));
+        
+        // ✅ ASSOUPLISSEMENT: Accepter aussi données chiffrées récentes comme source implicite
+        const hasRecentData = /\d{4}|202[4-5]|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre/i.test(response);
+        const hasNumericData = /\$\d+\.?\d*|\d+%|\d+\.\d+x|\d+\.\d+%/.test(response); // Prix, %, ratios
+        
+        // Si données chiffrées récentes présentes → considérer comme source implicite
+        if (!hasSources && hasRecentData && hasNumericData) {
+            console.log('🛡️ FreshDataGuard: Données chiffrées récentes détectées (source implicite)');
+        }
 
         // Calculer score de confiance
         let confidence = 0.5; // Base
@@ -1134,10 +1840,16 @@ class SmartAgent {
         const hasRecentDate = /202[4-5]|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre/i.test(response);
         if (hasRecentDate) confidence += 0.02;
 
+        // ✅ ASSOUPLISSEMENT: Accepter données chiffrées récentes comme source implicite
+        const finalHasSources = hasSources || (hasRecentData && hasNumericData);
+        const finalConfidence = finalHasSources ? Math.max(confidence, 0.75) : confidence; // Minimum 0.75 si données récentes
+        
         return {
-            passed: hasSources,
-            confidence: Math.min(1.0, confidence),
-            reason: hasSources ? 'Sources verified' : 'Missing sources for factual data',
+            passed: finalHasSources,
+            confidence: Math.min(1.0, finalConfidence),
+            reason: finalHasSources 
+                ? (hasSources ? 'Sources verified' : 'Recent numeric data detected (implicit source)')
+                : 'Missing sources for factual data',
             source_types_found: hasSourcePatterns.filter(pattern => pattern.test(response)).length
         };
     }
@@ -1421,19 +2133,19 @@ class SmartAgent {
         const userContext = userName
             ? `\n👤 UTILISATEUR: Tu parles avec ${userName}. Personnalise tes salutations et réponses en utilisant son nom quand approprié.
 
-🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS:
-- PRIORITÉ: Marchés américains (NYSE, NASDAQ) 🇺🇸
+🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS (ADAPTATIF):
+- PRIORITÉ PAR DÉFAUT: Marchés américains (NYSE, NASDAQ) 🇺🇸
 - SECONDAIRE: Marchés canadiens (TSX) 🇨🇦
 - TERTIAIRE: Aperçu marchés mondiaux (Europe, Asie)
-- ❌ ÉVITER: Immobilier français, marchés européens de niche sauf si explicitement demandé
-- L'utilisateur est un gestionnaire de portefeuille québécois/canadien axé sur les actions nord-américaines
-
-⚠️ NE JAMAIS parler d'immobilier français ou de marchés européens de niche sauf si l'utilisateur le demande explicitement.\n`
-            : `\n🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS:
-- PRIORITÉ: Marchés américains (NYSE, NASDAQ) 🇺🇸
+- ✅ Si question explicite sur autre marché → Répondre complètement
+- ✅ Si contexte international dans question → Inclure perspective globale
+- L'utilisateur est un gestionnaire de portefeuille québécois/canadien, mais peut avoir besoin d'infos sur autres marchés.\n`
+            : `\n🌍 FOCUS GÉOGRAPHIQUE DES MARCHÉS (ADAPTATIF):
+- PRIORITÉ PAR DÉFAUT: Marchés américains (NYSE, NASDAQ) 🇺🇸
 - SECONDAIRE: Marchés canadiens (TSX) 🇨🇦
-- TERTIAIRE: Aperçu marchés mondiaux
-- ❌ ÉVITER: Immobilier français, marchés européens de niche sauf si explicitement demandé\n`;
+- TERTIAIRE: Aperçu marchés mondiaux (Europe, Asie)
+- ✅ Si question explicite sur autre marché → Répondre complètement
+- ✅ Si contexte international dans question → Inclure perspective globale\n`;
 
         // Si Emma doit se présenter (premier message ou "Test Emma")
         const shouldIntroduce = context.should_introduce || false;
@@ -1473,42 +2185,64 @@ STRUCTURE OBLIGATOIRE:
             : `\n😊 STYLE SMS: Tu communiques par SMS. Utilise des emojis pour rendre tes réponses vivantes et engageantes (📊 📈 💰 💡 ✅ ⚠️ 🎯 👋 etc.). Reste concise mais complète. Pour analyses financières, donne les infos clés sans sacrifier la qualité. Limite-toi à 2-3 phrases maximum pour rester lisible.\n`
         ) : '';
 
-        // CFA®-Level Identity Integration
-        const cfaIdentity = intentData && ['comprehensive_analysis', 'fundamentals', 'comparative_analysis', 'earnings', 'recommendation'].includes(intentData.intent)
+        // 🎯 Détection si question générale/non-financière
+        const isGeneralNonFinancial = context.is_general_question || 
+            (intentData && ['general_conversation', 'help', 'capabilities'].includes(intentData.intent)) ||
+            (context.perplexity_only_reason && context.perplexity_only_reason.includes('générale/non-financière'));
+        
+        // CFA®-Level Identity Integration (uniquement pour questions financières)
+        const cfaIdentity = !isGeneralNonFinancial && intentData && ['comprehensive_analysis', 'fundamentals', 'comparative_analysis', 'earnings', 'recommendation'].includes(intentData.intent)
             ? `${CFA_SYSTEM_PROMPT.identity}
 
 ${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
 
 🎯 MISSION: Analyse de niveau institutionnel CFA® avec:
-- Minimum 8-12 ratios financiers
-- ❌ ❌ ❌ COMPARAISONS HISTORIQUES OBLIGATOIRES (5 ans minimum) - NON NÉGOCIABLE ❌ ❌ ❌
-  • CHAQUE ratio DOIT avoir: valeur actuelle vs moyenne 5 ans vs secteur
-  • Exemple OBLIGATOIRE: "P/E 28x vs moyenne 5 ans 24x (+17%) vs secteur 22x"
-  • ❌ INTERDIT: Mentionner un ratio sans comparaison historique
-- Comparaisons sectorielles obligatoires
+- Nombre de ratios adaptatif selon question:
+  • Questions simples (prix, 1 ratio) → 1-2 ratios suffisants
+  • Questions ciblées (fondamentaux) → 4-6 ratios pertinents
+  • Analyses complètes → 8-12 ratios (recommandé)
+- ✅ COMPARAISONS HISTORIQUES RECOMMANDÉES (quand disponibles):
+  • Si données historiques disponibles → TOUJOURS comparer vs 5 ans et secteur
+  • Si données historiques PARTIELLES → Comparer avec ce qui est disponible
+  • Si AUCUNE donnée historique → Fournir ratio actuel avec contexte sectoriel si possible
+  • Pour questions simples → Comparaison optionnelle
+  • Exemple idéal (si données disponibles): "P/E 28x vs moyenne 5 ans 24x (+17%) vs secteur 22x"
+- Comparaisons sectorielles recommandées (quand pertinentes)
 - Justifications détaillées chiffrées
 - Sources fiables (FMP, Perplexity, Bloomberg)
 - Formatage Bloomberg Terminal style
 
 `
+            : isGeneralNonFinancial
+            ? `Tu es Emma, une assistante IA polyvalente et intelligente. Tu peux répondre à des questions sur de nombreux sujets, pas seulement la finance. Réponds en français de manière naturelle, accessible et engageante. Si la question n'est pas financière, réponds simplement et utilement sans forcer un contexte financier.`
             : `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.`;
 
+        // 🎯 Instructions adaptées selon type de question
+        const generalInstructions = isGeneralNonFinancial ? `
+🎯 INSTRUCTIONS POUR QUESTION GÉNÉRALE:
+- Réponds naturellement et utilement à la question posée
+- Pas besoin de forcer un contexte financier
+- Utilise tes connaissances générales via Perplexity
+- Sois clair, concis et engageant
+- Si la question concerne un sujet non-financier, réponds simplement sans mentionner la finance
+` : '';
+
         return `${cfaIdentity}${userContext}${introContext}${emojiInstructions}
-📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
+${isGeneralNonFinancial ? '' : `📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
 ⚠️ CRITIQUE: Toutes les données doivent refléter les informations les plus récentes. Si une donnée est datée (ex: "au 8 août"), précise clairement que c'est une donnée ancienne et cherche des informations plus récentes si disponibles.
 
-CONTEXTE DE LA CONVERSATION:
+`}CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
 ${intentContext}
-DONNÉES DISPONIBLES DES OUTILS (résumées pour éviter surcharge):
+${isGeneralNonFinancial ? '' : `DONNÉES DISPONIBLES DES OUTILS (résumées pour éviter surcharge):
 ${toolsData.map(t => {
     const reliabilityNote = t.is_reliable === false ? ' [⚠️ SOURCE PARTIELLE - Utiliser avec prudence]' : '';
     return `- ${t.tool}${reliabilityNote}: ${this._summarizeToolData(t.tool, t.data)}`;
 }).join('\n')}
 
-QUESTION DE L'UTILISATEUR: ${userMessage}
+`}QUESTION DE L'UTILISATEUR: ${userMessage}
 
-INSTRUCTIONS CRITIQUES:
+${isGeneralNonFinancial ? generalInstructions : `INSTRUCTIONS CRITIQUES:
 1. ❌ ❌ ❌ ABSOLUMENT INTERDIT DE COPIER DU JSON/CODE DANS TA RÉPONSE ❌ ❌ ❌
    - Les données JSON ci-dessus sont pour TON ANALYSE INTERNE SEULEMENT
    - Tu dois TOUJOURS transformer ces données en TEXTE NATUREL EN FRANÇAIS
@@ -1544,12 +2278,21 @@ INSTRUCTIONS CRITIQUES:
    - Analyse CHAQUE ticker individuellement
    - Fournis un résumé pour CHAQUE compagnie mentionnée
    - N'ignore PAS les tickers - ils sont tous importants
-7. ❌ NE JAMAIS dire "aucune donnée disponible" si des outils ont retourné des données (même partielles)
-8. ❌ NE JAMAIS demander de clarifications - fournis directement l'analyse
+7. ✅ Transparence sur disponibilité des données:
+   - Si données complètes disponibles → Analyser normalement
+   - Si données partielles → Mentionner "données partielles, analyse basée sur..."
+   - Si AUCUNE donnée après recherche Perplexity → Dire clairement "Je n'ai pas trouvé de données récentes sur [X]. Vérifiez le ticker/nom exact."
+   - Toujours être transparent sur les limites
+8. ✅ Clarifications intelligentes (quand nécessaire):
+   - Si question ambiguë (ex: "Apple" peut être AAPL ou REIT) → Demander clarification
+   - Si ticker invalide/inexistant → Suggérer corrections possibles
+   - Si demande trop vague → Proposer options spécifiques
+   - Pour questions claires → Répondre directement
 9. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
 10. Cite tes sources (outils utilisés) en fin de réponse
 11. Ton: professionnel mais accessible, comme une vraie analyste financière
 ${intentData ? `12. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
+` : ''}
 
 📊 GRAPHIQUES ET VISUALISATIONS - ANALYSE CONTEXTUALISÉE:
 
@@ -1694,7 +2437,7 @@ INTENT DÉTECTÉ:
 TYPE DE BRIEFING: ${briefingType}
 
 INSTRUCTIONS PRINCIPALES:
-1. Rédige une analyse DÉTAILLÉE et PROFESSIONNELLE (1500-2000 mots minimum)
+1. Rédige une analyse DÉTAILLÉE et PROFESSIONNELLE (1000-1500 mots recommandé, adapte selon complexité)
 2. Structure OBLIGATOIRE avec sections claires (##, ###)
 3. Inclure des DONNÉES CHIFFRÉES précises (prix, %, volumes, etc.)
 4. Ton: Professionnel institutionnel
@@ -2020,7 +2763,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         } else if (complexityScore <= 5) {
             return { level: 'moyenne', tokens: 6000, description: 'Question modérément complexe - analyse détaillée (1200-1500 mots)' };
         } else if (complexityScore <= 8) {
-            return { level: 'complexe', tokens: 8000, description: 'Analyse détaillée avec données temps réel (1500-2000 mots)' };
+            return { level: 'complexe', tokens: 8000, description: 'Analyse détaillée avec données temps réel (1000-1500 mots recommandé)' };
         } else {
             return { level: 'très_complexe', tokens: 10000, description: 'Analyse exhaustive multi-dimensionnelle (2000-2500 mots)' };
         }
@@ -2035,8 +2778,12 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             return intentData.tickers[0];
         }
         
-        // 2. Extraire tickers du message
-        const tickers = TickerExtractor.extract(userMessage, { includeCompanyNames: true });
+        // 2. Extraire tickers du message (mode strict pour éviter faux positifs)
+        const tickers = TickerExtractor.extract(userMessage, { 
+            includeCompanyNames: true,
+            filterCommonWords: true,
+            strictContext: false // Pas trop strict pour garder flexibilité
+        });
         if (tickers.length > 0) {
             return tickers[0];
         }
@@ -2167,31 +2914,29 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 console.log(`🎯 Using custom prompt for intent: ${intentData.intent}`);
             }
 
-            // 🚨 DÉTECTION: Si l'utilisateur demande une entreprise/ticker qui n'est PAS dans les données des outils
-            // → Forcer une recherche Perplexity spécifique pour cette entreprise
+            // 🚨 DÉTECTION PRIORITAIRE: Questions sur fonds/quartiles/rendements
+            // ⚠️ CRITIQUE: Détecter AVANT l'extraction de tickers pour éviter faux positifs (TU, ME, AU, etc.)
             const userMessageLower = (userMessage || '').toLowerCase();
-            const requestedEntity = this._extractRequestedEntity(userMessage, intentData);
-            const hasDataForRequestedEntity = this._checkIfEntityInToolResults(requestedEntity, toolResults);
+            const isFundQuestion = userMessageLower.includes('fonds') || 
+                                  userMessageLower.includes('quartile') || 
+                                  userMessageLower.includes('quartiles') ||
+                                  userMessageLower.includes('rendement') ||
+                                  userMessageLower.includes('rendements') ||
+                                  userMessageLower.includes('équilibré') ||
+                                  userMessageLower.includes('equilibre') ||
+                                  userMessageLower.includes('mutual fund') ||
+                                  userMessageLower.includes('fonds mutuels') ||
+                                  userMessageLower.includes('fonds d\'investissement') ||
+                                  userMessageLower.includes('performance des fonds') ||
+                                  userMessageLower.includes('catégorie de fonds') ||
+                                  userMessageLower.includes('categorie de fonds');
             
-            // Si l'utilisateur demande une entreprise spécifique mais qu'on n'a pas de données pour elle
-            if (requestedEntity && !hasDataForRequestedEntity && outputMode === 'chat') {
-                console.log(`🔍 Entité demandée "${requestedEntity}" non trouvée dans les données des outils → Forcer recherche Perplexity`);
+            // ✅ Si question sur fonds → Utiliser directement la question originale sans extraction d'entité
+            if (isFundQuestion && outputMode === 'chat') {
+                console.log(`📊 Question sur fonds détectée → Recherche Perplexity directe (sans extraction tickers)`);
                 
-                // Construire un prompt naturel et ouvert pour Perplexity (comme une requête directe)
-                // Moins de contraintes = meilleurs résultats de Perplexity
-                // Pour les questions sur fonds/quartiles, inclure des instructions spécifiques
-                const isFundQuestion = userMessageLower.includes('fonds') || 
-                                      userMessageLower.includes('quartile') || 
-                                      userMessageLower.includes('rendement') ||
-                                      userMessageLower.includes('équilibré') ||
-                                      userMessageLower.includes('equilibre');
-                
-                let searchPrompt = userMessage;
-                
-                if (isFundQuestion) {
-                    // Questions sur fonds: demander tableaux, quartiles, exemples concrets
-                    // Format inspiré des meilleures réponses Perplexity
-                    searchPrompt = `${userMessage}
+                // Construire un prompt spécialisé pour les questions sur fonds
+                const searchPrompt = `${userMessage}
 
 Fournis une analyse financière complète et structurée selon ce format:
 
@@ -2216,9 +2961,68 @@ Inclus les principaux fonds de la catégorie demandée.
 Cite toutes tes sources avec liens vers documents officiels (Morningstar, Fundata, sites des manufacturiers)
 
 Structure ta réponse de manière professionnelle et facile à lire. Sois exhaustif, précis et cite toutes tes sources avec numérotation [1][2][3] etc.`;
+
+                // Appel Perplexity direct avec prompt spécialisé
+                const searchRequestBody = {
+                    model: 'sonar-pro',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Tu es Emma, analyste financière experte spécialisée en fonds d\'investissement. Fournis des analyses complètes et détaillées avec sources officielles (Morningstar, Fundata, etc.).'
+                        },
+                        {
+                            role: 'user',
+                            content: searchPrompt
+                        }
+                    ],
+                    max_tokens: maxTokens,
+                    temperature: 0.1,
+                    search_recency_filter: recency
+                };
+
+                const searchResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(searchRequestBody),
+                    signal: AbortSignal.timeout(timeoutDuration)
+                });
+
+                if (searchResponse.ok) {
+                    const searchData = await searchResponse.json();
+                    const searchContent = searchData.choices?.[0]?.message?.content || '';
+                    const searchCitations = searchData.citations || this._extractCitations(searchContent);
+                    
+                    console.log(`✅ Recherche Perplexity réussie pour question sur fonds (${searchContent.length} caractères)`);
+                    
+                    return {
+                        content: searchContent,
+                        citations: searchCitations,
+                        model: 'perplexity',
+                        recency: recency,
+                        searched_entity: 'fonds_investissement'
+                    };
                 } else {
-                    // Questions générales: prompt simple
-                    searchPrompt = `${userMessage}
+                    const errorText = await searchResponse.text().catch(() => 'Unknown error');
+                    console.warn(`⚠️ Recherche Perplexity échouée pour question sur fonds (${searchResponse.status}): ${errorText.substring(0, 200)}`);
+                    // Continuer avec le prompt normal
+                }
+            }
+            
+            // 🚨 DÉTECTION: Si l'utilisateur demande une entreprise/ticker qui n'est PAS dans les données des outils
+            // → Forcer une recherche Perplexity spécifique pour cette entreprise
+            const requestedEntity = this._extractRequestedEntity(userMessage, intentData);
+            const hasDataForRequestedEntity = this._checkIfEntityInToolResults(requestedEntity, toolResults);
+            
+            // Si l'utilisateur demande une entreprise spécifique mais qu'on n'a pas de données pour elle
+            if (requestedEntity && !hasDataForRequestedEntity && outputMode === 'chat') {
+                console.log(`🔍 Entité demandée "${requestedEntity}" non trouvée dans les données des outils → Forcer recherche Perplexity`);
+                
+                // Construire un prompt naturel et ouvert pour Perplexity (comme une requête directe)
+                // Note: Les questions sur fonds sont déjà gérées en priorité ci-dessus
+                const searchPrompt = `${userMessage}
 
 Fournis une analyse financière complète et détaillée incluant:
 - Nature de l'entreprise/fonds (type, secteur, description)
@@ -2231,7 +3035,6 @@ Fournis une analyse financière complète et détaillée incluant:
 - Recommandations d'analyse
 
 Sois exhaustif et cite tes sources.`;
-                }
 
                 // Utiliser ce prompt spécialisé au lieu du prompt normal
                 // Prompt minimal pour laisser Perplexity faire son travail naturellement
@@ -2375,7 +3178,7 @@ ACHETER < 340$ (marge 25%+)
 
 🚀🚀🚀 LONGUEUR DES RÉPONSES (RÈGLE #1 ABSOLUE - MAXIMUM DÉTAIL) 🚀🚀🚀:
 • 📏 RÉPONSES ULTRA-LONGUES PAR DÉFAUT: Privilégie TOUJOURS des réponses EXTRÊMEMENT LONGUES et EXHAUSTIVES
-• 📊 Analyses: 2000-3000 mots MINIMUM (3000-5000 mots pour analyses complexes)
+• 📊 Analyses: Longueur adaptative selon complexité (800-1200 mots pour analyses complètes, 200-400 mots pour questions simples)
 • ✅ LONGUEUR = EXCELLENCE: Plus c'est long, plus c'est complet, mieux c'est!
 • 🎯 TOUJOURS choisir "trop long" plutôt que "trop court" - pas de limite supérieure!
 • ❌ JAMAIS de réponses brèves sauf questions oui/non évidentes
@@ -2464,22 +3267,26 @@ ACHETER < 340$ (marge 25%+)
   - Procès en cours importants
   - Dépendance à un seul client/produit
 
-❌ ❌ ❌ RATIOS HISTORIQUES & BENCHMARKS - ABSOLUMENT OBLIGATOIRE ❌ ❌ ❌
+✅ RATIOS HISTORIQUES & BENCHMARKS - RECOMMANDÉS (quand disponibles)
 
-🚨 RÈGLE CRITIQUE: Pour CHAQUE analyse d'action, tu DOIS TOUJOURS:
+🎯 RÈGLE ADAPTATIVE: Pour chaque analyse d'action, compare quand possible:
 
-1️⃣ COMPARER RATIOS ACTUELS vs HISTORIQUES (5 ans minimum):
-   ✅ OBLIGATOIRE: "P/E actuel [X]x vs moyenne 5 ans [Y]x ([Z]% différence)"
-   ✅ OBLIGATOIRE: "Marges actuelles [X]% vs moyenne historique [Y]% (tendance: ↗️/↘️)"
-   ✅ OBLIGATOIRE: "ROE actuel [X]% vs historique [Y]% (cohérence: oui/non)"
-   ✅ OBLIGATOIRE: "Dette/Équité actuel [X] vs 5 ans [Y] (amélioration/détérioration)"
+1️⃣ COMPARER RATIOS ACTUELS vs HISTORIQUES (quand données disponibles):
+   ✅ RECOMMANDÉ: "P/E actuel [X]x vs moyenne 5 ans [Y]x ([Z]% différence)" (si données disponibles)
+   ✅ RECOMMANDÉ: "Marges actuelles [X]% vs moyenne historique [Y]% (tendance: ↗️/↘️)" (si données disponibles)
+   ✅ RECOMMANDÉ: "ROE actuel [X]% vs historique [Y]% (cohérence: oui/non)" (si données disponibles)
+   ✅ RECOMMANDÉ: "Dette/Équité actuel [X] vs 5 ans [Y] (amélioration/détérioration)" (si données disponibles)
 
-   ❌ INTERDIT: Mentionner un ratio SANS comparaison historique
-   ❌ INTERDIT: "P/E de 28x" → DOIT ÊTRE "P/E 28x vs moyenne 5 ans 24x (+17%)"
+   ✅ Si données historiques PARTIELLES → Comparer avec ce qui est disponible
+   ✅ Si AUCUNE donnée historique → Fournir ratio actuel avec contexte sectoriel si possible
+   ✅ Pour questions simples (prix, 1 ratio) → Comparaison optionnelle
 
-2️⃣ COMPARER vs SECTEUR ET MARCHÉ:
-   ✅ OBLIGATOIRE: "P/E [X]x vs secteur [Y]x vs S&P 500 [Z]x"
-   ✅ OBLIGATOIRE: Mentionner si valorisation premium/discount vs pairs
+2️⃣ COMPARER vs SECTEUR ET MARCHÉ (quand pertinent):
+   ✅ RECOMMANDÉ: "P/E [X]x vs secteur [Y]x vs S&P 500 [Z]x" (si données disponibles)
+   ✅ RECOMMANDÉ: Mentionner si valorisation premium/discount vs pairs (si contexte pertinent)
+   
+   ✅ Si comparaison avec titres spécifiques demandée explicitement → Autoriser comparaisons directes
+   ✅ Détecter intent "comparative_analysis" → Comparaisons directes autorisées
 
    BENCHMARKS DE RÉFÉRENCE (à utiliser):
    - P/E moyen S&P 500 (USA): ~18-22x
@@ -2503,12 +3310,13 @@ ACHETER < 340$ (marge 25%+)
    ❌ "Dette/Équité de 0,8" (manque évolution temporelle)
 
 🎯 VÉRIFICATION AVANT D'ENVOYER TA RÉPONSE:
-   □ Chaque ratio a une comparaison vs historique (5 ans) ?
-   □ Chaque ratio a une comparaison vs secteur ?
-   □ J'ai expliqué l'évolution (↗️/↘️) ?
+   □ J'ai fourni les ratios pertinents pour la question ?
+   □ Si données historiques disponibles → J'ai comparé vs historique ?
+   □ Si données sectorielles disponibles → J'ai comparé vs secteur ?
+   □ J'ai expliqué l'évolution (↗️/↘️) quand pertinent ?
    □ J'ai mentionné les implications (bon/mauvais signe) ?
 
-   Si UNE SEULE case est NON → ❌ RÉPONSE INCOMPLÈTE, REVOIR!
+   ✅ Réponse complète si ratios fournis avec contexte approprié (historique/secteur si disponible)
 
 EXEMPLE D'ANALYSE COMPLÈTE INTÉGRANT TOUT:
 "Microsoft (MSFT) trade à 32,5x earnings, soit 15% au-dessus de sa moyenne 5 ans (28x) mais sous son high 2021 (38x). Comparativement, le P/E moyen tech USA est 28x vs 22x au Canada (TSX tech). 
@@ -2521,8 +3329,12 @@ RISQUES POLITIQUES: Antitrust US/EU surveillance intense, potentiel démantèlem
 
 RECOMMANDATION VALUE: À 380$, MSFT trade à ~0,90x sa valeur intrinsèque estimée (425$ par DCF). Marge de sécurité faible (15% vs 30% idéal Graham). HOLD pour value investors, ACHETER si correction 340-350$ (marge 25%+)."
 
-💡 QUESTIONS SUGGÉRÉES INTELLIGENTES (OBLIGATOIRE EN FIN DE RÉPONSE) 💡:
-• 🎯 TOUJOURS terminer ta réponse par 3-5 questions suggérées PERTINENTES
+💡 QUESTIONS SUGGÉRÉES INTELLIGENTES (CONTEXTUELLES) 💡:
+• 🎯 Questions suggérées selon contexte:
+  - Questions simples/fermées (prix, ratio unique) → Pas de questions suggérées
+  - Questions ouvertes/analyses → 2-3 questions pertinentes
+  - SMS → Questions suggérées optionnelles (seulement si très pertinent)
+  - Analyses complètes → 3-5 questions (recommandé)
 • ✅ Questions doivent BONIFIER la compréhension ou OUVRIR de nouvelles perspectives
 • ❌ JAMAIS de redondance - ne pas demander ce qui a déjà été couvert en détail
 • 🔍 Types de questions intelligentes à suggérer:

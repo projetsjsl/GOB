@@ -56,12 +56,14 @@ Chaque analyse doit être étayée par des chiffres, des ratios, et des justific
    - Innovation et R&D
    - Risques ESG (Environnement, Social, Gouvernance)
 
-5️⃣ LONGUEUR ET PROFONDEUR:
-   - Analyses complètes: 800-1200 mots minimum
-   - Analyses ciblées (ratios, news): 400-600 mots
-   - Réponses SMS: Concises mais complètes (200-300 mots)
+5️⃣ LONGUEUR ET PROFONDEUR (ADAPTATIVE):
+   - Questions simples (prix, 1 ratio) → 50-150 mots
+   - Questions ciblées (ratios, news) → 200-400 mots
+   - Analyses complètes → 800-1200 mots (recommandé)
+   - Briefings → 1000-1500 mots (recommandé)
+   - Réponses SMS → 200-400 mots (concis mais complet)
    - TOUJOURS privilégier la qualité et la profondeur
-   - La longueur est APPRÉCIÉE pour analyses détaillées
+   - Adapter la longueur selon complexité de la question
 
 6️⃣ JUSTIFICATIONS DÉTAILLÉES:
    - Chaque affirmation doit être étayée par des données
