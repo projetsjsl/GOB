@@ -2167,31 +2167,29 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 console.log(`🎯 Using custom prompt for intent: ${intentData.intent}`);
             }
 
-            // 🚨 DÉTECTION: Si l'utilisateur demande une entreprise/ticker qui n'est PAS dans les données des outils
-            // → Forcer une recherche Perplexity spécifique pour cette entreprise
+            // 🚨 DÉTECTION PRIORITAIRE: Questions sur fonds/quartiles/rendements
+            // ⚠️ CRITIQUE: Détecter AVANT l'extraction de tickers pour éviter faux positifs (TU, ME, AU, etc.)
             const userMessageLower = (userMessage || '').toLowerCase();
-            const requestedEntity = this._extractRequestedEntity(userMessage, intentData);
-            const hasDataForRequestedEntity = this._checkIfEntityInToolResults(requestedEntity, toolResults);
+            const isFundQuestion = userMessageLower.includes('fonds') || 
+                                  userMessageLower.includes('quartile') || 
+                                  userMessageLower.includes('quartiles') ||
+                                  userMessageLower.includes('rendement') ||
+                                  userMessageLower.includes('rendements') ||
+                                  userMessageLower.includes('équilibré') ||
+                                  userMessageLower.includes('equilibre') ||
+                                  userMessageLower.includes('mutual fund') ||
+                                  userMessageLower.includes('fonds mutuels') ||
+                                  userMessageLower.includes('fonds d\'investissement') ||
+                                  userMessageLower.includes('performance des fonds') ||
+                                  userMessageLower.includes('catégorie de fonds') ||
+                                  userMessageLower.includes('categorie de fonds');
             
-            // Si l'utilisateur demande une entreprise spécifique mais qu'on n'a pas de données pour elle
-            if (requestedEntity && !hasDataForRequestedEntity && outputMode === 'chat') {
-                console.log(`🔍 Entité demandée "${requestedEntity}" non trouvée dans les données des outils → Forcer recherche Perplexity`);
+            // ✅ Si question sur fonds → Utiliser directement la question originale sans extraction d'entité
+            if (isFundQuestion && outputMode === 'chat') {
+                console.log(`📊 Question sur fonds détectée → Recherche Perplexity directe (sans extraction tickers)`);
                 
-                // Construire un prompt naturel et ouvert pour Perplexity (comme une requête directe)
-                // Moins de contraintes = meilleurs résultats de Perplexity
-                // Pour les questions sur fonds/quartiles, inclure des instructions spécifiques
-                const isFundQuestion = userMessageLower.includes('fonds') || 
-                                      userMessageLower.includes('quartile') || 
-                                      userMessageLower.includes('rendement') ||
-                                      userMessageLower.includes('équilibré') ||
-                                      userMessageLower.includes('equilibre');
-                
-                let searchPrompt = userMessage;
-                
-                if (isFundQuestion) {
-                    // Questions sur fonds: demander tableaux, quartiles, exemples concrets
-                    // Format inspiré des meilleures réponses Perplexity
-                    searchPrompt = `${userMessage}
+                // Construire un prompt spécialisé pour les questions sur fonds
+                const searchPrompt = `${userMessage}
 
 Fournis une analyse financière complète et structurée selon ce format:
 
@@ -2216,9 +2214,68 @@ Inclus les principaux fonds de la catégorie demandée.
 Cite toutes tes sources avec liens vers documents officiels (Morningstar, Fundata, sites des manufacturiers)
 
 Structure ta réponse de manière professionnelle et facile à lire. Sois exhaustif, précis et cite toutes tes sources avec numérotation [1][2][3] etc.`;
+
+                // Appel Perplexity direct avec prompt spécialisé
+                const searchRequestBody = {
+                    model: 'sonar-pro',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Tu es Emma, analyste financière experte spécialisée en fonds d\'investissement. Fournis des analyses complètes et détaillées avec sources officielles (Morningstar, Fundata, etc.).'
+                        },
+                        {
+                            role: 'user',
+                            content: searchPrompt
+                        }
+                    ],
+                    max_tokens: maxTokens,
+                    temperature: 0.1,
+                    search_recency_filter: recency
+                };
+
+                const searchResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(searchRequestBody),
+                    signal: AbortSignal.timeout(timeoutDuration)
+                });
+
+                if (searchResponse.ok) {
+                    const searchData = await searchResponse.json();
+                    const searchContent = searchData.choices?.[0]?.message?.content || '';
+                    const searchCitations = searchData.citations || this._extractCitations(searchContent);
+                    
+                    console.log(`✅ Recherche Perplexity réussie pour question sur fonds (${searchContent.length} caractères)`);
+                    
+                    return {
+                        content: searchContent,
+                        citations: searchCitations,
+                        model: 'perplexity',
+                        recency: recency,
+                        searched_entity: 'fonds_investissement'
+                    };
                 } else {
-                    // Questions générales: prompt simple
-                    searchPrompt = `${userMessage}
+                    const errorText = await searchResponse.text().catch(() => 'Unknown error');
+                    console.warn(`⚠️ Recherche Perplexity échouée pour question sur fonds (${searchResponse.status}): ${errorText.substring(0, 200)}`);
+                    // Continuer avec le prompt normal
+                }
+            }
+            
+            // 🚨 DÉTECTION: Si l'utilisateur demande une entreprise/ticker qui n'est PAS dans les données des outils
+            // → Forcer une recherche Perplexity spécifique pour cette entreprise
+            const requestedEntity = this._extractRequestedEntity(userMessage, intentData);
+            const hasDataForRequestedEntity = this._checkIfEntityInToolResults(requestedEntity, toolResults);
+            
+            // Si l'utilisateur demande une entreprise spécifique mais qu'on n'a pas de données pour elle
+            if (requestedEntity && !hasDataForRequestedEntity && outputMode === 'chat') {
+                console.log(`🔍 Entité demandée "${requestedEntity}" non trouvée dans les données des outils → Forcer recherche Perplexity`);
+                
+                // Construire un prompt naturel et ouvert pour Perplexity (comme une requête directe)
+                // Note: Les questions sur fonds sont déjà gérées en priorité ci-dessus
+                const searchPrompt = `${userMessage}
 
 Fournis une analyse financière complète et détaillée incluant:
 - Nature de l'entreprise/fonds (type, secteur, description)
@@ -2231,7 +2288,6 @@ Fournis une analyse financière complète et détaillée incluant:
 - Recommandations d'analyse
 
 Sois exhaustif et cite tes sources.`;
-                }
 
                 // Utiliser ce prompt spécialisé au lieu du prompt normal
                 // Prompt minimal pour laisser Perplexity faire son travail naturellement
