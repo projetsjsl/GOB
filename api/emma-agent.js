@@ -505,15 +505,149 @@ class SmartAgent {
     }
 
     /**
+     * Détecte si Perplexity seul est suffisant pour répondre
+     * ⚠️ CRITIQUE: Détermine quand utiliser Perplexity vs APIs complémentaires
+     * 
+     * Perplexity est suffisant pour:
+     * - Questions générales/conceptuelles (fonds, économie, explications)
+     * - Analyses qualitatives (comparaisons, stratégies)
+     * - Actualités/résumés (Perplexity a accès à sources récentes)
+     * - Questions macro-économiques
+     * 
+     * APIs sont nécessaires pour:
+     * - Prix en temps réel précis (exact, pas approximatif)
+     * - Ratios financiers exacts (P/E, ROE, etc. - données structurées)
+     * - Données fondamentales précises (revenus, bénéfices, etc.)
+     * - Indicateurs techniques (RSI, MACD - calculs précis)
+     * - Calendriers (earnings, economic - données structurées)
+     * - Watchlist/portfolio (données utilisateur)
+     */
+    _shouldUsePerplexityOnly(userMessage, context, intentData) {
+        const message = userMessage.toLowerCase();
+        const intent = intentData?.intent || context.intent_data?.intent || 'unknown';
+        const extractedTickers = context.extracted_tickers || context.tickers || [];
+        
+        // 🚫 SKIP OUTILS pour greetings et questions simples
+        const noToolsIntents = ['greeting', 'help', 'capabilities', 'general_conversation'];
+        if (noToolsIntents.includes(intent)) {
+            return { usePerplexityOnly: true, reason: `Intent "${intent}" ne nécessite pas de données` };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur fonds/ETF/portefeuille
+        const fundKeywords = [
+            'fonds', 'fond', 'mutual fund', 'fonds mutuels', 'fonds d\'investissement',
+            'quartile', 'quartiles', 'rendement', 'rendements', 'performance des fonds',
+            'catégorie de fonds', 'categorie de fonds', 'fonds équilibrés', 'fonds equilibres',
+            'etf', 'etfs', 'fonds indiciels', 'fonds actifs', 'fonds passifs'
+        ];
+        if (fundKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur fonds - Perplexity a accès aux données Morningstar/Fundata' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions macro-économiques générales
+        const macroKeywords = [
+            'inflation', 'taux directeur', 'fed', 'banque centrale', 'pib', 'gdp',
+            'chômage', 'chomage', 'emploi', 'récession', 'recession', 'croissance économique',
+            'politique monétaire', 'monetaire', 'taux d\'intérêt', 'interet', 'taux',
+            'courbe des taux', 'yield curve', 'spread', 'obligations', 'treasury'
+        ];
+        if (macroKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            // Exception: Si demande spécifique de courbe des taux → API nécessaire
+            if (message.includes('courbe des taux') || message.includes('yield curve') || message.includes('treasury')) {
+                return { usePerplexityOnly: false, reason: 'Courbe des taux nécessite données structurées précises' };
+            }
+            return { usePerplexityOnly: true, reason: 'Question macro-économique - Perplexity a accès aux données récentes' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions générales/conceptuelles
+        const generalKeywords = [
+            'qu\'est-ce que', 'quest-ce que', 'c\'est quoi', 'cest quoi', 'définition', 'definition',
+            'comment fonctionne', 'explique', 'explique-moi', 'pourquoi', 'comment',
+            'différence entre', 'difference entre', 'comparer', 'comparaison'
+        ];
+        if (generalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question conceptuelle - Perplexity peut expliquer sans données précises' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Actualités générales (pas ticker spécifique)
+        if ((intent === 'news' || message.includes('actualités') || message.includes('actualites') || message.includes('nouvelles')) 
+            && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Actualités générales - Perplexity a accès aux sources récentes' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Prix en temps réel précis
+        const priceKeywords = ['prix', 'cours', 'cotation', 'quote', 'se négocie', 'trading at', 'valeur actuelle'];
+        if (priceKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Prix temps réel nécessite données précises (FMP/Polygon)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Ratios financiers exacts
+        const ratioKeywords = ['pe ratio', 'p/e', 'p/b', 'p/s', 'roe', 'roa', 'debt/equity', 'current ratio', 'ratio'];
+        if (ratioKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Ratios financiers nécessitent données structurées précises (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Indicateurs techniques
+        const technicalKeywords = ['rsi', 'macd', 'sma', 'ema', 'moyennes mobiles', 'support', 'résistance', 'resistance'];
+        if (technicalKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Indicateurs techniques nécessitent calculs précis (Twelve Data)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Calendriers
+        if (intent === 'earnings' || intent === 'economic_analysis' || 
+            message.includes('calendrier') || message.includes('résultats') || message.includes('resultats')) {
+            return { usePerplexityOnly: false, reason: 'Calendriers nécessitent données structurées (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Watchlist/Portfolio
+        if (intent === 'portfolio' || message.includes('watchlist') || message.includes('portefeuille')) {
+            return { usePerplexityOnly: false, reason: 'Watchlist nécessite données utilisateur (Supabase)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Analyse complète avec ticker spécifique
+        if (extractedTickers.length > 0 && (intent === 'comprehensive_analysis' || message.includes('analyse complète'))) {
+            return { usePerplexityOnly: false, reason: 'Analyse complète nécessite toutes les métriques précises (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Données fondamentales précises
+        const fundamentalsKeywords = ['fondamentaux', 'fundamentals', 'revenus', 'bénéfices', 'benefices', 'eps', 'cash flow'];
+        if (fundamentalsKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Données fondamentales nécessitent précision (FMP)' };
+        }
+        
+        // ✅ PERPLEXITY SEUL par défaut pour questions générales sans ticker
+        if (extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question générale sans ticker spécifique - Perplexity suffisant' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES par défaut si ticker présent
+        return { usePerplexityOnly: false, reason: 'Ticker spécifique détecté - APIs nécessaires pour données précises' };
+    }
+
+    /**
      * Sélection intelligente des outils basée sur scoring
      * (Enrichi par l'analyse d'intention si disponible)
+     * ⚠️ AMÉLIORATION: Décision intelligente Perplexity vs APIs
      */
     async _plan_with_scoring(userMessage, context) {
         const message = userMessage.toLowerCase();
         const availableTools = this.toolsConfig.tools.filter(tool => tool.enabled);
+        const intentData = context.intent_data || {};
+
+        // ✅ NOUVEAU: Décision intelligente Perplexity vs APIs
+        const perplexityDecision = this._shouldUsePerplexityOnly(userMessage, context, intentData);
+        
+        if (perplexityDecision.usePerplexityOnly) {
+            console.log(`🧠 PERPLEXITY ONLY: ${perplexityDecision.reason}`);
+            console.log(`   → Pas d'outils nécessaires, Perplexity répondra directement`);
+            return []; // Retourner liste vide - Emma utilisera Perplexity seul
+        } else {
+            console.log(`📊 APIs NÉCESSAIRES: ${perplexityDecision.reason}`);
+            console.log(`   → Sélection des outils appropriés...`);
+        }
 
         // 🚫 SKIP OUTILS pour greetings et questions simples qui n'ont PAS besoin de données
-        const intent = context.intent_data?.intent || 'unknown';
+        const intent = intentData?.intent || context.intent_data?.intent || 'unknown';
         const noToolsIntents = ['greeting', 'help', 'capabilities'];
 
         if (noToolsIntents.includes(intent)) {
