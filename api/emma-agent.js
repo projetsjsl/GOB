@@ -629,10 +629,277 @@ class SmartAgent {
             'blé', 'maïs', 'soja', 'café', 'cacao', 'sucre', 'cotton', 'coton',
             'cuivre', 'nickel', 'zinc', 'aluminium', 'fer', 'acier', 'steel',
             'prix des matières premières', 'commodity prices', 'futures', 'contrats à terme',
-            'contango', 'backwardation', 'spread de commodities', 'commodity spread'
+            'contango', 'backwardation', 'spread de commodities', 'commodity spread',
+            'crude oil', 'wti', 'brent', 'gold', 'silver', 'platinum', 'palladium',
+            'wheat', 'corn', 'soybean', 'coffee', 'cocoa', 'sugar', 'cotton',
+            'copper', 'nickel', 'zinc', 'aluminum', 'iron ore', 'steel',
+            'commodity index', 'indice matières premières', 'gci', 'goldman sachs commodity index'
         ];
         if (commodityKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur commodities - Perplexity a accès aux données de marché' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Forex/Devises
+        const forexKeywords = [
+            'forex', 'fx', 'devise', 'devises', 'taux de change', 'exchange rate',
+            'currency', 'currencies', 'parité', 'cours des devises', 'currency pair',
+            'usd', 'eur', 'gbp', 'jpy', 'cad', 'chf', 'aud', 'nzd', 'cny',
+            'dollar', 'euro', 'livre', 'yen', 'franc suisse', 'dollar australien',
+            'dollar canadien', 'yuan', 'renminbi', 'currency market', 'marché des changes',
+            'carry trade', 'currency hedging', 'couverture de change', 'currency risk',
+            'currency exposure', 'exposition aux devises', 'fx risk', 'risque de change',
+            'currency correlation', 'corrélation devises', 'currency volatility', 'volatilité devises'
+        ];
+        if (forexKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur forex - Perplexity a accès aux données de change' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Obligations/Bonds détaillées
+        const bondKeywords = [
+            'obligations', 'bonds', 'obligation', 'bond', 'corporate bonds', 'obligations corporatives',
+            'government bonds', 'obligations d\'état', 'treasury bonds', 'obligations du trésor',
+            'municipal bonds', 'obligations municipales', 'high yield', 'junk bonds',
+            'investment grade', 'obligations investment grade', 'credit rating', 'notation crédit',
+            'yield', 'rendement obligataire', 'coupon', 'coupon rate', 'taux de coupon',
+            'duration', 'durée', 'convexity', 'convexité', 'spread', 'credit spread',
+            'yield to maturity', 'ytm', 'rendement à l\'échéance', 'yield curve', 'courbe des taux',
+            'bond ladder', 'échelle d\'obligations', 'bond portfolio', 'portefeuille obligataire',
+            'fixed income', 'revenu fixe', 'fixed income securities', 'titres à revenu fixe',
+            'bond market', 'marché obligataire', 'bond index', 'indice obligataire',
+            'sovereign bonds', 'obligations souveraines', 'emerging market bonds', 'obligations marchés émergents'
+        ];
+        if (bondKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            // Exception: Si demande spécifique de courbe des taux → API nécessaire
+            if (message.includes('courbe des taux') || message.includes('yield curve') || message.includes('treasury rates')) {
+                return { usePerplexityOnly: false, reason: 'Courbe des taux nécessite données structurées précises' };
+            }
+            return { usePerplexityOnly: true, reason: 'Question sur obligations - Perplexity a accès aux données obligataires' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Immobilier/Real Estate
+        const realEstateKeywords = [
+            'immobilier', 'real estate', 'reit', 'reits', 'fiducie immobilière',
+            'fiducie de placement', 'real estate investment trust',
+            'propriété', 'propriete', 'property', 'commercial real estate', 'immobilier commercial',
+            'residential real estate', 'immobilier résidentiel', 'real estate market', 'marché immobilier',
+            'cap rate', 'taux de capitalisation', 'cap rate', 'noi', 'net operating income',
+            'revenu net d\'exploitation', 'real estate valuation', 'valorisation immobilière',
+            'real estate cycle', 'cycle immobilier', 'property management', 'gestion immobilière',
+            'real estate investment', 'investissement immobilier', 'real estate portfolio',
+            'portefeuille immobilier', 'real estate trends', 'tendances immobilières'
+        ];
+        if (realEstateKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur immobilier - Perplexity a accès aux données immobilières' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Private Equity/Venture Capital
+        const privateEquityKeywords = [
+            'private equity', 'capital-investissement', 'capital investissement',
+            'venture capital', 'vc', 'capital de risque', 'startup', 'startups',
+            'unicorn', 'licorne', 'series a', 'series b', 'series c', 'funding round',
+            'tour de table', 'levée de fonds', 'fundraising', 'valuation startup',
+            'valorisation startup', 'exit', 'sortie', 'ipo', 'acquisition',
+            'private equity fund', 'fonds de private equity', 'pe fund',
+            'venture capital fund', 'fonds de capital de risque', 'vc fund',
+            'lbo', 'leveraged buyout', 'rachat par effet de levier', 'mbo', 'management buyout'
+        ];
+        if (privateEquityKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur private equity - Perplexity a accès aux données PE/VC' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Warrants/Convertibles
+        const warrantKeywords = [
+            'warrant', 'warrants', 'certificat', 'certificats', 'warrant d\'achat',
+            'warrant de vente', 'call warrant', 'put warrant', 'warrant call',
+            'warrant put', 'warrant price', 'prix warrant', 'warrant premium',
+            'prime warrant', 'warrant leverage', 'effet de levier warrant',
+            'convertible', 'convertibles', 'convertible bond', 'obligation convertible',
+            'convertible preferred', 'actions privilégiées convertibles',
+            'conversion ratio', 'ratio de conversion', 'conversion price', 'prix de conversion',
+            'conversion premium', 'prime de conversion', 'forced conversion', 'conversion forcée'
+        ];
+        if (warrantKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur warrants/convertibles - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Calculs/Simulations
+        const calculationKeywords = [
+            'calculer', 'calcul', 'simulation', 'simuler', 'scénario', 'scenario',
+            'projection', 'prévision', 'prevision', 'forecast', 'estimation',
+            'dcf', 'discounted cash flow', 'actualisation des flux', 'valeur actuelle nete',
+            'van', 'npv', 'net present value', 'irr', 'taux de rendement interne',
+            'taux de rendement', 'payback period', 'période de récupération',
+            'wacc', 'coût moyen pondéré du capital', 'weighted average cost of capital',
+            'terminal value', 'valeur terminale', 'perpetuity', 'perpétuité',
+            'sensitivity analysis', 'analyse de sensibilité', 'scenario analysis',
+            'analyse de scénarios', 'monte carlo', 'monte carlo simulation',
+            'backtesting', 'backtest', 'test historique', 'simulation historique',
+            'stress test', 'test de résistance', 'stress testing'
+        ];
+        if (calculationKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur calculs/simulations - Perplexity peut expliquer les méthodologies' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Réglementation/Compliance
+        const regulatoryKeywords = [
+            'réglementation', 'regulation', 'compliance', 'conformité', 'régulateur',
+            'regulateur', 'sec', 'securities and exchange commission', 'amf',
+            'autorité des marchés financiers', 'cvmf', 'cvm', 'osfi', 'cdic',
+            'fdic', 'federal deposit insurance', 'assurance dépôts',
+            'réglementation financière', 'financial regulation', 'règles boursières',
+            'stock exchange rules', 'règles de bourse', 'market regulation',
+            'régulation des marchés', 'insider trading', 'délit d\'initié',
+            'market manipulation', 'manipulation de marché', 'disclosure', 'divulgation',
+            'financial reporting', 'rapports financiers', 'gaap', 'ifrs',
+            'normes comptables', 'accounting standards', 'audit', 'vérification',
+            'kpi', 'key performance indicators', 'indicateurs de performance clés'
+        ];
+        if (regulatoryKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question réglementaire - Perplexity a accès aux règles et régulations' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur ESG/Durabilité
+        const esgKeywords = [
+            'esg', 'environmental social governance', 'environnemental social gouvernance',
+            'durabilité', 'durabilite', 'sustainability', 'responsabilité sociale',
+            'responsabilite sociale', 'corporate social responsibility', 'csr',
+            'rse', 'responsabilité sociale d\'entreprise', 'carbon footprint',
+            'empreinte carbone', 'green bonds', 'obligations vertes', 'sustainable investing',
+            'investissement durable', 'impact investing', 'investissement à impact',
+            'climate risk', 'risque climatique', 'transition énergétique', 'energy transition',
+            'renewable energy', 'énergie renouvelable', 'clean energy', 'énergie propre',
+            'esg rating', 'notation esg', 'esg score', 'score esg', 'esg factors',
+            'facteurs esg', 'esg integration', 'intégration esg', 'esg disclosure',
+            'divulgation esg', 'climate change', 'changement climatique', 'net zero',
+            'carboneutralité', 'carbon neutral', 'paris agreement', 'accord de paris'
+        ];
+        if (esgKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question ESG - Perplexity a accès aux données ESG récentes' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Arbitrage/Pairs Trading
+        const arbitrageKeywords = [
+            'arbitrage', 'arbitrage opportunity', 'opportunité d\'arbitrage',
+            'pairs trading', 'trading de paires', 'statistical arbitrage', 'arbitrage statistique',
+            'market neutral', 'neutre marché', 'long short', 'long/short',
+            'hedge fund strategy', 'stratégie hedge fund', 'relative value',
+            'valeur relative', 'spread trading', 'trading de spread', 'convergence',
+            'divergence', 'mean reversion', 'retour à la moyenne', 'momentum',
+            'momentum trading', 'contrarian strategy', 'stratégie contrarian',
+            'quantitative strategy', 'stratégie quantitative', 'quant trading',
+            'algorithmic trading', 'trading algorithmique', 'high frequency trading', 'hft'
+        ];
+        if (arbitrageKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur arbitrage - Perplexity peut expliquer les stratégies' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Méthodologies d'Analyse
+        const methodologyKeywords = [
+            'méthodologie', 'methodologie', 'methodology', 'approche', 'approach',
+            'dcf', 'discounted cash flow', 'actualisation des flux de trésorerie',
+            'multiples', 'valuation multiples', 'multiples de valorisation',
+            'comparable companies', 'entreprises comparables', 'comps', 'peer group',
+            'groupe de pairs', 'precedent transactions', 'transactions précédentes',
+            'sum of parts', 'somme des parties', 'sotp', 'sum of the parts',
+            'lbo model', 'modèle lbo', 'acquisition model', 'modèle d\'acquisition',
+            'three statement model', 'modèle trois états financiers', 'integrated model',
+            'modèle intégré', 'financial modeling', 'modélisation financière',
+            'pro forma', 'proforma', 'pro forma analysis', 'analyse pro forma',
+            'sensitivity table', 'tableau de sensibilité', 'data table', 'table de données',
+            'valuation methodology', 'méthodologie de valorisation', 'valuation approach',
+            'approche de valorisation', 'asset based valuation', 'valorisation basée actifs',
+            'income approach', 'approche revenus', 'market approach', 'approche marché'
+        ];
+        if (methodologyKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question méthodologique - Perplexity peut expliquer les approches' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Structured Products
+        const structuredProductsKeywords = [
+            'structured products', 'produits structurés', 'structured note',
+            'note structurée', 'principal protected', 'capital protégé',
+            'participation note', 'note de participation', 'reverse convertible',
+            'obligation convertible inversée', 'autocallable', 'autocall',
+            'barrier option', 'option barrière', 'knock in', 'knock out',
+            'structured deposit', 'dépôt structuré', 'market linked', 'lié au marché',
+            'equity linked', 'lié aux actions', 'commodity linked', 'lié aux matières premières',
+            'currency linked', 'lié aux devises', 'hybrid product', 'produit hybride'
+        ];
+        if (structuredProductsKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur produits structurés - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Gestion de Risque Avancée
+        const riskManagementKeywords = [
+            'gestion de risque', 'risk management', 'gestion des risques',
+            'var', 'value at risk', 'valeur à risque', 'cvar', 'conditional var',
+            'var conditionnelle', 'stress testing', 'test de résistance',
+            'scenario analysis', 'analyse de scénarios', 'sensitivity analysis',
+            'analyse de sensibilité', 'monte carlo', 'simulation monte carlo',
+            'risk metrics', 'métriques de risque', 'risk adjusted return',
+            'rendement ajusté au risque', 'sharpe ratio', 'sortino ratio',
+            'information ratio', 'calmar ratio', 'max drawdown', 'perte maximale',
+            'downside deviation', 'déviation négative', 'upside capture',
+            'capture haussière', 'downside capture', 'capture baissière',
+            'tracking error', 'erreur de suivi', 'beta', 'alpha', 'correlation',
+            'corrélation', 'diversification', 'diversification ratio', 'ratio de diversification',
+            'portfolio risk', 'risque portefeuille', 'systematic risk', 'risque systématique',
+            'idiosyncratic risk', 'risque idiosyncratique', 'tail risk', 'risque de queue',
+            'black swan', 'cygne noir', 'fat tail', 'queue épaisse'
+        ];
+        if (riskManagementKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur gestion de risque - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur Behavioral Finance
+        const behavioralKeywords = [
+            'behavioral finance', 'finance comportementale', 'psychologie des marchés',
+            'market psychology', 'psychologie de marché', 'investor behavior',
+            'comportement investisseur', 'cognitive bias', 'biais cognitif',
+            'confirmation bias', 'biais de confirmation', 'anchoring', 'ancrage',
+            'overconfidence', 'surappréciation', 'herd behavior', 'comportement grégaire',
+            'fomo', 'fear of missing out', 'peur de rater', 'fear and greed index',
+            'indice peur et cupidité', 'sentiment', 'sentiment de marché',
+            'market sentiment', 'investor sentiment', 'sentiment investisseur',
+            'contrarian investing', 'investissement contrarian', 'value investing',
+            'investissement value', 'growth investing', 'investissement croissance',
+            'momentum investing', 'investissement momentum', 'behavioral economics',
+            'économie comportementale'
+        ];
+        if (behavioralKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur finance comportementale - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur M&A/Fusions-Acquisitions
+        const maKeywords = [
+            'fusion', 'acquisition', 'm&a', 'merger', 'mergers and acquisitions',
+            'fusions acquisitions', 'takeover', 'rachat', 'hostile takeover',
+            'opa', 'offre publique d\'achat', 'ope', 'offre publique d\'échange',
+            'tender offer', 'offre publique', 'merger arbitrage', 'arbitrage de fusion',
+            'deal structure', 'structure transaction', 'synergy', 'synergie',
+            'due diligence', 'diligence raisonnable', 'integration', 'intégration',
+            'post merger integration', 'intégration post fusion', 'deal valuation',
+            'valorisation transaction', 'acquisition premium', 'prime d\'acquisition',
+            'deal multiples', 'multiples transaction', 'transaction multiples'
+        ];
+        if (maKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur M&A - Perplexity a accès aux données de transactions' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur IPO/Introduction en Bourse
+        const ipoKeywords = [
+            'ipo', 'introduction en bourse', 'public offering', 'offre publique',
+            'initial public offering', 'première introduction', 'going public',
+            'entrée en bourse', 'listing', 'cotation', 'debut trading',
+            'première cotation', 'ipo pricing', 'prix ipo', 'ipo valuation',
+            'valorisation ipo', 'underpricing', 'sous-évaluation', 'ipo performance',
+            'performance ipo', 'aftermarket performance', 'performance après introduction',
+            'lock up period', 'période de blocage', 'insider lockup', 'blocage initiés',
+            'ipo process', 'processus ipo', 'roadshow', 'roadshow ipo',
+            'book building', 'construction du carnet', 'ipo allocation', 'allocation ipo'
+        ];
+        if (ipoKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur IPO - Perplexity a accès aux données d\'introductions' };
         }
         
         // ✅ PERPLEXITY SEUL: Questions géopolitiques/événements
