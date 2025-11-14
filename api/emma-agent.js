@@ -538,7 +538,15 @@ class SmartAgent {
             'fonds', 'fond', 'mutual fund', 'fonds mutuels', 'fonds d\'investissement',
             'quartile', 'quartiles', 'rendement', 'rendements', 'performance des fonds',
             'catégorie de fonds', 'categorie de fonds', 'fonds équilibrés', 'fonds equilibres',
-            'etf', 'etfs', 'fonds indiciels', 'fonds actifs', 'fonds passifs'
+            'etf', 'etfs', 'fonds indiciels', 'fonds actifs', 'fonds passifs',
+            'fonds canadiens', 'fonds américains', 'fonds internationaux', 'fonds européens',
+            'fonds obligataires', 'fonds actions', 'fonds diversifiés', 'fonds sectoriels',
+            'fonds de croissance', 'fonds de valeur', 'fonds de dividendes', 'fonds de revenu',
+            'fonds indexés', 'fonds indiciels', 'fonds à capital garanti', 'fonds alternatifs',
+            'fonds de couverture', 'hedge fund', 'fonds de private equity', 'fonds immobiliers',
+            'reit', 'reits', 'fiducie de placement', 'fiducie immobilière',
+            'frais de gestion', 'frais de fonds', 'mer', 'ter', 'expense ratio',
+            'rating morningstar', 'étoiles morningstar', 'star rating', 'quartile morningstar'
         ];
         if (fundKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur fonds - Perplexity a accès aux données Morningstar/Fundata' };
@@ -549,7 +557,15 @@ class SmartAgent {
             'inflation', 'taux directeur', 'fed', 'banque centrale', 'pib', 'gdp',
             'chômage', 'chomage', 'emploi', 'récession', 'recession', 'croissance économique',
             'politique monétaire', 'monetaire', 'taux d\'intérêt', 'interet', 'taux',
-            'courbe des taux', 'yield curve', 'spread', 'obligations', 'treasury'
+            'courbe des taux', 'yield curve', 'spread', 'obligations', 'treasury',
+            'banque du canada', 'boc', 'ecb', 'banque centrale européenne', 'boj', 'banque du japon',
+            'politique budgétaire', 'fiscal', 'déficit', 'deficit', 'dette publique', 'dette souveraine',
+            'indicateurs économiques', 'indicateur macro', 'indicateurs macroéconomiques',
+            'consommation', 'production industrielle', 'pmi', 'ism', 'indice manufacturier',
+            'commerce extérieur', 'balance commerciale', 'exportations', 'importations',
+            'devise', 'devises', 'taux de change', 'forex', 'fx', 'parité', 'cours des devises',
+            'marché obligataire', 'marché obligataire', 'bonds', 'obligations d\'état',
+            'taux réel', 'taux nominal', 'prime de risque', 'risk premium', 'spread de crédit'
         ];
         if (macroKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             // Exception: Si demande spécifique de courbe des taux → API nécessaire
@@ -559,60 +575,291 @@ class SmartAgent {
             return { usePerplexityOnly: true, reason: 'Question macro-économique - Perplexity a accès aux données récentes' };
         }
         
+        // ✅ PERPLEXITY SEUL: Questions sur stratégies d'investissement
+        const strategyKeywords = [
+            'stratégie', 'strategie', 'stratégie d\'investissement', 'strategie d\'investissement',
+            'allocation d\'actifs', 'asset allocation', 'diversification', 'rééquilibrage', 'reequilibrage',
+            'value investing', 'growth investing', 'dividend investing', 'momentum investing',
+            'contrarian', 'contrarian investing', 'dollar cost averaging', 'dca',
+            'lump sum', 'investissement régulier', 'investissement systématique',
+            'buy and hold', 'trading actif', 'day trading', 'swing trading', 'position trading',
+            'hedging', 'couverture', 'protection de portefeuille', 'risk management',
+            'gestion des risques', 'stop loss', 'take profit', 'position sizing',
+            'pyramiding', 'averaging down', 'averaging up', 'scaling in', 'scaling out',
+            'sector rotation', 'rotation sectorielle', 'style rotation', 'rotation de style',
+            'market timing', 'timing de marché', 'tactical allocation', 'allocation tactique'
+        ];
+        if (strategyKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur stratégie - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur secteurs/industries
+        const sectorKeywords = [
+            'secteur', 'industrie', 'secteurs performants', 'secteurs en hausse', 'secteurs en baisse',
+            'secteur technologique', 'secteur techno', 'tech sector', 'secteur financier',
+            'secteur santé', 'healthcare sector', 'secteur énergétique', 'energy sector',
+            'secteur consommation', 'consumer sector', 'secteur industriel', 'industrial sector',
+            'secteur matériaux', 'materials sector', 'secteur immobilier', 'real estate sector',
+            'secteur utilities', 'secteur services publics', 'secteur télécom', 'telecom sector',
+            'secteur défensif', 'defensive sector', 'secteur cyclique', 'cyclical sector',
+            'analyse sectorielle', 'sector analysis', 'performance sectorielle', 'sector performance',
+            'rotation sectorielle', 'sector rotation', 'poids sectoriel', 'sector weight'
+        ];
+        if (sectorKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur secteurs - Perplexity a accès aux analyses sectorielles' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur crypto/blockchain
+        const cryptoKeywords = [
+            'crypto', 'cryptomonnaie', 'cryptomonnaies', 'bitcoin', 'btc', 'ethereum', 'eth',
+            'blockchain', 'defi', 'nft', 'altcoin', 'altcoins', 'stablecoin', 'stablecoins',
+            'mining', 'minage', 'staking', 'yield farming', 'liquidity pool', 'pool de liquidité',
+            'exchange', 'bourse crypto', 'wallet', 'portefeuille crypto', 'cold storage',
+            'halving', 'fork', 'hard fork', 'soft fork', 'consensus', 'proof of stake', 'pos',
+            'proof of work', 'pow', 'gas fee', 'frais de transaction', 'transaction fee'
+        ];
+        if (cryptoKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur crypto - Perplexity a accès aux données crypto récentes' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur commodities/matières premières
+        const commodityKeywords = [
+            'commodities', 'commodity', 'matières premières', 'matiere premiere',
+            'or', 'argent', 'pétrole', 'petrole', 'oil', 'gaz naturel', 'natural gas',
+            'blé', 'maïs', 'soja', 'café', 'cacao', 'sucre', 'cotton', 'coton',
+            'cuivre', 'nickel', 'zinc', 'aluminium', 'fer', 'acier', 'steel',
+            'prix des matières premières', 'commodity prices', 'futures', 'contrats à terme',
+            'contango', 'backwardation', 'spread de commodities', 'commodity spread'
+        ];
+        if (commodityKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur commodities - Perplexity a accès aux données de marché' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions géopolitiques/événements
+        const geopoliticalKeywords = [
+            'géopolitique', 'geopolitique', 'géopolitique', 'guerre', 'conflit', 'sanctions',
+            'élections', 'elections', 'politique', 'gouvernement', 'régulation', 'regulation',
+            'trade war', 'guerre commerciale', 'tarifs', 'douanes', 'protectionnisme',
+            'brexit', 'union européenne', 'ue', 'eu', 'otan', 'nato',
+            'relations internationales', 'tensions', 'diplomatie', 'alliances',
+            'impact géopolitique', 'geopolitical impact', 'risque géopolitique', 'geopolitical risk'
+        ];
+        if (geopoliticalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question géopolitique - Perplexity a accès aux analyses récentes' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur options/derivés
+        const optionsKeywords = [
+            'options', 'option', 'call', 'put', 'strike', 'prix d\'exercice',
+            'prime', 'option premium', 'delta', 'gamma', 'theta', 'vega', 'greeks',
+            'covered call', 'protective put', 'collar', 'strangle', 'straddle',
+            'spread', 'bull spread', 'bear spread', 'butterfly', 'iron condor',
+            'derivés', 'derives', 'derivatives', 'warrants', 'certificats',
+            'leverage', 'effet de levier', 'marge', 'margin', 'futures', 'contrats à terme'
+        ];
+        if (optionsKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question sur options - Perplexity peut expliquer les concepts' };
+        }
+        
+        // ✅ PERPLEXITY SEUL: Questions sur taxes/fiscalité
+        const taxKeywords = [
+            'impôt', 'impot', 'taxe', 'fiscalité', 'fiscalite', 'fiscal',
+            'tfsa', 'celi', 'reer', 'rrsp', 'régime enregistré', 'regime enregistre',
+            'gain en capital', 'capital gain', 'dividende', 'dividend', 'revenu d\'intérêt',
+            'déduction', 'deduction', 'crédit d\'impôt', 'credit d\'impot', 'exemption',
+            'planification fiscale', 'tax planning', 'optimisation fiscale', 'tax optimization',
+            'retraite', 'retirement', 'épargne retraite', 'epargne retraite', 'pension'
+        ];
+        if (taxKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question fiscale - Perplexity peut expliquer les règles' };
+        }
+        
         // ✅ PERPLEXITY SEUL: Questions générales/conceptuelles
         const generalKeywords = [
             'qu\'est-ce que', 'quest-ce que', 'c\'est quoi', 'cest quoi', 'définition', 'definition',
             'comment fonctionne', 'explique', 'explique-moi', 'pourquoi', 'comment',
-            'différence entre', 'difference entre', 'comparer', 'comparaison'
+            'différence entre', 'difference entre', 'comparer', 'comparaison',
+            'avantages', 'inconvénients', 'inconvenients', 'pour et contre', 'pros and cons',
+            'meilleur', 'meilleure', 'meilleurs', 'meilleures', 'best', 'top',
+            'recommandation', 'conseil', 'avis', 'opinion', 'suggestion'
         ];
         if (generalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question conceptuelle - Perplexity peut expliquer sans données précises' };
         }
         
         // ✅ PERPLEXITY SEUL: Actualités générales (pas ticker spécifique)
-        if ((intent === 'news' || message.includes('actualités') || message.includes('actualites') || message.includes('nouvelles')) 
-            && extractedTickers.length === 0) {
+        const newsKeywords = [
+            'actualités', 'actualites', 'nouvelles', 'news', 'information', 'infos',
+            'quoi de neuf', 'quoi de neuf en bourse', 'marché aujourd\'hui', 'marche aujourdhui',
+            'tendances', 'tendances du marché', 'tendances marche', 'market trends',
+            'événements', 'evenements', 'events', 'breaking news', 'flash info'
+        ];
+        if (newsKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Actualités générales - Perplexity a accès aux sources récentes' };
         }
         
+        // ✅ PERPLEXITY SEUL: Questions historiques/comparaisons temporelles
+        const historicalKeywords = [
+            'historique', 'histoire', 'évolution', 'evolution', 'tendance historique',
+            'performance historique', 'historical performance', 'crise', 'crash', 'bulle',
+            'krach', 'crise financière', 'financial crisis', 'récession', 'recession',
+            'dépression', 'depression', 'boom', 'expansion', 'cycle économique', 'economic cycle',
+            'crise de 2008', 'dot-com', 'tech bubble', 'bulle technologique', 'black monday',
+            'flash crash', 'correction', 'bear market', 'marché baissier', 'bull market', 'marché haussier'
+        ];
+        if (historicalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question historique - Perplexity a accès aux données historiques' };
+        }
+        
         // ❌ APIs NÉCESSAIRES: Prix en temps réel précis
-        const priceKeywords = ['prix', 'cours', 'cotation', 'quote', 'se négocie', 'trading at', 'valeur actuelle'];
+        const priceKeywords = [
+            'prix', 'cours', 'cotation', 'quote', 'se négocie', 'trading at', 'valeur actuelle',
+            'prix actuel', 'cours actuel', 'dernier prix', 'last price', 'prix de clôture',
+            'closing price', 'prix d\'ouverture', 'opening price', 'prix haut', 'high',
+            'prix bas', 'low', 'prix moyen', 'average price', 'vwap', 'volume weighted',
+            'market cap', 'capitalisation', 'market capitalization', 'valorisation boursière'
+        ];
         if (priceKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Prix temps réel nécessite données précises (FMP/Polygon)' };
         }
         
         // ❌ APIs NÉCESSAIRES: Ratios financiers exacts
-        const ratioKeywords = ['pe ratio', 'p/e', 'p/b', 'p/s', 'roe', 'roa', 'debt/equity', 'current ratio', 'ratio'];
+        const ratioKeywords = [
+            'pe ratio', 'p/e', 'p/b', 'p/s', 'p/fcf', 'peg', 'ev/ebitda', 'ev/sales',
+            'roe', 'roa', 'roic', 'roce', 'debt/equity', 'debt to equity', 'current ratio',
+            'quick ratio', 'cash ratio', 'debt ratio', 'equity ratio', 'ratio',
+            'marges', 'margins', 'gross margin', 'operating margin', 'net margin',
+            'profit margin', 'marge brute', 'marge opérationnelle', 'marge nette',
+            'turnover', 'rotation', 'asset turnover', 'inventory turnover', 'receivables turnover',
+            'days sales outstanding', 'dso', 'days payables outstanding', 'dpo',
+            'cash conversion cycle', 'ccc', 'working capital', 'fonds de roulement'
+        ];
         if (ratioKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Ratios financiers nécessitent données structurées précises (FMP)' };
         }
         
         // ❌ APIs NÉCESSAIRES: Indicateurs techniques
-        const technicalKeywords = ['rsi', 'macd', 'sma', 'ema', 'moyennes mobiles', 'support', 'résistance', 'resistance'];
+        const technicalKeywords = [
+            'rsi', 'macd', 'sma', 'ema', 'wma', 'vwap', 'atr', 'adx', 'obv', 'mfi',
+            'moyennes mobiles', 'moving averages', 'support', 'résistance', 'resistance',
+            'bollinger', 'bollinger bands', 'stochastic', 'williams %r', 'cci',
+            'momentum', 'rate of change', 'roc', 'parabolic sar', 'sar',
+            'fibonacci', 'fibonacci retracement', 'fibonacci extension',
+            'ichimoku', 'ichimoku cloud', 'pivot point', 'pivot points',
+            'volume', 'volume profile', 'on balance volume', 'accumulation distribution',
+            'chaikin oscillator', 'money flow index', 'relative strength', 'relative strength index'
+        ];
         if (technicalKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Indicateurs techniques nécessitent calculs précis (Twelve Data)' };
         }
         
+        // ❌ APIs NÉCESSAIRES: Dividendes
+        const dividendKeywords = [
+            'dividende', 'dividend', 'dividend yield', 'rendement', 'yield',
+            'payout ratio', 'taux de distribution', 'dividend per share', 'dps',
+            'dividend history', 'historique des dividendes', 'ex-dividend date',
+            'date ex-dividende', 'payment date', 'date de paiement', 'dividend growth',
+            'croissance des dividendes', 'dividend aristocrat', 'dividend king'
+        ];
+        if (dividendKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Dividendes nécessitent données précises (FMP)' };
+        }
+        
         // ❌ APIs NÉCESSAIRES: Calendriers
-        if (intent === 'earnings' || intent === 'economic_analysis' || 
-            message.includes('calendrier') || message.includes('résultats') || message.includes('resultats')) {
+        const calendarKeywords = [
+            'calendrier', 'calendar', 'résultats', 'resultats', 'earnings',
+            'prochains résultats', 'next earnings', 'earnings date', 'date de résultats',
+            'earnings call', 'conférence résultats', 'guidance', 'prévisions', 'previsions',
+            'forecast', 'outlook', 'perspectives', 'expectations', 'attentes',
+            'economic calendar', 'calendrier économique', 'événements économiques',
+            'evenements economiques', 'economic events', 'fed meeting', 'réunion fed',
+            'cpi', 'inflation data', 'données inflation', 'employment report', 'rapport emploi',
+            'gdp release', 'publication pib', 'retail sales', 'ventes au détail'
+        ];
+        if (calendarKeywords.some(kw => message.includes(kw))) {
             return { usePerplexityOnly: false, reason: 'Calendriers nécessitent données structurées (FMP)' };
         }
         
         // ❌ APIs NÉCESSAIRES: Watchlist/Portfolio
-        if (intent === 'portfolio' || message.includes('watchlist') || message.includes('portefeuille')) {
+        const portfolioKeywords = [
+            'watchlist', 'portefeuille', 'portfolio', 'mes actions', 'mes titres',
+            'mes tickers', 'ma liste', 'liste de suivi', 'positions', 'holdings',
+            'diversification', 'allocation', 'poids', 'weight', 'exposition', 'exposure',
+            'performance portefeuille', 'portfolio performance', 'rendement portefeuille',
+            'portfolio return', 'beta portefeuille', 'portfolio beta', 'corrélation', 'correlation'
+        ];
+        if (portfolioKeywords.some(kw => message.includes(kw))) {
             return { usePerplexityOnly: false, reason: 'Watchlist nécessite données utilisateur (Supabase)' };
         }
         
         // ❌ APIs NÉCESSAIRES: Analyse complète avec ticker spécifique
-        if (extractedTickers.length > 0 && (intent === 'comprehensive_analysis' || message.includes('analyse complète'))) {
+        const analysisKeywords = [
+            'analyse complète', 'comprehensive analysis', 'analyse approfondie', 'deep dive',
+            'due diligence', 'évaluation complète', 'evaluation complete', 'full analysis',
+            'analyse détaillée', 'detailed analysis', 'rapport complet', 'full report',
+            'analyse fondamentale complète', 'complete fundamental analysis'
+        ];
+        if (extractedTickers.length > 0 && analysisKeywords.some(kw => message.includes(kw))) {
             return { usePerplexityOnly: false, reason: 'Analyse complète nécessite toutes les métriques précises (FMP)' };
         }
         
         // ❌ APIs NÉCESSAIRES: Données fondamentales précises
-        const fundamentalsKeywords = ['fondamentaux', 'fundamentals', 'revenus', 'bénéfices', 'benefices', 'eps', 'cash flow'];
+        const fundamentalsKeywords = [
+            'fondamentaux', 'fundamentals', 'revenus', 'revenue', 'sales', 'ventes',
+            'bénéfices', 'benefices', 'earnings', 'profit', 'net income', 'revenu net',
+            'eps', 'earnings per share', 'bpa', 'bénéfice par action', 'benefice par action',
+            'cash flow', 'flux de trésorerie', 'free cash flow', 'fcf', 'flux de trésorerie libre',
+            'operating cash flow', 'ocf', 'cash from operations', 'cash from investing',
+            'cash from financing', 'ebitda', 'ebit', 'operating income', 'revenu opérationnel',
+            'gross profit', 'profit brut', 'operating profit', 'profit opérationnel',
+            'net profit', 'profit net', 'margins', 'marges', 'balance sheet', 'bilan',
+            'income statement', 'compte de résultat', 'cash flow statement', 'tableau des flux',
+            'assets', 'actifs', 'liabilities', 'passifs', 'equity', 'capitaux propres',
+            'book value', 'valeur comptable', 'tangible book value', 'valeur comptable tangible',
+            'debt', 'dette', 'long term debt', 'dette long terme', 'short term debt', 'dette court terme',
+            'working capital', 'fonds de roulement', 'current assets', 'actifs courants',
+            'current liabilities', 'passifs courants', 'inventory', 'inventaire', 'receivables', 'créances'
+        ];
         if (fundamentalsKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Données fondamentales nécessitent précision (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Recommandations analystes
+        const analystKeywords = [
+            'recommandation', 'recommendation', 'rating', 'note', 'consensus',
+            'analystes', 'analysts', 'consensus analystes', 'analyst consensus',
+            'price target', 'objectif de prix', 'target price', 'prix cible',
+            'buy', 'sell', 'hold', 'strong buy', 'strong sell', 'outperform', 'underperform',
+            'upgrade', 'downgrade', 'mise à niveau', 'rétrogradation', 'coverage', 'couverture'
+        ];
+        if (analystKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Recommandations analystes nécessitent données structurées (FMP)' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Options/Derivés avec ticker
+        const optionsTickerKeywords = [
+            'options', 'option', 'call', 'put', 'strike', 'prix d\'exercice',
+            'prime', 'option premium', 'delta', 'gamma', 'theta', 'vega', 'greeks',
+            'implied volatility', 'volatilité implicite', 'iv', 'open interest',
+            'volume options', 'volume d\'options', 'options chain', 'chaîne d\'options',
+            'covered call', 'protective put', 'collar', 'strangle', 'straddle'
+        ];
+        if (optionsTickerKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Options nécessitent données de marché précises' };
+        }
+        
+        // ❌ APIs NÉCESSAIRES: Performance historique précise
+        const performanceKeywords = [
+            'performance', 'rendement', 'return', 'ytd', 'year to date', 'année en cours',
+            '1 an', '1 year', '3 ans', '3 years', '5 ans', '5 years', '10 ans', '10 years',
+            '52 semaines', '52 weeks', '52w high', '52w low', '52 semaines haut', '52 semaines bas',
+            'all time high', 'ath', 'sommet historique', 'all time low', 'atl', 'creux historique',
+            'volatilité', 'volatility', 'beta', 'alpha', 'sharpe ratio', 'sortino ratio',
+            'max drawdown', 'perte maximale', 'downside deviation', 'upside capture',
+            'downside capture', 'tracking error', 'information ratio'
+        ];
+        if (performanceKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
+            return { usePerplexityOnly: false, reason: 'Performance historique nécessite données précises (FMP)' };
         }
         
         // ✅ PERPLEXITY SEUL par défaut pour questions générales sans ticker
