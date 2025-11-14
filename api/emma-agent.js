@@ -2177,31 +2177,30 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             if (requestedEntity && !hasDataForRequestedEntity && outputMode === 'chat') {
                 console.log(`🔍 Entité demandée "${requestedEntity}" non trouvée dans les données des outils → Forcer recherche Perplexity`);
                 
-                // Construire un prompt spécifique pour chercher cette entreprise
-                const searchPrompt = `Tu es Emma, analyste financière experte. L'utilisateur demande des informations sur "${requestedEntity}".
+                // Construire un prompt naturel et ouvert pour Perplexity (comme une requête directe)
+                // Moins de contraintes = meilleurs résultats de Perplexity
+                const searchPrompt = `${userMessage}
 
-⚠️ CRITIQUE: Cette entreprise/ticker n'a pas été trouvé dans les sources de données standard (FMP, Polygon, etc.).
+Fournis une analyse financière complète et détaillée incluant:
+- Nature de l'entreprise/fonds (type, secteur, description)
+- Ticker exact et bourse de cotation
+- Prix actuel et performance (1 an, 3 ans, 5 ans, 10 ans si disponible)
+- Ratios financiers pertinents (P/E, rendement, frais, etc.)
+- Composition du portefeuille si applicable
+- Profil de risque
+- Actualités récentes
+- Recommandations d'analyse
 
-TU DOIS:
-1. Chercher des informations sur "${requestedEntity}" via tes sources (Perplexity a accès à des millions de sources)
-2. Trouver le ticker exact si c'est un nom d'entreprise (ex: "Amaxx" pourrait être "AMXX" ou un autre ticker)
-3. Fournir des informations financières complètes: prix, ratios, fondamentaux, actualités récentes
-4. Si tu trouves que "${requestedEntity}" correspond à un ticker différent, mentionne-le clairement
-5. Si vraiment aucune information n'existe, dis-le clairement mais NE DONNE PAS d'informations sur d'autres entreprises
-
-❌ INTERDIT ABSOLU: Donner des informations sur une entreprise DIFFÉRENTE de "${requestedEntity}"
-
-Question de l'utilisateur: ${userMessage}
-
-Fournis une analyse complète de "${requestedEntity}" avec toutes les informations financières disponibles.`;
+Sois exhaustif et cite tes sources.`;
 
                 // Utiliser ce prompt spécialisé au lieu du prompt normal
+                // Prompt minimal pour laisser Perplexity faire son travail naturellement
                 const searchRequestBody = {
                     model: 'sonar-pro',
                     messages: [
                         {
                             role: 'system',
-                            content: 'Tu es Emma, analyste financière experte. Tu as accès à des millions de sources via Perplexity pour trouver des informations sur n\'importe quelle entreprise.'
+                            content: 'Tu es Emma, analyste financière experte. Fournis des analyses complètes et détaillées avec sources.'
                         },
                         {
                             role: 'user',
@@ -2210,8 +2209,8 @@ Fournis une analyse complète de "${requestedEntity}" avec toutes les informatio
                     ],
                     max_tokens: maxTokens,
                     temperature: 0.1,
-                    search_recency_filter: recency,
-                    search_domain_filter: ['finance.yahoo.com', 'bloomberg.com', 'reuters.com', 'marketwatch.com', 'cnbc.com', 'wsj.com', 'ft.com', 'theglobeandmail.com', 'lapresse.ca']
+                    search_recency_filter: recency
+                    // Pas de search_domain_filter pour laisser Perplexity chercher dans toutes ses sources
                 };
 
                 // Appel Perplexity avec prompt spécialisé
@@ -2228,9 +2227,18 @@ Fournis une analyse complète de "${requestedEntity}" avec toutes les informatio
                 if (searchResponse.ok) {
                     const searchData = await searchResponse.json();
                     const searchContent = searchData.choices?.[0]?.message?.content || '';
-                    const searchCitations = this._extractCitations(searchContent);
+                    const searchCitations = searchData.citations || this._extractCitations(searchContent);
                     
-                    console.log(`✅ Recherche Perplexity réussie pour "${requestedEntity}"`);
+                    console.log(`✅ Recherche Perplexity réussie pour "${requestedEntity}" (${searchContent.length} caractères)`);
+                    
+                    // Post-traitement: s'assurer que la réponse concerne bien l'entité demandée
+                    const contentUpper = searchContent.toUpperCase();
+                    const entityUpper = requestedEntity.toUpperCase();
+                    
+                    // Si la réponse ne mentionne pas l'entité demandée, ajouter un avertissement
+                    if (!contentUpper.includes(entityUpper) && !contentUpper.includes(entityUpper.replace('X', 'XX'))) {
+                        console.warn(`⚠️ La réponse Perplexity ne mentionne pas clairement "${requestedEntity}"`);
+                    }
                     
                     return {
                         content: searchContent,
@@ -2240,7 +2248,9 @@ Fournis une analyse complète de "${requestedEntity}" avec toutes les informatio
                         searched_entity: requestedEntity
                     };
                 } else {
-                    console.warn(`⚠️ Recherche Perplexity échouée pour "${requestedEntity}", continuer avec prompt normal`);
+                    const errorText = await searchResponse.text().catch(() => 'Unknown error');
+                    console.warn(`⚠️ Recherche Perplexity échouée pour "${requestedEntity}" (${searchResponse.status}): ${errorText.substring(0, 200)}`);
+                    // Continuer avec le prompt normal
                 }
             }
 
