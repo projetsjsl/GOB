@@ -2291,8 +2291,8 @@ ${isGeneralNonFinancial ? generalInstructions : `INSTRUCTIONS CRITIQUES:
 9. ⚠️ IMPORTANT: Vérifie les dates des données - signale si anciennes (> 1 mois) et mentionne la date actuelle: ${currentDate}
 10. Cite tes sources (outils utilisés) en fin de réponse
 11. Ton: professionnel mais accessible, comme une vraie analyste financière
-${intentData ? `12. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
-` : ''}
+${intentData ? '12. L\'intention détectée: ' + intentData.intent + ' - ' + (intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents') : ''}
+`}
 
 📊 GRAPHIQUES ET VISUALISATIONS - ANALYSE CONTEXTUALISÉE:
 
