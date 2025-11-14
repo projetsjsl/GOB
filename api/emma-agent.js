@@ -533,6 +533,60 @@ class SmartAgent {
             return { usePerplexityOnly: true, reason: `Intent "${intent}" ne nécessite pas de données` };
         }
         
+        // ✅ PERPLEXITY SEUL: Questions générales/non-financières (DÉTECTION PRIORITAIRE)
+        // 🎯 Permet à Emma de sortir du cadre strictement financier
+        const generalNonFinancialKeywords = [
+            // Questions générales de connaissance
+            'qu\'est-ce que', 'quest-ce que', 'c\'est quoi', 'cest quoi', 'définition', 'definition',
+            'explique', 'explique-moi', 'explique moi', 'comment fonctionne', 'comment ça marche',
+            'pourquoi', 'comment', 'quand', 'où', 'qui', 'quelle est la différence', 'difference entre',
+            // Questions scientifiques/techniques
+            'physique', 'chimie', 'biologie', 'mathématiques', 'math', 'science', 'sciences',
+            'technologie', 'tech', 'informatique', 'programmation', 'code', 'coding',
+            'histoire', 'géographie', 'culture', 'art', 'littérature', 'philosophie',
+            // Questions pratiques/vie quotidienne
+            'cuisine', 'recette', 'voyage', 'santé', 'sante', 'sport', 'fitness', 'médical', 'medical',
+            'éducation', 'education', 'apprendre', 'formation', 'tutoriel', 'guide',
+            'météo', 'meteo', 'climat', 'environnement', 'écologie', 'ecologie',
+            // Questions business/générales (non-financières spécifiques)
+            'marketing', 'vente', 'management', 'leadership', 'communication', 'productivité',
+            'entrepreneuriat', 'startup', 'innovation', 'stratégie business', 'business model',
+            // Questions personnelles/conversationnelles
+            'bonjour', 'salut', 'hello', 'hi', 'comment vas-tu', 'ça va', 'cava',
+            'merci', 'de rien', 'au revoir', 'bye', 'bonne journée', 'bonne soirée',
+            'aide', 'help', 'peux-tu', 'peux tu', 'capable de', 'fonctionnalités',
+            // Questions culturelles/actualités générales
+            'actualités', 'actualites', 'news', 'nouvelles', 'événements', 'evenements',
+            'culture', 'société', 'societe', 'politique générale', 'sport', 'divertissement',
+            'cinéma', 'cinema', 'musique', 'livre', 'livres', 'film', 'films',
+            // Questions éducatives générales
+            'apprendre', 'comprendre', 'expliquer', 'enseigner', 'cours', 'leçon', 'lecon',
+            'tutoriel', 'guide', 'méthode', 'methode', 'technique', 'astuce', 'conseil',
+            // Questions de comparaison générale
+            'meilleur', 'meilleure', 'meilleurs', 'meilleures', 'best', 'top', 'comparer',
+            'vs', 'versus', 'différence', 'difference', 'avantages', 'inconvénients', 'inconvenients',
+            // Questions de recommandation générale
+            'recommandation', 'recommandations', 'conseil', 'conseils', 'suggestion', 'suggestions',
+            'avis', 'opinion', 'que penses-tu', 'penses-tu que', 'crois-tu que'
+        ];
+        
+        // Détection: Si aucun ticker ET aucun mot financier spécifique → probablement question générale
+        const hasFinancialKeyword = [
+            ...fundKeywords, ...macroKeywords, ...strategyKeywords, ...sectorKeywords,
+            ...cryptoKeywords, ...commodityKeywords, ...forexKeywords, ...bondKeywords,
+            ...realEstateKeywords, ...privateEquityKeywords, ...warrantKeywords,
+            ...calculationKeywords, ...regulatoryKeywords, ...esgKeywords, ...arbitrageKeywords,
+            ...methodologyKeywords, ...structuredProductsKeywords, ...riskManagementKeywords,
+            ...behavioralKeywords, ...maKeywords, ...ipoKeywords, ...geopoliticalKeywords, ...taxKeywords
+        ].some(keywords => keywords.some(kw => message.includes(kw)));
+        
+        const hasGeneralKeyword = generalNonFinancialKeywords.some(kw => message.includes(kw));
+        
+        // Si question générale ET pas de mots financiers ET pas de tickers → Perplexity seul
+        if (hasGeneralKeyword && !hasFinancialKeyword && extractedTickers.length === 0) {
+            return { usePerplexityOnly: true, reason: 'Question générale/non-financière - Perplexity peut répondre naturellement' };
+        }
+        
         // ✅ PERPLEXITY SEUL: Questions sur fonds/ETF/portefeuille
         const fundKeywords = [
             'fonds', 'fond', 'mutual fund', 'fonds mutuels', 'fonds d\'investissement',
@@ -1154,6 +1208,14 @@ class SmartAgent {
         if (perplexityDecision.usePerplexityOnly) {
             console.log(`🧠 PERPLEXITY ONLY: ${perplexityDecision.reason}`);
             console.log(`   → Pas d'outils nécessaires, Perplexity répondra directement`);
+            
+            // 🎯 Marquer comme question générale si détectée
+            if (perplexityDecision.reason.includes('générale/non-financière')) {
+                context.is_general_question = true;
+                context.perplexity_only_reason = perplexityDecision.reason;
+                console.log(`   → Question générale/non-financière détectée - prompt adapté`);
+            }
+            
             return []; // Retourner liste vide - Emma utilisera Perplexity seul
         } else {
             console.log(`📊 APIs NÉCESSAIRES: ${perplexityDecision.reason}`);
@@ -2142,8 +2204,13 @@ STRUCTURE OBLIGATOIRE:
             : `\n😊 STYLE SMS: Tu communiques par SMS. Utilise des emojis pour rendre tes réponses vivantes et engageantes (📊 📈 💰 💡 ✅ ⚠️ 🎯 👋 etc.). Reste concise mais complète. Pour analyses financières, donne les infos clés sans sacrifier la qualité. Limite-toi à 2-3 phrases maximum pour rester lisible.\n`
         ) : '';
 
-        // CFA®-Level Identity Integration
-        const cfaIdentity = intentData && ['comprehensive_analysis', 'fundamentals', 'comparative_analysis', 'earnings', 'recommendation'].includes(intentData.intent)
+        // 🎯 Détection si question générale/non-financière
+        const isGeneralNonFinancial = context.is_general_question || 
+            (intentData && ['general_conversation', 'help', 'capabilities'].includes(intentData.intent)) ||
+            (context.perplexity_only_reason && context.perplexity_only_reason.includes('générale/non-financière'));
+        
+        // CFA®-Level Identity Integration (uniquement pour questions financières)
+        const cfaIdentity = !isGeneralNonFinancial && intentData && ['comprehensive_analysis', 'fundamentals', 'comparative_analysis', 'earnings', 'recommendation'].includes(intentData.intent)
             ? `${CFA_SYSTEM_PROMPT.identity}
 
 ${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
@@ -2165,24 +2232,36 @@ ${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
 - Formatage Bloomberg Terminal style
 
 `
+            : isGeneralNonFinancial
+            ? `Tu es Emma, une assistante IA polyvalente et intelligente. Tu peux répondre à des questions sur de nombreux sujets, pas seulement la finance. Réponds en français de manière naturelle, accessible et engageante. Si la question n'est pas financière, réponds simplement et utilement sans forcer un contexte financier.`
             : `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.`;
 
+        // 🎯 Instructions adaptées selon type de question
+        const generalInstructions = isGeneralNonFinancial ? `
+🎯 INSTRUCTIONS POUR QUESTION GÉNÉRALE:
+- Réponds naturellement et utilement à la question posée
+- Pas besoin de forcer un contexte financier
+- Utilise tes connaissances générales via Perplexity
+- Sois clair, concis et engageant
+- Si la question concerne un sujet non-financier, réponds simplement sans mentionner la finance
+` : '';
+
         return `${cfaIdentity}${userContext}${introContext}${emojiInstructions}
-📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
+${isGeneralNonFinancial ? '' : `📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
 ⚠️ CRITIQUE: Toutes les données doivent refléter les informations les plus récentes. Si une donnée est datée (ex: "au 8 août"), précise clairement que c'est une donnée ancienne et cherche des informations plus récentes si disponibles.
 
-CONTEXTE DE LA CONVERSATION:
+`}CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
 ${intentContext}
-DONNÉES DISPONIBLES DES OUTILS (résumées pour éviter surcharge):
+${isGeneralNonFinancial ? '' : `DONNÉES DISPONIBLES DES OUTILS (résumées pour éviter surcharge):
 ${toolsData.map(t => {
     const reliabilityNote = t.is_reliable === false ? ' [⚠️ SOURCE PARTIELLE - Utiliser avec prudence]' : '';
     return `- ${t.tool}${reliabilityNote}: ${this._summarizeToolData(t.tool, t.data)}`;
 }).join('\n')}
 
-QUESTION DE L'UTILISATEUR: ${userMessage}
+`}QUESTION DE L'UTILISATEUR: ${userMessage}
 
-INSTRUCTIONS CRITIQUES:
+${isGeneralNonFinancial ? generalInstructions : `INSTRUCTIONS CRITIQUES:
 1. ❌ ❌ ❌ ABSOLUMENT INTERDIT DE COPIER DU JSON/CODE DANS TA RÉPONSE ❌ ❌ ❌
    - Les données JSON ci-dessus sont pour TON ANALYSE INTERNE SEULEMENT
    - Tu dois TOUJOURS transformer ces données en TEXTE NATUREL EN FRANÇAIS
@@ -2232,6 +2311,7 @@ INSTRUCTIONS CRITIQUES:
 10. Cite tes sources (outils utilisés) en fin de réponse
 11. Ton: professionnel mais accessible, comme une vraie analyste financière
 ${intentData ? `12. L'intention détectée: ${intentData.intent} - ${intentData.intent === 'comprehensive_analysis' ? 'fournis une analyse COMPLÈTE pour chaque ticker avec prix, fondamentaux, et actualités' : 'réponds en analysant tous les tickers pertinents'}` : ''}
+` : ''}
 
 📊 GRAPHIQUES ET VISUALISATIONS - ANALYSE CONTEXTUALISÉE:
 
