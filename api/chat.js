@@ -887,63 +887,114 @@ Comment puis-je t'aider ? 🚀`;
     }
     */
 
-    // 7. APPELER EMMA-AGENT (Function Calling Router existant)
+    // 7. APPELER EMMA-AGENT (Function Calling Router existant) OU SMS V2 ORCHESTRATOR
     let emmaResponse;
-    try {
-      console.log('[Chat API] Appel emma-agent...');
 
-      // Simuler appel interne à emma-agent
-      // En production, on importe et appelle la fonction directement
-      const emmaAgentModule = await import('./emma-agent.js');
-      const emmaRequest = {
-        method: 'POST',
-        body: {
-          message: message,
-          context: emmaContext
-        }
-      };
+    // 🚀 FEATURE FLAG: SMS V2 Complete System (28 intents)
+    const USE_SMS_V2_COMPLETE = process.env.USE_SMS_ORCHESTRATOR_V2_COMPLETE === 'true';
 
-      // Mock response object for emma-agent
-      let emmaResponseData = null;
-      const emmaRes = {
-        status: (code) => ({
-          json: (data) => {
-            emmaResponseData = data;
-            return emmaResponseData;
+    if (channel === 'sms' && USE_SMS_V2_COMPLETE) {
+      // ⭐ NOUVEAU: SMS V2 Orchestrator (28 intents, LLM formatter only)
+      try {
+        console.log('[Chat API] 🚀 Appel SMS V2 Orchestrator (28 intents)...');
+
+        const { processSMS } = await import('../lib/sms/sms-orchestrator-complete.cjs');
+        const trimmedMessage = message.trim();
+
+        const smsResult = await processSMS(trimmedMessage, {
+          userId: userId,
+          previousMessages: conversationHistory.slice(-3),
+          previousSources: metadata?.previousSources || [],
+        });
+
+        // Adapter format de réponse pour compatibilité avec le reste du code
+        emmaResponse = {
+          success: true,
+          response: smsResult.response,
+          model: 'sms-v2-orchestrator',
+          tools_used: [smsResult.metadata.dataSource || 'unknown'],
+          execution_time_ms: smsResult.metadata.latency || 0,
+          confidence: smsResult.metadata.needsClarification ? 0.5 : 1.0,
+          intent: smsResult.metadata.intent,
+          metadata: {
+            smsV2: true,
+            intent: smsResult.metadata.intent,
+            latency: smsResult.metadata.latency,
+            dataSource: smsResult.metadata.dataSource,
+            validation: smsResult.metadata.validation,
+            truncated: smsResult.metadata.truncated,
+            pipeline: smsResult.metadata.pipeline,
           }
-        }),
-        setHeader: () => {}
-      };
+        };
 
-      // ⏱️ TIMEOUT INTELLIGENT : SMS=60s, Email=90s, Web/Messenger=75s
-      const timeoutMs = channel === 'sms' ? 60000 : channel === 'email' ? 90000 : 75000;
-      console.log(`[Chat API] ⏱️ Timeout configuré: ${timeoutMs}ms pour canal ${channel}`);
+        console.log(`[Chat API] ✅ SMS V2 response - Intent: ${emmaResponse.intent}, Latency: ${emmaResponse.execution_time_ms}ms`);
 
-      // Call emma-agent avec timeout
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(`Emma agent timeout after ${timeoutMs}ms`)), timeoutMs)
-      );
-
-      await Promise.race([
-        emmaAgentModule.default(emmaRequest, emmaRes),
-        timeoutPromise
-      ]);
-
-      if (!emmaResponseData || !emmaResponseData.success) {
-        console.error('[Chat API] Emma agent unsuccessful response:', JSON.stringify(emmaResponseData, null, 2));
-        throw new Error(`Emma agent returned unsuccessful response: ${emmaResponseData?.error || emmaResponseData?.response || 'Unknown error'}`);
+      } catch (error) {
+        console.error('[Chat API] ❌ Erreur SMS V2 Orchestrator:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to process SMS with v2 system',
+          details: error.message
+        });
       }
+    } else {
+      // ✅ INCHANGÉ: Web, Email, Messenger, SMS (si flag=false)
+      try {
+        console.log(`[Chat API] Appel emma-agent (canal: ${channel})...`);
 
-      emmaResponse = emmaResponseData;
-      console.log(`[Chat API] Emma response reçue - Model: ${emmaResponse.model}, Tools: ${emmaResponse.tools_used?.length || 0}`);
+        // Simuler appel interne à emma-agent
+        // En production, on importe et appelle la fonction directement
+        const emmaAgentModule = await import('./emma-agent.js');
+        const emmaRequest = {
+          method: 'POST',
+          body: {
+            message: message,
+            context: emmaContext
+          }
+        };
 
-    } catch (error) {
-      console.error('[Chat API] Erreur appel emma-agent:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to get response from Emma',
-        details: error.message
-      });
+        // Mock response object for emma-agent
+        let emmaResponseData = null;
+        const emmaRes = {
+          status: (code) => ({
+            json: (data) => {
+              emmaResponseData = data;
+              return emmaResponseData;
+            }
+          }),
+          setHeader: () => {}
+        };
+
+        // ⏱️ TIMEOUT INTELLIGENT : SMS=60s, Email=90s, Web/Messenger=75s
+        const timeoutMs = channel === 'sms' ? 60000 : channel === 'email' ? 90000 : 75000;
+        console.log(`[Chat API] ⏱️ Timeout configuré: ${timeoutMs}ms pour canal ${channel}`);
+
+        // Call emma-agent avec timeout
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error(`Emma agent timeout after ${timeoutMs}ms`)), timeoutMs)
+        );
+
+        await Promise.race([
+          emmaAgentModule.default(emmaRequest, emmaRes),
+          timeoutPromise
+        ]);
+
+        if (!emmaResponseData || !emmaResponseData.success) {
+          console.error('[Chat API] Emma agent unsuccessful response:', JSON.stringify(emmaResponseData, null, 2));
+          throw new Error(`Emma agent returned unsuccessful response: ${emmaResponseData?.error || emmaResponseData?.response || 'Unknown error'}`);
+        }
+
+        emmaResponse = emmaResponseData;
+        console.log(`[Chat API] Emma response reçue - Model: ${emmaResponse.model}, Tools: ${emmaResponse.tools_used?.length || 0}`);
+
+      } catch (error) {
+        console.error('[Chat API] Erreur appel emma-agent:', error);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to get response from Emma',
+          details: error.message
+        });
+      }
     }
 
     // 8. ADAPTER LA RÉPONSE POUR LE CANAL
