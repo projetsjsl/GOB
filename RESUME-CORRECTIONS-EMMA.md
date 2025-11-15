@@ -155,3 +155,5 @@ Traité **sans outils API** - réponse générée directement par LLM avec conna
 **Prochaine étape:** Déployer et tester en production avec SMS réel.
 
 
+
+

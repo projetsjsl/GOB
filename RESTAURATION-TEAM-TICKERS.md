@@ -176,3 +176,5 @@ Après avoir exécuté le script, vérifiez que tout fonctionne :
 - La colonne `priority` permet de trier les tickers par importance
 
 
+
+

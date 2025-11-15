@@ -276,3 +276,5 @@ L'intent `stock_screening` est traité **sans outils API** - la réponse est gé
 **Prêt pour déploiement en production.** 🚀
 
 
+
+

@@ -3789,6 +3789,15 @@ const fetchHybridData = async (symbol, dataType) => {
                         {
                             proName: 'BITSTAMP:ETHUSD',
                             title: 'Ethereum'
+                        },
+                        // Commodités - Pétrole
+                        {
+                            proName: 'NYMEX:CL1!',
+                            title: 'WTI (Pétrole)'
+                        },
+                        {
+                            proName: 'ICE:BR1!',
+                            title: 'Brent (Pétrole)'
                         }
                     ],
                     colorTheme: isDarkMode ? 'dark' : 'light',
@@ -4843,7 +4852,18 @@ STRUCTURE JSON OBLIGATOIRE:
                 setShowTemperatureEditor,
                 showLengthEditor,
                 setShowLengthEditor
-            }) => (
+            }) => {
+                // États pour Température et Longueur (chargés depuis localStorage)
+                const [emmaTemperature, setEmmaTemperature] = useState(() => {
+                    const saved = localStorage.getItem('emma-temperature');
+                    return saved ? parseFloat(saved) : 0.3;
+                });
+                const [emmaMaxTokens, setEmmaMaxTokens] = useState(() => {
+                    const saved = localStorage.getItem('emma-max-tokens');
+                    return saved ? parseInt(saved) : 4096;
+                });
+
+                return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
@@ -5311,7 +5331,7 @@ STRUCTURE JSON OBLIGATOIRE:
                                 {emmaConnected ? '✅ Gemini Actif' : '❌ Gemini Inactif'}
                             </div>
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-2 mb-4">
                             <button
                                 onClick={() => setShowPromptEditor(!showPromptEditor)}
                                 className={`px-4 py-2 rounded transition-colors ${
@@ -5343,8 +5363,145 @@ STRUCTURE JSON OBLIGATOIRE:
                                 📏 Longueur Réponse
                             </button>
                         </div>
+                        
+                        {/* Sliders pour Température et Longueur */}
+                        <div className={`space-y-4 ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'} p-4 rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                            {/* Slider Température */}
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className={`text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        🌡️ Température: <span className="font-bold text-blue-600">{emmaTemperature.toFixed(1)}</span>
+                                    </label>
+                                    <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        {emmaTemperature <= 0.3 ? 'Précis' : emmaTemperature <= 0.5 ? 'Équilibré' : emmaTemperature <= 0.7 ? 'Naturel' : 'Créatif'}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0.1"
+                                    max="1.0"
+                                    step="0.1"
+                                    value={emmaTemperature}
+                                    onChange={(e) => {
+                                        const newTemp = parseFloat(e.target.value);
+                                        setEmmaTemperature(newTemp);
+                                        localStorage.setItem('emma-temperature', newTemp.toString());
+                                    }}
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                    style={{
+                                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(emmaTemperature - 0.1) / 0.9 * 100}%, #e5e7eb ${(emmaTemperature - 0.1) / 0.9 * 100}%, #e5e7eb 100%)`
+                                    }}
+                                />
+                                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>0.1</span>
+                                    <span>0.5</span>
+                                    <span>1.0</span>
+                                </div>
+                            </div>
+                            
+                            {/* Slider Longueur */}
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className={`text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        📏 Longueur: <span className="font-bold text-green-600">{emmaMaxTokens}</span> tokens
+                                    </label>
+                                    <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        {emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="512"
+                                    max="8192"
+                                    step="512"
+                                    value={emmaMaxTokens}
+                                    onChange={(e) => {
+                                        const newTokens = parseInt(e.target.value);
+                                        setEmmaMaxTokens(newTokens);
+                                        localStorage.setItem('emma-max-tokens', newTokens.toString());
+                                    }}
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                    style={{
+                                        background: `linear-gradient(to right, #10b981 0%, #10b981 ${(emmaMaxTokens - 512) / 7680 * 100}%, #e5e7eb ${(emmaMaxTokens - 512) / 7680 * 100}%, #e5e7eb 100%)`
+                                    }}
+                                />
+                                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>512</span>
+                                    <span>4096</span>
+                                    <span>8192</span>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            💡 <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement.
+                            💡 <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement et sauvegardées dans localStorage.
+                        </div>
+                    </div>
+
+                    {/* Configuration Scraping Seeking Alpha */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gradient-to-br from-orange-900/20 to-gray-900 border-orange-700' : 'bg-gradient-to-br from-orange-50 to-gray-50 border-orange-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-orange-300' : 'text-orange-900'}`}>
+                                <Icon emoji="🔐" size={20} />
+                                Configuration Scraping Seeking Alpha
+                            </h3>
+                        </div>
+                        
+                        <div className={`space-y-4 ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'} p-4 rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                            {/* Email */}
+                            <div>
+                                <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    📧 Email:
+                                </label>
+                                <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
+                                    mvilla@videotron.ca
+                                </div>
+                            </div>
+                            
+                            {/* Mot de passe */}
+                            <div>
+                                <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    🔑 Mot de passe:
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <div className={`flex-1 p-3 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
+                                        <span id="seeking-alpha-password-display">••••••••</span>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            const display = document.getElementById('seeking-alpha-password-display');
+                                            if (display) {
+                                                if (display.textContent === '••••••••') {
+                                                    display.textContent = 'Mickey69';
+                                                } else {
+                                                    display.textContent = '••••••••';
+                                                }
+                                            }
+                                        }}
+                                        className={`px-4 py-3 rounded-lg border transition-colors ${
+                                            isDarkMode 
+                                                ? 'bg-orange-700 hover:bg-orange-600 border-orange-600 text-white' 
+                                                : 'bg-orange-500 hover:bg-orange-600 border-orange-400 text-white'
+                                        }`}
+                                    >
+                                        👁️
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {/* Instructions */}
+                            <div className={`mt-4 p-3 rounded-lg border ${isDarkMode ? 'bg-blue-900/20 border-blue-700 text-blue-200' : 'bg-blue-50 border-blue-200 text-blue-800'}`}>
+                                <div className="text-sm font-semibold mb-2">📋 Instructions d'utilisation:</div>
+                                <ol className="text-xs space-y-1 list-decimal list-inside">
+                                    <li>Connectez-vous à Seeking Alpha avec les identifiants ci-dessus</li>
+                                    <li>Utilisez la section "ÉTAPE 1: SCRAPING BATCH" ci-dessous pour lancer le scraping</li>
+                                    <li>Pour chaque popup ouverte, appuyez sur F12, allez dans la Console, et collez le script généré</li>
+                                    <li>Les données sont automatiquement sauvegardées dans Supabase</li>
+                                    <li>Utilisez "ÉTAPE 2: ANALYSE BATCH PERPLEXITY" pour analyser les données scrapées</li>
+                                </ol>
+                            </div>
                         </div>
                     </div>
 
@@ -13346,6 +13503,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                 const [emmaInput, setEmmaInput] = useState('');
                 const [emmaLoading, setEmmaLoading] = useState(false);
                 const chatContainerRef = useRef(null);
+                const [showThemesSuggestions, setShowThemesSuggestions] = useState(false);
+                const [selectedThemeCategory, setSelectedThemeCategory] = useState(null);
                 const [emmaApiKey, setEmmaApiKey] = useState('');
                 // emmaConnected, showPromptEditor, showTemperatureEditor, showLengthEditor maintenant dans le parent
                 const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
@@ -15143,6 +15302,97 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     setShowEmailModal(false);
                 };
 
+                // Suggestions par thèmes (6 catégories)
+                const themeSuggestions = {
+                    'analyses': {
+                        icon: '📊',
+                        label: 'Analyses d\'entreprises',
+                        suggestions: [
+                            'Quel est le prix actuel de [TICKER] ?',
+                            'Performance de [TICKER] aujourd\'hui',
+                            'Résumé rapide de [TICKER]',
+                            '[TICKER] est-il suracheté ou survendu ?',
+                            'Analyse approfondie de [TICKER] : fondamentaux, technique, actualités et recommandation',
+                            'Évalue [TICKER] selon les critères de Warren Buffett',
+                            'Analyse complète du bilan de [TICKER]',
+                            'Force et faiblesses de [TICKER] par rapport à ses concurrents',
+                            'Qualité du management et gouvernance de [TICKER]'
+                        ]
+                    },
+                    'comparaisons': {
+                        icon: '🔍',
+                        label: 'Comparaisons',
+                        suggestions: [
+                            'Compare [ACTION1], [ACTION2] et [ACTION3] : valorisation, croissance et dividendes',
+                            'Qui est le meilleur entre [ACTION1] et [ACTION2] ?',
+                            'Analyse comparative des GAFAM avec tableaux',
+                            'Range [ACTION1], [ACTION2], [ACTION3] du meilleur au pire selon le P/E',
+                            'Quelle action offre le meilleur potentiel : [ACTION1], [ACTION2] ou [ACTION3] ?'
+                        ]
+                    },
+                    'resultats': {
+                        icon: '📈',
+                        label: 'Résultats & Actualités',
+                        suggestions: [
+                            'Quelles sont les dernières actualités importantes sur [TICKER] ?',
+                            'Y a-t-il des catalyseurs à venir pour [TICKER] ?',
+                            'Résumé des résultats trimestriels de [TICKER]',
+                            '[TICKER] a-t-il annoncé quelque chose récemment ?',
+                            'Calendrier des événements importants pour [TICKER] cette semaine',
+                            'Montre-moi le graphique technique de [TICKER]',
+                            'Visualise la performance de [TICKER] avec chart',
+                            'Heatmap des secteurs du marché aujourd\'hui'
+                        ]
+                    },
+                    'valorisation': {
+                        icon: '💰',
+                        label: 'Valorisation & Métriques',
+                        suggestions: [
+                            'Calcule le score JSLAI™ de [TICKER] et explique-le',
+                            '[TICKER] est-il un achat, une conservation ou une vente ?',
+                            'Note [TICKER] sur 10 selon les critères de Peter Lynch',
+                            'Quel est le fair value de [TICKER] ?',
+                            '[TICKER] mérite-t-il sa valorisation actuelle ?'
+                        ]
+                    },
+                    'macro': {
+                        icon: '🌍',
+                        label: 'Macro & Marchés',
+                        suggestions: [
+                            'Quel est le meilleur secteur à investir en ce moment ?',
+                            'Performance du secteur technologique vs secteur financier',
+                            'Impact de la hausse des taux sur [TICKER]',
+                            'Quelles actions profitent de la tendance IA ?',
+                            'Analyse macro-économique et implications pour mon portefeuille'
+                        ]
+                    },
+                    'aide': {
+                        icon: '❓',
+                        label: 'Aide & Guides',
+                        suggestions: [
+                            'Explique-moi le ratio P/E et comment l\'interpréter',
+                            'C\'est quoi le ROIC et pourquoi c\'est important ?',
+                            'Comment analyser le cash flow d\'une entreprise ?',
+                            'Quelle est la différence entre croissance et value investing ?',
+                            'Les critères de Warren Buffett pour sélectionner une action',
+                            'Mon portefeuille contient [ACTION1], [ACTION2], [ACTION3]. Que dois-je surveiller ?',
+                            'Analyse les risques de mon portefeuille : [ACTION1], [ACTION2], [ACTION3]'
+                        ]
+                    }
+                };
+
+                // Fonction pour gérer le clic sur une suggestion
+                const handleSuggestionClick = (suggestionText) => {
+                    setEmmaInput(suggestionText);
+                    setShowThemesSuggestions(false);
+                    setSelectedThemeCategory(null);
+                    
+                    // Auto-envoi après un court délai
+                    setTimeout(() => {
+                        sendMessageToEmma();
+                    }, 300);
+                };
+
                 return (
                     <div className="space-y-6">
                         <div className="flex justify-end items-center">
@@ -15176,7 +15426,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 : 'bg-gray-50 border-gray-200'
                         }`}>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
+                                <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                                     <img 
                                         src={isDarkMode ? 'emma-avatar-gob-dark.jpg' : 'emma-avatar-gob-light.jpg'} 
                                         alt="Emma" 
@@ -15193,7 +15443,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div className="relative">
                                 <div
                                     ref={chatContainerRef}
-                                    className="h-[500px] overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 bg-white"
+                                    className={`${emmaMessages.length === 1 ? 'h-[200px]' : 'h-[500px]'} overflow-y-auto mb-4 p-4 rounded-lg transition-colors duration-300 bg-white`}
                                 >
                                 {historyLoading ? (
                                     // Animation de chargement pendant la restauration de l'historique
@@ -15251,7 +15501,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         {emmaMessages.map((message) => (
                                             <div key={message.id} className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : message.type === 'cost-estimate' ? 'justify-center' : 'justify-start'}`}>
                                                 {message.type !== 'user' && message.type !== 'cost-estimate' && (
-                                                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                                                         <img 
                                                             src={isDarkMode ? 'EMMA-JSLAI-GOB-dark.jpg' : 'EMMA-JSLAI-GOB-light.jpg'} 
                                                             alt="Emma" 
@@ -15422,8 +15672,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     onClick={() => setShowCommandsHelp(!showCommandsHelp)}
                                     className={`w-full text-left p-2 rounded-lg border transition-colors duration-300 ${
                                         isDarkMode 
-                                            ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800 text-gray-400 hover:text-gray-300' 
-                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-700'
+                                            ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-white' 
+                                            : 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-white'
                                     }`}
                                 >
                                     <div className="flex items-center justify-between">
@@ -15558,6 +15808,98 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                             </div>
 
+                            {/* Suggestions par thèmes */}
+                            <div className={`mb-3 transition-all duration-300 ${
+                                showThemesSuggestions ? 'opacity-100' : 'opacity-60 hover:opacity-100'
+                            }`}>
+                                <button
+                                    onClick={() => {
+                                        setShowThemesSuggestions(!showThemesSuggestions);
+                                        if (showThemesSuggestions) {
+                                            setSelectedThemeCategory(null);
+                                        }
+                                    }}
+                                    className={`w-full text-left p-2 rounded-lg border transition-colors duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-white' 
+                                            : 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-white'
+                                    }`}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-medium flex items-center gap-2">
+                                            <span>🎯</span>
+                                            <span>Thèmes</span>
+                                        </span>
+                                        <span className={`text-xs transition-transform duration-300 ${showThemesSuggestions ? 'rotate-180' : ''}`}>
+                                            ▼
+                                        </span>
+                                    </div>
+                                </button>
+                                
+                                {showThemesSuggestions && (
+                                    <div className={`mt-2 p-3 rounded-lg border transition-colors duration-300 ${
+                                        isDarkMode 
+                                            ? 'bg-gray-800/80 border-gray-700' 
+                                            : 'bg-white border-gray-200'
+                                    }`}>
+                                        {/* Grille des catégories */}
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                                            {Object.entries(themeSuggestions).map(([key, category]) => (
+                                                <button
+                                                    key={key}
+                                                    onClick={() => setSelectedThemeCategory(selectedThemeCategory === key ? null : key)}
+                                                    className={`p-3 rounded-lg border transition-all duration-200 hover:scale-105 ${
+                                                        selectedThemeCategory === key
+                                                            ? isDarkMode 
+                                                                ? 'bg-blue-700 border-blue-500 text-white' 
+                                                                : 'bg-blue-500 border-blue-400 text-white'
+                                                            : isDarkMode 
+                                                                ? 'bg-gray-700/50 border-gray-600 hover:bg-gray-700 hover:border-gray-500 text-gray-300' 
+                                                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300 text-gray-700'
+                                                    }`}
+                                                >
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <span className="text-xl">{category.icon}</span>
+                                                        <span className="text-xs font-semibold text-center">{category.label}</span>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                        
+                                        {/* Suggestions de la catégorie sélectionnée */}
+                                        {selectedThemeCategory && themeSuggestions[selectedThemeCategory] && (
+                                            <div className={`mt-3 p-3 rounded-lg border ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-900/50 border-gray-600' 
+                                                    : 'bg-gray-50 border-gray-200'
+                                            }`}>
+                                                <div className={`text-xs font-semibold mb-2 flex items-center gap-2 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>
+                                                    <span>{themeSuggestions[selectedThemeCategory].icon}</span>
+                                                    <span>{themeSuggestions[selectedThemeCategory].label}</span>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {themeSuggestions[selectedThemeCategory].suggestions.map((suggestion, index) => (
+                                                        <button
+                                                            key={index}
+                                                            onClick={() => handleSuggestionClick(suggestion)}
+                                                            className={`w-full text-left p-2 rounded border transition-all duration-200 hover:scale-[1.02] ${
+                                                                isDarkMode 
+                                                                    ? 'bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-blue-500 text-gray-200' 
+                                                                    : 'bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-300 text-gray-700'
+                                                            }`}
+                                                        >
+                                                            <span className="text-sm">{suggestion}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
                             {/* Input avec suggestions slash commands */}
                             <div className="relative flex gap-2">
                                 <div className="flex-1 relative">
@@ -15657,7 +15999,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             setTimeout(() => setShowSlashSuggestions(false), 200);
                                         }}
                                         placeholder="Posez votre question à Emma... (Tapez / pour voir les commandes)"
-                                        className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${
+                                        className={`flex-1 px-4 py-3 text-base rounded-lg border transition-colors duration-300 ${
                                             isDarkMode 
                                                 ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                                                 : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'

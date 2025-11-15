@@ -401,3 +401,5 @@ Emma génère alors une réponse textuelle via Gemini (comportement original).
 Emma peut maintenant faire de **VRAIES recherches** avec des **données réelles** !
 
 
+
+

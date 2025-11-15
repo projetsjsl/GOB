@@ -288,3 +288,5 @@ function _filterAndRank(stocks, criteria, market_cap) {
 export default { searchStocks };
 
 
+
+
