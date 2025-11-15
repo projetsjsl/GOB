@@ -53,23 +53,32 @@ Emma IA peut maintenant détecter automatiquement le type de produit financier (
 
 ## Implémentation technique
 
-### 1. Détection du type (lib/tools/fmp-fundamentals-tool.js)
+### 1. Détection Multi-Sources (lib/tools/product-type-detector.js)
+
+**Stratégie de détection fiable (3 niveaux) :**
 
 ```javascript
-_detectProductType(company, ticker) {
-    // Logique de détection basée sur:
-    // - Flag isEtf de FMP
-    // - Patterns de ticker
-    // - Nom de l'entreprise
-    // - Industrie/secteur
+// Niveau 1: FMP ETF endpoint (très fiable pour ETFs)
+GET https://financialmodelingprep.com/api/v3/etf-info/{ticker}
+// Si succès → C'est un ETF (confiance: haute)
 
-    return {
-        type: 'ETF',                    // Type lisible
-        category: 'Fund',               // Catégorie générale
-        framework: 'etf_analysis'       // Framework d'analyse à utiliser
-    };
-}
+// Niveau 2: Yahoo Finance quoteType (fiable pour tous types)
+GET https://query1.finance.yahoo.com/v7/finance/quote?symbols={ticker}
+// Retourne: quoteType = "EQUITY" | "ETF" | "MUTUALFUND" | "INDEX" | etc.
+// Confiance: haute
+
+// Niveau 3: FMP Profile (fallback basique)
+// Utilise isEtf flag et industry field
+// Confiance: moyenne
 ```
+
+**Types détectés avec sources :**
+- **ETF** : FMP etf-info endpoint (primaire) ou Yahoo quoteType=ETF
+- **Mutual Fund** : Yahoo quoteType=MUTUALFUND (seule source fiable)
+- **Common Stock** : Yahoo quoteType=EQUITY ou FMP profile
+- **REIT** : FMP industry="REIT"
+- **Index, Options, Futures** : Yahoo quoteType
+- **Crypto, Forex** : Yahoo quoteType
 
 ### 2. Prompt adaptatif (config/emma-cfa-prompt.js)
 
@@ -94,13 +103,25 @@ Le type de produit est extrait des données et injecté dans le prompt:
 
 ## Gestion des fonds communs
 
-**Problème:** Les fonds communs (ex: AMAXX) ne sont souvent PAS dans FMP ou autres API standard.
+**Problème:** Les fonds communs (ex: AMAXX) ne sont souvent PAS dans FMP.
 
-**Solution:** Emma est maintenant instruite à:
-1. Détecter les patterns de fonds communs (ticker finit par X, XX, IX)
-2. Chercher via Perplexity avec requête spécifique: `"mutual fund [ticker] performance expense ratio holdings"`
-3. Utiliser sources alternatives: Morningstar, Fundata, site web du fonds
-4. Adapter l'analyse: Focus sur expense ratio, performance vs benchmark, manager, rating Morningstar
+**Solution fiable:**
+1. **Détection via Yahoo Finance quoteType** : `GET /v7/finance/quote?symbols=AMAXX`
+   - Retourne `quoteType: "MUTUALFUND"` si c'est un fonds
+   - Source la plus fiable (pas de devinettes avec patterns)
+
+2. **Si Yahoo Finance confirme que c'est un fonds**, Emma :
+   - Cherche via Perplexity : `"mutual fund [ticker] expense ratio performance Morningstar rating"`
+   - Sources: Morningstar, Fundata, site web du fonds
+   - Analyse adaptée: expense ratio, performance vs benchmark, manager, rating
+
+3. **Métriques clés pour fonds** (pas les mêmes que actions) :
+   - Expense Ratio (frais de gestion)
+   - Sharpe Ratio, Alpha, Beta
+   - Performance vs benchmark
+   - Turnover ratio
+   - Manager track record
+   - Morningstar rating (étoiles)
 
 ## Exemple d'analyse adaptative
 
