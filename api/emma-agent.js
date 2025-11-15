@@ -1898,14 +1898,19 @@ class SmartAgent {
     /**
      * 🛡️ Détecte et nettoie le JSON brut dans les réponses conversationnelles
      * Protection contre les réponses qui contiennent du JSON au lieu de texte naturel
+     *
+     * ✅ AMÉLIORÉ: Détection plus agressive et conversion récursive en texte lisible
      */
     _sanitizeJsonInResponse(response) {
         try {
-            // Détecter si la réponse contient beaucoup de JSON brut
+            // ✅ DÉTECTION RENFORCÉE: Détecter TOUT JSON, pas seulement >100 chars
             const jsonPatterns = [
-                /\{[\s\S]{100,}\}/g,  // Gros objets JSON (>100 chars)
-                /\[[\s\S]{100,}\]/g,  // Gros arrays JSON (>100 chars)
-                /"[a-zA-Z_]+"\s*:\s*[{\["]/g  // Pattern clé:valeur JSON
+                /\{[\s\S]{20,}\}/g,           // Objets JSON (>20 chars pour éviter faux positifs)
+                /\[[\s\S]{20,}\]/g,           // Arrays JSON (>20 chars)
+                /"[a-zA-Z_]+"\s*:\s*[{\["]/g, // Pattern clé:valeur JSON
+                /\{\s*"[^"]+"\s*:/g,          // Début d'objet JSON avec clé
+                /:\s*\{[^}]+\}/g,             // Valeur objet JSON imbriqué
+                /\[\s*\{[^}]+\}\s*\]/g        // Array d'objets JSON
             ];
 
             let hasJsonDump = false;
@@ -1921,64 +1926,146 @@ class SmartAgent {
                 return response;
             }
 
-            console.warn('⚠️ JSON dump detected in response, attempting to clean...');
-
-            // Extraire le texte avant et après le JSON
+            console.warn('⚠️ JSON dump detected in response, attempting aggressive cleanup...');
             let cleaned = response;
 
-            // ✅ AMÉLIORATION: Extraire les données JSON et les convertir en texte lisible au lieu de les supprimer
-            // Détecter les blocs JSON et essayer de les convertir en format texte
-            const jsonBlockRegex = /\{[\s\S]{50,}\}/g;
-            cleaned = cleaned.replace(jsonBlockRegex, (jsonMatch) => {
-                try {
-                    const parsed = JSON.parse(jsonMatch);
-                    // Convertir l'objet JSON en texte lisible
-                    const textLines = [];
-                    for (const [key, value] of Object.entries(parsed)) {
-                        if (typeof value === 'object' && value !== null) {
-                            textLines.push(`${key}: ${JSON.stringify(value, null, 2)}`);
+            // ✅ HELPER: Convertir récursivement JSON en texte lisible
+            const jsonToText = (obj, indent = 0) => {
+                const prefix = '  '.repeat(indent);
+                const lines = [];
+
+                if (Array.isArray(obj)) {
+                    // Arrays: afficher comme liste
+                    obj.forEach((item, idx) => {
+                        if (typeof item === 'object' && item !== null) {
+                            lines.push(`${prefix}${idx + 1}. ${jsonToText(item, indent + 1).trim()}`);
                         } else {
-                            textLines.push(`${key}: ${value}`);
+                            lines.push(`${prefix}${idx + 1}. ${item}`);
+                        }
+                    });
+                } else if (typeof obj === 'object' && obj !== null) {
+                    // Objects: afficher comme clé: valeur
+                    for (const [key, value] of Object.entries(obj)) {
+                        // Formater les clés en français (camelCase → Texte lisible)
+                        const readableKey = key
+                            .replace(/([A-Z])/g, ' $1')
+                            .replace(/^./, str => str.toUpperCase())
+                            .trim();
+
+                        if (typeof value === 'object' && value !== null) {
+                            lines.push(`${prefix}${readableKey}:`);
+                            lines.push(jsonToText(value, indent + 1));
+                        } else {
+                            lines.push(`${prefix}${readableKey}: ${value}`);
                         }
                     }
-                    return textLines.join('\n');
-                } catch (e) {
-                    // Si le JSON ne peut pas être parsé, supprimer silencieusement
-                    return '';
+                } else {
+                    return String(obj);
                 }
-            });
 
-            // Supprimer les code blocks JSON (garder seulement le contenu si possible)
+                return lines.join('\n');
+            };
+
+            // ✅ ÉTAPE 1: Nettoyer code blocks JSON (```json ... ```)
             cleaned = cleaned.replace(/```json\s*([\s\S]*?)\s*```/g, (match, content) => {
                 try {
                     const parsed = JSON.parse(content);
-                    // Convertir en texte lisible
-                    return Object.entries(parsed).map(([k, v]) => `${k}: ${v}`).join(', ');
+                    return '\n' + jsonToText(parsed) + '\n';
                 } catch (e) {
+                    console.warn('⚠️ Could not parse JSON code block, removing');
                     return ''; // Supprimer si non parseable
                 }
             });
-            cleaned = cleaned.replace(/```[\s\S]*?```/g, ''); // Supprimer autres code blocks
 
-            // Supprimer les tableaux JSON non parsables (>200 chars)
-            cleaned = cleaned.replace(/\[[\s\S]{200,}\]/g, '');
+            // ✅ ÉTAPE 2: Nettoyer objets JSON autonomes (gros blocs >20 chars)
+            // Traiter les plus gros blocs d'abord (éviter remplacements en cascade)
+            const jsonObjectRegex = /\{[\s\S]{20,}\}/g;
+            const matches = [...cleaned.matchAll(jsonObjectRegex)].sort((a, b) => b[0].length - a[0].length);
 
-            // Si la réponse nettoyée est trop courte (moins de 50 chars), c'était probablement que du JSON
+            for (const match of matches) {
+                try {
+                    const parsed = JSON.parse(match[0]);
+                    const textVersion = jsonToText(parsed);
+                    cleaned = cleaned.replace(match[0], '\n' + textVersion + '\n');
+                } catch (e) {
+                    // Si parsing échoue, supprimer le bloc
+                    console.warn('⚠️ Could not parse JSON object, removing');
+                    cleaned = cleaned.replace(match[0], '');
+                }
+            }
+
+            // ✅ ÉTAPE 3: Nettoyer arrays JSON autonomes
+            const jsonArrayRegex = /\[[\s\S]{20,}\]/g;
+            const arrayMatches = [...cleaned.matchAll(jsonArrayRegex)].sort((a, b) => b[0].length - a[0].length);
+
+            for (const match of arrayMatches) {
+                try {
+                    const parsed = JSON.parse(match[0]);
+                    const textVersion = jsonToText(parsed);
+                    cleaned = cleaned.replace(match[0], '\n' + textVersion + '\n');
+                } catch (e) {
+                    // Si parsing échoue, supprimer le bloc
+                    console.warn('⚠️ Could not parse JSON array, removing');
+                    cleaned = cleaned.replace(match[0], '');
+                }
+            }
+
+            // ✅ ÉTAPE 4: Supprimer les petits fragments JSON restants (<20 chars mais suspects)
+            cleaned = cleaned.replace(/\{[^}]{1,20}\}/g, (match) => {
+                // Garder seulement si ce n'est pas du JSON (ex: emojis, texte entre accolades)
+                if (match.includes(':') || match.includes('"')) {
+                    return ''; // C'est probablement du JSON, supprimer
+                }
+                return match; // Garder (ex: {nom})
+            });
+
+            // ✅ ÉTAPE 5: Supprimer tous les code blocks restants (```, ~~, etc.)
+            cleaned = cleaned.replace(/```[\s\S]*?```/g, '');
+            cleaned = cleaned.replace(/`[^`]+`/g, ''); // Inline code
+
+            // ✅ ÉTAPE 6: Nettoyer les artifacts de formatage JSON
+            cleaned = cleaned.replace(/^[\s\n]*[\{\[][\s\S]*?[\}\]][\s\n]*$/gm, ''); // Lignes avec juste {} ou []
+            cleaned = cleaned.replace(/",\s*"/g, ', '); // "value1", "value2" → value1, value2
+            cleaned = cleaned.replace(/"([^"]+)"\s*:\s*/g, '$1: '); // "key": → key:
+
+            // ✅ ÉTAPE 7: Validation finale - Vérifier qu'il ne reste plus de JSON structuré
+            const finalJsonCheck = /\{[\s\S]{10,}\}/g.test(cleaned) || /\[[\s\S]{10,}\]/g.test(cleaned);
+            if (finalJsonCheck) {
+                console.error('❌ JSON still present after cleanup, applying fallback');
+                // Supprimer agressivement tout ce qui ressemble à du JSON
+                cleaned = cleaned.replace(/\{[\s\S]*?\}/g, '');
+                cleaned = cleaned.replace(/\[[\s\S]*?\]/g, '');
+            }
+
+            // ✅ ÉTAPE 8: Si la réponse nettoyée est trop courte, retourner message d'erreur
             if (cleaned.trim().length < 50) {
                 console.error('❌ Response was mostly JSON, returning fallback message');
                 return "Je dispose de nombreuses données financières pour répondre à votre question, mais je rencontre un problème technique pour les présenter clairement. Pourriez-vous reformuler votre question de manière plus spécifique ? Par exemple : 'Quel est le prix actuel de [TICKER] ?' ou 'Quelles sont les dernières nouvelles sur [TICKER] ?'";
             }
 
-            // Nettoyer les espaces multiples
-            cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+            // ✅ ÉTAPE 9: Nettoyer les espaces multiples et newlines excessifs
+            cleaned = cleaned.replace(/\n{3,}/g, '\n\n'); // Max 2 newlines
+            cleaned = cleaned.replace(/ {2,}/g, ' ');     // Max 1 espace
             cleaned = cleaned.trim();
 
-            console.log('✅ JSON dump cleaned from response (converted to readable text)');
+            console.log('✅ JSON dump aggressively cleaned from response (converted to readable text)');
+            console.log(`   - Original length: ${response.length} chars`);
+            console.log(`   - Cleaned length: ${cleaned.length} chars`);
+            console.log(`   - Reduction: ${((1 - cleaned.length / response.length) * 100).toFixed(1)}%`);
+
             return cleaned;
 
         } catch (error) {
-            console.error('Error sanitizing JSON in response:', error);
-            return response; // Retourner original en cas d'erreur
+            console.error('❌ Error sanitizing JSON in response:', error);
+            // En cas d'erreur, au moins essayer de supprimer les gros blocs JSON
+            try {
+                let fallback = response;
+                fallback = fallback.replace(/\{[\s\S]{50,}\}/g, '');
+                fallback = fallback.replace(/\[[\s\S]{50,}\]/g, '');
+                return fallback.trim() || response; // Retourner fallback ou original si vide
+            } catch (e) {
+                return response; // Dernier recours: retourner original
+            }
         }
     }
 
