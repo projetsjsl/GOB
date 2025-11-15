@@ -100,15 +100,24 @@ class FinancialCalculator {
 
 ```javascript
 class LLMFormatter {
+  constructor() {
+    // ✅ UTILISE PERPLEXITY API (comme actuellement)
+    this.perplexity = new PerplexityClient(process.env.PERPLEXITY_API_KEY);
+  }
+
   async formatForSMS(data, intent, options = {}) {
     // Template de prompt strict
     const prompt = this._buildFormatterPrompt(data, intent);
 
-    // Appel LLM (Gemini gratuit pour formatter)
-    const response = await this._callLLM(prompt);
+    // Appel Perplexity Sonar Pro (comme actuellement dans emma-agent.js)
+    const response = await this.perplexity.generate(prompt, {
+      model: 'sonar-pro',
+      temperature: 0.3,
+      max_tokens: 500  // Réduit pour SMS (vs 6000 pour web)
+    });
 
     // Post-traitement (longueur, sources, validation)
-    return this._postProcess(response, data);
+    return this._postProcess(response.content, data);
   }
 
   _buildFormatterPrompt(data, intent) {
@@ -440,10 +449,14 @@ class ResponseValidator {
 
 ## 📝 NOTES IMPORTANTES
 
-### Compatibilité
-- ✅ Web/Email gardent l'ancien système (emma-agent.js)
-- ✅ SMS migre progressivement vers nouveau système
-- ✅ Coexistence des 2 systèmes pendant transition
+### Compatibilité & Garanties
+- ✅ **Web/Email/Messenger gardent l'ancien système** (emma-agent.js - 0% modification)
+- ✅ **SMS migre progressivement** vers nouveau système (isolé)
+- ✅ **Coexistence des 2 systèmes** pendant transition
+- ✅ **Perplexity API utilisé** pour SMS formatter (comme actuellement)
+- ✅ **AUCUNE réduction** des fonctionnalités web/email
+- ✅ **Tests de non-régression** obligatoires avant déploiement
+- 📄 **Voir**: `docs/SMS_REFACTOR_GUARANTEES.md` pour détails complets
 
 ### Rollback Plan
 - Feature flag `USE_SMS_ORCHESTRATOR_V2=false` → rollback immédiat
