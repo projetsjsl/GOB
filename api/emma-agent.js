@@ -2277,9 +2277,32 @@ STRUCTURE OBLIGATOIRE:
             (intentData && ['general_conversation', 'help', 'capabilities'].includes(intentData.intent)) ||
             (context.perplexity_only_reason && context.perplexity_only_reason.includes('générale/non-financière'));
         
+        // Extract product type information from tools data
+        let productTypeContext = '';
+        const fundamentalsTools = toolsData.filter(t => t.tool.includes('fundamentals'));
+        if (fundamentalsTools.length > 0) {
+            const productTypes = fundamentalsTools
+                .map(t => {
+                    if (t.data && t.data.product_type) {
+                        return `- ${t.data.ticker || 'Ticker'}: ${t.data.product_type} (${t.data.product_category || 'N/A'})`;
+                    }
+                    return null;
+                })
+                .filter(p => p !== null);
+
+            if (productTypes.length > 0) {
+                productTypeContext = `\n🔖 TYPES DE PRODUITS DÉTECTÉS:
+${productTypes.join('\n')}
+
+⚠️ IMPORTANT: Adapte ton analyse selon le type de produit (voir section "ADAPTATION PAR TYPE DE PRODUIT FINANCIER" ci-dessous).\n`;
+            }
+        }
+
         // CFA®-Level Identity Integration (uniquement pour questions financières)
         const cfaIdentity = !isGeneralNonFinancial && intentData && ['comprehensive_analysis', 'fundamentals', 'comparative_analysis', 'earnings', 'recommendation'].includes(intentData.intent)
             ? `${CFA_SYSTEM_PROMPT.identity}
+
+${CFA_SYSTEM_PROMPT.productTypeGuidance}
 
 ${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
 
@@ -2318,7 +2341,7 @@ ${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
 ${isGeneralNonFinancial ? '' : `📅 DATE ACTUELLE: ${currentDate} (${currentDateTime})
 ⚠️ CRITIQUE: Toutes les données doivent refléter les informations les plus récentes. Si une donnée est datée (ex: "au 8 août"), précise clairement que c'est une donnée ancienne et cherche des informations plus récentes si disponibles.
 
-`}CONTEXTE DE LA CONVERSATION:
+${productTypeContext}`}CONTEXTE DE LA CONVERSATION:
 ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
 ${intentContext}
 ${isGeneralNonFinancial ? '' : `DONNÉES DISPONIBLES DES OUTILS (résumées pour éviter surcharge):
@@ -2352,6 +2375,12 @@ ${isGeneralNonFinancial ? generalInstructions : `INSTRUCTIONS CRITIQUES:
      → TU DOIS utiliser Perplexity (qui est déjà intégré) pour chercher des informations sur CETTE entreprise spécifique
      → Perplexity a accès à des millions de sources et peut trouver des informations sur n'importe quelle entreprise
      → Ne JAMAIS dire "aucune donnée disponible" sans avoir cherché via Perplexity
+   - ✅ FONDS COMMUNS ET ETFs:
+     → Si le ticker se termine par X, XX, IX (ex: AMAXX, VFIAX): c'est probablement un FONDS COMMUN
+     → Les fonds communs ne sont souvent PAS dans FMP/API standards
+     → TU DOIS chercher via Perplexity avec requête spécifique: "mutual fund [ticker] performance expense ratio holdings"
+     → Adapte l'analyse: Focus sur expense ratio, performance vs benchmark, manager, Morningstar rating
+     → Sources utiles: Morningstar, Fundata, site web du fonds
    - ✅ SI tu ne trouves vraiment aucune information après recherche Perplexity:
      → Dis clairement que tu n'as pas trouvé d'informations sur cette entreprise spécifique
      → Suggère de vérifier le nom/ticker exact

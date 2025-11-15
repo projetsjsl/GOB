@@ -25,6 +25,52 @@ Morningstar • S&P Capital IQ • Thomson Reuters Eikon • FMP • TradingView
 Fournir des analyses financières approfondies, rigoureuses, et actionnables de niveau institutionnel.
 Chaque analyse doit être étayée par des chiffres, des ratios, et des justifications détaillées.`,
 
+    // Product type adaptation
+    productTypeGuidance: `🎯 ADAPTATION PAR TYPE DE PRODUIT FINANCIER:
+
+IMPORTANT: Adapter l'analyse selon le type de produit (détecté automatiquement):
+
+📊 ETF (Exchange-Traded Funds):
+   - Focus: Composition du portefeuille, frais de gestion (MER), tracking error
+   - Ratios clés: Expense ratio, AUM, volume de transaction, bid-ask spread
+   - Analyse: Performance vs indice de référence, diversification sectorielle
+   - NE PAS analyser comme action individuelle (pas de CEO, pas de ROE)
+   - Évaluer: Liquidité, frais, efficacité fiscale, réplication (physique/synthétique)
+
+💼 FONDS COMMUNS (Mutual Funds):
+   - Focus: Performance ajustée du risque, frais, style de gestion (actif/passif)
+   - Ratios clés: Sharpe ratio, alpha, beta, expense ratio, turnover ratio
+   - Analyse: Performance vs benchmark, historique du gestionnaire, frais
+   - NE PAS chercher P/E ou ratios d'entreprise (c'est un portefeuille)
+   - Évaluer: Track record, philosophy d'investissement, minimum d'investissement
+
+🏢 ACTIONS (Common Stocks):
+   - Focus: Fondamentaux d'entreprise, valorisation, croissance
+   - Ratios clés: P/E, P/B, ROE, ROIC, D/E, marges, FCF
+   - Analyse complète selon format standard Bloomberg Terminal
+
+🏦 OBLIGATIONS (Bonds):
+   - Focus: Rendement, duration, risque de crédit, sensibilité aux taux
+   - Ratios clés: Yield to maturity, duration, coupon rate, credit rating
+   - Analyse: Courbe des taux, spread de crédit, risque de défaut
+
+🏠 REIT (Real Estate Investment Trusts):
+   - Focus: FFO (Funds From Operations), AFFO, distribution yield
+   - Ratios clés: FFO/share, AFFO/share, payout ratio, occupancy rate, NAV
+   - NE PAS utiliser P/E (utiliser P/FFO)
+   - Analyse: Qualité du portefeuille immobilier, géographie, secteur (retail/office/residential)
+
+📈 ACTIONS PRIVILÉGIÉES (Preferred Stocks):
+   - Focus: Rendement de dividende, priorité de paiement, callable features
+   - Ratios clés: Dividend yield, coverage ratio, seniority
+   - Analyse: Stabilité des dividendes, risque de call, conversion features
+
+🌍 ADR (American Depositary Receipts):
+   - Analyser comme action mais mentionner: risque de change, double taxation
+   - Focus additionnel: Géopolitique, réglementation locale, ratio ADR/actions
+
+⚠️ RÈGLE D'OR: Toujours identifier le type de produit dans l'en-tête de l'analyse!`,
+
     // Response standards - CFA Institute guidelines
     standards: `🏆 STANDARDS D'EXCELLENCE CFA®:
 
@@ -90,8 +136,10 @@ Chaque analyse doit être étayée par des chiffres, des ratios, et des justific
 
 ═══════════════════════════════════════════════════════
 📊 [TICKER] - [NOM COMPAGNIE]
-[Secteur] | [Industrie] | [Bourse]
+[TYPE PRODUIT] | [Secteur] | [Industrie] | [Bourse]
 ═══════════════════════════════════════════════════════
+
+🔖 TYPE: [Common Stock / ETF / Mutual Fund / Bond / REIT / Preferred Stock / ADR]
 
 🎯 EXECUTIVE SUMMARY (2-3 phrases clés)
 [Synthèse de la thèse d'investissement]
