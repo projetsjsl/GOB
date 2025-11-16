@@ -1,6 +1,40 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- 🔇 INTERCEPTION ERREURS: DOIT ÊTRE LA TOUTE PREMIÈRE CHOSE -->
+    <script>
+        (function() {
+            const originalWarn = console.warn;
+            const originalError = console.error;
+            console.warn = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('cdn.tailwindcss.com') || message.includes('should not be used in production')) return;
+                originalWarn.apply(console, args);
+            };
+            console.error = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('share-modal') || message.includes('chrome-extension') || message.includes('extension://')) return;
+                originalError.apply(console, args);
+            };
+            window.onerror = function(message, source, lineno, colno, error) {
+                if (source && (source.includes('share-modal') || source.includes('chrome-extension') || source.includes('extension://'))) return true;
+                return false;
+            };
+            window.addEventListener('error', function(event) {
+                if (event.filename && (event.filename.includes('share-modal') || event.filename.includes('chrome-extension') || event.filename.includes('extension://'))) {
+                    event.stopImmediatePropagation();
+                    event.preventDefault();
+                    return true;
+                }
+                if (event.message === 'Script error.' || !event.filename) {
+                    event.stopImmediatePropagation();
+                    event.preventDefault();
+                    return true;
+                }
+            }, true);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin JSLai - Gestion Emma IA</title>
