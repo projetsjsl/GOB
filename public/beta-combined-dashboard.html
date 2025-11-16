@@ -144,6 +144,176 @@
         })();
     </script>
 
+    <!-- 💾 SAFE STORAGE WRAPPER - Protection contre blocage storage -->
+    <script>
+        // Créer un wrapper de storage sécurisé avec fallback en mémoire
+        (function() {
+            'use strict';
+
+            // Vérifier si storage est disponible
+            const storageAvailable = (type) => {
+                try {
+                    const storage = window[type];
+                    const test = '__storage_test__';
+                    storage.setItem(test, test);
+                    storage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            };
+
+            const localStorageAvailable = storageAvailable('localStorage');
+            const sessionStorageAvailable = storageAvailable('sessionStorage');
+
+            // Fallback en mémoire si storage bloqué
+            const memoryStorage = {};
+
+            // Wrapper pour localStorage
+            const safeLocalStorage = {
+                getItem: function(key) {
+                    try {
+                        if (localStorageAvailable) {
+                            return localStorage.getItem(key);
+                        } else {
+                            return memoryStorage['local_' + key] || null;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ localStorage.getItem bloqué:', key);
+                        return memoryStorage['local_' + key] || null;
+                    }
+                },
+                setItem: function(key, value) {
+                    try {
+                        if (localStorageAvailable) {
+                            localStorage.setItem(key, value);
+                        } else {
+                            memoryStorage['local_' + key] = String(value);
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ localStorage.setItem bloqué:', key);
+                        memoryStorage['local_' + key] = String(value);
+                    }
+                },
+                removeItem: function(key) {
+                    try {
+                        if (localStorageAvailable) {
+                            localStorage.removeItem(key);
+                        } else {
+                            delete memoryStorage['local_' + key];
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ localStorage.removeItem bloqué:', key);
+                        delete memoryStorage['local_' + key];
+                    }
+                },
+                clear: function() {
+                    try {
+                        if (localStorageAvailable) {
+                            localStorage.clear();
+                        } else {
+                            Object.keys(memoryStorage).forEach(k => {
+                                if (k.startsWith('local_')) delete memoryStorage[k];
+                            });
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ localStorage.clear bloqué');
+                        Object.keys(memoryStorage).forEach(k => {
+                            if (k.startsWith('local_')) delete memoryStorage[k];
+                        });
+                    }
+                }
+            };
+
+            // Wrapper pour sessionStorage
+            const safeSessionStorage = {
+                getItem: function(key) {
+                    try {
+                        if (sessionStorageAvailable) {
+                            return sessionStorage.getItem(key);
+                        } else {
+                            return memoryStorage['session_' + key] || null;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ sessionStorage.getItem bloqué:', key);
+                        return memoryStorage['session_' + key] || null;
+                    }
+                },
+                setItem: function(key, value) {
+                    try {
+                        if (sessionStorageAvailable) {
+                            sessionStorage.setItem(key, value);
+                        } else {
+                            memoryStorage['session_' + key] = String(value);
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ sessionStorage.setItem bloqué:', key);
+                        memoryStorage['session_' + key] = String(value);
+                    }
+                },
+                removeItem: function(key) {
+                    try {
+                        if (sessionStorageAvailable) {
+                            sessionStorage.removeItem(key);
+                        } else {
+                            delete memoryStorage['session_' + key];
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ sessionStorage.removeItem bloqué:', key);
+                        delete memoryStorage['session_' + key];
+                    }
+                },
+                clear: function() {
+                    try {
+                        if (sessionStorageAvailable) {
+                            sessionStorage.clear();
+                        } else {
+                            Object.keys(memoryStorage).forEach(k => {
+                                if (k.startsWith('session_')) delete memoryStorage[k];
+                            });
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ sessionStorage.clear bloqué');
+                        Object.keys(memoryStorage).forEach(k => {
+                            if (k.startsWith('session_')) delete memoryStorage[k];
+                        });
+                    }
+                }
+            };
+
+            // Remplacer les objets natifs localStorage et sessionStorage
+            // par nos wrappers sécurisés
+            try {
+                Object.defineProperty(window, 'localStorage', {
+                    value: safeLocalStorage,
+                    writable: false,
+                    configurable: true
+                });
+            } catch (e) {
+                // Si impossible de redéfinir, créer un alias
+                window.safeLocalStorage = safeLocalStorage;
+                console.warn('⚠️ Impossible de remplacer localStorage, utiliser safeLocalStorage');
+            }
+
+            try {
+                Object.defineProperty(window, 'sessionStorage', {
+                    value: safeSessionStorage,
+                    writable: false,
+                    configurable: true
+                });
+            } catch (e) {
+                // Si impossible de redéfinir, créer un alias
+                window.safeSessionStorage = safeSessionStorage;
+                console.warn('⚠️ Impossible de remplacer sessionStorage, utiliser safeSessionStorage');
+            }
+
+            // Log du statut de storage
+            console.log('💾 Storage Status:');
+            console.log('  localStorage:', localStorageAvailable ? '✅ Disponible' : '⚠️ Bloqué (fallback mémoire)');
+            console.log('  sessionStorage:', sessionStorageAvailable ? '✅ Disponible' : '⚠️ Bloqué (fallback mémoire)');
+        })();
+    </script>
+
     <!-- Meta tags et ressources (APRÈS l'interception) -->
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">

@@ -46,6 +46,42 @@
     })();
   </script>
 
+  <!-- 💾 SAFE STORAGE WRAPPER -->
+  <script>
+    (function() {
+      'use strict';
+      const storageAvailable = (type) => {
+        try {
+          const storage = window[type];
+          const test = '__test__';
+          storage.setItem(test, test);
+          storage.removeItem(test);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+      const localAvail = storageAvailable('localStorage');
+      const sessionAvail = storageAvailable('sessionStorage');
+      const mem = {};
+      const safeLocal = {
+        getItem: (k) => { try { return localAvail ? localStorage.getItem(k) : (mem['l_'+k]||null); } catch(e) { return mem['l_'+k]||null; }},
+        setItem: (k,v) => { try { localAvail ? localStorage.setItem(k,v) : (mem['l_'+k]=String(v)); } catch(e) { mem['l_'+k]=String(v); }},
+        removeItem: (k) => { try { localAvail ? localStorage.removeItem(k) : delete mem['l_'+k]; } catch(e) { delete mem['l_'+k]; }},
+        clear: () => { try { localAvail ? localStorage.clear() : Object.keys(mem).forEach(k=>{if(k.startsWith('l_'))delete mem[k]}); } catch(e) { Object.keys(mem).forEach(k=>{if(k.startsWith('l_'))delete mem[k]}); }}
+      };
+      const safeSession = {
+        getItem: (k) => { try { return sessionAvail ? sessionStorage.getItem(k) : (mem['s_'+k]||null); } catch(e) { return mem['s_'+k]||null; }},
+        setItem: (k,v) => { try { sessionAvail ? sessionStorage.setItem(k,v) : (mem['s_'+k]=String(v)); } catch(e) { mem['s_'+k]=String(v); }},
+        removeItem: (k) => { try { sessionAvail ? sessionStorage.removeItem(k) : delete mem['s_'+k]; } catch(e) { delete mem['s_'+k]; }},
+        clear: () => { try { sessionAvail ? sessionStorage.clear() : Object.keys(mem).forEach(k=>{if(k.startsWith('s_'))delete mem[k]}); } catch(e) { Object.keys(mem).forEach(k=>{if(k.startsWith('s_'))delete mem[k]}); }}
+      };
+      try { Object.defineProperty(window, 'localStorage', {value: safeLocal, writable: false, configurable: true}); } catch(e) { window.safeLocalStorage = safeLocal; }
+      try { Object.defineProperty(window, 'sessionStorage', {value: safeSession, writable: false, configurable: true}); } catch(e) { window.safeSessionStorage = safeSession; }
+      console.log('💾 Storage:', localAvail?'✅':'⚠️', '/', sessionAvail?'✅':'⚠️');
+    })();
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portail connexion JSLAI, Client : GOB</title>
