@@ -33,7 +33,7 @@
 
     <!-- 🔇 SCRIPT D'INTERCEPTION - DOIT ÊTRE CHARGÉ AVANT TAILWIND -->
     <script>
-        // Intercepter console.warn AVANT le chargement de Tailwind/Babel
+        // Intercepter console.warn/error AVANT le chargement de Tailwind/Babel/Extensions
         (function() {
             const originalWarn = console.warn;
             const originalError = console.error;
@@ -55,24 +55,60 @@
                 originalWarn.apply(console, args);
             };
 
-            // Intercepter les erreurs globales
+            // Intercepter les erreurs console
+            console.error = function(...args) {
+                const message = args.join(' ');
+
+                // Supprimer les erreurs de scripts externes (extensions)
+                if (message.includes('share-modal') ||
+                    message.includes('chrome-extension') ||
+                    message.includes('extension://')) {
+                    return; // Ignorer silencieusement
+                }
+
+                // Passer les autres erreurs
+                originalError.apply(console, args);
+            };
+
+            // Intercepter les erreurs globales (window.onerror)
+            const originalOnError = window.onerror;
+            window.onerror = function(message, source, lineno, colno, error) {
+                // Bloquer les erreurs de scripts externes
+                if (source && (
+                    source.includes('share-modal') ||
+                    source.includes('chrome-extension') ||
+                    source.includes('extension://')
+                )) {
+                    return true; // true = erreur gérée, ne pas afficher
+                }
+
+                // Passer aux autres gestionnaires
+                if (originalOnError) {
+                    return originalOnError(message, source, lineno, colno, error);
+                }
+                return false;
+            };
+
+            // Intercepter addEventListener sur window pour capturer les erreurs
             window.addEventListener('error', function(event) {
-                // Ignorer les erreurs de scripts externes (extensions, share-modal, etc.)
+                // Bloquer les erreurs de scripts externes
                 if (event.filename && (
                     event.filename.includes('share-modal') ||
-                    event.filename.includes('extension') ||
-                    event.filename.includes('chrome-extension')
+                    event.filename.includes('chrome-extension') ||
+                    event.filename.includes('extension://')
                 )) {
+                    event.stopImmediatePropagation();
                     event.preventDefault();
                     return true;
                 }
 
-                // Ignorer les erreurs de type "Script error." (CORS)
+                // Bloquer les erreurs CORS génériques
                 if (event.message === 'Script error.' || !event.filename) {
+                    event.stopImmediatePropagation();
                     event.preventDefault();
                     return true;
                 }
-            }, true);
+            }, true); // true = capture phase (avant propagation)
 
             // Protection contre addEventListener sur null
             const originalAddEventListener = EventTarget.prototype.addEventListener;
