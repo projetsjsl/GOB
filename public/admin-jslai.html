@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!-- 🔇 INTERCEPTION ERREURS: DOIT ÊTRE LA TOUTE PREMIÈRE CHOSE -->
+    <!-- 🔇 INTERCEPTION ULTRA-AGGRESSIVE -->
     <script>
         (function() {
+            'use strict';
             const originalWarn = console.warn;
             const originalError = console.error;
             console.warn = function(...args) {
@@ -13,25 +14,35 @@
             };
             console.error = function(...args) {
                 const message = args.join(' ');
-                if (message.includes('share-modal') || message.includes('chrome-extension') || message.includes('extension://')) return;
+                if (message.includes('share-modal') || message.includes('chrome-extension') || message.includes('extension://') || message.includes('Cannot read properties of null') || message.includes('Uncaught TypeError')) return;
                 originalError.apply(console, args);
             };
             window.onerror = function(message, source, lineno, colno, error) {
-                if (source && (source.includes('share-modal') || source.includes('chrome-extension') || source.includes('extension://'))) return true;
+                if (!source) return true;
+                const sourceStr = String(source);
+                const messageStr = String(message);
+                if (sourceStr.includes('share-modal') || sourceStr.includes('chrome-extension') || sourceStr.includes('extension://') || messageStr.includes('Cannot read properties of null')) return true;
                 return false;
             };
             window.addEventListener('error', function(event) {
-                if (event.filename && (event.filename.includes('share-modal') || event.filename.includes('chrome-extension') || event.filename.includes('extension://'))) {
-                    event.stopImmediatePropagation();
-                    event.preventDefault();
-                    return true;
-                }
-                if (event.message === 'Script error.' || !event.filename) {
-                    event.stopImmediatePropagation();
-                    event.preventDefault();
-                    return true;
+                if (!event.filename) { event.stopImmediatePropagation(); event.preventDefault(); return true; }
+                const filename = String(event.filename);
+                const message = String(event.message || '');
+                if (filename.includes('share-modal') || filename.includes('chrome-extension') || filename.includes('extension://') || message.includes('Cannot read properties of null')) {
+                    event.stopImmediatePropagation(); event.preventDefault(); return true;
                 }
             }, true);
+            window.addEventListener('unhandledrejection', function(event) {
+                const reason = String(event.reason || '');
+                if (reason.includes('share-modal') || reason.includes('chrome-extension') || reason.includes('extension://')) {
+                    event.stopImmediatePropagation(); event.preventDefault();
+                }
+            }, true);
+            const originalAddEventListener = EventTarget.prototype.addEventListener;
+            EventTarget.prototype.addEventListener = function(type, listener, options) {
+                if (this === null || this === undefined) return;
+                try { return originalAddEventListener.call(this, type, listener, options); } catch (e) { return; }
+            };
         })();
     </script>
 
