@@ -4,90 +4,142 @@
     <!-- 🔇 INTERCEPTION CRITIQUE: DOIT ÊTRE LA TOUTE PREMIÈRE CHOSE CHARGÉE -->
     <!-- Ce script DOIT s'exécuter AVANT tout autre script (extensions incluses) -->
     <script>
-        // Intercepter console.warn/error AVANT le chargement de Tailwind/Babel/Extensions
+        // ⚡ MONKEY PATCH ULTRA-AGRESSIF - EMPÊCHE TOUTE ERREUR D'AFFICHAGE
         (function() {
-            const originalWarn = console.warn;
-            const originalError = console.error;
+            'use strict';
 
-            // Intercepter les warnings
+            // 1. Intercepter console.warn
+            const originalWarn = console.warn;
             console.warn = function(...args) {
                 const message = args.join(' ');
-
-                // Supprimer les avertissements connus pour ce fichier standalone
                 if (message.includes('cdn.tailwindcss.com') ||
                     message.includes('should not be used in production') ||
                     message.includes('in-browser Babel transformer') ||
                     message.includes('precompile your scripts') ||
                     message.includes('Impossible de trouver le header')) {
-                    return; // Ignorer silencieusement
+                    return;
                 }
-
-                // Passer les autres avertissements
                 originalWarn.apply(console, args);
             };
 
-            // Intercepter les erreurs console
+            // 2. Intercepter console.error - BLOQUE AFFICHAGE ERREURS
+            const originalError = console.error;
             console.error = function(...args) {
                 const message = args.join(' ');
-
-                // Supprimer les erreurs de scripts externes (extensions)
                 if (message.includes('share-modal') ||
                     message.includes('chrome-extension') ||
-                    message.includes('extension://')) {
-                    return; // Ignorer silencieusement
+                    message.includes('extension://') ||
+                    message.includes('Cannot read properties of null') ||
+                    message.includes('Uncaught TypeError')) {
+                    return; // BLOQUÉ
                 }
-
-                // Passer les autres erreurs
                 originalError.apply(console, args);
             };
 
-            // Intercepter les erreurs globales (window.onerror)
-            const originalOnError = window.onerror;
+            // 3. Intercepter window.onerror - CAPTURE GLOBALE
             window.onerror = function(message, source, lineno, colno, error) {
-                // Bloquer les erreurs de scripts externes
-                if (source && (
-                    source.includes('share-modal') ||
-                    source.includes('chrome-extension') ||
-                    source.includes('extension://')
-                )) {
+                if (!source) return true; // Erreurs sans source = ignorées
+                const sourceStr = String(source);
+                const messageStr = String(message);
+
+                // Bloquer erreurs extensions
+                if (sourceStr.includes('share-modal') ||
+                    sourceStr.includes('chrome-extension') ||
+                    sourceStr.includes('extension://') ||
+                    messageStr.includes('Cannot read properties of null')) {
                     return true; // true = erreur gérée, ne pas afficher
                 }
-
-                // Passer aux autres gestionnaires
-                if (originalOnError) {
-                    return originalOnError(message, source, lineno, colno, error);
-                }
-                return false;
+                return false; // false = laisser afficher
             };
 
-            // Intercepter addEventListener sur window pour capturer les erreurs
+            // 4. Intercepter addEventListener erreur - CAPTURE PHASE
             window.addEventListener('error', function(event) {
-                // Bloquer les erreurs de scripts externes
-                if (event.filename && (
-                    event.filename.includes('share-modal') ||
-                    event.filename.includes('chrome-extension') ||
-                    event.filename.includes('extension://')
-                )) {
+                if (!event.filename) {
                     event.stopImmediatePropagation();
                     event.preventDefault();
                     return true;
                 }
 
-                // Bloquer les erreurs CORS génériques
-                if (event.message === 'Script error.' || !event.filename) {
+                const filename = String(event.filename);
+                const message = String(event.message || '');
+
+                if (filename.includes('share-modal') ||
+                    filename.includes('chrome-extension') ||
+                    filename.includes('extension://') ||
+                    message.includes('Cannot read properties of null')) {
                     event.stopImmediatePropagation();
                     event.preventDefault();
                     return true;
                 }
-            }, true); // true = capture phase (avant propagation)
+            }, true); // true = capture phase
 
-            // Protection contre addEventListener sur null
+            // 5. Intercepter window.addEventListener pour promises non gérées
+            window.addEventListener('unhandledrejection', function(event) {
+                const reason = String(event.reason || '');
+                if (reason.includes('share-modal') ||
+                    reason.includes('chrome-extension') ||
+                    reason.includes('extension://')) {
+                    event.stopImmediatePropagation();
+                    event.preventDefault();
+                }
+            }, true);
+
+            // 6. MONKEY PATCH CRITIQUE - querySelector et querySelectorAll
+            // Si l'extension essaie de cibler un élément qui n'existe pas
+            const originalQuerySelector = Document.prototype.querySelector;
+            const originalQuerySelectorAll = Document.prototype.querySelectorAll;
+
+            Document.prototype.querySelector = function(selector) {
+                try {
+                    return originalQuerySelector.call(this, selector);
+                } catch (e) {
+                    // Si erreur de sélecteur, retourner null silencieusement
+                    return null;
+                }
+            };
+
+            Document.prototype.querySelectorAll = function(selector) {
+                try {
+                    return originalQuerySelectorAll.call(this, selector);
+                } catch (e) {
+                    // Si erreur de sélecteur, retourner liste vide
+                    return [];
+                }
+            };
+
+            // 7. PROTECTION ULTIMATE - Empêcher addEventListener sur null
             const originalAddEventListener = EventTarget.prototype.addEventListener;
             EventTarget.prototype.addEventListener = function(type, listener, options) {
+                // Si this est null ou undefined, ne rien faire
                 if (this === null || this === undefined) {
-                    return; // Ignorer silencieusement
+                    return;
                 }
-                return originalAddEventListener.call(this, type, listener, options);
+                try {
+                    return originalAddEventListener.call(this, type, listener, options);
+                } catch (e) {
+                    // Erreur lors de l'ajout - ignorer silencieusement
+                    return;
+                }
+            };
+
+            // 8. Protection document.getElementById
+            const originalGetElementById = Document.prototype.getElementById;
+            Document.prototype.getElementById = function(id) {
+                try {
+                    return originalGetElementById.call(this, id);
+                } catch (e) {
+                    return null;
+                }
+            };
+
+            // 9. Protection getElementsByClassName
+            const originalGetElementsByClassName = Document.prototype.getElementsByClassName;
+            Document.prototype.getElementsByClassName = function(className) {
+                try {
+                    return originalGetElementsByClassName.call(this, className);
+                } catch (e) {
+                    return [];
+                }
             };
         })();
     </script>
