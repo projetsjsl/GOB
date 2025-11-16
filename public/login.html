@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <!-- 🔇 INTERCEPTION ULTRA-AGGRESSIVE -->
+  <!-- 🔇 INTERCEPTION ULTRA-AGGRESSIVE + STORAGE PROTECTION -->
   <script>
     (function() {
       'use strict';
@@ -34,8 +34,17 @@
       }, true);
       window.addEventListener('unhandledrejection', function(event) {
         const reason = String(event.reason || '');
-        if (reason.includes('share-modal') || reason.includes('chrome-extension') || reason.includes('extension://')) {
-          event.stopImmediatePropagation(); event.preventDefault();
+        const reasonMsg = event.reason ? (event.reason.message || String(event.reason)) : '';
+        if (reason.includes('share-modal') ||
+            reason.includes('chrome-extension') ||
+            reason.includes('extension://') ||
+            reason.includes('Access to storage') ||
+            reason.includes('storage is not allowed') ||
+            reasonMsg.includes('Access to storage') ||
+            reasonMsg.includes('storage is not allowed')) {
+          console.warn('⚠️ Erreur storage interceptée et ignorée:', reasonMsg || reason);
+          event.stopImmediatePropagation();
+          event.preventDefault();
         }
       }, true);
       const originalAddEventListener = EventTarget.prototype.addEventListener;
