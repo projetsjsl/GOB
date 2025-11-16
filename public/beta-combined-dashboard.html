@@ -30,6 +30,61 @@
             letter-spacing: -0.02em;
         }
     </style>
+
+    <!-- 🔇 SCRIPT D'INTERCEPTION - DOIT ÊTRE CHARGÉ AVANT TAILWIND -->
+    <script>
+        // Intercepter console.warn AVANT le chargement de Tailwind/Babel
+        (function() {
+            const originalWarn = console.warn;
+            const originalError = console.error;
+
+            // Intercepter les warnings
+            console.warn = function(...args) {
+                const message = args.join(' ');
+
+                // Supprimer les avertissements connus pour ce fichier standalone
+                if (message.includes('cdn.tailwindcss.com') ||
+                    message.includes('should not be used in production') ||
+                    message.includes('in-browser Babel transformer') ||
+                    message.includes('precompile your scripts') ||
+                    message.includes('Impossible de trouver le header')) {
+                    return; // Ignorer silencieusement
+                }
+
+                // Passer les autres avertissements
+                originalWarn.apply(console, args);
+            };
+
+            // Intercepter les erreurs globales
+            window.addEventListener('error', function(event) {
+                // Ignorer les erreurs de scripts externes (extensions, share-modal, etc.)
+                if (event.filename && (
+                    event.filename.includes('share-modal') ||
+                    event.filename.includes('extension') ||
+                    event.filename.includes('chrome-extension')
+                )) {
+                    event.preventDefault();
+                    return true;
+                }
+
+                // Ignorer les erreurs de type "Script error." (CORS)
+                if (event.message === 'Script error.' || !event.filename) {
+                    event.preventDefault();
+                    return true;
+                }
+            }, true);
+
+            // Protection contre addEventListener sur null
+            const originalAddEventListener = EventTarget.prototype.addEventListener;
+            EventTarget.prototype.addEventListener = function(type, listener, options) {
+                if (this === null || this === undefined) {
+                    return; // Ignorer silencieusement
+                }
+                return originalAddEventListener.call(this, type, listener, options);
+            };
+        })();
+    </script>
+
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
@@ -46,64 +101,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
     
     <!-- Script pour exposer les bibliothèques globalement -->
-        <script>
-            // 🔇 SUPPRESSION DES AVERTISSEMENTS DE PRODUCTION
-            // Intercepter console.warn pour supprimer les avertissements Tailwind/Babel
-            (function() {
-                const originalWarn = console.warn;
-                console.warn = function(...args) {
-                    const message = args.join(' ');
+    <script>
+        // Exposer Recharts globalement
+        window.Recharts = window.Recharts || {};
 
-                    // Supprimer les avertissements connus pour ce fichier standalone
-                    if (message.includes('cdn.tailwindcss.com') ||
-                        message.includes('should not be used in production') ||
-                        message.includes('in-browser Babel transformer') ||
-                        message.includes('precompile your scripts')) {
-                        return; // Ignorer silencieusement
-                    }
-
-                    // Passer les autres avertissements
-                    originalWarn.apply(console, args);
-                };
-            })();
-
-            // Exposer Recharts globalement
-            window.Recharts = window.Recharts || {};
-
-            // Gestionnaire d'erreur global pour éviter que les erreurs de scripts externes cassent l'application
-            window.addEventListener('error', function(event) {
-                // Ignorer les erreurs de scripts externes (extensions, etc.)
-                if (event.filename && (event.filename.includes('share-modal') || event.filename.includes('extension'))) {
-                    // Supprimé le console.warn pour éviter le spam
-                    event.preventDefault();
-                    return true;
-                }
-
-                // Ignorer les erreurs de type "Script error." (provenant de scripts externes/CORS)
-                if (event.message === 'Script error.' || !event.filename) {
-                    event.preventDefault();
-                    return true;
-                }
-            }, true);
-
-            // Protection contre les addEventListener sur des éléments null
-            const originalAddEventListener = EventTarget.prototype.addEventListener;
-            EventTarget.prototype.addEventListener = function(type, listener, options) {
-                if (this === null || this === undefined) {
-                    console.warn('⚠️ Tentative d\'ajouter un event listener sur un élément null/undefined:', type);
-                    return;
-                }
-                return originalAddEventListener.call(this, type, listener, options);
-            };
-
-            // Vérifier le chargement des bibliothèques
-            window.addEventListener('load', function() {
-                console.log('📚 Vérification des bibliothèques:');
-                console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
-                console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
-                console.log('✅ Dashboard GOB chargé en mode production');
-            });
-        </script>
+        // Vérifier le chargement des bibliothèques
+        window.addEventListener('load', function() {
+            console.log('📚 Vérification des bibliothèques:');
+            console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
+            console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
+            console.log('✅ Dashboard GOB chargé en mode production');
+        });
+    </script>
     
     <!-- Styles Emma -->
     <link rel="stylesheet" href="emma-styles.css">
