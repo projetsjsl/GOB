@@ -1,37 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
-    <!-- Version: 2.1.0 - JLab V2 with Synchronized Widgets - 2025-10-25 -->
-    <!-- Favicon JSLAI -->
-    <link rel="icon" type="image/png" href="jlab.png">
-    <link rel="apple-touch-icon" href="jlab.png">
-    <!-- Cache bust: 2025-10-15 21:00 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
-    <!-- Avenir Pro 85 Heavy alternative: Montserrat Heavy (900) ou Avenir Next si disponible -->
-    <style>
-        @font-face {
-            font-family: 'Avenir Pro 85 Heavy';
-            src: local('Avenir Next Heavy'), local('Avenir-Heavy'), local('AvenirNext-Heavy');
-            font-weight: 900;
-            font-style: normal;
-            font-display: swap;
-        }
-        .avenir-heavy {
-            font-family: 'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif;
-            font-weight: 900;
-            letter-spacing: -0.02em;
-        }
-    </style>
-
-    <!-- 🔇 SCRIPT D'INTERCEPTION - DOIT ÊTRE CHARGÉ AVANT TAILWIND -->
+    <!-- 🔇 INTERCEPTION CRITIQUE: DOIT ÊTRE LA TOUTE PREMIÈRE CHOSE CHARGÉE -->
+    <!-- Ce script DOIT s'exécuter AVANT tout autre script (extensions incluses) -->
     <script>
         // Intercepter console.warn/error AVANT le chargement de Tailwind/Babel/Extensions
         (function() {
@@ -120,6 +91,37 @@
             };
         })();
     </script>
+
+    <!-- Meta tags et ressources (APRÈS l'interception) -->
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
+    <!-- Version: 2.1.0 - JLab V2 with Synchronized Widgets - 2025-10-25 -->
+    <!-- Favicon JSLAI -->
+    <link rel="icon" type="image/png" href="jlab.png">
+    <link rel="apple-touch-icon" href="jlab.png">
+    <!-- Cache bust: 2025-10-15 21:00 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <!-- Avenir Pro 85 Heavy alternative: Montserrat Heavy (900) ou Avenir Next si disponible -->
+    <style>
+        @font-face {
+            font-family: 'Avenir Pro 85 Heavy';
+            src: local('Avenir Next Heavy'), local('Avenir-Heavy'), local('AvenirNext-Heavy');
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        .avenir-heavy {
+            font-family: 'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+    </style>
 
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
