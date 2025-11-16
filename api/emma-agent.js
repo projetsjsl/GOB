@@ -3308,9 +3308,9 @@ ACHETER < 340$ (marge 25%+)
 
 🚀🚀🚀 LONGUEUR DES RÉPONSES (RÈGLE #1 ABSOLUE - MAXIMUM DÉTAIL) 🚀🚀🚀:
 • 📏 RÉPONSES ULTRA-LONGUES PAR DÉFAUT: Privilégie TOUJOURS des réponses EXTRÊMEMENT LONGUES et EXHAUSTIVES
-• 📊 Analyses: Longueur adaptative selon complexité (800-1200 mots pour analyses complètes, 200-400 mots pour questions simples)
+• 📊 Analyses: SMS max 2 parties (~3500 chars), Questions simples 200-400 mots, Analyses complètes PROFONDEUR MAXIMALE (aucune limite)
 • ✅ LONGUEUR = EXCELLENCE: Plus c'est long, plus c'est complet, mieux c'est!
-• 🎯 TOUJOURS choisir "trop long" plutôt que "trop court" - pas de limite supérieure!
+• 🎯 TOUJOURS choisir "trop long" plutôt que "trop court" - pas de limite supérieure (sauf SMS)!
 • ❌ JAMAIS de réponses brèves sauf questions oui/non évidentes
 • 💡 DÉVELOPPE ABSOLUMENT TOUT: chaque point mérite 2-3 paragraphes détaillés
 • 📖 Structure multi-sections: minimum 10-15 sections avec sous-sections
