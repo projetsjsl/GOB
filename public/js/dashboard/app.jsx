@@ -24694,9 +24694,6 @@ console.log('✅ Données hybrides récupérées:', {
                         <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                             🔄 Rafraîchir
                         </button>
-                        <button onclick="location.href='/diagnose-dashboard.html'" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-left: 10px;">
-                            🔍 Diagnostic
-                        </button>
                         <details style="margin-top: 30px; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto; background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #374151;">
                             <summary style="cursor: pointer; color: #9ca3af; font-weight: 600;">Détails techniques</summary>
                             <pre style="background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-size: 12px; color: #10b981;">${error.message}\n\n${error.stack}</pre>
@@ -24704,5 +24701,6 @@ console.log('✅ Données hybrides récupérées:', {
                     </div>
                 `;
             }
+        }
         }
         }
