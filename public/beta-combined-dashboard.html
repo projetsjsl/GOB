@@ -359,12 +359,12 @@
         }
     </style>
 
-    <!-- React et ReactDOM - CDN Cloudflare (plus fiable que unpkg) -->
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" integrity="sha512-8Q6Y9XnTbOE+JNvjBQwJ2H8S+UV4uA6hiRykhdtIyDYZ2TprdNmWOUaKdGzOhyr4dCyk287OejbPvwl7lrfqrQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" integrity="sha512-6a1107rTlA4gYpgHAqbwLAtxmWipBdJFcq8y5S/aTge3Bp+VAklABm2LO+Kg51vOWR9JMZq1Ovjl5tpluNpTeQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- React et ReactDOM - CDN jsDelivr (pas de problème integrity) -->
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
 
-    <!-- Babel Standalone - CDN Cloudflare -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js" integrity="sha512-kp4fjmG4dUoKs8HKQQeITn7I+4WPYModkzyKPYrkC5M6JPcu2GOt92K4FqbMr1pM2OpOT+NqCZvzONq1Vfb6Fg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Babel Standalone - CDN jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.6/babel.min.js"></script>
 
     <!-- Fallback automatique si CDN principal échoue -->
     <script>
@@ -959,22 +959,23 @@
                     </style>
                 `;
 
-                // Timeout de sécurité : si après 5 secondes le loader est toujours là
+                // Timeout de sécurité : si après 15 secondes le loader est toujours là (fichier volumineux ~25k lignes)
                 setTimeout(function() {
                     if (rootElement.innerHTML.includes('Transpilation JSX')) {
-                        console.error('❌ [GUARD] Timeout : Babel n\'a pas transpiré le code après 5s');
+                        console.error('❌ [GUARD] Timeout : Babel n\'a pas transpiré le code après 15s');
                         rootElement.innerHTML = `
                             <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; color: white; font-family: Inter, sans-serif; padding: 20px;">
                                 <div style="max-width: 700px; text-align: center;">
                                     <h1 style="color: #ef4444; font-size: 2rem; margin-bottom: 20px;">⚠️ Erreur de Transpilation</h1>
-                                    <p style="color: #9ca3af; margin-bottom: 10px;">Babel n'a pas pu transpiler le code JSX après 5 secondes.</p>
+                                    <p style="color: #9ca3af; margin-bottom: 10px;">Babel n'a pas pu transpiler le code JSX après 15 secondes.</p>
                                     <p style="color: #6b7280; margin-bottom: 20px;">Causes possibles :</p>
                                     <ul style="text-align: left; color: #6b7280; margin-bottom: 30px; list-style: inside;">
+                                        <li><strong>Fichier trop volumineux</strong> (25,000+ lignes) pour Babel standalone</li>
                                         <li>Erreur de syntaxe dans le code JSX</li>
-                                        <li>Fichier trop volumineux pour Babel standalone</li>
                                         <li>Extension de navigateur qui bloque l'exécution</li>
-                                        <li>Navigateur incompatible</li>
+                                        <li>Navigateur incompatible ou lent</li>
                                     </ul>
+                                    <p style="color: #f59e0b; margin-bottom: 20px; font-weight: 600;">💡 Solution recommandée: Migrer vers un build process (Vite + React)</p>
                                     <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; margin-right: 10px;">
                                         🔄 Rafraîchir
                                     </button>
@@ -985,7 +986,7 @@
                             </div>
                         `;
                     }
-                }, 5000);
+                }, 15000);
 
                 return true;
             }
