@@ -383,7 +383,23 @@
         window.addEventListener('load', function() {
             console.log('📚 Vérification des bibliothèques:');
             console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
-            console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
+
+            // Vérifier si le stylesheet Iconoir est chargé
+            const iconoirLink = document.querySelector('link[href*="iconoir"]');
+            const iconoirLoaded = iconoirLink !== null;
+            console.log('Iconoir CSS chargé:', iconoirLoaded);
+
+            // Vérifier les icônes après un court délai pour laisser React render
+            setTimeout(() => {
+                const iconoirElements = document.querySelectorAll('[class*="iconoir-"]').length;
+                console.log('Éléments Iconoir rendus:', iconoirElements);
+                if (iconoirElements > 0) {
+                    console.log('✅ Iconoir opérationnel');
+                } else if (iconoirLoaded) {
+                    console.log('⚠️ CSS Iconoir chargé mais aucun élément rendu encore');
+                }
+            }, 1000);
+
             console.log('✅ Dashboard GOB chargé en mode production');
         });
     </script>
