@@ -21,5 +21,8 @@
     "express": "^5.1.0",
     "resend": "^3.0.0",
     "twilio": "^4.20.0"
+  },
+  "devDependencies": {
+    "@babel/standalone": "^7.23.6"
   }
 }

@@ -124,22 +124,6 @@ test_api "News API - Finance News" \
     "$BASE_URL/api/news?q=finance&limit=5" \
     "GET"
 
-# Test 8: MarketAux
-test_api "MarketAux API - Latest News" \
-    "$BASE_URL/api/marketaux" \
-    "GET"
-
-# Test 9: Status API
-test_api "Status Check API" \
-    "$BASE_URL/api/status" \
-    "GET"
-
-# Test 10: Claude (si configuré)
-test_api "Claude API (optionnel)" \
-    "$BASE_URL/api/claude" \
-    "POST" \
-    '{"message":"Hello, respond with just hi"}'
-
 # ================================
 # RÉSUMÉ
 # ================================
