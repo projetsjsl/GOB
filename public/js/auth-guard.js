@@ -32,7 +32,18 @@
       }
 
       // Récupérer l'utilisateur depuis sessionStorage
-      const userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+      // CRITIQUE: Utiliser le storage NATIF (pas le wrapper avec fallback mémoire)
+      // pour pouvoir lire les données après redirection depuis login.html
+      let userJson = null;
+      try {
+        if (window.__nativeSessionStorage) {
+          userJson = window.__nativeSessionStorage.getItem(AUTH_STORAGE_KEY);
+        } else {
+          userJson = sessionStorage.getItem(AUTH_STORAGE_KEY);
+        }
+      } catch (e) {
+        console.error('❌ Impossible de lire sessionStorage:', e);
+      }
 
       if (!userJson) {
         console.warn('❌ Aucun utilisateur connecté - redirection vers login');
@@ -207,29 +218,44 @@
       // entre utilisateurs (admin → gob, etc.)
       console.log('🧹 Nettoyage des données Emma...');
 
-      // 1. Vider sessionStorage Emma
-      sessionStorage.removeItem('emma-chat-history');
-      sessionStorage.removeItem('emma-intro-shown');
+      // 1. Vider sessionStorage Emma (utiliser storage natif si disponible)
+      const session = window.__nativeSessionStorage || sessionStorage;
+      const local = window.__nativeLocalStorage || localStorage;
+
+      try {
+        session.removeItem('emma-chat-history');
+        session.removeItem('emma-intro-shown');
+      } catch (e) {
+        console.warn('⚠️ Impossible de vider sessionStorage:', e);
+      }
 
       // 2. Vider localStorage Emma et données user-specific
       const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        // Supprimer toutes les clés Emma et watchlist (données user-specific)
-        if (key && (key.startsWith('emma-') || key.startsWith('dans-') || key.startsWith('jslai'))) {
-          keysToRemove.push(key);
+      try {
+        for (let i = 0; i < local.length; i++) {
+          const key = local.key(i);
+          // Supprimer toutes les clés Emma et watchlist (données user-specific)
+          if (key && (key.startsWith('emma-') || key.startsWith('dans-') || key.startsWith('jslai'))) {
+            keysToRemove.push(key);
+          }
         }
+
+        keysToRemove.forEach(key => {
+          console.log(`  🗑️ Suppression: ${key}`);
+          local.removeItem(key);
+        });
+
+        console.log(`✅ ${keysToRemove.length} clés nettoyées`);
+      } catch (e) {
+        console.warn('⚠️ Impossible de nettoyer localStorage:', e);
       }
 
-      keysToRemove.forEach(key => {
-        console.log(`  🗑️ Suppression: ${key}`);
-        localStorage.removeItem(key);
-      });
-
-      console.log(`✅ ${keysToRemove.length} clés nettoyées`);
-
-      // 3. Supprimer la session user
-      sessionStorage.removeItem(AUTH_STORAGE_KEY);
+      // 3. Supprimer la session user (utiliser storage natif)
+      try {
+        session.removeItem(AUTH_STORAGE_KEY);
+      } catch (e) {
+        console.warn('⚠️ Impossible de supprimer session:', e);
+      }
 
       this.redirectToLogin();
     }

@@ -156,6 +156,14 @@
         (function() {
             'use strict';
 
+            // SAUVEGARDER les références au storage NATIF avant remplacement
+            const nativeLocalStorage = window.localStorage;
+            const nativeSessionStorage = window.sessionStorage;
+
+            // Exposer globalement pour usage critique (auth-guard)
+            window.__nativeLocalStorage = nativeLocalStorage;
+            window.__nativeSessionStorage = nativeSessionStorage;
+
             // Vérifier si storage est disponible
             const storageAvailable = (type) => {
                 try {
