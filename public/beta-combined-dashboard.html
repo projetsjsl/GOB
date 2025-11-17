@@ -359,29 +359,11 @@
         }
     </style>
 
-    <!-- React, ReactDOM, Babel - Vendored libraries (see public/vendor/README.md) -->
-    <script crossorigin src="/vendor/react.production.min.js"></script>
-    <script crossorigin src="/vendor/react-dom.production.min.js"></script>
-    <script src="/vendor/babel.min.js"></script>
-
-    <!-- Fallback CDN si fichiers vendorisés échouent -->
-    <script>
-        // Vérifier React
-        if (typeof React === 'undefined') {
-            console.warn('⚠️ Fichier vendorisé React échoué, chargement depuis CDN...');
-            document.write('<script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"><\/script>');
-        }
-        // Vérifier ReactDOM
-        if (typeof ReactDOM === 'undefined') {
-            console.warn('⚠️ Fichier vendorisé ReactDOM échoué, chargement depuis CDN...');
-            document.write('<script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"><\/script>');
-        }
-        // Vérifier Babel
-        if (typeof Babel === 'undefined') {
-            console.warn('⚠️ Fichier vendorisé Babel échoué, chargement depuis CDN...');
-            document.write('<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.6/babel.min.js"><\/script>');
-        }
-    </script>
+    <!-- ✨ VITE BUILD - React & App précompilés (suppression de Babel runtime) -->
+    <!-- Les assets sont générés par: npm run build -->
+    <script type="module" crossorigin src="/assets/index-WxqVlNm9.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-labSKdyf.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-Do8890S4.css">
 
     <!-- TradingView Lightweight Charts - CDN jsDelivr -->
     <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
@@ -858,153 +840,16 @@
     <!-- 🔐 Auth Guard - Protection du Dashboard -->
     <script src="/js/auth-guard.js"></script>
 
-    <!-- 🚨 SCRIPT DE GARDE CRITIQUE - S'exécute AVANT Babel -->
-    <script>
-        (function() {
-            'use strict';
-
-            console.log('🚨 [GUARD] Script de garde activé...');
-
-            // Attendre que le DOM soit prêt
-            function checkDependencies() {
-                console.log('🔍 [GUARD] Vérification des dépendances...');
-
-                const rootElement = document.getElementById('root');
-                if (!rootElement) {
-                    console.error('❌ [GUARD] Element #root introuvable !');
-                    return;
-                }
-
-                // Vérifier React
-                if (typeof React === 'undefined') {
-                    console.error('❌ [GUARD] React non chargé !');
-                    rootElement.innerHTML = `
-                        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; color: white; font-family: Inter, sans-serif; padding: 20px;">
-                            <div style="max-width: 600px; text-align: center;">
-                                <h1 style="color: #ef4444; font-size: 2rem; margin-bottom: 20px;">⚠️ Erreur de Chargement</h1>
-                                <p style="color: #9ca3af; margin-bottom: 10px;">React n'a pas pu être chargé depuis le CDN.</p>
-                                <p style="color: #6b7280; margin-bottom: 20px;">Cela peut être causé par :</p>
-                                <ul style="text-align: left; color: #6b7280; margin-bottom: 30px; list-style: inside;">
-                                    <li>Problème de connexion internet</li>
-                                    <li>CDN unpkg.com inaccessible</li>
-                                    <li>Bloqueur de contenu/publicités</li>
-                                    <li>Extension de navigateur qui bloque les scripts</li>
-                                </ul>
-                                <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; margin-right: 10px;">
-                                    🔄 Rafraîchir
-                                </button>
-                                <button onclick="window.open('https://unpkg.com/react@18/umd/react.production.min.js', '_blank')" style="background: #10b981; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
-                                    🔗 Tester CDN
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    return false;
-                }
-
-                // Vérifier ReactDOM
-                if (typeof ReactDOM === 'undefined') {
-                    console.error('❌ [GUARD] ReactDOM non chargé !');
-                    rootElement.innerHTML = `
-                        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; color: white; font-family: Inter, sans-serif; padding: 20px;">
-                            <div style="max-width: 600px; text-align: center;">
-                                <h1 style="color: #ef4444; font-size: 2rem; margin-bottom: 20px;">⚠️ Erreur de Chargement</h1>
-                                <p style="color: #9ca3af; margin-bottom: 20px;">ReactDOM n'a pas pu être chargé.</p>
-                                <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
-                                    🔄 Rafraîchir
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    return false;
-                }
-
-                // Vérifier Babel
-                if (typeof Babel === 'undefined') {
-                    console.error('❌ [GUARD] Babel non chargé !');
-                    rootElement.innerHTML = `
-                        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; color: white; font-family: Inter, sans-serif; padding: 20px;">
-                            <div style="max-width: 600px; text-align: center;">
-                                <h1 style="color: #ef4444; font-size: 2rem; margin-bottom: 20px;">⚠️ Erreur de Chargement</h1>
-                                <p style="color: #9ca3af; margin-bottom: 20px;">Babel (transpileur JSX) n'a pas pu être chargé.</p>
-                                <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
-                                    🔄 Rafraîchir
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    return false;
-                }
-
-                console.log('✅ [GUARD] Toutes les dépendances chargées !');
-                console.log('  - React:', typeof React);
-                console.log('  - ReactDOM:', typeof ReactDOM);
-                console.log('  - Babel:', typeof Babel);
-
-                // Afficher un loader pendant que Babel transpile
-                rootElement.innerHTML = `
-                    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; color: white; font-family: Inter, sans-serif;">
-                        <div style="text-align: center;">
-                            <div style="width: 60px; height: 60px; border: 4px solid #374151; border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                            <p style="color: #9ca3af; font-size: 18px;">Chargement du Terminal Financier...</p>
-                            <p style="color: #6b7280; font-size: 14px; margin-top: 10px;">Transpilation JSX en cours...</p>
-                        </div>
-                    </div>
-                    <style>
-                        @keyframes spin {
-                            to { transform: rotate(360deg); }
-                        }
-                    </style>
-                `;
-
-                // Timeout de sécurité : si après 15 secondes le loader est toujours là (fichier volumineux ~25k lignes)
-                setTimeout(function() {
-                    if (rootElement.innerHTML.includes('Transpilation JSX')) {
-                        console.error('❌ [GUARD] Timeout : Babel n\'a pas transpiré le code après 15s');
-                        rootElement.innerHTML = `
-                            <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; color: white; font-family: Inter, sans-serif; padding: 20px;">
-                                <div style="max-width: 700px; text-align: center;">
-                                    <h1 style="color: #ef4444; font-size: 2rem; margin-bottom: 20px;">⚠️ Erreur de Transpilation</h1>
-                                    <p style="color: #9ca3af; margin-bottom: 10px;">Babel n'a pas pu transpiler le code JSX après 15 secondes.</p>
-                                    <p style="color: #6b7280; margin-bottom: 20px;">Causes possibles :</p>
-                                    <ul style="text-align: left; color: #6b7280; margin-bottom: 30px; list-style: inside;">
-                                        <li><strong>Fichier trop volumineux</strong> (25,000+ lignes) pour Babel standalone</li>
-                                        <li>Erreur de syntaxe dans le code JSX</li>
-                                        <li>Extension de navigateur qui bloque l'exécution</li>
-                                        <li>Navigateur incompatible ou lent</li>
-                                    </ul>
-                                    <p style="color: #f59e0b; margin-bottom: 20px; font-weight: 600;">💡 Solution recommandée: Migrer vers un build process (Vite + React)</p>
-                                    <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; margin-right: 10px;">
-                                        🔄 Rafraîchir
-                                    </button>
-                                    <button onclick="location.href='/diagnose-dashboard.html'" style="background: #10b981; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
-                                        🔍 Diagnostic
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                }, 15000);
-
-                return true;
-            }
-
-            // Attendre le chargement du DOM et un peu plus pour les scripts CDN
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    setTimeout(checkDependencies, 100);
-                });
-            } else {
-                setTimeout(checkDependencies, 100);
-            }
-        })();
-    </script>
+    <!-- ✅ BUILD VITE UTILISÉ - Plus besoin de script de garde Babel -->
+    <!-- Le chargement est instantané avec les modules ES6 précompilés -->
 </head>
 <body class="min-h-screen">
     <div id="root"></div>
 
-    <script type="text/babel" src="/js/dashboard/app.jsx"></script>
-    
-    
+    <!-- Auth Guard (gestion authentification) -->
+    <script src="/auth-guard.js"></script>
+
+    <!-- ✨ Le dashboard est maintenant chargé via le build Vite (voir <head>) -->
+    <!-- Plus besoin de <script type="text/babel"> car tout est précompilé ! -->
 </body>
 </html>
