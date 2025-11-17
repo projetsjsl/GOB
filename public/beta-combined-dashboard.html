@@ -957,15 +957,15 @@
                     </style>
                 `;
 
-                // Timeout de sécurité : si après 15 secondes le loader est toujours là (fichier volumineux ~25k lignes)
+                // Timeout de sécurité : si après 60 secondes le loader est toujours là (fichier volumineux 1.5MB)
                 setTimeout(function() {
                     if (rootElement.innerHTML.includes('Transpilation JSX')) {
-                        console.error('❌ [GUARD] Timeout : Babel n\'a pas transpiré le code après 15s');
+                        console.error('❌ [GUARD] Timeout : Babel n\'a pas transpiré le code après 60s');
                         rootElement.innerHTML = `
                             <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0a0a; color: white; font-family: Inter, sans-serif; padding: 20px;">
                                 <div style="max-width: 700px; text-align: center;">
                                     <h1 style="color: #ef4444; font-size: 2rem; margin-bottom: 20px;">⚠️ Erreur de Transpilation</h1>
-                                    <p style="color: #9ca3af; margin-bottom: 10px;">Babel n'a pas pu transpiler le code JSX après 15 secondes.</p>
+                                    <p style="color: #9ca3af; margin-bottom: 10px;">Babel n'a pas pu transpiler le code JSX après 60 secondes.</p>
                                     <p style="color: #6b7280; margin-bottom: 20px;">Causes possibles :</p>
                                     <ul style="text-align: left; color: #6b7280; margin-bottom: 30px; list-style: inside;">
                                         <li><strong>Fichier trop volumineux</strong> (25,000+ lignes) pour Babel standalone</li>
@@ -984,7 +984,7 @@
                             </div>
                         `;
                     }
-                }, 15000);
+                }, 60000);
 
                 return true;
             }
