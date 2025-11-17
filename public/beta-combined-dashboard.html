@@ -25476,25 +25476,79 @@ console.log('✅ Données hybrides récupérées:', {
 
         // Fonction fallback SUPPRIMÉE - Plus de contenu demo
 
-        // Render avec gestion d'erreur robuste
-        try {
-            ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
-        } catch (error) {
-            console.error('❌ Erreur lors du rendu du dashboard:', error);
-            document.getElementById('root').innerHTML = `
-                <div style="padding: 40px; text-align: center; font-family: Inter, sans-serif;">
-                    <h2 style="color: #ef4444; margin-bottom: 20px;">⚠️ Erreur de Chargement</h2>
-                    <p style="color: #6b7280; margin-bottom: 10px;">Une erreur s'est produite lors du chargement du dashboard.</p>
-                    <p style="color: #6b7280; margin-bottom: 20px;">Veuillez rafraîchir la page.</p>
-                    <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+        // 🔍 DEBUG: Afficher un loader pendant le chargement
+        console.log('🎨 Préparation du rendu React...');
+        const rootElement = document.getElementById('root');
+
+        if (!rootElement) {
+            console.error('❌ ERREUR CRITIQUE: Element #root introuvable !');
+            document.body.innerHTML = `
+                <div style="padding: 40px; text-align: center; font-family: Inter, sans-serif; background: #0a0a0a; color: white; min-height: 100vh;">
+                    <h2 style="color: #ef4444; margin-bottom: 20px;">⚠️ Erreur Critique</h2>
+                    <p style="color: #9ca3af;">L'élément #root n'a pas été trouvé dans le DOM.</p>
+                    <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 20px;">
                         🔄 Rafraîchir
                     </button>
-                    <details style="margin-top: 30px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
-                        <summary style="cursor: pointer; color: #6b7280; font-weight: 600;">Détails techniques</summary>
-                        <pre style="background: #f3f4f6; padding: 15px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-size: 12px;">${error.message}\n\n${error.stack}</pre>
-                    </details>
                 </div>
             `;
+        } else {
+            // Afficher un loader temporaire
+            rootElement.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0a0a0a; color: white; font-family: Inter, sans-serif;">
+                    <div style="text-align: center;">
+                        <div style="width: 50px; height: 50px; border: 3px solid #374151; border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                        <p style="color: #9ca3af;">Chargement du Terminal Financier...</p>
+                        <p style="color: #6b7280; font-size: 12px; margin-top: 10px;">Powered by JSL AI</p>
+                    </div>
+                </div>
+                <style>
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
+
+            // Vérifier que React et ReactDOM sont chargés
+            console.log('🔍 Vérification des dépendances:');
+            console.log('  React:', typeof React !== 'undefined' ? '✅' : '❌');
+            console.log('  ReactDOM:', typeof ReactDOM !== 'undefined' ? '✅' : '❌');
+            console.log('  Babel:', typeof Babel !== 'undefined' ? '✅' : '❌');
+
+            // Render avec gestion d'erreur robuste
+            try {
+                console.log('🚀 Lancement du rendu React...');
+                ReactDOM.render(<BetaCombinedDashboard />, rootElement);
+                console.log('✅ Rendu React terminé avec succès !');
+
+                // Vérifier après 2 secondes si du contenu a été rendu
+                setTimeout(() => {
+                    if (rootElement.innerHTML.includes('Chargement du Terminal Financier')) {
+                        console.warn('⚠️ Le loader est toujours présent après 2s - possible problème de rendu');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                console.error('❌ Erreur lors du rendu du dashboard:', error);
+                console.error('Stack trace:', error.stack);
+
+                rootElement.innerHTML = `
+                    <div style="padding: 40px; text-align: center; font-family: Inter, sans-serif; background: #0a0a0a; color: white; min-height: 100vh;">
+                        <h2 style="color: #ef4444; margin-bottom: 20px;">⚠️ Erreur de Chargement</h2>
+                        <p style="color: #9ca3af; margin-bottom: 10px;">Une erreur s'est produite lors du chargement du dashboard.</p>
+                        <p style="color: #6b7280; margin-bottom: 20px;">Veuillez rafraîchir la page ou consulter la console pour plus de détails.</p>
+                        <button onclick="location.reload()" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            🔄 Rafraîchir
+                        </button>
+                        <button onclick="location.href='/diagnose-dashboard.html'" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-left: 10px;">
+                            🔍 Diagnostic
+                        </button>
+                        <details style="margin-top: 30px; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto; background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #374151;">
+                            <summary style="cursor: pointer; color: #9ca3af; font-weight: 600;">Détails techniques</summary>
+                            <pre style="background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-size: 12px; color: #10b981;">${error.message}\n\n${error.stack}</pre>
+                        </details>
+                    </div>
+                `;
+            }
         }
         }
     </script>

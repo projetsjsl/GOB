@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Diagnostic Dashboard GOB</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #00ff00;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .test-title {
+            font-weight: bold;
+            color: #ffff00;
+            margin-bottom: 10px;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffaa00; }
+        .info { color: #00aaff; }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        .code-block {
+            background: #000;
+            padding: 10px;
+            border-left: 3px solid #00ff00;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 DIAGNOSTIC DASHBOARD GOB</h1>
+        <p class="info">Ce script teste tous les composants critiques du dashboard pour identifier la cause de la page blanche.</p>
+
+        <div class="test-section">
+            <div class="test-title">⚙️ CONTRÔLES PRÉLIMINAIRES</div>
+            <button onclick="runAllTests()">▶️ Exécuter tous les tests</button>
+            <button onclick="location.href='/beta-combined-dashboard.html'">🔙 Retour au Dashboard</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const results = document.getElementById('results');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        function createSection(title) {
+            const section = document.createElement('div');
+            section.className = 'test-section';
+            section.innerHTML = `<div class="test-title">${title}</div>`;
+            results.appendChild(section);
+            return section;
+        }
+
+        async function runAllTests() {
+            results.innerHTML = '';
+            log('🚀 Démarrage des tests de diagnostic...', 'info');
+
+            // TEST 1: Vérifier Storage
+            const storageSection = createSection('TEST 1: Storage (localStorage / sessionStorage)');
+            try {
+                const testKey = '__test__';
+                localStorage.setItem(testKey, 'test');
+                localStorage.removeItem(testKey);
+                storageSection.innerHTML += '<div class="success">✅ localStorage: FONCTIONNEL</div>';
+
+                sessionStorage.setItem(testKey, 'test');
+                sessionStorage.removeItem(testKey);
+                storageSection.innerHTML += '<div class="success">✅ sessionStorage: FONCTIONNEL</div>';
+
+                // Vérifier l'utilisateur
+                const user = sessionStorage.getItem('gob-user');
+                if (user) {
+                    const userData = JSON.parse(user);
+                    storageSection.innerHTML += `<div class="success">✅ Utilisateur connecté: ${userData.display_name} (${userData.role})</div>`;
+                } else {
+                    storageSection.innerHTML += '<div class="error">❌ Aucun utilisateur en session (devrait rediriger vers login)</div>';
+                }
+            } catch (error) {
+                storageSection.innerHTML += `<div class="error">❌ Erreur Storage: ${error.message}</div>`;
+            }
+
+            // TEST 2: Vérifier CDN Dependencies
+            const cdnSection = createSection('TEST 2: CDN Dependencies (React, Babel, etc.)');
+            const cdnTests = [
+                { name: 'React', check: () => typeof React !== 'undefined', url: 'https://unpkg.com/react@18/umd/react.production.min.js' },
+                { name: 'ReactDOM', check: () => typeof ReactDOM !== 'undefined', url: 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js' },
+                { name: 'Babel', check: () => typeof Babel !== 'undefined', url: 'https://unpkg.com/@babel/standalone@7.23.6/babel.min.js' },
+                { name: 'Recharts', check: () => typeof Recharts !== 'undefined', url: 'https://unpkg.com/recharts@2.5.0/dist/Recharts.js' }
+            ];
+
+            for (const test of cdnTests) {
+                if (test.check()) {
+                    cdnSection.innerHTML += `<div class="success">✅ ${test.name}: CHARGÉ</div>`;
+                } else {
+                    cdnSection.innerHTML += `<div class="error">❌ ${test.name}: NON CHARGÉ<br>URL: <code>${test.url}</code></div>`;
+                }
+            }
+
+            // TEST 3: Vérifier DOM
+            const domSection = createSection('TEST 3: Structure DOM');
+            const rootElement = document.getElementById('root');
+            if (rootElement) {
+                domSection.innerHTML += '<div class="success">✅ Element #root: TROUVÉ</div>';
+                domSection.innerHTML += `<div class="info">📏 Contenu #root: "${rootElement.innerHTML.substring(0, 100)}${rootElement.innerHTML.length > 100 ? '...' : ''}"</div>`;
+                domSection.innerHTML += `<div class="info">📏 Taille: ${rootElement.innerHTML.length} caractères</div>`;
+            } else {
+                domSection.innerHTML += '<div class="error">❌ Element #root: INTROUVABLE</div>';
+            }
+
+            // TEST 4: Tester le rendering React
+            const reactSection = createSection('TEST 4: Test React Rendering');
+            try {
+                if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined') {
+                    // Créer un composant test simple
+                    const TestComponent = () => {
+                        return React.createElement('div', {
+                            style: { color: '#00ff00', padding: '10px', background: '#1a1a1a' }
+                        }, '✅ React peut effectuer le rendu !');
+                    };
+
+                    const testContainer = document.createElement('div');
+                    testContainer.id = 'react-test-container';
+                    reactSection.appendChild(testContainer);
+
+                    ReactDOM.render(React.createElement(TestComponent), testContainer);
+                    reactSection.innerHTML += '<div class="success">✅ React rendering: FONCTIONNEL</div>';
+                } else {
+                    reactSection.innerHTML += '<div class="error">❌ React ou ReactDOM non disponible</div>';
+                }
+            } catch (error) {
+                reactSection.innerHTML += `<div class="error">❌ Erreur React rendering: ${error.message}</div>`;
+                reactSection.innerHTML += `<pre>${error.stack}</pre>`;
+            }
+
+            // TEST 5: Vérifier les API endpoints
+            const apiSection = createSection('TEST 5: Connectivité API');
+            try {
+                const response = await fetch('/api/status?test=true');
+                if (response.ok) {
+                    const data = await response.json();
+                    apiSection.innerHTML += '<div class="success">✅ API /api/status: ACCESSIBLE</div>';
+                    apiSection.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    apiSection.innerHTML += `<div class="warning">⚠️ API status code: ${response.status}</div>`;
+                }
+            } catch (error) {
+                apiSection.innerHTML += `<div class="error">❌ Erreur API: ${error.message}</div>`;
+            }
+
+            // TEST 6: Console Errors
+            const consoleSection = createSection('TEST 6: Erreurs Console');
+            consoleSection.innerHTML += '<div class="info">💡 Ouvrez la console DevTools (F12) pour voir toutes les erreurs JavaScript</div>';
+            consoleSection.innerHTML += '<div class="info">Recherchez particulièrement:</div>';
+            consoleSection.innerHTML += '<ul>';
+            consoleSection.innerHTML += '<li>❌ Erreurs de syntaxe JSX</li>';
+            consoleSection.innerHTML += '<li>❌ Erreurs "Uncaught TypeError"</li>';
+            consoleSection.innerHTML += '<li>❌ Erreurs de chargement de ressources (404)</li>';
+            consoleSection.innerHTML += '<li>❌ Erreurs CORS</li>';
+            consoleSection.innerHTML += '</ul>';
+
+            // TEST 7: Performance
+            const perfSection = createSection('TEST 7: Performance & Timing');
+            if (window.performance) {
+                const timing = window.performance.timing;
+                const loadTime = timing.loadEventEnd - timing.navigationStart;
+                const domReady = timing.domContentLoadedEventEnd - timing.navigationStart;
+
+                perfSection.innerHTML += `<div class="info">⏱️ Temps de chargement total: ${loadTime}ms</div>`;
+                perfSection.innerHTML += `<div class="info">⏱️ DOM Ready: ${domReady}ms</div>`;
+            }
+
+            log('✅ Tous les tests terminés ! Analysez les résultats ci-dessus.', 'success');
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>
