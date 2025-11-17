@@ -188,50 +188,50 @@
                 getItem: function(key) {
                     try {
                         if (localStorageAvailable) {
-                            return localStorage.getItem(key);
+                            return nativeLocalStorage.getItem(key);
                         } else {
                             return memoryStorage['local_' + key] || null;
                         }
                     } catch (e) {
-                        console.warn('⚠️ localStorage.getItem bloqué:', key);
+                        // Pas de console.warn répétitif - retourne juste le fallback
                         return memoryStorage['local_' + key] || null;
                     }
                 },
                 setItem: function(key, value) {
                     try {
                         if (localStorageAvailable) {
-                            localStorage.setItem(key, value);
+                            nativeLocalStorage.setItem(key, value);
                         } else {
                             memoryStorage['local_' + key] = String(value);
                         }
                     } catch (e) {
-                        console.warn('⚠️ localStorage.setItem bloqué:', key);
+                        // Pas de console.warn répétitif - stocke juste en mémoire
                         memoryStorage['local_' + key] = String(value);
                     }
                 },
                 removeItem: function(key) {
                     try {
                         if (localStorageAvailable) {
-                            localStorage.removeItem(key);
+                            nativeLocalStorage.removeItem(key);
                         } else {
                             delete memoryStorage['local_' + key];
                         }
                     } catch (e) {
-                        console.warn('⚠️ localStorage.removeItem bloqué:', key);
+                        // Pas de console.warn répétitif
                         delete memoryStorage['local_' + key];
                     }
                 },
                 clear: function() {
                     try {
                         if (localStorageAvailable) {
-                            localStorage.clear();
+                            nativeLocalStorage.clear();
                         } else {
                             Object.keys(memoryStorage).forEach(k => {
                                 if (k.startsWith('local_')) delete memoryStorage[k];
                             });
                         }
                     } catch (e) {
-                        console.warn('⚠️ localStorage.clear bloqué');
+                        // Pas de console.warn répétitif
                         Object.keys(memoryStorage).forEach(k => {
                             if (k.startsWith('local_')) delete memoryStorage[k];
                         });
@@ -244,50 +244,50 @@
                 getItem: function(key) {
                     try {
                         if (sessionStorageAvailable) {
-                            return sessionStorage.getItem(key);
+                            return nativeSessionStorage.getItem(key);
                         } else {
                             return memoryStorage['session_' + key] || null;
                         }
                     } catch (e) {
-                        console.warn('⚠️ sessionStorage.getItem bloqué:', key);
+                        // Pas de console.warn répétitif - retourne juste le fallback
                         return memoryStorage['session_' + key] || null;
                     }
                 },
                 setItem: function(key, value) {
                     try {
                         if (sessionStorageAvailable) {
-                            sessionStorage.setItem(key, value);
+                            nativeSessionStorage.setItem(key, value);
                         } else {
                             memoryStorage['session_' + key] = String(value);
                         }
                     } catch (e) {
-                        console.warn('⚠️ sessionStorage.setItem bloqué:', key);
+                        // Pas de console.warn répétitif - stocke juste en mémoire
                         memoryStorage['session_' + key] = String(value);
                     }
                 },
                 removeItem: function(key) {
                     try {
                         if (sessionStorageAvailable) {
-                            sessionStorage.removeItem(key);
+                            nativeSessionStorage.removeItem(key);
                         } else {
                             delete memoryStorage['session_' + key];
                         }
                     } catch (e) {
-                        console.warn('⚠️ sessionStorage.removeItem bloqué:', key);
+                        // Pas de console.warn répétitif
                         delete memoryStorage['session_' + key];
                     }
                 },
                 clear: function() {
                     try {
                         if (sessionStorageAvailable) {
-                            sessionStorage.clear();
+                            nativeSessionStorage.clear();
                         } else {
                             Object.keys(memoryStorage).forEach(k => {
                                 if (k.startsWith('session_')) delete memoryStorage[k];
                             });
                         }
                     } catch (e) {
-                        console.warn('⚠️ sessionStorage.clear bloqué');
+                        // Pas de console.warn répétitif
                         Object.keys(memoryStorage).forEach(k => {
                             if (k.startsWith('session_')) delete memoryStorage[k];
                         });
