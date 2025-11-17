@@ -59,6 +59,15 @@
   <script>
     (function() {
       'use strict';
+
+      // SAUVEGARDER les références au storage NATIF avant remplacement
+      const nativeLocalStorage = window.localStorage;
+      const nativeSessionStorage = window.sessionStorage;
+
+      // Exposer globalement pour usage critique (login)
+      window.__nativeLocalStorage = nativeLocalStorage;
+      window.__nativeSessionStorage = nativeSessionStorage;
+
       const storageAvailable = (type) => {
         try {
           const storage = window[type];
@@ -643,9 +652,19 @@
 
     // Vérifier si déjà connecté
     window.addEventListener('DOMContentLoaded', () => {
-      const currentUser = sessionStorage.getItem('gob-user');
+      // Utiliser le sessionStorage NATIF pour vérifier (pas le wrapper avec fallback mémoire)
+      let currentUser = null;
+      try {
+        currentUser = window.__nativeSessionStorage
+          ? window.__nativeSessionStorage.getItem('gob-user')
+          : sessionStorage.getItem('gob-user');
+      } catch (e) {
+        console.warn('⚠️ Impossible de vérifier sessionStorage:', e);
+      }
+
       if (currentUser) {
         // Déjà connecté, rediriger
+        console.log('✅ Utilisateur déjà connecté, redirection...');
         window.location.href = '/beta-combined-dashboard.html';
         return;
       }
@@ -719,12 +738,35 @@
         }
 
         // Succès - Stocker les infos utilisateur
-        sessionStorage.setItem('gob-user', JSON.stringify({
-          username: data.user.username,
-          role: data.user.role,
-          display_name: data.user.display_name,
-          permissions: data.user.permissions
-        }));
+        // CRITIQUE: On doit stocker dans le VRAI sessionStorage, pas le fallback mémoire
+        // Sinon la redirection vers une autre page perdra les données
+        try {
+          const userData = JSON.stringify({
+            username: data.user.username,
+            role: data.user.role,
+            display_name: data.user.display_name,
+            permissions: data.user.permissions
+          });
+
+          // Essayer d'écrire dans le VRAI sessionStorage NATIF (pas le wrapper)
+          // C'est CRITIQUE car on va changer de page et le fallback mémoire sera perdu
+          try {
+            if (window.__nativeSessionStorage) {
+              window.__nativeSessionStorage.setItem('gob-user', userData);
+              console.log('✅ Utilisateur stocké dans sessionStorage natif');
+            } else {
+              // Fallback si __nativeSessionStorage n'existe pas
+              sessionStorage.setItem('gob-user', userData);
+              console.log('✅ Utilisateur stocké dans sessionStorage (wrapper)');
+            }
+          } catch (storageError) {
+            // Storage bloqué - impossible de rediriger car les données seront perdues
+            console.error('❌ sessionStorage bloqué:', storageError);
+            throw new Error('Votre navigateur bloque le stockage des données. Veuillez autoriser les cookies et le stockage local, puis réessayer.');
+          }
+        } catch (jsonError) {
+          throw new Error('Erreur de formatage des données utilisateur');
+        }
 
         // Message de succès
         showSuccess(`Bienvenue ${data.user.display_name}! Redirection...`);
