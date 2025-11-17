@@ -359,13 +359,34 @@
         }
     </style>
 
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
-    <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+    <!-- React et ReactDOM - CDN Cloudflare (plus fiable que unpkg) -->
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" integrity="sha512-8Q6Y9XnTbOE+JNvjBQwJ2H8S+UV4uA6hiRykhdtIyDYZ2TprdNmWOUaKdGzOhyr4dCyk287OejbPvwl7lrfqrQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" integrity="sha512-6a1107rTlA4gYpgHAqbwLAtxmWipBdJFcq8y5S/aTge3Bp+VAklABm2LO+Kg51vOWR9JMZq1Ovjl5tpluNpTeQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
-    <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- Babel Standalone - CDN Cloudflare -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js" integrity="sha512-kp4fjmG4dUoKs8HKQQeITn7I+4WPYModkzyKPYrkC5M6JPcu2GOt92K4FqbMr1pM2OpOT+NqCZvzONq1Vfb6Fg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Fallback automatique si CDN principal échoue -->
+    <script>
+        // Vérifier React
+        if (typeof React === 'undefined') {
+            console.warn('⚠️ CDN principal React échoué, chargement fallback...');
+            document.write('<script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"><\/script>');
+        }
+        // Vérifier ReactDOM
+        if (typeof ReactDOM === 'undefined') {
+            console.warn('⚠️ CDN principal ReactDOM échoué, chargement fallback...');
+            document.write('<script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"><\/script>');
+        }
+        // Vérifier Babel
+        if (typeof Babel === 'undefined') {
+            console.warn('⚠️ CDN principal Babel échoué, chargement fallback...');
+            document.write('<script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"><\/script>');
+        }
+    </script>
+
+    <!-- TradingView Lightweight Charts - CDN jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
     <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
