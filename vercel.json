@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "installCommand": "npm install",
   "functions": {
     "api/marketdata.js": {
@@ -114,16 +116,6 @@
     { "source": "/api/finnhub", "destination": "/api/marketdata" }
   ],
   "redirects": [
-    {
-      "source": "/",
-      "destination": "/beta-combined-dashboard.html",
-      "permanent": false
-    },
-    {
-      "source": "/index.html",
-      "destination": "/beta-combined-dashboard.html",
-      "permanent": false
-    },
     {
       "source": "/test",
       "destination": "/test-simple.html",
