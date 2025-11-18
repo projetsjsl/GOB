@@ -185,14 +185,37 @@ export default async function handler(req, res) {
     // n8n a un timeout de 5s, mais l'API Emma peut prendre 30-90s
     // Solution: Répondre immédiatement avec TwiML, traiter en arrière-plan
     
-    // Répondre immédiatement à n8n avec confirmation
+    // ✅ FIX MODE TEST: En mode test, générer réponse simulée immédiate pour dashboard
+    const isTest = isTestPhoneNumber(senderPhone);
+    let immediateResponse = '⏳ Analyse en cours, réponse dans quelques instants...';
+    
+    if (isTest) {
+      console.log('[SMS Adapter] 🧪 Mode test: Génération réponse simulée immédiate pour dashboard...');
+      try {
+        // Générer réponse simulée immédiatement (sans attendre API chat)
+        const simulatedResponse = await generateSimulatedResponse(messageBody, senderPhone);
+        immediateResponse = simulatedResponse;
+        console.log(`[SMS Adapter] 🧪 Réponse simulée générée (${simulatedResponse.length} chars) - Envoyée immédiatement à n8n`);
+      } catch (simError) {
+        console.error('[SMS Adapter] Erreur génération réponse simulée immédiate:', simError);
+        // Fallback: message par défaut
+      }
+    }
+    
+    // Répondre immédiatement à n8n (avec réponse simulée en mode test, ou message d'attente en prod)
     res.setHeader('Content-Type', 'text/xml');
     res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Message>⏳ Analyse en cours, réponse dans quelques instants...</Message>
+  <Message>${escapeXml(immediateResponse)}</Message>
 </Response>`);
     
     // Traiter la requête en arrière-plan (ne pas bloquer la réponse n8n)
+    // En mode test, on a déjà envoyé la réponse simulée, donc on peut skip le traitement
+    if (isTest) {
+      console.log('[SMS Adapter] 🧪 Mode test: Réponse simulée déjà envoyée, skip traitement arrière-plan');
+      return;
+    }
+    
     (async () => {
       try {
         // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMÉDIAT (UX)
