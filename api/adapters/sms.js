@@ -147,190 +147,152 @@ export default async function handler(req, res) {
     // 4. VÉRIFICATION ANTI-SPAM (optionnel)
     // TODO: Implémenter rate limiting basé sur le numéro de téléphone
 
-    // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMÉDIAT (UX)
-    // L'utilisateur sait qu'Emma travaille pendant le traitement
-    try {
-      await sendSMS(
-        senderPhone,
-        '👩🏻 Message reçu! J\'analyse ta demande, je te reviens! 📈🔍⏳'
-      );
-      console.log('[SMS Adapter] SMS de confirmation envoyé');
-    } catch (confirmError) {
-      console.error('[SMS Adapter] Erreur envoi SMS confirmation:', confirmError);
-      // Non-bloquant: on continue même si la confirmation échoue
-    }
+    // ✅ FIX TIMEOUT N8N: Répondre immédiatement à n8n (< 5s) et traiter en arrière-plan
+    // n8n a un timeout de 5s, mais l'API Emma peut prendre 30-90s
+    // Solution: Répondre immédiatement avec TwiML, traiter en arrière-plan
+    
+    // Répondre immédiatement à n8n avec confirmation
+    res.setHeader('Content-Type', 'text/xml');
+    res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>⏳ Analyse en cours, réponse dans quelques instants...</Message>
+</Response>`);
+    
+    // Traiter la requête en arrière-plan (ne pas bloquer la réponse n8n)
+    (async () => {
+      try {
+        // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMÉDIAT (UX)
+        // L'utilisateur sait qu'Emma travaille pendant le traitement
+        try {
+          await sendSMS(
+            senderPhone,
+            '👩🏻 Message reçu! J\'analyse ta demande, je te reviens! 📈🔍⏳'
+          );
+          console.log('[SMS Adapter] SMS de confirmation envoyé');
+        } catch (confirmError) {
+          console.error('[SMS Adapter] Erreur envoi SMS confirmation:', confirmError);
+          // Non-bloquant: on continue même si la confirmation échoue
+        }
 
-    // 5. APPELER L'API CHAT CENTRALISÉE
-    let chatResponse;
-    try {
-      // Import dynamique pour éviter les circular dependencies
-      const chatModule = await import('../chat.js');
+        // 5. APPELER L'API CHAT CENTRALISÉE
+        let chatResponse;
+        try {
+          // Import dynamique pour éviter les circular dependencies
+          const chatModule = await import('../chat.js');
 
-      const chatRequest = {
-        method: 'POST',
-        body: {
-          message: messageBody,
-          userId: senderPhone,
-          channel: 'sms',
-          metadata: {
-            messageSid: MessageSid,
-            twilioFrom: senderPhone
+          const chatRequest = {
+            method: 'POST',
+            body: {
+              message: messageBody,
+              userId: senderPhone,
+              channel: 'sms',
+              metadata: {
+                messageSid: MessageSid,
+                twilioFrom: senderPhone
+              }
+            }
+          };
+
+          // Mock response object
+          let chatResponseData = null;
+          const chatRes = {
+            status: (code) => ({
+              json: (data) => {
+                chatResponseData = data;
+                return chatResponseData;
+              }
+            }),
+            setHeader: () => {}
+          };
+
+          await chatModule.default(chatRequest, chatRes);
+
+          if (!chatResponseData || !chatResponseData.success) {
+            throw new Error('Chat API returned unsuccessful response');
+          }
+
+          chatResponse = chatResponseData;
+          console.log(`[SMS Adapter] Réponse reçue de /api/chat (${chatResponse.response.length} chars)`);
+
+        } catch (error) {
+          console.error('[SMS Adapter] Erreur appel /api/chat:', error);
+          await sendSMS(
+            senderPhone,
+            '❌ Désolé, une erreur est survenue. Réessayez dans quelques instants.'
+          );
+          return;
+        }
+
+        // 6. ENVOYER LA RÉPONSE PAR SMS (en arrière-plan)
+        try {
+          const response = chatResponse.response;
+
+          // 🛡️ PROTECTION ANTI-SPAM: Refuser les réponses > 4500 chars (3 SMS max)
+          if (response.length > 4500) {
+            console.error(`❌ [SMS Adapter] RÉPONSE TROP LONGUE (${response.length} chars) - REFUSÉE!`);
+
+            // Envoyer un message d'erreur court
+            await sendSMS(
+              senderPhone,
+              "❌ Désolé, la réponse est trop longue pour SMS. Essayez une question plus spécifique ou consultez gobapps.com pour l'analyse complète."
+            );
+            return;
+          }
+
+          // Envoyer la vraie réponse via Twilio API (tous les messages, pas seulement > 800 chars)
+          // Car on a déjà répondu à n8n avec TwiML, donc on envoie toujours via API
+          console.log(`[SMS Adapter] Envoi réponse via Twilio API (${response.length} chars)`);
+          await sendSMS(senderPhone, response);
+
+          // 6.5. ENVOYER NOTIFICATION EMAIL EN ARRIÈRE-PLAN (après SMS)
+          sendConversationEmail({
+            userName: chatResponse.metadata?.name || senderPhone,
+            userPhone: senderPhone,
+            userId: chatResponse.metadata?.user_id || 'unknown',
+            userMessage: messageBody,
+            emmaResponse: chatResponse.response,
+            metadata: {
+              conversationId: chatResponse.metadata?.conversation_id,
+              model: chatResponse.metadata?.model,
+              tools_used: chatResponse.metadata?.tools_used || [],
+              execution_time_ms: chatResponse.metadata?.execution_time_ms,
+              intent_data: chatResponse.metadata?.intent,
+              timestamp: new Date().toISOString()
+            }
+          }).then(() => {
+            console.log('✅ [SMS Adapter] Notification email envoyée (arrière-plan)');
+          }).catch((emailError) => {
+            console.error('⚠️ [SMS Adapter] Erreur envoi email (non-bloquant):', emailError.message);
+          });
+
+        } catch (error) {
+          console.error('[SMS Adapter] Erreur envoi SMS (arrière-plan):', error);
+          // Envoyer message d'erreur à l'utilisateur
+          try {
+            await sendSMS(
+              senderPhone,
+              '❌ Erreur technique. Réessayez ou consultez gobapps.com'
+            );
+          } catch (smsError) {
+            console.error('[SMS Adapter] Impossible d\'envoyer SMS d\'erreur:', smsError);
           }
         }
-      };
-
-      // Mock response object
-      let chatResponseData = null;
-      const chatRes = {
-        status: (code) => ({
-          json: (data) => {
-            chatResponseData = data;
-            return chatResponseData;
-          }
-        }),
-        setHeader: () => {}
-      };
-
-      await chatModule.default(chatRequest, chatRes);
-
-      if (!chatResponseData || !chatResponseData.success) {
-        throw new Error('Chat API returned unsuccessful response');
+      } catch (error) {
+        console.error('[SMS Adapter] Erreur traitement arrière-plan:', error);
+        // Envoyer message d'erreur à l'utilisateur
+        try {
+          await sendSMS(
+            senderPhone,
+            '❌ Erreur système. Contactez le support GOB si le problème persiste.'
+          );
+        } catch (smsError) {
+          console.error('[SMS Adapter] Impossible d\'envoyer SMS d\'erreur:', smsError);
+        }
       }
-
-      chatResponse = chatResponseData;
-      console.log(`[SMS Adapter] Réponse reçue de /api/chat (${chatResponse.response.length} chars)`);
-
-    } catch (error) {
-      console.error('[SMS Adapter] Erreur appel /api/chat:', error);
-      return await sendSMS(
-        senderPhone,
-        '❌ Désolé, une erreur est survenue. Réessayez dans quelques instants.'
-      );
-    }
-
-    // 6. ENVOYER LA RÉPONSE PAR SMS (PRIORITÉ: latence minimale)
-    try {
-      const response = chatResponse.response;
-
-      // 🛡️ PROTECTION ANTI-SPAM: Refuser les réponses > 4500 chars (3 SMS max)
-      if (response.length > 4500) {
-        console.error(`❌ [SMS Adapter] RÉPONSE TROP LONGUE (${response.length} chars) - REFUSÉE!`);
-
-        // Envoyer un message d'erreur court
-        await sendSMS(
-          senderPhone,
-          "❌ Désolé, la réponse est trop longue pour SMS. Essayez une question plus spécifique ou consultez gobapps.com pour l'analyse complète."
-        );
-
-        res.setHeader('Content-Type', 'text/xml');
-        return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
-<Response></Response>`);
-      }
-
-      // Pour messages > 800 chars, TwiML échoue silencieusement
-      // On utilise sendSMS() qui découpe automatiquement en plusieurs SMS
-      // BAISSÉ de 1600 → 1000 → 800 car TwiML échoue même pour 800-1000 chars
-      if (response.length > 800) {
-        console.log(`[SMS Adapter] Message long (${response.length} chars) - envoi via sendSMS() avec découpage`);
-
-        await sendSMS(senderPhone, response);
-
-        // 6.5. ENVOYER NOTIFICATION EMAIL EN ARRIÈRE-PLAN (après SMS)
-        // Ne pas attendre pour ne pas ralentir la réponse SMS
-        sendConversationEmail({
-          userName: chatResponse.metadata?.name || senderPhone,
-          userPhone: senderPhone,
-          userId: chatResponse.metadata?.user_id || 'unknown',
-          userMessage: messageBody,
-          emmaResponse: chatResponse.response,
-          metadata: {
-            conversationId: chatResponse.metadata?.conversation_id,
-            model: chatResponse.metadata?.model,
-            tools_used: chatResponse.metadata?.tools_used || [],
-            execution_time_ms: chatResponse.metadata?.execution_time_ms,
-            intent_data: chatResponse.metadata?.intent,
-            timestamp: new Date().toISOString()
-          }
-        }).then(() => {
-          console.log('✅ [SMS Adapter] Notification email envoyée (arrière-plan)');
-        }).catch((emailError) => {
-          console.error('⚠️ [SMS Adapter] Erreur envoi email (non-bloquant):', emailError.message);
-        });
-
-        // Retourner TwiML vide pour confirmer à Twilio
-        res.setHeader('Content-Type', 'text/xml');
-        return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
-<Response></Response>`);
-      } else {
-        // Message court: TwiML direct (plus rapide)
-        console.log(`[SMS Adapter] Message court (${response.length} chars) - envoi via TwiML`);
-
-        // 🛡️ FALLBACK: Si TwiML échoue, envoyer via sendSMS() après 3 secondes
-        setTimeout(async () => {
-          try {
-            // Vérifier si le message a été livré via Twilio API
-            const client = getTwilioClient();
-            const messages = await client.messages.list({
-              to: senderPhone,
-              limit: 1
-            });
-            
-            const lastMessage = messages[0];
-            const wasJustSent = lastMessage && 
-                                (Date.now() - new Date(lastMessage.dateCreated).getTime()) < 5000;
-            
-            if (!wasJustSent) {
-              console.warn('⚠️ [SMS Adapter] TwiML semble avoir échoué - Fallback vers sendSMS()');
-              await sendSMS(senderPhone, response);
-              console.log('✅ [SMS Adapter] Fallback SMS envoyé avec succès');
-            }
-          } catch (fallbackError) {
-            console.error('❌ [SMS Adapter] Erreur fallback:', fallbackError.message);
-            // Dernier recours: envoyer message d'erreur
-            try {
-              await sendSMS(senderPhone, '❌ Erreur technique. Réessayez ou consultez gobapps.com');
-            } catch (e) {
-              console.error('❌ [SMS Adapter] Impossible d\'envoyer message d\'erreur');
-            }
-          }
-        }, 3000);
-
-        // 6.5. ENVOYER NOTIFICATION EMAIL EN ARRIÈRE-PLAN (après SMS)
-        sendConversationEmail({
-          userName: chatResponse.metadata?.name || senderPhone,
-          userPhone: senderPhone,
-          userId: chatResponse.metadata?.user_id || 'unknown',
-          userMessage: messageBody,
-          emmaResponse: chatResponse.response,
-          metadata: {
-            conversationId: chatResponse.metadata?.conversation_id,
-            model: chatResponse.metadata?.model,
-            tools_used: chatResponse.metadata?.tools_used || [],
-            execution_time_ms: chatResponse.metadata?.execution_time_ms,
-            intent_data: chatResponse.metadata?.intent,
-            timestamp: new Date().toISOString()
-          }
-        }).then(() => {
-          console.log('✅ [SMS Adapter] Notification email envoyée (arrière-plan)');
-        }).catch((emailError) => {
-          console.error('⚠️ [SMS Adapter] Erreur envoi email (non-bloquant):', emailError.message);
-        });
-
-        res.setHeader('Content-Type', 'text/xml');
-        return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Message>${escapeXml(response)}</Message>
-</Response>`);
-      }
-
-    } catch (error) {
-      console.error('[SMS Adapter] Erreur envoi SMS:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to send SMS response',
-        details: error.message
-      });
-    }
+    })();
+    
+    // Retourner immédiatement (réponse déjà envoyée ci-dessus)
+    return;
 
   } catch (error) {
     console.error('[SMS Adapter] Erreur générale:', error);
