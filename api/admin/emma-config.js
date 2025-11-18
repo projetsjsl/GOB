@@ -101,8 +101,23 @@ async function handleGet(req, res, section, key) {
             if (!config[item.section]) {
                 config[item.section] = {};
             }
+
+            // Parser la valeur selon le type
+            let parsedValue = item.value;
+            if (item.type === 'json' && typeof item.value === 'string') {
+                try {
+                    parsedValue = JSON.parse(item.value);
+                } catch (e) {
+                    console.warn(`Erreur parsing JSON pour ${item.section}.${item.key}:`, e.message);
+                }
+            } else if (item.type === 'number') {
+                parsedValue = typeof item.value === 'string' ? parseFloat(item.value) : item.value;
+            } else if (item.type === 'boolean') {
+                parsedValue = item.value === true || item.value === 'true';
+            }
+
             config[item.section][item.key] = {
-                value: item.value,
+                value: parsedValue,
                 type: item.type || 'string',
                 description: item.description || '',
                 updated_at: item.updated_at,
