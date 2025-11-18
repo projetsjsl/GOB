@@ -14026,8 +14026,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                 return newMessages;
                             });
 
-                            // Démarrer l'effet de typing progressif
-                            startTypingEffect(messageId, response);
+                            // Démarrer l'effet de typing progressif APRÈS la mise à jour du state
+                            setTimeout(() => {
+                                startTypingEffect(messageId, response);
+                            }, 50); // Délai minimal pour garantir que le state est mis à jour
                         }
                         
                         // Confirmation de réception
