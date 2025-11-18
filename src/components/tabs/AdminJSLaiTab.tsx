@@ -5,16 +5,8 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const AdminJSLaiTab = ({
-                emmaConnected,
-                setEmmaConnected,
-                showPromptEditor,
-                setShowPromptEditor,
-                showTemperatureEditor,
-                setShowTemperatureEditor,
-                showLengthEditor,
-                setShowLengthEditor
-            }) => {
+export const AdminJSLaiTab: React.FC<TabProps> = (props) => {
+    const {             emmaConnected,                 setEmmaConnected,                 showPromptEditor,                 setShowPromptEditor,                 showTemperatureEditor,                 setShowTemperatureEditor,                 showLengthEditor,                 setShowLengthEditor } = props;
                 // États pour Température et Longueur (chargés depuis localStorage)
                 const [emmaTemperature, setEmmaTemperature] = useState(() => {
                     const saved = localStorage.getItem('emma-temperature');

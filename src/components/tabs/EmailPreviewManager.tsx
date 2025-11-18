@@ -5,7 +5,9 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const EmailPreviewManager = () => {
+export const EmailPreviewManager: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true } = props;
+
                 const [previewType, setPreviewType] = useState('morning');
                 const [loading, setLoading] = useState(false);
                 const [previewData, setPreviewData] = useState(null);

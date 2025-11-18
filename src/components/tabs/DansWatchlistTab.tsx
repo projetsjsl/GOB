@@ -5,7 +5,8 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const DansWatchlistTab = () => {
+            export const DansWatchlistTab: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true, tickers = [], stockData = {}, API_BASE_URL, fetchStockData, showMessage, getCompanyLogo, emmaPopulateWatchlist, initialLoadComplete } = props;
                 const [watchlistTickers, setWatchlistTickers] = useState([]);
                 const [newTicker, setNewTicker] = useState('');
                 const [watchlistStockData, setWatchlistStockData] = useState({});

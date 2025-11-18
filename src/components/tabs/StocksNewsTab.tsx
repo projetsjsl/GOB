@@ -5,7 +5,8 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const StocksNewsTab = () => {
+            export const StocksNewsTab: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true, tickers = [], stockData = {}, newsData = [], loading = false, lastUpdate, setSelectedStock, setActiveTab, fetchNews, refreshAllStocks, loadTickersFromSupabase, fetchLatestNewsForTickers, LucideIcon, getCompanyLogo } = props;
                 const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
                 const [expandedStock, setExpandedStock] = useState(null);
 

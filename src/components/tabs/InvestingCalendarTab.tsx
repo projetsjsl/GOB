@@ -5,7 +5,9 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const InvestingCalendarTab = () => {
+export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true } = props;
+
                 // Refs pour les widgets TradingView
                 const tradingViewForexRef = useRef(null);
                 const tradingViewEventsRef = useRef(null);

@@ -5,7 +5,8 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const IntelliStocksTab = () => {
+            export const IntelliStocksTab: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true } = props;
                 const [time, setTime] = useState(new Date());
                 const [selectedStock, setSelectedStock] = useState('AAPL');
                 const [timeframe, setTimeframe] = useState('1D');
