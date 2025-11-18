@@ -94,6 +94,34 @@ export interface TabProps {
   setStockData?: (data: Record<string, StockData>) => void;
   setNewsData?: (news: NewsArticle[]) => void;
   setEconomicCalendarData?: (events: EconomicEvent[]) => void;
+  setSeekingAlphaData?: (data: Record<string, SeekingAlphaData>) => void;
+  setSeekingAlphaStockData?: (data: Record<string, any>) => void;
+  setSelectedStock?: (stock: string | null) => void;
+  setActiveTab?: (tab: TabName) => void;
+  setLoading?: (loading: boolean) => void;
+  setLastUpdate?: (date: Date | null) => void;
+
+  // État du système
+  loading?: boolean;
+  isDarkMode?: boolean;
+  lastUpdate?: Date | null;
+  initialLoadComplete?: boolean;
+  selectedStock?: string | null;
+  API_BASE_URL?: string;
+
+  // Fonctions utilitaires
+  fetchStockData?: (ticker: string) => Promise<any>;
+  fetchNews?: (context?: string, limit?: number) => Promise<NewsArticle[]>;
+  fetchLatestNewsForTickers?: () => Promise<void>;
+  loadTickersFromSupabase?: () => Promise<string[]>;
+  refreshAllStocks?: () => Promise<void>;
+  showMessage?: (message: string, type?: 'success' | 'error' | 'info') => void;
+  getCompanyLogo?: (ticker: string) => string;
+  emmaPopulateWatchlist?: () => Promise<void>;
+
+  // Icon components (si disponibles)
+  LucideIcon?: React.FC<{ name: string; className?: string }>;
+  IconoirIcon?: React.FC<{ name: string; className?: string }>;
 
   // Autres props spécifiques
   [key: string]: any;
