@@ -26,13 +26,13 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    // Vérification d'authentification (à adapter selon votre système)
-    const authHeader = req.headers.authorization;
-    const isAuthorized = authHeader && authHeader === `Bearer ${process.env.ADMIN_API_KEY}`;
-    
-    if (!isAuthorized && process.env.ADMIN_API_KEY) {
-        return res.status(401).json({ error: 'Non autorisé. Token admin requis.' });
-    }
+    // ⚠️ AVERTISSEMENT: Authentification désactivée
+    // Pour activer la sécurité, décommenter les lignes ci-dessous et définir ADMIN_API_KEY dans Vercel
+    // const authHeader = req.headers.authorization;
+    // const isAuthorized = authHeader && authHeader === `Bearer ${process.env.ADMIN_API_KEY}`;
+    // if (!isAuthorized && process.env.ADMIN_API_KEY) {
+    //     return res.status(401).json({ error: 'Non autorisé. Token admin requis.' });
+    // }
 
     try {
         const { action, section, key, value } = req.body;
