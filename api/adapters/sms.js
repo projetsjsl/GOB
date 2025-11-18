@@ -101,7 +101,27 @@ export default async function handler(req, res) {
       });
     }
 
-    const { From: senderPhone, Body: messageBody, MessageSid } = twilioData;
+    let { From: senderPhone, Body: messageBody, MessageSid } = twilioData;
+
+    // ✅ FIX: Nettoyer le numéro de téléphone (enlever = au début si présent)
+    // Problème: n8n peut envoyer =+15551111111 au lieu de +15551111111
+    if (senderPhone && typeof senderPhone === 'string') {
+      senderPhone = senderPhone.trim();
+      // Enlever = au début si présent (problème d'URL encoding)
+      if (senderPhone.startsWith('=')) {
+        senderPhone = senderPhone.substring(1);
+        console.log(`[SMS Adapter] ⚠️ Numéro nettoyé (enlevé = au début): ${senderPhone}`);
+      }
+      // Valider format (doit commencer par +)
+      if (!senderPhone.startsWith('+')) {
+        console.error(`[SMS Adapter] ❌ Format numéro invalide: ${senderPhone}`);
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid phone number format',
+          details: `Phone number must start with +, got: ${senderPhone}`
+        });
+      }
+    }
 
     console.log(`[SMS Adapter] SMS de ${senderPhone}: "${messageBody}"`);
 
@@ -326,6 +346,22 @@ export default async function handler(req, res) {
  */
 async function sendSMS(to, message, simulate = false) {
   try {
+    // ✅ FIX: Nettoyer et valider le numéro de téléphone
+    if (to && typeof to === 'string') {
+      to = to.trim();
+      // Enlever = au début si présent (problème d'URL encoding)
+      if (to.startsWith('=')) {
+        to = to.substring(1);
+        console.log(`[SMS Adapter] ⚠️ Numéro nettoyé (enlevé = au début): ${to}`);
+      }
+      // Valider format (doit commencer par +)
+      if (!to.startsWith('+')) {
+        throw new Error(`Invalid phone number format: ${to} (must start with +)`);
+      }
+    } else {
+      throw new Error(`Invalid phone number type: ${typeof to}, value: ${to}`);
+    }
+
     // 🧪 MODE SIMULATION: Ne pas envoyer de vrai SMS
     if (simulate) {
       console.log(`[SMS Adapter] 🧪 MODE SIMULATION - SMS NON ENVOYÉ à ${to} (${message.length} chars)`);
