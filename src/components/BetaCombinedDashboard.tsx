@@ -7,14 +7,33 @@ import DansWatchlistTab from './tabs/DansWatchlistTab';
 import StocksNewsTab from './tabs/StocksNewsTab';
 import IntelliStocksTab from './tabs/IntelliStocksTab';
 import EconomicCalendarTab from './tabs/EconomicCalendarTab';
-import type { TabName } from '../types';
+import type { TabName, StockData, NewsArticle } from '../types';
 
 export const BetaCombinedDashboard: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TabName>('stocks-news');
     const [isDarkMode, setIsDarkMode] = useState(true);
 
-    // Props minimales pour les tabs (à enrichir progressivement)
-    const tabProps = { isDarkMode };
+    // États pour les données
+    const [tickers, setTickers] = useState<string[]>(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']);
+    const [stockData, setStockData] = useState<Record<string, StockData>>({});
+    const [newsData, setNewsData] = useState<NewsArticle[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+    // Props complètes pour les tabs
+    const tabProps = {
+        isDarkMode,
+        tickers,
+        setTickers,
+        stockData,
+        setStockData,
+        newsData,
+        setNewsData,
+        loading,
+        setLoading,
+        lastUpdate,
+        setLastUpdate
+    };
 
     const renderActiveTab = () => {
         switch (activeTab) {
