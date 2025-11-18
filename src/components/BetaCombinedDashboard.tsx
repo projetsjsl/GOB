@@ -14,7 +14,7 @@ export const BetaCombinedDashboard: React.FC = () => {
     const [isDarkMode, setIsDarkMode] = useState(true);
 
     // États pour les données
-    const [tickers, setTickers] = useState<string[]>(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']);
+    const [tickers, setTickers] = useState<string[]>([]); // Vide au départ, chargé depuis Supabase
     const [stockData, setStockData] = useState<Record<string, StockData>>({});
     const [newsData, setNewsData] = useState<NewsArticle[]>([]);
     const [loading, setLoading] = useState(false);
@@ -53,33 +53,58 @@ export const BetaCombinedDashboard: React.FC = () => {
         // TODO: Implémenter logique Emma
     };
 
-    // Effet: charger données initiales
+    // Effet: charger watchlist depuis Supabase puis les données
     useEffect(() => {
         const loadInitialData = async () => {
             setLoading(true);
             try {
-                // Charger données pour tickers par défaut
-                const promises = tickers.map(ticker => fetchStockData(ticker));
-                const results = await Promise.all(promises);
+                // 1. Charger watchlist depuis Supabase
+                console.log('📊 Chargement watchlist depuis Supabase...');
+                const watchlistRes = await fetch('/api/supabase-watchlist');
 
-                const newStockData: Record<string, StockData> = {};
-                results.forEach((data, index) => {
-                    if (data) {
-                        newStockData[tickers[index]] = {
-                            symbol: tickers[index],
-                            price: data.c || data.price,
-                            change: data.d || data.change,
-                            changePercent: data.dp || data.changePercent,
-                            ...data
-                        };
+                if (watchlistRes.ok) {
+                    const watchlistData = await watchlistRes.json();
+                    const tickersFromSupabase = watchlistData.data?.map((item: any) => item.symbol) || [];
+
+                    if (tickersFromSupabase.length > 0) {
+                        console.log(`✅ ${tickersFromSupabase.length} tickers chargés depuis Supabase:`, tickersFromSupabase);
+                        setTickers(tickersFromSupabase);
+
+                        // 2. Charger données pour ces tickers
+                        const promises = tickersFromSupabase.map((ticker: string) => fetchStockData(ticker));
+                        const results = await Promise.all(promises);
+
+                        const newStockData: Record<string, StockData> = {};
+                        results.forEach((data, index) => {
+                            if (data) {
+                                newStockData[tickersFromSupabase[index]] = {
+                                    symbol: tickersFromSupabase[index],
+                                    price: data.c || data.price,
+                                    change: data.d || data.change,
+                                    changePercent: data.dp || data.changePercent,
+                                    ...data
+                                };
+                            }
+                        });
+
+                        setStockData(newStockData);
+                        setLastUpdate(new Date());
+                    } else {
+                        console.log('ℹ️ Watchlist vide dans Supabase - aucun ticker chargé');
                     }
-                });
+                } else {
+                    console.warn('⚠️ Impossible de charger watchlist depuis Supabase, utilisation locale');
+                    // Fallback: tickers par défaut si Supabase échoue
+                    const defaultTickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'];
+                    setTickers(defaultTickers);
+                }
 
-                setStockData(newStockData);
-                setLastUpdate(new Date());
                 setInitialLoadComplete(true);
             } catch (error) {
-                console.error('Erreur chargement initial:', error);
+                console.error('❌ Erreur chargement initial:', error);
+                // Fallback en cas d'erreur
+                setTickers(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']);
+                setInitialLoadComplete(true);
             } finally {
                 setLoading(false);
             }
