@@ -35,20 +35,23 @@ export default async function handler(req, res) {
     // }
 
     try {
-        const { action, section, key, value } = req.body;
-        const { section: querySection, key: queryKey } = req.query;
-
         switch (req.method) {
-            case 'GET':
+            case 'GET': {
+                const { section: querySection, key: queryKey } = req.query;
                 return handleGet(req, res, querySection, queryKey);
-            
+            }
+
             case 'POST':
-            case 'PUT':
+            case 'PUT': {
+                const { action, section, key, value } = req.body || {};
                 return handleSet(req, res, action, section, key, value);
-            
-            case 'DELETE':
+            }
+
+            case 'DELETE': {
+                const { section, key } = req.body || {};
                 return handleDelete(req, res, section, key);
-            
+            }
+
             default:
                 return res.status(405).json({ error: 'Méthode non autorisée' });
         }
