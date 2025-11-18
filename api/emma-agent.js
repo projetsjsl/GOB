@@ -17,6 +17,7 @@ import { geminiFetchWithRetry } from '../lib/utils/gemini-retry.js';
 import { ContextMemory } from '../lib/context-memory.js';
 import { ResponseValidator } from '../lib/response-validator.js';
 import { DynamicPromptsSystem } from '../lib/dynamic-prompts.js';
+import { normalizeTickerWithClarification, normalizeTicker, extractGeographicContext, saveTickerPreference } from '../lib/utils/ticker-normalizer.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -89,6 +90,48 @@ class SmartAgent {
 
             // Enrichir le contexte passé aux étapes suivantes
             context.enriched_context = enrichedContext;
+
+            // ✅ NOUVELLE FEATURE: Détection de tickers ambigus (POW Canada vs POW US)
+            // Vérifier si les tickers détectés sont ambigus et nécessitent une clarification
+            if (intentData && intentData.tickers && intentData.tickers.length > 0) {
+                const sessionMemory = {
+                    userName: context.user_name || '',
+                    tickerPreferences: context.enriched_context?.tickerPreferences || {}
+                };
+
+                for (const ticker of intentData.tickers) {
+                    const normalizationResult = normalizeTickerWithClarification(ticker, userMessage, sessionMemory);
+
+                    if (normalizationResult.needsClarification) {
+                        console.log(`❓ Ticker ambigu détecté: ${ticker} - demande de clarification`);
+                        return {
+                            success: true,
+                            response: normalizationResult.clarificationQuestion,
+                            needs_clarification: true,
+                            clarification_type: 'ambiguous_ticker',
+                            ticker: ticker,
+                            options: normalizationResult.options,
+                            intent: intentData.intent,
+                            confidence: 0.9,
+                            tools_used: [],
+                            is_reliable: true
+                        };
+                    }
+
+                    // Si un ticker a été normalisé, mettre à jour la liste
+                    if (normalizationResult.normalized && normalizationResult.normalized !== ticker) {
+                        console.log(`🔄 Ticker normalisé: ${ticker} → ${normalizationResult.normalized}`);
+                        const index = intentData.tickers.indexOf(ticker);
+                        intentData.tickers[index] = normalizationResult.normalized;
+
+                        // Sauvegarder la préférence en mémoire de session
+                        if (normalizationResult.source === 'geographic_context' || normalizationResult.source === 'session_memory') {
+                            saveTickerPreference(sessionMemory, ticker, normalizationResult.normalized);
+                            context.enriched_context.tickerPreferences = sessionMemory.tickerPreferences;
+                        }
+                    }
+                }
+            }
 
             // ✅ CLARIFICATIONS ACTIVÉES - Emma peut poser des questions de suivi quand nécessaire
             // Si l'intention n'est pas claire (confidence < 0.5), Emma demande des précisions
@@ -4459,13 +4502,12 @@ Génère une réponse professionnelle en français basée sur ces données:`;
             'TOTAL': 'TTE',
             'BERKSHIRE': 'BRK.B',
             'BERKSHIRE HATHAWAY': 'BRK.B',
-            // Canadiennes
+            // Canadiennes (noms complets → tickers de base, normalisés après)
             'ROYAL BANK': 'RY',
             'TD BANK': 'TD',
             'TORONTO DOMINION': 'TD',
             'BANK OF NOVA SCOTIA': 'BNS',
             'SCOTIABANK': 'BNS',
-            'BMO': 'BMO',
             'BANK OF MONTREAL': 'BMO',
             'CIBC': 'CM',
             'NATIONAL BANK': 'NA',
@@ -4476,15 +4518,17 @@ Génère une réponse professionnelle en français basée sur ces données:`;
             'TC ENERGY': 'TRP',
             'TRANSCANADA': 'TRP',
             'CN RAIL': 'CNR',
-            'CNR': 'CNR',
             'CP RAIL': 'CP',
             'CANADIAN PACIFIC': 'CP',
             'SHOPIFY': 'SHOP',
-            'BCE': 'BCE',
             'BELL': 'BCE',
-            'TELUS': 'T',
-            'ROGERS': 'RCI.B'
+            'ROGERS': 'RCI.B',
+            'POWER CORP': 'POW',
+            'POWER CORPORATION': 'POW'
         };
+
+        // Normaliser les tickers canadiens avec le contexte géographique
+        const geoContext = extractGeographicContext(message);
 
         let correctedMessage = message;
         let corrections = [];
@@ -4499,8 +4543,19 @@ Génère une réponse professionnelle en français basée sur ces données:`;
             }
         }
 
+        // Normaliser les tickers canadiens détectés (ajouter .TO)
+        // Pattern: détecte les tickers en majuscules de 2-5 lettres
+        const tickerPattern = /\b([A-Z]{2,5})\b/g;
+        correctedMessage = correctedMessage.replace(tickerPattern, (match) => {
+            const normalized = normalizeTicker(match, geoContext);
+            if (normalized !== match.toUpperCase()) {
+                corrections.push(`${match} → ${normalized} (normalized)`);
+            }
+            return normalized;
+        });
+
         if (corrections.length > 0) {
-            console.log(`🔧 Auto-correction tickers: ${corrections.join(', ')}`);
+            console.log(`🔧 Auto-correction + normalisation tickers: ${corrections.join(', ')}`);
         }
 
         return correctedMessage;
