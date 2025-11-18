@@ -338,7 +338,6 @@
 
     <script>
         const API_BASE = '/api/admin/emma-config';
-        const ADMIN_TOKEN = localStorage.getItem('admin_token') || prompt('Token admin:');
 
         // Tab switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -363,12 +362,8 @@
         async function loadConfig() {
             try {
                 showStatus('Chargement de la configuration...', 'info');
-                
-                const response = await fetch(`${API_BASE}`, {
-                    headers: {
-                        'Authorization': `Bearer ${ADMIN_TOKEN}`
-                    }
-                });
+
+                const response = await fetch(`${API_BASE}`);
 
                 const data = await response.json();
                 
@@ -458,8 +453,7 @@
                 const response = await fetch(`${API_BASE}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${ADMIN_TOKEN}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         action: 'set',
@@ -522,8 +516,7 @@
                     const response = await fetch(`${API_BASE}`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${ADMIN_TOKEN}`
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             action: 'set',
