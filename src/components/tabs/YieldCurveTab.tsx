@@ -5,7 +5,9 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const YieldCurveTab = () => {
+export const YieldCurveTab: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true } = props;
+
                 const [yieldData, setYieldData] = useState(null);
                 const [loading, setLoading] = useState(true);
                 const [error, setError] = useState(null);

@@ -1,9 +1,8 @@
 import React from 'react';
 import type { TabProps } from '../../types';
 
-export const PlusTab: React.FC<TabProps> = () => {
-    // TODO: Récupérer isDarkMode du context
-    const isDarkMode = document.documentElement.classList.contains('dark');
+export const PlusTab: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true } = props;
 
     const handleLogout = () => {
         // Nettoyer toutes les données de session

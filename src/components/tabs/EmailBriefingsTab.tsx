@@ -5,7 +5,8 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const EmailBriefingsTab = () => {
+            export const EmailBriefingsTab: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true } = props;
                 const [loading, setLoading] = useState(false);
                 const [currentBriefing, setCurrentBriefing] = useState(null);
                 const [previewHtml, setPreviewHtml] = useState('');

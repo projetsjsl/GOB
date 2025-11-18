@@ -5,7 +5,9 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const EconomicCalendarTab = () => {
+export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
+    const { isDarkMode = true } = props;
+
                 // Initialize with fallback data so component is never blank
                 const [activeSubTab, setActiveSubTab] = useState('economic');
                 const [calendarData, setCalendarData] = useState([{
