@@ -201,31 +201,58 @@ export default async function handler(req, res) {
         }
       }
 
-      // CAS 2: Numéro inconnu sans nom - demander le nom
+      // CAS 2: Numéro inconnu sans nom - demander le nom SAUF si requête financière
       if (!isKnownInContacts && !hasName && !awaitingName) {
-        console.log(`[Chat API] Numéro inconnu détecté, demande du nom`);
+        // ✅ FIX: Détecter si c'est une requête financière (ANALYSE, PRIX, NEWS, etc.)
+        // Si oui, traiter la requête d'abord, demander le nom après
+        const messageUpper = message.trim().toUpperCase();
+        const financialKeywords = [
+          'ANALYSE', 'ANALYZE', 'PRIX', 'PRICE', 'NEWS', 'ACTUALITES', 'ACTUALITÉS',
+          'RSI', 'MACD', 'FONDAMENTAUX', 'FUNDAMENTALS', 'TECHNIQUE', 'TECHNICAL',
+          'COMPARER', 'COMPARE', 'RATIOS', 'CROISSANCE', 'GROWTH', 'MARCHE', 'MARKET',
+          'INDICES', 'INDICES', 'SECTEUR', 'SECTOR', 'ACHETER', 'BUY', 'VENDRE', 'SELL',
+          'LISTE', 'LIST', 'AJOUTER', 'ADD', 'RETIRER', 'REMOVE', 'TOP 5', 'SKILLS',
+          'RESULTATS', 'EARNINGS', 'CALENDRIER', 'CALENDAR', 'INFLATION', 'FED', 'TAUX'
+        ];
+        
+        const isFinancialRequest = financialKeywords.some(keyword => 
+          messageUpper.includes(keyword) || messageUpper.startsWith(keyword + ' ')
+        );
+        
+        // Détecter aussi les tickers (mots en majuscules de 1-5 lettres)
+        const tickerPattern = /^[A-Z]{1,5}(\s|$)/;
+        const hasTicker = tickerPattern.test(messageUpper) || messageUpper.match(/[A-Z]{2,5}/);
 
-        try {
-          await updateUserProfile(userProfile.id, {
-            metadata: { ...userProfile.metadata, awaiting_name: true }
-          });
+        if (!isFinancialRequest && !hasTicker) {
+          // Ce n'est pas une requête financière → demander le nom
+          console.log(`[Chat API] Numéro inconnu détecté, demande du nom (message non-financier)`);
 
-          const askNameResponse = "Bonjour ! 👋\n\nAvant de commencer, pourrais-tu me dire ton prénom ? Ça me permettra de personnaliser nos échanges.";
+          try {
+            await updateUserProfile(userProfile.id, {
+              metadata: { ...userProfile.metadata, awaiting_name: true }
+            });
 
-          // Sauvegarder dans la conversation
-          await saveConversationTurn(conversation.id, message, askNameResponse, {
-            type: 'name_request',
-            channel: channel
-          });
+            const askNameResponse = "Bonjour ! 👋\n\nAvant de commencer, pourrais-tu me dire ton prénom ? Ça me permettra de personnaliser nos échanges.";
 
-          return res.status(200).json({
-            success: true,
-            response: askNameResponse,
-            metadata: { awaiting_name: true }
-          });
-        } catch (error) {
-          console.error('[Chat API] Erreur demande nom:', error);
-          // Continuer normalement en cas d'erreur
+            // Sauvegarder dans la conversation
+            await saveConversationTurn(conversation.id, message, askNameResponse, {
+              type: 'name_request',
+              channel: channel
+            });
+
+            return res.status(200).json({
+              success: true,
+              response: askNameResponse,
+              metadata: { awaiting_name: true }
+            });
+          } catch (error) {
+            console.error('[Chat API] Erreur demande nom:', error);
+            // Continuer normalement en cas d'erreur
+          }
+        } else {
+          // Requête financière détectée → traiter la requête, demander le nom après
+          console.log(`[Chat API] Numéro inconnu mais requête financière détectée, traitement de la requête d'abord`);
+          // Continuer le flux normal pour traiter la requête
         }
       }
     }
