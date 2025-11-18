@@ -58,7 +58,27 @@ class SmartAgent {
 
             // Load conversation history from context if provided
             if (context.conversationHistory && Array.isArray(context.conversationHistory)) {
-                this.conversationHistory = context.conversationHistory;
+                // ✅ FIX: Normaliser le format de l'historique (formatHistoryForEmma utilise parts: [{ text }])
+                this.conversationHistory = context.conversationHistory.map(msg => {
+                    // Si format parts: [{ text }], extraire le texte
+                    if (msg.parts && Array.isArray(msg.parts) && msg.parts[0]?.text) {
+                        return {
+                            role: msg.role,
+                            content: msg.parts[0].text,
+                            timestamp: msg.timestamp || new Date().toISOString()
+                        };
+                    }
+                    // Si format content direct, utiliser tel quel
+                    if (msg.content) {
+                        return {
+                            role: msg.role,
+                            content: msg.content,
+                            timestamp: msg.timestamp || new Date().toISOString()
+                        };
+                    }
+                    // Format inconnu, ignorer
+                    return null;
+                }).filter(msg => msg !== null);
                 console.log(`💬 Loaded conversation history: ${this.conversationHistory.length} messages`);
             }
 
@@ -1693,7 +1713,9 @@ class SmartAgent {
                     success: r.success
                 }));
 
-            const conversationContext = this.conversationHistory.slice(-5); // 5 derniers échanges
+            // ✅ FIX: Utiliser les 10 derniers messages pour meilleur contexte (au lieu de 5)
+            const conversationContext = this.conversationHistory.slice(-10); // 10 derniers échanges
+            console.log(`💬 Conversation context: ${conversationContext.length} messages`);
 
             // 🎯 SMART ROUTER: Sélectionner le meilleur modèle
             const modelSelection = this._selectModel(intentData, outputMode, toolsData, userMessage);
