@@ -5,7 +5,10 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            const ScrappingSATab = () => (
+export const ScrappingSATab: React.FC<TabProps> = (props) => {
+    const isDarkMode = props.isDarkMode || false;
+
+    return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
@@ -744,7 +747,6 @@ declare const LightweightCharts: any;
                     </div>
                 </div>
             );
-};
-
+        };
 
 export default ScrappingSATab;
