@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Emma - Interface Dynamique</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .config-item {
+            transition: all 0.2s ease;
+        }
+        .config-item:hover {
+            background: #f3f4f6;
+        }
+        .config-item.active {
+            background: #dbeafe;
+            border-left: 3px solid #3b82f6;
+        }
+        .empty-badge {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .override-badge {
+            background: #ddd6fe;
+            color: #5b21b6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar: Liste des configurations -->
+        <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
+            <!-- Header Sidebar -->
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-xl font-bold text-gray-800">📝 Emma Config</h1>
+                <p class="text-xs text-gray-500 mt-1">Gestion dynamique</p>
+
+                <!-- Boutons actions -->
+                <div class="mt-3 flex gap-2">
+                    <button id="refreshBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded transition">
+                        🔄 Recharger
+                    </button>
+                    <button id="addBtn" class="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-2 rounded transition">
+                        ➕ Nouveau
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div id="statusSidebar" class="hidden p-3 text-xs">
+                <p id="statusText"></p>
+            </div>
+
+            <!-- Liste des configs (scrollable) -->
+            <div class="flex-1 overflow-y-auto" id="configList">
+                <div class="p-4 text-center text-gray-500">
+                    <p class="text-sm">⏳ Chargement...</p>
+                </div>
+            </div>
+
+            <!-- Stats footer -->
+            <div class="p-3 border-t border-gray-200 bg-gray-50 text-xs text-gray-600">
+                <div class="flex justify-between">
+                    <span>Total: <strong id="totalCount">0</strong></span>
+                    <span>Actifs: <strong id="activeCount">0</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Panel: Éditeur -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header Main -->
+            <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+                <div>
+                    <h2 id="editorTitle" class="text-2xl font-bold text-gray-800">Sélectionnez une configuration</h2>
+                    <p id="editorSubtitle" class="text-sm text-gray-500 mt-1"></p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="saveBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition hidden">
+                        💾 Sauvegarder
+                    </button>
+                    <button id="deleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition hidden">
+                        🗑️ Supprimer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Editor Area -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <div id="editorEmpty" class="flex items-center justify-center h-full text-gray-400">
+                    <div class="text-center">
+                        <svg class="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="text-xl">Sélectionnez une configuration dans la liste</p>
+                        <p class="text-sm mt-2">ou créez-en une nouvelle</p>
+                    </div>
+                </div>
+
+                <div id="editorContent" class="hidden max-w-4xl mx-auto">
+                    <!-- Metadata -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                            <input type="text" id="editSection" class="w-full px-3 py-2 border rounded-lg" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Clé</label>
+                            <input type="text" id="editKey" class="w-full px-3 py-2 border rounded-lg" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <input type="text" id="editDescription" class="w-full px-3 py-2 border rounded-lg" placeholder="Description de la configuration">
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <select id="editType" class="w-full px-3 py-2 border rounded-lg">
+                                <option value="string">String</option>
+                                <option value="number">Number</option>
+                                <option value="boolean">Boolean</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                            <input type="text" id="editCategory" class="w-full px-3 py-2 border rounded-lg" placeholder="prompt, variable, etc.">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+                            <input type="number" id="editPriority" class="w-full px-3 py-2 border rounded-lg" value="0">
+                        </div>
+                    </div>
+
+                    <!-- Valeur -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Valeur</label>
+                        <textarea id="editValue" rows="15" class="w-full px-3 py-2 border rounded-lg font-mono text-sm" placeholder="Entrez la valeur..."></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Pour JSON: utilisez un format valide avec indentation</p>
+                    </div>
+
+                    <!-- Metadata info -->
+                    <div class="grid grid-cols-2 gap-4 text-xs text-gray-500 border-t pt-4">
+                        <div>
+                            <p>Dernière modification: <span id="editUpdatedAt">-</span></p>
+                            <p>Par: <span id="editUpdatedBy">-</span></p>
+                        </div>
+                        <div>
+                            <p>Version: <span id="editVersion">-</span></p>
+                            <p>Override: <span id="editIsOverride">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/admin/emma-config';
+        let allConfigs = {};
+        let currentConfig = null;
+
+        // Charger toutes les configurations
+        async function loadAllConfigs() {
+            try {
+                showStatus('Chargement...', 'info');
+                const response = await fetch(API_BASE);
+                const data = await response.json();
+
+                if (data.config) {
+                    allConfigs = data.config;
+                    renderConfigList();
+                    updateStats();
+                    showStatus('✅ Chargé', 'success');
+                } else {
+                    showStatus('❌ Erreur', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
+
+        // Afficher la liste des configs
+        function renderConfigList() {
+            const container = document.getElementById('configList');
+            container.innerHTML = '';
+
+            const sections = ['prompts', 'variables', 'directives', 'routing'];
+
+            sections.forEach(section => {
+                if (!allConfigs[section]) return;
+
+                // Header section
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'px-4 py-2 bg-gray-100 border-b border-gray-200 text-xs font-bold text-gray-600 uppercase';
+                sectionHeader.textContent = getSectionEmoji(section) + ' ' + section;
+                container.appendChild(sectionHeader);
+
+                // Items
+                const items = Object.entries(allConfigs[section]);
+                items.forEach(([key, config]) => {
+                    const item = document.createElement('div');
+                    item.className = 'config-item px-4 py-3 border-b border-gray-100 cursor-pointer';
+                    item.onclick = () => selectConfig(section, key, config);
+
+                    const isEmpty = !config.value || config.value === '';
+                    const isOverride = config.is_override || false;
+
+                    item.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-800">${key}</p>
+                                <p class="text-xs text-gray-500 truncate mt-1">${config.description || 'Pas de description'}</p>
+                            </div>
+                            <div class="flex flex-col gap-1 ml-2">
+                                ${isEmpty ? '<span class="empty-badge text-xs px-2 py-0.5 rounded">Vide</span>' : ''}
+                                ${isOverride ? '<span class="override-badge text-xs px-2 py-0.5 rounded">Override</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    container.appendChild(item);
+                });
+            });
+        }
+
+        // Sélectionner une config pour édition
+        function selectConfig(section, key, config) {
+            currentConfig = { section, key, ...config };
+
+            // Highlight
+            document.querySelectorAll('.config-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Afficher éditeur
+            document.getElementById('editorEmpty').classList.add('hidden');
+            document.getElementById('editorContent').classList.remove('hidden');
+            document.getElementById('saveBtn').classList.remove('hidden');
+            document.getElementById('deleteBtn').classList.remove('hidden');
+
+            // Remplir
+            document.getElementById('editorTitle').textContent = key;
+            document.getElementById('editorSubtitle').textContent = `${section} • ${config.type || 'string'}`;
+            document.getElementById('editSection').value = section;
+            document.getElementById('editKey').value = key;
+            document.getElementById('editDescription').value = config.description || '';
+            document.getElementById('editType').value = config.type || 'string';
+            document.getElementById('editCategory').value = config.category || '';
+            document.getElementById('editPriority').value = config.priority || 0;
+
+            // Valeur
+            let displayValue = config.value;
+            if (config.type === 'json' && typeof config.value === 'object') {
+                displayValue = JSON.stringify(config.value, null, 2);
+            }
+            document.getElementById('editValue').value = displayValue || '';
+
+            // Metadata
+            document.getElementById('editUpdatedAt').textContent = config.updated_at ? new Date(config.updated_at).toLocaleString() : '-';
+            document.getElementById('editUpdatedBy').textContent = config.updated_by || '-';
+            document.getElementById('editVersion').textContent = config.version || '1';
+            document.getElementById('editIsOverride').textContent = config.is_override ? 'Oui' : 'Non';
+        }
+
+        // Sauvegarder
+        async function saveCurrentConfig() {
+            if (!currentConfig) return;
+
+            try {
+                const type = document.getElementById('editType').value;
+                let value = document.getElementById('editValue').value;
+
+                // Parse selon type
+                if (type === 'json') {
+                    value = JSON.parse(value);
+                } else if (type === 'number') {
+                    value = parseFloat(value);
+                } else if (type === 'boolean') {
+                    value = value === 'true' || value === true;
+                }
+
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'set',
+                        section: currentConfig.section,
+                        key: currentConfig.key,
+                        value,
+                        description: document.getElementById('editDescription').value,
+                        category: document.getElementById('editCategory').value,
+                        priority: parseInt(document.getElementById('editPriority').value)
+                    })
+                });
+
+                if (response.ok) {
+                    showStatus('✅ Sauvegardé', 'success');
+                    await loadAllConfigs();
+                } else {
+                    showStatus('❌ Erreur sauvegarde', 'error');
+                }
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
+
+        // Supprimer
+        async function deleteCurrentConfig() {
+            if (!currentConfig) return;
+            if (!confirm(`Supprimer ${currentConfig.section}.${currentConfig.key} ?`)) return;
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        section: currentConfig.section,
+                        key: currentConfig.key
+                    })
+                });
+
+                if (response.ok) {
+                    showStatus('✅ Supprimé', 'success');
+                    document.getElementById('editorContent').classList.add('hidden');
+                    document.getElementById('editorEmpty').classList.remove('hidden');
+                    await loadAllConfigs();
+                } else {
+                    showStatus('❌ Erreur suppression', 'error');
+                }
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
+
+        // Nouvelle config
+        function createNewConfig() {
+            const section = prompt('Section (prompts, variables, directives, routing):');
+            if (!section) return;
+            const key = prompt('Clé (nom unique):');
+            if (!key) return;
+
+            currentConfig = { section, key, value: '', type: 'string', description: '', category: '', priority: 0 };
+
+            selectConfig(section, key, currentConfig);
+        }
+
+        // Stats
+        function updateStats() {
+            let total = 0;
+            let active = 0;
+
+            Object.values(allConfigs).forEach(section => {
+                Object.values(section).forEach(config => {
+                    total++;
+                    if (config.enabled !== false && config.value) active++;
+                });
+            });
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('activeCount').textContent = active;
+        }
+
+        // Status
+        function showStatus(message, type) {
+            const el = document.getElementById('statusSidebar');
+            const text = document.getElementById('statusText');
+
+            el.classList.remove('hidden', 'bg-green-50', 'bg-red-50', 'bg-blue-50', 'text-green-800', 'text-red-800', 'text-blue-800');
+
+            if (type === 'success') {
+                el.classList.add('bg-green-50', 'text-green-800');
+            } else if (type === 'error') {
+                el.classList.add('bg-red-50', 'text-red-800');
+            } else {
+                el.classList.add('bg-blue-50', 'text-blue-800');
+            }
+
+            text.textContent = message;
+
+            if (type !== 'info') {
+                setTimeout(() => el.classList.add('hidden'), 3000);
+            }
+        }
+
+        // Emoji helper
+        function getSectionEmoji(section) {
+            const emojis = {
+                'prompts': '📝',
+                'variables': '⚙️',
+                'directives': '🎯',
+                'routing': '🧭'
+            };
+            return emojis[section] || '📄';
+        }
+
+        // Events
+        document.getElementById('refreshBtn').addEventListener('click', loadAllConfigs);
+        document.getElementById('saveBtn').addEventListener('click', saveCurrentConfig);
+        document.getElementById('deleteBtn').addEventListener('click', deleteCurrentConfig);
+        document.getElementById('addBtn').addEventListener('click', createNewConfig);
+
+        // Raccourcis clavier
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveCurrentConfig();
+            }
+        });
+
+        // Init
+        loadAllConfigs();
+    </script>
+</body>
+</html>
