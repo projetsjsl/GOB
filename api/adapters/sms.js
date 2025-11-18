@@ -123,6 +123,18 @@ export default async function handler(req, res) {
       }
     }
 
+    // ✅ FIX: Nettoyer le message (enlever = au début si présent)
+    // Problème: n8n peut envoyer =TEST... ou =ANALYSE AAPL... au lieu de TEST... ou ANALYSE AAPL...
+    if (messageBody && typeof messageBody === 'string') {
+      const originalMessage = messageBody;
+      messageBody = messageBody.trim();
+      // Enlever = au début si présent (problème d'URL encoding)
+      if (messageBody.startsWith('=')) {
+        messageBody = messageBody.substring(1);
+        console.log(`[SMS Adapter] ⚠️ Message nettoyé (enlevé = au début): "${originalMessage}" → "${messageBody}"`);
+      }
+    }
+
     console.log(`[SMS Adapter] SMS de ${senderPhone}: "${messageBody}"`);
 
     if (!senderPhone || !messageBody) {
@@ -227,12 +239,22 @@ export default async function handler(req, res) {
 
           await chatModule.default(chatRequest, chatRes);
 
-          if (!chatResponseData || !chatResponseData.success) {
-            throw new Error('Chat API returned unsuccessful response');
+          // ✅ FIX: Logging détaillé pour diagnostiquer les erreurs
+          if (!chatResponseData) {
+            console.error('[SMS Adapter] ❌ Chat API n\'a retourné aucune donnée');
+            throw new Error('Chat API returned no data');
+          }
+
+          if (!chatResponseData.success) {
+            console.error('[SMS Adapter] ❌ Chat API returned unsuccessful response:');
+            console.error('[SMS Adapter] ❌ Error:', chatResponseData.error);
+            console.error('[SMS Adapter] ❌ Details:', chatResponseData.details);
+            console.error('[SMS Adapter] ❌ Full response:', JSON.stringify(chatResponseData, null, 2));
+            throw new Error(`Chat API returned unsuccessful response: ${chatResponseData.error || 'Unknown error'}`);
           }
 
           chatResponse = chatResponseData;
-          console.log(`[SMS Adapter] Réponse reçue de /api/chat (${chatResponse.response.length} chars)`);
+          console.log(`[SMS Adapter] ✅ Réponse reçue de /api/chat (${chatResponse.response?.length || 0} chars)`);
 
         } catch (error) {
           console.error('[SMS Adapter] Erreur appel /api/chat:', error);
