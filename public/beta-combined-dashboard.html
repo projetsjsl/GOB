@@ -22515,6 +22515,655 @@ console.log('✅ Données hybrides récupérées:', {
 
 
             // ============================================================================
+            // COMPOSANTS DE GRAPHIQUES FASTGRAPH (doivent être définis AVANT FastGraphTab)
+            // ============================================================================
+
+            const PriceFairValueChart = ({ data, symbol, isDarkMode }) => {
+                const chartContainerRef = React.useRef(null);
+
+                React.useEffect(() => {
+                    if (!data || !data.incomeStatements || !data.historicalPrice) return;
+                    if (!chartContainerRef.current) return;
+
+                    const incomeData = data.incomeStatements.slice(0, 40).reverse();
+                    const priceData = data.historicalPrice;
+                    const ctx = chartContainerRef.current;
+
+                    if (ctx.chart) {
+                        ctx.chart.destroy();
+                    }
+
+                    const dates = incomeData.map(d => d.date);
+                    const fairValues = data.computed?.fairValue?.map(fv => fv.fairValue) || [];
+                    const prices = dates.map(date => {
+                        const pricePoint = priceData.find(p => p.date === date);
+                        return pricePoint ? pricePoint.close : null;
+                    });
+
+                    ctx.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'Prix Actuel',
+                                    data: prices,
+                                    borderColor: '#3b82f6',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: 'Valeur Estimée (Fair Value)',
+                                    data: fairValues,
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                    borderWidth: 3,
+                                    borderDash: [5, 5],
+                                    fill: true,
+                                    tension: 0.4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        font: { size: 14, weight: 'bold' }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: `${symbol} - Prix vs Valeur Estimée`,
+                                    color: isDarkMode ? '#fff' : '#000',
+                                    font: { size: 18, weight: 'bold' }
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.dataset.label}: $${context.parsed.y?.toFixed(2) || 'N/A'}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        callback: function(value) {
+                                            return '$' + value.toFixed(0);
+                                        }
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    return () => {
+                        if (ctx.chart) {
+                            ctx.chart.destroy();
+                        }
+                    };
+                }, [data, symbol, isDarkMode]);
+
+                return (
+                    <div style={{ height: '500px' }}>
+                        <canvas ref={chartContainerRef}></canvas>
+                    </div>
+                );
+            };
+
+            const DividendGrowthChart = ({ data, symbol, isDarkMode }) => {
+                const chartContainerRef = React.useRef(null);
+
+                React.useEffect(() => {
+                    if (!data || !data.dividendHistory || data.dividendHistory.length === 0) return;
+                    if (!chartContainerRef.current) return;
+
+                    const ctx = chartContainerRef.current;
+
+                    if (ctx.chart) {
+                        ctx.chart.destroy();
+                    }
+
+                    const dividends = data.dividendHistory.slice(0, 40).reverse();
+                    const dates = dividends.map(d => d.date);
+                    const amounts = dividends.map(d => d.dividend);
+
+                    ctx.chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: 'Dividende par Action',
+                                data: amounts,
+                                backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                                borderColor: '#22c55e',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        font: { size: 14, weight: 'bold' }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: `${symbol} - Historique des Dividendes`,
+                                    color: isDarkMode ? '#fff' : '#000',
+                                    font: { size: 18, weight: 'bold' }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Dividende: $${context.parsed.y?.toFixed(4) || 'N/A'}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        callback: function(value) {
+                                            return '$' + value.toFixed(2);
+                                        }
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    return () => {
+                        if (ctx.chart) {
+                            ctx.chart.destroy();
+                        }
+                    };
+                }, [data, symbol, isDarkMode]);
+
+                if (!data || !data.dividendHistory || data.dividendHistory.length === 0) {
+                    return (
+                        <div className="flex items-center justify-center h-96">
+                            <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <div className="text-4xl mb-4">📭</div>
+                                <div className="text-xl font-semibold">Pas de données de dividendes disponibles</div>
+                                <div className="text-sm mt-2">Cette société ne verse peut-être pas de dividendes</div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div style={{ height: '500px' }}>
+                        <canvas ref={chartContainerRef}></canvas>
+                    </div>
+                );
+            };
+
+            const EarningsGrowthChart = ({ data, symbol, isDarkMode }) => {
+                const chartContainerRef = React.useRef(null);
+
+                React.useEffect(() => {
+                    if (!data || !data.incomeStatements) return;
+                    if (!chartContainerRef.current) return;
+
+                    const ctx = chartContainerRef.current;
+                    if (ctx.chart) {
+                        ctx.chart.destroy();
+                    }
+
+                    const statements = data.incomeStatements.slice(0, 40).reverse();
+                    const dates = statements.map(d => d.date);
+                    const eps = statements.map(d => d.eps);
+                    const netIncome = statements.map(d => d.netIncome / 1000000000);
+
+                    ctx.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'EPS (Bénéfice par Action)',
+                                    data: eps,
+                                    borderColor: '#8b5cf6',
+                                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                    borderWidth: 3,
+                                    yAxisID: 'y',
+                                    tension: 0.4
+                                },
+                                {
+                                    label: 'Bénéfice Net (Milliards $)',
+                                    data: netIncome,
+                                    borderColor: '#06b6d4',
+                                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                                    borderWidth: 3,
+                                    yAxisID: 'y1',
+                                    tension: 0.4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        font: { size: 14, weight: 'bold' }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: `${symbol} - Croissance des Bénéfices`,
+                                    color: isDarkMode ? '#fff' : '#000',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        callback: function(value) {
+                                            return '$' + value.toFixed(2);
+                                        }
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        callback: function(value) {
+                                            return '$' + value.toFixed(1) + 'B';
+                                        }
+                                    },
+                                    grid: {
+                                        drawOnChartArea: false
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    return () => {
+                        if (ctx.chart) {
+                            ctx.chart.destroy();
+                        }
+                    };
+                }, [data, symbol, isDarkMode]);
+
+                return (
+                    <div style={{ height: '500px' }}>
+                        <canvas ref={chartContainerRef}></canvas>
+                    </div>
+                );
+            };
+
+            const RevenueGrowthChart = ({ data, symbol, isDarkMode }) => {
+                const chartContainerRef = React.useRef(null);
+
+                React.useEffect(() => {
+                    if (!data || !data.incomeStatements) return;
+                    if (!chartContainerRef.current) return;
+
+                    const ctx = chartContainerRef.current;
+                    if (ctx.chart) {
+                        ctx.chart.destroy();
+                    }
+
+                    const statements = data.incomeStatements.slice(0, 40).reverse();
+                    const dates = statements.map(d => d.date);
+                    const revenue = statements.map(d => d.revenue / 1000000000);
+                    const grossProfit = statements.map(d => d.grossProfit / 1000000000);
+
+                    ctx.chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'Revenus (Milliards $)',
+                                    data: revenue,
+                                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                                    borderColor: '#3b82f6',
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Profit Brut (Milliards $)',
+                                    data: grossProfit,
+                                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                    borderColor: '#10b981',
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        font: { size: 14, weight: 'bold' }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: `${symbol} - Croissance des Revenus`,
+                                    color: isDarkMode ? '#fff' : '#000',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        callback: function(value) {
+                                            return '$' + value.toFixed(1) + 'B';
+                                        }
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    return () => {
+                        if (ctx.chart) {
+                            ctx.chart.destroy();
+                        }
+                    };
+                }, [data, symbol, isDarkMode]);
+
+                return (
+                    <div style={{ height: '500px' }}>
+                        <canvas ref={chartContainerRef}></canvas>
+                    </div>
+                );
+            };
+
+            const CashFlowChart = ({ data, symbol, isDarkMode }) => {
+                const chartContainerRef = React.useRef(null);
+
+                React.useEffect(() => {
+                    if (!data || !data.cashFlowStatements) return;
+                    if (!chartContainerRef.current) return;
+
+                    const ctx = chartContainerRef.current;
+                    if (ctx.chart) {
+                        ctx.chart.destroy();
+                    }
+
+                    const statements = data.cashFlowStatements.slice(0, 40).reverse();
+                    const dates = statements.map(d => d.date);
+                    const fcf = statements.map(d => d.freeCashFlow / 1000000000);
+                    const operatingCF = statements.map(d => d.operatingCashFlow / 1000000000);
+
+                    ctx.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'Free Cash Flow (Milliards $)',
+                                    data: fcf,
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: 'Operating Cash Flow (Milliards $)',
+                                    data: operatingCF,
+                                    borderColor: '#3b82f6',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        font: { size: 14, weight: 'bold' }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: `${symbol} - Flux de Trésorerie`,
+                                    color: isDarkMode ? '#fff' : '#000',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        callback: function(value) {
+                                            return '$' + value.toFixed(1) + 'B';
+                                        }
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    return () => {
+                        if (ctx.chart) {
+                            ctx.chart.destroy();
+                        }
+                    };
+                }, [data, symbol, isDarkMode]);
+
+                return (
+                    <div style={{ height: '500px' }}>
+                        <canvas ref={chartContainerRef}></canvas>
+                    </div>
+                );
+            };
+
+            const ValuationMultiplesChart = ({ data, symbol, isDarkMode }) => {
+                const chartContainerRef = React.useRef(null);
+
+                React.useEffect(() => {
+                    if (!data || !data.keyMetrics) return;
+                    if (!chartContainerRef.current) return;
+
+                    const ctx = chartContainerRef.current;
+                    if (ctx.chart) {
+                        ctx.chart.destroy();
+                    }
+
+                    const metrics = data.keyMetrics.slice(0, 40).reverse();
+                    const dates = metrics.map(d => d.date);
+                    const peRatio = metrics.map(d => d.peRatio);
+                    const pbRatio = metrics.map(d => d.pbRatio);
+                    const pfcfRatio = metrics.map(d => d.pfcfRatio);
+
+                    ctx.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'P/E Ratio',
+                                    data: peRatio,
+                                    borderColor: '#8b5cf6',
+                                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                    borderWidth: 2,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: 'P/B Ratio',
+                                    data: pbRatio,
+                                    borderColor: '#ec4899',
+                                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                                    borderWidth: 2,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: 'P/FCF Ratio',
+                                    data: pfcfRatio,
+                                    borderColor: '#f59e0b',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                    borderWidth: 2,
+                                    tension: 0.4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        font: { size: 14, weight: 'bold' }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: `${symbol} - Multiples de Valorisation`,
+                                    color: isDarkMode ? '#fff' : '#000',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        callback: function(value) {
+                                            return value.toFixed(1) + 'x';
+                                        }
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: isDarkMode ? '#fff' : '#000',
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    },
+                                    grid: {
+                                        color: isDarkMode ? '#374151' : '#e5e7eb'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    return () => {
+                        if (ctx.chart) {
+                            ctx.chart.destroy();
+                        }
+                    };
+                }, [data, symbol, isDarkMode]);
+
+                return (
+                    <div style={{ height: '500px' }}>
+                        <canvas ref={chartContainerRef}></canvas>
+                    </div>
+                );
+            };
+
+            // ============================================================================
             // COMPOSANT FASTGRAPH ANALYSIS (GRAPHIQUES FONDAMENTAUX)
             // ============================================================================
             const FastGraphTab = () => {
@@ -22890,664 +23539,6 @@ console.log('✅ Données hybrides récupérées:', {
                 );
             };
 
-            // Composants de graphiques individuels
-            const PriceFairValueChart = ({ data, symbol, isDarkMode }) => {
-                const chartContainerRef = useRef(null);
-
-                useEffect(() => {
-                    if (!data || !data.incomeStatements || !data.historicalPrice) return;
-                    if (!chartContainerRef.current) return;
-
-                    // Préparer les données
-                    const incomeData = data.incomeStatements.slice(0, 40).reverse();
-                    const priceData = data.historicalPrice;
-
-                    // Créer le graphique avec Chart.js
-                    const ctx = chartContainerRef.current;
-
-                    // Nettoyer le graphique précédent s'il existe
-                    if (ctx.chart) {
-                        ctx.chart.destroy();
-                    }
-
-                    const dates = incomeData.map(d => d.date);
-                    const fairValues = data.computed?.fairValue?.map(fv => fv.fairValue) || [];
-
-                    // Mapper les prix historiques aux dates des revenus
-                    const prices = dates.map(date => {
-                        const pricePoint = priceData.find(p => p.date === date);
-                        return pricePoint ? pricePoint.close : null;
-                    });
-
-                    ctx.chart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: dates,
-                            datasets: [
-                                {
-                                    label: 'Prix Actuel',
-                                    data: prices,
-                                    borderColor: '#3b82f6',
-                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                    borderWidth: 3,
-                                    fill: true,
-                                    tension: 0.4
-                                },
-                                {
-                                    label: 'Valeur Estimée (Fair Value)',
-                                    data: fairValues,
-                                    borderColor: '#10b981',
-                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                    borderWidth: 3,
-                                    borderDash: [5, 5],
-                                    fill: true,
-                                    tension: 0.4
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        font: { size: 14, weight: 'bold' }
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: `${symbol} - Prix vs Valeur Estimée`,
-                                    color: isDarkMode ? '#fff' : '#000',
-                                    font: { size: 18, weight: 'bold' }
-                                },
-                                tooltip: {
-                                    mode: 'index',
-                                    intersect: false,
-                                    callbacks: {
-                                        label: function(context) {
-                                            return `${context.dataset.label}: $${context.parsed.y?.toFixed(2) || 'N/A'}`;
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: false,
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        callback: function(value) {
-                                            return '$' + value.toFixed(0);
-                                        }
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        maxRotation: 45,
-                                        minRotation: 45
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    return () => {
-                        if (ctx.chart) {
-                            ctx.chart.destroy();
-                        }
-                    };
-                }, [data, symbol, isDarkMode]);
-
-                return (
-                    <div style={{ height: '500px' }}>
-                        <canvas ref={chartContainerRef}></canvas>
-                    </div>
-                );
-            };
-
-            const DividendGrowthChart = ({ data, symbol, isDarkMode }) => {
-                const chartContainerRef = useRef(null);
-
-                useEffect(() => {
-                    if (!data || !data.dividendHistory || data.dividendHistory.length === 0) return;
-                    if (!chartContainerRef.current) return;
-
-                    const ctx = chartContainerRef.current;
-
-                    if (ctx.chart) {
-                        ctx.chart.destroy();
-                    }
-
-                    const dividends = data.dividendHistory.slice(0, 40).reverse();
-                    const dates = dividends.map(d => d.date);
-                    const amounts = dividends.map(d => d.dividend);
-
-                    ctx.chart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: dates,
-                            datasets: [{
-                                label: 'Dividende par Action',
-                                data: amounts,
-                                backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                                borderColor: '#22c55e',
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        font: { size: 14, weight: 'bold' }
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: `${symbol} - Historique des Dividendes`,
-                                    color: isDarkMode ? '#fff' : '#000',
-                                    font: { size: 18, weight: 'bold' }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return `Dividende: $${context.parsed.y?.toFixed(4) || 'N/A'}`;
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        callback: function(value) {
-                                            return '$' + value.toFixed(2);
-                                        }
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        maxRotation: 45,
-                                        minRotation: 45
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    return () => {
-                        if (ctx.chart) {
-                            ctx.chart.destroy();
-                        }
-                    };
-                }, [data, symbol, isDarkMode]);
-
-                if (!data || !data.dividendHistory || data.dividendHistory.length === 0) {
-                    return (
-                        <div className="flex items-center justify-center h-96">
-                            <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <div className="text-4xl mb-4">📭</div>
-                                <div className="text-xl font-semibold">Pas de données de dividendes disponibles</div>
-                                <div className="text-sm mt-2">Cette société ne verse peut-être pas de dividendes</div>
-                            </div>
-                        </div>
-                    );
-                }
-
-                return (
-                    <div style={{ height: '500px' }}>
-                        <canvas ref={chartContainerRef}></canvas>
-                    </div>
-                );
-            };
-
-            const EarningsGrowthChart = ({ data, symbol, isDarkMode }) => {
-                const chartContainerRef = useRef(null);
-
-                useEffect(() => {
-                    if (!data || !data.incomeStatements) return;
-                    if (!chartContainerRef.current) return;
-
-                    const ctx = chartContainerRef.current;
-
-                    if (ctx.chart) {
-                        ctx.chart.destroy();
-                    }
-
-                    const statements = data.incomeStatements.slice(0, 40).reverse();
-                    const dates = statements.map(d => d.date);
-                    const eps = statements.map(d => d.eps);
-                    const netIncome = statements.map(d => d.netIncome / 1000000000); // En milliards
-
-                    ctx.chart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: dates,
-                            datasets: [
-                                {
-                                    label: 'EPS (Bénéfice par Action)',
-                                    data: eps,
-                                    borderColor: '#8b5cf6',
-                                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                                    borderWidth: 3,
-                                    yAxisID: 'y',
-                                    tension: 0.4
-                                },
-                                {
-                                    label: 'Bénéfice Net (Milliards $)',
-                                    data: netIncome,
-                                    borderColor: '#06b6d4',
-                                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
-                                    borderWidth: 3,
-                                    yAxisID: 'y1',
-                                    tension: 0.4
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        font: { size: 14, weight: 'bold' }
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: `${symbol} - Croissance des Bénéfices`,
-                                    color: isDarkMode ? '#fff' : '#000',
-                                    font: { size: 18, weight: 'bold' }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    type: 'linear',
-                                    display: true,
-                                    position: 'left',
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        callback: function(value) {
-                                            return '$' + value.toFixed(2);
-                                        }
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                },
-                                y1: {
-                                    type: 'linear',
-                                    display: true,
-                                    position: 'right',
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        callback: function(value) {
-                                            return '$' + value.toFixed(1) + 'B';
-                                        }
-                                    },
-                                    grid: {
-                                        drawOnChartArea: false
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        maxRotation: 45,
-                                        minRotation: 45
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    return () => {
-                        if (ctx.chart) {
-                            ctx.chart.destroy();
-                        }
-                    };
-                }, [data, symbol, isDarkMode]);
-
-                return (
-                    <div style={{ height: '500px' }}>
-                        <canvas ref={chartContainerRef}></canvas>
-                    </div>
-                );
-            };
-
-            const RevenueGrowthChart = ({ data, symbol, isDarkMode }) => {
-                const chartContainerRef = useRef(null);
-
-                useEffect(() => {
-                    if (!data || !data.incomeStatements) return;
-                    if (!chartContainerRef.current) return;
-
-                    const ctx = chartContainerRef.current;
-
-                    if (ctx.chart) {
-                        ctx.chart.destroy();
-                    }
-
-                    const statements = data.incomeStatements.slice(0, 40).reverse();
-                    const dates = statements.map(d => d.date);
-                    const revenue = statements.map(d => d.revenue / 1000000000); // En milliards
-                    const grossProfit = statements.map(d => d.grossProfit / 1000000000);
-
-                    ctx.chart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: dates,
-                            datasets: [
-                                {
-                                    label: 'Revenus (Milliards $)',
-                                    data: revenue,
-                                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                                    borderColor: '#3b82f6',
-                                    borderWidth: 2
-                                },
-                                {
-                                    label: 'Profit Brut (Milliards $)',
-                                    data: grossProfit,
-                                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                                    borderColor: '#10b981',
-                                    borderWidth: 2
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        font: { size: 14, weight: 'bold' }
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: `${symbol} - Croissance des Revenus`,
-                                    color: isDarkMode ? '#fff' : '#000',
-                                    font: { size: 18, weight: 'bold' }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        callback: function(value) {
-                                            return '$' + value.toFixed(1) + 'B';
-                                        }
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        maxRotation: 45,
-                                        minRotation: 45
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    return () => {
-                        if (ctx.chart) {
-                            ctx.chart.destroy();
-                        }
-                    };
-                }, [data, symbol, isDarkMode]);
-
-                return (
-                    <div style={{ height: '500px' }}>
-                        <canvas ref={chartContainerRef}></canvas>
-                    </div>
-                );
-            };
-
-            const CashFlowChart = ({ data, symbol, isDarkMode }) => {
-                const chartContainerRef = useRef(null);
-
-                useEffect(() => {
-                    if (!data || !data.cashFlowStatements) return;
-                    if (!chartContainerRef.current) return;
-
-                    const ctx = chartContainerRef.current;
-
-                    if (ctx.chart) {
-                        ctx.chart.destroy();
-                    }
-
-                    const statements = data.cashFlowStatements.slice(0, 40).reverse();
-                    const dates = statements.map(d => d.date);
-                    const fcf = statements.map(d => d.freeCashFlow / 1000000000); // En milliards
-                    const operatingCF = statements.map(d => d.operatingCashFlow / 1000000000);
-
-                    ctx.chart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: dates,
-                            datasets: [
-                                {
-                                    label: 'Free Cash Flow (Milliards $)',
-                                    data: fcf,
-                                    borderColor: '#10b981',
-                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                    borderWidth: 3,
-                                    fill: true,
-                                    tension: 0.4
-                                },
-                                {
-                                    label: 'Operating Cash Flow (Milliards $)',
-                                    data: operatingCF,
-                                    borderColor: '#3b82f6',
-                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                    borderWidth: 3,
-                                    fill: true,
-                                    tension: 0.4
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        font: { size: 14, weight: 'bold' }
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: `${symbol} - Flux de Trésorerie`,
-                                    color: isDarkMode ? '#fff' : '#000',
-                                    font: { size: 18, weight: 'bold' }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        callback: function(value) {
-                                            return '$' + value.toFixed(1) + 'B';
-                                        }
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        maxRotation: 45,
-                                        minRotation: 45
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    return () => {
-                        if (ctx.chart) {
-                            ctx.chart.destroy();
-                        }
-                    };
-                }, [data, symbol, isDarkMode]);
-
-                return (
-                    <div style={{ height: '500px' }}>
-                        <canvas ref={chartContainerRef}></canvas>
-                    </div>
-                );
-            };
-
-            const ValuationMultiplesChart = ({ data, symbol, isDarkMode }) => {
-                const chartContainerRef = useRef(null);
-
-                useEffect(() => {
-                    if (!data || !data.keyMetrics) return;
-                    if (!chartContainerRef.current) return;
-
-                    const ctx = chartContainerRef.current;
-
-                    if (ctx.chart) {
-                        ctx.chart.destroy();
-                    }
-
-                    const metrics = data.keyMetrics.slice(0, 40).reverse();
-                    const dates = metrics.map(d => d.date);
-                    const peRatio = metrics.map(d => d.peRatio);
-                    const pbRatio = metrics.map(d => d.pbRatio);
-                    const pfcfRatio = metrics.map(d => d.pfcfRatio);
-
-                    ctx.chart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: dates,
-                            datasets: [
-                                {
-                                    label: 'P/E Ratio',
-                                    data: peRatio,
-                                    borderColor: '#8b5cf6',
-                                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                                    borderWidth: 2,
-                                    tension: 0.4
-                                },
-                                {
-                                    label: 'P/B Ratio',
-                                    data: pbRatio,
-                                    borderColor: '#ec4899',
-                                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                                    borderWidth: 2,
-                                    tension: 0.4
-                                },
-                                {
-                                    label: 'P/FCF Ratio',
-                                    data: pfcfRatio,
-                                    borderColor: '#f59e0b',
-                                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                    borderWidth: 2,
-                                    tension: 0.4
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        font: { size: 14, weight: 'bold' }
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: `${symbol} - Multiples de Valorisation`,
-                                    color: isDarkMode ? '#fff' : '#000',
-                                    font: { size: 18, weight: 'bold' }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: false,
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        callback: function(value) {
-                                            return value.toFixed(1) + 'x';
-                                        }
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                },
-                                x: {
-                                    ticks: {
-                                        color: isDarkMode ? '#fff' : '#000',
-                                        maxRotation: 45,
-                                        minRotation: 45
-                                    },
-                                    grid: {
-                                        color: isDarkMode ? '#374151' : '#e5e7eb'
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    return () => {
-                        if (ctx.chart) {
-                            ctx.chart.destroy();
-                        }
-                    };
-                }, [data, symbol, isDarkMode]);
-
-                return (
-                    <div style={{ height: '500px' }}>
-                        <canvas ref={chartContainerRef}></canvas>
-                    </div>
-                );
-            };
-
-
-            // ============================================================================
             // COMPOSANT YIELD CURVE (COURBE DES TAUX)
             // ============================================================================
             const YieldCurveTab = () => {
