@@ -166,12 +166,54 @@ const runScenarios = (envOverrides = {}) => new Promise((resolve, reject) => {
 const checkWebhook = async (url) => {
   if (!url) return { status: 'missing', message: 'URL non définie' };
   try {
-    const res = await fetch(url, { method: 'HEAD' });
-    if (res.ok) {
-      return { status: 'ok', message: `${res.status} ${res.statusText}` };
+    // ✅ FIX: Les webhooks n8n ne répondent pas à HEAD, utiliser POST avec payload minimal
+    // Test avec un payload minimal pour vérifier que le webhook existe et répond
+    const testPayload = {
+      From: '+15551234567',
+      To: '+15559876543',
+      Body: 'TEST',
+      MessageSid: 'test-check-' + Date.now()
+    };
+    
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams(testPayload).toString(),
+      // Timeout court pour éviter d'attendre trop longtemps
+      signal: AbortSignal.timeout(5000)
+    });
+    
+    // n8n peut retourner 200, 201, ou même 400/500 si le workflow existe mais échoue
+    // L'important est que ce n'est PAS 404 (webhook inexistant)
+    if (res.status === 404) {
+      return { 
+        status: 'error', 
+        message: `404 Not Found - Le webhook n'existe pas dans n8n. Vérifiez que le workflow est activé et que le chemin est correct.` 
+      };
     }
-    return { status: 'error', message: `${res.status} ${res.statusText}` };
+    
+    // Si on obtient une réponse (même erreur), le webhook existe
+    return { 
+      status: 'ok', 
+      message: `${res.status} ${res.statusText} - Webhook accessible` 
+    };
   } catch (error) {
+    // Timeout ou erreur réseau
+    if (error.name === 'AbortError' || error.message.includes('timeout')) {
+      return { 
+        status: 'error', 
+        message: 'Timeout - Le webhook n\'a pas répondu dans les 5 secondes. Vérifiez que n8n est accessible.' 
+      };
+    }
+    // Erreur réseau (n8n inaccessible, DNS, etc.)
+    if (error.message.includes('fetch failed') || error.code === 'ENOTFOUND') {
+      return { 
+        status: 'error', 
+        message: `Erreur réseau - Impossible d'atteindre n8n. Vérifiez l'URL: ${url}` 
+      };
+    }
     return { status: 'error', message: error.message };
   }
 };
