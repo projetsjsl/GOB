@@ -52,6 +52,9 @@
     "api/admin/emma-config.js": {
       "maxDuration": 10
     },
+    "api/admin/tickers.js": {
+      "maxDuration": 15
+    },
     "api/ai-services.js": {
       "maxDuration": 120
     },

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { TabProps } from '../../types';
+import Icon from '../shared/Icon';
 
 declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
 export const AdminJSLaiTab: React.FC<TabProps> = (props) => {
-    const {             emmaConnected,                 setEmmaConnected,                 showPromptEditor,                 setShowPromptEditor,                 showTemperatureEditor,                 setShowTemperatureEditor,                 showLengthEditor,                 setShowLengthEditor } = props;
+    const {             emmaConnected,                 setEmmaConnected,                 showPromptEditor,                 setShowPromptEditor,                 showTemperatureEditor,                 setShowTemperatureEditor,                 showLengthEditor,                 setShowLengthEditor,                 API_BASE_URL = '',                 isDarkMode = true,                 tickers = [],                 stockData = {},                 newsData = [],                 seekingAlphaData = {},                 seekingAlphaStockData = {},                 lastUpdate = null,                 cacheSettings = { maxAgeHours: 4, refreshOnNavigation: true, refreshIntervalMinutes: 10 },                 setCacheSettings = () => {},                 cacheStatus = {},                 setCacheStatus = () => {},                 loadingCacheStatus = false,                 setLoadingCacheStatus = () => {},                 systemLogs = [] } = props;
                 // États pour Température et Longueur (chargés depuis localStorage)
                 const [emmaTemperature, setEmmaTemperature] = useState(() => {
                     const saved = localStorage.getItem('emma-temperature');
@@ -69,6 +70,30 @@ CONTRAINTES:
 
                 // État pour afficher/masquer les sections
                 const [showEmmaConfig, setShowEmmaConfig] = useState(false);
+                const [showTickersManager, setShowTickersManager] = useState(false);
+                
+                // États pour la gestion des tickers
+                const [tickersList, setTickersList] = useState([]);
+                const [loadingTickers, setLoadingTickers] = useState(false);
+                const [tickerFilter, setTickerFilter] = useState({ source: 'all', is_active: 'true' });
+                const [editingTicker, setEditingTicker] = useState(null);
+                const [showAddForm, setShowAddForm] = useState(false);
+                const [newTicker, setNewTicker] = useState({
+                    ticker: '',
+                    company_name: '',
+                    sector: '',
+                    industry: '',
+                    country: '',
+                    exchange: '',
+                    currency: 'USD',
+                    market_cap: '',
+                    source: 'manual',
+                    priority: 1,
+                    is_active: true,
+                    target_price: '',
+                    stop_loss: '',
+                    notes: ''
+                });
 
                 // Handlers pour sauvegarder dans localStorage
                 const handlePromptChange = (newPrompt) => {
@@ -133,6 +158,128 @@ CONTRAINTES:
 - Disclaimer obligatoire si recommandations d'investissement`;
                     handlePromptChange(optimizedPrompt);
                 };
+
+                // Fonctions pour gérer les tickers
+                const fetchTickers = async () => {
+                    setLoadingTickers(true);
+                    try {
+                        const params = new URLSearchParams();
+                        if (tickerFilter.source !== 'all') {
+                            params.append('source', tickerFilter.source);
+                        }
+                        if (tickerFilter.is_active !== 'all') {
+                            params.append('is_active', tickerFilter.is_active);
+                        }
+                        params.append('limit', '1000');
+                        params.append('order_by', 'priority');
+                        params.append('order_direction', 'desc');
+
+                        const response = await fetch(`${API_BASE_URL}/api/admin/tickers?${params.toString()}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            setTickersList(data.tickers || []);
+                        } else {
+                            console.error('Erreur récupération tickers:', await response.text());
+                        }
+                    } catch (error) {
+                        console.error('Erreur fetchTickers:', error);
+                    } finally {
+                        setLoadingTickers(false);
+                    }
+                };
+
+                const handleAddTicker = async () => {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/admin/tickers`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(newTicker)
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            alert(`✅ Ticker ${data.ticker.ticker} ajouté avec succès`);
+                            setNewTicker({
+                                ticker: '',
+                                company_name: '',
+                                sector: '',
+                                industry: '',
+                                country: '',
+                                exchange: '',
+                                currency: 'USD',
+                                market_cap: '',
+                                source: 'manual',
+                                priority: 1,
+                                is_active: true,
+                                target_price: '',
+                                stop_loss: '',
+                                notes: ''
+                            });
+                            setShowAddForm(false);
+                            fetchTickers();
+                        } else {
+                            const error = await response.json();
+                            alert(`❌ Erreur: ${error.error || 'Impossible d\'ajouter le ticker'}`);
+                        }
+                    } catch (error) {
+                        console.error('Erreur addTicker:', error);
+                        alert('❌ Erreur lors de l\'ajout du ticker');
+                    }
+                };
+
+                const handleUpdateTicker = async (tickerId, updateData) => {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/admin/tickers?id=${tickerId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updateData)
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            alert(`✅ Ticker ${data.ticker.ticker} mis à jour avec succès`);
+                            setEditingTicker(null);
+                            fetchTickers();
+                        } else {
+                            const error = await response.json();
+                            alert(`❌ Erreur: ${error.error || 'Impossible de mettre à jour le ticker'}`);
+                        }
+                    } catch (error) {
+                        console.error('Erreur updateTicker:', error);
+                        alert('❌ Erreur lors de la mise à jour du ticker');
+                    }
+                };
+
+                const handleDeleteTicker = async (tickerId, tickerSymbol, hardDelete = false) => {
+                    if (!confirm(`Êtes-vous sûr de vouloir ${hardDelete ? 'supprimer définitivement' : 'désactiver'} le ticker ${tickerSymbol} ?`)) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/admin/tickers?id=${tickerId}&hard_delete=${hardDelete}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            alert(`✅ ${data.message}`);
+                            fetchTickers();
+                        } else {
+                            const error = await response.json();
+                            alert(`❌ Erreur: ${error.error || 'Impossible de supprimer le ticker'}`);
+                        }
+                    } catch (error) {
+                        console.error('Erreur deleteTicker:', error);
+                        alert('❌ Erreur lors de la suppression du ticker');
+                    }
+                };
+
+                // Charger les tickers au montage et quand les filtres changent
+                useEffect(() => {
+                    if (showTickersManager) {
+                        fetchTickers();
+                    }
+                }, [showTickersManager, tickerFilter]);
 
                 return (
                 <div className="space-y-6">
@@ -284,6 +431,560 @@ CONTRAINTES:
                                         <Icon emoji="ℹ️" size={16} /> <strong>Synchronisation automatique:</strong> Tous les réglages sont partagés avec l'onglet "Emma IA™" via localStorage.
                                         Les modifications ici s'appliquent immédiatement partout.
                                     </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 📊 Gestion des Tickers Supabase */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gradient-to-br from-green-900/20 to-gray-900 border-green-700' : 'bg-gradient-to-br from-green-50 to-gray-50 border-green-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4 cursor-pointer" onClick={() => setShowTickersManager(!showTickersManager)}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-green-300' : 'text-green-900'}`}>
+                                <Icon emoji="📊" size={20} />
+                                Gestion des Tickers Supabase
+                            </h3>
+                            <button className={`px-3 py-1 text-xs rounded transition-colors ${
+                                isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
+                            }`}>
+                                {showTickersManager ? '▼ Masquer' : '▶ Afficher'}
+                            </button>
+                        </div>
+
+                        {showTickersManager && (
+                            <div className="space-y-4">
+                                {/* Filtres */}
+                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className="font-semibold mb-3 flex items-center gap-2">
+                                        <Icon emoji="🔍" size={16} />
+                                        Filtres
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm mb-2">Source</label>
+                                            <select
+                                                value={tickerFilter.source}
+                                                onChange={(e) => setTickerFilter({ ...tickerFilter, source: e.target.value })}
+                                                className={`w-full p-2 rounded border ${
+                                                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                }`}
+                                            >
+                                                <option value="all">Toutes</option>
+                                                <option value="team">Équipe</option>
+                                                <option value="watchlist">Watchlist</option>
+                                                <option value="manual">Manuel</option>
+                                                <option value="both">Les deux (team + watchlist)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm mb-2">Statut</label>
+                                            <select
+                                                value={tickerFilter.is_active}
+                                                onChange={(e) => setTickerFilter({ ...tickerFilter, is_active: e.target.value })}
+                                                className={`w-full p-2 rounded border ${
+                                                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                }`}
+                                            >
+                                                <option value="all">Tous</option>
+                                                <option value="true">Actifs</option>
+                                                <option value="false">Inactifs</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={fetchTickers}
+                                        disabled={loadingTickers}
+                                        className={`mt-3 px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                            loadingTickers
+                                                ? 'bg-gray-500 text-white cursor-not-allowed'
+                                                : isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
+                                        }`}
+                                    >
+                                        {loadingTickers ? '⏳ Chargement...' : '🔄 Actualiser'}
+                                    </button>
+                                </div>
+
+                                {/* Liste des tickers */}
+                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className="flex justify-between items-center mb-3">
+                                        <div className="font-semibold flex items-center gap-2">
+                                            <Icon emoji="📋" size={16} />
+                                            Liste des Tickers ({tickersList.length})
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setShowAddForm(!showAddForm);
+                                                setEditingTicker(null);
+                                            }}
+                                            className={`px-3 py-1 text-xs rounded transition-colors ${
+                                                isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                            }`}
+                                        >
+                                            {showAddForm ? '❌ Annuler' : '➕ Ajouter'}
+                                        </button>
+                                    </div>
+
+                                    {/* Formulaire d'ajout */}
+                                    {showAddForm && (
+                                        <div className={`mb-4 p-4 rounded border-2 ${isDarkMode ? 'bg-gray-900 border-blue-600' : 'bg-blue-50 border-blue-300'}`}>
+                                            <h4 className="font-semibold mb-3">Ajouter un nouveau ticker</h4>
+                                            <div className="grid grid-cols-2 gap-3 text-sm">
+                                                <div>
+                                                    <label className="block mb-1">Ticker *</label>
+                                                    <input
+                                                        type="text"
+                                                        value={newTicker.ticker}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, ticker: e.target.value.toUpperCase() })}
+                                                        placeholder="AAPL"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Nom de l'entreprise</label>
+                                                    <input
+                                                        type="text"
+                                                        value={newTicker.company_name}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, company_name: e.target.value })}
+                                                        placeholder="Apple Inc."
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Secteur</label>
+                                                    <input
+                                                        type="text"
+                                                        value={newTicker.sector}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, sector: e.target.value })}
+                                                        placeholder="Technology"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Industrie</label>
+                                                    <input
+                                                        type="text"
+                                                        value={newTicker.industry}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, industry: e.target.value })}
+                                                        placeholder="Consumer Electronics"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Pays</label>
+                                                    <input
+                                                        type="text"
+                                                        value={newTicker.country}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, country: e.target.value })}
+                                                        placeholder="United States"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Bourse</label>
+                                                    <input
+                                                        type="text"
+                                                        value={newTicker.exchange}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, exchange: e.target.value })}
+                                                        placeholder="NASDAQ"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Devise</label>
+                                                    <select
+                                                        value={newTicker.currency}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, currency: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    >
+                                                        <option value="USD">USD</option>
+                                                        <option value="CAD">CAD</option>
+                                                        <option value="EUR">EUR</option>
+                                                        <option value="GBP">GBP</option>
+                                                        <option value="CHF">CHF</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Source</label>
+                                                    <select
+                                                        value={newTicker.source}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, source: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    >
+                                                        <option value="manual">Manuel</option>
+                                                        <option value="team">Équipe</option>
+                                                        <option value="watchlist">Watchlist</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Priorité</label>
+                                                    <input
+                                                        type="number"
+                                                        value={newTicker.priority}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, priority: parseInt(e.target.value) || 1 })}
+                                                        min="1"
+                                                        max="100"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Market Cap</label>
+                                                    <input
+                                                        type="text"
+                                                        value={newTicker.market_cap}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, market_cap: e.target.value })}
+                                                        placeholder="2.5T"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Prix cible</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={newTicker.target_price}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, target_price: e.target.value })}
+                                                        placeholder="150.00"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Stop Loss</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={newTicker.stop_loss}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, stop_loss: e.target.value })}
+                                                        placeholder="140.00"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div className="col-span-2">
+                                                    <label className="block mb-1">Notes</label>
+                                                    <textarea
+                                                        value={newTicker.notes}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, notes: e.target.value })}
+                                                        placeholder="Notes sur ce ticker..."
+                                                        rows="2"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div className="col-span-2 flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="newTickerActive"
+                                                        checked={newTicker.is_active}
+                                                        onChange={(e) => setNewTicker({ ...newTicker, is_active: e.target.checked })}
+                                                        className="rounded"
+                                                    />
+                                                    <label htmlFor="newTickerActive">Actif</label>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={handleAddTicker}
+                                                disabled={!newTicker.ticker}
+                                                className={`mt-3 px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                                    !newTicker.ticker
+                                                        ? 'bg-gray-500 text-white cursor-not-allowed'
+                                                        : isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
+                                                }`}
+                                            >
+                                                ✅ Ajouter le ticker
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Table des tickers */}
+                                    <div className={`overflow-x-auto rounded ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                                        {loadingTickers ? (
+                                            <div className="text-center py-8">
+                                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                                                <p className="mt-2 text-sm">Chargement des tickers...</p>
+                                            </div>
+                                        ) : tickersList.length === 0 ? (
+                                            <div className="text-center py-8 text-gray-500">
+                                                Aucun ticker trouvé avec ces filtres
+                                            </div>
+                                        ) : (
+                                            <table className="w-full text-sm">
+                                                <thead>
+                                                    <tr className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+                                                        <th className="p-2 text-left">Ticker</th>
+                                                        <th className="p-2 text-left">Entreprise</th>
+                                                        <th className="p-2 text-left">Source</th>
+                                                        <th className="p-2 text-left">Priorité</th>
+                                                        <th className="p-2 text-left">Statut</th>
+                                                        <th className="p-2 text-left">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {tickersList.map((t) => (
+                                                        <tr key={t.id} className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+                                                            <td className="p-2 font-semibold">{t.ticker}</td>
+                                                            <td className="p-2">{t.company_name || '—'}</td>
+                                                            <td className="p-2">
+                                                                <span className={`px-2 py-1 rounded text-xs ${
+                                                                    t.source === 'team' ? 'bg-blue-500 text-white' :
+                                                                    t.source === 'watchlist' ? 'bg-purple-500 text-white' :
+                                                                    t.source === 'both' ? 'bg-indigo-500 text-white' :
+                                                                    'bg-gray-500 text-white'
+                                                                }`}>
+                                                                    {t.source}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-2">{t.priority}</td>
+                                                            <td className="p-2">
+                                                                <span className={`px-2 py-1 rounded text-xs ${
+                                                                    t.is_active ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                                                                }`}>
+                                                                    {t.is_active ? '✅ Actif' : '❌ Inactif'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-2">
+                                                                <div className="flex gap-2">
+                                                                    <button
+                                                                        onClick={() => setEditingTicker(editingTicker?.id === t.id ? null : t)}
+                                                                        className={`px-2 py-1 text-xs rounded transition-colors ${
+                                                                            isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                                        }`}
+                                                                    >
+                                                                        {editingTicker?.id === t.id ? '❌ Annuler' : '✏️ Éditer'}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleDeleteTicker(t.id, t.ticker, false)}
+                                                                        className={`px-2 py-1 text-xs rounded transition-colors ${
+                                                                            isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
+                                                                        }`}
+                                                                    >
+                                                                        🗑️ Supprimer
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        )}
+                                    </div>
+
+                                    {/* Formulaire d'édition (modal inline) */}
+                                    {editingTicker && (
+                                        <div className={`mt-4 p-4 rounded border-2 ${isDarkMode ? 'bg-gray-900 border-yellow-600' : 'bg-yellow-50 border-yellow-300'}`}>
+                                            <h4 className="font-semibold mb-3">Éditer le ticker {editingTicker.ticker}</h4>
+                                            <div className="grid grid-cols-2 gap-3 text-sm">
+                                                <div>
+                                                    <label className="block mb-1">Ticker</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editingTicker.ticker}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, ticker: e.target.value.toUpperCase() })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Nom de l'entreprise</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editingTicker.company_name || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, company_name: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Secteur</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editingTicker.sector || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, sector: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Industrie</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editingTicker.industry || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, industry: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Pays</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editingTicker.country || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, country: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Bourse</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editingTicker.exchange || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, exchange: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Devise</label>
+                                                    <select
+                                                        value={editingTicker.currency || 'USD'}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, currency: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    >
+                                                        <option value="USD">USD</option>
+                                                        <option value="CAD">CAD</option>
+                                                        <option value="EUR">EUR</option>
+                                                        <option value="GBP">GBP</option>
+                                                        <option value="CHF">CHF</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Source</label>
+                                                    <select
+                                                        value={editingTicker.source || 'manual'}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, source: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    >
+                                                        <option value="manual">Manuel</option>
+                                                        <option value="team">Équipe</option>
+                                                        <option value="watchlist">Watchlist</option>
+                                                        <option value="both">Les deux</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Priorité</label>
+                                                    <input
+                                                        type="number"
+                                                        value={editingTicker.priority || 1}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, priority: parseInt(e.target.value) || 1 })}
+                                                        min="1"
+                                                        max="100"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Market Cap</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editingTicker.market_cap || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, market_cap: e.target.value })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Prix cible</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={editingTicker.target_price || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, target_price: e.target.value ? parseFloat(e.target.value) : null })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block mb-1">Stop Loss</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={editingTicker.stop_loss || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, stop_loss: e.target.value ? parseFloat(e.target.value) : null })}
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div className="col-span-2">
+                                                    <label className="block mb-1">Notes</label>
+                                                    <textarea
+                                                        value={editingTicker.notes || ''}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, notes: e.target.value })}
+                                                        rows="2"
+                                                        className={`w-full p-2 rounded border ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                                        }`}
+                                                    />
+                                                </div>
+                                                <div className="col-span-2 flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="editTickerActive"
+                                                        checked={editingTicker.is_active}
+                                                        onChange={(e) => setEditingTicker({ ...editingTicker, is_active: e.target.checked })}
+                                                        className="rounded"
+                                                    />
+                                                    <label htmlFor="editTickerActive">Actif</label>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 mt-3">
+                                                <button
+                                                    onClick={() => handleUpdateTicker(editingTicker.id, editingTicker)}
+                                                    className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                                        isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
+                                                    }`}
+                                                >
+                                                    ✅ Sauvegarder
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingTicker(null)}
+                                                    className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
+                                                        isDarkMode ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'bg-gray-500 hover:bg-gray-600 text-white'
+                                                    }`}
+                                                >
+                                                    ❌ Annuler
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}

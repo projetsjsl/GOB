@@ -1,0 +1,7 @@
+Local vendor copies used to keep the dashboard working even if public CDNs fail.
+
+- `react.production.min.js` – React 18.2.0 UMD build from https://unpkg.com/react@18.2.0/umd/react.production.min.js
+- `react-dom.production.min.js` – ReactDOM 18.2.0 UMD build from https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js
+- `babel-standalone.min.js` – Babel Standalone 7.23.6 build from https://unpkg.com/@babel/standalone@7.23.6/babel.min.js
+
+Files are copied as‑is (minified) so that the authentication-guarded dashboard can boot without relying on third-party SRI hashes that frequently change. Update these files if you bump the associated CDN versions.
