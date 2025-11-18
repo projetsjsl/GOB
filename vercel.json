@@ -58,6 +58,10 @@
     "api/fmp.js": {
       "maxDuration": 10
     },
+    "api/fundamental-data.js": {
+      "maxDuration": 20,
+      "memory": 1024
+    },
     "api/finviz-news.js": {
       "maxDuration": 15
     },
