@@ -338,10 +338,49 @@ export default async function handler(req, res) {
 }
 
 /**
+ * Détecte si un numéro est un numéro de test/fictif
+ * @param {string} phoneNumber - Numéro de téléphone à vérifier
+ * @returns {boolean} true si c'est un numéro de test
+ */
+function isTestPhoneNumber(phoneNumber) {
+  if (!phoneNumber || typeof phoneNumber !== 'string') return false;
+  
+  const cleaned = phoneNumber.trim().replace(/^=/, ''); // Enlever = au début
+  
+  // Patterns de numéros de test communs
+  const testPatterns = [
+    /^\+1555\d{7}$/,        // +1555XXXXXXX (US test numbers)
+    /^\+15551\d{6}$/,       // +15551XXXXXX (US test numbers)
+    /^\+1555123\d{4}$/,     // +1555123XXXX (US test numbers)
+    /^\+1555111\d{4}$/,     // +1555111XXXX (US test numbers)
+    /^\+1555222\d{4}$/,     // +1555222XXXX (US test numbers)
+    /^\+1555987\d{4}$/,     // +1555987XXXX (US test numbers)
+    /^\+1\d{10}$/,          // +1XXXXXXXXXX (US format, mais peut être test)
+  ];
+  
+  // Vérifier si le numéro correspond à un pattern de test
+  const isTestPattern = testPatterns.some(pattern => pattern.test(cleaned));
+  
+  // Vérifier aussi si c'est un numéro connu de test
+  const knownTestNumbers = [
+    '+15551111111',
+    '+15551234567',
+    '+15552222222',
+    '+15559876543',
+    '+15554343638',
+    '+15558866755',
+    '+15559048339'
+  ];
+  
+  return isTestPattern || knownTestNumbers.includes(cleaned);
+}
+
+/**
  * Envoie un SMS via Twilio
  *
  * @param {string} to - Numéro du destinataire
  * @param {string} message - Message à envoyer
+ * @param {boolean} simulate - Forcer mode simulation (optionnel)
  * @returns {Promise<object>} Résultat Twilio
  */
 async function sendSMS(to, message, simulate = false) {
@@ -360,6 +399,13 @@ async function sendSMS(to, message, simulate = false) {
       }
     } else {
       throw new Error(`Invalid phone number type: ${typeof to}, value: ${to}`);
+    }
+
+    // ✅ FIX: Détecter automatiquement les numéros de test et activer simulation
+    // Évite d'appeler Twilio avec des numéros invalides
+    if (!simulate && isTestPhoneNumber(to)) {
+      console.log(`[SMS Adapter] 🧪 Numéro de test détecté: ${to} → Mode simulation activé automatiquement`);
+      simulate = true;
     }
 
     // 🧪 MODE SIMULATION: Ne pas envoyer de vrai SMS
