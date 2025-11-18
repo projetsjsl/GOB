@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { TabProps } from '../../types';
 
-// Déclarations pour bibliothèques CDN
 declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
@@ -227,6 +226,7 @@ declare const LightweightCharts: any;
                     </div>
                 );
             };
+
 
 
 export default PromptManager;

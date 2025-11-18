@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { TabProps } from '../../types';
 
-// Déclarations pour bibliothèques CDN
 declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
@@ -1339,8 +1338,6 @@ console.log('✅ Données hybrides récupérées:', {
                         </div>
                     );
                 }
-
-                // Composant de graphique simple (alternative à Recharts)
                 const SimpleChart = ({ data, type = 'line', width = 300, height = 200 }) => {
                     const chartRef = useRef(null);
                     
@@ -2902,5 +2899,6 @@ console.log('✅ Données hybrides récupérées:', {
             // ============================================================================
             // COMPOSANT CALENDRIER ÉCONOMIQUE AMÉLIORÉ
             // ============================================================================
+
 
 export default IntelliStocksTab;

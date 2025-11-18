@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { TabProps } from '../../types';
+
+declare const Chart: any;
+declare const Recharts: any;
+declare const LightweightCharts: any;
 
             const AdminJSLaiTab = ({
                 emmaConnected,
@@ -1592,6 +1596,6 @@ CONTRAINTES:
                 </div>
             );
 
-            // Composant onglet Plus
 
+};
 export default AdminJSLaiTab;

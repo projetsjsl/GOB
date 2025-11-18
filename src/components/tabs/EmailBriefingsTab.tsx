@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { TabProps } from '../../types';
 
-// Déclarations pour bibliothèques CDN
 declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
@@ -2888,8 +2887,6 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                     </div>
                 );
             };
-
-            // Composant onglet Ask Emma avec intégration Gemini
             // Isolé avec React.memo pour éviter les re-renders causés par les mises à jour de marché
             const AskEmmaTab = React.memo(({
                 prefillMessage = '',
@@ -5933,6 +5930,5 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 );
             });
 
-            // Composant onglet Stocks & News
 
 export default EmailBriefingsTab;
