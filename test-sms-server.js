@@ -57,7 +57,9 @@ const DEFAULT_TWILIO_TO = process.env.TWILIO_PHONE_NUMBER || process.env.TEST_TW
 const PUBLIC_URL = (process.env.PUBLIC_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 const TEST_MODE = process.env.TEST_MODE === 'true' || MODE === 'test';
 const DEBUG = process.env.DEBUG_EMMA === 'true';
-const EMMA_TIMEOUT_MS = Number(process.env.EMMA_TIMEOUT_MS || 45000);
+// ⏱️ TIMEOUT: 90s pour permettre analyses complètes (comprehensive_analysis = 90s)
+// L'API /api/chat a timeout 60s pour SMS, mais comprehensive_analysis peut prendre 90s
+const EMMA_TIMEOUT_MS = Number(process.env.EMMA_TIMEOUT_MS || 90000);
 const SIMULATED_LATENCY_MS = Number(process.env.SIMULATED_LATENCY_MS || 0);
 
 const conversations = [];
