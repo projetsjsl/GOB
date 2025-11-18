@@ -20,6 +20,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
+        // Noms de fichiers SIMPLES sans hash aléatoire
+        entryFileNames: 'assets/index.js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
         manualChunks: {
           // Séparer React dans son propre chunk
           'react-vendor': ['react', 'react-dom'],
