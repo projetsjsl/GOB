@@ -1,47 +1,33 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React, { useEffect } from 'react';
+import BetaCombinedDashboard from './components/BetaCombinedDashboard';
 
-// ====================================================================
-// GOB DASHBOARD - Solution temporaire
-// ====================================================================
-// Charge le fichier app.jsx existant via Babel dans le navigateur
-// TODO: Scinder app.jsx en modules ES6 propres
+// Import utils pour exposition globale
+import { IconoirIcon, ProfessionalModeSystem } from './utils/iconMapping';
 
-declare const Chart: any
-declare const Recharts: any
-declare const LightweightCharts: any
+// Déclarations TypeScript pour bibliothèques CDN
+declare const Chart: any;
+declare const Recharts: any;
+declare const LightweightCharts: any;
 
 const App: React.FC = () => {
-    return (
-        <div id="dashboard-loading" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-            background: '#0a0a0a',
-            color: 'white',
-            fontFamily: 'Inter, sans-serif'
-        }}>
-            <div style={{ textAlign: 'center' }}>
-                <div style={{
-                    width: '60px',
-                    height: '60px',
-                    border: '4px solid #374151',
-                    borderTopColor: '#10b981',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite',
-                    margin: '0 auto 20px'
-                }}></div>
-                <p style={{ color: '#9ca3af', fontSize: '18px' }}>Chargement du Terminal Financier...</p>
-                <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '10px' }}>Powered by JSL AI</p>
-            </div>
-            <style>{`
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-            `}</style>
-        </div>
-    );
+    useEffect(() => {
+        // Guard pour éviter le double-montage
+        if ((window as any).__GOB_DASHBOARD_MOUNTED) {
+            console.warn('⚠️ Dashboard déjà monté');
+            return;
+        }
+        (window as any).__GOB_DASHBOARD_MOUNTED = true;
+
+        // Exposer les utils globalement pour compatibilité
+        (window as any).IconoirIcon = IconoirIcon;
+        (window as any).LucideIcon = IconoirIcon; // Backward compatibility
+        (window as any).ProfessionalModeSystem = ProfessionalModeSystem;
+
+        console.log('✅ GOB Dashboard monté (Vite + React + TypeScript)');
+    }, []);
+
+    // Rendu direct du dashboard - UI friendly, pas de loader
+    return <BetaCombinedDashboard />;
 };
 
 export default App;
