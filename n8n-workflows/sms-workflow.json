@@ -62,11 +62,21 @@
         "options": {
           "response": {
             "response": {
-              "responseFormat": "string"
+              "responseFormat": "string",
+              "fullResponse": true
             }
           }
         },
-        "bodyParametersJson": "={{ JSON.stringify({\n  From: $json.from_phone,\n  To: $json.to_phone,\n  Body: $json.message_body,\n  MessageSid: $json.message_sid\n}) }}"
+        "bodyParametersJson": "={{ JSON.stringify({\n  From: $json.from_phone,\n  To: $json.to_phone,\n  Body: $json.message_body,\n  MessageSid: $json.message_sid\n}) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
       },
       "name": "Call SMS Adapter",
       "type": "n8n-nodes-base.httpRequest",
@@ -76,7 +86,7 @@
     {
       "parameters": {
         "respondWith": "text",
-        "responseBody": "={{ $json.body }}",
+        "responseBody": "={{ $json.body || $json.data || $json }}",
         "options": {}
       },
       "name": "Response",
