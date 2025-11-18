@@ -131,20 +131,116 @@ function isValidTestNumber(number) {
 }
 
 function extractMessageFromResponse(data) {
-  if (!data) return 'Réponse Emma reçue';
+  if (!data) {
+    console.warn('⚠️ [extractMessage] Aucune donnée reçue');
+    return 'Réponse Emma reçue';
+  }
+  
+  console.log(`🔍 [extractMessage] Type: ${typeof data}, Longueur: ${typeof data === 'string' ? data.length : 'N/A'}`);
+  
+  // ✅ FIX: Parser TwiML XML correctement
   if (typeof data === 'string') {
-    const match = data.match(/<Message[^>]*>([\s\S]*?)<\/Message>/i);
-    if (match) {
-      return match[1].trim();
+    // Pattern 1: TwiML complet avec <Message>...</Message>
+    const twimlMatch = data.match(/<Message[^>]*>([\s\S]*?)<\/Message>/i);
+    if (twimlMatch) {
+      const message = twimlMatch[1].trim();
+      console.log(`✅ [extractMessage] Message extrait du TwiML: ${message.substring(0, 50)}...`);
+      return message;
     }
+    
+    // Pattern 2: TwiML avec CDATA
+    const cdataMatch = data.match(/<!\[CDATA\[([\s\S]*?)\]\]>/i);
+    if (cdataMatch) {
+      const message = cdataMatch[1].trim();
+      console.log(`✅ [extractMessage] Message extrait du CDATA: ${message.substring(0, 50)}...`);
+      return message;
+    }
+    
+    // Pattern 3: JSON stringifié dans une string
+    try {
+      const parsed = JSON.parse(data);
+      if (parsed.response) {
+        console.log(`✅ [extractMessage] Message extrait du JSON.response: ${parsed.response.substring(0, 50)}...`);
+        return parsed.response;
+      }
+      if (parsed.message) {
+        console.log(`✅ [extractMessage] Message extrait du JSON.message: ${parsed.message.substring(0, 50)}...`);
+        return parsed.message;
+      }
+    } catch (e) {
+      // Pas du JSON, continuer
+    }
+    
+    // Pattern 4: Nettoyer HTML/XML tags et extraire le texte
     const stripped = data.replace(/<[^>]+>/g, '').trim();
-    return stripped || data;
+    if (stripped && stripped.length > 0 && stripped !== data) {
+      console.log(`✅ [extractMessage] Message nettoyé (HTML/XML): ${stripped.substring(0, 50)}...`);
+      return stripped;
+    }
+    
+    // Pattern 5: Si c'est déjà du texte brut (pas de tags)
+    if (data.trim().length > 0 && !data.includes('<') && !data.includes('{')) {
+      console.log(`✅ [extractMessage] Message texte brut: ${data.substring(0, 50)}...`);
+      return data.trim();
+    }
+    
+    console.warn(`⚠️ [extractMessage] Impossible d'extraire le message de la string: ${data.substring(0, 100)}...`);
+    return data; // Retourner tel quel plutôt que "Réponse Emma reçue"
   }
+  
+  // ✅ FIX: Parser objets JSON correctement
   if (typeof data === 'object') {
-    if (data.response) return data.response;
-    if (data.message) return data.message;
-    if (data.body) return data.body;
+    // Pattern 1: Objet avec propriété response
+    if (data.response && typeof data.response === 'string') {
+      console.log(`✅ [extractMessage] Message depuis data.response: ${data.response.substring(0, 50)}...`);
+      return data.response;
+    }
+    
+    // Pattern 2: Objet avec propriété message
+    if (data.message && typeof data.message === 'string') {
+      console.log(`✅ [extractMessage] Message depuis data.message: ${data.message.substring(0, 50)}...`);
+      return data.message;
+    }
+    
+    // Pattern 3: Objet avec propriété body (n8n peut retourner dans body)
+    if (data.body) {
+      // Si body est une string, c'est peut-être du TwiML
+      if (typeof data.body === 'string') {
+        const twimlMatch = data.body.match(/<Message[^>]*>([\s\S]*?)<\/Message>/i);
+        if (twimlMatch) {
+          console.log(`✅ [extractMessage] Message extrait de data.body (TwiML): ${twimlMatch[1].substring(0, 50)}...`);
+          return twimlMatch[1].trim();
+        }
+        console.log(`✅ [extractMessage] Message depuis data.body: ${data.body.substring(0, 50)}...`);
+        return data.body;
+      }
+      // Si body est un objet, chercher response/message dedans
+      if (typeof data.body === 'object' && data.body.response) {
+        console.log(`✅ [extractMessage] Message depuis data.body.response: ${data.body.response.substring(0, 50)}...`);
+        return data.body.response;
+      }
+    }
+    
+    // Pattern 4: Objet avec propriété data (réponse axios)
+    if (data.data) {
+      // Récursion pour parser data.data
+      const extracted = extractMessageFromResponse(data.data);
+      if (extracted !== 'Réponse Emma reçue') {
+        return extracted;
+      }
+    }
+    
+    console.warn(`⚠️ [extractMessage] Impossible d'extraire le message de l'objet:`, Object.keys(data));
+    // Essayer de stringifier pour debug
+    try {
+      const stringified = JSON.stringify(data);
+      console.log(`🔍 [extractMessage] Objet stringifié: ${stringified.substring(0, 200)}...`);
+    } catch (e) {
+      // Ignore
+    }
   }
+  
+  console.error(`❌ [extractMessage] Aucun pattern reconnu, retour par défaut`);
   return 'Réponse Emma reçue';
 }
 
@@ -177,20 +273,41 @@ async function relayToEmma(payload, { simulate = TEST_MODE } = {}) {
     await new Promise(resolve => setTimeout(resolve, SIMULATED_LATENCY_MS));
   }
 
-  const response = await axios.post(EMMA_WEBHOOK_URL, params.toString(), {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    timeout: EMMA_TIMEOUT_MS
-  });
+  console.log(`📤 [relayToEmma] Appel webhook n8n: ${EMMA_WEBHOOK_URL}`);
+  console.log(`📤 [relayToEmma] Message: "${payload.Body}"`);
+  console.log(`📤 [relayToEmma] From: ${payload.From}, To: ${payload.To || DEFAULT_TWILIO_TO}`);
 
-  const message = extractMessageFromResponse(response.data);
+  try {
+    const response = await axios.post(EMMA_WEBHOOK_URL, params.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      timeout: EMMA_TIMEOUT_MS
+    });
 
-  return {
-    message,
-    raw: response.data,
-    headers: response.headers,
-    status: response.status,
-    processingTime: Date.now() - startedAt
-  };
+    console.log(`📥 [relayToEmma] Réponse reçue: Status ${response.status}`);
+    console.log(`📥 [relayToEmma] Content-Type: ${response.headers['content-type']}`);
+    console.log(`📥 [relayToEmma] Data type: ${typeof response.data}, Length: ${typeof response.data === 'string' ? response.data.length : 'N/A'}`);
+    console.log(`📥 [relayToEmma] Data preview: ${typeof response.data === 'string' ? response.data.substring(0, 200) : JSON.stringify(response.data).substring(0, 200)}...`);
+
+    const message = extractMessageFromResponse(response.data);
+
+    console.log(`✅ [relayToEmma] Message extrait: ${message.substring(0, 100)}... (${message.length} chars)`);
+    console.log(`⏱️ [relayToEmma] Temps de traitement: ${Date.now() - startedAt}ms`);
+
+    return {
+      message,
+      raw: response.data,
+      headers: response.headers,
+      status: response.status,
+      processingTime: Date.now() - startedAt
+    };
+  } catch (error) {
+    console.error(`❌ [relayToEmma] Erreur appel webhook:`, error.message);
+    if (error.response) {
+      console.error(`❌ [relayToEmma] Status: ${error.response.status}`);
+      console.error(`❌ [relayToEmma] Data: ${JSON.stringify(error.response.data).substring(0, 200)}...`);
+    }
+    throw error;
+  }
 }
 
 function buildTwimlResponse(message) {
