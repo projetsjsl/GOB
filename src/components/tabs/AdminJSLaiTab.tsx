@@ -289,154 +289,7 @@ CONTRAINTES:
                         }`}>⚙️ Admin-JSLAI</h2>
                     </div>
 
-                    <EmmaSmsPanel />
-
-                    {/* 🤖 Emma Configuration (nouveau - centralisé pour admin) */}
-                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
-                    }`}>
-                        <div className="flex justify-between items-center mb-4 cursor-pointer" onClick={() => setShowEmmaConfig(!showEmmaConfig)}>
-                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                <Icon emoji="🤖" size={20} />
-                                Emma Configuration (Prompts Optimisés)
-                                <span className="text-xs opacity-70">(partagé avec onglet Emma IA™)</span>
-                            </h3>
-                            <button className={`px-3 py-1 text-xs rounded transition-colors ${
-                                isDarkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-purple-500 hover:bg-purple-600 text-white'
-                            }`}>
-                                {showEmmaConfig ? '▼ Masquer' : '▶ Afficher'}
-                            </button>
-                        </div>
-
-                        {showEmmaConfig && (
-                            <div className="space-y-4">
-                                {/* Prompt Système */}
-                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                    <div className="flex justify-between items-center mb-3">
-                                        <label className={`font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                            <Icon emoji="📝" size={16} />
-                                            Prompt Système (Optimisé Hassid)
-                                        </label>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={resetToOptimizedPrompt}
-                                                className={`px-3 py-1 text-xs rounded transition-colors ${
-                                                    isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
-                                                }`}
-                                            >
-                                                ✅ Restaurer prompt optimisé
-                                            </button>
-                                            <span className={`px-3 py-1 text-xs rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
-                                                {emmaPrompt.split(' ').length} mots (-85.6% vs original)
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <textarea
-                                        value={emmaPrompt}
-                                        onChange={(e) => handlePromptChange(e.target.value)}
-                                        className={`w-full h-64 p-3 rounded border font-mono text-sm ${
-                                            isDarkMode ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-gray-300 text-gray-900'
-                                        }`}
-                                        placeholder="Prompt système Emma..."
-                                    />
-                                    <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        💡 Prompt optimisé selon principes Hassid: layered structure, délimiteurs ///, contraintes en fin (recency effect)
-                                    </div>
-                                </div>
-
-                                {/* Température */}
-                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                    <label className={`block font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                        <Icon emoji="🌡️" size={16} />
-                                        Température: <span className="font-bold text-blue-600">{emmaTemperature.toFixed(2)}</span>
-                                        <span className="text-xs font-normal opacity-70">
-                                            ({emmaTemperature <= 0.3 ? 'Précis/Factuel' : emmaTemperature <= 0.6 ? 'Équilibré' : 'Créatif'})
-                                        </span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="0.1"
-                                        max="1.0"
-                                        step="0.05"
-                                        value={emmaTemperature}
-                                        onChange={(e) => handleTemperatureChange(parseFloat(e.target.value))}
-                                        className="w-full"
-                                    />
-                                    <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        <span>0.1 (Précis)</span>
-                                        <span>0.5 (Équilibré)</span>
-                                        <span>1.0 (Créatif)</span>
-                                    </div>
-                                </div>
-
-                                {/* Max Tokens */}
-                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                    <label className={`block font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                        <Icon emoji="📏" size={16} />
-                                        Longueur Max: <span className="font-bold text-blue-600">{emmaMaxTokens} tokens</span>
-                                        <span className="text-xs font-normal opacity-70">
-                                            (~{Math.round(emmaMaxTokens * 0.75)} mots)
-                                        </span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="1024"
-                                        max="16384"
-                                        step="512"
-                                        value={emmaMaxTokens}
-                                        onChange={(e) => handleMaxTokensChange(parseInt(e.target.value))}
-                                        className="w-full"
-                                    />
-                                    <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        <span>1024</span>
-                                        <span>4096 (défaut)</span>
-                                        <span>8192</span>
-                                        <span>16384</span>
-                                    </div>
-                                    <div className={`mt-2 text-xs ${isDarkMode ? 'text-yellow-400' : 'text-yellow-700'}`}>
-                                        ⚠️ Note: Analyses complètes SMS = max 2 parties (~3500 chars). Web/Email = profondeur maximale.
-                                    </div>
-                                </div>
-
-                                {/* Function Calling */}
-                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                    <div className="flex items-center justify-between">
-                                        <label className={`font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                            <Icon emoji="🔧" size={16} />
-                                            Function Calling (APIs temps réel)
-                                        </label>
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={useFunctionCalling}
-                                                onChange={(e) => handleFunctionCallingToggle(e.target.checked)}
-                                                className="sr-only peer"
-                                            />
-                                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-                                            <span className={`ml-3 text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-                                                {useFunctionCalling ? 'Activé ✅' : 'Désactivé ❌'}
-                                            </span>
-                                        </label>
-                                    </div>
-                                    <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        {useFunctionCalling
-                                            ? '✅ Emma utilise les APIs (FMP, Finnhub, etc.) pour données temps réel'
-                                            : '❌ Emma se base uniquement sur ses connaissances d\'entraînement'}
-                                    </div>
-                                </div>
-
-                                {/* Info Synchronisation */}
-                                <div className={`p-3 rounded border-2 ${isDarkMode ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-300'}`}>
-                                    <div className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-900'}`}>
-                                        <Icon emoji="ℹ️" size={16} /> <strong>Synchronisation automatique:</strong> Tous les réglages sont partagés avec l'onglet "Emma IA™" via localStorage.
-                                        Les modifications ici s'appliquent immédiatement partout.
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* 📊 Gestion des Tickers Supabase */}
+                    {/* 📊 Gestion des Tickers Supabase - EN HAUT */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-green-900/20 to-gray-900 border-green-700' : 'bg-gradient-to-br from-green-50 to-gray-50 border-green-200'
                     }`}>
@@ -985,6 +838,153 @@ CONTRAINTES:
                                             </div>
                                         </div>
                                     )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <EmmaSmsPanel />
+
+                    {/* 🤖 Emma Configuration (nouveau - centralisé pour admin) */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4 cursor-pointer" onClick={() => setShowEmmaConfig(!showEmmaConfig)}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
+                                <Icon emoji="🤖" size={20} />
+                                Emma Configuration (Prompts Optimisés)
+                                <span className="text-xs opacity-70">(partagé avec onglet Emma IA™)</span>
+                            </h3>
+                            <button className={`px-3 py-1 text-xs rounded transition-colors ${
+                                isDarkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-purple-500 hover:bg-purple-600 text-white'
+                            }`}>
+                                {showEmmaConfig ? '▼ Masquer' : '▶ Afficher'}
+                            </button>
+                        </div>
+
+                        {showEmmaConfig && (
+                            <div className="space-y-4">
+                                {/* Prompt Système */}
+                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className="flex justify-between items-center mb-3">
+                                        <label className={`font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
+                                            <Icon emoji="📝" size={16} />
+                                            Prompt Système (Optimisé Hassid)
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={resetToOptimizedPrompt}
+                                                className={`px-3 py-1 text-xs rounded transition-colors ${
+                                                    isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
+                                                }`}
+                                            >
+                                                ✅ Restaurer prompt optimisé
+                                            </button>
+                                            <span className={`px-3 py-1 text-xs rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
+                                                {emmaPrompt.split(' ').length} mots (-85.6% vs original)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <textarea
+                                        value={emmaPrompt}
+                                        onChange={(e) => handlePromptChange(e.target.value)}
+                                        className={`w-full h-64 p-3 rounded border font-mono text-sm ${
+                                            isDarkMode ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-gray-300 text-gray-900'
+                                        }`}
+                                        placeholder="Prompt système Emma..."
+                                    />
+                                    <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        💡 Prompt optimisé selon principes Hassid: layered structure, délimiteurs ///, contraintes en fin (recency effect)
+                                    </div>
+                                </div>
+
+                                {/* Température */}
+                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <label className={`block font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
+                                        <Icon emoji="🌡️" size={16} />
+                                        Température: <span className="font-bold text-blue-600">{emmaTemperature.toFixed(2)}</span>
+                                        <span className="text-xs font-normal opacity-70">
+                                            ({emmaTemperature <= 0.3 ? 'Précis/Factuel' : emmaTemperature <= 0.6 ? 'Équilibré' : 'Créatif'})
+                                        </span>
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="0.1"
+                                        max="1.0"
+                                        step="0.05"
+                                        value={emmaTemperature}
+                                        onChange={(e) => handleTemperatureChange(parseFloat(e.target.value))}
+                                        className="w-full"
+                                    />
+                                    <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <span>0.1 (Précis)</span>
+                                        <span>0.5 (Équilibré)</span>
+                                        <span>1.0 (Créatif)</span>
+                                    </div>
+                                </div>
+
+                                {/* Max Tokens */}
+                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <label className={`block font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
+                                        <Icon emoji="📏" size={16} />
+                                        Longueur Max: <span className="font-bold text-blue-600">{emmaMaxTokens} tokens</span>
+                                        <span className="text-xs font-normal opacity-70">
+                                            (~{Math.round(emmaMaxTokens * 0.75)} mots)
+                                        </span>
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="1024"
+                                        max="16384"
+                                        step="512"
+                                        value={emmaMaxTokens}
+                                        onChange={(e) => handleMaxTokensChange(parseInt(e.target.value))}
+                                        className="w-full"
+                                    />
+                                    <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <span>1024</span>
+                                        <span>4096 (défaut)</span>
+                                        <span>8192</span>
+                                        <span>16384</span>
+                                    </div>
+                                    <div className={`mt-2 text-xs ${isDarkMode ? 'text-yellow-400' : 'text-yellow-700'}`}>
+                                        ⚠️ Note: Analyses complètes SMS = max 2 parties (~3500 chars). Web/Email = profondeur maximale.
+                                    </div>
+                                </div>
+
+                                {/* Function Calling */}
+                                <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className="flex items-center justify-between">
+                                        <label className={`font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
+                                            <Icon emoji="🔧" size={16} />
+                                            Function Calling (APIs temps réel)
+                                        </label>
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={useFunctionCalling}
+                                                onChange={(e) => handleFunctionCallingToggle(e.target.checked)}
+                                                className="sr-only peer"
+                                            />
+                                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                                            <span className={`ml-3 text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                                                {useFunctionCalling ? 'Activé ✅' : 'Désactivé ❌'}
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {useFunctionCalling
+                                            ? '✅ Emma utilise les APIs (FMP, Finnhub, etc.) pour données temps réel'
+                                            : '❌ Emma se base uniquement sur ses connaissances d\'entraînement'}
+                                    </div>
+                                </div>
+
+                                {/* Info Synchronisation */}
+                                <div className={`p-3 rounded border-2 ${isDarkMode ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-300'}`}>
+                                    <div className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-900'}`}>
+                                        <Icon emoji="ℹ️" size={16} /> <strong>Synchronisation automatique:</strong> Tous les réglages sont partagés avec l'onglet "Emma IA™" via localStorage.
+                                        Les modifications ici s'appliquent immédiatement partout.
+                                    </div>
                                 </div>
                             </div>
                         )}
