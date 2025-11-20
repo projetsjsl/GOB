@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
+    <!-- Version: 2.1.0 - JLab V2 with Synchronized Widgets - 2025-10-25 -->
+    <!-- Favicon JSLAI -->
+    <link rel="icon" type="image/png" href="jlab.png">
+    <link rel="apple-touch-icon" href="jlab.png">
+    <!-- Cache bust: 2025-10-15 21:00 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <!-- Avenir Pro 85 Heavy alternative: Montserrat Heavy (900) ou Avenir Next si disponible -->
+    <style>
+        @font-face {
+            font-family: 'Avenir Pro 85 Heavy';
+            src: local('Avenir Next Heavy'), local('Avenir-Heavy'), local('AvenirNext-Heavy');
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        .avenir-heavy {
+            font-family: 'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+    </style>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
+    <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+
+    <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
+    <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Recharts pour IntelliStocks -->
+    <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
+    <!-- Iconoir - Beautiful open source icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+    
+    <!-- Script pour exposer les bibliothèques globalement -->
+        <script>
+            // Exposer Recharts globalement
+            window.Recharts = window.Recharts || {};
+            
+            // Gestionnaire d'erreur global pour éviter que les erreurs de scripts externes cassent l'application
+            window.addEventListener('error', function(event) {
+                // Ignorer les erreurs de scripts externes (extensions, etc.)
+                if (event.filename && (event.filename.includes('share-modal') || event.filename.includes('extension'))) {
+                    console.warn('⚠️ Erreur ignorée depuis un script externe:', event.filename);
+                    event.preventDefault();
+                    return true;
+                }
+            }, true);
+            
+            // Protection contre les addEventListener sur des éléments null
+            const originalAddEventListener = EventTarget.prototype.addEventListener;
+            EventTarget.prototype.addEventListener = function(type, listener, options) {
+                if (this === null || this === undefined) {
+                    console.warn('⚠️ Tentative d\'ajouter un event listener sur un élément null/undefined:', type);
+                    return;
+                }
+                return originalAddEventListener.call(this, type, listener, options);
+            };
+            
+            // Vérifier le chargement des bibliothèques
+            window.addEventListener('load', function() {
+                console.log('📚 Vérification des bibliothèques:');
+                console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
+                console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
+                
+                // Message informatif sur les avertissements de production
+                console.log('ℹ️ Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
+                console.log('ℹ️ Ce fichier utilise intentionnellement des CDN pour la portabilité');
+            });
+        </script>
+    
+    <!-- Styles Emma -->
+    <link rel="stylesheet" href="emma-styles.css">
+    <style>
+        * {
+            font-family: 'Inter', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-button.active { 
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+        }
+        .pulse-animation {
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 🎨 Animations pour la bottom bar avec icônes Iconoir */
+        @keyframes slide-down {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes icon-pop {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .animate-slide-down {
+            animation: slide-down 0.3s ease-out;
+        }
+
+        /* Effet de glow sur l'icône active */
+        nav button:has(i.scale-110) i {
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        /* Styles pour garantir l'affichage des icônes Iconoir sur mobile */
+        .iconoir-chart-line,
+        .iconoir-trending-up,
+        .iconoir-chat-bubble,
+        .iconoir-settings,
+        .iconoir-star,
+        .iconoir-search,
+        .iconoir-graph-up,
+        .iconoir-antenna-signal,
+        .iconoir-calendar,
+        .iconoir-flask,
+        .iconoir-globe,
+        .iconoir-log-out,
+        .iconoir-menu,
+        .iconoir-briefcase {
+            display: inline-block !important;
+            font-style: normal !important;
+            font-variant: normal !important;
+            text-rendering: auto !important;
+            line-height: 1 !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+        }
+
+        /* Transition fluide pour toutes les icônes */
+        nav button i {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Effet hover sur les boutons de navigation */
+        nav button:hover:not(:active) i {
+            transform: translateY(-2px);
+        }
+
+        /* Effet de press */
+        nav button:active i {
+            transform: scale(0.9);
+        }
+
+        .stock-card {
+            transition: all 0.3s ease;
+        }
+        .stock-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* 💎 VAGUES 3+4 - Finance Pro UI Effects */
+
+        /* 🌫️ Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card-light {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        /* ⬆️ Hover Lift Effect (-4px translateY) */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        /* ✨ Shine Effect (horizontal sweep) */
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+
+        .shine-effect:hover::before {
+            left: 100%;
+        }
+
+        /* 🌟 Glow Animation for Important Metrics */
+        .glow-pulse {
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(74, 222, 128, 0.5),
+                            0 0 10px rgba(74, 222, 128, 0.3),
+                            0 0 15px rgba(74, 222, 128, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(74, 222, 128, 0.8),
+                            0 0 20px rgba(74, 222, 128, 0.6),
+                            0 0 30px rgba(74, 222, 128, 0.4);
+            }
+        }
+
+        .glow-pulse-red {
+            animation: glow-pulse-red 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.5),
+                            0 0 10px rgba(239, 68, 68, 0.3),
+                            0 0 15px rgba(239, 68, 68, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.8),
+                            0 0 20px rgba(239, 68, 68, 0.6),
+                            0 0 30px rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        .glow-pulse-blue {
+            animation: glow-pulse-blue 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-blue {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(59, 130, 246, 0.5),
+                            0 0 10px rgba(59, 130, 246, 0.3),
+                            0 0 15px rgba(59, 130, 246, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(59, 130, 246, 0.8),
+                            0 0 20px rgba(59, 130, 246, 0.6),
+                            0 0 30px rgba(59, 130, 246, 0.4);
+            }
+        }
+
+        /* 💫 Shimmer Effect for Loading States */
+        .shimmer {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.05) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* 🔒 Prévention du scroll horizontal sur tous les appareils */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+            position: relative;
+        }
+
+        html {
+            width: 100%;
+        }
+
+        body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Empêcher tout débordement des éléments enfants */
+        #root {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* 📱 MOBILE - COMPACT VIEW for Global Overview */
+        @media (max-width: 768px) {
+            /* Compact global scaling for dashboard view */
+            html {
+                font-size: 55%;
+                overflow-x: hidden;
+                max-width: 100vw;
+            }
+            body {
+                padding: 6px;
+                overflow-x: hidden;
+                max-width: 100vw;
+                width: 100%;
+            }
+
+            /* Compact header */
+            header { padding: 10px !important; }
+            header img { width: 36px !important; height: 36px !important; }
+            header h1 { font-size: 1.3rem !important; }
+            header p { font-size: 0.65rem !important; }
+
+            /* Ticker banner compact */
+            .ticker-content > div {
+                padding: 6px 10px !important;
+                font-size: 0.65rem !important;
+            }
+
+            /* Navigation tabs - horizontal scroll */
+            nav {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+                padding: 6px !important;
+            }
+
+            nav::-webkit-scrollbar { display: none; }
+
+            nav button {
+                flex-shrink: 0 !important;
+                white-space: nowrap !important;
+                padding: 10px 14px !important;
+                font-size: 0.75rem !important;
+            }
+
+            /* Tables: horizontal scroll */
+            table {
+                display: block !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                white-space: nowrap !important;
+                font-size: 0.7rem !important;
+            }
+
+            /* Buttons slightly larger for touch */
+            button, .btn, a[class*="btn"] {
+                min-height: 36px !important;
+                padding: 8px 12px !important;
+            }
+
+            /* Input fields prevent iOS zoom */
+            input, textarea, select {
+                font-size: 16px !important; /* Prevent zoom on focus */
+                padding: 8px !important;
+                min-height: 36px !important;
+            }
+
+            /* Compact card spacing */
+            .space-y-6 > * + * { margin-top: 12px !important; }
+            .space-y-4 > * + * { margin-top: 8px !important; }
+            .space-y-2 > * + * { margin-top: 4px !important; }
+
+            .p-6 { padding: 12px !important; }
+            .p-4 { padding: 8px !important; }
+            .p-3 { padding: 6px !important; }
+            .p-2 { padding: 4px !important; }
+
+            /* Gap reduction */
+            .gap-6 { gap: 12px !important; }
+            .gap-4 { gap: 8px !important; }
+            .gap-2 { gap: 4px !important; }
+
+            /* Grid stays but more compact */
+            .grid {
+                gap: 8px !important;
+            }
+
+            /* Charts and images responsive */
+            img, canvas, svg {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        }
+        .seeking-alpha-card {
+            background: linear-gradient(135deg, #1f1f1f 0%, #2d2d2d 100%);
+        }
+        .stocks-news-card {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        /* Scrollbar personnalisée */
+        .scrollbar-thin {
+            scrollbar-width: thin;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* Dark mode scrollbar */
+        .dark .scrollbar-thin::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-card {
+            transition: all 0.3s ease;
+        }
+        .news-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        /* Effets visuels - ripple sur boutons */
+        .btn-ripple { position: relative; overflow: hidden; }
+        .ripple-circle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            background: rgba(59, 130, 246, 0.45); /* blue */
+            transform: scale(0);
+            animation: ripple 600ms ease-out;
+        }
+        @keyframes ripple {
+            to { transform: scale(3); opacity: 0; }
+        }
+        /* Animation intro Emma */
+        @keyframes emma-intro-fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes emma-zoom-in {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .emma-intro-overlay { animation: emma-intro-fade 300ms ease-out; }
+        .emma-intro-image { animation: emma-zoom-in 800ms ease-out; }
+    </style>
+
+    <!-- 🔐 Auth Guard - Protection du Dashboard -->
+    <script src="/js/auth-guard.js"></script>
+</head>
+<body class="min-h-screen">
+    <div id="root"></div>
+    
+    <!-- Dashboard Modules - Split for faster Babel transpilation -->
+    <!-- Each module is transpiled separately, greatly improving load performance -->
+    
+    <script type="text/babel" src="/js/dashboard/utils.js"></script>
+    <script type="text/babel" src="/js/dashboard/api-helpers.js"></script>
+    <script type="text/babel" src="/js/dashboard/cache-manager.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/common.js"></script>
+    
+    <script type="text/babel" src="/js/dashboard/components/tabs/PlusTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/YieldCurveTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/MarketsEconomyTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/EconomicCalendarTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/InvestingCalendarTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/EmmaSmsPanel.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/AdminJSLaiTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/AskEmmaTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/DansWatchlistTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/StocksNewsTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/IntelliStocksTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/EmailBriefingsTab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/ScrappingSATab.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/tabs/SeekingAlphaTab.js"></script>
+    
+    <script type="text/babel" src="/js/dashboard/dashboard-main.js"></script>
+    
+    
+</body>
+</html>
