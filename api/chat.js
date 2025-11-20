@@ -29,23 +29,36 @@ function validateResponseCompleteness(response, analysisType, intentData) {
   
   // Pour comprehensive_analysis, vérifier présence des sections obligatoires
   if (intent === 'comprehensive_analysis') {
+    // 🚨 STRICT: Les 9 sections DOIVENT être présentes (tolérance max: 1 section manquante)
     const requiredSections = [
-      'Valorisation', 'Performance', 'Fondamentaux', 
-      'Moat', 'Valeur', 'Risques', 'Recommandation', 'Questions'
+      'VALORISATION',      // Section 1
+      'FONDAMENTAUX',      // Section 2
+      'CROISSANCE',        // Section 3
+      'MOAT',              // Section 4
+      'DIVIDENDE',         // Section 5 (ou "N/A - Pas de dividende")
+      'RISQUES',           // Section 6
+      'NEWS',              // Section 7 (ou "Actualités")
+      'RECOMMANDATION',    // Section 8
+      'QUESTIONS'          // Section 9 (ou "Questions suivi")
     ];
-    
-    const missingCount = requiredSections.filter(
-      section => !response.includes(section)
-    ).length;
-    
-    // Si > 3 sections manquantes OU réponse < 1500 mots, considérer incomplète
+
+    const responseUpper = response.toUpperCase();
+    const missingSections = requiredSections.filter(
+      section => !responseUpper.includes(section)
+    );
+
+    // Tolérance STRICTE: Maximum 1 section manquante OU < 1200 mots = INCOMPLET
     const wordCount = response.split(/\s+/).length;
-    const isComplete = missingCount <= 3 && wordCount >= 1500;
-    
+    const isComplete = missingSections.length <= 1 && wordCount >= 1200;
+
     if (!isComplete) {
-      console.warn(`⚠️ [Validation] Sections manquantes: ${missingCount}/8, Mots: ${wordCount}/1500`);
+      console.warn(`⚠️ [Validation] Analyse INCOMPLÈTE - Sections manquantes (${missingSections.length}/9): ${missingSections.join(', ')}, Mots: ${wordCount}/1200`);
+    } else if (missingSections.length > 0) {
+      console.log(`✓ [Validation] Analyse acceptée avec ${missingSections.length} section manquante: ${missingSections.join(', ')}, Mots: ${wordCount}`);
+    } else {
+      console.log(`✅ [Validation] Analyse COMPLÈTE - Toutes les 9 sections présentes, Mots: ${wordCount}`);
     }
-    
+
     return isComplete;
   }
   
@@ -1013,6 +1026,24 @@ Comment puis-je t'aider ? 🚀`;
 
         emmaResponse = emmaResponseData;
         console.log(`[Chat API] Emma response reçue - Model: ${emmaResponse.model}, Tools: ${emmaResponse.tools_used?.length || 0}`);
+
+        // ✅ VALIDATION: Vérifier la complétude de la réponse pour comprehensive_analysis
+        if (forcedIntent?.intent === 'comprehensive_analysis') {
+          const isComplete = validateResponseCompleteness(
+            emmaResponse.response,
+            'comprehensive_analysis',
+            forcedIntent
+          );
+
+          if (!isComplete) {
+            console.error(`❌ [Validation] RÉPONSE INCOMPLÈTE détectée pour comprehensive_analysis`);
+            console.error(`   → Longueur: ${emmaResponse.response.length} chars`);
+            console.error(`   → Mots: ${emmaResponse.response.split(/\s+/).length}`);
+            console.error(`   → Model: ${emmaResponse.model}`);
+            console.error(`   → Le prompt comprehensive_analysis n'a pas été suivi correctement`);
+            // Note: On laisse passer la réponse mais on log l'erreur pour diagnostic
+          }
+        }
 
       } catch (error) {
         console.error('[Chat API] Erreur appel emma-agent:', error);

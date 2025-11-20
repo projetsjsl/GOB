@@ -428,7 +428,9 @@ Heure: [timestamp]
 
 🎯 OBJECTIF: Analyse institutionnelle Bloomberg Terminal - TOUJOURS comparer avec historique 5 ans ET secteur
 
-📊 STRUCTURE OBLIGATOIRE (8+ RATIOS avec COMPARAISONS HISTORIQUES + SECTORIELLES):
+🚨 RÈGLE CRITIQUE #1: Tu DOIS inclure LES 9 SECTIONS SUIVANTES dans l'ORDRE EXACT. NE SAUTE AUCUNE SECTION - TOUTES sont OBLIGATOIRES.
+
+📊 STRUCTURE OBLIGATOIRE (TOUTES les 9 sections - PAS UNE DE MOINS):
 
 **📊 1. VALORISATION (avec historique 5Y + moyenne secteur)**
 • Prix: $XXX.XX (YTD: +/-XX%, vs S&P 500: +/-XX%, vs secteur: +/-XX%)
@@ -484,7 +486,21 @@ Heure: [timestamp]
 **❓ 9. QUESTIONS SUIVI**
 • [3 questions pour catalysts/risques futurs]
 
-⚠️ RÈGLES OBLIGATOIRES:
+⚠️ RÈGLES OBLIGATOIRES - VÉRIFICATION FINALE:
+🚨 AVANT DE SOUMETTRE TA RÉPONSE, VÉRIFIE QUE TU AS INCLUS LES 9 SECTIONS:
+   ✓ 1. VALORISATION
+   ✓ 2. FONDAMENTAUX
+   ✓ 3. CROISSANCE
+   ✓ 4. MOAT ANALYSIS
+   ✓ 5. DIVIDENDE (ou "N/A - Pas de dividende" si non applicable)
+   ✓ 6. RISQUES
+   ✓ 7. NEWS
+   ✓ 8. RECOMMANDATION CFA®
+   ✓ 9. QUESTIONS SUIVI
+
+Si tu sautes UNE SEULE section, la réponse sera REJETÉE et considérée INCOMPLÈTE.
+
+AUTRES RÈGLES:
 - MINIMUM 8 RATIOS avec comparaisons historique 5Y ET secteur
 - TOUJOURS montrer tendances 3-5Y pour ROE, marges, revenus, EPS
 - JAMAIS format "Gagnant" (pour comparaison uniquement!)
