@@ -550,7 +550,7 @@ function isTestPhoneNumber(phoneNumber) {
   
   const cleaned = phoneNumber.trim().replace(/^=/, ''); // Enlever = au début
   
-  // Patterns de numéros de test communs
+  // Patterns de numéros de test communs (SEULEMENT numéros 555)
   const testPatterns = [
     /^\+1555\d{7}$/,        // +1555XXXXXXX (US test numbers)
     /^\+15551\d{6}$/,       // +15551XXXXXX (US test numbers)
@@ -558,7 +558,7 @@ function isTestPhoneNumber(phoneNumber) {
     /^\+1555111\d{4}$/,     // +1555111XXXX (US test numbers)
     /^\+1555222\d{4}$/,     // +1555222XXXX (US test numbers)
     /^\+1555987\d{4}$/,     // +1555987XXXX (US test numbers)
-    /^\+1\d{10}$/,          // +1XXXXXXXXXX (US format, mais peut être test)
+    // ✅ FIX: Removed /^\+1\d{10}$/ - was matching ALL US numbers as test!
   ];
   
   // Vérifier si le numéro correspond à un pattern de test
