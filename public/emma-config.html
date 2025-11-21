@@ -729,11 +729,12 @@
         }
 
         /**
-         * Wrapper SMS avec template visuel
+         * Wrapper SMS avec template visuel (pas de limite, multi-SMS Twilio)
          */
         function wrapSmsPreview(data) {
+            const isLong = data.smsCount > 5;
             return `
-                <div style="background:#1a1a1a;color:white;border-radius:20px;padding:16px;max-width:320px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;">
+                <div style="background:#1a1a1a;color:white;border-radius:20px;padding:16px;max-width:340px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #333;">
                         <span style="font-size:28px;">👩🏻</span>
                         <div>
@@ -741,12 +742,13 @@
                             <p style="margin:0;font-size:11px;color:#888;">+1 438-544-EMMA</p>
                         </div>
                     </div>
-                    <div style="white-space:pre-wrap;line-height:1.5;">${data.text}</div>
-                    ${data.isOverLimit ? '<p style="color:#f87171;font-size:11px;margin-top:10px;">⚠️ Tronqué à 3500 chars</p>' : ''}
-                    <div style="margin-top:12px;padding-top:10px;border-top:1px solid #333;font-size:11px;color:#666;display:flex;justify-content:space-between;">
-                        <span>${data.chars} chars</span>
-                        <span>~${data.smsCount} SMS</span>
+                    <div style="white-space:pre-wrap;line-height:1.5;max-height:400px;overflow-y:auto;">${data.text}</div>
+                    <div style="margin-top:12px;padding-top:10px;border-top:1px solid #333;font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                        <span style="color:#888;">${data.chars} chars</span>
+                        <span style="color:${isLong ? '#fbbf24' : '#10b981'};">${data.smsCount} segments</span>
+                        <span style="color:#888;">${data.estimatedCost || ''}</span>
                     </div>
+                    ${isLong ? '<p style="color:#fbbf24;font-size:11px;margin-top:8px;">💡 Conseil: Réduire le contenu pour moins de segments</p>' : ''}
                 </div>
             `;
         }

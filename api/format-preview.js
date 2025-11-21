@@ -69,17 +69,21 @@ function generateEmailTemplate(content, type = 'morning') {
 
 /**
  * Génère le template SMS
+ * Note: Pas de limite - Twilio gère automatiquement le multi-SMS
  */
 function generateSmsTemplate(content) {
   const sms = adaptForSMS(content, {});
   const chars = sms.length;
-  const smsCount = Math.ceil(chars / 160);
+  // SMS standard = 160 chars (GSM-7) ou 70 chars (UCS-2 avec emojis)
+  // On utilise 153 car SMS concaténés = 153 chars utiles par segment
+  const smsCount = Math.ceil(chars / 153);
 
   return {
     text: sms,
     chars,
     smsCount,
-    isOverLimit: chars > 3500
+    segments: smsCount, // Alias pour clarté
+    estimatedCost: `~${(smsCount * 0.0079).toFixed(2)}$ USD` // Twilio pricing
   };
 }
 
