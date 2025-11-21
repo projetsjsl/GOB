@@ -1,1624 +1,1463 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- 🔇 INTERCEPTION CONSOLE ERRORS (extensions, etc.) -->
+    <script>
+        (function() {
+            'use strict';
+            const originalWarn = console.warn;
+            const originalError = console.error;
+            console.warn = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('cdn.tailwindcss.com') || message.includes('should not be used in production')) return;
+                originalWarn.apply(console, args);
+            };
+            console.error = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('share-modal') || message.includes('chrome-extension') || message.includes('extension://')) return;
+                originalError.apply(console, args);
+            };
+            window.onerror = function(message, source) {
+                if (!source) return true;
+                if (String(source).includes('extension://')) return true;
+                return false;
+            };
+        })();
+    </script>
+
+    <!-- 💾 SAFE STORAGE WRAPPER -->
+    <script>
+        (function() {
+            'use strict';
+            const storageAvailable = (type) => {
+                try {
+                    const storage = window[type];
+                    const test = '__test__';
+                    storage.setItem(test, test);
+                    storage.removeItem(test);
+                    return true;
+                } catch (e) { return false; }
+            };
+            const localAvail = storageAvailable('localStorage');
+            const mem = {};
+            const safeLocal = {
+                getItem: (k) => { try { return localAvail ? localStorage.getItem(k) : (mem['l_'+k]||null); } catch(e) { return mem['l_'+k]||null; }},
+                setItem: (k,v) => { try { localAvail ? localStorage.setItem(k,v) : (mem['l_'+k]=String(v)); } catch(e) { mem['l_'+k]=String(v); }},
+                removeItem: (k) => { try { localAvail ? localStorage.removeItem(k) : delete mem['l_'+k]; } catch(e) { delete mem['l_'+k]; }}
+            };
+            if (!localAvail) { try { Object.defineProperty(window, 'localStorage', {value: safeLocal, writable: false}); } catch(e) { window.safeLocalStorage = safeLocal; }}
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emma Config - Interface Améliorée</title>
+    <title>Emma Config - Gestion Prompts & Variables</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            plugins: []
+        }
+    </script>
     <style>
-        /* Animations & Transitions */
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        /* Preview formatting (remplace prose) */
+        .preview-content { font-size: 0.9rem; line-height: 1.6; }
+        .preview-content h1 { font-size: 1.4rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #1e3a8a; }
+        .preview-content h2 { font-size: 1.2rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #1e40af; }
+        .preview-content h3 { font-size: 1.05rem; font-weight: 600; margin: 0.75rem 0 0.5rem; color: #3730a3; }
+        .preview-content p { margin-bottom: 0.5rem; }
+        .preview-content strong { font-weight: 600; color: #1f2937; }
+        .preview-content .section-header { display: block; font-weight: 700; font-size: 1.1rem; margin: 1rem 0 0.5rem; padding: 0.5rem; background: linear-gradient(90deg, #e0e7ff 0%, transparent 100%); border-left: 3px solid #4f46e5; border-radius: 0 4px 4px 0; }
+        .preview-content .emoji-header { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.25rem; color: #374151; }
+        .preview-content ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        .preview-content li { margin-bottom: 0.25rem; list-style-type: disc; }
+        .preview-content .instruction { background: #fef3c7; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; font-size: 0.85rem; }
+        .preview-content .warning { background: #fee2e2; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; color: #991b1b; }
+        .preview-content .example { background: #f0fdf4; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; font-family: monospace; font-size: 0.8rem; }
+        .preview-content code { background: #f3f4f6; padding: 0.1rem 0.3rem; border-radius: 3px; font-family: monospace; font-size: 0.85em; }
+    </style>
+    <style>
+        .config-item {
+            transition: all 0.2s ease;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .config-item:hover {
+            background: #f3f4f6;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .config-item.active {
+            background: #dbeafe;
+            border-left: 3px solid #3b82f6;
         }
-        @keyframes pulse-success {
-            0%, 100% { background-color: #10b981; }
-            50% { background-color: #34d399; }
+        .empty-badge {
+            background: #fef3c7;
+            color: #92400e;
         }
-
-        .toast {
-            animation: slideIn 0.3s ease-out;
+        .override-badge {
+            background: #ddd6fe;
+            color: #5b21b6;
         }
-        .collapsible-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .collapsible-content.expanded {
-            max-height: 2000px;
-        }
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-        .pulse-success {
-            animation: pulse-success 0.5s ease-in-out;
-        }
-
-        /* Boutons améliorés */
-        .btn {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        .btn:active::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        /* Toggle switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #cbd5e1;
-            transition: .3s;
-            border-radius: 24px;
-        }
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
-        input:checked + .toggle-slider {
-            background-color: #3b82f6;
-        }
-        input:checked + .toggle-slider:before {
-            transform: translateX(20px);
-        }
-
-        /* Color picker enhanced */
-        .color-picker-group {
-            position: relative;
-        }
-        .color-preview {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            border: 2px solid #e5e7eb;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .color-preview:hover {
-            transform: scale(1.1);
-            border-color: #3b82f6;
-        }
-
-        /* Section collapsible */
-        .section-header {
-            cursor: pointer;
-            user-select: none;
-        }
-        .section-header:hover {
-            background-color: #f9fafb;
-        }
-        .section-icon {
-            transition: transform 0.3s ease;
-        }
-        .section-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        /* Tooltip personnalisé */
-        .tooltip {
-            position: relative;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            background-color: #1f2937;
-            color: white;
-            text-align: left;
-            padding: 8px 12px;
-            border-radius: 6px;
-            position: absolute;
-            z-index: 1000;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #1f2937 transparent transparent transparent;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Status indicator */
-        .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-        .status-saved { background-color: #10b981; }
-        .status-unsaved { background-color: #f59e0b; }
-        .status-error { background-color: #ef4444; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar: Liste des configurations -->
+        <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
+            <!-- Header Sidebar -->
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-xl font-bold text-gray-800">⚙️ Emma Config</h1>
+                <p class="text-xs text-gray-500 mt-1">Centre de configuration unifié</p>
 
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+                <!-- ONGLETS PRINCIPAUX -->
+                <div class="mt-3 flex rounded-lg bg-gray-100 p-1">
+                    <button id="tabPrompts" onclick="switchMainTab('prompts')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md bg-white shadow font-medium" title="Gérer les prompts et instructions d'Emma">
+                        📝 Prompts
+                    </button>
+                    <button id="tabDesign" onclick="switchMainTab('design')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Personnaliser le design des emails">
+                        🎨 Design
+                    </button>
+                    <button id="tabSms" onclick="switchMainTab('sms')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configurer les paramètres SMS">
+                        📱 SMS
+                    </button>
+                </div>
 
-    <!-- Status Bar -->
-    <div class="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <h1 class="text-xl font-bold text-gray-800">🤖 Emma Config</h1>
-                <div class="flex items-center text-sm">
-                    <span id="saveStatus" class="status-indicator status-saved"></span>
-                    <span id="saveStatusText" class="text-gray-600">Sauvegardé</span>
+                <!-- Recherche -->
+                <div class="mt-3">
+                    <input type="text" id="searchFilter" class="w-full text-xs px-2 py-1 border rounded" placeholder="🔍 Rechercher...">
+                </div>
+
+                <!-- Filtres -->
+                <div class="mt-2 grid grid-cols-2 gap-2">
+                    <select id="sectionFilter" class="text-xs px-2 py-1 border rounded">
+                        <option value="">📂 Toutes sections</option>
+                        <option value="prompts">📝 Prompts</option>
+                        <option value="variables">⚙️ Variables</option>
+                        <option value="directives">🎯 Directives</option>
+                        <option value="routing">🧭 Routage</option>
+                    </select>
+
+                    <select id="channelFilter" class="text-xs px-2 py-1 border rounded">
+                        <option value="">🌐 Tous canaux</option>
+                        <option value="web">💬 Web</option>
+                        <option value="sms">📱 SMS</option>
+                        <option value="email">📧 Email</option>
+                        <option value="messenger">💬 Messenger</option>
+                        <option value="multicanal">🌐 Multi</option>
+                    </select>
+                </div>
+
+                <!-- Tri -->
+                <div class="mt-2">
+                    <select id="sortFilter" class="w-full text-xs px-2 py-1 border rounded">
+                        <option value="name">🔤 Tri: Nom (A-Z)</option>
+                        <option value="name-desc">🔤 Tri: Nom (Z-A)</option>
+                        <option value="date">📅 Tri: Date (récent)</option>
+                        <option value="date-asc">📅 Tri: Date (ancien)</option>
+                        <option value="priority">⭐ Tri: Priorité</option>
+                    </select>
+                </div>
+
+                <!-- Boutons actions -->
+                <div class="mt-3 flex gap-2">
+                    <button id="refreshBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded transition">
+                        🔄
+                    </button>
+                    <button id="addBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-2 rounded transition">
+                        ➕
+                    </button>
+                    <button id="clearFilters" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white text-sm px-3 py-2 rounded transition">
+                        ✕
+                    </button>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button id="undoBtn" class="tooltip px-3 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition disabled:opacity-30" disabled>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
-                    <span class="tooltiptext">Annuler (Ctrl+Z)</span>
-                </button>
-                <button id="redoBtn" class="tooltip px-3 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition disabled:opacity-30" disabled>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path></svg>
-                    <span class="tooltiptext">Rétablir (Ctrl+Y)</span>
-                </button>
-                <div class="h-6 w-px bg-gray-300"></div>
-                <button id="previewToggle" class="tooltip px-3 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    <span class="tooltiptext">Aperçu temps réel</span>
-                </button>
+
+            <!-- Status -->
+            <div id="statusSidebar" class="hidden p-3 text-xs">
+                <p id="statusText"></p>
+            </div>
+
+            <!-- Liste des configs (scrollable) -->
+            <div class="flex-1 overflow-y-auto" id="configList">
+                <div class="p-4 text-center text-gray-500">
+                    <p class="text-sm">⏳ Chargement...</p>
+                </div>
+            </div>
+
+            <!-- Stats footer -->
+            <div class="p-3 border-t border-gray-200 bg-gray-50 text-xs text-gray-600">
+                <div class="flex justify-between">
+                    <span>Total: <strong id="totalCount">0</strong></span>
+                    <span>Actifs: <strong id="activeCount">0</strong></span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Tab Navigation -->
-        <div class="bg-white rounded-xl shadow-sm p-2 mb-6 inline-flex gap-1">
-            <button onclick="switchTab('design')" id="tabDesign" class="tab-btn px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 bg-blue-50 text-blue-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
-                Design Email
-            </button>
-            <button onclick="switchTab('sms')" id="tabSms" class="tab-btn px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 text-gray-600 hover:bg-gray-50">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                Config SMS
-            </button>
-            <button onclick="switchTab('prompts')" id="tabPrompts" class="tab-btn px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 text-gray-600 hover:bg-gray-50">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Prompts
-            </button>
-        </div>
-
-        <!-- Design Tab Content -->
-        <div id="designContent" class="space-y-6">
-
-            <!-- SECTION 1: Branding -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="section-header p-4 border-b flex justify-between items-center" onclick="toggleSection('branding')">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                        </div>
-                        <div>
-                            <h2 class="font-semibold text-gray-900">Identité de Marque</h2>
-                            <p class="text-sm text-gray-500">Logo, nom, slogan et identité visuelle</p>
-                        </div>
-                    </div>
-                    <svg id="brandingIcon" class="w-5 h-5 text-gray-400 section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+        <!-- Main Panel: Éditeur -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header Main -->
+            <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+                <div>
+                    <h2 id="editorTitle" class="text-2xl font-bold text-gray-800">Sélectionnez une configuration</h2>
+                    <p id="editorSubtitle" class="text-sm text-gray-500 mt-1"></p>
                 </div>
-                <div id="brandingSection" class="collapsible-content expanded">
-                    <div class="p-6 space-y-6">
-                        <!-- Avatar & Logo -->
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="space-y-3">
-                                <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                    Avatar Emma
-                                </label>
-                                <div class="flex gap-3">
-                                    <div id="avatarPreview" class="w-16 h-16 rounded-full border-2 border-gray-200 flex items-center justify-center bg-gray-50 overflow-hidden">
-                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                    </div>
-                                    <div class="flex-1 space-y-2">
-                                        <input type="url" id="avatarUrl" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://example.com/avatar.png">
-                                        <p class="text-xs text-gray-500">64x64px recommandé · Formats: PNG, JPG, WebP</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-3">
-                                <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    Logo Entreprise
-                                </label>
-                                <div class="flex gap-3">
-                                    <div id="logoPreview" class="w-16 h-16 rounded-lg border-2 border-gray-200 flex items-center justify-center bg-gray-50 overflow-hidden">
-                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    </div>
-                                    <div class="flex-1 space-y-2">
-                                        <input type="url" id="logoUrl" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://example.com/logo.png">
-                                        <p class="text-xs text-gray-500">150x40px recommandé · Fond transparent préféré</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Company Info -->
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Nom de l'entreprise</label>
-                                <input type="text" id="companyName" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="GOB Apps" value="GOB Apps">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Slogan / Tagline</label>
-                                <input type="text" id="tagline" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Intelligence Financière Propulsée par Emma IA" value="Intelligence Financière Propulsée par Emma IA">
-                            </div>
-                        </div>
-                    </div>
+                <div class="flex gap-2">
+                    <button id="saveBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition hidden">
+                        💾 Sauvegarder
+                    </button>
+                    <button id="deleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition hidden">
+                        🗑️ Supprimer
+                    </button>
                 </div>
             </div>
 
-            <!-- SECTION 2: Couleurs -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="section-header p-4 border-b flex justify-between items-center" onclick="toggleSection('colors')">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+            <!-- Editor Area -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- PROMPTS TAB CONTENT -->
+                <div id="promptsTabContent">
+                <div id="editorEmpty" class="flex items-center justify-center h-full text-gray-400">
+                    <div class="text-center">
+                        <svg class="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="text-xl">Sélectionnez une configuration dans la liste</p>
+                        <p class="text-sm mt-2">ou créez-en une nouvelle</p>
+                    </div>
+                </div>
+
+                <div id="editorContent" class="hidden max-w-4xl mx-auto">
+                    <!-- Metadata -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                            <input type="text" id="editSection" class="w-full px-3 py-2 border rounded-lg" readonly>
                         </div>
                         <div>
-                            <h2 class="font-semibold text-gray-900">Palette de Couleurs</h2>
-                            <p class="text-sm text-gray-500">Thème chromatique des emails et SMS</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Clé</label>
+                            <input type="text" id="editKey" class="w-full px-3 py-2 border rounded-lg" readonly>
                         </div>
                     </div>
-                    <svg id="colorsIcon" class="w-5 h-5 text-gray-400 section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div id="colorsSection" class="collapsible-content expanded">
-                    <div class="p-6">
-                        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <!-- Primary Color -->
-                            <div class="space-y-3">
-                                <label class="block text-sm font-medium text-gray-700">Couleur Primaire</label>
-                                <div class="color-picker-group flex items-center gap-3">
-                                    <input type="color" id="colorPrimary" value="#6366f1" class="color-preview">
-                                    <div class="flex-1">
-                                        <input type="text" id="colorPrimaryHex" value="#6366f1" class="w-full px-3 py-2 border rounded-lg text-sm font-mono" pattern="^#[0-9A-Fa-f]{6}$">
-                                        <p class="text-xs text-gray-500 mt-1">Headers, liens, accents</p>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Primary Dark -->
-                            <div class="space-y-3">
-                                <label class="block text-sm font-medium text-gray-700">Primaire Foncé</label>
-                                <div class="color-picker-group flex items-center gap-3">
-                                    <input type="color" id="colorPrimaryDark" value="#4f46e5" class="color-preview">
-                                    <div class="flex-1">
-                                        <input type="text" id="colorPrimaryDarkHex" value="#4f46e5" class="w-full px-3 py-2 border rounded-lg text-sm font-mono">
-                                        <p class="text-xs text-gray-500 mt-1">Titres, emphasis</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Primary Light -->
-                            <div class="space-y-3">
-                                <label class="block text-sm font-medium text-gray-700">Primaire Clair</label>
-                                <div class="color-picker-group flex items-center gap-3">
-                                    <input type="color" id="colorPrimaryLight" value="#8b5cf6" class="color-preview">
-                                    <div class="flex-1">
-                                        <input type="text" id="colorPrimaryLightHex" value="#8b5cf6" class="w-full px-3 py-2 border rounded-lg text-sm font-mono">
-                                        <p class="text-xs text-gray-500 mt-1">Bordures, highlights</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Text Color -->
-                            <div class="space-y-3">
-                                <label class="block text-sm font-medium text-gray-700">Texte Principal</label>
-                                <div class="color-picker-group flex items-center gap-3">
-                                    <input type="color" id="colorText" value="#1f2937" class="color-preview">
-                                    <div class="flex-1">
-                                        <input type="text" id="colorTextHex" value="#1f2937" class="w-full px-3 py-2 border rounded-lg text-sm font-mono">
-                                        <p class="text-xs text-gray-500 mt-1">Corps du texte</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Color Presets -->
-                        <div class="mt-6 pt-6 border-t">
-                            <label class="block text-sm font-medium text-gray-700 mb-3">Thèmes Prédéfinis</label>
-                            <div class="flex gap-2">
-                                <button onclick="applyColorPreset('blue')" class="tooltip px-4 py-2 rounded-lg border-2 border-blue-500 bg-blue-50 hover:bg-blue-100 transition flex items-center gap-2">
-                                    <div class="flex gap-1">
-                                        <div class="w-4 h-4 rounded-full bg-blue-600"></div>
-                                        <div class="w-4 h-4 rounded-full bg-blue-500"></div>
-                                        <div class="w-4 h-4 rounded-full bg-blue-400"></div>
-                                    </div>
-                                    <span class="text-sm font-medium">Bleu</span>
-                                    <span class="tooltiptext">Thème professionnel bleu</span>
-                                </button>
-                                <button onclick="applyColorPreset('purple')" class="tooltip px-4 py-2 rounded-lg border-2 border-purple-300 hover:bg-purple-50 transition flex items-center gap-2">
-                                    <div class="flex gap-1">
-                                        <div class="w-4 h-4 rounded-full bg-purple-600"></div>
-                                        <div class="w-4 h-4 rounded-full bg-purple-500"></div>
-                                        <div class="w-4 h-4 rounded-full bg-purple-400"></div>
-                                    </div>
-                                    <span class="text-sm font-medium">Violet</span>
-                                    <span class="tooltiptext">Thème créatif violet</span>
-                                </button>
-                                <button onclick="applyColorPreset('green')" class="tooltip px-4 py-2 rounded-lg border-2 border-green-300 hover:bg-green-50 transition flex items-center gap-2">
-                                    <div class="flex gap-1">
-                                        <div class="w-4 h-4 rounded-full bg-green-600"></div>
-                                        <div class="w-4 h-4 rounded-full bg-green-500"></div>
-                                        <div class="w-4 h-4 rounded-full bg-green-400"></div>
-                                    </div>
-                                    <span class="text-sm font-medium">Vert</span>
-                                    <span class="tooltiptext">Thème nature vert</span>
-                                </button>
-                                <button onclick="applyColorPreset('orange')" class="tooltip px-4 py-2 rounded-lg border-2 border-orange-300 hover:bg-orange-50 transition flex items-center gap-2">
-                                    <div class="flex gap-1">
-                                        <div class="w-4 h-4 rounded-full bg-orange-600"></div>
-                                        <div class="w-4 h-4 rounded-full bg-orange-500"></div>
-                                        <div class="w-4 h-4 rounded-full bg-orange-400"></div>
-                                    </div>
-                                    <span class="text-sm font-medium">Orange</span>
-                                    <span class="tooltiptext">Thème énergique orange</span>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <input type="text" id="editDescription" class="w-full px-3 py-2 border rounded-lg" placeholder="Description de la configuration">
                     </div>
-                </div>
-            </div>
 
-            <!-- SECTION 3: Header Configuration -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="section-header p-4 border-b flex justify-between items-center" onclick="toggleSection('header')">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <select id="editType" class="w-full px-3 py-2 border rounded-lg">
+                                <option value="string">String</option>
+                                <option value="number">Number</option>
+                                <option value="boolean">Boolean</option>
+                                <option value="json">JSON</option>
+                            </select>
                         </div>
                         <div>
-                            <h2 class="font-semibold text-gray-900">En-tête Email</h2>
-                            <p class="text-sm text-gray-500">Configuration du header des emails</p>
-                        </div>
-                    </div>
-                    <svg id="headerIcon" class="w-5 h-5 text-gray-400 section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div id="headerSection" class="collapsible-content expanded">
-                    <div class="p-6 space-y-6">
-                        <!-- Header Options -->
-                        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                    <span class="text-sm font-medium">Avatar</span>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="showAvatar" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <span class="text-sm font-medium">Date</span>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="showDate" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                                    <span class="text-sm font-medium">Édition</span>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="showEdition" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Header Styling -->
-                        <div class="grid md:grid-cols-2 gap-6 pt-4 border-t">
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Taille Police Titre</label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="headerFontSize" min="20" max="40" value="32" class="flex-1">
-                                    <span id="headerFontSizeValue" class="text-sm font-mono text-gray-600 w-12">32px</span>
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Padding Vertical</label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="headerPadding" min="16" max="64" value="32" class="flex-1">
-                                    <span id="headerPaddingValue" class="text-sm font-mono text-gray-600 w-12">32px</span>
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Arrondi Coins (Border Radius)</label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="headerBorderRadius" min="0" max="24" value="12" class="flex-1">
-                                    <span id="headerBorderRadiusValue" class="text-sm font-mono text-gray-600 w-12">12px</span>
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Alignement Texte</label>
-                                <select id="headerTextAlign" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="left">Gauche</option>
-                                    <option value="center" selected>Centre</option>
-                                    <option value="right">Droite</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 4: Footer Configuration -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="section-header p-4 border-b flex justify-between items-center" onclick="toggleSection('footer')">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                            <input type="text" id="editCategory" class="w-full px-3 py-2 border rounded-lg" placeholder="prompt, variable, etc.">
                         </div>
                         <div>
-                            <h2 class="font-semibold text-gray-900">Pied de Page</h2>
-                            <p class="text-sm text-gray-500">Footer, disclaimer, copyright et liens</p>
-                        </div>
-                    </div>
-                    <svg id="footerIcon" class="w-5 h-5 text-gray-400 section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div id="footerSection" class="collapsible-content expanded">
-                    <div class="p-6 space-y-6">
-                        <!-- Footer Toggles -->
-                        <div class="grid sm:grid-cols-2 gap-4">
-                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <span class="text-sm font-medium">Afficher Logo</span>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="showLogo" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                    <span class="text-sm font-medium">Disclaimer</span>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="showDisclaimer" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Footer Texts -->
-                        <div class="space-y-4 pt-4 border-t">
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Texte du Disclaimer</label>
-                                <textarea id="disclaimerText" rows="3" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ce briefing est généré automatiquement par Emma IA à des fins informatives uniquement.">Ce briefing est généré automatiquement par Emma IA à des fins informatives uniquement.</textarea>
-                                <p class="text-xs text-gray-500">Texte légal affiché en petits caractères</p>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">Copyright</label>
-                                <input type="text" id="copyrightText" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="© 2025 GOB Apps - Tous droits réservés" value="© 2025 GOB Apps - Tous droits réservés">
-                            </div>
-                        </div>
-
-                        <!-- Social Links (NEW) -->
-                        <div class="space-y-4 pt-4 border-t">
-                            <div class="flex items-center justify-between">
-                                <label class="block text-sm font-medium text-gray-700">Liens Réseaux Sociaux</label>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="showSocialLinks">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div id="socialLinksContainer" class="grid md:grid-cols-2 gap-4 opacity-50 pointer-events-none">
-                                <div class="space-y-2">
-                                    <label class="block text-xs text-gray-600">LinkedIn</label>
-                                    <input type="url" id="socialLinkedIn" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="https://linkedin.com/company/...">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="block text-xs text-gray-600">Twitter / X</label>
-                                    <input type="url" id="socialTwitter" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="https://twitter.com/...">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="block text-xs text-gray-600">Facebook</label>
-                                    <input type="url" id="socialFacebook" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="https://facebook.com/...">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="block text-xs text-gray-600">Site Web</label>
-                                    <input type="url" id="socialWebsite" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="https://...">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 5: Live Preview -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="section-header p-4 border-b flex justify-between items-center" onclick="toggleSection('preview')">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg flex items-center justify-center text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Canal</label>
+                            <select id="editChannel" class="w-full px-3 py-2 border rounded-lg">
+                                <option value="">Tous canaux</option>
+                                <option value="web">💬 Web</option>
+                                <option value="sms">📱 SMS</option>
+                                <option value="email">📧 Email</option>
+                                <option value="messenger">💬 Messenger</option>
+                                <option value="multicanal">🌐 Multicanal</option>
+                            </select>
                         </div>
                         <div>
-                            <h2 class="font-semibold text-gray-900">Aperçu en Direct</h2>
-                            <p class="text-sm text-gray-500">Preview temps réel de l'email formaté</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+                            <input type="number" id="editPriority" class="w-full px-3 py-2 border rounded-lg" value="0">
                         </div>
                     </div>
-                    <svg id="previewIcon" class="w-5 h-5 text-gray-400 section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div id="previewSection" class="collapsible-content expanded">
-                    <div class="p-6 space-y-4">
-                        <!-- Preview Controls -->
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex gap-2">
-                                <button id="refreshPreviewBtn" onclick="updatePreview(true)" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                    Actualiser
-                                </button>
-                                <select id="previewType" onchange="updatePreview(true)" class="px-3 py-2 border rounded-lg text-sm">
-                                    <option value="morning">Briefing Matin</option>
-                                    <option value="midday">Briefing Midi</option>
-                                    <option value="evening">Briefing Soir</option>
-                                </select>
-                            </div>
-                            <div class="text-sm text-gray-500">
-                                <span id="previewStatus">●</span> <span id="previewStatusText">Prêt</span>
-                            </div>
-                        </div>
 
-                        <!-- Preview Container -->
-                        <div id="previewContainer" class="border-2 border-gray-200 rounded-lg bg-gray-50 p-4 min-h-[500px] max-h-[700px] overflow-auto">
-                            <div id="previewContent" class="bg-white">
-                                <p class="text-gray-400 text-center py-20">Cliquez sur "Actualiser" pour générer le preview</p>
-                            </div>
-                        </div>
-
-                        <!-- Preview Info -->
-                        <div class="flex items-center gap-4 text-xs text-gray-500 pt-2">
+                    <!-- Valeur avec Preview Split-View -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700">Valeur / Code du Prompt</label>
                             <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Le preview utilise /api/format-preview avec votre config actuelle
+                                <!-- Badges canaux applicables -->
+                                <div id="channelBadges" class="flex gap-1">
+                                    <span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-700">💻 Web</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">📱 SMS</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-700">📧 Email</span>
+                                </div>
+                                <!-- Mode Preview -->
+                                <select id="previewMode" class="text-xs px-2 py-1 border rounded bg-gray-50">
+                                    <option value="web">👁️ Preview: Web</option>
+                                    <option value="sms">👁️ Preview: SMS</option>
+                                    <option value="email">👁️ Preview: Email</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Split View: Code | Preview -->
+                        <div class="grid grid-cols-2 gap-4 border rounded-lg overflow-hidden">
+                            <!-- Colonne gauche: Code -->
+                            <div class="border-r">
+                                <div class="bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 border-b">
+                                    📝 Code / Prompt
+                                </div>
+                                <textarea id="editValue" rows="20" class="w-full px-3 py-2 font-mono text-sm border-0 resize-none focus:ring-0" placeholder="Entrez la valeur..."></textarea>
+                            </div>
+
+                            <!-- Colonne droite: Preview -->
+                            <div class="bg-gray-50">
+                                <div class="bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 border-b flex items-center justify-between">
+                                    <span>👁️ Preview <span id="previewModeLabel" class="text-blue-600">(Web)</span></span>
+                                    <span id="charCount" class="text-gray-400">0 chars</span>
+                                </div>
+                                <div id="previewArea" class="p-3 overflow-y-auto" style="height: 480px;">
+                                    <p class="text-gray-400 italic">Le preview s'affiche ici en temps réel...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="flex justify-between text-xs text-gray-500 mt-2">
+                            <span>💡 Pour JSON: utilisez un format valide avec indentation</span>
+                            <div class="flex gap-4">
+                                <span>📏 <span id="wordCount">0</span> mots</span>
+                                <span>📄 <span id="lineCount">0</span> lignes</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Action Buttons -->
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex flex-wrap gap-3 justify-between">
-                    <div class="flex gap-3">
-                        <button id="saveDesignBtn" class="btn px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-medium shadow-lg shadow-green-500/30 transition flex items-center gap-2">
-                            <svg id="saveIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                            <span id="saveBtnText">Sauvegarder la Configuration</span>
-                        </button>
-
-                        <button id="resetDesignBtn" class="tooltip btn px-6 py-3 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 rounded-lg font-medium transition flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            <span>Réinitialiser</span>
-                            <span class="tooltiptext">Restaurer les valeurs par défaut</span>
-                        </button>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <button id="exportHtmlBtn" class="tooltip btn px-6 py-3 border-2 border-blue-300 hover:border-blue-400 hover:bg-blue-50 text-blue-600 rounded-lg font-medium transition flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                            <span>Exporter HTML</span>
-                            <span class="tooltiptext">Télécharger un exemple d'email</span>
-                        </button>
-
-                        <button id="testEmailBtn" class="tooltip btn px-6 py-3 border-2 border-purple-300 hover:border-purple-400 hover:bg-purple-50 text-purple-600 rounded-lg font-medium transition flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            <span>Envoyer Test</span>
-                            <span class="tooltiptext">Recevoir un email de test</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SMS Tab Content -->
-        <div id="smsContent" class="hidden space-y-6">
-
-            <!-- SECTION SMS: Configuration -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    <!-- Metadata info -->
+                    <div class="grid grid-cols-2 gap-4 text-xs text-gray-500 border-t pt-4">
+                        <div>
+                            <p>Dernière modification: <span id="editUpdatedAt">-</span></p>
+                            <p>Par: <span id="editUpdatedBy">-</span></p>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-bold">Configuration SMS</h2>
-                            <p class="text-blue-100 mt-1">Paramètres d'envoi et formatage des SMS</p>
+                            <p>Version: <span id="editVersion">-</span></p>
+                            <p>Override: <span id="editIsOverride">-</span></p>
+                        </div>
+                    </div>
+                </div>
+                </div><!-- END promptsTabContent -->
+
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- DESIGN TAB CONTENT - Configuration visuelle des emails      -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <div id="designTabContent" class="hidden max-w-4xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <!-- Header -->
+                        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6">
+                            <h2 class="text-2xl font-bold">🎨 Design des Emails</h2>
+                            <p class="text-purple-100 mt-1">Personnalisez l'apparence des emails envoyés par Emma</p>
+                        </div>
+
+                        <div class="p-6 space-y-8">
+                            <!-- SECTION: Branding -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">🏷️</span>
+                                    Branding
+                                </h3>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Avatar Emma
+                                            <span class="ml-1 text-gray-400 cursor-help" title="URL de l'image avatar d'Emma (64x64px recommandé)">ⓘ</span>
+                                        </label>
+                                        <input type="url" id="designAvatarUrl" class="w-full px-3 py-2 border rounded-lg" placeholder="https://...">
+                                        <p class="text-xs text-gray-500 mt-1">Image affichée dans le header des emails</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Logo JSLai
+                                            <span class="ml-1 text-gray-400 cursor-help" title="URL du logo affiché dans le footer">ⓘ</span>
+                                        </label>
+                                        <input type="url" id="designLogoUrl" class="w-full px-3 py-2 border rounded-lg" placeholder="https://...">
+                                        <p class="text-xs text-gray-500 mt-1">Logo affiché dans le pied de page</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom de l'entreprise</label>
+                                        <input type="text" id="designCompanyName" class="w-full px-3 py-2 border rounded-lg" placeholder="GOB Apps">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Slogan</label>
+                                        <input type="text" id="designTagline" class="w-full px-3 py-2 border rounded-lg" placeholder="Intelligence Financière...">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- SECTION: Couleurs -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">🎨</span>
+                                    Couleurs
+                                </h3>
+                                <div class="grid grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Primaire</label>
+                                        <div class="flex gap-2">
+                                            <input type="color" id="designColorPrimary" class="w-12 h-10 rounded cursor-pointer" value="#6366f1">
+                                            <input type="text" id="designColorPrimaryText" class="flex-1 px-2 py-1 border rounded text-sm" value="#6366f1">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Primaire foncé</label>
+                                        <div class="flex gap-2">
+                                            <input type="color" id="designColorPrimaryDark" class="w-12 h-10 rounded cursor-pointer" value="#4f46e5">
+                                            <input type="text" id="designColorPrimaryDarkText" class="flex-1 px-2 py-1 border rounded text-sm" value="#4f46e5">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Primaire clair</label>
+                                        <div class="flex gap-2">
+                                            <input type="color" id="designColorPrimaryLight" class="w-12 h-10 rounded cursor-pointer" value="#8b5cf6">
+                                            <input type="text" id="designColorPrimaryLightText" class="flex-1 px-2 py-1 border rounded text-sm" value="#8b5cf6">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Texte</label>
+                                        <div class="flex gap-2">
+                                            <input type="color" id="designColorText" class="w-12 h-10 rounded cursor-pointer" value="#1f2937">
+                                            <input type="text" id="designColorTextValue" class="flex-1 px-2 py-1 border rounded text-sm" value="#1f2937">
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- SECTION: Header -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">📧</span>
+                                    Header des emails
+                                </h3>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="designShowAvatar" class="w-4 h-4 rounded" checked>
+                                        <label class="text-sm text-gray-700">Afficher l'avatar</label>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="designShowDate" class="w-4 h-4 rounded" checked>
+                                        <label class="text-sm text-gray-700">Afficher la date</label>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="designShowEdition" class="w-4 h-4 rounded" checked>
+                                        <label class="text-sm text-gray-700">Afficher l'édition</label>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- SECTION: Footer -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">📝</span>
+                                    Footer des emails
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" id="designShowLogo" class="w-4 h-4 rounded" checked>
+                                            <label class="text-sm text-gray-700">Afficher le logo</label>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" id="designShowDisclaimer" class="w-4 h-4 rounded" checked>
+                                            <label class="text-sm text-gray-700">Afficher le disclaimer</label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Texte de disclaimer</label>
+                                        <textarea id="designDisclaimer" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Ce briefing est généré automatiquement..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Copyright</label>
+                                        <input type="text" id="designCopyright" class="w-full px-3 py-2 border rounded-lg" placeholder="© 2025 GOB Apps">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- PREVIEW -->
+                            <section class="border rounded-lg p-4 bg-gray-50">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">👁️</span>
+                                    Aperçu en direct
+                                </h3>
+                                <div id="designPreview" class="bg-white rounded-lg shadow-inner p-4 min-h-[300px]">
+                                    <p class="text-gray-400 text-center">Le preview s'affichera ici...</p>
+                                </div>
+                            </section>
+
+                            <!-- BOUTONS D'ACTION -->
+                            <div class="flex justify-between items-center pt-4 border-t">
+                                <div class="flex gap-2">
+                                    <button onclick="resetDesignToDefaults()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2 group" title="Réinitialise tous les paramètres aux valeurs par défaut">
+                                        🔄 <span>Réinitialiser</span>
+                                        <span class="hidden group-hover:block absolute mt-12 ml-[-50px] bg-gray-800 text-white text-xs px-2 py-1 rounded">Revenir aux valeurs par défaut</span>
+                                    </button>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="cancelDesignChanges()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2" title="Annuler les modifications non sauvegardées">
+                                        ❌ <span>Annuler</span>
+                                    </button>
+                                    <button onclick="saveDesignConfig()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2" title="Sauvegarder les modifications - Appliqué immédiatement à tous les emails">
+                                        💾 <span>Sauvegarder</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="p-6 space-y-8">
-                    <!-- Limites SMS -->
-                    <section class="border rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <span class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">⚠️</span>
-                            Limites et Segments
-                        </h3>
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Segments Maximum
-                                    <span class="ml-1 text-gray-400 cursor-help" title="Nombre maximum de segments SMS autorisés (1 segment = 153 chars)">ⓘ</span>
-                                </label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="smsMaxSegments" min="1" max="20" value="10" class="flex-1">
-                                    <span id="smsMaxSegmentsValue" class="text-sm font-mono text-gray-600 w-12">10</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Coût estimé: <span id="smsMaxCost">~$0.08 USD</span></p>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Seuil d'Avertissement
-                                    <span class="ml-1 text-gray-400 cursor-help" title="Affiche un warning si le SMS dépasse ce nombre de segments">ⓘ</span>
-                                </label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="smsWarningThreshold" min="1" max="15" value="5" class="flex-1">
-                                    <span id="smsWarningThresholdValue" class="text-sm font-mono text-gray-600 w-12">5</span>
-                                </div>
-                                <p class="text-xs text-gray-500">Alerte si > 5 segments</p>
-                            </div>
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- SMS TAB CONTENT - Configuration des SMS                     -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <div id="smsTabContent" class="hidden max-w-4xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <!-- Header -->
+                        <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white p-6">
+                            <h2 class="text-2xl font-bold">📱 Configuration SMS</h2>
+                            <p class="text-green-100 mt-1">Paramètres pour les messages SMS via Twilio</p>
                         </div>
-                    </section>
 
-                    <!-- Formatage SMS -->
-                    <section class="border rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <span class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">✨</span>
-                            Format et Style
-                        </h3>
-                        <div class="space-y-6">
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700">Signature</label>
-                                    <input type="text" id="smsSignature" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="- Emma IA" value="- Emma IA">
-                                    <p class="text-xs text-gray-500">Texte ajouté à la fin de chaque SMS</p>
-                                </div>
-
-                                <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700">Préfixe (optionnel)</label>
-                                    <input type="text" id="smsPrefix" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Emma:">
-                                    <p class="text-xs text-gray-500">Texte au début du SMS (ex: "Emma:")</p>
-                                </div>
-                            </div>
-
-                            <div class="grid md:grid-cols-3 gap-4">
-                                <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-2xl">📊</span>
-                                        <span class="text-sm font-medium">Emojis de Sections</span>
+                        <div class="p-6 space-y-6">
+                            <!-- Paramètres SMS -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">⚙️</span>
+                                    Paramètres généraux
+                                </h3>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Segments max
+                                            <span class="ml-1 text-gray-400 cursor-help" title="Nombre maximum de segments SMS (1 segment = ~153 caractères)">ⓘ</span>
+                                        </label>
+                                        <input type="number" id="smsMaxSegments" class="w-full px-3 py-2 border rounded-lg" value="10" min="1" max="50">
+                                        <p class="text-xs text-gray-500 mt-1">Twilio gère automatiquement les multi-SMS</p>
                                     </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="smsKeepEmojis" checked>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-
-                                <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-2xl">⚠️</span>
-                                        <span class="text-sm font-medium">Warning Segments</span>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Seuil d'avertissement
+                                            <span class="ml-1 text-gray-400 cursor-help" title="Affiche un avertissement au-delà de ce nombre de segments">ⓘ</span>
+                                        </label>
+                                        <input type="number" id="smsWarningThreshold" class="w-full px-3 py-2 border rounded-lg" value="5" min="1" max="20">
                                     </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="smsShowWarning" checked>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-
-                                <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-2xl">📏</span>
-                                        <span class="text-sm font-medium">Compteur Chars</span>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Signature</label>
+                                        <input type="text" id="smsSignature" class="w-full px-3 py-2 border rounded-lg" value="- Emma IA">
+                                        <p class="text-xs text-gray-500 mt-1">Ajoutée à la fin de chaque SMS</p>
                                     </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="smsShowCounter" checked>
-                                        <span class="toggle-slider"></span>
-                                    </label>
+                                    <div class="flex flex-col justify-center gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" id="smsKeepSectionEmojis" class="w-4 h-4 rounded" checked>
+                                            <label class="text-sm text-gray-700">Garder les emojis de section</label>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" id="smsShowWarning" class="w-4 h-4 rounded" checked>
+                                            <label class="text-sm text-gray-700">Afficher avertissement longueur</label>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </section>
+                            </section>
 
-                    <!-- Preview SMS -->
-                    <section class="border rounded-lg p-4 bg-gray-50">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">📱</span>
-                            Aperçu SMS
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-3 mb-3">
-                                <button onclick="updateSmsPreview()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                    Actualiser Preview
+                            <!-- Info coût -->
+                            <section class="border rounded-lg p-4 bg-blue-50">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                                    <span>💰</span> Estimation des coûts Twilio
+                                </h3>
+                                <p class="text-sm text-gray-600">Prix approximatif: <strong>~$0.0079 USD</strong> par segment SMS</p>
+                                <p class="text-xs text-gray-500 mt-1">10 segments = ~$0.08 USD par message</p>
+                            </section>
+
+                            <!-- BOUTONS D'ACTION -->
+                            <div class="flex justify-end gap-2 pt-4 border-t">
+                                <button onclick="cancelSmsChanges()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2" title="Annuler les modifications">
+                                    ❌ <span>Annuler</span>
+                                </button>
+                                <button onclick="saveSmsConfig()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2" title="Sauvegarder les paramètres SMS">
+                                    💾 <span>Sauvegarder</span>
                                 </button>
                             </div>
-
-                            <!-- Phone mockup -->
-                            <div class="max-w-sm mx-auto">
-                                <div class="bg-gray-900 rounded-3xl p-3 shadow-2xl">
-                                    <div class="bg-white rounded-2xl overflow-hidden">
-                                        <div class="bg-gray-100 px-4 py-3 border-b">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">E</div>
-                                                <div>
-                                                    <div class="font-semibold text-sm">Emma IA</div>
-                                                    <div class="text-xs text-gray-500">SMS</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="p-4 h-96 overflow-y-auto bg-[#e5ddd5]">
-                                            <div class="flex justify-end">
-                                                <div class="bg-white rounded-lg p-3 max-w-[85%] shadow">
-                                                    <div id="smsPreviewContent" class="text-sm whitespace-pre-wrap">
-                                                        Cliquez sur "Actualiser" pour voir le preview SMS
-                                                    </div>
-                                                    <div id="smsPreviewStats" class="text-xs text-gray-400 mt-2 pt-2 border-t hidden">
-                                                        <div class="flex justify-between">
-                                                            <span>Chars: <span id="smsChars">0</span></span>
-                                                            <span>Segments: <span id="smsSegments">0</span></span>
-                                                            <span>Coût: <span id="smsCost">$0.00</span></span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                    </section>
-
-                    <!-- Twilio Info -->
-                    <section class="border rounded-lg p-4 bg-blue-50 border-blue-200">
-                        <h3 class="text-lg font-semibold text-blue-900 mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Informations Twilio
-                        </h3>
-                        <div class="grid md:grid-cols-3 gap-4 text-sm">
-                            <div class="bg-white p-3 rounded-lg">
-                                <div class="text-gray-600 text-xs mb-1">Coût par segment</div>
-                                <div class="font-semibold text-blue-900">$0.0079 USD</div>
-                            </div>
-                            <div class="bg-white p-3 rounded-lg">
-                                <div class="text-gray-600 text-xs mb-1">Chars par segment</div>
-                                <div class="font-semibold text-blue-900">153 (concaténé)</div>
-                            </div>
-                            <div class="bg-white p-3 rounded-lg">
-                                <div class="text-gray-600 text-xs mb-1">Gestion auto</div>
-                                <div class="font-semibold text-blue-900">✓ Multi-SMS</div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Save Button -->
-                    <div class="flex justify-between items-center pt-4 border-t">
-                        <button onclick="resetSmsToDefaults()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition">
-                            🔄 Réinitialiser
-                        </button>
-                        <button onclick="saveSmsConfiguration()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-lg font-medium shadow-lg transition flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                            Sauvegarder Config SMS
-                        </button>
                     </div>
                 </div>
-            </div>
 
-        </div>
-
-        <!-- Prompts Tab Content (Placeholder) -->
-        <div id="promptsContent" class="hidden">
-            <div class="bg-white rounded-xl shadow-sm p-8 text-center">
-                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Gestion des Prompts</h3>
-                <p class="text-gray-500">Cette section sera disponible prochainement</p>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================================================
-        // STATE MANAGEMENT
-        // ============================================================================
-        let currentConfig = {};
-        let history = [];
-        let historyIndex = -1;
-        const MAX_HISTORY = 50;
+        const API_BASE = '/api/admin/emma-config';
+        const DESIGN_API = '/api/email-design';
+        let allConfigs = {};
+        let currentConfig = null;
+        let designConfig = null;
+        let originalDesignConfig = null;
 
-        // ============================================================================
+        // ═══════════════════════════════════════════════════════════════
         // TAB SWITCHING
-        // ============================================================================
-        function switchTab(tab) {
+        // ═══════════════════════════════════════════════════════════════
+        function switchMainTab(tab) {
             // Update tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-50', 'text-blue-600');
-                btn.classList.add('text-gray-600', 'hover:bg-gray-50');
+            document.querySelectorAll('.main-tab').forEach(btn => {
+                btn.classList.remove('bg-white', 'shadow', 'font-medium');
+                btn.classList.add('text-gray-600');
             });
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('bg-blue-50', 'text-blue-600');
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('text-gray-600', 'hover:bg-gray-50');
+            const activeBtn = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'shadow', 'font-medium');
+                activeBtn.classList.remove('text-gray-600');
+            }
 
             // Show/hide content
-            document.getElementById('designContent').classList.toggle('hidden', tab !== 'design');
-            document.getElementById('smsContent').classList.toggle('hidden', tab !== 'sms');
-            document.getElementById('promptsContent').classList.toggle('hidden', tab !== 'prompts');
+            document.getElementById('promptsTabContent').classList.toggle('hidden', tab !== 'prompts');
+            document.getElementById('designTabContent').classList.toggle('hidden', tab !== 'design');
+            document.getElementById('smsTabContent').classList.toggle('hidden', tab !== 'sms');
+
+            // Update header
+            const titles = {
+                prompts: '📝 Gestion des Prompts',
+                design: '🎨 Design des Emails',
+                sms: '📱 Configuration SMS'
+            };
+            document.getElementById('editorTitle').textContent = titles[tab] || 'Configuration';
+            document.getElementById('editorSubtitle').textContent = '';
+
+            // Hide prompt editor buttons when not on prompts tab
+            document.getElementById('saveBtn').classList.toggle('hidden', tab !== 'prompts' || !currentConfig);
+            document.getElementById('deleteBtn').classList.toggle('hidden', tab !== 'prompts' || !currentConfig);
+
+            // Load data for design/sms tabs
+            if (tab === 'design' && !designConfig) loadDesignConfig();
+            if (tab === 'sms' && !designConfig) loadDesignConfig();
         }
 
-        // ============================================================================
-        // SECTION TOGGLE (COLLAPSIBLE)
-        // ============================================================================
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId + 'Section');
-            const icon = document.getElementById(sectionId + 'Icon');
-
-            section.classList.toggle('expanded');
-            icon.classList.toggle('rotated');
-        }
-
-        // ============================================================================
-        // COLOR PICKER SYNC
-        // ============================================================================
-        function setupColorPickers() {
-            const colorInputs = ['colorPrimary', 'colorPrimaryDark', 'colorPrimaryLight', 'colorText'];
-
-            colorInputs.forEach(id => {
-                const colorPicker = document.getElementById(id);
-                const hexInput = document.getElementById(id + 'Hex');
-
-                colorPicker.addEventListener('input', (e) => {
-                    hexInput.value = e.target.value;
-                    updatePreview();
-                    saveToHistory();
-                });
-
-                hexInput.addEventListener('change', (e) => {
-                    if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
-                        colorPicker.value = e.target.value;
-                        updatePreview();
-                        saveToHistory();
-                    }
-                });
-            });
-        }
-
-        // ============================================================================
-        // RANGE SLIDERS SYNC
-        // ============================================================================
-        function setupRangeSliders() {
-            const sliders = [
-                { id: 'headerFontSize', unit: 'px' },
-                { id: 'headerPadding', unit: 'px' },
-                { id: 'headerBorderRadius', unit: 'px' }
-            ];
-
-            sliders.forEach(({ id, unit }) => {
-                const slider = document.getElementById(id);
-                const display = document.getElementById(id + 'Value');
-
-                slider.addEventListener('input', (e) => {
-                    display.textContent = e.target.value + unit;
-                    updatePreview();
-                    saveToHistory();
-                });
-            });
-        }
-
-        // ============================================================================
-        // SOCIAL LINKS TOGGLE
-        // ============================================================================
-        document.getElementById('showSocialLinks').addEventListener('change', (e) => {
-            const container = document.getElementById('socialLinksContainer');
-            if (e.target.checked) {
-                container.classList.remove('opacity-50', 'pointer-events-none');
-            } else {
-                container.classList.add('opacity-50', 'pointer-events-none');
-            }
-        });
-
-        // ============================================================================
-        // COLOR PRESETS
-        // ============================================================================
-        const colorPresets = {
-            blue: {
-                primary: '#3b82f6',
-                primaryDark: '#2563eb',
-                primaryLight: '#60a5fa',
-                text: '#1e3a8a'
-            },
-            purple: {
-                primary: '#8b5cf6',
-                primaryDark: '#7c3aed',
-                primaryLight: '#a78bfa',
-                text: '#5b21b6'
-            },
-            green: {
-                primary: '#10b981',
-                primaryDark: '#059669',
-                primaryLight: '#34d399',
-                text: '#065f46'
-            },
-            orange: {
-                primary: '#f97316',
-                primaryDark: '#ea580c',
-                primaryLight: '#fb923c',
-                text: '#9a3412'
-            }
-        };
-
-        function applyColorPreset(presetName) {
-            const preset = colorPresets[presetName];
-            if (!preset) return;
-
-            document.getElementById('colorPrimary').value = preset.primary;
-            document.getElementById('colorPrimaryHex').value = preset.primary;
-            document.getElementById('colorPrimaryDark').value = preset.primaryDark;
-            document.getElementById('colorPrimaryDarkHex').value = preset.primaryDark;
-            document.getElementById('colorPrimaryLight').value = preset.primaryLight;
-            document.getElementById('colorPrimaryLightHex').value = preset.primaryLight;
-            document.getElementById('colorText').value = preset.text;
-            document.getElementById('colorTextHex').value = preset.text;
-
-            updatePreview();
-            saveToHistory();
-            showToast('Thème appliqué avec succès!', 'success');
-        }
-
-        // ============================================================================
-        // TOAST NOTIFICATIONS
-        // ============================================================================
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast flex items-center gap-3 p-4 rounded-lg shadow-lg ${
-                type === 'success' ? 'bg-green-500' :
-                type === 'error' ? 'bg-red-500' :
-                type === 'warning' ? 'bg-orange-500' :
-                'bg-blue-500'
-            } text-white min-w-[300px]`;
-
-            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '⚠' : 'ℹ';
-
-            toast.innerHTML = `
-                <div class="text-2xl">${icon}</div>
-                <div class="flex-1">${message}</div>
-                <button onclick="this.parentElement.remove()" class="hover:bg-white/20 rounded p-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            `;
-
-            document.getElementById('toastContainer').appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.animation = 'slideIn 0.3s ease-out reverse';
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
-        }
-
-        // ============================================================================
-        // HISTORY MANAGEMENT (UNDO/REDO)
-        // ============================================================================
-        function saveToHistory() {
-            const state = getFormData();
-
-            // Remove future history if we're not at the end
-            if (historyIndex < history.length - 1) {
-                history = history.slice(0, historyIndex + 1);
-            }
-
-            history.push(JSON.parse(JSON.stringify(state)));
-
-            if (history.length > MAX_HISTORY) {
-                history.shift();
-            } else {
-                historyIndex++;
-            }
-
-            updateHistoryButtons();
-            updateSaveStatus(false);
-        }
-
-        function undo() {
-            if (historyIndex > 0) {
-                historyIndex--;
-                applyState(history[historyIndex]);
-                updateHistoryButtons();
-                showToast('Action annulée', 'info');
-            }
-        }
-
-        function redo() {
-            if (historyIndex < history.length - 1) {
-                historyIndex++;
-                applyState(history[historyIndex]);
-                updateHistoryButtons();
-                showToast('Action rétablie', 'info');
-            }
-        }
-
-        function updateHistoryButtons() {
-            document.getElementById('undoBtn').disabled = historyIndex <= 0;
-            document.getElementById('redoBtn').disabled = historyIndex >= history.length - 1;
-        }
-
-        // ============================================================================
-        // SAVE CONFIGURATION
-        // ============================================================================
-        async function saveConfiguration() {
-            const saveBtn = document.getElementById('saveDesignBtn');
-            const saveIcon = document.getElementById('saveIcon');
-            const saveBtnText = document.getElementById('saveBtnText');
-
-            // Show loading state
-            saveBtn.disabled = true;
-            saveIcon.classList.add('spinner');
-            saveBtnText.textContent = 'Sauvegarde en cours...';
-
+        // ═══════════════════════════════════════════════════════════════
+        // EMAIL DESIGN FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════
+        async function loadDesignConfig() {
             try {
-                const config = getFormData();
-
-                const response = await fetch('/api/email-design', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(config)
-                });
-
-                if (!response.ok) throw new Error('Erreur lors de la sauvegarde');
-
-                const result = await response.json();
-
-                // Success state
-                saveIcon.classList.remove('spinner');
-                saveIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
-                saveBtnText.textContent = 'Sauvegardé!';
-                saveBtn.classList.add('pulse-success');
-
-                updateSaveStatus(true);
-                showToast('Configuration sauvegardée dans Supabase!', 'success');
-
-                setTimeout(() => {
-                    saveIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>';
-                    saveBtnText.textContent = 'Sauvegarder la Configuration';
-                    saveBtn.classList.remove('pulse-success');
-                    saveBtn.disabled = false;
-                }, 2000);
-
+                const response = await fetch(DESIGN_API);
+                designConfig = await response.json();
+                originalDesignConfig = JSON.parse(JSON.stringify(designConfig));
+                populateDesignForm(designConfig);
+                updateDesignPreview();
             } catch (error) {
-                saveIcon.classList.remove('spinner');
-                saveBtnText.textContent = 'Erreur - Réessayer';
-                showToast('Erreur: ' + error.message, 'error');
-
-                setTimeout(() => {
-                    saveIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>';
-                    saveBtnText.textContent = 'Sauvegarder la Configuration';
-                    saveBtn.disabled = false;
-                }, 2000);
+                console.error('Error loading design config:', error);
+                showStatus('❌ Erreur chargement design', 'error');
             }
         }
 
-        function updateSaveStatus(saved) {
-            const indicator = document.getElementById('saveStatus');
-            const text = document.getElementById('saveStatusText');
+        function populateDesignForm(config) {
+            // Branding
+            document.getElementById('designAvatarUrl').value = config.branding?.avatar?.url || '';
+            document.getElementById('designLogoUrl').value = config.branding?.logo?.url || '';
+            document.getElementById('designCompanyName').value = config.branding?.companyName || '';
+            document.getElementById('designTagline').value = config.branding?.tagline || '';
 
-            if (saved) {
-                indicator.className = 'status-indicator status-saved';
-                text.textContent = 'Sauvegardé';
-            } else {
-                indicator.className = 'status-indicator status-unsaved';
-                text.textContent = 'Modifications non sauvegardées';
-            }
+            // Colors
+            const colors = config.colors || {};
+            document.getElementById('designColorPrimary').value = colors.primary || '#6366f1';
+            document.getElementById('designColorPrimaryText').value = colors.primary || '#6366f1';
+            document.getElementById('designColorPrimaryDark').value = colors.primaryDark || '#4f46e5';
+            document.getElementById('designColorPrimaryDarkText').value = colors.primaryDark || '#4f46e5';
+            document.getElementById('designColorPrimaryLight').value = colors.primaryLight || '#8b5cf6';
+            document.getElementById('designColorPrimaryLightText').value = colors.primaryLight || '#8b5cf6';
+            document.getElementById('designColorText').value = colors.textDark || '#1f2937';
+            document.getElementById('designColorTextValue').value = colors.textDark || '#1f2937';
+
+            // Header
+            document.getElementById('designShowAvatar').checked = config.header?.showAvatar !== false;
+            document.getElementById('designShowDate').checked = config.header?.showDate !== false;
+            document.getElementById('designShowEdition').checked = config.header?.showEdition !== false;
+
+            // Footer
+            document.getElementById('designShowLogo').checked = config.footer?.showLogo !== false;
+            document.getElementById('designShowDisclaimer').checked = config.footer?.showDisclaimer !== false;
+            document.getElementById('designDisclaimer').value = config.footer?.disclaimerText || '';
+            document.getElementById('designCopyright').value = config.footer?.copyrightText || '';
+
+            // SMS
+            document.getElementById('smsMaxSegments').value = config.sms?.maxSegments || 10;
+            document.getElementById('smsWarningThreshold').value = config.sms?.warningThreshold || 5;
+            document.getElementById('smsSignature').value = config.sms?.signature || '- Emma IA';
+            document.getElementById('smsKeepSectionEmojis').checked = config.sms?.keepSectionEmojis !== false;
+            document.getElementById('smsShowWarning').checked = config.sms?.showSegmentWarning !== false;
         }
 
-        // ============================================================================
-        // GET/SET FORM DATA
-        // ============================================================================
-        function getFormData() {
+        function getDesignFormData() {
             return {
                 branding: {
-                    avatar: {
-                        url: document.getElementById('avatarUrl').value,
-                        alt: 'Emma IA',
-                        size: 64
-                    },
-                    logo: {
-                        url: document.getElementById('logoUrl').value,
-                        alt: document.getElementById('companyName').value,
-                        width: 150
-                    },
-                    companyName: document.getElementById('companyName').value,
-                    tagline: document.getElementById('tagline').value
+                    avatar: { url: document.getElementById('designAvatarUrl').value },
+                    logo: { url: document.getElementById('designLogoUrl').value },
+                    companyName: document.getElementById('designCompanyName').value,
+                    tagline: document.getElementById('designTagline').value
                 },
                 colors: {
-                    primary: document.getElementById('colorPrimary').value,
-                    primaryDark: document.getElementById('colorPrimaryDark').value,
-                    primaryLight: document.getElementById('colorPrimaryLight').value,
-                    textDark: document.getElementById('colorText').value,
-                    textMuted: '#6b7280'
+                    primary: document.getElementById('designColorPrimary').value,
+                    primaryDark: document.getElementById('designColorPrimaryDark').value,
+                    primaryLight: document.getElementById('designColorPrimaryLight').value,
+                    textDark: document.getElementById('designColorText').value
                 },
                 header: {
-                    showAvatar: document.getElementById('showAvatar').checked,
-                    showDate: document.getElementById('showDate').checked,
-                    showEdition: document.getElementById('showEdition').checked,
-                    fontSize: parseInt(document.getElementById('headerFontSize').value),
-                    padding: parseInt(document.getElementById('headerPadding').value),
-                    borderRadius: parseInt(document.getElementById('headerBorderRadius').value),
-                    textAlign: document.getElementById('headerTextAlign').value
+                    showAvatar: document.getElementById('designShowAvatar').checked,
+                    showDate: document.getElementById('designShowDate').checked,
+                    showEdition: document.getElementById('designShowEdition').checked
                 },
                 footer: {
-                    showLogo: document.getElementById('showLogo').checked,
-                    showDisclaimer: document.getElementById('showDisclaimer').checked,
-                    disclaimerText: document.getElementById('disclaimerText').value,
-                    copyrightText: document.getElementById('copyrightText').value,
-                    socialLinks: {
-                        enabled: document.getElementById('showSocialLinks').checked,
-                        linkedin: document.getElementById('socialLinkedIn').value,
-                        twitter: document.getElementById('socialTwitter').value,
-                        facebook: document.getElementById('socialFacebook').value,
-                        website: document.getElementById('socialWebsite').value
-                    }
+                    showLogo: document.getElementById('designShowLogo').checked,
+                    showDisclaimer: document.getElementById('designShowDisclaimer').checked,
+                    disclaimerText: document.getElementById('designDisclaimer').value,
+                    copyrightText: document.getElementById('designCopyright').value
+                },
+                sms: {
+                    maxSegments: parseInt(document.getElementById('smsMaxSegments').value),
+                    warningThreshold: parseInt(document.getElementById('smsWarningThreshold').value),
+                    signature: document.getElementById('smsSignature').value,
+                    keepSectionEmojis: document.getElementById('smsKeepSectionEmojis').checked,
+                    showSegmentWarning: document.getElementById('smsShowWarning').checked
                 }
             };
         }
 
-        function applyState(state) {
-            if (state.branding) {
-                document.getElementById('avatarUrl').value = state.branding.avatar?.url || '';
-                document.getElementById('logoUrl').value = state.branding.logo?.url || '';
-                document.getElementById('companyName').value = state.branding.companyName || '';
-                document.getElementById('tagline').value = state.branding.tagline || '';
-            }
-
-            if (state.colors) {
-                document.getElementById('colorPrimary').value = state.colors.primary;
-                document.getElementById('colorPrimaryHex').value = state.colors.primary;
-                document.getElementById('colorPrimaryDark').value = state.colors.primaryDark;
-                document.getElementById('colorPrimaryDarkHex').value = state.colors.primaryDark;
-                document.getElementById('colorPrimaryLight').value = state.colors.primaryLight;
-                document.getElementById('colorPrimaryLightHex').value = state.colors.primaryLight;
-                document.getElementById('colorText').value = state.colors.textDark;
-                document.getElementById('colorTextHex').value = state.colors.textDark;
-            }
-
-            // Apply header/footer settings...
-            updatePreview();
-        }
-
-        // ============================================================================
-        // PREVIEW UPDATE (LIVE WITH API)
-        // ============================================================================
-        let previewDebounceTimer = null;
-
-        async function updatePreview(force = false) {
-            // Debounce auto-updates (not manual clicks)
-            if (!force) {
-                clearTimeout(previewDebounceTimer);
-                previewDebounceTimer = setTimeout(() => updatePreview(true), 1000);
-                return;
-            }
-
-            const statusEl = document.getElementById('previewStatus');
-            const statusText = document.getElementById('previewStatusText');
-            const content = document.getElementById('previewContent');
-
-            // Show loading
-            statusEl.style.color = '#f59e0b';
-            statusText.textContent = 'Génération...';
-            content.innerHTML = '<p class="text-gray-400 text-center py-20"><svg class="w-8 h-8 mx-auto spinner text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg><br>Génération du preview...</p>';
-
+        async function saveDesignConfig() {
             try {
-                const briefingType = document.getElementById('previewType').value;
-
-                // Sample content for preview
-                const sampleContent = `## 📊 Résumé des Marchés
-
-Les marchés ont ouvert en **hausse** ce matin avec des gains importants dans le secteur technologique.
-
-### 🔝 Performances Principales
-
-- **AAPL**: +2.5% à $175.32
-- **MSFT**: +1.8% à $380.15
-- **GOOGL**: +2.1% à $142.50
-
-### 📈 Analyse
-
-Le sentiment des investisseurs reste **positif** suite aux derniers résultats trimestriels.
-
----
-*Ceci est un exemple de preview - Le contenu réel sera généré par Emma IA*`;
-
-                // Call API avec config actuelle (sans sauvegarder d'abord)
-                const response = await fetch('/api/format-preview', {
+                const data = getDesignFormData();
+                const response = await fetch(DESIGN_API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: sampleContent,
-                        channel: 'email',
-                        briefingType: briefingType
-                    })
+                    body: JSON.stringify(data)
                 });
-
-                if (!response.ok) throw new Error('Erreur API preview');
-
                 const result = await response.json();
-
-                if (result.success && result.html) {
-                    content.innerHTML = result.html;
-                    statusEl.style.color = '#10b981';
-                    statusText.textContent = 'Preview à jour';
-                } else {
-                    throw new Error('Format invalide');
-                }
-
-            } catch (error) {
-                console.error('Preview error:', error);
-                statusEl.style.color = '#ef4444';
-                statusText.textContent = 'Erreur';
-                content.innerHTML = `<div class="text-red-500 text-center py-20"><svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><p class="font-medium">Erreur lors de la génération du preview</p><p class="text-sm text-gray-500 mt-2">${error.message}</p></div>`;
-            }
-        }
-
-        // ============================================================================
-        // RESET TO DEFAULTS
-        // ============================================================================
-        function resetDesignToDefaults() {
-            if (confirm('Êtes-vous sûr de vouloir réinitialiser toute la configuration?')) {
-                // Reset to defaults...
-                showToast('Configuration réinitialisée', 'info');
-                saveToHistory();
-            }
-        }
-
-        // ============================================================================
-        // EXPORT HTML
-        // ============================================================================
-        async function exportHtml() {
-            showToast('Génération du HTML...', 'info');
-
-            try {
-                const briefingType = document.getElementById('previewType')?.value || 'morning';
-
-                const sampleContent = `## 📊 Résumé des Marchés - Export HTML
-
-Les marchés ont ouvert en **hausse** ce matin.
-
-### 🔝 Performances
-- **AAPL**: +2.5%
-- **MSFT**: +1.8%
-
-### 📈 Analyse
-Le sentiment des investisseurs reste **positif**.
-
----
-*Email généré par Emma IA - GOB Apps*`;
-
-                const response = await fetch('/api/format-preview', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: sampleContent,
-                        channel: 'email',
-                        briefingType: briefingType
-                    })
-                });
-
-                if (!response.ok) throw new Error('Erreur lors de la génération');
-
-                const result = await response.json();
-
-                if (result.success && result.html) {
-                    // Create downloadable file
-                    const blob = new Blob([result.html], { type: 'text/html' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `emma-email-${briefingType}-${Date.now()}.html`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-
-                    showToast('HTML exporté avec succès!', 'success');
-                } else {
-                    throw new Error('Format invalide');
-                }
-
-            } catch (error) {
-                console.error('Export error:', error);
-                showToast('Erreur lors de l\'export: ' + error.message, 'error');
-            }
-        }
-
-        // ============================================================================
-        // SEND TEST EMAIL
-        // ============================================================================
-        async function sendTestEmail() {
-            const email = prompt('Entrez votre adresse email pour recevoir un test:');
-            if (!email) return;
-
-            // Validate email
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showToast('Adresse email invalide', 'error');
-                return;
-            }
-
-            showToast('Envoi de l\'email de test...', 'info');
-
-            try {
-                const briefingType = document.getElementById('previewType')?.value || 'morning';
-
-                const sampleContent = `## 📊 Test Email Emma IA
-
-Ceci est un **email de test** pour valider le design et le formatage.
-
-### ✅ Éléments Testés
-- Couleurs personnalisées
-- Branding (logo, avatar)
-- Header et footer
-- Formatage markdown
-
-Si vous recevez cet email, votre configuration fonctionne parfaitement!
-
----
-*Email de test généré le ${new Date().toLocaleString('fr-FR')}*`;
-
-                const response = await fetch('/api/format-preview', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: sampleContent,
-                        channel: 'email',
-                        briefingType: briefingType,
-                        testEmail: email  // Peut être géré par une route dédiée
-                    })
-                });
-
-                if (!response.ok) throw new Error('Erreur lors de l\'envoi');
-
-                // Note: Pour un vrai envoi, il faudrait une route /api/send-test-email
-                // Pour l'instant, on génère juste le HTML et on informe l'utilisateur
-                const result = await response.json();
-
                 if (result.success) {
-                    showToast(`Preview généré! Pour envoyer réellement, configurez /api/send-test-email`, 'warning');
-                    console.log('Test email HTML generated for:', email);
-                    console.log('HTML:', result.html);
+                    designConfig = result.config;
+                    originalDesignConfig = JSON.parse(JSON.stringify(designConfig));
+                    showStatus('✅ Design sauvegardé!', 'success');
                 } else {
-                    throw new Error('Génération échouée');
+                    showStatus('❌ Erreur: ' + result.error, 'error');
                 }
-
             } catch (error) {
-                console.error('Test email error:', error);
-                showToast('Erreur: ' + error.message, 'error');
+                showStatus('❌ Erreur sauvegarde', 'error');
             }
         }
 
-        // ============================================================================
-        // SMS CONFIGURATION FUNCTIONS
-        // ============================================================================
-        async function updateSmsPreview() {
-            const content = document.getElementById('smsPreviewContent');
-            const stats = document.getElementById('smsPreviewStats');
+        async function saveSmsConfig() {
+            await saveDesignConfig(); // SMS config is part of design config
+        }
 
-            content.textContent = 'Génération...';
+        function cancelDesignChanges() {
+            if (originalDesignConfig) {
+                populateDesignForm(originalDesignConfig);
+                updateDesignPreview();
+                showStatus('↩️ Modifications annulées', 'info');
+            }
+        }
 
+        function cancelSmsChanges() {
+            cancelDesignChanges();
+        }
+
+        function resetDesignToDefaults() {
+            if (confirm('Réinitialiser tous les paramètres design aux valeurs par défaut?')) {
+                fetch(DESIGN_API).then(r => r.json()).then(config => {
+                    populateDesignForm(config);
+                    updateDesignPreview();
+                    showStatus('🔄 Réinitialisé aux valeurs par défaut', 'info');
+                });
+            }
+        }
+
+        function updateDesignPreview() {
+            const preview = document.getElementById('designPreview');
+            const primary = document.getElementById('designColorPrimary').value;
+            const primaryLight = document.getElementById('designColorPrimaryLight').value;
+            const avatar = document.getElementById('designAvatarUrl').value;
+            const logo = document.getElementById('designLogoUrl').value;
+            const company = document.getElementById('designCompanyName').value || 'GOB Apps';
+
+            preview.innerHTML = `
+                <div style="max-width:500px;margin:0 auto;font-family:sans-serif;background:#f8fafc;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="background:linear-gradient(135deg,${primary},${primaryLight});color:white;padding:20px;text-align:center;">
+                        ${avatar ? `<img src="${avatar}" style="width:48px;height:48px;border-radius:50%;margin-bottom:8px;">` : '<div style="font-size:32px;margin-bottom:8px;">👩🏻</div>'}
+                        <h2 style="margin:0;font-size:20px;">Emma En Direct</h2>
+                        <p style="margin:4px 0 0;opacity:0.9;font-size:12px;">ÉDITION MATIN | ${new Date().toLocaleDateString('fr-FR')}</p>
+                    </div>
+                    <div style="padding:20px;background:white;">
+                        <p style="color:#1f2937;line-height:1.6;">Bonjour! Voici votre briefing matinal des marchés financiers...</p>
+                        <h3 style="color:${primary};margin:16px 0 8px;">📊 Marchés</h3>
+                        <p style="color:#4b5563;font-size:14px;">Les indices sont en hausse ce matin...</p>
+                    </div>
+                    <div style="padding:16px;background:#f8fafc;text-align:center;border-top:1px solid #e5e7eb;">
+                        ${logo ? `<img src="${logo}" style="height:30px;margin-bottom:8px;">` : ''}
+                        <p style="margin:0;font-size:11px;color:#6b7280;">🤖 Généré par Emma IA • ${company}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Sync color pickers with text inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            ['Primary', 'PrimaryDark', 'PrimaryLight', 'Text'].forEach(name => {
+                const picker = document.getElementById('designColor' + name);
+                const text = document.getElementById('designColor' + name + (name === 'Text' ? 'Value' : 'Text'));
+                if (picker && text) {
+                    picker.addEventListener('input', () => { text.value = picker.value; updateDesignPreview(); });
+                    text.addEventListener('input', () => { picker.value = text.value; updateDesignPreview(); });
+                }
+            });
+            // Update preview on any input change
+            document.querySelectorAll('#designTabContent input, #designTabContent textarea').forEach(el => {
+                el.addEventListener('change', updateDesignPreview);
+            });
+        });
+
+        // Charger toutes les configurations
+        async function loadAllConfigs() {
             try {
-                const sampleText = `📊 Marchés aujourd'hui:\n\nAPPL +2.5% | MSFT +1.8% | GOOGL +2.1%\n\nLe secteur tech reste solide.\n\n${document.getElementById('smsSignature').value || ''}`;
+                showStatus('Chargement...', 'info');
+                const response = await fetch(API_BASE);
+                const data = await response.json();
 
-                const response = await fetch('/api/format-preview', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: sampleText,
-                        channel: 'sms'
-                    })
+                if (data.config) {
+                    allConfigs = data.config;
+                    renderConfigList();
+                    updateStats();
+                    showStatus('✅ Chargé', 'success');
+                } else {
+                    showStatus('❌ Erreur', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
+
+        // Afficher la liste des configs
+        function renderConfigList() {
+            const container = document.getElementById('configList');
+            container.innerHTML = '';
+
+            const searchTerm = document.getElementById('searchFilter').value.toLowerCase();
+            const sectionFilter = document.getElementById('sectionFilter').value;
+            const channelFilter = document.getElementById('channelFilter').value;
+            const sortBy = document.getElementById('sortFilter').value;
+
+            const sections = sectionFilter ? [sectionFilter] : ['prompts', 'variables', 'directives', 'routing'];
+            let totalFiltered = 0;
+
+            sections.forEach(section => {
+                if (!allConfigs[section]) return;
+
+                // Items filtrés
+                let items = Object.entries(allConfigs[section]).filter(([key, config]) => {
+                    // Filtre recherche
+                    if (searchTerm) {
+                        const searchIn = `${key} ${config.description || ''}`.toLowerCase();
+                        if (!searchIn.includes(searchTerm)) return false;
+                    }
+
+                    // Filtre canal
+                    if (channelFilter) {
+                        const configChannel = config.metadata?.channel || '';
+                        if (configChannel !== channelFilter) return false;
+                    }
+
+                    return true;
                 });
 
-                if (!response.ok) throw new Error('Erreur API');
+                // Tri
+                items.sort(([keyA, configA], [keyB, configB]) => {
+                    switch(sortBy) {
+                        case 'name':
+                            return keyA.localeCompare(keyB);
+                        case 'name-desc':
+                            return keyB.localeCompare(keyA);
+                        case 'date':
+                            return new Date(configB.updated_at || 0) - new Date(configA.updated_at || 0);
+                        case 'date-asc':
+                            return new Date(configA.updated_at || 0) - new Date(configB.updated_at || 0);
+                        case 'priority':
+                            return (configB.priority || 0) - (configA.priority || 0);
+                        default:
+                            return 0;
+                    }
+                });
 
-                const result = await response.json();
+                if (items.length === 0) return;
 
-                if (result.success && result.text) {
-                    content.textContent = result.text;
-                    document.getElementById('smsChars').textContent = result.chars || 0;
-                    document.getElementById('smsSegments').textContent = result.segments || 0;
-                    document.getElementById('smsCost').textContent = result.estimatedCost || '$0.00';
-                    stats.classList.remove('hidden');
-                } else {
-                    throw new Error('Format invalide');
-                }
-            } catch (error) {
-                content.textContent = 'Erreur: ' + error.message;
-                stats.classList.add('hidden');
+                totalFiltered += items.length;
+
+                // Header section
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'px-4 py-2 bg-gray-100 border-b border-gray-200 text-xs font-bold text-gray-600 uppercase flex justify-between items-center';
+                sectionHeader.innerHTML = `
+                    <span>${getSectionEmoji(section)} ${section}</span>
+                    <span class="text-gray-400">${items.length}</span>
+                `;
+                container.appendChild(sectionHeader);
+
+                // Items
+                items.forEach(([key, config]) => {
+                    const item = document.createElement('div');
+                    item.className = 'config-item px-4 py-3 border-b border-gray-100 cursor-pointer';
+                    item.onclick = () => selectConfig(section, key, config);
+
+                    const isEmpty = !config.value || config.value === '';
+                    const isOverride = config.is_override || false;
+                    const channel = config.metadata?.channel || '';
+                    const channelBadge = getChannelBadge(channel);
+
+                    // Highlight search term
+                    let displayKey = key;
+                    if (searchTerm) {
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        displayKey = key.replace(regex, '<mark class="bg-yellow-200">$1</mark>');
+                    }
+
+                    item.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-800">${displayKey}</p>
+                                <p class="text-xs text-gray-500 truncate mt-1">${config.description || 'Pas de description'}</p>
+                            </div>
+                            <div class="flex flex-col gap-1 ml-2 flex-shrink-0">
+                                ${channelBadge ? `<span class="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-700 whitespace-nowrap">${channelBadge}</span>` : ''}
+                                ${isEmpty ? '<span class="empty-badge text-xs px-2 py-0.5 rounded whitespace-nowrap">Vide</span>' : ''}
+                                ${isOverride ? '<span class="override-badge text-xs px-2 py-0.5 rounded whitespace-nowrap">Override</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    container.appendChild(item);
+                });
+            });
+
+            if (container.children.length === 0) {
+                container.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Aucun résultat</div>';
             }
+
+            // Update stats
+            document.getElementById('activeCount').textContent = totalFiltered;
         }
 
-        async function saveSmsConfiguration() {
+        // Sélectionner une config pour édition
+        function selectConfig(section, key, config) {
+            currentConfig = { section, key, ...config };
+
+            // Highlight
+            document.querySelectorAll('.config-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Afficher éditeur
+            document.getElementById('editorEmpty').classList.add('hidden');
+            document.getElementById('editorContent').classList.remove('hidden');
+            document.getElementById('saveBtn').classList.remove('hidden');
+            document.getElementById('deleteBtn').classList.remove('hidden');
+
+            // Remplir
+            document.getElementById('editorTitle').textContent = key;
+            const channelEmoji = getChannelEmoji(config.metadata?.channel || '');
+            document.getElementById('editorSubtitle').textContent = `${section} • ${config.type || 'string'} ${channelEmoji}`;
+            document.getElementById('editSection').value = section;
+            document.getElementById('editKey').value = key;
+            document.getElementById('editDescription').value = config.description || '';
+            document.getElementById('editType').value = config.type || 'string';
+            document.getElementById('editCategory').value = config.category || '';
+            document.getElementById('editChannel').value = config.metadata?.channel || '';
+            document.getElementById('editPriority').value = config.priority || 0;
+
+            // Valeur
+            let displayValue = config.value;
+            if (config.type === 'json' && typeof config.value === 'object') {
+                displayValue = JSON.stringify(config.value, null, 2);
+            }
+            document.getElementById('editValue').value = displayValue || '';
+
+            // Metadata
+            document.getElementById('editUpdatedAt').textContent = config.updated_at ? new Date(config.updated_at).toLocaleString() : '-';
+            document.getElementById('editUpdatedBy').textContent = config.updated_by || '-';
+            document.getElementById('editVersion').textContent = config.version || '1';
+            document.getElementById('editIsOverride').textContent = config.is_override ? 'Oui' : 'Non';
+
+            // ✅ Mettre à jour le preview et les badges de canaux
+            updatePreview();
+            updateChannelBadges(key);
+        }
+
+        // Sauvegarder
+        async function saveCurrentConfig() {
+            if (!currentConfig) return;
+
             try {
-                const config = {
-                    sms: {
-                        maxSegments: parseInt(document.getElementById('smsMaxSegments').value),
-                        warningThreshold: parseInt(document.getElementById('smsWarningThreshold').value),
-                        signature: document.getElementById('smsSignature').value,
-                        prefix: document.getElementById('smsPrefix').value,
-                        keepSectionEmojis: document.getElementById('smsKeepEmojis').checked,
-                        showSegmentWarning: document.getElementById('smsShowWarning').checked,
-                        showCounter: document.getElementById('smsShowCounter').checked
-                    }
+                const type = document.getElementById('editType').value;
+                let value = document.getElementById('editValue').value;
+
+                // Parse selon type
+                if (type === 'json') {
+                    value = JSON.parse(value);
+                } else if (type === 'number') {
+                    value = parseFloat(value);
+                } else if (type === 'boolean') {
+                    value = value === 'true' || value === true;
+                }
+
+                // Metadata avec canal
+                const metadata = {
+                    channel: document.getElementById('editChannel').value || null
                 };
 
-                const response = await fetch('/api/email-design', {
+                const response = await fetch(API_BASE, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(config)
+                    body: JSON.stringify({
+                        action: 'set',
+                        section: currentConfig.section,
+                        key: currentConfig.key,
+                        value,
+                        description: document.getElementById('editDescription').value,
+                        category: document.getElementById('editCategory').value,
+                        priority: parseInt(document.getElementById('editPriority').value),
+                        metadata
+                    })
                 });
 
-                if (!response.ok) throw new Error('Erreur sauvegarde');
-
-                showToast('Configuration SMS sauvegardée!', 'success');
-            } catch (error) {
-                showToast('Erreur: ' + error.message, 'error');
-            }
-        }
-
-        function resetSmsToDefaults() {
-            if (confirm('Réinitialiser la configuration SMS aux valeurs par défaut?')) {
-                document.getElementById('smsMaxSegments').value = 10;
-                document.getElementById('smsMaxSegmentsValue').textContent = '10';
-                document.getElementById('smsWarningThreshold').value = 5;
-                document.getElementById('smsWarningThresholdValue').textContent = '5';
-                document.getElementById('smsSignature').value = '- Emma IA';
-                document.getElementById('smsPrefix').value = '';
-                document.getElementById('smsKeepEmojis').checked = true;
-                document.getElementById('smsShowWarning').checked = true;
-                document.getElementById('smsShowCounter').checked = true;
-                showToast('Configuration SMS réinitialisée', 'info');
-            }
-        }
-
-        function setupSmsSliders() {
-            // Max segments slider
-            const maxSegSlider = document.getElementById('smsMaxSegments');
-            const maxSegValue = document.getElementById('smsMaxSegmentsValue');
-            const maxCost = document.getElementById('smsMaxCost');
-
-            maxSegSlider?.addEventListener('input', (e) => {
-                maxSegValue.textContent = e.target.value;
-                maxCost.textContent = '~$' + (e.target.value * 0.0079).toFixed(2) + ' USD';
-            });
-
-            // Warning threshold slider
-            const warnSlider = document.getElementById('smsWarningThreshold');
-            const warnValue = document.getElementById('smsWarningThresholdValue');
-
-            warnSlider?.addEventListener('input', (e) => {
-                warnValue.textContent = e.target.value;
-            });
-        }
-
-        // ============================================================================
-        // EVENT LISTENERS
-        // ============================================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            setupColorPickers();
-            setupRangeSliders();
-            setupSmsSliders();
-
-            // Save button
-            document.getElementById('saveDesignBtn').addEventListener('click', saveConfiguration);
-
-            // Reset button
-            document.getElementById('resetDesignBtn').addEventListener('click', resetDesignToDefaults);
-
-            // Export button
-            document.getElementById('exportHtmlBtn').addEventListener('click', exportHtml);
-
-            // Test email button
-            document.getElementById('testEmailBtn').addEventListener('click', sendTestEmail);
-
-            // Undo/Redo buttons
-            document.getElementById('undoBtn').addEventListener('click', undo);
-            document.getElementById('redoBtn').addEventListener('click', redo);
-
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-                    e.preventDefault();
-                    undo();
-                } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
-                    e.preventDefault();
-                    redo();
-                } else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                    e.preventDefault();
-                    saveConfiguration();
+                if (response.ok) {
+                    showStatus('✅ Sauvegardé', 'success');
+                    await loadAllConfigs();
+                } else {
+                    showStatus('❌ Erreur sauvegarde', 'error');
                 }
-            });
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
 
-            // Track changes
-            document.querySelectorAll('input, textarea, select').forEach(el => {
-                el.addEventListener('change', () => {
-                    updateSaveStatus(false);
+        // Supprimer
+        async function deleteCurrentConfig() {
+            if (!currentConfig) return;
+            if (!confirm(`Supprimer ${currentConfig.section}.${currentConfig.key} ?`)) return;
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        section: currentConfig.section,
+                        key: currentConfig.key
+                    })
+                });
+
+                if (response.ok) {
+                    showStatus('✅ Supprimé', 'success');
+                    document.getElementById('editorContent').classList.add('hidden');
+                    document.getElementById('editorEmpty').classList.remove('hidden');
+                    await loadAllConfigs();
+                } else {
+                    showStatus('❌ Erreur suppression', 'error');
+                }
+            } catch (error) {
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
+
+        // Nouvelle config
+        function createNewConfig() {
+            const section = prompt('Section (prompts, variables, directives, routing):');
+            if (!section) return;
+            const key = prompt('Clé (nom unique):');
+            if (!key) return;
+
+            currentConfig = { section, key, value: '', type: 'string', description: '', category: '', priority: 0 };
+
+            selectConfig(section, key, currentConfig);
+        }
+
+        // Stats
+        function updateStats() {
+            let total = 0;
+            let active = 0;
+
+            Object.values(allConfigs).forEach(section => {
+                Object.values(section).forEach(config => {
+                    total++;
+                    if (config.enabled !== false && config.value) active++;
                 });
             });
 
-            // Initial history state
-            saveToHistory();
-            updateSaveStatus(true);
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('activeCount').textContent = active;
+        }
+
+        // Status
+        function showStatus(message, type) {
+            const el = document.getElementById('statusSidebar');
+            const text = document.getElementById('statusText');
+
+            el.classList.remove('hidden', 'bg-green-50', 'bg-red-50', 'bg-blue-50', 'text-green-800', 'text-red-800', 'text-blue-800');
+
+            if (type === 'success') {
+                el.classList.add('bg-green-50', 'text-green-800');
+            } else if (type === 'error') {
+                el.classList.add('bg-red-50', 'text-red-800');
+            } else {
+                el.classList.add('bg-blue-50', 'text-blue-800');
+            }
+
+            text.textContent = message;
+
+            if (type !== 'info') {
+                setTimeout(() => el.classList.add('hidden'), 3000);
+            }
+        }
+
+        // Emoji helper
+        function getSectionEmoji(section) {
+            const emojis = {
+                'prompts': '📝',
+                'variables': '⚙️',
+                'directives': '🎯',
+                'routing': '🧭'
+            };
+            return emojis[section] || '📄';
+        }
+
+        // Channel badge helper
+        function getChannelBadge(channel) {
+            const badges = {
+                'web': '💬 Web',
+                'sms': '📱 SMS',
+                'email': '📧 Email',
+                'messenger': '💬 MSG',
+                'multicanal': '🌐 Multi'
+            };
+            return badges[channel] || '';
+        }
+
+        // Channel emoji helper
+        function getChannelEmoji(channel) {
+            const emojis = {
+                'web': '💬',
+                'sms': '📱',
+                'email': '📧',
+                'messenger': '💬',
+                'multicanal': '🌐'
+            };
+            return emojis[channel] ? `• ${emojis[channel]}` : '';
+        }
+
+        // ========== PREVIEW SYSTEM ==========
+
+        // Convertir markdown en HTML
+        function markdownToHtml(text) {
+            if (!text) return '';
+
+            let html = text
+                // Emoji section headers (📊 SECTION, 🎯 OBJECTIF, etc.)
+                .replace(/^([\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}])\s*(\d+\.?\s*)?([A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ\s]+)(\s*[:：])?$/gmu,
+                    '<span class="section-header">$1 $2$3</span>')
+                // Emoji line headers (📈 Something:)
+                .replace(/^([\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}])\s+(.+)$/gmu, '<span class="emoji-header">$1 $2</span>')
+                // Markdown headers
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                // Bold with **
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Inline code
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                // Warning lines (⚠️, 🚨)
+                .replace(/^(⚠️|🚨)(.*)$/gm, '<div class="warning">$1$2</div>')
+                // Example blocks
+                .replace(/^EXEMPLE[S]?[\s:：]*(.*)/gim, '<div class="example">📋 $1</div>')
+                // Numbered lists
+                .replace(/^(\d+)\.\s+(.*)$/gm, '<li><strong>$1.</strong> $2</li>')
+                // Bullet points
+                .replace(/^[•\-✓✅]\s+(.*)$/gm, '<li>$1</li>')
+                // Italic
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                // Double line breaks = paragraph
+                .replace(/\n\n+/g, '</p><p>')
+                // Single line break
+                .replace(/\n/g, '<br>');
+
+            // Wrap lists in <ul>
+            html = html.replace(/(<li>.*?<\/li>)+/gs, '<ul>$&</ul>');
+
+            return `<p>${html}</p>`;
+        }
+
+        // ========== PREVIEW CENTRALISÉ VIA API ==========
+        // Toutes les fonctions de formatage appellent /api/format-preview
+        // pour garantir un rendu identique partout (emma-config, n8n, emails réels)
+
+        let previewDebounceTimer = null;
+        let lastPreviewRequest = '';
+
+        /**
+         * Appelle l'API centralisée pour le formatage
+         */
+        async function fetchFormattedPreview(text, channel, briefingType = 'morning') {
+            try {
+                const response = await fetch('/api/format-preview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, channel, briefingType })
+                });
+                if (!response.ok) throw new Error('API error');
+                return await response.json();
+            } catch (error) {
+                console.warn('[Preview] API error, using fallback:', error);
+                return null; // Fallback to local
+            }
+        }
+
+        /**
+         * Wrapper SMS avec template visuel (pas de limite, multi-SMS Twilio)
+         */
+        function wrapSmsPreview(data) {
+            const isLong = data.smsCount > 5;
+            return `
+                <div style="background:#1a1a1a;color:white;border-radius:20px;padding:16px;max-width:340px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #333;">
+                        <span style="font-size:28px;">👩🏻</span>
+                        <div>
+                            <p style="margin:0;font-weight:600;">Emma IA</p>
+                            <p style="margin:0;font-size:11px;color:#888;">+1 438-544-EMMA</p>
+                        </div>
+                    </div>
+                    <div style="white-space:pre-wrap;line-height:1.5;max-height:400px;overflow-y:auto;">${data.text}</div>
+                    <div style="margin-top:12px;padding-top:10px;border-top:1px solid #333;font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                        <span style="color:#888;">${data.chars} chars</span>
+                        <span style="color:${isLong ? '#fbbf24' : '#10b981'};">${data.smsCount} segments</span>
+                        <span style="color:#888;">${data.estimatedCost || ''}</span>
+                    </div>
+                    ${isLong ? '<p style="color:#fbbf24;font-size:11px;margin-top:8px;">💡 Conseil: Réduire le contenu pour moins de segments</p>' : ''}
+                </div>
+            `;
+        }
+
+        /**
+         * Format Web - détecte JSON ou markdown
+         */
+        function formatWebPreview(text) {
+            if (!text) return '';
+
+            // Détecter si c'est du JSON
+            const trimmed = text.trim();
+            if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                try {
+                    const json = JSON.parse(trimmed);
+                    return formatJsonPreview(json);
+                } catch (e) {
+                    // Pas du JSON valide, continuer avec markdown
+                }
+            }
+
+            return `<div class="preview-content">${markdownToHtml(text)}</div>`;
+        }
+
+        // Format JSON (briefings, configs)
+        function formatJsonPreview(json) {
+            let html = '<div class="preview-content">';
+
+            // Header avec nom
+            if (json.name) {
+                html += `<h2 style="margin-top:0">📋 ${json.name}</h2>`;
+            }
+
+            // Metadata
+            const meta = [];
+            if (json.schedule) meta.push(`🕐 ${json.schedule}`);
+            if (json.tone) meta.push(`🎭 ${json.tone}`);
+            if (json.length) meta.push(`📏 ${json.length}`);
+            if (meta.length) {
+                html += `<p style="color:#6b7280;font-size:0.85rem">${meta.join(' • ')}</p>`;
+            }
+
+            // Prompt principal (le plus important)
+            if (json.prompt) {
+                html += `<div style="margin:1rem 0;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">`;
+                html += `<strong style="color:#4f46e5">📝 Prompt:</strong>`;
+                html += `<div style="margin-top:0.5rem">${markdownToHtml(json.prompt)}</div>`;
+                html += `</div>`;
+            }
+
+            // Tools
+            if (json.tools_priority && json.tools_priority.length) {
+                html += `<p><strong>🔧 Outils:</strong> <span style="font-size:0.85rem;color:#6b7280">${json.tools_priority.join(', ')}</span></p>`;
+            }
+
+            // Structure
+            if (json.structure?.sections) {
+                html += `<p><strong>📊 Sections:</strong></p><ul>`;
+                json.structure.sections.forEach(s => {
+                    html += `<li>${s.replace(/_/g, ' ')}</li>`;
+                });
+                html += `</ul>`;
+            }
+
+            // Email config
+            if (json.email_config) {
+                html += `<div style="margin-top:1rem;padding:0.75rem;background:#eff6ff;border-radius:6px">`;
+                html += `<strong>📧 Email:</strong> ${json.email_config.subject_template || ''}`;
+                if (json.email_config.preview_text) {
+                    html += `<br><span style="font-size:0.8rem;color:#6b7280">${json.email_config.preview_text}</span>`;
+                }
+                html += `</div>`;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        // Mettre à jour le preview (avec debounce pour API)
+        function updatePreview() {
+            const text = document.getElementById('editValue').value;
+            const mode = document.getElementById('previewMode').value;
+            const previewArea = document.getElementById('previewArea');
+            const modeLabel = document.getElementById('previewModeLabel');
+            const charCount = document.getElementById('charCount');
+            const wordCount = document.getElementById('wordCount');
+            const lineCount = document.getElementById('lineCount');
+
+            // Stats
+            const chars = text.length;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const lines = text.split('\n').length;
+
+            charCount.textContent = `${chars} chars`;
+            wordCount.textContent = words;
+            lineCount.textContent = lines;
+
+            // Mode label
+            const labels = { web: '(Web)', sms: '(SMS 🔄)', email: '(Email 🔄)' };
+            modeLabel.textContent = labels[mode] || '(Web)';
+
+            // Render preview
+            if (!text.trim()) {
+                previewArea.innerHTML = '<p class="text-gray-400 italic">Le preview s\'affiche ici en temps réel...</p>';
+                return;
+            }
+
+            // Web = local (rapide), SMS/Email = API centralisée (debounced)
+            if (mode === 'web') {
+                previewArea.innerHTML = formatWebPreview(text);
+                return;
+            }
+
+            // Debounce pour SMS/Email (appel API)
+            clearTimeout(previewDebounceTimer);
+            const requestKey = `${mode}:${text.substring(0, 100)}`;
+
+            if (requestKey === lastPreviewRequest) return;
+
+            previewArea.innerHTML = '<p class="text-gray-400 italic">⏳ Chargement preview via API...</p>';
+
+            previewDebounceTimer = setTimeout(async () => {
+                lastPreviewRequest = requestKey;
+
+                // Extraire le texte du prompt si c'est du JSON
+                let contentToFormat = text;
+                try {
+                    const json = JSON.parse(text);
+                    if (json.prompt) contentToFormat = json.prompt;
+                } catch (e) {}
+
+                // Détecter le type de briefing
+                let briefingType = 'morning';
+                if (text.includes('midday') || text.includes('Mi-Journée')) briefingType = 'midday';
+                if (text.includes('evening') || text.includes('Soir')) briefingType = 'evening';
+
+                const result = await fetchFormattedPreview(contentToFormat, mode, briefingType);
+
+                if (result && result.success) {
+                    if (mode === 'sms') {
+                        previewArea.innerHTML = wrapSmsPreview(result);
+                    } else {
+                        previewArea.innerHTML = result.html;
+                    }
+                    modeLabel.textContent = labels[mode].replace('🔄', '✅');
+                } else {
+                    // Fallback local
+                    previewArea.innerHTML = `<div class="preview-content">${markdownToHtml(contentToFormat)}</div>`;
+                    modeLabel.textContent = labels[mode].replace('🔄', '⚠️');
+                }
+            }, 500); // 500ms debounce
+        }
+
+        // Mettre à jour les badges de canaux selon le contenu
+        function updateChannelBadges(configKey) {
+            const badges = document.getElementById('channelBadges');
+            if (!configKey) return;
+
+            // Détecter les canaux depuis le nom de la config ou son contenu
+            const key = configKey.toLowerCase();
+            const text = document.getElementById('editValue').value.toLowerCase();
+
+            let channels = [];
+
+            // Détection par annotation @channels dans le prompt
+            const channelMatch = text.match(/@channels?:\s*([a-z,\s]+)/i);
+            if (channelMatch) {
+                channels = channelMatch[1].split(',').map(c => c.trim());
+            } else {
+                // Détection par défaut
+                if (key.includes('sms') || text.includes('format sms')) channels.push('sms');
+                if (key.includes('email') || text.includes('format email')) channels.push('email');
+                if (key.includes('web') || text.includes('format web')) channels.push('web');
+
+                // Si aucun canal spécifique, tous les canaux
+                if (channels.length === 0) channels = ['web', 'sms', 'email'];
+            }
+
+            // Render badges
+            const badgeHtml = channels.map(ch => {
+                const styles = {
+                    web: 'bg-blue-100 text-blue-700',
+                    sms: 'bg-green-100 text-green-700',
+                    email: 'bg-purple-100 text-purple-700'
+                };
+                const icons = { web: '💻', sms: '📱', email: '📧' };
+                return `<span class="px-2 py-0.5 text-xs rounded ${styles[ch] || 'bg-gray-100'}">${icons[ch] || ''} ${ch.toUpperCase()}</span>`;
+            }).join('');
+
+            badges.innerHTML = badgeHtml;
+        }
+
+        // ========== END PREVIEW SYSTEM ==========
+
+        // Events
+        document.getElementById('refreshBtn').addEventListener('click', loadAllConfigs);
+        document.getElementById('saveBtn').addEventListener('click', saveCurrentConfig);
+        document.getElementById('deleteBtn').addEventListener('click', deleteCurrentConfig);
+        document.getElementById('addBtn').addEventListener('click', createNewConfig);
+
+        // Preview events
+        document.getElementById('editValue').addEventListener('input', () => {
+            updatePreview();
+            updateChannelBadges(currentConfig?.key);
         });
+        document.getElementById('previewMode').addEventListener('change', updatePreview);
+
+        // Filter events
+        document.getElementById('searchFilter').addEventListener('input', renderConfigList);
+        document.getElementById('sectionFilter').addEventListener('change', renderConfigList);
+        document.getElementById('channelFilter').addEventListener('change', renderConfigList);
+        document.getElementById('sortFilter').addEventListener('change', renderConfigList);
+
+        // Clear filters button
+        document.getElementById('clearFilters').addEventListener('click', () => {
+            document.getElementById('searchFilter').value = '';
+            document.getElementById('sectionFilter').value = '';
+            document.getElementById('channelFilter').value = '';
+            document.getElementById('sortFilter').value = 'name';
+            renderConfigList();
+        });
+
+        // Raccourcis clavier
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveCurrentConfig();
+            }
+        });
+
+        // Init
+        loadAllConfigs();
     </script>
 </body>
 </html>
