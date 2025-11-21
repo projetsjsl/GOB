@@ -1,9 +1,57 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- 🔇 INTERCEPTION CONSOLE ERRORS (extensions, etc.) -->
+    <script>
+        (function() {
+            'use strict';
+            const originalWarn = console.warn;
+            const originalError = console.error;
+            console.warn = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('cdn.tailwindcss.com') || message.includes('should not be used in production')) return;
+                originalWarn.apply(console, args);
+            };
+            console.error = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('share-modal') || message.includes('chrome-extension') || message.includes('extension://')) return;
+                originalError.apply(console, args);
+            };
+            window.onerror = function(message, source) {
+                if (!source) return true;
+                if (String(source).includes('extension://')) return true;
+                return false;
+            };
+        })();
+    </script>
+
+    <!-- 💾 SAFE STORAGE WRAPPER -->
+    <script>
+        (function() {
+            'use strict';
+            const storageAvailable = (type) => {
+                try {
+                    const storage = window[type];
+                    const test = '__test__';
+                    storage.setItem(test, test);
+                    storage.removeItem(test);
+                    return true;
+                } catch (e) { return false; }
+            };
+            const localAvail = storageAvailable('localStorage');
+            const mem = {};
+            const safeLocal = {
+                getItem: (k) => { try { return localAvail ? localStorage.getItem(k) : (mem['l_'+k]||null); } catch(e) { return mem['l_'+k]||null; }},
+                setItem: (k,v) => { try { localAvail ? localStorage.setItem(k,v) : (mem['l_'+k]=String(v)); } catch(e) { mem['l_'+k]=String(v); }},
+                removeItem: (k) => { try { localAvail ? localStorage.removeItem(k) : delete mem['l_'+k]; } catch(e) { delete mem['l_'+k]; }}
+            };
+            if (!localAvail) { try { Object.defineProperty(window, 'localStorage', {value: safeLocal, writable: false}); } catch(e) { window.safeLocalStorage = safeLocal; }}
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Emma - Interface Dynamique</title>
+    <title>Emma Config - Gestion Prompts & Variables</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,13 +60,20 @@
     </script>
     <style>
         /* Preview formatting (remplace prose) */
-        .preview-content h1 { font-size: 1.5rem; font-weight: 700; margin: 1rem 0 0.5rem; }
-        .preview-content h2 { font-size: 1.25rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #1e40af; }
-        .preview-content h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.5rem; }
-        .preview-content p { margin-bottom: 0.75rem; line-height: 1.6; }
+        .preview-content { font-size: 0.9rem; line-height: 1.6; }
+        .preview-content h1 { font-size: 1.4rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #1e3a8a; }
+        .preview-content h2 { font-size: 1.2rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #1e40af; }
+        .preview-content h3 { font-size: 1.05rem; font-weight: 600; margin: 0.75rem 0 0.5rem; color: #3730a3; }
+        .preview-content p { margin-bottom: 0.5rem; }
         .preview-content strong { font-weight: 600; color: #1f2937; }
-        .preview-content li { margin-left: 1.5rem; margin-bottom: 0.25rem; }
-        .preview-content li::before { content: "•"; margin-right: 0.5rem; color: #6b7280; }
+        .preview-content .section-header { display: block; font-weight: 700; font-size: 1.1rem; margin: 1rem 0 0.5rem; padding: 0.5rem; background: linear-gradient(90deg, #e0e7ff 0%, transparent 100%); border-left: 3px solid #4f46e5; border-radius: 0 4px 4px 0; }
+        .preview-content .emoji-header { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.25rem; color: #374151; }
+        .preview-content ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        .preview-content li { margin-bottom: 0.25rem; list-style-type: disc; }
+        .preview-content .instruction { background: #fef3c7; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; font-size: 0.85rem; }
+        .preview-content .warning { background: #fee2e2; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; color: #991b1b; }
+        .preview-content .example { background: #f0fdf4; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; font-family: monospace; font-size: 0.8rem; }
+        .preview-content code { background: #f3f4f6; padding: 0.1rem 0.3rem; border-radius: 3px; font-family: monospace; font-size: 0.85em; }
     </style>
     <style>
         .config-item {
@@ -614,22 +669,38 @@
             if (!text) return '';
 
             let html = text
-                // Headers
-                .replace(/^### (.*$)/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>')
-                .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-4 mb-2">$1</h2>')
-                .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>')
-                // Bold
-                .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
-                // Italic
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Emoji section headers (📊 SECTION, 🎯 OBJECTIF, etc.)
+                .replace(/^([\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}])\s*(\d+\.?\s*)?([A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ\s]+)(\s*[:：])?$/gmu,
+                    '<span class="section-header">$1 $2$3</span>')
+                // Emoji line headers (📈 Something:)
+                .replace(/^([\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}])\s+(.+)$/gmu, '<span class="emoji-header">$1 $2</span>')
+                // Markdown headers
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                // Bold with **
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Inline code
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                // Warning lines (⚠️, 🚨)
+                .replace(/^(⚠️|🚨)(.*)$/gm, '<div class="warning">$1$2</div>')
+                // Example blocks
+                .replace(/^EXEMPLE[S]?[\s:：]*(.*)/gim, '<div class="example">📋 $1</div>')
+                // Numbered lists
+                .replace(/^(\d+)\.\s+(.*)$/gm, '<li><strong>$1.</strong> $2</li>')
                 // Bullet points
-                .replace(/^• (.*$)/gm, '<li class="ml-4">$1</li>')
-                .replace(/^- (.*$)/gm, '<li class="ml-4">$1</li>')
-                // Line breaks
-                .replace(/\n\n/g, '</p><p class="mb-3">')
+                .replace(/^[•\-✓✅]\s+(.*)$/gm, '<li>$1</li>')
+                // Italic
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                // Double line breaks = paragraph
+                .replace(/\n\n+/g, '</p><p>')
+                // Single line break
                 .replace(/\n/g, '<br>');
 
-            return `<p class="mb-3">${html}</p>`;
+            // Wrap lists in <ul>
+            html = html.replace(/(<li>.*?<\/li>)+/gs, '<ul>$&</ul>');
+
+            return `<p>${html}</p>`;
         }
 
         // Format SMS (pas de markdown, style mobile)
