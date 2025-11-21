@@ -1,40 +1,133 @@
 /**
- * API Email Design Configuration
+ * API Email Design Configuration - Persisté dans Supabase
  *
  * GET  → Récupère la config actuelle
  * POST → Met à jour la config
  *
- * Utilisé par emma-config.html pour éditer le design des emails
+ * Stockage: Supabase table `emma_config` (clé: 'email_design')
+ * Persiste entre les déploiements Vercel ✅
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
 
-const CONFIG_PATH = join(__dirname, '..', 'config', 'email-design.json');
+const CONFIG_KEY = 'email_design';
 
-function loadConfig() {
-  try {
-    if (existsSync(CONFIG_PATH)) {
-      return JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'));
-    }
-  } catch (error) {
-    console.error('[Email Design API] Error loading config:', error);
+// Config par défaut si rien en base
+const DEFAULT_CONFIG = {
+  branding: {
+    avatar: { url: '', alt: 'Emma IA', size: 64 },
+    logo: { url: '', alt: 'JSLai', width: 150 },
+    companyName: 'GOB Apps',
+    tagline: 'Intelligence Financière Propulsée par Emma IA'
+  },
+  colors: {
+    primary: '#6366f1',
+    primaryDark: '#4f46e5',
+    primaryLight: '#8b5cf6',
+    textDark: '#1f2937',
+    textMuted: '#6b7280'
+  },
+  header: {
+    showAvatar: true,
+    showDate: true,
+    showEdition: true
+  },
+  footer: {
+    showLogo: true,
+    showDisclaimer: true,
+    disclaimerText: 'Ce briefing est généré automatiquement par Emma IA à des fins informatives uniquement.',
+    copyrightText: '© 2025 GOB Apps - Tous droits réservés'
+  },
+  sms: {
+    maxSegments: 10,
+    warningThreshold: 5,
+    signature: '- Emma IA',
+    keepSectionEmojis: true,
+    showSegmentWarning: true
   }
-  return null;
+};
+
+function getSupabase() {
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('[Email Design API] Missing Supabase credentials');
+    return null;
+  }
+  return createClient(supabaseUrl, supabaseKey);
 }
 
-function saveConfig(config) {
+async function loadConfig() {
+  const supabase = getSupabase();
+  if (!supabase) return DEFAULT_CONFIG;
+
   try {
-    config.lastUpdated = new Date().toISOString();
-    writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf-8');
-    return true;
+    const { data, error } = await supabase
+      .from('emma_config')
+      .select('value, updated_at, updated_by')
+      .eq('key', CONFIG_KEY)
+      .single();
+
+    if (error) {
+      console.log('[Email Design API] No config in DB, using defaults');
+      return DEFAULT_CONFIG;
+    }
+
+    return {
+      ...data.value,
+      _meta: {
+        updatedAt: data.updated_at,
+        updatedBy: data.updated_by,
+        source: 'supabase'
+      }
+    };
   } catch (error) {
-    console.error('[Email Design API] Error saving config:', error);
-    return false;
+    console.error('[Email Design API] Error loading config:', error);
+    return DEFAULT_CONFIG;
+  }
+}
+
+async function saveConfig(config, updatedBy = 'emma-config') {
+  const supabase = getSupabase();
+  if (!supabase) {
+    return { success: false, error: 'Supabase not configured' };
+  }
+
+  try {
+    // Remove meta fields before saving
+    const { _meta, ...configToSave } = config;
+
+    const { data, error } = await supabase
+      .from('emma_config')
+      .upsert({
+        key: CONFIG_KEY,
+        value: configToSave,
+        description: 'Configuration design des emails et SMS',
+        updated_by: updatedBy
+      }, { onConflict: 'key' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[Email Design API] Save error:', error);
+      return { success: false, error: error.message };
+    }
+
+    return {
+      success: true,
+      config: {
+        ...data.value,
+        _meta: {
+          updatedAt: data.updated_at,
+          updatedBy: data.updated_by,
+          source: 'supabase'
+        }
+      }
+    };
+  } catch (error) {
+    console.error('[Email Design API] Save exception:', error);
+    return { success: false, error: error.message };
   }
 }
 
@@ -50,10 +143,7 @@ export default async function handler(req, res) {
 
   // GET - Récupérer la config
   if (req.method === 'GET') {
-    const config = loadConfig();
-    if (!config) {
-      return res.status(500).json({ error: 'Failed to load config' });
-    }
+    const config = await loadConfig();
     return res.status(200).json(config);
   }
 
@@ -66,23 +156,21 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid request body' });
       }
 
-      const currentConfig = loadConfig();
-      if (!currentConfig) {
-        return res.status(500).json({ error: 'Failed to load current config' });
-      }
+      const currentConfig = await loadConfig();
 
-      // Merge updates with current config (deep merge)
+      // Deep merge updates with current config
       const mergedConfig = deepMerge(currentConfig, updates);
-      mergedConfig.updatedBy = updates.updatedBy || 'emma-config';
 
-      if (saveConfig(mergedConfig)) {
+      const result = await saveConfig(mergedConfig, updates.updatedBy || 'emma-config');
+
+      if (result.success) {
         return res.status(200).json({
           success: true,
-          message: 'Configuration saved successfully',
-          config: mergedConfig
+          message: 'Configuration sauvegardée dans Supabase ✅',
+          config: result.config
         });
       } else {
-        return res.status(500).json({ error: 'Failed to save config' });
+        return res.status(500).json({ error: result.error });
       }
     } catch (error) {
       console.error('[Email Design API] Error:', error);
@@ -97,6 +185,7 @@ export default async function handler(req, res) {
 function deepMerge(target, source) {
   const result = { ...target };
   for (const key in source) {
+    if (key === '_meta') continue; // Skip meta fields
     if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
       result[key] = deepMerge(target[key] || {}, source[key]);
     } else {
