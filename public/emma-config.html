@@ -703,27 +703,35 @@
             return `<p>${html}</p>`;
         }
 
-        // Format SMS (identique à lib/channel-adapter.js)
-        function formatSmsPreview(text) {
-            if (!text) return '';
+        // ========== PREVIEW CENTRALISÉ VIA API ==========
+        // Toutes les fonctions de formatage appellent /api/format-preview
+        // pour garantir un rendu identique partout (emma-config, n8n, emails réels)
 
-            // Nettoyage identique à adaptForSMS()
-            let sms = text
-                // Markdown → texte brut
-                .replace(/\*\*(.*?)\*\*/g, '$1')
-                .replace(/\*(.*?)\*/g, '$1')
-                .replace(/^#+\s*/gm, '')
-                .replace(/^- /gm, '• ')
-                // Emojis numérotés → chiffres
-                .replace(/[0-9]️⃣/g, m => m.charAt(0) + '.')
-                // Emojis répétitifs supprimés
-                .replace(/[📱💬🎯🔑🏆⭐🔴🟢🟡🚀🔍🌎🌍🌏]/g, '')
-                .replace(/💵|💲/g, '$');
+        let previewDebounceTimer = null;
+        let lastPreviewRequest = '';
 
-            const chars = sms.length;
-            const smsCount = Math.ceil(chars / 160);
-            const isOverLimit = chars > 3500;
+        /**
+         * Appelle l'API centralisée pour le formatage
+         */
+        async function fetchFormattedPreview(text, channel, briefingType = 'morning') {
+            try {
+                const response = await fetch('/api/format-preview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, channel, briefingType })
+                });
+                if (!response.ok) throw new Error('API error');
+                return await response.json();
+            } catch (error) {
+                console.warn('[Preview] API error, using fallback:', error);
+                return null; // Fallback to local
+            }
+        }
 
+        /**
+         * Wrapper SMS avec template visuel
+         */
+        function wrapSmsPreview(data) {
             return `
                 <div style="background:#1a1a1a;color:white;border-radius:20px;padding:16px;max-width:320px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #333;">
@@ -733,61 +741,19 @@
                             <p style="margin:0;font-size:11px;color:#888;">+1 438-544-EMMA</p>
                         </div>
                     </div>
-                    <div style="white-space:pre-wrap;line-height:1.5;">${sms.substring(0, 3500)}</div>
-                    ${isOverLimit ? '<p style="color:#f87171;font-size:11px;margin-top:10px;">⚠️ Tronqué à 3500 chars</p>' : ''}
+                    <div style="white-space:pre-wrap;line-height:1.5;">${data.text}</div>
+                    ${data.isOverLimit ? '<p style="color:#f87171;font-size:11px;margin-top:10px;">⚠️ Tronqué à 3500 chars</p>' : ''}
                     <div style="margin-top:12px;padding-top:10px;border-top:1px solid #333;font-size:11px;color:#666;display:flex;justify-content:space-between;">
-                        <span>${chars} chars</span>
-                        <span>~${smsCount} SMS</span>
+                        <span>${data.chars} chars</span>
+                        <span>~${data.smsCount} SMS</span>
                     </div>
                 </div>
             `;
         }
 
-        // Format Email (identique à lib/email-templates.js)
-        function formatEmailPreview(text) {
-            if (!text) return '';
-
-            // Couleurs du thème GOB (config/theme-colors.json)
-            const colors = {
-                primary: '#6366f1',
-                primaryDark: '#4f46e5',
-                primaryLight: '#8b5cf6',
-                text: '#1f2937',
-                textMuted: '#6b7280'
-            };
-
-            // Markdown → HTML avec styles inline (comme email-templates.js)
-            let html = text
-                .replace(/^### (.+)$/gm, `<h3 style="color:${colors.primary};margin:24px 0 12px;font-size:18px;font-weight:600;border-left:4px solid ${colors.primaryLight};padding-left:12px;">$1</h3>`)
-                .replace(/^## (.+)$/gm, `<h2 style="color:${colors.primaryDark};margin:28px 0 16px;font-size:20px;font-weight:700;border-bottom:3px solid ${colors.primary};padding-bottom:8px;">$1</h2>`)
-                .replace(/^# (.+)$/gm, `<h1 style="color:${colors.primaryDark};margin:32px 0 20px;font-size:24px;font-weight:700;">$1</h1>`)
-                .replace(/\*\*(.+?)\*\*/g, `<strong style="font-weight:700;color:${colors.primary};">$1</strong>`)
-                .replace(/\*(.+?)\*/g, '<em style="font-style:italic;">$1</em>')
-                .replace(/\n\n/g, `</p><p style="margin:12px 0;line-height:1.8;color:${colors.text};">`)
-                .replace(/\n/g, '<br>');
-            html = `<p style="margin:12px 0;line-height:1.8;color:${colors.text};">${html}</p>`;
-
-            return `
-                <div style="max-width:600px;margin:0 auto;font-family:'Segoe UI',Roboto,sans-serif;background:#f8fafc;padding:10px;">
-                    <!-- Header gradient comme emails réels -->
-                    <div style="background:linear-gradient(135deg,${colors.primary} 0%,${colors.primaryLight} 100%);color:white;padding:32px 24px;border-radius:12px 12px 0 0;text-align:center;">
-                        <div style="font-size:48px;margin-bottom:12px;">☀️</div>
-                        <h1 style="margin:0 0 8px;font-size:28px;font-weight:700;">Emma En Direct</h1>
-                        <div style="opacity:0.95;font-size:14px;">ÉDITION MATIN | ${new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long'})}</div>
-                    </div>
-                    <!-- Content -->
-                    <div style="background:white;padding:32px 24px;border-radius:0 0 12px 12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
-                        ${html}
-                    </div>
-                    <!-- Footer -->
-                    <div style="text-align:center;padding:20px;color:${colors.textMuted};font-size:12px;">
-                        <p style="margin:0;">🤖 Généré par <strong style="color:${colors.primaryDark};">Emma IA</strong> • GOB Apps</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Format Web (markdown)
+        /**
+         * Format Web - détecte JSON ou markdown
+         */
         function formatWebPreview(text) {
             if (!text) return '';
 
@@ -859,7 +825,7 @@
             return html;
         }
 
-        // Mettre à jour le preview
+        // Mettre à jour le preview (avec debounce pour API)
         function updatePreview() {
             const text = document.getElementById('editValue').value;
             const mode = document.getElementById('previewMode').value;
@@ -879,7 +845,7 @@
             lineCount.textContent = lines;
 
             // Mode label
-            const labels = { web: '(Web)', sms: '(SMS)', email: '(Email)' };
+            const labels = { web: '(Web)', sms: '(SMS 🔄)', email: '(Email 🔄)' };
             modeLabel.textContent = labels[mode] || '(Web)';
 
             // Render preview
@@ -888,16 +854,50 @@
                 return;
             }
 
-            switch (mode) {
-                case 'sms':
-                    previewArea.innerHTML = formatSmsPreview(text);
-                    break;
-                case 'email':
-                    previewArea.innerHTML = formatEmailPreview(text);
-                    break;
-                default:
-                    previewArea.innerHTML = formatWebPreview(text);
+            // Web = local (rapide), SMS/Email = API centralisée (debounced)
+            if (mode === 'web') {
+                previewArea.innerHTML = formatWebPreview(text);
+                return;
             }
+
+            // Debounce pour SMS/Email (appel API)
+            clearTimeout(previewDebounceTimer);
+            const requestKey = `${mode}:${text.substring(0, 100)}`;
+
+            if (requestKey === lastPreviewRequest) return;
+
+            previewArea.innerHTML = '<p class="text-gray-400 italic">⏳ Chargement preview via API...</p>';
+
+            previewDebounceTimer = setTimeout(async () => {
+                lastPreviewRequest = requestKey;
+
+                // Extraire le texte du prompt si c'est du JSON
+                let contentToFormat = text;
+                try {
+                    const json = JSON.parse(text);
+                    if (json.prompt) contentToFormat = json.prompt;
+                } catch (e) {}
+
+                // Détecter le type de briefing
+                let briefingType = 'morning';
+                if (text.includes('midday') || text.includes('Mi-Journée')) briefingType = 'midday';
+                if (text.includes('evening') || text.includes('Soir')) briefingType = 'evening';
+
+                const result = await fetchFormattedPreview(contentToFormat, mode, briefingType);
+
+                if (result && result.success) {
+                    if (mode === 'sms') {
+                        previewArea.innerHTML = wrapSmsPreview(result);
+                    } else {
+                        previewArea.innerHTML = result.html;
+                    }
+                    modeLabel.textContent = labels[mode].replace('🔄', '✅');
+                } else {
+                    // Fallback local
+                    previewArea.innerHTML = `<div class="preview-content">${markdownToHtml(contentToFormat)}</div>`;
+                    modeLabel.textContent = labels[mode].replace('🔄', '⚠️');
+                }
+            }, 500); // 500ms debounce
         }
 
         // Mettre à jour les badges de canaux selon le contenu
