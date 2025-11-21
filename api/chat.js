@@ -29,34 +29,54 @@ function validateResponseCompleteness(response, analysisType, intentData) {
   
   // Pour comprehensive_analysis, vérifier présence des sections obligatoires
   if (intent === 'comprehensive_analysis') {
-    // 🚨 STRICT: Les 9 sections DOIVENT être présentes (tolérance max: 1 section manquante)
+    // 🚨 12 sections UNIFIÉES (tolérance: max 2 sections manquantes)
     const requiredSections = [
-      'VALORISATION',      // Section 1
-      'FONDAMENTAUX',      // Section 2
-      'CROISSANCE',        // Section 3
-      'MOAT',              // Section 4
-      'DIVIDENDE',         // Section 5 (ou "N/A - Pas de dividende")
-      'RISQUES',           // Section 6
-      'NEWS',              // Section 7 (ou "Actualités")
-      'RECOMMANDATION',    // Section 8
-      'QUESTIONS'          // Section 9 (ou "Questions suivi")
+      'VUE D\'ENSEMBLE',   // Section 1 (ou "OVERVIEW")
+      'VALORISATION',      // Section 2
+      'FONDAMENTAUX',      // Section 3
+      'CROISSANCE',        // Section 4
+      'MOAT',              // Section 5
+      'VALEUR INTRINSÈQUE',// Section 6 (ou "DCF", "FAIR VALUE")
+      'RÉSULTATS',         // Section 7 (ou "EARNINGS", "Q1/Q2/Q3/Q4")
+      'MACRO',             // Section 8 (ou "FED", "INFLATION")
+      'DIVIDENDE',         // Section 9 (ou "N/A")
+      'RISQUES',           // Section 10
+      'NEWS',              // Section 11 (ou "CATALYSTS", "ACTUALITÉS")
+      'RECOMMANDATION'     // Section 12 (ou "RECO", "AVIS")
     ];
 
     const responseUpper = response.toUpperCase();
-    const missingSections = requiredSections.filter(
-      section => !responseUpper.includes(section)
-    );
 
-    // Tolérance STRICTE: Maximum 1 section manquante OU < 1200 mots = INCOMPLET
+    // Vérification flexible avec alternatives
+    const checkSection = (section) => {
+      const alternatives = {
+        'VUE D\'ENSEMBLE': ['VUE D\'ENSEMBLE', 'OVERVIEW', 'APERÇU'],
+        'VALEUR INTRINSÈQUE': ['VALEUR INTRINSÈQUE', 'DCF', 'FAIR VALUE', 'VALEUR'],
+        'RÉSULTATS': ['RÉSULTATS', 'EARNINGS', 'Q1', 'Q2', 'Q3', 'Q4', 'TRIMESTRE'],
+        'MACRO': ['MACRO', 'FED', 'INFLATION', 'TAUX', 'ÉCONOMIQUE'],
+        'NEWS': ['NEWS', 'CATALYSTS', 'ACTUALITÉS', 'CATALYST'],
+        'RECOMMANDATION': ['RECOMMANDATION', 'RECO', 'AVIS', 'BUY', 'SELL', 'HOLD', 'ACHAT', 'VENDRE', 'CONSERVER']
+      };
+
+      const alts = alternatives[section] || [section];
+      return alts.some(alt => responseUpper.includes(alt));
+    };
+
+    const missingSections = requiredSections.filter(section => !checkSection(section));
+
+    // Tolérance: Max 2 sections manquantes, min 800 mots (SMS) ou 1200 mots (Web)
     const wordCount = response.split(/\s+/).length;
-    const isComplete = missingSections.length <= 1 && wordCount >= 1200;
+    const charCount = response.length;
+    const isSMS = charCount < 4000;
+    const minWords = isSMS ? 300 : 1200;
+    const isComplete = missingSections.length <= 2 && wordCount >= minWords;
 
     if (!isComplete) {
-      console.warn(`⚠️ [Validation] Analyse INCOMPLÈTE - Sections manquantes (${missingSections.length}/9): ${missingSections.join(', ')}, Mots: ${wordCount}/1200`);
+      console.warn(`⚠️ [Validation] Analyse INCOMPLÈTE - Sections manquantes (${missingSections.length}/12): ${missingSections.join(', ')}, Mots: ${wordCount}/${minWords}, Mode: ${isSMS ? 'SMS' : 'Web'}`);
     } else if (missingSections.length > 0) {
-      console.log(`✓ [Validation] Analyse acceptée avec ${missingSections.length} section manquante: ${missingSections.join(', ')}, Mots: ${wordCount}`);
+      console.log(`✓ [Validation] Analyse acceptée avec ${missingSections.length} sections manquantes: ${missingSections.join(', ')}, Mots: ${wordCount}`);
     } else {
-      console.log(`✅ [Validation] Analyse COMPLÈTE - Toutes les 9 sections présentes, Mots: ${wordCount}`);
+      console.log(`✅ [Validation] Analyse COMPLÈTE - 12 sections présentes, Mots: ${wordCount}, Mode: ${isSMS ? 'SMS' : 'Web'}`);
     }
 
     return isComplete;

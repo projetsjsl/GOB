@@ -3125,23 +3125,91 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
 
             // 🎯 NOUVEAU: Utiliser prompt spécifique par intent si disponible
             let systemPrompt = null;
-            
+
             // Vérifier si un prompt custom existe pour cet intent
             if (intentData && intentData.intent && hasCustomPrompt(intentData.intent)) {
                 systemPrompt = getIntentPrompt(intentData.intent);
-                
+
                 // ✅ Pour earnings, injecter la date actuelle dans le prompt
                 if (intentData.intent === 'earnings') {
-                    const currentDate = new Date().toLocaleDateString('fr-FR', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
+                    const currentDate = new Date().toLocaleDateString('fr-FR', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
                     });
                     systemPrompt = systemPrompt.replace('(date actuelle)', `(${currentDate})`);
                 }
-                
-                console.log(`🎯 Using custom prompt for intent: ${intentData.intent}`);
+
+                // ✅ ADAPTATION FORMAT SELON CANAL pour comprehensive_analysis
+                if (intentData.intent === 'comprehensive_analysis') {
+                    const channel = context.user_channel || 'web';
+
+                    if (channel === 'sms') {
+                        // 📱 FORMAT SMS: Concis, max 3500 chars, pas de markdown
+                        systemPrompt += `
+
+📱 FORMAT SMS OBLIGATOIRE:
+- MAX 3500 caractères total (environ 6-8 SMS)
+- Paragraphes TRÈS courts (2-3 lignes max)
+- PAS de markdown (pas de ** ou ##)
+- Utilise emojis pour séparer sections
+- Chiffres concis: "P/E: 32x (5Y: 28x, sect: 28x)"
+- Chaque section = 2-4 lignes maximum
+- Style télégraphique, pas de phrases longues
+
+EXEMPLE FORMAT SMS:
+"📊 MSFT - Microsoft
+Prix: 478$ | Cap: 2.8T$ | YTD: -13%
+
+💰 Valorisation
+P/E: 34x (5Y: 32x, sect: 28x)
+P/FCF: 28x | EV/EBITDA: 22x
+
+💼 Fondamentaux
+ROE: 35% (5Y: 33%) | Marge: 36%
+D/E: 0.4 (très sain)
+
+📈 Croissance
+Rev CAGR: +12% | EPS: +15%
+
+🏰 Moat: Large (cloud, Office)
+
+💵 DCF: 520$ → marge sécu 9%
+
+📋 Q3: Beat +3% rev, +5% EPS
+
+🌍 Macro: Fed neutre
+
+💰 Div: 0.8% | Payout 25%
+
+⚠️ Risques: Antitrust, AI costs
+
+📰 Catalysts: Copilot, Azure growth
+
+🎯 CONSERVER 478$
+Cible: 520$ (+9%)
+
+❓ Questions:
+1. Impact Copilot sur marges?
+2. Concurrence cloud?"`;
+                        console.log(`📱 comprehensive_analysis: Format SMS appliqué (max 3500 chars)`);
+                    } else {
+                        // 💻 FORMAT WEB/EMAIL: Détaillé, markdown, 1500+ mots
+                        systemPrompt += `
+
+💻 FORMAT WEB/EMAIL OBLIGATOIRE:
+- MINIMUM 1500 mots (analyse détaillée)
+- Markdown activé (** pour gras, ## pour titres)
+- Chaque section = 1-2 paragraphes complets
+- Explications narratives professionnelles
+- Comparaisons historiques et sectorielles explicites
+- Style rapport CFA® institutionnel`;
+                        console.log(`💻 comprehensive_analysis: Format Web/Email appliqué (1500+ mots)`);
+                    }
+                }
+
+                console.log(`🎯 Using custom prompt for intent: ${intentData.intent}, channel: ${context.user_channel || 'web'}`);
             }
 
             // 🚨 DÉTECTION PRIORITAIRE: Questions sur fonds/quartiles/rendements

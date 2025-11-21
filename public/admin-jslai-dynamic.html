@@ -185,11 +185,56 @@
                         </div>
                     </div>
 
-                    <!-- Valeur -->
+                    <!-- Valeur avec Preview Split-View -->
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Valeur</label>
-                        <textarea id="editValue" rows="15" class="w-full px-3 py-2 border rounded-lg font-mono text-sm" placeholder="Entrez la valeur..."></textarea>
-                        <p class="text-xs text-gray-500 mt-1">Pour JSON: utilisez un format valide avec indentation</p>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700">Valeur / Code du Prompt</label>
+                            <div class="flex items-center gap-2">
+                                <!-- Badges canaux applicables -->
+                                <div id="channelBadges" class="flex gap-1">
+                                    <span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-700">💻 Web</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">📱 SMS</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-700">📧 Email</span>
+                                </div>
+                                <!-- Mode Preview -->
+                                <select id="previewMode" class="text-xs px-2 py-1 border rounded bg-gray-50">
+                                    <option value="web">👁️ Preview: Web</option>
+                                    <option value="sms">👁️ Preview: SMS</option>
+                                    <option value="email">👁️ Preview: Email</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Split View: Code | Preview -->
+                        <div class="grid grid-cols-2 gap-4 border rounded-lg overflow-hidden">
+                            <!-- Colonne gauche: Code -->
+                            <div class="border-r">
+                                <div class="bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 border-b">
+                                    📝 Code / Prompt
+                                </div>
+                                <textarea id="editValue" rows="20" class="w-full px-3 py-2 font-mono text-sm border-0 resize-none focus:ring-0" placeholder="Entrez la valeur..."></textarea>
+                            </div>
+
+                            <!-- Colonne droite: Preview -->
+                            <div class="bg-gray-50">
+                                <div class="bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 border-b flex items-center justify-between">
+                                    <span>👁️ Preview <span id="previewModeLabel" class="text-blue-600">(Web)</span></span>
+                                    <span id="charCount" class="text-gray-400">0 chars</span>
+                                </div>
+                                <div id="previewArea" class="p-3 overflow-y-auto prose prose-sm max-w-none" style="height: 480px;">
+                                    <p class="text-gray-400 italic">Le preview s'affiche ici en temps réel...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="flex justify-between text-xs text-gray-500 mt-2">
+                            <span>💡 Pour JSON: utilisez un format valide avec indentation</span>
+                            <div class="flex gap-4">
+                                <span>📏 <span id="wordCount">0</span> mots</span>
+                                <span>📄 <span id="lineCount">0</span> lignes</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Metadata info -->
@@ -380,6 +425,10 @@
             document.getElementById('editUpdatedBy').textContent = config.updated_by || '-';
             document.getElementById('editVersion').textContent = config.version || '1';
             document.getElementById('editIsOverride').textContent = config.is_override ? 'Oui' : 'Non';
+
+            // ✅ Mettre à jour le preview et les badges de canaux
+            updatePreview();
+            updateChannelBadges(key);
         }
 
         // Sauvegarder
@@ -543,11 +592,194 @@
             return emojis[channel] ? `• ${emojis[channel]}` : '';
         }
 
+        // ========== PREVIEW SYSTEM ==========
+
+        // Convertir markdown en HTML
+        function markdownToHtml(text) {
+            if (!text) return '';
+
+            let html = text
+                // Headers
+                .replace(/^### (.*$)/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-4 mb-2">$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>')
+                // Bold
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+                // Italic
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Bullet points
+                .replace(/^• (.*$)/gm, '<li class="ml-4">$1</li>')
+                .replace(/^- (.*$)/gm, '<li class="ml-4">$1</li>')
+                // Line breaks
+                .replace(/\n\n/g, '</p><p class="mb-3">')
+                .replace(/\n/g, '<br>');
+
+            return `<p class="mb-3">${html}</p>`;
+        }
+
+        // Format SMS (pas de markdown, style mobile)
+        function formatSmsPreview(text) {
+            if (!text) return '';
+
+            // Retirer le markdown
+            let sms = text
+                .replace(/\*\*(.*?)\*\*/g, '$1')
+                .replace(/\*(.*?)\*/g, '$1')
+                .replace(/^#+\s*/gm, '')
+                .replace(/^- /gm, '• ');
+
+            // Simuler le style SMS
+            const chars = sms.length;
+            const smsCount = Math.ceil(chars / 160);
+            const isOverLimit = chars > 3500;
+
+            return `
+                <div class="bg-gray-900 text-white rounded-2xl p-4 max-w-sm font-sans text-sm" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <div class="flex items-center gap-2 mb-3 pb-2 border-b border-gray-700">
+                        <span class="text-2xl">👩🏻</span>
+                        <div>
+                            <p class="font-semibold">Emma IA</p>
+                            <p class="text-xs text-gray-400">+1 438-544-EMMA</p>
+                        </div>
+                    </div>
+                    <div class="whitespace-pre-wrap leading-relaxed">${sms.substring(0, 3500)}</div>
+                    ${isOverLimit ? '<p class="text-red-400 text-xs mt-2">⚠️ Tronqué à 3500 chars</p>' : ''}
+                    <div class="mt-3 pt-2 border-t border-gray-700 text-xs text-gray-400 flex justify-between">
+                        <span>${chars} chars</span>
+                        <span>~${smsCount} SMS</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Format Email
+        function formatEmailPreview(text) {
+            if (!text) return '';
+
+            const html = markdownToHtml(text);
+
+            return `
+                <div class="bg-white border rounded-lg shadow-sm max-w-2xl">
+                    <div class="bg-gray-100 px-4 py-3 border-b rounded-t-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xl">👩🏻</span>
+                            <div>
+                                <p class="font-semibold text-sm">Emma IA - Analyse Financière</p>
+                                <p class="text-xs text-gray-500">emma@gobapps.com</p>
+                            </div>
+                        </div>
+                        <p class="text-sm font-medium">📊 Analyse CFA® - [TICKER]</p>
+                    </div>
+                    <div class="p-4 prose prose-sm max-w-none">
+                        ${html}
+                    </div>
+                    <div class="bg-gray-50 px-4 py-2 border-t text-xs text-gray-500 rounded-b-lg">
+                        <p>🤖 Généré par Emma IA • GOB Financial Dashboard</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Format Web (markdown)
+        function formatWebPreview(text) {
+            if (!text) return '';
+            return `<div class="prose prose-sm max-w-none">${markdownToHtml(text)}</div>`;
+        }
+
+        // Mettre à jour le preview
+        function updatePreview() {
+            const text = document.getElementById('editValue').value;
+            const mode = document.getElementById('previewMode').value;
+            const previewArea = document.getElementById('previewArea');
+            const modeLabel = document.getElementById('previewModeLabel');
+            const charCount = document.getElementById('charCount');
+            const wordCount = document.getElementById('wordCount');
+            const lineCount = document.getElementById('lineCount');
+
+            // Stats
+            const chars = text.length;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const lines = text.split('\n').length;
+
+            charCount.textContent = `${chars} chars`;
+            wordCount.textContent = words;
+            lineCount.textContent = lines;
+
+            // Mode label
+            const labels = { web: '(Web)', sms: '(SMS)', email: '(Email)' };
+            modeLabel.textContent = labels[mode] || '(Web)';
+
+            // Render preview
+            if (!text.trim()) {
+                previewArea.innerHTML = '<p class="text-gray-400 italic">Le preview s\'affiche ici en temps réel...</p>';
+                return;
+            }
+
+            switch (mode) {
+                case 'sms':
+                    previewArea.innerHTML = formatSmsPreview(text);
+                    break;
+                case 'email':
+                    previewArea.innerHTML = formatEmailPreview(text);
+                    break;
+                default:
+                    previewArea.innerHTML = formatWebPreview(text);
+            }
+        }
+
+        // Mettre à jour les badges de canaux selon le contenu
+        function updateChannelBadges(configKey) {
+            const badges = document.getElementById('channelBadges');
+            if (!configKey) return;
+
+            // Détecter les canaux depuis le nom de la config ou son contenu
+            const key = configKey.toLowerCase();
+            const text = document.getElementById('editValue').value.toLowerCase();
+
+            let channels = [];
+
+            // Détection par annotation @channels dans le prompt
+            const channelMatch = text.match(/@channels?:\s*([a-z,\s]+)/i);
+            if (channelMatch) {
+                channels = channelMatch[1].split(',').map(c => c.trim());
+            } else {
+                // Détection par défaut
+                if (key.includes('sms') || text.includes('format sms')) channels.push('sms');
+                if (key.includes('email') || text.includes('format email')) channels.push('email');
+                if (key.includes('web') || text.includes('format web')) channels.push('web');
+
+                // Si aucun canal spécifique, tous les canaux
+                if (channels.length === 0) channels = ['web', 'sms', 'email'];
+            }
+
+            // Render badges
+            const badgeHtml = channels.map(ch => {
+                const styles = {
+                    web: 'bg-blue-100 text-blue-700',
+                    sms: 'bg-green-100 text-green-700',
+                    email: 'bg-purple-100 text-purple-700'
+                };
+                const icons = { web: '💻', sms: '📱', email: '📧' };
+                return `<span class="px-2 py-0.5 text-xs rounded ${styles[ch] || 'bg-gray-100'}">${icons[ch] || ''} ${ch.toUpperCase()}</span>`;
+            }).join('');
+
+            badges.innerHTML = badgeHtml;
+        }
+
+        // ========== END PREVIEW SYSTEM ==========
+
         // Events
         document.getElementById('refreshBtn').addEventListener('click', loadAllConfigs);
         document.getElementById('saveBtn').addEventListener('click', saveCurrentConfig);
         document.getElementById('deleteBtn').addEventListener('click', deleteCurrentConfig);
         document.getElementById('addBtn').addEventListener('click', createNewConfig);
+
+        // Preview events
+        document.getElementById('editValue').addEventListener('input', () => {
+            updatePreview();
+            updateChannelBadges(currentConfig?.key);
+        });
+        document.getElementById('previewMode').addEventListener('change', updatePreview);
 
         // Filter events
         document.getElementById('searchFilter').addEventListener('input', renderConfigList);
