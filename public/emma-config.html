@@ -703,34 +703,39 @@
             return `<p>${html}</p>`;
         }
 
-        // Format SMS (pas de markdown, style mobile)
+        // Format SMS (identique à lib/channel-adapter.js)
         function formatSmsPreview(text) {
             if (!text) return '';
 
-            // Retirer le markdown
+            // Nettoyage identique à adaptForSMS()
             let sms = text
+                // Markdown → texte brut
                 .replace(/\*\*(.*?)\*\*/g, '$1')
                 .replace(/\*(.*?)\*/g, '$1')
                 .replace(/^#+\s*/gm, '')
-                .replace(/^- /gm, '• ');
+                .replace(/^- /gm, '• ')
+                // Emojis numérotés → chiffres
+                .replace(/[0-9]️⃣/g, m => m.charAt(0) + '.')
+                // Emojis répétitifs supprimés
+                .replace(/[📱💬🎯🔑🏆⭐🔴🟢🟡🚀🔍🌎🌍🌏]/g, '')
+                .replace(/💵|💲/g, '$');
 
-            // Simuler le style SMS
             const chars = sms.length;
             const smsCount = Math.ceil(chars / 160);
             const isOverLimit = chars > 3500;
 
             return `
-                <div class="bg-gray-900 text-white rounded-2xl p-4 max-w-sm font-sans text-sm" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                    <div class="flex items-center gap-2 mb-3 pb-2 border-b border-gray-700">
-                        <span class="text-2xl">👩🏻</span>
+                <div style="background:#1a1a1a;color:white;border-radius:20px;padding:16px;max-width:320px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #333;">
+                        <span style="font-size:28px;">👩🏻</span>
                         <div>
-                            <p class="font-semibold">Emma IA</p>
-                            <p class="text-xs text-gray-400">+1 438-544-EMMA</p>
+                            <p style="margin:0;font-weight:600;">Emma IA</p>
+                            <p style="margin:0;font-size:11px;color:#888;">+1 438-544-EMMA</p>
                         </div>
                     </div>
-                    <div class="whitespace-pre-wrap leading-relaxed">${sms.substring(0, 3500)}</div>
-                    ${isOverLimit ? '<p class="text-red-400 text-xs mt-2">⚠️ Tronqué à 3500 chars</p>' : ''}
-                    <div class="mt-3 pt-2 border-t border-gray-700 text-xs text-gray-400 flex justify-between">
+                    <div style="white-space:pre-wrap;line-height:1.5;">${sms.substring(0, 3500)}</div>
+                    ${isOverLimit ? '<p style="color:#f87171;font-size:11px;margin-top:10px;">⚠️ Tronqué à 3500 chars</p>' : ''}
+                    <div style="margin-top:12px;padding-top:10px;border-top:1px solid #333;font-size:11px;color:#666;display:flex;justify-content:space-between;">
                         <span>${chars} chars</span>
                         <span>~${smsCount} SMS</span>
                     </div>
@@ -738,29 +743,45 @@
             `;
         }
 
-        // Format Email
+        // Format Email (identique à lib/email-templates.js)
         function formatEmailPreview(text) {
             if (!text) return '';
 
-            const html = markdownToHtml(text);
+            // Couleurs du thème GOB (config/theme-colors.json)
+            const colors = {
+                primary: '#6366f1',
+                primaryDark: '#4f46e5',
+                primaryLight: '#8b5cf6',
+                text: '#1f2937',
+                textMuted: '#6b7280'
+            };
+
+            // Markdown → HTML avec styles inline (comme email-templates.js)
+            let html = text
+                .replace(/^### (.+)$/gm, `<h3 style="color:${colors.primary};margin:24px 0 12px;font-size:18px;font-weight:600;border-left:4px solid ${colors.primaryLight};padding-left:12px;">$1</h3>`)
+                .replace(/^## (.+)$/gm, `<h2 style="color:${colors.primaryDark};margin:28px 0 16px;font-size:20px;font-weight:700;border-bottom:3px solid ${colors.primary};padding-bottom:8px;">$1</h2>`)
+                .replace(/^# (.+)$/gm, `<h1 style="color:${colors.primaryDark};margin:32px 0 20px;font-size:24px;font-weight:700;">$1</h1>`)
+                .replace(/\*\*(.+?)\*\*/g, `<strong style="font-weight:700;color:${colors.primary};">$1</strong>`)
+                .replace(/\*(.+?)\*/g, '<em style="font-style:italic;">$1</em>')
+                .replace(/\n\n/g, `</p><p style="margin:12px 0;line-height:1.8;color:${colors.text};">`)
+                .replace(/\n/g, '<br>');
+            html = `<p style="margin:12px 0;line-height:1.8;color:${colors.text};">${html}</p>`;
 
             return `
-                <div class="bg-white border rounded-lg shadow-sm max-w-2xl">
-                    <div class="bg-gray-100 px-4 py-3 border-b rounded-t-lg">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="text-xl">👩🏻</span>
-                            <div>
-                                <p class="font-semibold text-sm">Emma IA - Analyse Financière</p>
-                                <p class="text-xs text-gray-500">emma@gobapps.com</p>
-                            </div>
-                        </div>
-                        <p class="text-sm font-medium">📊 Analyse CFA® - [TICKER]</p>
+                <div style="max-width:600px;margin:0 auto;font-family:'Segoe UI',Roboto,sans-serif;background:#f8fafc;padding:10px;">
+                    <!-- Header gradient comme emails réels -->
+                    <div style="background:linear-gradient(135deg,${colors.primary} 0%,${colors.primaryLight} 100%);color:white;padding:32px 24px;border-radius:12px 12px 0 0;text-align:center;">
+                        <div style="font-size:48px;margin-bottom:12px;">☀️</div>
+                        <h1 style="margin:0 0 8px;font-size:28px;font-weight:700;">Emma En Direct</h1>
+                        <div style="opacity:0.95;font-size:14px;">ÉDITION MATIN | ${new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long'})}</div>
                     </div>
-                    <div class="p-4 prose prose-sm max-w-none">
+                    <!-- Content -->
+                    <div style="background:white;padding:32px 24px;border-radius:0 0 12px 12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
                         ${html}
                     </div>
-                    <div class="bg-gray-50 px-4 py-2 border-t text-xs text-gray-500 rounded-b-lg">
-                        <p>🤖 Généré par Emma IA • GOB Financial Dashboard</p>
+                    <!-- Footer -->
+                    <div style="text-align:center;padding:20px;color:${colors.textMuted};font-size:12px;">
+                        <p style="margin:0;">🤖 Généré par <strong style="color:${colors.primaryDark};">Emma IA</strong> • GOB Apps</p>
                     </div>
                 </div>
             `;
