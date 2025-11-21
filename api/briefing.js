@@ -253,8 +253,8 @@ export default async function handler(req, res) {
 
     const content = emmaResponse.response || emmaResponse.analysis || '';
 
-    // 6. GÉNÉRER LE HTML AVEC LE TEMPLATE APPROPRIÉ
-    const htmlContent = generateBriefingTemplate(briefingType, content, {
+    // 6. GÉNÉRER LE HTML AVEC LE TEMPLATE APPROPRIÉ (chargé depuis Supabase)
+    const htmlContent = await generateBriefingTemplate(briefingType, content, {
       tickers: allTickers,
       tools_used: emmaResponse.tools_used,
       execution_time_ms: emmaResponse.execution_time_ms
