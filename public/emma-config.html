@@ -102,8 +102,21 @@
         <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
             <!-- Header Sidebar -->
             <div class="p-4 border-b border-gray-200">
-                <h1 class="text-xl font-bold text-gray-800">📝 Emma Config</h1>
-                <p class="text-xs text-gray-500 mt-1">Gestion dynamique</p>
+                <h1 class="text-xl font-bold text-gray-800">⚙️ Emma Config</h1>
+                <p class="text-xs text-gray-500 mt-1">Centre de configuration unifié</p>
+
+                <!-- ONGLETS PRINCIPAUX -->
+                <div class="mt-3 flex rounded-lg bg-gray-100 p-1">
+                    <button id="tabPrompts" onclick="switchMainTab('prompts')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md bg-white shadow font-medium" title="Gérer les prompts et instructions d'Emma">
+                        📝 Prompts
+                    </button>
+                    <button id="tabDesign" onclick="switchMainTab('design')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Personnaliser le design des emails">
+                        🎨 Design
+                    </button>
+                    <button id="tabSms" onclick="switchMainTab('sms')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configurer les paramètres SMS">
+                        📱 SMS
+                    </button>
+                </div>
 
                 <!-- Recherche -->
                 <div class="mt-3">
@@ -196,6 +209,8 @@
 
             <!-- Editor Area -->
             <div class="flex-1 overflow-y-auto p-6">
+                <!-- PROMPTS TAB CONTENT -->
+                <div id="promptsTabContent">
                 <div id="editorEmpty" class="flex items-center justify-center h-full text-gray-400">
                     <div class="text-center">
                         <svg class="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,14 +334,476 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- END promptsTabContent -->
+
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- DESIGN TAB CONTENT - Configuration visuelle des emails      -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <div id="designTabContent" class="hidden max-w-4xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <!-- Header -->
+                        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6">
+                            <h2 class="text-2xl font-bold">🎨 Design des Emails</h2>
+                            <p class="text-purple-100 mt-1">Personnalisez l'apparence des emails envoyés par Emma</p>
+                        </div>
+
+                        <div class="p-6 space-y-8">
+                            <!-- SECTION: Branding -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">🏷️</span>
+                                    Branding
+                                </h3>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Avatar Emma
+                                            <span class="ml-1 text-gray-400 cursor-help" title="URL de l'image avatar d'Emma (64x64px recommandé)">ⓘ</span>
+                                        </label>
+                                        <input type="url" id="designAvatarUrl" class="w-full px-3 py-2 border rounded-lg" placeholder="https://...">
+                                        <p class="text-xs text-gray-500 mt-1">Image affichée dans le header des emails</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Logo JSLai
+                                            <span class="ml-1 text-gray-400 cursor-help" title="URL du logo affiché dans le footer">ⓘ</span>
+                                        </label>
+                                        <input type="url" id="designLogoUrl" class="w-full px-3 py-2 border rounded-lg" placeholder="https://...">
+                                        <p class="text-xs text-gray-500 mt-1">Logo affiché dans le pied de page</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom de l'entreprise</label>
+                                        <input type="text" id="designCompanyName" class="w-full px-3 py-2 border rounded-lg" placeholder="GOB Apps">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Slogan</label>
+                                        <input type="text" id="designTagline" class="w-full px-3 py-2 border rounded-lg" placeholder="Intelligence Financière...">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- SECTION: Couleurs -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">🎨</span>
+                                    Couleurs
+                                </h3>
+                                <div class="grid grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Primaire</label>
+                                        <div class="flex gap-2">
+                                            <input type="color" id="designColorPrimary" class="w-12 h-10 rounded cursor-pointer" value="#6366f1">
+                                            <input type="text" id="designColorPrimaryText" class="flex-1 px-2 py-1 border rounded text-sm" value="#6366f1">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Primaire foncé</label>
+                                        <div class="flex gap-2">
+                                            <input type="color" id="designColorPrimaryDark" class="w-12 h-10 rounded cursor-pointer" value="#4f46e5">
+                                            <input type="text" id="designColorPrimaryDarkText" class="flex-1 px-2 py-1 border rounded text-sm" value="#4f46e5">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Primaire clair</label>
+                                        <div class="flex gap-2">
+                                            <input type="color" id="designColorPrimaryLight" class="w-12 h-10 rounded cursor-pointer" value="#8b5cf6">
+                                            <input type="text" id="designColorPrimaryLightText" class="flex-1 px-2 py-1 border rounded text-sm" value="#8b5cf6">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Texte</label>
+                                        <div class="flex gap-2">
+                                            <input type="color" id="designColorText" class="w-12 h-10 rounded cursor-pointer" value="#1f2937">
+                                            <input type="text" id="designColorTextValue" class="flex-1 px-2 py-1 border rounded text-sm" value="#1f2937">
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- SECTION: Header -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">📧</span>
+                                    Header des emails
+                                </h3>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="designShowAvatar" class="w-4 h-4 rounded" checked>
+                                        <label class="text-sm text-gray-700">Afficher l'avatar</label>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="designShowDate" class="w-4 h-4 rounded" checked>
+                                        <label class="text-sm text-gray-700">Afficher la date</label>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="designShowEdition" class="w-4 h-4 rounded" checked>
+                                        <label class="text-sm text-gray-700">Afficher l'édition</label>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- SECTION: Footer -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">📝</span>
+                                    Footer des emails
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" id="designShowLogo" class="w-4 h-4 rounded" checked>
+                                            <label class="text-sm text-gray-700">Afficher le logo</label>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" id="designShowDisclaimer" class="w-4 h-4 rounded" checked>
+                                            <label class="text-sm text-gray-700">Afficher le disclaimer</label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Texte de disclaimer</label>
+                                        <textarea id="designDisclaimer" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Ce briefing est généré automatiquement..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Copyright</label>
+                                        <input type="text" id="designCopyright" class="w-full px-3 py-2 border rounded-lg" placeholder="© 2025 GOB Apps">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- PREVIEW -->
+                            <section class="border rounded-lg p-4 bg-gray-50">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">👁️</span>
+                                    Aperçu en direct
+                                </h3>
+                                <div id="designPreview" class="bg-white rounded-lg shadow-inner p-4 min-h-[300px]">
+                                    <p class="text-gray-400 text-center">Le preview s'affichera ici...</p>
+                                </div>
+                            </section>
+
+                            <!-- BOUTONS D'ACTION -->
+                            <div class="flex justify-between items-center pt-4 border-t">
+                                <div class="flex gap-2">
+                                    <button onclick="resetDesignToDefaults()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2 group" title="Réinitialise tous les paramètres aux valeurs par défaut">
+                                        🔄 <span>Réinitialiser</span>
+                                        <span class="hidden group-hover:block absolute mt-12 ml-[-50px] bg-gray-800 text-white text-xs px-2 py-1 rounded">Revenir aux valeurs par défaut</span>
+                                    </button>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="cancelDesignChanges()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2" title="Annuler les modifications non sauvegardées">
+                                        ❌ <span>Annuler</span>
+                                    </button>
+                                    <button onclick="saveDesignConfig()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2" title="Sauvegarder les modifications - Appliqué immédiatement à tous les emails">
+                                        💾 <span>Sauvegarder</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- SMS TAB CONTENT - Configuration des SMS                     -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <div id="smsTabContent" class="hidden max-w-4xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <!-- Header -->
+                        <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white p-6">
+                            <h2 class="text-2xl font-bold">📱 Configuration SMS</h2>
+                            <p class="text-green-100 mt-1">Paramètres pour les messages SMS via Twilio</p>
+                        </div>
+
+                        <div class="p-6 space-y-6">
+                            <!-- Paramètres SMS -->
+                            <section class="border rounded-lg p-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">⚙️</span>
+                                    Paramètres généraux
+                                </h3>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Segments max
+                                            <span class="ml-1 text-gray-400 cursor-help" title="Nombre maximum de segments SMS (1 segment = ~153 caractères)">ⓘ</span>
+                                        </label>
+                                        <input type="number" id="smsMaxSegments" class="w-full px-3 py-2 border rounded-lg" value="10" min="1" max="50">
+                                        <p class="text-xs text-gray-500 mt-1">Twilio gère automatiquement les multi-SMS</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Seuil d'avertissement
+                                            <span class="ml-1 text-gray-400 cursor-help" title="Affiche un avertissement au-delà de ce nombre de segments">ⓘ</span>
+                                        </label>
+                                        <input type="number" id="smsWarningThreshold" class="w-full px-3 py-2 border rounded-lg" value="5" min="1" max="20">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Signature</label>
+                                        <input type="text" id="smsSignature" class="w-full px-3 py-2 border rounded-lg" value="- Emma IA">
+                                        <p class="text-xs text-gray-500 mt-1">Ajoutée à la fin de chaque SMS</p>
+                                    </div>
+                                    <div class="flex flex-col justify-center gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" id="smsKeepSectionEmojis" class="w-4 h-4 rounded" checked>
+                                            <label class="text-sm text-gray-700">Garder les emojis de section</label>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" id="smsShowWarning" class="w-4 h-4 rounded" checked>
+                                            <label class="text-sm text-gray-700">Afficher avertissement longueur</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Info coût -->
+                            <section class="border rounded-lg p-4 bg-blue-50">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                                    <span>💰</span> Estimation des coûts Twilio
+                                </h3>
+                                <p class="text-sm text-gray-600">Prix approximatif: <strong>~$0.0079 USD</strong> par segment SMS</p>
+                                <p class="text-xs text-gray-500 mt-1">10 segments = ~$0.08 USD par message</p>
+                            </section>
+
+                            <!-- BOUTONS D'ACTION -->
+                            <div class="flex justify-end gap-2 pt-4 border-t">
+                                <button onclick="cancelSmsChanges()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2" title="Annuler les modifications">
+                                    ❌ <span>Annuler</span>
+                                </button>
+                                <button onclick="saveSmsConfig()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2" title="Sauvegarder les paramètres SMS">
+                                    💾 <span>Sauvegarder</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
     <script>
         const API_BASE = '/api/admin/emma-config';
+        const DESIGN_API = '/api/email-design';
         let allConfigs = {};
         let currentConfig = null;
+        let designConfig = null;
+        let originalDesignConfig = null;
+
+        // ═══════════════════════════════════════════════════════════════
+        // TAB SWITCHING
+        // ═══════════════════════════════════════════════════════════════
+        function switchMainTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.main-tab').forEach(btn => {
+                btn.classList.remove('bg-white', 'shadow', 'font-medium');
+                btn.classList.add('text-gray-600');
+            });
+            const activeBtn = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'shadow', 'font-medium');
+                activeBtn.classList.remove('text-gray-600');
+            }
+
+            // Show/hide content
+            document.getElementById('promptsTabContent').classList.toggle('hidden', tab !== 'prompts');
+            document.getElementById('designTabContent').classList.toggle('hidden', tab !== 'design');
+            document.getElementById('smsTabContent').classList.toggle('hidden', tab !== 'sms');
+
+            // Update header
+            const titles = {
+                prompts: '📝 Gestion des Prompts',
+                design: '🎨 Design des Emails',
+                sms: '📱 Configuration SMS'
+            };
+            document.getElementById('editorTitle').textContent = titles[tab] || 'Configuration';
+            document.getElementById('editorSubtitle').textContent = '';
+
+            // Hide prompt editor buttons when not on prompts tab
+            document.getElementById('saveBtn').classList.toggle('hidden', tab !== 'prompts' || !currentConfig);
+            document.getElementById('deleteBtn').classList.toggle('hidden', tab !== 'prompts' || !currentConfig);
+
+            // Load data for design/sms tabs
+            if (tab === 'design' && !designConfig) loadDesignConfig();
+            if (tab === 'sms' && !designConfig) loadDesignConfig();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // EMAIL DESIGN FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════
+        async function loadDesignConfig() {
+            try {
+                const response = await fetch(DESIGN_API);
+                designConfig = await response.json();
+                originalDesignConfig = JSON.parse(JSON.stringify(designConfig));
+                populateDesignForm(designConfig);
+                updateDesignPreview();
+            } catch (error) {
+                console.error('Error loading design config:', error);
+                showStatus('❌ Erreur chargement design', 'error');
+            }
+        }
+
+        function populateDesignForm(config) {
+            // Branding
+            document.getElementById('designAvatarUrl').value = config.branding?.avatar?.url || '';
+            document.getElementById('designLogoUrl').value = config.branding?.logo?.url || '';
+            document.getElementById('designCompanyName').value = config.branding?.companyName || '';
+            document.getElementById('designTagline').value = config.branding?.tagline || '';
+
+            // Colors
+            const colors = config.colors || {};
+            document.getElementById('designColorPrimary').value = colors.primary || '#6366f1';
+            document.getElementById('designColorPrimaryText').value = colors.primary || '#6366f1';
+            document.getElementById('designColorPrimaryDark').value = colors.primaryDark || '#4f46e5';
+            document.getElementById('designColorPrimaryDarkText').value = colors.primaryDark || '#4f46e5';
+            document.getElementById('designColorPrimaryLight').value = colors.primaryLight || '#8b5cf6';
+            document.getElementById('designColorPrimaryLightText').value = colors.primaryLight || '#8b5cf6';
+            document.getElementById('designColorText').value = colors.textDark || '#1f2937';
+            document.getElementById('designColorTextValue').value = colors.textDark || '#1f2937';
+
+            // Header
+            document.getElementById('designShowAvatar').checked = config.header?.showAvatar !== false;
+            document.getElementById('designShowDate').checked = config.header?.showDate !== false;
+            document.getElementById('designShowEdition').checked = config.header?.showEdition !== false;
+
+            // Footer
+            document.getElementById('designShowLogo').checked = config.footer?.showLogo !== false;
+            document.getElementById('designShowDisclaimer').checked = config.footer?.showDisclaimer !== false;
+            document.getElementById('designDisclaimer').value = config.footer?.disclaimerText || '';
+            document.getElementById('designCopyright').value = config.footer?.copyrightText || '';
+
+            // SMS
+            document.getElementById('smsMaxSegments').value = config.sms?.maxSegments || 10;
+            document.getElementById('smsWarningThreshold').value = config.sms?.warningThreshold || 5;
+            document.getElementById('smsSignature').value = config.sms?.signature || '- Emma IA';
+            document.getElementById('smsKeepSectionEmojis').checked = config.sms?.keepSectionEmojis !== false;
+            document.getElementById('smsShowWarning').checked = config.sms?.showSegmentWarning !== false;
+        }
+
+        function getDesignFormData() {
+            return {
+                branding: {
+                    avatar: { url: document.getElementById('designAvatarUrl').value },
+                    logo: { url: document.getElementById('designLogoUrl').value },
+                    companyName: document.getElementById('designCompanyName').value,
+                    tagline: document.getElementById('designTagline').value
+                },
+                colors: {
+                    primary: document.getElementById('designColorPrimary').value,
+                    primaryDark: document.getElementById('designColorPrimaryDark').value,
+                    primaryLight: document.getElementById('designColorPrimaryLight').value,
+                    textDark: document.getElementById('designColorText').value
+                },
+                header: {
+                    showAvatar: document.getElementById('designShowAvatar').checked,
+                    showDate: document.getElementById('designShowDate').checked,
+                    showEdition: document.getElementById('designShowEdition').checked
+                },
+                footer: {
+                    showLogo: document.getElementById('designShowLogo').checked,
+                    showDisclaimer: document.getElementById('designShowDisclaimer').checked,
+                    disclaimerText: document.getElementById('designDisclaimer').value,
+                    copyrightText: document.getElementById('designCopyright').value
+                },
+                sms: {
+                    maxSegments: parseInt(document.getElementById('smsMaxSegments').value),
+                    warningThreshold: parseInt(document.getElementById('smsWarningThreshold').value),
+                    signature: document.getElementById('smsSignature').value,
+                    keepSectionEmojis: document.getElementById('smsKeepSectionEmojis').checked,
+                    showSegmentWarning: document.getElementById('smsShowWarning').checked
+                }
+            };
+        }
+
+        async function saveDesignConfig() {
+            try {
+                const data = getDesignFormData();
+                const response = await fetch(DESIGN_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    designConfig = result.config;
+                    originalDesignConfig = JSON.parse(JSON.stringify(designConfig));
+                    showStatus('✅ Design sauvegardé!', 'success');
+                } else {
+                    showStatus('❌ Erreur: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Erreur sauvegarde', 'error');
+            }
+        }
+
+        async function saveSmsConfig() {
+            await saveDesignConfig(); // SMS config is part of design config
+        }
+
+        function cancelDesignChanges() {
+            if (originalDesignConfig) {
+                populateDesignForm(originalDesignConfig);
+                updateDesignPreview();
+                showStatus('↩️ Modifications annulées', 'info');
+            }
+        }
+
+        function cancelSmsChanges() {
+            cancelDesignChanges();
+        }
+
+        function resetDesignToDefaults() {
+            if (confirm('Réinitialiser tous les paramètres design aux valeurs par défaut?')) {
+                fetch(DESIGN_API).then(r => r.json()).then(config => {
+                    populateDesignForm(config);
+                    updateDesignPreview();
+                    showStatus('🔄 Réinitialisé aux valeurs par défaut', 'info');
+                });
+            }
+        }
+
+        function updateDesignPreview() {
+            const preview = document.getElementById('designPreview');
+            const primary = document.getElementById('designColorPrimary').value;
+            const primaryLight = document.getElementById('designColorPrimaryLight').value;
+            const avatar = document.getElementById('designAvatarUrl').value;
+            const logo = document.getElementById('designLogoUrl').value;
+            const company = document.getElementById('designCompanyName').value || 'GOB Apps';
+
+            preview.innerHTML = `
+                <div style="max-width:500px;margin:0 auto;font-family:sans-serif;background:#f8fafc;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="background:linear-gradient(135deg,${primary},${primaryLight});color:white;padding:20px;text-align:center;">
+                        ${avatar ? `<img src="${avatar}" style="width:48px;height:48px;border-radius:50%;margin-bottom:8px;">` : '<div style="font-size:32px;margin-bottom:8px;">👩🏻</div>'}
+                        <h2 style="margin:0;font-size:20px;">Emma En Direct</h2>
+                        <p style="margin:4px 0 0;opacity:0.9;font-size:12px;">ÉDITION MATIN | ${new Date().toLocaleDateString('fr-FR')}</p>
+                    </div>
+                    <div style="padding:20px;background:white;">
+                        <p style="color:#1f2937;line-height:1.6;">Bonjour! Voici votre briefing matinal des marchés financiers...</p>
+                        <h3 style="color:${primary};margin:16px 0 8px;">📊 Marchés</h3>
+                        <p style="color:#4b5563;font-size:14px;">Les indices sont en hausse ce matin...</p>
+                    </div>
+                    <div style="padding:16px;background:#f8fafc;text-align:center;border-top:1px solid #e5e7eb;">
+                        ${logo ? `<img src="${logo}" style="height:30px;margin-bottom:8px;">` : ''}
+                        <p style="margin:0;font-size:11px;color:#6b7280;">🤖 Généré par Emma IA • ${company}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Sync color pickers with text inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            ['Primary', 'PrimaryDark', 'PrimaryLight', 'Text'].forEach(name => {
+                const picker = document.getElementById('designColor' + name);
+                const text = document.getElementById('designColor' + name + (name === 'Text' ? 'Value' : 'Text'));
+                if (picker && text) {
+                    picker.addEventListener('input', () => { text.value = picker.value; updateDesignPreview(); });
+                    text.addEventListener('input', () => { picker.value = text.value; updateDesignPreview(); });
+                }
+            });
+            // Update preview on any input change
+            document.querySelectorAll('#designTabContent input, #designTabContent textarea').forEach(el => {
+                el.addEventListener('change', updateDesignPreview);
+            });
+        });
 
         // Charger toutes les configurations
         async function loadAllConfigs() {

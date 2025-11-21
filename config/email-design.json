@@ -1,0 +1,80 @@
+{
+  "name": "Emma Email Design Configuration",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-21T00:00:00Z",
+  "updatedBy": "system",
+
+  "branding": {
+    "avatar": {
+      "url": "https://gobapps.com/images/emma-avatar.png",
+      "alt": "Emma IA",
+      "size": 64,
+      "description": "Avatar d'Emma affiché dans le header des emails"
+    },
+    "logo": {
+      "url": "https://gobapps.com/images/jslai-logo.png",
+      "alt": "JSLai - Intelligence Financière",
+      "width": 150,
+      "description": "Logo affiché dans le footer des emails"
+    },
+    "companyName": "GOB Apps",
+    "tagline": "Intelligence Financière Propulsée par Emma IA"
+  },
+
+  "colors": {
+    "primary": "#6366f1",
+    "primaryDark": "#4f46e5",
+    "primaryLight": "#8b5cf6",
+    "headerGradientStart": "#6366f1",
+    "headerGradientEnd": "#8b5cf6",
+    "textDark": "#1f2937",
+    "textMuted": "#6b7280",
+    "background": "#f8fafc",
+    "cardBackground": "#ffffff",
+    "border": "#e5e7eb"
+  },
+
+  "header": {
+    "style": "gradient",
+    "showAvatar": true,
+    "showDate": true,
+    "showEdition": true,
+    "editions": {
+      "morning": { "emoji": "☀️", "label": "ÉDITION MATIN" },
+      "midday": { "emoji": "📊", "label": "ÉDITION MI-JOURNÉE" },
+      "evening": { "emoji": "🌙", "label": "ÉDITION SOIRÉE" }
+    }
+  },
+
+  "footer": {
+    "showLogo": true,
+    "showDisclaimer": true,
+    "disclaimerText": "Ce briefing est généré automatiquement par Emma IA à des fins informatives uniquement. Il ne constitue pas un conseil en investissement.",
+    "copyrightText": "© 2025 GOB Apps - Tous droits réservés",
+    "unsubscribeText": "Se désabonner",
+    "showSocialLinks": false,
+    "socialLinks": {
+      "linkedin": "",
+      "twitter": ""
+    }
+  },
+
+  "content": {
+    "fontFamily": "'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    "fontSize": "16px",
+    "lineHeight": "1.8",
+    "paragraphSpacing": "12px",
+    "headingColor": "#4f46e5",
+    "linkColor": "#6366f1",
+    "highlightBackground": "#eff6ff"
+  },
+
+  "sms": {
+    "maxSegments": 10,
+    "showSegmentWarning": true,
+    "warningThreshold": 5,
+    "removeEmojis": false,
+    "keepSectionEmojis": true,
+    "signature": "- Emma IA"
+  }
+}
