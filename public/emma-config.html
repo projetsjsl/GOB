@@ -769,7 +769,73 @@
         // Format Web (markdown)
         function formatWebPreview(text) {
             if (!text) return '';
+
+            // Détecter si c'est du JSON
+            const trimmed = text.trim();
+            if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                try {
+                    const json = JSON.parse(trimmed);
+                    return formatJsonPreview(json);
+                } catch (e) {
+                    // Pas du JSON valide, continuer avec markdown
+                }
+            }
+
             return `<div class="preview-content">${markdownToHtml(text)}</div>`;
+        }
+
+        // Format JSON (briefings, configs)
+        function formatJsonPreview(json) {
+            let html = '<div class="preview-content">';
+
+            // Header avec nom
+            if (json.name) {
+                html += `<h2 style="margin-top:0">📋 ${json.name}</h2>`;
+            }
+
+            // Metadata
+            const meta = [];
+            if (json.schedule) meta.push(`🕐 ${json.schedule}`);
+            if (json.tone) meta.push(`🎭 ${json.tone}`);
+            if (json.length) meta.push(`📏 ${json.length}`);
+            if (meta.length) {
+                html += `<p style="color:#6b7280;font-size:0.85rem">${meta.join(' • ')}</p>`;
+            }
+
+            // Prompt principal (le plus important)
+            if (json.prompt) {
+                html += `<div style="margin:1rem 0;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">`;
+                html += `<strong style="color:#4f46e5">📝 Prompt:</strong>`;
+                html += `<div style="margin-top:0.5rem">${markdownToHtml(json.prompt)}</div>`;
+                html += `</div>`;
+            }
+
+            // Tools
+            if (json.tools_priority && json.tools_priority.length) {
+                html += `<p><strong>🔧 Outils:</strong> <span style="font-size:0.85rem;color:#6b7280">${json.tools_priority.join(', ')}</span></p>`;
+            }
+
+            // Structure
+            if (json.structure?.sections) {
+                html += `<p><strong>📊 Sections:</strong></p><ul>`;
+                json.structure.sections.forEach(s => {
+                    html += `<li>${s.replace(/_/g, ' ')}</li>`;
+                });
+                html += `</ul>`;
+            }
+
+            // Email config
+            if (json.email_config) {
+                html += `<div style="margin-top:1rem;padding:0.75rem;background:#eff6ff;border-radius:6px">`;
+                html += `<strong>📧 Email:</strong> ${json.email_config.subject_template || ''}`;
+                if (json.email_config.preview_text) {
+                    html += `<br><span style="font-size:0.8rem;color:#6b7280">${json.email_config.preview_text}</span>`;
+                }
+                html += `</div>`;
+            }
+
+            html += '</div>';
+            return html;
         }
 
         // Mettre à jour le preview
