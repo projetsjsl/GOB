@@ -83,7 +83,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://your-app.vercel.app/api/adapters/email",
+        "url": "https://gobapps.com/api/adapters/email",
         "authentication": "none",
         "options": {},
         "bodyParametersJson": "={{ JSON.stringify({\n  from: $json.from,\n  to: $json.to,\n  subject: $json.subject,\n  text: $json.text,\n  html: $json.html\n}) }}"
