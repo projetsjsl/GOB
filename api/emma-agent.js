@@ -180,8 +180,36 @@ class SmartAgent {
             }
 
             // 1. Planification avec scoring (enrichi par l'intent)
-            const selectedTools = await this._plan_with_scoring(userMessage, context);
+            let selectedTools = await this._plan_with_scoring(userMessage, context);
             console.log('📋 Selected tools:', selectedTools.map(t => t.id));
+
+            // ═══════════════════════════════════════════════════════════
+            // BRIEFINGS: FORCER L'UTILISATION DES OUTILS DE DONNÉES RÉELLES
+            // Fix: Emma inventait des données car aucun outil n'était appelé
+            // ═══════════════════════════════════════════════════════════
+            if (context.output_mode === 'briefing' && context.tickers && context.tickers.length > 0) {
+                console.log('📊 BRIEFING MODE: Forcing market data tools for tickers:', context.tickers);
+
+                // Outils essentiels pour un briefing avec vraies données
+                const essentialBriefingTools = [
+                    'fmp-quote',           // Prix en temps réel
+                    'fmp-fundamentals',    // Données fondamentales
+                    'fmp-key-metrics',     // Métriques clés
+                    'finnhub-news'         // News récentes
+                ];
+
+                // Ajouter les outils manquants
+                const toolIds = selectedTools.map(t => t.id);
+                const missingTools = essentialBriefingTools
+                    .filter(toolId => !toolIds.includes(toolId))
+                    .map(toolId => this.toolsConfig.tools.find(t => t.id === toolId && t.enabled))
+                    .filter(tool => tool !== undefined);
+
+                if (missingTools.length > 0) {
+                    console.log('✅ Adding missing essential tools:', missingTools.map(t => t.id));
+                    selectedTools = [...missingTools, ...selectedTools];
+                }
+            }
 
             // 2. Exécution des outils
             const toolResults = await this._execute_all(selectedTools, userMessage, context);
