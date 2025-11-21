@@ -131,15 +131,27 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { text, channel = 'web', briefingType = 'morning' } = req.body;
+    const { text, channel = 'web', briefingType = 'morning', customDesign } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'text is required' });
     }
 
-    // Charge la config design depuis Supabase (avec cache 1min)
-    const config = await getDesignConfig();
-    const colors = config.colors;
+    // ═══════════════════════════════════════════════════════════
+    // DESIGN: Chaque prompt peut avoir son propre design
+    // - Si customDesign fourni → utiliser ce design spécifique
+    // - Sinon → charger le design global depuis Supabase
+    // ═══════════════════════════════════════════════════════════
+    let config;
+    if (customDesign) {
+      // Design personnalisé passé par le prompt
+      config = customDesign;
+    } else {
+      // Design global par défaut (cache 1min)
+      config = await getDesignConfig();
+    }
+
+    const colors = config.colors || DEFAULT_COLORS;
 
     let result;
 
