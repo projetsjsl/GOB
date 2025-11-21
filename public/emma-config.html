@@ -222,6 +222,32 @@
                 </div>
 
                 <div id="editorContent" class="hidden max-w-4xl mx-auto">
+                    <!-- ═══════════════════════════════════════════════════════════ -->
+                    <!-- HEADER - Indicateur clair du prompt en cours d'édition      -->
+                    <!-- ═══════════════════════════════════════════════════════════ -->
+                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg p-6 mb-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="text-3xl">📝</span>
+                                    <div>
+                                        <p class="text-sm text-indigo-200 font-medium">Édition en cours</p>
+                                        <h2 id="currentPromptTitle" class="text-2xl font-bold">Sélectionnez un prompt</h2>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 mt-3">
+                                    <span id="currentPromptSection" class="px-3 py-1 bg-white/20 rounded-full text-sm font-medium">Section</span>
+                                    <span id="currentPromptKey" class="px-3 py-1 bg-white/20 rounded-full text-sm font-medium">Clé</span>
+                                    <span id="currentPromptChannel" class="px-3 py-1 bg-white/10 rounded-full text-xs">Canal</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-indigo-200 text-xs mb-1">Dernière modification</p>
+                                <p id="currentPromptUpdated" class="text-sm font-medium">-</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Metadata -->
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div>
@@ -1082,6 +1108,30 @@
             document.getElementById('editUpdatedBy').textContent = config.updated_by || '-';
             document.getElementById('editVersion').textContent = config.version || '1';
             document.getElementById('editIsOverride').textContent = config.is_override ? 'Oui' : 'Non';
+
+            // ═══════════════════════════════════════════════════════════
+            // HEADER - Mettre à jour l'indicateur du prompt actuel
+            // ═══════════════════════════════════════════════════════════
+            const channelLabel = {
+                'web': '💬 Web',
+                'sms': '📱 SMS',
+                'email': '📧 Email',
+                'messenger': '💬 Messenger',
+                'multicanal': '🌐 Multicanal'
+            }[config.metadata?.channel || ''] || '📝 Tous canaux';
+
+            document.getElementById('currentPromptTitle').textContent = key || 'Sans titre';
+            document.getElementById('currentPromptSection').textContent = section || 'Section';
+            document.getElementById('currentPromptKey').textContent = key || 'Clé';
+            document.getElementById('currentPromptChannel').textContent = channelLabel;
+            document.getElementById('currentPromptUpdated').textContent = config.updated_at
+                ? new Date(config.updated_at).toLocaleString('fr-FR', {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+                : '-';
 
             // ✅ Mettre à jour le preview et les badges de canaux
             updatePreview();
