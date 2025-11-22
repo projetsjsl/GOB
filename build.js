@@ -21,25 +21,36 @@ async function build() {
     if (existsSync(APP_3P1_DIR)) {
       console.log('🔨 Construction de l\'application 3p1...');
       try {
-        // Installer les dépendances si nécessaire
-        const packageLockPath = join(APP_3P1_DIR, 'package-lock.json');
-        if (!existsSync(packageLockPath)) {
-          console.log('📦 Installation des dépendances 3p1...');
-          execSync('npm install', { 
-            cwd: APP_3P1_DIR, 
-            stdio: 'inherit' 
-          });
-        }
+        // Toujours installer les dépendances (nécessaire sur Vercel)
+        console.log('📦 Installation des dépendances 3p1...');
+        execSync('npm install', { 
+          cwd: APP_3P1_DIR, 
+          stdio: 'inherit',
+          env: { ...process.env, NODE_ENV: 'production' }
+        });
         
         // Construire l'application
+        console.log('🔨 Build de l\'application 3p1...');
         execSync('npm run build', { 
           cwd: APP_3P1_DIR, 
-          stdio: 'inherit' 
+          stdio: 'inherit',
+          env: { ...process.env, NODE_ENV: 'production' }
         });
-        console.log('✅ Application 3p1 construite avec succès');
+        
+        // Vérifier que le build a réussi
+        const distPath = join(APP_3P1_DIR, 'dist', 'assets', 'index.js');
+        if (existsSync(distPath)) {
+          console.log('✅ Application 3p1 construite avec succès');
+          console.log(`✅ Fichier trouvé: ${distPath}`);
+        } else {
+          console.warn(`⚠️ Fichier de build non trouvé: ${distPath}`);
+          throw new Error('Build 3p1 réussi mais fichier index.js non trouvé');
+        }
       } catch (error) {
-        console.warn('⚠️ Erreur lors de la construction de 3p1:', error.message);
-        console.warn('⚠️ Continuons le build sans 3p1...');
+        console.error('❌ Erreur lors de la construction de 3p1:', error.message);
+        console.error('❌ Stack:', error.stack);
+        // Ne pas continuer si le build échoue - c'est critique
+        throw error;
       }
     }
     
