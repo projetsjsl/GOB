@@ -56,7 +56,17 @@ async function build() {
     }
     
     // Copier récursivement tous les fichiers de public vers dist
-    await cp(PUBLIC_DIR, DIST_DIR, { recursive: true });
+    // Exclure node_modules pour éviter de copier les dépendances
+    await cp(PUBLIC_DIR, DIST_DIR, { 
+      recursive: true,
+      filter: (src) => {
+        // Exclure node_modules
+        if (src.includes('node_modules')) {
+          return false;
+        }
+        return true;
+      }
+    });
     console.log(`✅ Fichiers copiés de ${PUBLIC_DIR}/ vers ${DIST_DIR}/`);
     
     // Copier index.html de la racine vers dist
