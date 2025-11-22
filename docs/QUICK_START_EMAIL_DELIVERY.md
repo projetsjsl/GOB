@@ -103,84 +103,107 @@ curl https://gob.vercel.app/api/prompt-delivery-config?prompt_id=briefing_mornin
 
 ## Étape 4: Intégrer avec n8n (Automatisation)
 
-### 4.1 Créer un Workflow n8n
+### 🎯 Approche Recommandée: Planification Dynamique
 
-**Template de base:**
+Au lieu de créer un Cron pour chaque heure, utilisez **UN SEUL workflow** qui s'exécute toutes les 5 minutes et interroge l'API pour savoir quels prompts envoyer **maintenant**.
+
+**Avantages:**
+- ✅ Changez les heures depuis emma-config sans toucher à n8n
+- ✅ Chaque prompt peut avoir son propre horaire et timezone
+- ✅ Ajoutez/retirez des prompts sans redéployer n8n
+- ✅ Un seul workflow pour gérer tous les envois
+
+### 4.1 Créer le Workflow Dynamique
+
+**Template simplifié:**
 
 ```
-┌─────────────┐
-│ Cron        │  Déclencheur quotidien à 9h
-│ 0 9 * * 1-5 │
-└──────┬──────┘
+┌─────────────────┐
+│ Schedule        │  Toutes les 5 minutes
+│ */5 * * * *     │
+└──────┬──────────┘
        │
        v
-┌──────────────────┐
-│ HTTP Request     │  GET config du prompt
-│ GET /api/prompt- │
-│ delivery-config  │
-└──────┬───────────┘
+┌─────────────────────────┐
+│ GET /api/prompt-        │  Récupère SEULEMENT les prompts
+│ delivery-schedule       │  à envoyer MAINTENANT (selon heure
+└──────┬──────────────────┘  configurée dans emma-config)
        │
        v
-┌──────────────────┐
-│ Code             │  Filtrer destinataires actifs
-│ Filter active    │
-└──────┬───────────┘
-       │
+┌─────────────────────────┐
+│ IF: count > 0 ?         │  Des prompts trouvés ?
+└──────┬──────────────────┘
+       │ YES
        v
-┌──────────────────┐
-│ HTTP Request     │  Générer le briefing
-│ POST /api/       │
-│ briefing         │
-└──────┬───────────┘
-       │
-       v
-┌──────────────────┐
-│ Send Email       │  Envoyer via Resend
-│ (Resend)         │
-└──────────────────┘
+┌─────────────────────────┐
+│ Loop: Pour chaque       │  Générer briefing + Envoyer
+│ prompt et destinataire  │
+└─────────────────────────┘
 ```
 
-### 4.2 Configuration du Nœud "HTTP Request" (Get Config)
+### 4.2 Configuration du Nœud "Schedule Trigger"
+
+```json
+{
+  "rule": {
+    "interval": [
+      {
+        "field": "cronExpression",
+        "expression": "*/5 * * * *"
+      }
+    ]
+  }
+}
+```
+
+### 4.3 Configuration du Nœud "HTTP Request" (Get Schedule)
 
 ```json
 {
   "method": "GET",
-  "url": "https://gob.vercel.app/api/prompt-delivery-config?prompt_id=briefing_morning",
+  "url": "https://gob.vercel.app/api/prompt-delivery-schedule",
   "authentication": "None",
   "options": {}
 }
 ```
 
-### 4.3 Configuration du Nœud "Code" (Filter)
-
-```javascript
-const config = $input.item.json.config;
-const activeRecipients = config.email_recipients.filter(r => r.active);
-
-return activeRecipients.map(recipient => ({
-  json: {
-    to: recipient.email,
-    name: recipient.name,
-    prompt_content: config.prompt_content
-  }
-}));
-```
-
-### 4.4 Configuration du Nœud "HTTP Request" (Generate Briefing)
-
+**Réponse de l'API:**
 ```json
 {
-  "method": "POST",
-  "url": "https://gob.vercel.app/api/briefing",
-  "authentication": "None",
-  "body": {
-    "type": "morning",
-    "custom_prompt": "={{ $json.prompt_content }}"
-  }
+  "success": true,
+  "prompts_to_send": [
+    {
+      "prompt_id": "briefing_morning",
+      "recipients": [{"email": "daniel@example.com", "name": "Daniel", "active": true}],
+      "prompt_content": "Génère un briefing matinal...",
+      "schedule": {"time": "09:00", "timezone": "America/Montreal"}
+    }
+  ],
+  "count": 1
 }
 ```
 
-### 4.5 Configuration du Nœud "Send Email" (Resend)
+### 4.4 Configuration Complète du Workflow
+
+**👉 Pour le workflow complet prêt à importer dans n8n:**
+
+Consultez `docs/N8N_DYNAMIC_SCHEDULE_GUIDE.md` qui contient:
+- Workflow JSON complet à importer
+- Configuration détaillée de chaque node
+- Version simplifiée avec Code node
+- Exemples de testing
+
+### 4.5 Test Rapide de l'API
+
+```bash
+# Voir quels prompts doivent être envoyés maintenant
+curl https://gob.vercel.app/api/prompt-delivery-schedule
+
+# Simuler une heure spécifique
+curl "https://gob.vercel.app/api/prompt-delivery-schedule?check_time=09:00"
+```
+
+### 4.6 Configuration du Nœud "Send Email" (Resend)
 
 ```json
 {
