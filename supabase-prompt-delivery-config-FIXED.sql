@@ -41,7 +41,10 @@ ORDER BY prompt_number;
 -- 5. Grant permissions
 GRANT SELECT ON prompt_delivery_configs TO anon, authenticated;
 
--- 6. Fonction RPC corrigée (SANS colonne section)
+-- 6. Supprimer l'ancienne fonction si elle existe
+DROP FUNCTION IF EXISTS get_prompt_delivery_config(TEXT);
+
+-- 7. Fonction RPC corrigée (SANS colonne section)
 CREATE OR REPLACE FUNCTION get_prompt_delivery_config(p_prompt_id TEXT)
 RETURNS TABLE (
     key TEXT,

@@ -14,7 +14,7 @@ if (supabaseUrl && supabaseKey) {
 }
 
 // Table Supabase pour stocker la configuration
-const CONFIG_TABLE = 'emma_system_config';
+const CONFIG_TABLE = 'emma_config';
 
 export default async function handler(req, res) {
     // CORS headers
