@@ -1,0 +1,70 @@
+[
+  {
+    "parameters": {
+      "rule": {
+        "interval": [
+          {
+            "field": "cronExpression",
+            "cronExpression": "*/5 * * * *"
+          }
+        ]
+      }
+    },
+    "name": "Emma Schedule (Every 5 Min)",
+    "type": "n8n-nodes-base.scheduleTrigger",
+    "typeVersion": 1.2,
+    "position": [
+      240,
+      500
+    ]
+  },
+  {
+    "parameters": {
+      "method": "GET",
+      "url": "https://gob.vercel.app/api/prompt-delivery-schedule",
+      "options": {}
+    },
+    "name": "Get Emma Prompts To Send",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.2,
+    "position": [
+      460,
+      500
+    ]
+  },
+  {
+    "parameters": {
+      "jsCode": "const response = $input.item.json;\n\nif (response.count === 0) {\n  console.log('No prompts to send at this time');\n  return [];\n}\n\nconst results = [];\n\nfor (const prompt of response.prompts_to_send) {\n  try {\n    // Générer briefing\n    const briefing = await fetch('https://gob.vercel.app/api/briefing', {\n      method: 'POST',\n      headers: {'Content-Type': 'application/json'},\n      body: JSON.stringify({\n        type: prompt.key,\n        custom_prompt: prompt.prompt_content\n      })\n    }).then(r => r.json());\n\n    if (!briefing.success) {\n      console.error(`Failed to generate briefing for ${prompt.prompt_id}:`, briefing.error);\n      continue;\n    }\n\n    // Envoyer à chaque destinataire actif\n    for (const recipient of prompt.recipients) {\n      if (recipient.active) {\n        results.push({\n          json: {\n            to: recipient.email,\n            name: recipient.name,\n            subject: briefing.subject || `📊 Briefing Emma IA - ${new Date().toLocaleDateString('fr-FR')}`,\n            html: briefing.html_content,\n            prompt_id: prompt.prompt_id,\n            prompt_name: `${prompt.section}_${prompt.key}`,\n            sent_at: new Date().toISOString()\n          }\n        });\n      }\n    }\n  } catch (error) {\n    console.error(`Error processing prompt ${prompt.prompt_id}:`, error.message);\n  }\n}\n\nconsole.log(`Generated ${results.length} emails to send`);\nreturn results;"
+    },
+    "name": "Emma Process & Generate",
+    "type": "n8n-nodes-base.code",
+    "typeVersion": 2,
+    "position": [
+      680,
+      500
+    ]
+  },
+  {
+    "parameters": {
+      "fromEmail": "emma@gobapps.com",
+      "toEmail": "={{ $json.to }}",
+      "subject": "={{ $json.subject }}",
+      "emailType": "html",
+      "message": "={{ $json.html }}",
+      "options": {}
+    },
+    "name": "Emma Send Email",
+    "type": "n8n-nodes-base.resend",
+    "typeVersion": 1,
+    "position": [
+      900,
+      500
+    ],
+    "credentials": {
+      "resendApi": {
+        "id": "YOUR_RESEND_CREDENTIAL_ID",
+        "name": "Resend account"
+      }
+    }
+  }
+]

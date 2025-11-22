@@ -1,0 +1,121 @@
+{
+  "name": "Emma Dynamic Email Scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "cronExpression": "*/5 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "f6b0c5e0-1234-4abc-8def-0123456789ab",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://gob.vercel.app/api/prompt-delivery-schedule",
+        "options": {}
+      },
+      "id": "a1b2c3d4-5678-4e9f-9abc-def012345678",
+      "name": "Get Prompts To Send Now",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.item.json;\n\nif (response.count === 0) {\n  console.log('No prompts to send at this time');\n  return [];\n}\n\nconst results = [];\n\nfor (const prompt of response.prompts_to_send) {\n  try {\n    // Générer briefing\n    const briefing = await fetch('https://gob.vercel.app/api/briefing', {\n      method: 'POST',\n      headers: {'Content-Type': 'application/json'},\n      body: JSON.stringify({\n        type: prompt.key,\n        custom_prompt: prompt.prompt_content\n      })\n    }).then(r => r.json());\n\n    if (!briefing.success) {\n      console.error(`Failed to generate briefing for ${prompt.prompt_id}:`, briefing.error);\n      continue;\n    }\n\n    // Envoyer à chaque destinataire actif\n    for (const recipient of prompt.recipients) {\n      if (recipient.active) {\n        results.push({\n          json: {\n            to: recipient.email,\n            name: recipient.name,\n            subject: briefing.subject || `📊 Briefing Emma IA - ${new Date().toLocaleDateString('fr-FR')}`,\n            html: briefing.html_content,\n            prompt_id: prompt.prompt_id,\n            prompt_name: `${prompt.section}_${prompt.key}`,\n            sent_at: new Date().toISOString()\n          }\n        });\n      }\n    }\n  } catch (error) {\n    console.error(`Error processing prompt ${prompt.prompt_id}:`, error.message);\n  }\n}\n\nconsole.log(`Generated ${results.length} emails to send`);\nreturn results;"
+      },
+      "id": "b2c3d4e5-6789-4f0a-abcd-ef0123456789",
+      "name": "Process Prompts & Generate Briefings",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "emma@gobapps.com",
+        "toEmail": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "c3d4e5f6-789a-4b0c-bcde-f01234567890",
+      "name": "Send Email via Resend",
+      "type": "n8n-nodes-base.resend",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ],
+      "credentials": {
+        "resendApi": {
+          "id": "YOUR_RESEND_CREDENTIAL_ID",
+          "name": "Resend account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Get Prompts To Send Now",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Prompts To Send Now": {
+      "main": [
+        [
+          {
+            "node": "Process Prompts & Generate Briefings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Prompts & Generate Briefings": {
+      "main": [
+        [
+          {
+            "node": "Send Email via Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-21T14:30:00.000Z",
+  "versionId": "1"
+}
