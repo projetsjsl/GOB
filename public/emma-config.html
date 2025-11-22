@@ -762,15 +762,18 @@
                                 </div>
                             </div>
 
-                            <!-- Bouton de sauvegarde -->
+                            <!-- Boutons d'action -->
                             <div class="flex gap-3">
                                 <button onclick="saveDeliveryConfig()" class="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold">
-                                    💾 Enregistrer la configuration d'envoi
+                                    💾 Enregistrer la configuration
                                 </button>
-                                <button onclick="testEmailDelivery()" class="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
-                                    📤 Test
+                                <button onclick="sendBriefingNow()" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-lg">
+                                    📧 Envoyer Maintenant
                                 </button>
                             </div>
+                            <p class="text-xs text-gray-600 italic mt-2">
+                                ℹ️ "Envoyer Maintenant" génère le briefing et l'envoie immédiatement à tous les destinataires actifs (LIVE).
+                            </p>
 
                             <!-- Info n8n -->
                             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -2288,46 +2291,74 @@
             }
         }
 
-        // Tester l'envoi email
-        async function testEmailDelivery() {
+        // Envoyer le briefing immédiatement (LIVE)
+        async function sendBriefingNow() {
             if (!currentConfig) {
                 showStatus('⚠️ Aucun prompt sélectionné', 'warning');
                 return;
             }
 
-            if (currentRecipients.filter(r => r.active).length === 0) {
-                showStatus('⚠️ Aucun destinataire actif', 'warning');
+            const activeRecipients = currentRecipients.filter(r => r.active);
+            if (activeRecipients.length === 0) {
+                showStatus('⚠️ Aucun destinataire actif configuré', 'warning');
+                return;
+            }
+
+            // Confirmation avant envoi LIVE
+            const recipientsList = activeRecipients.map(r => `  • ${r.name} (${r.email})`).join('\n');
+            const confirmed = confirm(
+                `📧 ENVOI IMMÉDIAT EN PRODUCTION\n\n` +
+                `Le briefing sera généré et envoyé MAINTENANT à ${activeRecipients.length} destinataire(s):\n\n` +
+                `${recipientsList}\n\n` +
+                `Voulez-vous continuer?`
+            );
+
+            if (!confirmed) {
+                showStatus('❌ Envoi annulé', 'info');
                 return;
             }
 
             try {
-                showStatus('📤 Test d\'envoi en cours...', 'info');
+                showStatus('📧 Génération et envoi en cours...', 'info');
 
-                // Générer le briefing avec le prompt actuel
-                const promptId = `${currentConfig.section}_${currentConfig.key}`;
+                // Récupérer le contenu du prompt actuel
                 const promptContent = document.getElementById('editValue').value;
 
-                // Appeler l'API de briefing avec le prompt personnalisé
-                const response = await fetch('/api/briefing', {
+                // Appeler l'API d'envoi immédiat
+                const response = await fetch('/api/send-briefing', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        type: 'custom',
+                        prompt_id: currentConfig.key,  // Juste le key, pas section_key
+                        recipients: currentRecipients,
                         custom_prompt: promptContent
                     })
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    showStatus('✅ Email de test envoyé avec succès !', 'success');
-                    console.log('Test briefing result:', data);
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus(
+                        `✅ ${data.message}\n` +
+                        `📊 Envoyés: ${data.sent_count}/${data.total_recipients}\n` +
+                        `📧 Sujet: ${data.briefing.subject}`,
+                        'success'
+                    );
+                    console.log('Envoi réussi:', data);
+
+                    // Afficher les détails des erreurs s'il y en a
+                    if (data.failed_count > 0 && data.errors) {
+                        console.warn('Échecs d\'envoi:', data.errors);
+                        const errorList = data.errors.map(e => `  • ${e.email}: ${e.error}`).join('\n');
+                        alert(`⚠️ Certains envois ont échoué:\n\n${errorList}`);
+                    }
                 } else {
-                    const error = await response.json();
-                    showStatus('❌ Erreur test: ' + (error.error || 'Unknown error'), 'error');
+                    showStatus('❌ Échec: ' + (data.error || data.message), 'error');
+                    console.error('Erreur envoi:', data);
                 }
             } catch (error) {
-                console.error('Erreur test delivery:', error);
-                showStatus('❌ ' + error.message, 'error');
+                console.error('Erreur send-briefing:', error);
+                showStatus('❌ Erreur: ' + error.message, 'error');
             }
         }
 
