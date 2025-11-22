@@ -101,10 +101,11 @@ export default async function handler(req, res) {
     // Paramètres optionnels pour testing
     const { check_time, timezone: forcedTimezone } = req.query;
 
-    // Récupérer tous les prompts actifs
+    // Récupérer tous les prompts actifs depuis emma_config (sans utiliser la vue)
     const { data: prompts, error } = await supabase
-      .from('prompt_delivery_configs')
-      .select('*');
+      .from('emma_config')
+      .select('*')
+      .eq('delivery_enabled', true);
 
     if (error) {
       console.error('Supabase error:', error);
@@ -124,40 +125,39 @@ export default async function handler(req, res) {
     const promptsToSend = [];
 
     for (const prompt of prompts) {
-      const schedule = typeof prompt.delivery_schedule === 'string'
-        ? JSON.parse(prompt.delivery_schedule)
-        : prompt.delivery_schedule;
+      // Extraire les données depuis emma_config
+      const schedule = prompt.delivery_schedule || {};
+      const recipients = prompt.email_recipients || [];
+
+      // Parser si c'est du JSON string
+      const parsedSchedule = typeof schedule === 'string' ? JSON.parse(schedule) : schedule;
+      const parsedRecipients = typeof recipients === 'string' ? JSON.parse(recipients) : recipients;
 
       // Utiliser le fuseau horaire du prompt ou celui forcé (pour testing)
-      const timezone = forcedTimezone || schedule.timezone || 'America/Montreal';
+      const timezone = forcedTimezone || parsedSchedule.timezone || 'America/Montreal';
 
       // Heure actuelle dans le fuseau horaire du prompt
       const currentTime = check_time || getCurrentTimeInTimezone(timezone);
       const currentDay = getCurrentDayInTimezone(timezone);
 
-      if (shouldSendNow(schedule, currentTime, currentDay, timezone)) {
-        // Parser les destinataires
-        const recipients = typeof prompt.email_recipients === 'string'
-          ? JSON.parse(prompt.email_recipients)
-          : prompt.email_recipients || [];
-
+      if (shouldSendNow(parsedSchedule, currentTime, currentDay, timezone)) {
         // Filtrer uniquement les actifs
-        const activeRecipients = recipients.filter(r => r.active);
+        const activeRecipients = parsedRecipients.filter(r => r.active);
 
         if (activeRecipients.length > 0) {
+          // Extraire le prompt content
+          const config = typeof prompt.config === 'string' ? JSON.parse(prompt.config) : prompt.config;
+          const promptContent = config?.value || config?.prompt || '';
+
           promptsToSend.push({
-            prompt_id: prompt.prompt_id,
-            prompt_number: prompt.prompt_number,
+            prompt_id: prompt.prompt_id || `${prompt.section}_${prompt.key}`,
+            prompt_number: prompt.prompt_number || 0,
             section: prompt.section,
             key: prompt.key,
             recipients: activeRecipients,
-            schedule: schedule,
-            metadata: typeof prompt.metadata === 'string'
-              ? JSON.parse(prompt.metadata)
-              : prompt.metadata,
-            prompt_content: typeof prompt.config === 'string'
-              ? JSON.parse(prompt.config)?.prompt
-              : prompt.config?.prompt
+            schedule: parsedSchedule,
+            metadata: prompt.metadata || {},
+            prompt_content: promptContent
           });
         }
       }
