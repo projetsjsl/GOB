@@ -4,7 +4,7 @@
  * Construit également l'application 3p1
  */
 
-import { mkdir, cp } from 'fs/promises';
+import { mkdir, cp, readdir, stat } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
@@ -55,18 +55,30 @@ async function build() {
       return;
     }
     
-    // Copier récursivement tous les fichiers de public vers dist
-    // Exclure node_modules pour éviter de copier les dépendances
-    await cp(PUBLIC_DIR, DIST_DIR, { 
-      recursive: true,
-      filter: (src) => {
+    // Fonction récursive pour copier en excluant node_modules
+    async function copyDir(src, dest) {
+      await mkdir(dest, { recursive: true });
+      const entries = await readdir(src, { withFileTypes: true });
+      
+      for (const entry of entries) {
+        const srcPath = join(src, entry.name);
+        const destPath = join(dest, entry.name);
+        
         // Exclure node_modules
-        if (src.includes('node_modules')) {
-          return false;
+        if (entry.name === 'node_modules') {
+          continue;
         }
-        return true;
+        
+        if (entry.isDirectory()) {
+          await copyDir(srcPath, destPath);
+        } else {
+          await cp(srcPath, destPath);
+        }
       }
-    });
+    }
+    
+    // Copier récursivement tous les fichiers de public vers dist
+    await copyDir(PUBLIC_DIR, DIST_DIR);
     console.log(`✅ Fichiers copiés de ${PUBLIC_DIR}/ vers ${DIST_DIR}/`);
     
     // Copier index.html de la racine vers dist
