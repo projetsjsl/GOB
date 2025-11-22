@@ -23750,11 +23750,21 @@ console.log('✅ Données hybrides récupérées:', {
                         setIsLoaded(true);
                         setLoadError(false);
                     };
-                    script.onerror = () => {
+                    script.onerror = (error) => {
+                        console.error('❌ Erreur de chargement de 3p1:', error);
+                        console.error('❌ Chemin tenté: /3p1/dist/assets/index.js');
                         setLoadError(true);
                         setIsLoaded(false);
                     };
                     document.head.appendChild(script);
+                    
+                    // Timeout pour détecter si le script ne charge pas
+                    setTimeout(() => {
+                        if (!isLoaded && !loadError) {
+                            console.warn('⚠️ Timeout de chargement de 3p1');
+                            setLoadError(true);
+                        }
+                    }, 10000);
 
                     return () => {
                         // Cleanup
