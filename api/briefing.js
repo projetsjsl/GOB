@@ -184,7 +184,8 @@ export default async function handler(req, res) {
           'morning': 'morning',
           'midday': 'midday',
           'evening': 'evening',
-          'noon': 'midday' // Ancien format
+          'noon': 'midday', // Ancien format
+          'custom': 'custom' // Prompt personnalisé
         };
         
         // Normaliser le type (français ou anglais → anglais)
