@@ -43,13 +43,13 @@ export default async function handler(req, res) {
 
             case 'POST':
             case 'PUT': {
-                const { action, section, key, value } = req.body || {};
-                return handleSet(req, res, action, section, key, value);
+                const { action, key, value, category } = req.body || {};
+                return handleSet(req, res, action, key, value, category);
             }
 
             case 'DELETE': {
-                const { section, key } = req.body || {};
-                return handleDelete(req, res, section, key);
+                const { key } = req.body || {};
+                return handleDelete(req, res, key);
             }
 
             default:
@@ -78,16 +78,17 @@ async function handleGet(req, res, section, key) {
         }
 
         let query = supabase.from(CONFIG_TABLE).select('*');
-        
+
+        // Filtrer par catégorie au lieu de section
         if (section) {
-            query = query.eq('section', section);
+            query = query.eq('category', section);
         }
-        
+
         if (key) {
             query = query.eq('key', key);
         }
 
-        const { data, error } = await query.order('section', { ascending: true });
+        const { data, error } = await query.order('key', { ascending: true });
 
         if (error) {
             console.error('Erreur Supabase:', error);
@@ -98,11 +99,13 @@ async function handleGet(req, res, section, key) {
             });
         }
 
-        // Transformer en structure hiérarchique
+        // Organiser par catégorie (ex: prompts, variables, directives)
         const config = {};
         data.forEach(item => {
-            if (!config[item.section]) {
-                config[item.section] = {};
+            const category = item.category || 'prompts';
+
+            if (!config[category]) {
+                config[category] = {};
             }
 
             // Parser la valeur selon le type
@@ -111,7 +114,7 @@ async function handleGet(req, res, section, key) {
                 try {
                     parsedValue = JSON.parse(item.value);
                 } catch (e) {
-                    console.warn(`Erreur parsing JSON pour ${item.section}.${item.key}:`, e.message);
+                    console.warn(`Erreur parsing JSON pour ${item.key}:`, e.message);
                 }
             } else if (item.type === 'number') {
                 parsedValue = typeof item.value === 'string' ? parseFloat(item.value) : item.value;
@@ -119,7 +122,7 @@ async function handleGet(req, res, section, key) {
                 parsedValue = item.value === true || item.value === 'true';
             }
 
-            config[item.section][item.key] = {
+            config[category][item.key] = {
                 value: parsedValue,
                 type: item.type || 'string',
                 description: item.description || '',
@@ -128,11 +131,21 @@ async function handleGet(req, res, section, key) {
             };
         });
 
-        // Si section/key spécifique demandée, retourner seulement ça
-        if (section && key) {
+        // Si key spécifique demandée, retourner seulement ça
+        if (key) {
+            // Trouver dans n'importe quelle catégorie
+            for (const category of Object.keys(config)) {
+                if (config[category][key]) {
+                    return res.status(200).json({
+                        config: config[category][key],
+                        source: 'database'
+                    });
+                }
+            }
+            // Fallback vers default si non trouvé
             return res.status(200).json({
-                config: config[section]?.[key] || getDefaultConfig(section, key),
-                source: 'database'
+                config: getDefaultConfig(section, key),
+                source: 'default_fallback'
             });
         }
 
@@ -143,7 +156,7 @@ async function handleGet(req, res, section, key) {
         return res.status(200).json({
             config: mergedConfig,
             source: 'database',
-            sections: Object.keys(mergedConfig)
+            categories: Object.keys(mergedConfig)
         });
     } catch (error) {
         console.error('Erreur handleGet:', error);
@@ -154,10 +167,10 @@ async function handleGet(req, res, section, key) {
 /**
  * POST/PUT - Sauvegarder la configuration
  */
-async function handleSet(req, res, action, section, key, value) {
-    if (!section || !key) {
-        return res.status(400).json({ 
-            error: 'Section et key requis' 
+async function handleSet(req, res, action, key, value, category) {
+    if (!key) {
+        return res.status(400).json({
+            error: 'Key requis'
         });
     }
 
@@ -167,22 +180,21 @@ async function handleSet(req, res, action, section, key, value) {
             return res.status(200).json({
                 success: true,
                 message: 'Config sauvegardée (mode dev - fichier local)',
-                section,
                 key,
                 value: typeof value === 'string' ? value.substring(0, 100) + '...' : value
             });
         }
 
         // Déterminer le type de valeur
-        const valueType = typeof value === 'object' ? 'json' : 
-                         typeof value === 'number' ? 'number' : 
+        const valueType = typeof value === 'object' ? 'json' :
+                         typeof value === 'number' ? 'number' :
                          typeof value === 'boolean' ? 'boolean' : 'string';
 
         const configData = {
-            section,
             key,
             value: typeof value === 'object' ? JSON.stringify(value) : value,
             type: valueType,
+            category: category || 'prompt',
             updated_at: new Date().toISOString(),
             updated_by: req.headers['x-admin-user'] || 'admin'
         };
@@ -191,7 +203,6 @@ async function handleSet(req, res, action, section, key, value) {
         const { data: existing } = await supabase
             .from(CONFIG_TABLE)
             .select('id')
-            .eq('section', section)
             .eq('key', key)
             .single();
 
@@ -201,7 +212,6 @@ async function handleSet(req, res, action, section, key, value) {
             const { data, error } = await supabase
                 .from(CONFIG_TABLE)
                 .update(configData)
-                .eq('section', section)
                 .eq('key', key)
                 .select()
                 .single();
@@ -224,10 +234,10 @@ async function handleSet(req, res, action, section, key, value) {
             success: true,
             message: 'Configuration sauvegardée',
             config: {
-                section: result.section,
                 key: result.key,
                 value: result.type === 'json' ? JSON.parse(result.value) : result.value,
                 type: result.type,
+                category: result.category,
                 updated_at: result.updated_at
             }
         });
@@ -240,10 +250,10 @@ async function handleSet(req, res, action, section, key, value) {
 /**
  * DELETE - Supprimer une configuration
  */
-async function handleDelete(req, res, section, key) {
-    if (!section || !key) {
-        return res.status(400).json({ 
-            error: 'Section et key requis' 
+async function handleDelete(req, res, key) {
+    if (!key) {
+        return res.status(400).json({
+            error: 'Key requis'
         });
     }
 
@@ -252,7 +262,6 @@ async function handleDelete(req, res, section, key) {
             return res.status(200).json({
                 success: true,
                 message: 'Config supprimée (mode dev)',
-                section,
                 key
             });
         }
@@ -260,7 +269,6 @@ async function handleDelete(req, res, section, key) {
         const { error } = await supabase
             .from(CONFIG_TABLE)
             .delete()
-            .eq('section', section)
             .eq('key', key);
 
         if (error) throw error;
@@ -268,7 +276,6 @@ async function handleDelete(req, res, section, key) {
         return res.status(200).json({
             success: true,
             message: 'Configuration supprimée',
-            section,
             key
         });
     } catch (error) {
