@@ -490,13 +490,13 @@ class SmartAgent {
     _selectModel(intentData, outputMode, toolsData, userMessage = '') {
         console.log('🎯 SmartRouter: Selecting optimal model...');
 
-        // BRIEFING MODE: Toujours Claude pour qualité premium
+        // BRIEFING MODE: Perplexity Sonar pour données en temps réel
         if (outputMode === 'briefing') {
-            console.log('📝 Briefing detected → Using CLAUDE (premium writing)');
+            console.log('📝 Briefing detected → Using PERPLEXITY SONAR (real-time data + sources)');
             return {
-                model: 'claude',
-                reason: 'Briefing requires premium writing quality',
-                recency: intentData?.recency_filter || 'month'
+                model: 'perplexity',
+                reason: 'Briefing requires real-time market data with sources',
+                recency: 'day' // Données les plus récentes pour briefings financiers
             };
         }
 
