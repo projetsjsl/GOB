@@ -1,0 +1,5 @@
+{
+  "name": "Analyse Financière Pro",
+  "description": "Application d'analyse financière inspirée de Value Line. Permet la projection de prix, l'analyse de ratios historiques et la détermination de zones d'achat/vente.",
+  "requestFramePermissions": []
+}

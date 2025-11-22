@@ -1,0 +1,65 @@
+export interface AnnualData {
+  year: number;
+  priceHigh: number;
+  priceLow: number;
+  cashFlowPerShare: number;
+  dividendPerShare: number;
+  bookValuePerShare: number;
+  earningsPerShare: number;
+  isEstimate?: boolean;
+}
+
+export interface CalculatedRatios {
+  pcfHigh: number;
+  pcfLow: number;
+  yieldHigh: number; // Based on Low Price usually (highest yield)
+  yieldLow: number;
+  pbvHigh: number;
+  pbvLow: number;
+  peHigh: number;
+  peLow: number;
+}
+
+export interface Assumptions {
+  currentPrice: number;
+  currentDividend: number;
+  // Growth Rates
+  growthRateEPS: number; 
+  growthRateSales: number; 
+  growthRateCF: number; // New
+  growthRateBV: number; // New
+  growthRateDiv: number; // New
+  // Target Ratios
+  targetPE: number;
+  targetPCF: number; // New
+  targetPBV: number; // New
+  targetYield: number; // New
+  // Other
+  requiredReturn: number; 
+  dividendPayoutRatio: number; 
+  baseYear: number;
+}
+
+export interface CompanyInfo {
+  symbol: string;
+  name: string;
+  sector: string;
+  securityRank: string;
+  marketCap: string; // formatted string for display
+}
+
+export enum Recommendation {
+  BUY = "ACHAT",
+  HOLD = "CONSERVER",
+  SELL = "VENTE"
+}
+
+export interface AnalysisProfile {
+  id: string; // usually symbol
+  lastModified: number;
+  data: AnnualData[];
+  assumptions: Assumptions;
+  info: CompanyInfo;
+  notes?: string;
+  isWatchlist?: boolean; // New field to distinguish Watchlist vs Portfolio
+}
