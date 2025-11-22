@@ -145,8 +145,8 @@ export default async function handler(req, res) {
         const activeRecipients = parsedRecipients.filter(r => r.active);
 
         if (activeRecipients.length > 0) {
-          // Extraire le prompt content
-          const config = typeof prompt.config === 'string' ? JSON.parse(prompt.config) : prompt.config;
+          // Extraire le prompt content (colonne 'value' dans emma_config)
+          const config = typeof prompt.value === 'string' ? JSON.parse(prompt.value) : prompt.value;
           const promptContent = config?.value || config?.prompt || '';
 
           // Extraire le type depuis le key (ex: "briefing_evening" -> "evening")
