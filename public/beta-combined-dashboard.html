@@ -23691,8 +23691,9 @@ console.log('✅ Données hybrides récupérées:', {
                     if (!containerRef.current) return;
 
                     // Créer un conteneur pour l'application 3p1
+                    // L'application 3p1 cherche un élément avec id="root"
                     const rootDiv = document.createElement('div');
-                    rootDiv.id = 'finance-pro-root';
+                    rootDiv.id = 'root';
                     rootDiv.className = 'w-full h-full';
                     containerRef.current.innerHTML = '';
                     containerRef.current.appendChild(rootDiv);
@@ -23700,12 +23701,12 @@ console.log('✅ Données hybrides récupérées:', {
                     // Créer et charger les styles nécessaires
                     const style = document.createElement('style');
                     style.textContent = `
-                        #finance-pro-root {
+                        #finance-pro-root #root {
                             width: 100%;
                             height: 100%;
                             overflow: auto;
                         }
-                        #finance-pro-root ::-webkit-scrollbar {
+                        #finance-pro-root #root ::-webkit-scrollbar {
                             width: 8px;
                             height: 8px;
                         }
@@ -23719,8 +23720,8 @@ console.log('✅ Données hybrides récupérées:', {
                         #finance-pro-root ::-webkit-scrollbar-thumb:hover {
                             background: #a8a8a8;
                         }
-                        #finance-pro-root input[type=number]::-webkit-inner-spin-button,
-                        #finance-pro-root input[type=number]::-webkit-outer-spin-button {
+                        #finance-pro-root #root input[type=number]::-webkit-inner-spin-button,
+                        #finance-pro-root #root input[type=number]::-webkit-outer-spin-button {
                             -webkit-appearance: none;
                             margin: 0;
                         }
@@ -23787,6 +23788,7 @@ console.log('✅ Données hybrides récupérées:', {
                             </div>
                         )}
                         <div 
+                            id="finance-pro-root"
                             ref={containerRef}
                             className={`flex-1 rounded-lg overflow-hidden border transition-colors duration-300 ${
                                 isDarkMode
