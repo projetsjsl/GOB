@@ -42,8 +42,25 @@ async function build() {
         if (existsSync(distPath)) {
           console.log('✅ Application 3p1 construite avec succès');
           console.log(`✅ Fichier trouvé: ${distPath}`);
+          
+          // Lister les fichiers dans dist pour debug
+          const distDir = join(APP_3P1_DIR, 'dist');
+          if (existsSync(distDir)) {
+            const files = await readdir(distDir, { recursive: true });
+            console.log(`📁 Fichiers dans dist: ${files.slice(0, 10).join(', ')}...`);
+          }
         } else {
           console.warn(`⚠️ Fichier de build non trouvé: ${distPath}`);
+          // Lister le contenu de dist pour debug
+          const distDir = join(APP_3P1_DIR, 'dist');
+          if (existsSync(distDir)) {
+            try {
+              const files = await readdir(distDir, { recursive: true });
+              console.log(`📁 Contenu de dist: ${files.join(', ')}`);
+            } catch (e) {
+              console.warn('⚠️ Impossible de lire le contenu de dist:', e.message);
+            }
+          }
           throw new Error('Build 3p1 réussi mais fichier index.js non trouvé');
         }
       } catch (error) {
