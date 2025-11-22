@@ -4313,7 +4313,7 @@ Tu es utilisée principalement pour rédiger des briefings quotidiens de haute q
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: 'claude-3-5-sonnet-20241022',
+                    model: 'claude-3-5-sonnet-20240620',
                     max_tokens: maxTokens,
                     temperature: 0.5, // Déterministe pour écriture professionnelle
                     system: systemPrompt,
