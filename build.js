@@ -1,18 +1,47 @@
 /**
  * Script de build pour Vercel
  * Copie les fichiers statiques de public/ vers dist/
+ * Construit également l'application 3p1
  */
 
 import { mkdir, cp } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { execSync } from 'child_process';
 
 const PUBLIC_DIR = 'public';
 const DIST_DIR = 'dist';
+const APP_3P1_DIR = join(PUBLIC_DIR, '3p1');
 
 async function build() {
   try {
     console.log('📦 Démarrage du build...');
+    
+    // Construire l'application 3p1 si elle existe
+    if (existsSync(APP_3P1_DIR)) {
+      console.log('🔨 Construction de l\'application 3p1...');
+      try {
+        // Installer les dépendances si nécessaire
+        const packageLockPath = join(APP_3P1_DIR, 'package-lock.json');
+        if (!existsSync(packageLockPath)) {
+          console.log('📦 Installation des dépendances 3p1...');
+          execSync('npm install', { 
+            cwd: APP_3P1_DIR, 
+            stdio: 'inherit' 
+          });
+        }
+        
+        // Construire l'application
+        execSync('npm run build', { 
+          cwd: APP_3P1_DIR, 
+          stdio: 'inherit' 
+        });
+        console.log('✅ Application 3p1 construite avec succès');
+      } catch (error) {
+        console.warn('⚠️ Erreur lors de la construction de 3p1:', error.message);
+        console.warn('⚠️ Continuons le build sans 3p1...');
+      }
+    }
     
     // Créer le dossier dist s'il n'existe pas
     if (!existsSync(DIST_DIR)) {
