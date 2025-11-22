@@ -625,6 +625,163 @@
                         </div>
                     </div>
 
+                    <!-- ═══════════════════════════════════════════════════════════ -->
+                    <!-- EMAIL DELIVERY SECTION - Configuration envoi email         -->
+                    <!-- ═══════════════════════════════════════════════════════════ -->
+                    <div class="mt-6 border-t pt-6">
+                        <button
+                            onclick="document.getElementById('emailDeliverySection').classList.toggle('hidden'); toggleIcon('emailDeliveryToggleIcon')"
+                            class="flex items-center gap-2 text-lg font-semibold text-gray-700 hover:text-indigo-600 transition-colors w-full"
+                        >
+                            <span id="emailDeliveryToggleIcon">▶</span>
+                            📧 Destinataires Email & Planification
+                            <span class="text-xs font-normal text-gray-500 ml-2">(configuration envoi automatique)</span>
+                        </button>
+
+                        <div id="emailDeliverySection" class="hidden mt-4 space-y-6 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg border border-indigo-200">
+                            <!-- Header avec prompt ID -->
+                            <div class="bg-white rounded-lg p-4 border-l-4 border-indigo-600">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-gray-600 mb-1">Identifiant unique du prompt</p>
+                                        <p class="font-mono text-sm font-semibold text-indigo-900" id="deliveryPromptId">-</p>
+                                        <p class="text-xs text-gray-500 mt-1">N° <span id="deliveryPromptNumber">-</span></p>
+                                    </div>
+                                    <div>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" id="deliveryEnabled" class="w-5 h-5 text-indigo-600 rounded">
+                                            <span class="text-sm font-semibold text-gray-700">Envoi activé</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Liste des destinataires -->
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                        👥 Destinataires
+                                        <span id="recipientsCount" class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-full">0</span>
+                                    </h4>
+                                    <button onclick="showAddRecipientForm()" class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors">
+                                        + Ajouter
+                                    </button>
+                                </div>
+
+                                <!-- Formulaire ajout (caché par défaut) -->
+                                <div id="addRecipientForm" class="hidden bg-white rounded-lg p-4 mb-3 border border-indigo-300">
+                                    <div class="grid grid-cols-2 gap-3 mb-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-600 mb-1">Email *</label>
+                                            <input type="email" id="newRecipientEmail" placeholder="email@example.com" class="w-full px-3 py-2 border rounded text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-600 mb-1">Nom</label>
+                                            <input type="text" id="newRecipientName" placeholder="Daniel Ouellet" class="w-full px-3 py-2 border rounded text-sm">
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="addRecipient()" class="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors">
+                                            ✓ Ajouter
+                                        </button>
+                                        <button onclick="hideAddRecipientForm()" class="px-4 py-2 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400 transition-colors">
+                                            Annuler
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Liste des emails -->
+                                <div id="recipientsList" class="space-y-2 bg-white rounded-lg p-3 min-h-[100px] max-h-[300px] overflow-y-auto">
+                                    <p class="text-gray-400 text-sm italic">Aucun destinataire configuré</p>
+                                </div>
+                            </div>
+
+                            <!-- Planification -->
+                            <div>
+                                <h4 class="font-semibold text-gray-800 mb-3">⏰ Planification</h4>
+                                <div class="bg-white rounded-lg p-4 space-y-3">
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div>
+                                            <label class="block text-xs text-gray-600 mb-1">Fréquence</label>
+                                            <select id="deliveryFrequency" class="w-full px-3 py-2 border rounded text-sm">
+                                                <option value="manual">Manuel</option>
+                                                <option value="daily">Quotidien</option>
+                                                <option value="weekly">Hebdomadaire</option>
+                                                <option value="monthly">Mensuel</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-600 mb-1">Heure</label>
+                                            <input type="time" id="deliveryTime" value="09:00" class="w-full px-3 py-2 border rounded text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-600 mb-1">Fuseau horaire</label>
+                                            <select id="deliveryTimezone" class="w-full px-3 py-2 border rounded text-sm">
+                                                <option value="America/Montreal">America/Montreal</option>
+                                                <option value="America/New_York">America/New_York</option>
+                                                <option value="America/Los_Angeles">America/Los_Angeles</option>
+                                                <option value="Europe/Paris">Europe/Paris</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Jours de la semaine (si hebdomadaire ou quotidien) -->
+                                    <div id="deliveryDaysSection" class="hidden">
+                                        <label class="block text-xs text-gray-600 mb-2">Jours de la semaine</label>
+                                        <div class="flex gap-2 flex-wrap">
+                                            <label class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded cursor-pointer hover:bg-indigo-100">
+                                                <input type="checkbox" name="deliveryDay" value="monday" class="w-4 h-4 text-indigo-600 rounded">
+                                                <span class="text-sm">Lun</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded cursor-pointer hover:bg-indigo-100">
+                                                <input type="checkbox" name="deliveryDay" value="tuesday" class="w-4 h-4 text-indigo-600 rounded">
+                                                <span class="text-sm">Mar</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded cursor-pointer hover:bg-indigo-100">
+                                                <input type="checkbox" name="deliveryDay" value="wednesday" class="w-4 h-4 text-indigo-600 rounded">
+                                                <span class="text-sm">Mer</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded cursor-pointer hover:bg-indigo-100">
+                                                <input type="checkbox" name="deliveryDay" value="thursday" class="w-4 h-4 text-indigo-600 rounded">
+                                                <span class="text-sm">Jeu</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded cursor-pointer hover:bg-indigo-100">
+                                                <input type="checkbox" name="deliveryDay" value="friday" class="w-4 h-4 text-indigo-600 rounded">
+                                                <span class="text-sm">Ven</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded cursor-pointer hover:bg-indigo-100">
+                                                <input type="checkbox" name="deliveryDay" value="saturday" class="w-4 h-4 text-indigo-600 rounded">
+                                                <span class="text-sm">Sam</span>
+                                            </label>
+                                            <label class="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded cursor-pointer hover:bg-indigo-100">
+                                                <input type="checkbox" name="deliveryDay" value="sunday" class="w-4 h-4 text-indigo-600 rounded">
+                                                <span class="text-sm">Dim</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bouton de sauvegarde -->
+                            <div class="flex gap-3">
+                                <button onclick="saveDeliveryConfig()" class="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold">
+                                    💾 Enregistrer la configuration d'envoi
+                                </button>
+                                <button onclick="testEmailDelivery()" class="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                                    📤 Test
+                                </button>
+                            </div>
+
+                            <!-- Info n8n -->
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <p class="text-xs text-yellow-800">
+                                    <strong>💡 Info n8n:</strong> Cette configuration est automatiquement accessible dans vos workflows n8n via l'endpoint
+                                    <code class="bg-yellow-100 px-2 py-0.5 rounded">/api/prompt-delivery-config?prompt_id=<span id="deliveryPromptIdInfo">-</span></code>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Metadata info -->
                     <div class="grid grid-cols-2 gap-4 text-xs text-gray-500 border-t pt-4 mt-6">
                         <div>
@@ -1303,6 +1460,9 @@
             // ✅ Mettre à jour le preview et les badges de canaux
             updatePreview();
             updateChannelBadges(key);
+
+            // ✅ Charger la configuration de delivery email
+            loadDeliveryConfig(section, key);
         }
 
         // Sauvegarder
@@ -1903,6 +2063,284 @@
             document.getElementById('sortFilter').value = 'name';
             renderConfigList();
         });
+
+        // ═══════════════════════════════════════════════════════════
+        // EMAIL DELIVERY FUNCTIONS - Gestion destinataires & planification
+        // ═══════════════════════════════════════════════════════════
+
+        let currentRecipients = [];
+
+        // Toggle icon helper
+        function toggleIcon(iconId) {
+            const icon = document.getElementById(iconId);
+            if (icon) {
+                icon.textContent = icon.textContent === '▶' ? '▼' : '▶';
+            }
+        }
+
+        // Charger la config de delivery pour le prompt sélectionné
+        async function loadDeliveryConfig(section, key) {
+            try {
+                const promptId = `${section}_${key}`;
+                document.getElementById('deliveryPromptId').textContent = promptId;
+                document.getElementById('deliveryPromptIdInfo').textContent = promptId;
+
+                const response = await fetch(`/api/prompt-delivery-config?prompt_id=${promptId}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.config) {
+                        const config = data.config;
+
+                        // Charger les destinataires
+                        currentRecipients = config.email_recipients || [];
+                        renderRecipientsList();
+
+                        // Charger les settings
+                        document.getElementById('deliveryEnabled').checked = config.delivery_enabled || false;
+                        document.getElementById('deliveryPromptNumber').textContent = config.prompt_number || '-';
+
+                        // Charger la planification
+                        const schedule = config.delivery_schedule || {};
+                        document.getElementById('deliveryFrequency').value = schedule.frequency || 'manual';
+                        document.getElementById('deliveryTime').value = schedule.time || '09:00';
+                        document.getElementById('deliveryTimezone').value = schedule.timezone || 'America/Montreal';
+
+                        // Jours de la semaine
+                        const days = schedule.days || [];
+                        document.querySelectorAll('input[name="deliveryDay"]').forEach(checkbox => {
+                            checkbox.checked = days.includes(checkbox.value);
+                        });
+
+                        // Afficher section jours si nécessaire
+                        const freq = schedule.frequency || 'manual';
+                        const showDays = freq === 'daily' || freq === 'weekly';
+                        document.getElementById('deliveryDaysSection').classList.toggle('hidden', !showDays);
+                    } else {
+                        // Pas de config existante, utiliser valeurs par défaut
+                        resetDeliveryConfig(promptId);
+                    }
+                } else {
+                    // Erreur 404 ou autre, utiliser valeurs par défaut
+                    resetDeliveryConfig(promptId);
+                }
+            } catch (error) {
+                console.error('Erreur chargement delivery config:', error);
+                showStatus('⚠️ Impossible de charger la config de delivery', 'warning');
+            }
+        }
+
+        // Reset delivery config avec valeurs par défaut
+        function resetDeliveryConfig(promptId) {
+            currentRecipients = [];
+            renderRecipientsList();
+            document.getElementById('deliveryEnabled').checked = false;
+            document.getElementById('deliveryPromptNumber').textContent = '-';
+            document.getElementById('deliveryFrequency').value = 'manual';
+            document.getElementById('deliveryTime').value = '09:00';
+            document.getElementById('deliveryTimezone').value = 'America/Montreal';
+            document.querySelectorAll('input[name="deliveryDay"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('deliveryDaysSection').classList.add('hidden');
+        }
+
+        // Afficher/masquer formulaire ajout destinataire
+        function showAddRecipientForm() {
+            document.getElementById('addRecipientForm').classList.remove('hidden');
+            document.getElementById('newRecipientEmail').focus();
+        }
+
+        function hideAddRecipientForm() {
+            document.getElementById('addRecipientForm').classList.add('hidden');
+            document.getElementById('newRecipientEmail').value = '';
+            document.getElementById('newRecipientName').value = '';
+        }
+
+        // Ajouter un destinataire
+        function addRecipient() {
+            const email = document.getElementById('newRecipientEmail').value.trim();
+            const name = document.getElementById('newRecipientName').value.trim();
+
+            if (!email) {
+                showStatus('⚠️ Email requis', 'warning');
+                return;
+            }
+
+            // Vérifier format email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showStatus('⚠️ Format email invalide', 'warning');
+                return;
+            }
+
+            // Vérifier si email déjà présent
+            if (currentRecipients.some(r => r.email === email)) {
+                showStatus('⚠️ Email déjà dans la liste', 'warning');
+                return;
+            }
+
+            // Ajouter
+            currentRecipients.push({
+                email,
+                name: name || email.split('@')[0],
+                active: true,
+                priority: currentRecipients.length + 1
+            });
+
+            renderRecipientsList();
+            hideAddRecipientForm();
+            showStatus('✅ Destinataire ajouté', 'success');
+        }
+
+        // Retirer un destinataire
+        function removeRecipient(email) {
+            if (!confirm(`Retirer ${email} de la liste ?`)) return;
+
+            currentRecipients = currentRecipients.filter(r => r.email !== email);
+            renderRecipientsList();
+            showStatus('✅ Destinataire retiré', 'success');
+        }
+
+        // Toggle actif/inactif
+        function toggleRecipientActive(email) {
+            const recipient = currentRecipients.find(r => r.email === email);
+            if (recipient) {
+                recipient.active = !recipient.active;
+                renderRecipientsList();
+            }
+        }
+
+        // Rendre la liste des destinataires
+        function renderRecipientsList() {
+            const container = document.getElementById('recipientsList');
+            document.getElementById('recipientsCount').textContent = currentRecipients.length;
+
+            if (currentRecipients.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm italic">Aucun destinataire configuré</p>';
+                return;
+            }
+
+            container.innerHTML = currentRecipients.map(recipient => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded border ${recipient.active ? 'border-green-300' : 'border-gray-300'}">
+                    <div class="flex items-center gap-3 flex-1">
+                        <input
+                            type="checkbox"
+                            ${recipient.active ? 'checked' : ''}
+                            onchange="toggleRecipientActive('${recipient.email}')"
+                            class="w-4 h-4 text-green-600 rounded"
+                        >
+                        <div>
+                            <p class="text-sm font-semibold ${recipient.active ? 'text-gray-900' : 'text-gray-400'}">${recipient.name}</p>
+                            <p class="text-xs text-gray-500">${recipient.email}</p>
+                        </div>
+                    </div>
+                    <button
+                        onclick="removeRecipient('${recipient.email}')"
+                        class="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition-colors"
+                    >
+                        🗑️ Retirer
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Sauvegarder la config de delivery
+        async function saveDeliveryConfig() {
+            if (!currentConfig) {
+                showStatus('⚠️ Aucun prompt sélectionné', 'warning');
+                return;
+            }
+
+            try {
+                // Collecter les jours sélectionnés
+                const selectedDays = Array.from(document.querySelectorAll('input[name="deliveryDay"]:checked'))
+                    .map(checkbox => checkbox.value);
+
+                const deliveryConfig = {
+                    section: currentConfig.section,
+                    key: currentConfig.key,
+                    email_recipients: currentRecipients,
+                    delivery_enabled: document.getElementById('deliveryEnabled').checked,
+                    delivery_schedule: {
+                        frequency: document.getElementById('deliveryFrequency').value,
+                        time: document.getElementById('deliveryTime').value,
+                        timezone: document.getElementById('deliveryTimezone').value,
+                        days: selectedDays
+                    }
+                };
+
+                const response = await fetch('/api/prompt-delivery-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(deliveryConfig)
+                });
+
+                if (response.ok) {
+                    showStatus('✅ Configuration d\'envoi sauvegardée', 'success');
+                } else {
+                    const error = await response.json();
+                    showStatus('❌ Erreur: ' + (error.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Erreur sauvegarde delivery config:', error);
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
+
+        // Tester l'envoi email
+        async function testEmailDelivery() {
+            if (!currentConfig) {
+                showStatus('⚠️ Aucun prompt sélectionné', 'warning');
+                return;
+            }
+
+            if (currentRecipients.filter(r => r.active).length === 0) {
+                showStatus('⚠️ Aucun destinataire actif', 'warning');
+                return;
+            }
+
+            try {
+                showStatus('📤 Test d\'envoi en cours...', 'info');
+
+                // Générer le briefing avec le prompt actuel
+                const promptId = `${currentConfig.section}_${currentConfig.key}`;
+                const promptContent = document.getElementById('editValue').value;
+
+                // Appeler l'API de briefing avec le prompt personnalisé
+                const response = await fetch('/api/briefing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'custom',
+                        custom_prompt: promptContent
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('✅ Email de test envoyé avec succès !', 'success');
+                    console.log('Test briefing result:', data);
+                } else {
+                    const error = await response.json();
+                    showStatus('❌ Erreur test: ' + (error.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Erreur test delivery:', error);
+                showStatus('❌ ' + error.message, 'error');
+            }
+        }
+
+        // Event listener pour la fréquence (afficher/masquer jours)
+        document.getElementById('deliveryFrequency')?.addEventListener('change', (e) => {
+            const freq = e.target.value;
+            const showDays = freq === 'daily' || freq === 'weekly';
+            document.getElementById('deliveryDaysSection').classList.toggle('hidden', !showDays);
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // FIN EMAIL DELIVERY FUNCTIONS
+        // ═══════════════════════════════════════════════════════════
 
         // Raccourcis clavier
         document.addEventListener('keydown', (e) => {
