@@ -149,11 +149,14 @@ export default async function handler(req, res) {
           const config = typeof prompt.config === 'string' ? JSON.parse(prompt.config) : prompt.config;
           const promptContent = config?.value || config?.prompt || '';
 
+          // Extraire le type depuis le key (ex: "briefing_evening" -> "evening")
+          const keyParts = prompt.key?.split('_') || [];
+          const briefingType = keyParts[keyParts.length - 1] || 'custom';
+
           promptsToSend.push({
-            prompt_id: prompt.prompt_id || `${prompt.section}_${prompt.key}`,
+            prompt_id: prompt.prompt_id || prompt.key,
             prompt_number: prompt.prompt_number || 0,
-            section: prompt.section,
-            key: prompt.key,
+            key: briefingType,
             recipients: activeRecipients,
             schedule: parsedSchedule,
             metadata: prompt.metadata || {},
