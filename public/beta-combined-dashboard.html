@@ -3644,6 +3644,7 @@ const fetchHybridData = async (symbol, dataType) => {
                     'stocks-news': 'iconoir-briefcase', // Portefeuille pour Titres & Nouvelles
                     'intellistocks': 'iconoir-flask', // Laboratoire pour JLab™
                     'ask-emma': 'iconoir-chat-bubble', // ✅ Icône valide
+                    'finance-pro': 'iconoir-calculator', // Calculatrice pour Finance Pro
                     'plus': 'iconoir-menu', // Menu pour Plus
                     'admin-jsla': 'iconoir-settings', // ✅ Icône valide
                     'dans-watchlist': 'iconoir-star', // ✅ Icône valide
@@ -23680,6 +23681,71 @@ console.log('✅ Données hybrides récupérées:', {
                 );
             };
 
+            // Composant onglet Finance Pro (Analyse Financière Pro)
+            const FinanceProTab = () => {
+                const [iframeError, setIframeError] = useState(false);
+
+                return (
+                    <div className="w-full h-full">
+                        <div className={`backdrop-blur-sm rounded-lg p-4 mb-4 border transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gray-900 border-gray-700'
+                                : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
+                                <Icon emoji="📊" size={24} className="mr-2 inline-block" />
+                                Analyse Financière Pro
+                            </h2>
+                            <p className={`text-sm transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                Outil d'analyse financière avancée avec évaluation de valorisation, ratios historiques et projections
+                            </p>
+                            {iframeError && (
+                                <div className={`mt-4 p-4 rounded-lg border transition-colors duration-300 ${
+                                    isDarkMode
+                                        ? 'bg-yellow-900/20 border-yellow-600/50 text-yellow-200'
+                                        : 'bg-yellow-50 border-yellow-300 text-yellow-800'
+                                }`}>
+                                    <p className="font-semibold mb-2">⚠️ Application non disponible</p>
+                                    <p className="text-sm">
+                                        Pour activer cette application, exécutez dans le dossier <code className="px-2 py-1 bg-gray-800 rounded">public/3p1</code> :<br />
+                                        <code className="px-2 py-1 bg-gray-800 rounded">npm install && npm run build</code>
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        <div className={`rounded-lg overflow-hidden border transition-colors duration-300 ${
+                            isDarkMode
+                                ? 'bg-gray-900 border-gray-700'
+                                : 'bg-white border-gray-200'
+                        }`} style={{ height: 'calc(100vh - 250px)', minHeight: '600px' }}>
+                            <iframe
+                                src="/3p1/index.html"
+                                className="w-full h-full border-0"
+                                title="Analyse Financière Pro"
+                                style={{ width: '100%', height: '100%' }}
+                                onError={() => setIframeError(true)}
+                                onLoad={(e) => {
+                                    // Vérifier si l'iframe a chargé correctement
+                                    try {
+                                        const iframe = e.target;
+                                        if (iframe.contentDocument && iframe.contentDocument.body) {
+                                            setIframeError(false);
+                                        }
+                                    } catch (err) {
+                                        // Cross-origin, on ne peut pas vérifier
+                                        setIframeError(false);
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                );
+            };
+
             // Configuration des onglets (après déclaration de TOUS les composants)
             // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
             const tabs = [
@@ -23688,6 +23754,7 @@ console.log('✅ Données hybrides récupérées:', {
                 { id: 'ask-emma', label: 'Emma IA™', component: AskEmmaTab },
                 { id: 'yield-curve', label: '📈 Yield Curve', component: YieldCurveTab },
                 { id: 'intellistocks', label: 'JLab™', component: IntelliStocksTab },
+                { id: 'finance-pro', label: 'Finance Pro', component: FinanceProTab },
                 { id: 'plus', label: 'Plus', component: PlusTab },
                 { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
                 { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab },
@@ -24250,6 +24317,7 @@ console.log('✅ Données hybrides récupérées:', {
                         {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                         {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                         {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
+                        {activeTab === 'finance-pro' && <FinanceProTab />}
                     </main>
 
                     {/* Messages */}
