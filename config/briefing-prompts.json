@@ -81,6 +81,19 @@
       "preview_text": "Bilan de journée : Clôture des marchés et perspectives pour demain"
     }
   },
+  "custom": {
+    "name": "Briefing Personnalisé",
+    "prompt": "Placeholder - Le prompt personnalisé sera fourni via custom_prompt",
+    "tools_priority": ["fmp-quote", "fmp-ticker-news", "fmp-key-metrics", "economic-calendar", "team-tickers"],
+    "tone": "professionnel, informatif",
+    "length": "300-400 mots",
+    "focus": "selon le prompt personnalisé",
+    "email_config": {
+      "subject_template": "📊 Briefing Emma IA - {date}",
+      "from_name": "Emma - Assistant Financier",
+      "preview_text": "Briefing personnalisé généré par Emma IA"
+    }
+  },
   "config": {
     "default_timezone": "America/Montreal",
     "email_recipients": ["admin@example.com"],
