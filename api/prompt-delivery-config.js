@@ -78,19 +78,18 @@ export default async function handler(req, res) {
     // ═══════════════════════════════════════════════════════════
     if (req.method === 'POST') {
       const {
-        section,
         key,
         email_recipients,
         delivery_enabled,
         delivery_schedule
       } = req.body;
 
-      if (!section || !key) {
-        return res.status(400).json({ error: 'section and key are required' });
+      if (!key) {
+        return res.status(400).json({ error: 'key is required' });
       }
 
-      // Générer le prompt_id
-      const prompt_id = `${section}_${key}`;
+      // Le prompt_id est simplement le key
+      const prompt_id = key;
 
       // Mettre à jour la config
       const { data, error } = await supabase
@@ -102,7 +101,6 @@ export default async function handler(req, res) {
           delivery_schedule: delivery_schedule || {},
           updated_at: new Date().toISOString()
         })
-        .eq('section', section)
         .eq('key', key)
         .select();
 

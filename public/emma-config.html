@@ -2081,7 +2081,8 @@
         // Charger la config de delivery pour le prompt sélectionné
         async function loadDeliveryConfig(section, key) {
             try {
-                const promptId = `${section}_${key}`;
+                // Dans emma_config, le prompt_id est juste le key (pas section_key)
+                const promptId = key;
                 document.getElementById('deliveryPromptId').textContent = promptId;
                 document.getElementById('deliveryPromptIdInfo').textContent = promptId;
 
@@ -2258,7 +2259,6 @@
                     .map(checkbox => checkbox.value);
 
                 const deliveryConfig = {
-                    section: currentConfig.section,
                     key: currentConfig.key,
                     email_recipients: currentRecipients,
                     delivery_enabled: document.getElementById('deliveryEnabled').checked,
