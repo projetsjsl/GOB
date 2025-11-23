@@ -339,10 +339,3 @@ function updateStats() {
 export function getCurrentConfig() {
     return currentConfig;
 }
-
-/**
- * Retourne toutes les configs (pour export)
- */
-export function getAllConfigs() {
-    return allConfigs;
-}
