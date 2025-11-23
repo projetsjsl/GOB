@@ -3,6 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { loadAllConfigs } from './api-client.js';
+import { RUNTIME_FLOWS, getRelatedPrompts, getFlowsUsingPrompt } from './runtime-relationships.js';
 
 let dashboardData = null;
 let currentFilter = 'all';
@@ -135,178 +136,92 @@ function processConfigsForDashboard(configs) {
 /**
  * Construit la carte des relations entre prompts (optimisé)
  */
+/**
+ * Construit les relations entre prompts basées sur les FLUX D'EXÉCUTION RÉELS
+ *
+ * Utilise RUNTIME_FLOWS qui mappe comment les prompts sont utilisés ensemble
+ * lors de l'exécution (SMS, Web, Email, Briefings)
+ */
 function buildPromptRelationships(allPrompts) {
-    console.time('Build relationships');
-    console.log(`🔍 Analyzing relationships for ${allPrompts.length} prompts...`);
+    console.time('Build runtime relationships');
+    console.log(`🚀 Analyzing RUNTIME EXECUTION relationships for ${allPrompts.length} prompts...`);
 
     promptRelationships = {};
 
-    // Initialiser toutes les relations
+    // Initialiser les structures
     allPrompts.forEach(prompt => {
         promptRelationships[prompt.key] = {
-            references: [],
-            referencedBy: []
+            references: [],      // Prompts utilisés avec celui-ci
+            referencedBy: [],    // Identique (relation bidirectionnelle)
+            flows: []            // Flux d'exécution utilisant ce prompt
         };
     });
 
-    // Créer un map pour lookup rapide par key et prompt_id
-    const promptsByKey = new Map();
-    const promptsByPromptId = new Map();
-
-    allPrompts.forEach(prompt => {
-        promptsByKey.set(prompt.key, prompt);
-        if (prompt.prompt_id) {
-            promptsByPromptId.set(prompt.prompt_id.toString(), prompt);
-        }
-    });
-
-    console.log(`📋 Prompts keys:`, allPrompts.map(p => p.key));
-
-    // Analyser chaque prompt UNE SEULE FOIS
-    let totalReferencesFound = 0;
-    allPrompts.forEach(prompt => {
-        const content = typeof prompt.value === 'string'
-            ? prompt.value
-            : JSON.stringify(prompt.value);
-
-        if (!content) {
-            console.log(`⚠️ ${prompt.key} has no content`);
-            return;
-        }
-
-        const contentLower = content.toLowerCase();
-        let referencesInThisPrompt = 0;
-
-        // Chercher les références aux autres prompts
-        allPrompts.forEach(otherPrompt => {
-            if (otherPrompt.key === prompt.key) return;
-
-            // Patterns simplifiés et combinés
-            const keyPattern = otherPrompt.key.toLowerCase();
-
-            // Test simple: chercher la clé dans le contenu
-            if (contentLower.includes(keyPattern)) {
-                // Vérifier que c'est bien une référence (word boundary approximatif)
-                const wordBoundaryCheck = new RegExp(`[^a-z0-9_]${keyPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^a-z0-9_]`, 'i');
-                const quotedCheck = new RegExp(`["']${keyPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`, 'i');
-
-                if (wordBoundaryCheck.test(content) || quotedCheck.test(content)) {
-                    if (!promptRelationships[prompt.key].references.includes(otherPrompt.key)) {
-                        promptRelationships[prompt.key].references.push(otherPrompt.key);
-                        referencesInThisPrompt++;
-                        totalReferencesFound++;
-                        console.log(`  ✅ ${prompt.key} → ${otherPrompt.key}`);
-                    }
-                }
-            }
-
-            // Chercher par prompt_id si disponible
-            if (otherPrompt.prompt_id && content.includes(otherPrompt.prompt_id.toString())) {
-                if (!promptRelationships[prompt.key].references.includes(otherPrompt.key)) {
-                    promptRelationships[prompt.key].references.push(otherPrompt.key);
-                    referencesInThisPrompt++;
-                    totalReferencesFound++;
-                    console.log(`  ✅ ${prompt.key} → ${otherPrompt.key} (by prompt_id)`);
-                }
-            }
-        });
-
-        if (referencesInThisPrompt > 0) {
-            console.log(`📎 ${prompt.key}: ${referencesInThisPrompt} references found`);
-        }
-    });
-
-    console.log(`🔗 Direct references found: ${totalReferencesFound}`);
-
-    // Construire les "referencedBy" (inverse) - optimisé
-    Object.entries(promptRelationships).forEach(([key, rel]) => {
-        rel.references.forEach(refKey => {
-            if (promptRelationships[refKey]) {
-                promptRelationships[refKey].referencedBy.push(key);
-            }
-        });
-    });
-
     // ═══════════════════════════════════════════════════════════
-    // RELATIONS SÉMANTIQUES - Basées sur la structure logique
+    // RELATIONS BASÉES SUR LES FLUX D'EXÉCUTION RUNTIME
     // ═══════════════════════════════════════════════════════════
-    console.log('🧠 Adding semantic relationships...');
-    let semanticRelationsAdded = 0;
+    console.log('🎯 Building runtime execution relationships...');
+    console.log(`📊 Total flows mapped: ${Object.keys(RUNTIME_FLOWS).length}`);
+    let runtimeRelationsAdded = 0;
 
+    // Pour chaque prompt existant, trouver les flux qui l'utilisent
     allPrompts.forEach(prompt => {
         const key = prompt.key;
-        const category = prompt.category;
+        const relatedData = getRelatedPrompts(key);
 
-        // 1. RELATIONS PAR PRÉFIXE (general_, intent_, briefing_, cfa_)
-        const prefix = key.split('_')[0];
-        if (prefix && prefix.length > 2) {
-            allPrompts.forEach(otherPrompt => {
-                if (otherPrompt.key !== key && otherPrompt.key.startsWith(prefix + '_')) {
-                    if (!promptRelationships[key].references.includes(otherPrompt.key)) {
-                        promptRelationships[key].references.push(otherPrompt.key);
-                        promptRelationships[otherPrompt.key].referencedBy.push(key);
-                        semanticRelationsAdded++;
-                        console.log(`  🏷️ ${key} ↔ ${otherPrompt.key} (prefix: ${prefix}_)`);
-                    }
-                }
-            });
-        }
+        // Ajouter les prompts liés (utilisés dans les mêmes flux)
+        relatedData.references.forEach(relatedKey => {
+            if (!promptRelationships[key].references.includes(relatedKey)) {
+                promptRelationships[key].references.push(relatedKey);
+                runtimeRelationsAdded++;
+            }
+        });
 
-        // 2. RELATIONS PAR CANAL (_sms, _web, _email)
-        const channelMatch = key.match(/_(sms|web|email|messenger)$/);
-        if (channelMatch) {
-            const channel = channelMatch[1];
-            allPrompts.forEach(otherPrompt => {
-                if (otherPrompt.key !== key && otherPrompt.key.endsWith('_' + channel)) {
-                    if (!promptRelationships[key].references.includes(otherPrompt.key)) {
-                        promptRelationships[key].references.push(otherPrompt.key);
-                        promptRelationships[otherPrompt.key].referencedBy.push(key);
-                        semanticRelationsAdded++;
-                        console.log(`  📱 ${key} ↔ ${otherPrompt.key} (channel: ${channel})`);
-                    }
-                }
-            });
-        }
+        // Relation bidirectionnelle
+        relatedData.referencedBy.forEach(relatedKey => {
+            if (!promptRelationships[key].referencedBy.includes(relatedKey)) {
+                promptRelationships[key].referencedBy.push(relatedKey);
+            }
+        });
 
-        // 3. RELATIONS HIÉRARCHIQUES LOGIQUES
-        // Briefings utilisent les intents et identités
-        if (key.startsWith('briefing_')) {
-            allPrompts.forEach(otherPrompt => {
-                if (otherPrompt.key.startsWith('intent_') ||
-                    otherPrompt.key.includes('identity') ||
-                    otherPrompt.key.includes('cfa_')) {
-                    if (!promptRelationships[key].references.includes(otherPrompt.key)) {
-                        promptRelationships[key].references.push(otherPrompt.key);
-                        promptRelationships[otherPrompt.key].referencedBy.push(key);
-                        semanticRelationsAdded++;
-                        console.log(`  🏗️ ${key} → ${otherPrompt.key} (hierarchical)`);
-                    }
-                }
-            });
-        }
+        // Stocker les flux pour affichage
+        promptRelationships[key].flows = relatedData.flows;
 
-        // Intents utilisent les standards et identités
-        if (key.startsWith('intent_')) {
-            allPrompts.forEach(otherPrompt => {
-                if (otherPrompt.key.includes('standards') ||
-                    otherPrompt.key.includes('identity') ||
-                    otherPrompt.key.includes('instructions')) {
-                    if (!promptRelationships[key].references.includes(otherPrompt.key)) {
-                        promptRelationships[key].references.push(otherPrompt.key);
-                        promptRelationships[otherPrompt.key].referencedBy.push(key);
-                        semanticRelationsAdded++;
-                        console.log(`  🏗️ ${key} → ${otherPrompt.key} (hierarchical)`);
-                    }
-                }
+        // Log détaillé des flows
+        if (relatedData.flows.length > 0) {
+            console.log(`\n🔗 ${key}:`);
+            relatedData.flows.forEach(flow => {
+                console.log(`  ↳ ${flow.name}: ${flow.description}`);
             });
+            console.log(`  → Utilisé avec: ${relatedData.references.join(', ') || 'aucun'}`);
         }
     });
 
-    console.log(`🧠 Semantic relations added: ${semanticRelationsAdded}`);
-    console.log(`🔗 TOTAL relations (direct + semantic): ${totalReferencesFound + semanticRelationsAdded}`);
+    // Statistiques
+    const totalPrompts = allPrompts.length;
+    const promptsWithRelations = Object.values(promptRelationships)
+        .filter(rel => rel.references.length > 0).length;
+    const totalFlows = Object.keys(RUNTIME_FLOWS).length;
 
-    console.timeEnd('Build relationships');
-    console.log('Relationships built:', Object.keys(promptRelationships).length, 'prompts analyzed');
+    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`📊 RUNTIME RELATIONSHIPS SUMMARY:`);
+    console.log(`  ✅ ${totalPrompts} prompts analyzed`);
+    console.log(`  🔗 ${promptsWithRelations} prompts have runtime relations`);
+    console.log(`  🚀 ${totalFlows} execution flows mapped`);
+    console.log(`  ⚡ ${runtimeRelationsAdded} runtime relations created`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
+    // Lister les flux disponibles
+    console.log(`🎯 EXECUTION FLOWS:`);
+    Object.entries(RUNTIME_FLOWS).forEach(([flowId, flow]) => {
+        const channel = flow.channel === 'any' ? '🌐' :
+                       flow.channel === 'sms' ? '📱' :
+                       flow.channel === 'web' ? '💬' :
+                       flow.channel === 'email' ? '📧' : '💬';
+        console.log(`  ${channel} ${flow.name} (${flow.prompts.length} prompts)`);
+    });
+
+    console.timeEnd('Build runtime relationships');
 }
 
 /**
@@ -862,15 +777,24 @@ function showRelationshipFilterBanner(promptKey, count) {
         tableContainer.insertBefore(banner, tableContainer.firstChild);
     }
 
+    // Récupérer les flux associés au prompt
+    const promptFlows = promptRelationships[promptKey]?.flows || [];
+    const flowsHtml = promptFlows.length > 0
+        ? `<div class="text-xs text-blue-600 mt-1">
+            <strong>Flux d'exécution:</strong> ${promptFlows.map(f => f.name).join(', ')}
+           </div>`
+        : '';
+
     banner.className = 'mb-4 p-4 bg-blue-50 border-2 border-blue-500 rounded-lg flex items-center justify-between';
     banner.innerHTML = `
         <div class="flex items-center gap-3">
-            <span class="text-2xl">🔗</span>
+            <span class="text-2xl">🚀</span>
             <div>
-                <h4 class="font-bold text-blue-900">Filtrage par relations actif</h4>
+                <h4 class="font-bold text-blue-900">Filtrage par relations runtime actif</h4>
                 <p class="text-sm text-blue-700">
-                    Affichage de <strong>${count} prompt${count > 1 ? 's' : ''}</strong> reliés à <strong class="font-mono bg-blue-100 px-2 py-0.5 rounded">${promptKey}</strong>
+                    Affichage de <strong>${count} prompt${count > 1 ? 's' : ''}</strong> utilisés avec <strong class="font-mono bg-blue-100 px-2 py-0.5 rounded">${promptKey}</strong>
                 </p>
+                ${flowsHtml}
             </div>
         </div>
         <button onclick="window.clearRelationshipFilter()"
