@@ -137,6 +137,8 @@ function processConfigsForDashboard(configs) {
  */
 function buildPromptRelationships(allPrompts) {
     console.time('Build relationships');
+    console.log(`🔍 Analyzing relationships for ${allPrompts.length} prompts...`);
+
     promptRelationships = {};
 
     // Initialiser toutes les relations
@@ -158,15 +160,22 @@ function buildPromptRelationships(allPrompts) {
         }
     });
 
+    console.log(`📋 Prompts keys:`, allPrompts.map(p => p.key));
+
     // Analyser chaque prompt UNE SEULE FOIS
+    let totalReferencesFound = 0;
     allPrompts.forEach(prompt => {
         const content = typeof prompt.value === 'string'
             ? prompt.value
             : JSON.stringify(prompt.value);
 
-        if (!content) return;
+        if (!content) {
+            console.log(`⚠️ ${prompt.key} has no content`);
+            return;
+        }
 
         const contentLower = content.toLowerCase();
+        let referencesInThisPrompt = 0;
 
         // Chercher les références aux autres prompts
         allPrompts.forEach(otherPrompt => {
@@ -184,6 +193,9 @@ function buildPromptRelationships(allPrompts) {
                 if (wordBoundaryCheck.test(content) || quotedCheck.test(content)) {
                     if (!promptRelationships[prompt.key].references.includes(otherPrompt.key)) {
                         promptRelationships[prompt.key].references.push(otherPrompt.key);
+                        referencesInThisPrompt++;
+                        totalReferencesFound++;
+                        console.log(`  ✅ ${prompt.key} → ${otherPrompt.key}`);
                     }
                 }
             }
@@ -192,10 +204,19 @@ function buildPromptRelationships(allPrompts) {
             if (otherPrompt.prompt_id && content.includes(otherPrompt.prompt_id.toString())) {
                 if (!promptRelationships[prompt.key].references.includes(otherPrompt.key)) {
                     promptRelationships[prompt.key].references.push(otherPrompt.key);
+                    referencesInThisPrompt++;
+                    totalReferencesFound++;
+                    console.log(`  ✅ ${prompt.key} → ${otherPrompt.key} (by prompt_id)`);
                 }
             }
         });
+
+        if (referencesInThisPrompt > 0) {
+            console.log(`📎 ${prompt.key}: ${referencesInThisPrompt} references found`);
+        }
     });
+
+    console.log(`🔗 Total references found: ${totalReferencesFound}`);
 
     // Construire les "referencedBy" (inverse) - optimisé
     Object.entries(promptRelationships).forEach(([key, rel]) => {
@@ -680,14 +701,17 @@ export function filterDashboard(category) {
  */
 export function filterByRelatedPrompts(promptKey) {
     console.log(`🔗 filterByRelatedPrompts called for: ${promptKey}`);
+    alert(`Clic détecté sur: ${promptKey}`); // Test visuel
 
     relationshipFilter = promptKey;
 
     // Get related prompts
     const relationships = promptRelationships[promptKey];
     if (!relationships) {
-        console.warn(`⚠️ No relationships found for ${promptKey}`);
+        console.error(`⚠️ No relationships found for ${promptKey}`);
         console.log('Available relationships:', Object.keys(promptRelationships));
+        console.log('Full relationships map:', promptRelationships);
+        alert(`ERREUR: Pas de relations trouvées pour ${promptKey}`);
         return;
     }
 
