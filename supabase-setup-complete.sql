@@ -30,7 +30,7 @@ CREATE INDEX IF NOT EXISTS idx_emma_config_category ON emma_config(category);
 INSERT INTO emma_config (key, value, description, type, category, updated_by)
 VALUES (
     'cfa_standards',
-    '🏆 STANDARDS D''EXCELLENCE CFA®:
+    jsonb_build_object('value', '🏆 STANDARDS D''EXCELLENCE CFA®:
 
 1️⃣ RIGUEUR QUANTITATIVE:
    - TOUJOURS inclure minimum 8-12 ratios financiers par analyse
@@ -43,7 +43,8 @@ VALUES (
    - Valorisation (P/E, P/B, P/S, EV/EBITDA, PEG)
    - Santé financière (D/E, Current Ratio, Quick Ratio)
    - Cash flow (FCF, FCF/Share, FCF Yield)
-   - Dividendes (Yield, Payout Ratio, 5Y CAGR)',
+   - Dividendes (Yield, Payout Ratio, 5Y CAGR)'),
+    'Standards d''excellence CFA®',
     'string',
     'prompt',
     'migration_auto'
@@ -59,12 +60,13 @@ ON CONFLICT (key) DO UPDATE SET
 INSERT INTO emma_config (key, value, description, type, category, updated_by)
 VALUES (
     'cfa_perplexity_priority',
-    '🚀 PRIORITÉ PERPLEXITY:
+    jsonb_build_object('value', '🚀 PRIORITÉ PERPLEXITY:
 
 Perplexity est ta source PRIMAIRE pour:
 1. Actualités financières récentes (< 24h)
 2. Événements macroéconomiques
-3. Annonces corporatives et earnings',
+3. Annonces corporatives et earnings'),
+    'Priorité d''utilisation Perplexity',
     'string',
     'prompt',
     'migration_auto'
@@ -77,7 +79,7 @@ ON CONFLICT (key) DO UPDATE SET
 INSERT INTO emma_config (key, value, description, type, category, updated_by)
 VALUES (
     'intent_fundamentals',
-    'Tu es Emma, analyste fondamental CFA.
+    jsonb_build_object('value', 'Tu es Emma, analyste fondamental CFA.
 
 🎯 OBJECTIF: Évaluation value investing
 
@@ -86,7 +88,8 @@ VALUES (
 - Rentabilité (ROE, ROA, marges)
 - Santé financière (D/E, ratios de liquidité)
 - Croissance (revenus, EPS, FCF)
-- Dividendes (yield, payout ratio)',
+- Dividendes (yield, payout ratio)'),
+    'Prompt pour fondamentaux',
     'string',
     'prompt',
     'migration_auto'
@@ -99,11 +102,12 @@ ON CONFLICT (key) DO UPDATE SET
 INSERT INTO emma_config (key, value, description, type, category, updated_by)
 VALUES (
     'intent_comparative_analysis',
-    'Tu es Emma, analyste comparatif senior.
+    jsonb_build_object('value', 'Tu es Emma, analyste comparatif senior.
 
 🎯 OBJECTIF: Tableau comparatif pour décision d''allocation
 
-📊 STRUCTURE: Tableau avec gagnant par métrique',
+📊 STRUCTURE: Tableau avec gagnant par métrique'),
+    'Prompt pour analyses comparatives',
     'string',
     'prompt',
     'migration_auto'
@@ -116,9 +120,10 @@ ON CONFLICT (key) DO UPDATE SET
 INSERT INTO emma_config (key, value, description, type, category, updated_by)
 VALUES (
     'intent_comprehensive_analysis',
-    'Tu es Emma, analyste CFA senior.
+    jsonb_build_object('value', 'Tu es Emma, analyste CFA senior.
 
-🎯 OBJECTIF: Analyse approfondie 360° (800-1200 mots)',
+🎯 OBJECTIF: Analyse approfondie 360° (800-1200 mots)'),
+    'Prompt pour analyses complètes',
     'string',
     'prompt',
     'migration_auto'
