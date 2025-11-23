@@ -14,7 +14,7 @@ import { initChatAssistant } from './chat-assistant.js';
 /**
  * Fonction d'initialisation principale
  */
-export function init() {
+export async function init() {
     // ═══════════════════════════════════════════════════════════
     // EXPOSE FUNCTIONS TO GLOBAL SCOPE (pour onclick HTML)
     // ═══════════════════════════════════════════════════════════
@@ -140,13 +140,23 @@ export function init() {
     // ═══════════════════════════════════════════════════════════
     // INITIALISATION
     // ═══════════════════════════════════════════════════════════
-    loadConfigs();
+
+    console.log('🚀 Initialisation Emma Config...');
+
+    // Charger les prompts d'abord (nécessaire pour le dashboard)
+    await loadConfigs();
+    console.log('✅ Prompts chargés');
+
+    // Initialiser le chatbot
     initChatAssistant();
 
     // Charger le dashboard si c'est l'onglet actif par défaut
-    const dashboardTab = document.getElementById('tabDashboard');
-    if (dashboardTab && dashboardTab.classList.contains('bg-white')) {
-        // L'onglet dashboard est actif par défaut, le charger
-        loadDashboard();
-    }
+    // Utiliser setTimeout pour s'assurer que le DOM est prêt
+    setTimeout(() => {
+        const dashboardTab = document.getElementById('tabDashboard');
+        if (dashboardTab && dashboardTab.classList.contains('bg-white')) {
+            console.log('📊 Onglet dashboard actif, chargement...');
+            loadDashboard();
+        }
+    }, 100);
 }
