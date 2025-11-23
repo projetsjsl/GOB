@@ -4,8 +4,7 @@
 
 import { getAllConfigs } from './prompts-manager.js';
 
-const GEMINI_API_KEY = 'AIzaSyBEH74T-hbRxR5uKSlsJa3-VZOQWsyXXyY'; // Votre clé API
-const GEMINI_MODEL = 'gemini-2.0-flash-exp';
+const CHAT_API_ENDPOINT = '/api/chat-assistant';
 const STORAGE_KEY = 'emma-config-chat-history';
 
 let chatHistory = [];
@@ -225,55 +224,31 @@ CAPACITÉS:
 }
 
 /**
- * Appelle l'API Gemini
+ * Appelle l'API Chat Assistant (sécurisée côté serveur)
  */
 async function callGemini(userMessage, context) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
-    // Construire l'historique pour Gemini
-    const contents = [
-        {
-            role: 'user',
-            parts: [{ text: context }]
-        },
-        {
-            role: 'model',
-            parts: [{ text: 'Compris! Je suis prêt à vous aider avec Emma Config. Quelle est votre question?' }]
-        }
-    ];
-
-    // Ajouter l'historique de conversation
-    chatHistory.forEach(msg => {
-        contents.push({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.content }]
-        });
-    });
-
-    // Ajouter le message actuel
-    contents.push({
-        role: 'user',
-        parts: [{ text: userMessage }]
-    });
-
-    const response = await fetch(url, {
+    const response = await fetch(CHAT_API_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            contents,
-            generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 2048
-            }
+            message: userMessage,
+            context: context,
+            history: chatHistory
         })
     });
 
     if (!response.ok) {
-        throw new Error(`Gemini API error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.status}`);
     }
 
     const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+
+    if (!data.success || !data.message) {
+        throw new Error('Invalid response from chat API');
+    }
+
+    return data.message;
 }
 
 /**

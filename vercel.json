@@ -13,6 +13,9 @@
     "api/gemini/chat.js": {
       "maxDuration": 30
     },
+    "api/chat-assistant.js": {
+      "maxDuration": 30
+    },
     "api/emma-agent.js": {
       "maxDuration": 300
     },
