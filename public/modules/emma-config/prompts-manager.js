@@ -11,6 +11,20 @@ let allConfigs = {};
 let currentConfig = null;
 
 /**
+ * Obtient une config par catégorie et key
+ */
+export function getConfig(category, key) {
+    return allConfigs[category]?.[key] || null;
+}
+
+/**
+ * Obtient toutes les configs
+ */
+export function getAllConfigs() {
+    return allConfigs;
+}
+
+/**
  * Charge toutes les configurations
  */
 export async function loadConfigs() {
@@ -144,7 +158,19 @@ export function selectConfig(section, key, config) {
 
     // Highlight
     document.querySelectorAll('.config-item').forEach(el => el.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    if (typeof event !== 'undefined' && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    } else {
+        // Programmatic selection - find and highlight the item
+        const items = document.querySelectorAll('.config-item');
+        for (const item of items) {
+            if (item.dataset.key === key) {
+                item.classList.add('active');
+                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                break;
+            }
+        }
+    }
 
     // Afficher éditeur
     document.getElementById('editorEmpty').classList.add('hidden');

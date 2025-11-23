@@ -286,18 +286,19 @@ export function editPromptFromDashboard(category, key) {
         window.switchMainTab('prompts');
     }
 
-    // Wait a bit for tab switch then trigger selection
+    // Wait for tab switch and sidebar to render, then select the config
     setTimeout(() => {
-        // Find the config item in the sidebar and click it
-        const items = document.querySelectorAll('.config-item');
-        for (const item of items) {
-            if (item.dataset.key === key) {
-                item.click();
-                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                break;
+        // Get the config data from the prompts manager
+        if (window.getConfig && window.selectConfig) {
+            const config = window.getConfig(category, key);
+            if (config) {
+                // Call selectConfig programmatically
+                window.selectConfig(category, key, config);
+            } else {
+                console.error(`Config not found: ${category}/${key}`);
             }
         }
-    }, 200);
+    }, 300);
 }
 
 /**

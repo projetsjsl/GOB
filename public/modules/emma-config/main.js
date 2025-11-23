@@ -7,7 +7,7 @@ import { updatePreview, updateChannelBadges } from './preview-manager.js';
 import { loadDesignConfig, updateDesignPreview, saveDesign, cancelDesignChanges, resetDesignToDefaults } from './design-manager.js';
 import { saveSms, cancelSmsChanges } from './sms-manager.js';
 import { showAddRecipientForm, hideAddRecipientForm, addRecipient, removeRecipient, toggleRecipientActive, saveDeliveryConfig, sendBriefingNow } from './delivery-manager.js';
-import { loadConfigs, renderConfigList, saveConfig, deleteConfig, createNewConfig, getCurrentConfig, selectConfig } from './prompts-manager.js';
+import { loadConfigs, renderConfigList, saveConfig, deleteConfig, createNewConfig, getCurrentConfig, selectConfig, getConfig } from './prompts-manager.js';
 import { loadDashboard, filterDashboard, editPromptFromDashboard } from './dashboard-manager.js';
 
 /**
@@ -19,6 +19,7 @@ export function init() {
     // ═══════════════════════════════════════════════════════════
     window.switchMainTab = switchMainTab;
     window.selectConfig = selectConfig;
+    window.getConfig = getConfig;
     window.updatePreview = updatePreview;
     window.saveDesignConfig = saveDesign;
     window.cancelDesignChanges = cancelDesignChanges;

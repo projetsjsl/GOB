@@ -58,7 +58,7 @@ export function switchMainTab(tab) {
 
     // Update header
     const titles = {
-        dashboard: '📊 Dashboard',
+        dashboard: '📊 Configuration',
         prompts: '📝 Gestion des Prompts',
         design: '🎨 Design des Emails',
         sms: '📱 Configuration SMS',
