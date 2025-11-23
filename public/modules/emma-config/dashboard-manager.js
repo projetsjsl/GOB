@@ -6,6 +6,8 @@ import { loadAllConfigs } from './api-client.js';
 
 let dashboardData = null;
 let currentFilter = 'all';
+let relationshipFilter = null; // Pour filtrer par relations
+let promptRelationships = {}; // Map des relations entre prompts
 
 /**
  * Charge et affiche le dashboard
@@ -14,6 +16,9 @@ export async function loadDashboard() {
     try {
         const configs = await loadAllConfigs();
         dashboardData = processConfigsForDashboard(configs);
+
+        // Build relationship map
+        buildPromptRelationships(dashboardData.allPrompts);
 
         renderStatistics(dashboardData);
         renderArchitecture(dashboardData);
@@ -77,6 +82,59 @@ function processConfigsForDashboard(configs) {
     });
 
     return { allPrompts, stats };
+}
+
+/**
+ * Construit la carte des relations entre prompts
+ */
+function buildPromptRelationships(allPrompts) {
+    promptRelationships = {};
+
+    allPrompts.forEach(prompt => {
+        const key = prompt.key;
+        promptRelationships[key] = {
+            references: [], // Prompts référencés par celui-ci
+            referencedBy: [] // Prompts qui référencent celui-ci
+        };
+
+        // Analyser le contenu pour trouver les références
+        const content = typeof prompt.value === 'string'
+            ? prompt.value
+            : JSON.stringify(prompt.value);
+
+        if (content) {
+            // Chercher les références à d'autres prompts
+            allPrompts.forEach(otherPrompt => {
+                if (otherPrompt.key !== key) {
+                    // Vérifier si le prompt fait référence à l'autre
+                    const patterns = [
+                        new RegExp(`\\b${otherPrompt.key}\\b`, 'i'),
+                        new RegExp(`"${otherPrompt.key}"`, 'i'),
+                        new RegExp(`'${otherPrompt.key}'`, 'i'),
+                        new RegExp(`prompt_id.*${otherPrompt.prompt_id}`, 'i')
+                    ];
+
+                    const hasReference = patterns.some(pattern => pattern.test(content));
+                    if (hasReference) {
+                        promptRelationships[key].references.push(otherPrompt.key);
+                    }
+                }
+            });
+        }
+    });
+
+    // Construire les "referencedBy" (inverse)
+    Object.keys(promptRelationships).forEach(key => {
+        promptRelationships[key].references.forEach(refKey => {
+            if (promptRelationships[refKey]) {
+                if (!promptRelationships[refKey].referencedBy.includes(key)) {
+                    promptRelationships[refKey].referencedBy.push(key);
+                }
+            }
+        });
+    });
+
+    console.log('Relationships built:', promptRelationships);
 }
 
 /**
@@ -253,8 +311,7 @@ function createArchitectureNode(prompt, color, isBriefing = false, isSmall = fal
     const sizeClass = isSmall ? 'text-xs p-2' : 'text-sm p-3';
 
     return `
-        <div onclick="editPromptFromDashboard('${prompt.category}', '${prompt.key}')"
-             class="relative ${c.bg} border-2 ${c.border} rounded-lg ${sizeClass} ${c.hover} cursor-pointer transition-all duration-200 transform hover:scale-105 hover:shadow-lg">
+        <div class="relative ${c.bg} border-2 ${c.border} rounded-lg ${sizeClass} ${c.hover} cursor-pointer transition-all duration-200 transform hover:scale-105 hover:shadow-lg group">
             <div class="font-bold ${c.text} mb-1 truncate" title="${prompt.key}">
                 ${title}
             </div>
@@ -272,6 +329,17 @@ function createArchitectureNode(prompt, color, isBriefing = false, isSmall = fal
                     ⏰
                 </div>
             ` : ''}
+            <!-- Boutons d'action au hover -->
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                <button onclick="event.stopPropagation(); window.filterByRelatedPrompts('${prompt.key}')"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-lg">
+                    🔗 Voir relations
+                </button>
+                <button onclick="event.stopPropagation(); editPromptFromDashboard('${prompt.category}', '${prompt.key}')"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-lg">
+                    ✏️ Éditer
+                </button>
+            </div>
         </div>
     `;
 }
@@ -357,9 +425,23 @@ function renderTable(data) {
     }
 
     // Filtrer selon le filtre actuel
-    const filteredPrompts = currentFilter === 'all'
-        ? allPrompts
-        : allPrompts.filter(p => p.category === currentFilter);
+    let filteredPrompts = allPrompts;
+
+    // Relationship filter takes precedence
+    if (relationshipFilter) {
+        const relationships = promptRelationships[relationshipFilter];
+        if (relationships) {
+            const relatedKeys = [
+                relationshipFilter,
+                ...relationships.references,
+                ...relationships.referencedBy
+            ];
+            filteredPrompts = allPrompts.filter(p => relatedKeys.includes(p.key));
+        }
+    } else if (currentFilter !== 'all') {
+        // Category filter
+        filteredPrompts = allPrompts.filter(p => p.category === currentFilter);
+    }
 
     tbody.innerHTML = filteredPrompts.map(prompt => {
         const valueSize = getValueSize(prompt.value);
@@ -474,6 +556,7 @@ export function editPromptFromDashboard(category, key) {
  */
 export function filterDashboard(category) {
     currentFilter = category;
+    relationshipFilter = null; // Reset relationship filter
 
     // Mettre à jour les boutons de filtre
     document.querySelectorAll('.dashboard-filter-btn').forEach(btn => {
@@ -487,7 +570,102 @@ export function filterDashboard(category) {
         activeBtn.classList.add('bg-indigo-600', 'text-white', 'active');
     }
 
+    // Hide clear filter button
+    hideRelationshipFilterBanner();
+
     // Re-render le tableau
+    if (dashboardData) {
+        renderTable(dashboardData);
+    }
+}
+
+/**
+ * Filtre par prompts reliés
+ */
+export function filterByRelatedPrompts(promptKey) {
+    relationshipFilter = promptKey;
+
+    // Get related prompts
+    const relationships = promptRelationships[promptKey];
+    if (!relationships) {
+        console.warn(`No relationships found for ${promptKey}`);
+        return;
+    }
+
+    const relatedKeys = [
+        promptKey,
+        ...relationships.references,
+        ...relationships.referencedBy
+    ];
+
+    console.log(`Filtering by prompts related to ${promptKey}:`, relatedKeys);
+
+    // Reset category filter
+    currentFilter = 'all';
+
+    // Show relationship filter banner
+    showRelationshipFilterBanner(promptKey, relatedKeys.length);
+
+    // Re-render table with relationship filter
+    if (dashboardData) {
+        renderTable(dashboardData);
+    }
+
+    // Scroll to table
+    document.getElementById('dashboardTable')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Affiche la bannière de filtre par relations
+ */
+function showRelationshipFilterBanner(promptKey, count) {
+    let banner = document.getElementById('relationshipFilterBanner');
+
+    if (!banner) {
+        // Créer la bannière
+        const tableContainer = document.querySelector('#dashboardTable').parentElement;
+        banner = document.createElement('div');
+        banner.id = 'relationshipFilterBanner';
+        tableContainer.insertBefore(banner, tableContainer.firstChild);
+    }
+
+    banner.className = 'mb-4 p-4 bg-blue-50 border-2 border-blue-500 rounded-lg flex items-center justify-between';
+    banner.innerHTML = `
+        <div class="flex items-center gap-3">
+            <span class="text-2xl">🔗</span>
+            <div>
+                <h4 class="font-bold text-blue-900">Filtrage par relations actif</h4>
+                <p class="text-sm text-blue-700">
+                    Affichage de <strong>${count} prompt${count > 1 ? 's' : ''}</strong> reliés à <strong class="font-mono bg-blue-100 px-2 py-0.5 rounded">${promptKey}</strong>
+                </p>
+            </div>
+        </div>
+        <button onclick="window.clearRelationshipFilter()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+            <span>✕</span>
+            <span>Annuler le filtre</span>
+        </button>
+    `;
+}
+
+/**
+ * Cache la bannière de filtre par relations
+ */
+function hideRelationshipFilterBanner() {
+    const banner = document.getElementById('relationshipFilterBanner');
+    if (banner) {
+        banner.remove();
+    }
+}
+
+/**
+ * Annule le filtre par relations
+ */
+export function clearRelationshipFilter() {
+    relationshipFilter = null;
+    hideRelationshipFilterBanner();
+
+    // Re-render table
     if (dashboardData) {
         renderTable(dashboardData);
     }
