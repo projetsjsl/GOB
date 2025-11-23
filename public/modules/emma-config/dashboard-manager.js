@@ -413,8 +413,8 @@ function createArchitectureNode(prompt, color, isBriefing = false, isSmall = fal
                 </button>
             </div>
             <!-- Indicateur de clic pour filtrage -->
-            <div class="absolute bottom-2 left-2 opacity-50 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-500">
-                <span class="bg-white px-2 py-0.5 rounded border border-gray-300">🔗 Cliquer pour filtrer</span>
+            <div class="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-all duration-200 text-xs">
+                <span class="bg-blue-500 text-white px-2 py-1 rounded shadow-lg animate-pulse">🔗 Cliquer pour voir relations</span>
             </div>
         </div>
     `;
@@ -771,12 +771,14 @@ function hideRelationshipFilterBanner() {
  * Annule le filtre par relations
  */
 export function clearRelationshipFilter() {
+    console.log('🔄 Clearing relationship filter');
     relationshipFilter = null;
     hideRelationshipFilterBanner();
 
-    // Remove highlight from architecture
+    // Remove ALL highlights from architecture
     document.querySelectorAll('.architecture-node').forEach(node => {
-        node.classList.remove('ring-4', 'ring-blue-500', 'ring-offset-2');
+        node.classList.remove('ring-4', 'ring-blue-500', 'ring-green-500', 'ring-offset-2', 'opacity-30', 'scale-95');
+        node.style.transform = '';
     });
 
     // Re-render table
@@ -789,21 +791,54 @@ export function clearRelationshipFilter() {
  * Highlight le prompt sélectionné dans l'architecture
  */
 function highlightPromptInArchitecture(promptKey) {
-    // Remove previous highlights
-    document.querySelectorAll('.architecture-node').forEach(node => {
-        node.classList.remove('ring-4', 'ring-blue-500', 'ring-offset-2');
-    });
+    console.log(`🎨 Highlighting architecture for: ${promptKey}`);
 
-    // Add highlight to selected node
+    // Get relationships
+    const relationships = promptRelationships[promptKey];
+    if (!relationships) {
+        console.warn('No relationships found for highlighting');
+        return;
+    }
+
+    const relatedKeys = new Set([
+        ...relationships.references,
+        ...relationships.referencedBy
+    ]);
+
+    console.log(`Related prompts (${relatedKeys.size}):`, Array.from(relatedKeys));
+
+    // Process all nodes
     const nodes = document.querySelectorAll('.architecture-node');
+    let selectedNode = null;
+
     nodes.forEach(node => {
-        // Check if this node corresponds to the prompt key
-        if (node.getAttribute('data-prompt-key') === promptKey) {
+        const nodeKey = node.getAttribute('data-prompt-key');
+
+        // Remove all previous highlights
+        node.classList.remove('ring-4', 'ring-blue-500', 'ring-green-500', 'ring-offset-2', 'opacity-30', 'scale-95');
+        node.style.transform = '';
+
+        if (nodeKey === promptKey) {
+            // Selected node - Blue ring
             node.classList.add('ring-4', 'ring-blue-500', 'ring-offset-2');
-            // Scroll to it
-            node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            selectedNode = node;
+            console.log(`✅ Selected node: ${nodeKey}`);
+        } else if (relatedKeys.has(nodeKey)) {
+            // Related node - Green ring
+            node.classList.add('ring-4', 'ring-green-500', 'ring-offset-2');
+            console.log(`🔗 Related node: ${nodeKey}`);
+        } else {
+            // Unrelated node - Dim
+            node.classList.add('opacity-30', 'scale-95');
         }
     });
+
+    // Scroll to selected node
+    if (selectedNode) {
+        setTimeout(() => {
+            selectedNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
 }
 
 /**
