@@ -6,6 +6,7 @@ import { loadAllConfigs as apiLoadAll, saveCurrentConfig as apiSave, deleteCurre
 import { showStatus, getSectionEmoji, getChannelBadge, getChannelEmoji } from './ui-helpers.js';
 import { updatePreview, updateChannelBadges } from './preview-manager.js';
 import { loadDeliveryConfig } from './delivery-manager.js';
+import { invalidateDashboardCache } from './dashboard-manager.js';
 
 let allConfigs = {};
 let currentConfig = null;
@@ -34,6 +35,9 @@ export async function loadConfigs() {
         renderConfigList();
         updateStats();
         showStatus('✅ Chargé', 'success');
+
+        // Invalider le cache du dashboard
+        invalidateDashboardCache();
     } catch (error) {
         console.error('Erreur chargement:', error);
         showStatus('❌ ' + error.message, 'error');
@@ -270,6 +274,7 @@ export async function saveConfig() {
         if (success) {
             showStatus('✅ Sauvegardé', 'success');
             await loadConfigs();
+            // loadConfigs() invalide déjà le cache, pas besoin de le faire ici
         } else {
             showStatus('❌ Erreur sauvegarde', 'error');
         }
@@ -293,6 +298,7 @@ export async function deleteConfig() {
             document.getElementById('editorContent').classList.add('hidden');
             document.getElementById('editorEmpty').classList.remove('hidden');
             await loadConfigs();
+            // loadConfigs() invalide déjà le cache, pas besoin de le faire ici
         } else {
             showStatus('❌ Erreur suppression', 'error');
         }

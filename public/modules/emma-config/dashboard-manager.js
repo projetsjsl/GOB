@@ -639,6 +639,15 @@ export function reloadDashboard() {
 }
 
 /**
+ * Invalide le cache du dashboard (appelé quand les prompts changent)
+ */
+export function invalidateDashboardCache() {
+    console.log('♻️ Cache dashboard invalidé (prompts modifiés)');
+    dashboardLoaded = false;
+    dashboardData = null;
+}
+
+/**
  * Filtre le dashboard
  */
 export function filterDashboard(category) {
