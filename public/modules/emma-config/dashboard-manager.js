@@ -17,16 +17,33 @@ export async function loadDashboard() {
         const configs = await loadAllConfigs();
         dashboardData = processConfigsForDashboard(configs);
 
-        // Build relationship map
-        buildPromptRelationships(dashboardData.allPrompts);
-
+        // Render UI immediately (non-blocking)
         renderStatistics(dashboardData);
-        renderArchitecture(dashboardData);
         renderCharts(dashboardData);
         renderTable(dashboardData);
         renderBriefingSchedule(dashboardData);
 
+        // Show loading state for architecture
+        const archContainer = document.getElementById('promptsArchitecture');
+        if (archContainer) {
+            archContainer.innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <div class="text-center">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-3"></div>
+                        <p class="text-gray-600">Analyse des relations entre prompts...</p>
+                    </div>
+                </div>
+            `;
+        }
+
         updateLastUpdateTime();
+
+        // Build relationships asynchronously (non-blocking)
+        setTimeout(() => {
+            buildPromptRelationships(dashboardData.allPrompts);
+            renderArchitecture(dashboardData);
+        }, 100);
+
     } catch (error) {
         console.error('Erreur chargement dashboard:', error);
         showDashboardError();
@@ -85,56 +102,81 @@ function processConfigsForDashboard(configs) {
 }
 
 /**
- * Construit la carte des relations entre prompts
+ * Construit la carte des relations entre prompts (optimisé)
  */
 function buildPromptRelationships(allPrompts) {
+    console.time('Build relationships');
     promptRelationships = {};
 
+    // Initialiser toutes les relations
     allPrompts.forEach(prompt => {
-        const key = prompt.key;
-        promptRelationships[key] = {
-            references: [], // Prompts référencés par celui-ci
-            referencedBy: [] // Prompts qui référencent celui-ci
+        promptRelationships[prompt.key] = {
+            references: [],
+            referencedBy: []
         };
+    });
 
-        // Analyser le contenu pour trouver les références
+    // Créer un map pour lookup rapide par key et prompt_id
+    const promptsByKey = new Map();
+    const promptsByPromptId = new Map();
+
+    allPrompts.forEach(prompt => {
+        promptsByKey.set(prompt.key, prompt);
+        if (prompt.prompt_id) {
+            promptsByPromptId.set(prompt.prompt_id.toString(), prompt);
+        }
+    });
+
+    // Analyser chaque prompt UNE SEULE FOIS
+    allPrompts.forEach(prompt => {
         const content = typeof prompt.value === 'string'
             ? prompt.value
             : JSON.stringify(prompt.value);
 
-        if (content) {
-            // Chercher les références à d'autres prompts
-            allPrompts.forEach(otherPrompt => {
-                if (otherPrompt.key !== key) {
-                    // Vérifier si le prompt fait référence à l'autre
-                    const patterns = [
-                        new RegExp(`\\b${otherPrompt.key}\\b`, 'i'),
-                        new RegExp(`"${otherPrompt.key}"`, 'i'),
-                        new RegExp(`'${otherPrompt.key}'`, 'i'),
-                        new RegExp(`prompt_id.*${otherPrompt.prompt_id}`, 'i')
-                    ];
+        if (!content) return;
 
-                    const hasReference = patterns.some(pattern => pattern.test(content));
-                    if (hasReference) {
-                        promptRelationships[key].references.push(otherPrompt.key);
+        const contentLower = content.toLowerCase();
+
+        // Chercher les références aux autres prompts
+        allPrompts.forEach(otherPrompt => {
+            if (otherPrompt.key === prompt.key) return;
+
+            // Patterns simplifiés et combinés
+            const keyPattern = otherPrompt.key.toLowerCase();
+
+            // Test simple: chercher la clé dans le contenu
+            if (contentLower.includes(keyPattern)) {
+                // Vérifier que c'est bien une référence (word boundary approximatif)
+                const wordBoundaryCheck = new RegExp(`[^a-z0-9_]${keyPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^a-z0-9_]`, 'i');
+                const quotedCheck = new RegExp(`["']${keyPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`, 'i');
+
+                if (wordBoundaryCheck.test(content) || quotedCheck.test(content)) {
+                    if (!promptRelationships[prompt.key].references.includes(otherPrompt.key)) {
+                        promptRelationships[prompt.key].references.push(otherPrompt.key);
                     }
                 }
-            });
-        }
-    });
+            }
 
-    // Construire les "referencedBy" (inverse)
-    Object.keys(promptRelationships).forEach(key => {
-        promptRelationships[key].references.forEach(refKey => {
-            if (promptRelationships[refKey]) {
-                if (!promptRelationships[refKey].referencedBy.includes(key)) {
-                    promptRelationships[refKey].referencedBy.push(key);
+            // Chercher par prompt_id si disponible
+            if (otherPrompt.prompt_id && content.includes(otherPrompt.prompt_id.toString())) {
+                if (!promptRelationships[prompt.key].references.includes(otherPrompt.key)) {
+                    promptRelationships[prompt.key].references.push(otherPrompt.key);
                 }
             }
         });
     });
 
-    console.log('Relationships built:', promptRelationships);
+    // Construire les "referencedBy" (inverse) - optimisé
+    Object.entries(promptRelationships).forEach(([key, rel]) => {
+        rel.references.forEach(refKey => {
+            if (promptRelationships[refKey]) {
+                promptRelationships[refKey].referencedBy.push(key);
+            }
+        });
+    });
+
+    console.timeEnd('Build relationships');
+    console.log('Relationships built:', Object.keys(promptRelationships).length, 'prompts analyzed');
 }
 
 /**
