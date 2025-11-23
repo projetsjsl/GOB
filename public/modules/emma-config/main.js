@@ -142,4 +142,11 @@ export function init() {
     // ═══════════════════════════════════════════════════════════
     loadConfigs();
     initChatAssistant();
+
+    // Charger le dashboard si c'est l'onglet actif par défaut
+    const dashboardTab = document.getElementById('tabDashboard');
+    if (dashboardTab && dashboardTab.classList.contains('bg-white')) {
+        // L'onglet dashboard est actif par défaut, le charger
+        loadDashboard();
+    }
 }
