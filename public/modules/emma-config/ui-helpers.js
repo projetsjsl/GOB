@@ -53,12 +53,14 @@ export function switchMainTab(tab) {
     document.getElementById('promptsTabContent').classList.toggle('hidden', tab !== 'prompts');
     document.getElementById('designTabContent').classList.toggle('hidden', tab !== 'design');
     document.getElementById('smsTabContent').classList.toggle('hidden', tab !== 'sms');
+    document.getElementById('helpTabContent').classList.toggle('hidden', tab !== 'help');
 
     // Update header
     const titles = {
         prompts: '📝 Gestion des Prompts',
         design: '🎨 Design des Emails',
-        sms: '📱 Configuration SMS'
+        sms: '📱 Configuration SMS',
+        help: '📖 Mode d\'Emploi'
     };
     document.getElementById('editorTitle').textContent = titles[tab] || 'Configuration';
     document.getElementById('editorSubtitle').textContent = '';

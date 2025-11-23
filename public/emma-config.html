@@ -106,15 +106,18 @@
                 <p class="text-xs text-gray-500 mt-1">Centre de configuration unifié</p>
 
                 <!-- ONGLETS PRINCIPAUX -->
-                <div class="mt-3 flex rounded-lg bg-gray-100 p-1">
-                    <button id="tabPrompts" onclick="switchMainTab('prompts')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md bg-white shadow font-medium" title="Gérer les prompts et instructions d'Emma">
+                <div class="mt-3 grid grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1">
+                    <button id="tabPrompts" onclick="switchMainTab('prompts')" class="main-tab text-xs px-2 py-1.5 rounded-md bg-white shadow font-medium" title="Gérer les prompts et instructions d'Emma">
                         📝 Prompts
                     </button>
-                    <button id="tabDesign" onclick="switchMainTab('design')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Personnaliser le design des emails">
+                    <button id="tabDesign" onclick="switchMainTab('design')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Personnaliser le design des emails">
                         🎨 Design
                     </button>
-                    <button id="tabSms" onclick="switchMainTab('sms')" class="main-tab flex-1 text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configurer les paramètres SMS">
+                    <button id="tabSms" onclick="switchMainTab('sms')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configurer les paramètres SMS">
                         📱 SMS
+                    </button>
+                    <button id="tabHelp" onclick="switchMainTab('help')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Mode d'emploi et intégration n8n">
+                        📖 Aide
                     </button>
                 </div>
 
@@ -1035,6 +1038,382 @@
                                     💾 <span>Sauvegarder</span>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- HELP TAB CONTENT - Mode d'emploi et documentation           -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <div id="helpTabContent" class="hidden max-w-5xl mx-auto">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <!-- Header -->
+                        <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6">
+                            <h2 class="text-2xl font-bold">📖 Mode d'Emploi Emma Config</h2>
+                            <p class="text-blue-100 mt-1">Guide complet pour gérer les prompts et intégrer avec n8n</p>
+                        </div>
+
+                        <div class="p-6 space-y-6">
+                            <!-- Navigation rapide -->
+                            <nav class="bg-gray-50 rounded-lg p-4 border">
+                                <h3 class="font-semibold text-gray-800 mb-3">📑 Navigation Rapide</h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                                    <a href="#help-add-prompt" class="text-blue-600 hover:underline">➕ Ajouter un Prompt</a>
+                                    <a href="#help-n8n-simple" class="text-blue-600 hover:underline">🔌 n8n Simple</a>
+                                    <a href="#help-n8n-briefing" class="text-blue-600 hover:underline">📧 n8n Briefing</a>
+                                    <a href="#help-api-ref" class="text-blue-600 hover:underline">📚 Référence API</a>
+                                    <a href="#help-examples" class="text-blue-600 hover:underline">💡 Exemples</a>
+                                    <a href="#help-troubleshoot" class="text-blue-600 hover:underline">🔧 Troubleshooting</a>
+                                    <a href="#help-sql" class="text-blue-600 hover:underline">🗄️ SQL Direct</a>
+                                    <a href="#help-vars" class="text-blue-600 hover:underline">🔑 Variables Env</a>
+                                </div>
+                            </nav>
+
+                            <!-- Section 1: Ajouter un Prompt -->
+                            <section id="help-add-prompt" class="border rounded-lg p-6">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">➕</span>
+                                    Ajouter un Nouveau Prompt
+                                </h3>
+
+                                <div class="space-y-4">
+                                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                                        <p class="font-semibold text-blue-900">Méthode Recommandée: Interface Web</p>
+                                        <ol class="mt-2 space-y-2 text-sm text-blue-800">
+                                            <li>1️⃣ Cliquer sur l'onglet <strong>📝 Prompts</strong></li>
+                                            <li>2️⃣ Cliquer sur <strong>➕</strong> (bouton vert dans la sidebar)</li>
+                                            <li>3️⃣ Remplir le formulaire:
+                                                <ul class="ml-4 mt-1 list-disc">
+                                                    <li><strong>Key</strong>: Identifiant unique (ex: <code>my_custom_prompt</code>)</li>
+                                                    <li><strong>Description</strong>: Description courte</li>
+                                                    <li><strong>Type</strong>: <code>string</code> pour texte simple, <code>json</code> pour config complexe</li>
+                                                    <li><strong>Category</strong>: <code>prompt</code>, <code>briefing</code>, ou <code>system</code></li>
+                                                    <li><strong>Value</strong>: Contenu de votre prompt</li>
+                                                </ul>
+                                            </li>
+                                            <li>4️⃣ Cliquer <strong>💾 Sauvegarder</strong></li>
+                                        </ol>
+                                    </div>
+
+                                    <div class="bg-gray-50 border-l-4 border-gray-500 p-4">
+                                        <p class="font-semibold text-gray-900">Méthode Alternative: SQL Direct</p>
+                                        <p class="text-sm text-gray-700 mt-2">Pour ajouter en masse ou via script:</p>
+                                        <pre class="mt-2 bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>INSERT INTO emma_config (key, value, description, type, category, updated_by)
+VALUES (
+    'my_custom_prompt',
+    jsonb_build_object('value', 'Ton contenu de prompt ici...'),
+    'Description de mon prompt',
+    'string',
+    'prompt',
+    'votre_nom'
+)
+ON CONFLICT (key) DO UPDATE SET
+    value = EXCLUDED.value,
+    updated_at = NOW();</code></pre>
+                                        <p class="text-xs text-gray-600 mt-2">💡 Exécuter dans Supabase SQL Editor</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Section 2: n8n Simple -->
+                            <section id="help-n8n-simple" class="border rounded-lg p-6 bg-gradient-to-br from-purple-50 to-pink-50">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">🔌</span>
+                                    Workflow n8n Simple (3 Nodes)
+                                </h3>
+
+                                <div class="bg-white rounded-lg p-4 mb-4">
+                                    <div class="flex items-center gap-3 text-sm">
+                                        <div class="flex-1 border-2 border-purple-300 rounded-lg p-3 text-center">
+                                            <div class="font-bold text-purple-700">1. Get Prompt</div>
+                                            <div class="text-xs text-gray-600">HTTP Request</div>
+                                        </div>
+                                        <div class="text-2xl text-purple-400">→</div>
+                                        <div class="flex-1 border-2 border-purple-300 rounded-lg p-3 text-center">
+                                            <div class="font-bold text-purple-700">2. Call Gemini</div>
+                                            <div class="text-xs text-gray-600">HTTP Request</div>
+                                        </div>
+                                        <div class="text-2xl text-purple-400">→</div>
+                                        <div class="flex-1 border-2 border-purple-300 rounded-lg p-3 text-center">
+                                            <div class="font-bold text-purple-700">3. Send Result</div>
+                                            <div class="text-xs text-gray-600">Email/SMS</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-purple-900 mb-2">Node 1: Get Prompt</h4>
+                                        <div class="text-sm space-y-1">
+                                            <div><strong>Type:</strong> HTTP Request</div>
+                                            <div><strong>Method:</strong> GET</div>
+                                            <div><strong>URL:</strong> <code class="bg-gray-100 px-2 py-1 rounded text-xs">https://gobapps.com/api/admin/emma-config?key=intent_fundamentals</code></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-purple-900 mb-2">Node 2: Call Gemini</h4>
+                                        <div class="text-sm space-y-1 mb-2">
+                                            <div><strong>Type:</strong> HTTP Request</div>
+                                            <div><strong>Method:</strong> POST</div>
+                                            <div><strong>URL:</strong> <code class="bg-gray-100 px-2 py-1 rounded text-xs">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={{$env.GEMINI_API_KEY}}</code></div>
+                                            <div><strong>Body (JSON Expression):</strong></div>
+                                        </div>
+                                        <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>={{
+  {
+    "contents": [{
+      "parts": [{
+        "text": $json.intent_fundamentals.value + "\n\nAnalyse: AAPL"
+      }]
+    }]
+  }
+}}</code></pre>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-purple-900 mb-2">Node 3: Extract Response</h4>
+                                        <div class="text-sm mb-2"><strong>Type:</strong> Code</div>
+                                        <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>const response = $json.candidates[0].content.parts[0].text;
+return { analysis: response };</code></pre>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Section 3: n8n Briefing Automatisé -->
+                            <section id="help-n8n-briefing" class="border rounded-lg p-6 bg-gradient-to-br from-orange-50 to-yellow-50">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">📧</span>
+                                    Briefing Automatisé (Cron)
+                                </h3>
+
+                                <div class="bg-white rounded-lg p-4 mb-4">
+                                    <div class="flex flex-wrap items-center gap-2 text-sm">
+                                        <div class="flex-1 min-w-[150px] border-2 border-orange-300 rounded-lg p-2 text-center">
+                                            <div class="font-bold text-orange-700 text-xs">Schedule Trigger</div>
+                                            <div class="text-xs text-gray-600">Cron: 20 11 * * 1-5</div>
+                                        </div>
+                                        <div class="text-xl text-orange-400">→</div>
+                                        <div class="flex-1 min-w-[150px] border-2 border-orange-300 rounded-lg p-2 text-center">
+                                            <div class="font-bold text-orange-700 text-xs">Get Config</div>
+                                            <div class="text-xs text-gray-600">HTTP</div>
+                                        </div>
+                                        <div class="text-xl text-orange-400">→</div>
+                                        <div class="flex-1 min-w-[150px] border-2 border-orange-300 rounded-lg p-2 text-center">
+                                            <div class="font-bold text-orange-700 text-xs">Generate</div>
+                                            <div class="text-xs text-gray-600">Gemini</div>
+                                        </div>
+                                        <div class="text-xl text-orange-400">→</div>
+                                        <div class="flex-1 min-w-[150px] border-2 border-orange-300 rounded-lg p-2 text-center">
+                                            <div class="font-bold text-orange-700 text-xs">Send Email</div>
+                                            <div class="text-xs text-gray-600">Resend</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-orange-900 mb-2">Configuration Briefing Matinal (7h20 AM)</h4>
+                                        <div class="text-sm space-y-1">
+                                            <div><strong>Schedule Trigger:</strong> <code class="bg-gray-100 px-2 py-1 rounded text-xs">20 11 * * 1-5</code> (7h20 AM EST, lun-ven)</div>
+                                            <div><strong>Get Config URL:</strong> <code class="bg-gray-100 px-2 py-1 rounded text-xs">https://gobapps.com/api/prompt-delivery-config?prompt_id=briefing_morning</code></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-orange-900 mb-2">Briefings Disponibles</h4>
+                                        <div class="grid grid-cols-3 gap-3 text-sm">
+                                            <div class="border rounded p-2">
+                                                <div class="font-semibold text-orange-700">🌅 Matin</div>
+                                                <div class="text-xs text-gray-600">7h20 AM</div>
+                                                <code class="text-xs bg-gray-100 px-1 rounded">briefing_morning</code>
+                                            </div>
+                                            <div class="border rounded p-2">
+                                                <div class="font-semibold text-orange-700">☀️ Midi</div>
+                                                <div class="text-xs text-gray-600">11h50 AM</div>
+                                                <code class="text-xs bg-gray-100 px-1 rounded">briefing_midday</code>
+                                            </div>
+                                            <div class="border rounded p-2">
+                                                <div class="font-semibold text-orange-700">🌙 Soirée</div>
+                                                <div class="text-xs text-gray-600">16h20 PM</div>
+                                                <code class="text-xs bg-gray-100 px-1 rounded">briefing_evening</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Section 4: Référence API -->
+                            <section id="help-api-ref" class="border rounded-lg p-6">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">📚</span>
+                                    Référence API
+                                </h3>
+
+                                <div class="space-y-3">
+                                    <div class="border-l-4 border-blue-500 pl-4">
+                                        <div class="font-semibold text-blue-900">Liste tous les prompts</div>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">GET https://gobapps.com/api/admin/emma-config</code>
+                                    </div>
+
+                                    <div class="border-l-4 border-green-500 pl-4">
+                                        <div class="font-semibold text-green-900">Récupérer un prompt spécifique</div>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">GET https://gobapps.com/api/admin/emma-config?key=intent_fundamentals</code>
+                                    </div>
+
+                                    <div class="border-l-4 border-purple-500 pl-4">
+                                        <div class="font-semibold text-purple-900">Config de delivery (briefings)</div>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">GET https://gobapps.com/api/prompt-delivery-config?prompt_id=briefing_morning</code>
+                                    </div>
+
+                                    <div class="border-l-4 border-orange-500 pl-4">
+                                        <div class="font-semibold text-orange-900">Créer/Mettre à jour un prompt</div>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">POST https://gobapps.com/api/admin/emma-config</code>
+                                        <pre class="mt-2 bg-gray-800 text-green-400 p-2 rounded text-xs overflow-x-auto"><code>{
+  "key": "my_prompt",
+  "value": "Contenu",
+  "description": "Description",
+  "type": "string",
+  "category": "prompt"
+}</code></pre>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Section 5: Exemples de Prompts -->
+                            <section id="help-examples" class="border rounded-lg p-6 bg-gradient-to-br from-green-50 to-emerald-50">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">💡</span>
+                                    Exemples de Prompts
+                                </h3>
+
+                                <div class="space-y-4">
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-green-900 mb-2">📊 Analyse Technique</h4>
+                                        <div class="text-xs mb-2"><strong>Key:</strong> <code class="bg-gray-100 px-2 py-1 rounded">intent_technical_analysis</code></div>
+                                        <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>Tu es Emma, analyste technique senior.
+
+🎯 OBJECTIF: Analyse technique complète
+
+📊 INDICATEURS REQUIS:
+- RSI (14 jours) + interprétation
+- MACD (12,26,9) + signal
+- Moyennes mobiles (20, 50, 200 jours)
+- Volume relatif vs moyenne 30 jours
+- Support/Résistance clés
+- Tendance: haussière/baissière/neutre</code></pre>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-green-900 mb-2">📰 Résumé News</h4>
+                                        <div class="text-xs mb-2"><strong>Key:</strong> <code class="bg-gray-100 px-2 py-1 rounded">intent_news_summary</code></div>
+                                        <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>Tu es Emma, analyste news financières.
+
+🎯 OBJECTIF: Résumer actualités récentes (<24h)
+
+📰 STRUCTURE:
+1. Titre principal (1 phrase)
+2. Points clés (3-5 bullets)
+3. Impact potentiel sur le titre
+4. Sentiment: Positif/Négatif/Neutre</code></pre>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Section 6: Variables d'Environnement -->
+                            <section id="help-vars" class="border rounded-lg p-6">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">🔑</span>
+                                    Variables d'Environnement n8n
+                                </h3>
+
+                                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                                    <p class="font-semibold text-yellow-900 mb-2">À Configurer dans n8n → Settings → Variables</p>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                    <div class="border rounded p-3">
+                                        <div class="font-semibold text-gray-800">GEMINI_API_KEY</div>
+                                        <div class="text-xs text-gray-600">Google Gemini 2.0 Flash (requis)</div>
+                                    </div>
+                                    <div class="border rounded p-3">
+                                        <div class="font-semibold text-gray-800">RESEND_API_KEY</div>
+                                        <div class="text-xs text-gray-600">Pour envoi d'emails (optionnel)</div>
+                                    </div>
+                                    <div class="border rounded p-3">
+                                        <div class="font-semibold text-gray-800">TWILIO_ACCOUNT_SID</div>
+                                        <div class="text-xs text-gray-600">Pour envoi SMS (optionnel)</div>
+                                    </div>
+                                    <div class="border rounded p-3">
+                                        <div class="font-semibold text-gray-800">TWILIO_AUTH_TOKEN</div>
+                                        <div class="text-xs text-gray-600">Pour envoi SMS (optionnel)</div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Section 7: Troubleshooting -->
+                            <section id="help-troubleshoot" class="border rounded-lg p-6 bg-red-50">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">🔧</span>
+                                    Troubleshooting
+                                </h3>
+
+                                <div class="space-y-3">
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-red-900 mb-2">❌ "Cannot read property 'value' of undefined"</h4>
+                                        <p class="text-sm text-gray-700 mb-2"><strong>Problème:</strong> Mauvais chemin JSON ou prompt inexistant</p>
+                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Vérifier que le <code class="bg-gray-100 px-1 rounded">key</code> existe dans l'API</p>
+                                        <pre class="mt-2 bg-gray-800 text-green-400 p-2 rounded text-xs overflow-x-auto"><code>// Tester d'abord:
+curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-red-900 mb-2">❌ "API key not valid"</h4>
+                                        <p class="text-sm text-gray-700 mb-2"><strong>Problème:</strong> Variable d'environnement manquante dans n8n</p>
+                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Vérifier Settings → Variables → <code class="bg-gray-100 px-1 rounded">GEMINI_API_KEY</code></p>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4">
+                                        <h4 class="font-semibold text-red-900 mb-2">❌ Prompt retourne vide</h4>
+                                        <p class="text-sm text-gray-700 mb-2"><strong>Problème:</strong> Prompt pas encore dans Supabase</p>
+                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Exécuter <code class="bg-gray-100 px-1 rounded">supabase-setup-complete.sql</code> d'abord</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Section 8: Ressources -->
+                            <section class="border rounded-lg p-6 bg-gradient-to-br from-indigo-50 to-blue-50">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">📚</span>
+                                    Ressources Complètes
+                                </h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="bg-white rounded-lg p-4 border-2 border-indigo-200">
+                                        <div class="font-semibold text-indigo-900 mb-1">📘 Guide Complet n8n</div>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded">GUIDE-AJOUT-PROMPTS-N8N.md</code>
+                                        <p class="text-xs text-gray-600 mt-2">Workflows détaillés, exemples avancés</p>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4 border-2 border-indigo-200">
+                                        <div class="font-semibold text-indigo-900 mb-1">⚡ Référence Rapide</div>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded">QUICK-REF-N8N-PROMPTS.md</code>
+                                        <p class="text-xs text-gray-600 mt-2">Templates copiables-collables</p>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4 border-2 border-indigo-200">
+                                        <div class="font-semibold text-indigo-900 mb-1">🗄️ Setup Supabase</div>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded">GUIDE-EXECUTION-SQL.md</code>
+                                        <p class="text-xs text-gray-600 mt-2">Restaurer les prompts manquants</p>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4 border-2 border-indigo-200">
+                                        <div class="font-semibold text-indigo-900 mb-1">📖 Documentation API</div>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded">docs/api/DOCUMENTATION_APIs.md</code>
+                                        <p class="text-xs text-gray-600 mt-2">Référence complète des APIs</p>
+                                    </div>
+                                </div>
+                            </section>
+
                         </div>
                     </div>
                 </div>
