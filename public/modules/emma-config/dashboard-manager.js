@@ -216,7 +216,7 @@ function buildPromptRelationships(allPrompts) {
         }
     });
 
-    console.log(`🔗 Total references found: ${totalReferencesFound}`);
+    console.log(`🔗 Direct references found: ${totalReferencesFound}`);
 
     // Construire les "referencedBy" (inverse) - optimisé
     Object.entries(promptRelationships).forEach(([key, rel]) => {
@@ -226,6 +226,84 @@ function buildPromptRelationships(allPrompts) {
             }
         });
     });
+
+    // ═══════════════════════════════════════════════════════════
+    // RELATIONS SÉMANTIQUES - Basées sur la structure logique
+    // ═══════════════════════════════════════════════════════════
+    console.log('🧠 Adding semantic relationships...');
+    let semanticRelationsAdded = 0;
+
+    allPrompts.forEach(prompt => {
+        const key = prompt.key;
+        const category = prompt.category;
+
+        // 1. RELATIONS PAR PRÉFIXE (general_, intent_, briefing_, cfa_)
+        const prefix = key.split('_')[0];
+        if (prefix && prefix.length > 2) {
+            allPrompts.forEach(otherPrompt => {
+                if (otherPrompt.key !== key && otherPrompt.key.startsWith(prefix + '_')) {
+                    if (!promptRelationships[key].references.includes(otherPrompt.key)) {
+                        promptRelationships[key].references.push(otherPrompt.key);
+                        promptRelationships[otherPrompt.key].referencedBy.push(key);
+                        semanticRelationsAdded++;
+                        console.log(`  🏷️ ${key} ↔ ${otherPrompt.key} (prefix: ${prefix}_)`);
+                    }
+                }
+            });
+        }
+
+        // 2. RELATIONS PAR CANAL (_sms, _web, _email)
+        const channelMatch = key.match(/_(sms|web|email|messenger)$/);
+        if (channelMatch) {
+            const channel = channelMatch[1];
+            allPrompts.forEach(otherPrompt => {
+                if (otherPrompt.key !== key && otherPrompt.key.endsWith('_' + channel)) {
+                    if (!promptRelationships[key].references.includes(otherPrompt.key)) {
+                        promptRelationships[key].references.push(otherPrompt.key);
+                        promptRelationships[otherPrompt.key].referencedBy.push(key);
+                        semanticRelationsAdded++;
+                        console.log(`  📱 ${key} ↔ ${otherPrompt.key} (channel: ${channel})`);
+                    }
+                }
+            });
+        }
+
+        // 3. RELATIONS HIÉRARCHIQUES LOGIQUES
+        // Briefings utilisent les intents et identités
+        if (key.startsWith('briefing_')) {
+            allPrompts.forEach(otherPrompt => {
+                if (otherPrompt.key.startsWith('intent_') ||
+                    otherPrompt.key.includes('identity') ||
+                    otherPrompt.key.includes('cfa_')) {
+                    if (!promptRelationships[key].references.includes(otherPrompt.key)) {
+                        promptRelationships[key].references.push(otherPrompt.key);
+                        promptRelationships[otherPrompt.key].referencedBy.push(key);
+                        semanticRelationsAdded++;
+                        console.log(`  🏗️ ${key} → ${otherPrompt.key} (hierarchical)`);
+                    }
+                }
+            });
+        }
+
+        // Intents utilisent les standards et identités
+        if (key.startsWith('intent_')) {
+            allPrompts.forEach(otherPrompt => {
+                if (otherPrompt.key.includes('standards') ||
+                    otherPrompt.key.includes('identity') ||
+                    otherPrompt.key.includes('instructions')) {
+                    if (!promptRelationships[key].references.includes(otherPrompt.key)) {
+                        promptRelationships[key].references.push(otherPrompt.key);
+                        promptRelationships[otherPrompt.key].referencedBy.push(key);
+                        semanticRelationsAdded++;
+                        console.log(`  🏗️ ${key} → ${otherPrompt.key} (hierarchical)`);
+                    }
+                }
+            });
+        }
+    });
+
+    console.log(`🧠 Semantic relations added: ${semanticRelationsAdded}`);
+    console.log(`🔗 TOTAL relations (direct + semantic): ${totalReferencesFound + semanticRelationsAdded}`);
 
     console.timeEnd('Build relationships');
     console.log('Relationships built:', Object.keys(promptRelationships).length, 'prompts analyzed');
