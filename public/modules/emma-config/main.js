@@ -8,7 +8,7 @@ import { loadDesignConfig, updateDesignPreview, saveDesign, cancelDesignChanges,
 import { saveSms, cancelSmsChanges } from './sms-manager.js';
 import { showAddRecipientForm, hideAddRecipientForm, addRecipient, removeRecipient, toggleRecipientActive, saveDeliveryConfig, sendBriefingNow } from './delivery-manager.js';
 import { loadConfigs, renderConfigList, saveConfig, deleteConfig, createNewConfig, getCurrentConfig, selectConfig, getConfig } from './prompts-manager.js';
-import { loadDashboard, filterDashboard, editPromptFromDashboard, filterByRelatedPrompts, clearRelationshipFilter } from './dashboard-manager.js';
+import { loadDashboard, filterDashboard, editPromptFromDashboard, filterByRelatedPrompts, clearRelationshipFilter, reloadDashboard } from './dashboard-manager.js';
 import { initChatAssistant } from './chat-assistant.js';
 
 /**
@@ -35,6 +35,7 @@ export function init() {
     window.saveDeliveryConfig = () => saveDeliveryConfig(getCurrentConfig());
     window.sendBriefingNow = () => sendBriefingNow(getCurrentConfig());
     window.loadDashboard = loadDashboard;
+    window.reloadDashboard = reloadDashboard;
     window.filterDashboard = filterDashboard;
     window.editPromptFromDashboard = editPromptFromDashboard;
     window.filterByRelatedPrompts = filterByRelatedPrompts;

@@ -8,11 +8,34 @@ let dashboardData = null;
 let currentFilter = 'all';
 let relationshipFilter = null; // Pour filtrer par relations
 let promptRelationships = {}; // Map des relations entre prompts
+let isLoadingDashboard = false; // Flag pour éviter les chargements multiples
+let dashboardLoaded = false; // Flag pour tracker si le dashboard a été chargé
 
 /**
  * Charge et affiche le dashboard
  */
-export async function loadDashboard() {
+export async function loadDashboard(forceReload = false) {
+    // Éviter les chargements multiples simultanés
+    if (isLoadingDashboard && !forceReload) {
+        console.log('⏳ Dashboard déjà en cours de chargement...');
+        return;
+    }
+
+    // Si déjà chargé et pas de force reload, juste re-render
+    if (dashboardLoaded && dashboardData && !forceReload) {
+        console.log('♻️ Dashboard déjà chargé, re-render rapide');
+        renderStatistics(dashboardData);
+        renderCharts(dashboardData);
+        renderTable(dashboardData);
+        renderBriefingSchedule(dashboardData);
+        renderArchitecture(dashboardData);
+        updateLastUpdateTime();
+        return;
+    }
+
+    console.log('🔄 Chargement complet du dashboard...');
+    isLoadingDashboard = true;
+
     try {
         const configs = await loadAllConfigs();
         dashboardData = processConfigsForDashboard(configs);
@@ -39,14 +62,22 @@ export async function loadDashboard() {
         updateLastUpdateTime();
 
         // Build relationships asynchronously (non-blocking)
-        setTimeout(() => {
-            buildPromptRelationships(dashboardData.allPrompts);
-            renderArchitecture(dashboardData);
-        }, 100);
+        // Use requestAnimationFrame pour un meilleur timing
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                buildPromptRelationships(dashboardData.allPrompts);
+                renderArchitecture(dashboardData);
+                dashboardLoaded = true;
+                isLoadingDashboard = false;
+                console.log('✅ Dashboard chargé complètement');
+            }, 50);
+        });
 
     } catch (error) {
-        console.error('Erreur chargement dashboard:', error);
+        console.error('❌ Erreur chargement dashboard:', error);
         showDashboardError();
+        isLoadingDashboard = false;
+        dashboardLoaded = false;
     }
 }
 
@@ -594,6 +625,17 @@ export function editPromptFromDashboard(category, key) {
             }
         }
     }, 300);
+}
+
+/**
+ * Force le rechargement du dashboard
+ */
+export function reloadDashboard() {
+    console.log('🔄 Force reload demandé');
+    dashboardLoaded = false;
+    relationshipFilter = null;
+    hideRelationshipFilterBanner();
+    loadDashboard(true);
 }
 
 /**
