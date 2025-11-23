@@ -16,6 +16,7 @@ export async function loadDashboard() {
         dashboardData = processConfigsForDashboard(configs);
 
         renderStatistics(dashboardData);
+        renderArchitecture(dashboardData);
         renderCharts(dashboardData);
         renderTable(dashboardData);
         renderBriefingSchedule(dashboardData);
@@ -106,6 +107,173 @@ function renderStatistics(data) {
     document.getElementById('filterCountPrompt').textContent = stats.byCategory.prompt || 0;
     document.getElementById('filterCountBriefing').textContent = stats.byCategory.briefing || 0;
     document.getElementById('filterCountSystem').textContent = stats.byCategory.system || 0;
+}
+
+/**
+ * Affiche l'architecture des prompts
+ */
+function renderArchitecture(data) {
+    const { allPrompts } = data;
+    const container = document.getElementById('promptsArchitecture');
+
+    // Organiser les prompts par catégorie
+    const system = allPrompts.filter(p => p.category === 'system' || p.key.includes('cfa_') || p.key.includes('identity'));
+    const intents = allPrompts.filter(p => p.key.includes('intent_'));
+    const briefings = allPrompts.filter(p => p.category === 'briefing');
+    const others = allPrompts.filter(p => !system.includes(p) && !intents.includes(p) && !briefings.includes(p));
+
+    // Structure hiérarchique
+    const architecture = `
+        <div class="space-y-8">
+            <!-- Légende -->
+            <div class="flex flex-wrap gap-4 text-xs">
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-purple-500 rounded"></div>
+                    <span class="text-gray-700">Système (Base)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-blue-500 rounded"></div>
+                    <span class="text-gray-700">Intents (Spécialisés)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-green-500 rounded"></div>
+                    <span class="text-gray-700">Briefings (Automatisés)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-gray-400 rounded"></div>
+                    <span class="text-gray-700">Autres</span>
+                </div>
+            </div>
+
+            <!-- Niveau 1: Prompts Système (Base) -->
+            ${system.length > 0 ? `
+            <div class="relative">
+                <div class="text-center mb-4">
+                    <h4 class="text-sm font-bold text-purple-700 bg-purple-100 inline-block px-4 py-2 rounded-full">
+                        📋 Niveau 1: Prompts Système (Base)
+                    </h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-${Math.min(system.length, 4)} gap-4">
+                    ${system.map(prompt => createArchitectureNode(prompt, 'purple')).join('')}
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Flèche vers le bas -->
+            ${system.length > 0 && intents.length > 0 ? `
+            <div class="flex justify-center">
+                <div class="flex flex-col items-center">
+                    <div class="text-3xl text-gray-400">↓</div>
+                    <div class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">utilisés par</div>
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Niveau 2: Prompts d'Intent (Spécialisés) -->
+            ${intents.length > 0 ? `
+            <div class="relative">
+                <div class="text-center mb-4">
+                    <h4 class="text-sm font-bold text-blue-700 bg-blue-100 inline-block px-4 py-2 rounded-full">
+                        🎯 Niveau 2: Prompts d'Intent (Analyses Spécialisées)
+                    </h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-${Math.min(intents.length, 3)} gap-4">
+                    ${intents.map(prompt => createArchitectureNode(prompt, 'blue')).join('')}
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Flèche vers le bas -->
+            ${intents.length > 0 && briefings.length > 0 ? `
+            <div class="flex justify-center">
+                <div class="flex flex-col items-center">
+                    <div class="text-3xl text-gray-400">↓</div>
+                    <div class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">intégrés dans</div>
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Niveau 3: Briefings (Automatisés) -->
+            ${briefings.length > 0 ? `
+            <div class="relative">
+                <div class="text-center mb-4">
+                    <h4 class="text-sm font-bold text-green-700 bg-green-100 inline-block px-4 py-2 rounded-full">
+                        📧 Niveau 3: Briefings Automatisés (Cron)
+                    </h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    ${briefings.map(prompt => createArchitectureNode(prompt, 'green', true)).join('')}
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Autres prompts -->
+            ${others.length > 0 ? `
+            <div class="relative mt-8 pt-6 border-t-2 border-gray-200">
+                <div class="text-center mb-4">
+                    <h4 class="text-sm font-bold text-gray-700 bg-gray-100 inline-block px-4 py-2 rounded-full">
+                        📦 Autres Configurations
+                    </h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    ${others.map(prompt => createArchitectureNode(prompt, 'gray', false, true)).join('')}
+                </div>
+            </div>
+            ` : ''}
+        </div>
+    `;
+
+    container.innerHTML = architecture;
+}
+
+/**
+ * Crée un noeud d'architecture
+ */
+function createArchitectureNode(prompt, color, isBriefing = false, isSmall = false) {
+    const colors = {
+        purple: { bg: 'bg-purple-50', border: 'border-purple-500', text: 'text-purple-700', hover: 'hover:bg-purple-100' },
+        blue: { bg: 'bg-blue-50', border: 'border-blue-500', text: 'text-blue-700', hover: 'hover:bg-blue-100' },
+        green: { bg: 'bg-green-50', border: 'border-green-500', text: 'text-green-700', hover: 'hover:bg-green-100' },
+        gray: { bg: 'bg-gray-50', border: 'border-gray-400', text: 'text-gray-700', hover: 'hover:bg-gray-100' }
+    };
+
+    const c = colors[color] || colors.gray;
+    const valueSize = getValueSize(prompt.value);
+
+    let title = prompt.key;
+    let subtitle = prompt.description || '-';
+
+    // Pour les briefings, extraire le nom et l'horaire
+    if (isBriefing && typeof prompt.value === 'object') {
+        const config = prompt.value;
+        title = config.name || prompt.key;
+        subtitle = config.schedule || subtitle;
+    }
+
+    const sizeClass = isSmall ? 'text-xs p-2' : 'text-sm p-3';
+
+    return `
+        <div onclick="editPromptFromDashboard('${prompt.category}', '${prompt.key}')"
+             class="relative ${c.bg} border-2 ${c.border} rounded-lg ${sizeClass} ${c.hover} cursor-pointer transition-all duration-200 transform hover:scale-105 hover:shadow-lg">
+            <div class="font-bold ${c.text} mb-1 truncate" title="${prompt.key}">
+                ${title}
+            </div>
+            <div class="text-xs text-gray-600 mb-2 line-clamp-2" title="${subtitle}">
+                ${subtitle}
+            </div>
+            <div class="flex items-center justify-between text-xs">
+                <span class="bg-white px-2 py-0.5 rounded border ${c.border}">
+                    ${prompt.type}
+                </span>
+                <span class="text-gray-500">${valueSize}</span>
+            </div>
+            ${isBriefing && prompt.delivery_enabled ? `
+                <div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow">
+                    ⏰
+                </div>
+            ` : ''}
+        </div>
+    `;
 }
 
 /**
