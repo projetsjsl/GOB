@@ -7,7 +7,8 @@ import { updatePreview, updateChannelBadges } from './preview-manager.js';
 import { loadDesignConfig, updateDesignPreview, saveDesign, cancelDesignChanges, resetDesignToDefaults } from './design-manager.js';
 import { saveSms, cancelSmsChanges } from './sms-manager.js';
 import { showAddRecipientForm, hideAddRecipientForm, addRecipient, removeRecipient, toggleRecipientActive, saveDeliveryConfig, sendBriefingNow } from './delivery-manager.js';
-import { loadConfigs, renderConfigList, saveConfig, deleteConfig, createNewConfig, getCurrentConfig } from './prompts-manager.js';
+import { loadConfigs, renderConfigList, saveConfig, deleteConfig, createNewConfig, getCurrentConfig, selectConfig } from './prompts-manager.js';
+import { loadDashboard, filterDashboard, editPromptFromDashboard } from './dashboard-manager.js';
 
 /**
  * Fonction d'initialisation principale
@@ -17,6 +18,7 @@ export function init() {
     // EXPOSE FUNCTIONS TO GLOBAL SCOPE (pour onclick HTML)
     // ═══════════════════════════════════════════════════════════
     window.switchMainTab = switchMainTab;
+    window.selectConfig = selectConfig;
     window.updatePreview = updatePreview;
     window.saveDesignConfig = saveDesign;
     window.cancelDesignChanges = cancelDesignChanges;
@@ -30,6 +32,9 @@ export function init() {
     window.toggleRecipientActive = toggleRecipientActive;
     window.saveDeliveryConfig = () => saveDeliveryConfig(getCurrentConfig());
     window.sendBriefingNow = () => sendBriefingNow(getCurrentConfig());
+    window.loadDashboard = loadDashboard;
+    window.filterDashboard = filterDashboard;
+    window.editPromptFromDashboard = editPromptFromDashboard;
 
     // ═══════════════════════════════════════════════════════════
     // EVENT LISTENERS

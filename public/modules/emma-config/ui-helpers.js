@@ -50,6 +50,7 @@ export function switchMainTab(tab) {
     }
 
     // Show/hide content
+    document.getElementById('dashboardTabContent').classList.toggle('hidden', tab !== 'dashboard');
     document.getElementById('promptsTabContent').classList.toggle('hidden', tab !== 'prompts');
     document.getElementById('designTabContent').classList.toggle('hidden', tab !== 'design');
     document.getElementById('smsTabContent').classList.toggle('hidden', tab !== 'sms');
@@ -57,6 +58,7 @@ export function switchMainTab(tab) {
 
     // Update header
     const titles = {
+        dashboard: '📊 Dashboard',
         prompts: '📝 Gestion des Prompts',
         design: '🎨 Design des Emails',
         sms: '📱 Configuration SMS',
@@ -64,6 +66,11 @@ export function switchMainTab(tab) {
     };
     document.getElementById('editorTitle').textContent = titles[tab] || 'Configuration';
     document.getElementById('editorSubtitle').textContent = '';
+
+    // Load dashboard data if switching to dashboard
+    if (tab === 'dashboard' && window.loadDashboard) {
+        window.loadDashboard();
+    }
 
     return tab;
 }
