@@ -701,17 +701,14 @@ export function filterDashboard(category) {
  */
 export function filterByRelatedPrompts(promptKey) {
     console.log(`🔗 filterByRelatedPrompts called for: ${promptKey}`);
-    alert(`Clic détecté sur: ${promptKey}`); // Test visuel
 
     relationshipFilter = promptKey;
 
     // Get related prompts
     const relationships = promptRelationships[promptKey];
     if (!relationships) {
-        console.error(`⚠️ No relationships found for ${promptKey}`);
+        console.error(`⚠️ No relationships map found for ${promptKey}`);
         console.log('Available relationships:', Object.keys(promptRelationships));
-        console.log('Full relationships map:', promptRelationships);
-        alert(`ERREUR: Pas de relations trouvées pour ${promptKey}`);
         return;
     }
 
@@ -721,11 +718,20 @@ export function filterByRelatedPrompts(promptKey) {
         ...relationships.referencedBy
     ];
 
+    const hasRelations = relationships.references.length > 0 || relationships.referencedBy.length > 0;
+
+    if (!hasRelations) {
+        console.log(`ℹ️ "${promptKey}" n'a aucune relation détectée`);
+        console.log('   Les prompts ne semblent pas se référencer par clé.');
+        console.log('   Affichage du prompt seulement.');
+    }
+
     console.log(`✅ Filtering by prompts related to ${promptKey}:`, {
         total: relatedKeys.length,
         self: promptKey,
         references: relationships.references,
-        referencedBy: relationships.referencedBy
+        referencedBy: relationships.referencedBy,
+        hasRelations: hasRelations
     });
 
     // Reset category filter
@@ -745,7 +751,10 @@ export function filterByRelatedPrompts(promptKey) {
     }
 
     // Scroll to table
-    document.getElementById('dashboardTable')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const tableBody = document.getElementById('dashboardTableBody');
+    if (tableBody) {
+        tableBody.closest('table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 /**
@@ -755,8 +764,21 @@ function showRelationshipFilterBanner(promptKey, count) {
     let banner = document.getElementById('relationshipFilterBanner');
 
     if (!banner) {
-        // Créer la bannière
-        const tableContainer = document.querySelector('#dashboardTable').parentElement;
+        // Créer la bannière - chercher le tbody et remonter au container de la table
+        const tableBody = document.getElementById('dashboardTableBody');
+        if (!tableBody) {
+            console.error('❌ dashboardTableBody not found in DOM');
+            return;
+        }
+
+        const table = tableBody.closest('table');
+        const tableContainer = table ? table.parentElement : null;
+
+        if (!tableContainer) {
+            console.error('❌ Table container not found');
+            return;
+        }
+
         banner = document.createElement('div');
         banner.id = 'relationshipFilterBanner';
         tableContainer.insertBefore(banner, tableContainer.firstChild);
