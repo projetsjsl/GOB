@@ -50,6 +50,38 @@ export default async function handler(req, res) {
         if (!metricsRes.ok) throw new Error(`FMP Metrics error: ${metricsRes.statusText}`);
         const metricsData = await metricsRes.json();
 
+        // 2a. Fetch Dividend History (separate endpoint since key-metrics doesn't include it)
+        const dividendRes = await fetch(`${FMP_BASE}/historical-price-full/stock_dividend/${cleanSymbol}?apikey=${FMP_KEY}`);
+        let dividendsByFiscalYear = {};
+
+        if (dividendRes.ok) {
+            const dividendData = await dividendRes.json();
+
+            // Aggregate dividends by fiscal year (ACN fiscal year ends Aug 31)
+            // For most companies: fiscal year = calendar year, but we use the metric date as reference
+            if (dividendData.historical && dividendData.historical.length > 0) {
+                dividendData.historical.forEach(div => {
+                    const divDate = new Date(div.date);
+                    const divYear = divDate.getFullYear();
+                    const divMonth = divDate.getMonth(); // 0-11
+
+                    // Determine fiscal year based on month
+                    // For ACN (fiscal ends Aug 31): Sept-Aug = fiscal year
+                    // Simplified: if month >= Sept (8), it belongs to next calendar year's fiscal
+                    const fiscalYear = divMonth >= 8 ? divYear + 1 : divYear;
+
+                    if (!dividendsByFiscalYear[fiscalYear]) {
+                        dividendsByFiscalYear[fiscalYear] = 0;
+                    }
+                    dividendsByFiscalYear[fiscalYear] += div.dividend || div.adjDividend || 0;
+                });
+
+                console.log(`✅ Dividends aggregated for ${cleanSymbol}:`, dividendsByFiscalYear);
+            }
+        } else {
+            console.warn(`⚠️ No dividend data available for ${cleanSymbol}`);
+        }
+
         // 3. Fetch Historical Prices for High/Low
         const priceRes = await fetch(`${FMP_BASE}/historical-price-full/${cleanSymbol}?serietype=line&timeseries=1825&apikey=${FMP_KEY}`);
         if (!priceRes.ok) throw new Error(`FMP Price error: ${priceRes.statusText}`);
@@ -90,16 +122,15 @@ export default async function handler(req, res) {
             const high = priceStats.high > 0 ? priceStats.high : (metric.revenuePerShare * 20 || 0);
             const low = priceStats.low < 999999 && priceStats.low > 0 ? priceStats.low : (high * 0.5);
 
-            const dps = metric.dividendPerShare !== undefined
-                ? metric.dividendPerShare
-                : (metric.netIncomePerShare * (metric.payoutRatio || 0));
+            // Use aggregated dividend data by fiscal year
+            const dps = dividendsByFiscalYear[year] || 0;
 
             return {
                 year: year,
                 priceHigh: parseFloat(high.toFixed(2)),
                 priceLow: parseFloat(low.toFixed(2)),
                 cashFlowPerShare: parseFloat((metric.operatingCashFlowPerShare || 0).toFixed(2)),
-                dividendPerShare: parseFloat((dps || 0).toFixed(2)),
+                dividendPerShare: parseFloat(dps.toFixed(2)),
                 bookValuePerShare: parseFloat((metric.bookValuePerShare || 0).toFixed(2)),
                 earningsPerShare: parseFloat((metric.netIncomePerShare || 0).toFixed(2)),
                 isEstimate: false
