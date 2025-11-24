@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-// import { Header } from './components/Header';
+import { Header } from './components/Header';
 import { HistoricalTable } from './components/HistoricalTable';
 import { ValuationCharts } from './components/ValuationCharts';
 // ... other imports
@@ -476,14 +476,47 @@ export default function App() {
         try {
             const result = await fetchCompanyData(upperSymbol);
 
-            setData(result.data);
-            setInfo(prev => ({ ...prev, ...result.info }));
+            // Auto-fill assumptions based on historical data
+            const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
+            const lastData = result.data[result.data.length - 1];
+            const firstData = result.data[0];
+            const yearsDiff = lastData.year - firstData.year;
+
+            // Calculate historical CAGRs
+            const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastData.earningsPerShare, yearsDiff);
+            const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastData.cashFlowPerShare, yearsDiff);
+            const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastData.bookValuePerShare, yearsDiff);
+            const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastData.dividendPerShare, yearsDiff);
+
+            // Calculate Average Ratios
+            const avgPE = validHistory.length > 0
+                ? calculateAverage(validHistory.map(d => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2))
+                : 15;
+
+            const avgPCF = validHistory.length > 0
+                ? calculateAverage(validHistory.map(d => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2))
+                : 10;
+
+            const avgYield = validHistory.length > 0
+                ? calculateAverage(validHistory.map(d => (d.dividendPerShare / d.priceHigh) * 100))
+                : 2.0;
+
             setAssumptions(prev => ({
                 ...prev,
                 currentPrice: result.currentPrice,
-                currentDividend: result.data.length > 0 ? result.data[result.data.length - 1].dividendPerShare : prev.currentDividend,
-                baseYear: result.data.length > 0 ? result.data[result.data.length - 1].year : prev.baseYear
+                currentDividend: lastData.dividendPerShare,
+                baseYear: lastData.year,
+                growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
+                growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
+                growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
+                growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
+                growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
+                targetPE: parseFloat(avgPE.toFixed(1)),
+                targetPCF: parseFloat(avgPCF.toFixed(1)),
+                targetYield: parseFloat(avgYield.toFixed(2))
             }));
+            setData(result.data);
+            setInfo(prev => ({ ...prev, ...result.info }));
         } catch (e) {
             console.error('Auto-fetch failed:', e);
             // Profile already created, user can manually sync later
@@ -651,7 +684,7 @@ export default function App() {
                             </div>
                         </div>
 
-                        {/* <Header
+                        <Header
                             info={info}
                             assumptions={assumptions}
                             availableYears={availableYears}
@@ -660,8 +693,8 @@ export default function App() {
                             onUpdateInfo={handleUpdateInfo}
                             onUpdateAssumption={handleUpdateAssumption}
                             onFetchData={handleFetchData}
-                        /> */}
-                        <div className="p-4 bg-yellow-100 text-yellow-800">Header désactivé pour débogage</div>
+                        />
+                        {/* <div className="p-4 bg-yellow-100 text-yellow-800">Header désactivé pour débogage</div> */}
 
                         {/* CONDITIONAL RENDER: ANALYSIS VS INFO */}
                         {currentView === 'info' ? (

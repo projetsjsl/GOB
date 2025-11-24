@@ -106,27 +106,25 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="font-semibold text-gray-600 block text-xs">CÔTE SÉCURITÉ</span>
             <span className="font-bold text-green-600">{info.securityRank}</span>
           </div>
-          {onFetchData && (
-            <>
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('open-save-dialog'))}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700"
-                title="Sauvegarder une version (Snapshot)"
-              >
-                <CloudArrowDownIcon className="w-4 h-4" />
-                Sauvegarder
-              </button>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('open-save-dialog'))}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700"
+            title="Sauvegarder une version (Snapshot)"
+          >
+            <CloudArrowDownIcon className="w-4 h-4" />
+            Sauvegarder
+          </button>
 
-              <button
-                onClick={handleSyncClick}
-                disabled={isLoading}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
-                title="Récupérer les données via API (FMP & Finnhub)"
-              >
-                <ArrowPathIcon className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                {isLoading ? 'Sync...' : 'Sync. Données'}
-              </button>
-            </>
+          {onFetchData && (
+            <button
+              onClick={handleSyncClick}
+              disabled={isLoading}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase transition-colors no-print ${isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+              title="Récupérer les données via API (FMP & Finnhub)"
+            >
+              <ArrowPathIcon className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              {isLoading ? 'Sync...' : 'Sync. Données'}
+            </button>
           )}
 
           <button
