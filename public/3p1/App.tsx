@@ -9,11 +9,12 @@ import { EvaluationDetails } from './components/EvaluationDetails';
 import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
+import { HistoricalVersionBanner } from './components/HistoricalVersionBanner';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation } from './utils/calculations';
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
-import { saveSnapshot, hasManualEdits } from './services/snapshotApi';
+import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 
 // Initial Mock Data mirroring the image
 const INITIAL_DATA: AnnualData[] = [
@@ -71,6 +72,15 @@ export default function App() {
     const [currentView, setCurrentView] = useState<'analysis' | 'info'>('analysis');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [showConfirmSync, setShowConfirmSync] = useState(false);
+
+    // Historical Version State
+    const [currentSnapshot, setCurrentSnapshot] = useState<{
+        id: string;
+        date: string;
+        version: number;
+        isHistorical: boolean;
+    } | null>(null);
+    const [isReadOnly, setIsReadOnly] = useState(false);
 
     // Load from LocalStorage on Mount
     useEffect(() => {
@@ -278,12 +288,18 @@ export default function App() {
     };
 
     const handleUpdateRow = (index: number, field: keyof AnnualData, value: number) => {
-        if (data[index][field] === value) return;
+        // Block updates if viewing historical version in read-only mode
+        if (isReadOnly) {
+            alert('Cette version est en lecture seule. Déverrouillez-la pour la modifier.');
+            return;
+        }
+
         setPastData(prev => [...prev, data]);
         setFutureData([]);
-        const newData = [...data];
-        newData[index] = { ...newData[index], [field]: value };
-        setData(newData);
+
+        const updated = [...data];
+        updated[index] = { ...updated[index], [field]: value, autoFetched: false };
+        setData(updated);
     };
 
     const handleUpdateAssumption = (key: keyof Assumptions, value: number) => {

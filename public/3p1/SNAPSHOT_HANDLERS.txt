@@ -1,0 +1,82 @@
+// Add these handlers after performSync in App.tsx (around line 287)
+
+    // Load a historical snapshot
+    const handleLoadSnapshot = async (snapshotId: string) => {
+        const result = await loadSnapshot(snapshotId);
+        
+        if (!result.success) {
+            alert(`Erreur chargement: ${result.error}`);
+            return;
+        }
+
+        const snapshot = result.snapshot;
+        
+        // Set historical version state
+        setCurrentSnapshot({
+            id: snapshot.id,
+            date: snapshot.snapshot_date,
+            version: snapshot.version,
+            isHistorical: !snapshot.is_current
+        });
+        
+        // Enable read-only mode for historical versions
+        setIsReadOnly(!snapshot.is_current);
+        
+        // Load data
+        setData(snapshot.annual_data);
+        setAssumptions(snapshot.assumptions);
+        setInfo(snapshot.company_info);
+        
+        console.log(`📜 Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
+    };
+
+    // Revert to current version
+    const handleRevertToCurrent = async () => {
+        const result = await listSnapshots(activeId, 1);
+        
+        if (result.success && result.snapshots && result.snapshots.length > 0) {
+            const currentSnap = result.snapshots.find(s => s.is_current);
+            if (currentSnap) {
+                await handleLoadSnapshot(currentSnap.id);
+            }
+        }
+        
+        // Reset historical state
+        setCurrentSnapshot(null);
+        setIsReadOnly(false);
+    };
+
+    // Unlock historical version for editing
+    const handleUnlockVersion = () => {
+        if (!confirm('Déverrouiller cette version pour modification? Les changements seront enregistrés sur cette ancienne version.')) {
+            return;
+        }
+        setIsReadOnly(false);
+    };
+
+    // Save current state as new snapshot
+    const handleSaveAsNew = async () => {
+        const notes = prompt('Notes pour cette nouvelle version (optionnel):');
+        
+        const result = await saveSnapshot(
+            activeId,
+            data,
+            assumptions,
+            info,
+            notes || `Copie de v${currentSnapshot?.version || '?'}`,
+            true,  // Mark as current
+            false  // Not auto-fetched
+        );
+        
+        if (result.success) {
+            alert('✅ Nouvelle version sauvegardée!');
+            // Reset to normal mode
+            setCurrentSnapshot(null);
+            setIsReadOnly(false);
+        } else {
+            alert(`Erreur: ${result.error}`);
+        }
+    };
+
+// Also add import at top:
+import { loadSnapshot, listSnapshots } from './services/snapshotApi';
