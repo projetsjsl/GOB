@@ -24,8 +24,14 @@ export const fetchCompanyData = async (symbol: string): Promise<{
 
     const result = await response.json();
 
+    // Mark all data as auto-fetched for visual indicator
+    const dataWithFlag = (result.data || []).map((item: AnnualData) => ({
+      ...item,
+      autoFetched: true
+    }));
+
     return {
-      data: result.data || [],
+      data: dataWithFlag,
       info: result.info || {},
       currentPrice: result.currentPrice || 0
     };

@@ -13,30 +13,41 @@ const EditableCell: React.FC<{
   onCommit: (val: number) => void;
   min?: number;
   id: string; // Added ID for navigation
-}> = ({ value, onCommit, min = -Infinity, id }) => {
+  autoFetched?: boolean; // Track if value is from API (shows green)
+}> = ({ value, onCommit, min = -Infinity, id, autoFetched = false }) => {
   const [localValue, setLocalValue] = useState(value.toString());
+  const [wasAutoFetched, setWasAutoFetched] = useState(autoFetched);
 
   // Sync local state if external value changes (e.g. via undo/redo)
   useEffect(() => {
     setLocalValue(value.toString());
-  }, [value]);
+    setWasAutoFetched(autoFetched);
+  }, [value, autoFetched]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalValue(e.target.value);
+    // Mark as manually edited (removes green styling)
+    if (wasAutoFetched) {
+      setWasAutoFetched(false);
+    }
+  };
 
   const handleBlur = () => {
     if (localValue === '') {
-       onCommit(0);
-       return;
+      onCommit(0);
+      return;
     }
     const num = parseFloat(localValue);
     if (!isNaN(num)) {
-       if (min !== -Infinity && num < min) {
-           setLocalValue(value.toString()); // Revert if invalid
-           return;
-       }
-       if (num !== value) {
-           onCommit(num);
-       }
+      if (min !== -Infinity && num < min) {
+        setLocalValue(value.toString()); // Revert if invalid
+        return;
+      }
+      if (num !== value) {
+        onCommit(num);
+      }
     } else {
-        setLocalValue(value.toString()); // Revert if NaN
+      setLocalValue(value.toString()); // Revert if NaN
     }
   };
 
@@ -44,18 +55,24 @@ const EditableCell: React.FC<{
     if (e.key === 'Enter') {
       e.currentTarget.blur();
     } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        const parts = id.split('-'); // format: input-field-index
-        if (parts.length === 3) {
-            const field = parts[1];
-            const currentIndex = parseInt(parts[2]);
-            const nextIndex = e.key === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1;
-            const targetId = `input-${field}-${nextIndex}`;
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) targetEl.focus();
-        }
+      e.preventDefault();
+      const parts = id.split('-'); // format: input-field-index
+      if (parts.length === 3) {
+        const field = parts[1];
+        const currentIndex = parseInt(parts[2]);
+        const nextIndex = e.key === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1;
+        const targetId = `input-${field}-${nextIndex}`;
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) targetEl.focus();
+      }
     }
   };
+
+  // Conditional styling: green background + green text for auto-fetched data
+  const baseClass = "w-full text-right focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1 outline-none transition-colors invalid:text-red-500 invalid:bg-red-50";
+  const autoFetchClass = wasAutoFetched
+    ? "bg-green-50 text-green-700 font-medium"
+    : "bg-transparent";
 
   return (
     <input
@@ -63,9 +80,9 @@ const EditableCell: React.FC<{
       type="number"
       step="0.01"
       min={min !== -Infinity ? min : undefined}
-      className="w-full bg-transparent text-right focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-1 outline-none transition-colors invalid:text-red-500 invalid:bg-red-50"
+      className={`${baseClass} ${autoFetchClass}`}
       value={localValue}
-      onChange={(e) => setLocalValue(e.target.value)}
+      onChange={handleChange}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
     />
@@ -73,7 +90,7 @@ const EditableCell: React.FC<{
 };
 
 export const HistoricalTable: React.FC<HistoricalTableProps> = ({ data, onUpdateRow }) => {
-  
+
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200 mb-6 print-break-inside-avoid">
       <table className="min-w-full text-sm text-right">
@@ -114,33 +131,33 @@ export const HistoricalTable: React.FC<HistoricalTableProps> = ({ data, onUpdate
                 <td className="px-3 py-2 font-bold text-left text-gray-700 sticky left-0 bg-white border-r z-10">
                   {row.year}
                 </td>
-                
+
                 <td className="px-2 py-2 bg-blue-50/30 border-r">
-                    <EditableCell id={`input-priceHigh-${idx}`} value={row.priceHigh} onCommit={(v) => onUpdateRow(idx, 'priceHigh', v)} min={0} />
+                  <EditableCell id={`input-priceHigh-${idx}`} value={row.priceHigh} onCommit={(v) => onUpdateRow(idx, 'priceHigh', v)} min={0} autoFetched={row.autoFetched} />
                 </td>
                 <td className="px-2 py-2 bg-blue-50/30 border-r">
-                    <EditableCell id={`input-priceLow-${idx}`} value={row.priceLow} onCommit={(v) => onUpdateRow(idx, 'priceLow', v)} min={0} />
+                  <EditableCell id={`input-priceLow-${idx}`} value={row.priceLow} onCommit={(v) => onUpdateRow(idx, 'priceLow', v)} min={0} autoFetched={row.autoFetched} />
                 </td>
-                
+
                 <td className="px-2 py-2 bg-green-50/30 border-r">
-                    <EditableCell id={`input-cashFlowPerShare-${idx}`} value={row.cashFlowPerShare} onCommit={(v) => onUpdateRow(idx, 'cashFlowPerShare', v)} />
+                  <EditableCell id={`input-cashFlowPerShare-${idx}`} value={row.cashFlowPerShare} onCommit={(v) => onUpdateRow(idx, 'cashFlowPerShare', v)} autoFetched={row.autoFetched} />
                 </td>
                 <td className="px-2 py-2 text-gray-500">{ratios.pcfHigh.toFixed(1)}</td>
                 <td className="px-2 py-2 text-gray-500 border-r">{ratios.pcfLow.toFixed(1)}</td>
-                
+
                 <td className="px-2 py-2 bg-yellow-50/30 border-r">
-                    <EditableCell id={`input-dividendPerShare-${idx}`} value={row.dividendPerShare} onCommit={(v) => onUpdateRow(idx, 'dividendPerShare', v)} min={0} />
+                  <EditableCell id={`input-dividendPerShare-${idx}`} value={row.dividendPerShare} onCommit={(v) => onUpdateRow(idx, 'dividendPerShare', v)} min={0} autoFetched={row.autoFetched} />
                 </td>
                 <td className="px-2 py-2 text-gray-500 border-r">{ratios.yieldHigh.toFixed(2)}%</td>
 
                 <td className="px-2 py-2 bg-purple-50/30 border-r">
-                    <EditableCell id={`input-bookValuePerShare-${idx}`} value={row.bookValuePerShare} onCommit={(v) => onUpdateRow(idx, 'bookValuePerShare', v)} />
+                  <EditableCell id={`input-bookValuePerShare-${idx}`} value={row.bookValuePerShare} onCommit={(v) => onUpdateRow(idx, 'bookValuePerShare', v)} autoFetched={row.autoFetched} />
                 </td>
                 <td className="px-2 py-2 text-gray-500">{ratios.pbvHigh.toFixed(1)}</td>
                 <td className="px-2 py-2 text-gray-500 border-r">{ratios.pbvLow.toFixed(1)}</td>
 
                 <td className="px-2 py-2 bg-red-50/30 border-r font-medium">
-                    <EditableCell id={`input-earningsPerShare-${idx}`} value={row.earningsPerShare} onCommit={(v) => onUpdateRow(idx, 'earningsPerShare', v)} />
+                  <EditableCell id={`input-earningsPerShare-${idx}`} value={row.earningsPerShare} onCommit={(v) => onUpdateRow(idx, 'earningsPerShare', v)} autoFetched={row.autoFetched} />
                 </td>
                 <td className="px-2 py-2 text-gray-500">{ratios.peHigh.toFixed(1)}</td>
                 <td className="px-2 py-2 text-gray-500">{ratios.peLow.toFixed(1)}</td>

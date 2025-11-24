@@ -7,6 +7,7 @@ export interface AnnualData {
   bookValuePerShare: number;
   earningsPerShare: number;
   isEstimate?: boolean;
+  autoFetched?: boolean; // Track if data came from API (shows green background)
 }
 
 export interface CalculatedRatios {
@@ -24,8 +25,8 @@ export interface Assumptions {
   currentPrice: number;
   currentDividend: number;
   // Growth Rates
-  growthRateEPS: number; 
-  growthRateSales: number; 
+  growthRateEPS: number;
+  growthRateSales: number;
   growthRateCF: number; // New
   growthRateBV: number; // New
   growthRateDiv: number; // New
@@ -35,8 +36,8 @@ export interface Assumptions {
   targetPBV: number; // New
   targetYield: number; // New
   // Other
-  requiredReturn: number; 
-  dividendPayoutRatio: number; 
+  requiredReturn: number;
+  dividendPayoutRatio: number;
   baseYear: number;
 }
 
