@@ -104,6 +104,15 @@ export default function App() {
         setIsInitialized(true);
     }, []);
 
+    // --- EVENT LISTENERS ---
+    useEffect(() => {
+        const handleSaveDialog = () => {
+            handleManualSave();
+        };
+        window.addEventListener('open-save-dialog', handleSaveDialog);
+        return () => window.removeEventListener('open-save-dialog', handleSaveDialog);
+    }, [data, assumptions, info, notes, activeId]); // Dependencies for closure capture
+
     // --- ACTIVE SESSION STATE ---
     const [data, setData] = useState<AnnualData[]>(INITIAL_DATA);
     const [assumptions, setAssumptions] = useState<Assumptions>(INITIAL_ASSUMPTIONS);
@@ -314,6 +323,119 @@ export default function App() {
         setIsSearchOpen(true);
     };
 
+    // --- SNAPSHOT MANAGEMENT HANDLERS ---
+
+    const handleLoadSnapshot = async (snapshotId: string) => {
+        console.log(`🔄 Attempting to load snapshot: ${snapshotId}`);
+        const result = await loadSnapshot(snapshotId);
+
+        if (!result.success) {
+            console.error(`❌ Load failed: ${result.error}`);
+            alert(`Erreur chargement: ${result.error}`);
+            return;
+        }
+
+        const snapshot = result.snapshot;
+        console.log('✅ Snapshot loaded:', snapshot);
+
+        // Set historical version state
+        setCurrentSnapshot({
+            id: snapshot.id,
+            date: snapshot.snapshot_date,
+            version: snapshot.version,
+            isHistorical: !snapshot.is_current
+        });
+
+        // Enable read-only mode for historical versions
+        setIsReadOnly(!snapshot.is_current);
+
+        // Load data
+        setData(snapshot.annual_data);
+        setAssumptions(snapshot.assumptions);
+        setInfo(snapshot.company_info);
+
+        console.log(`📜 Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
+    };
+
+    const handleRevertToCurrent = async () => {
+        const result = await listSnapshots(activeId, 50);
+
+        if (result.success && result.snapshots && result.snapshots.length > 0) {
+            const currentSnap = result.snapshots.find(s => s.is_current);
+            if (currentSnap) {
+                await handleLoadSnapshot(currentSnap.id);
+            } else {
+                alert('Aucune version actuelle trouvée');
+            }
+        }
+
+        // Reset historical state
+        setCurrentSnapshot(null);
+        setIsReadOnly(false);
+    };
+
+    const handleUnlockVersion = () => {
+        if (!confirm('Déverrouiller cette version pour modification?\n\nLes changements seront enregistrés sur cette ancienne version.')) {
+            return;
+        }
+        setIsReadOnly(false);
+    };
+
+    const handleManualSave = async () => {
+        const defaultNote = `Sauvegarde manuelle - ${new Date().toLocaleString()}`;
+        const note = prompt('Notes pour cette sauvegarde (optionnel):', defaultNote);
+
+        if (note === null) return; // Cancelled
+
+        const result = await saveSnapshot(
+            activeId,
+            data,
+            assumptions,
+            info,
+            note || defaultNote,
+            true,  // Mark as current (since it's a manual save of current state)
+            false  // Not auto-fetched (user might have edited)
+        );
+
+        if (result.success) {
+            alert('✅ Version sauvegardée avec succès!');
+            // Update current snapshot state to reflect this new version
+            if (result.snapshot) {
+                setCurrentSnapshot({
+                    id: result.snapshot.id,
+                    date: result.snapshot.snapshot_date,
+                    version: result.snapshot.version,
+                    isHistorical: false
+                });
+            }
+        } else {
+            alert(`Erreur lors de la sauvegarde: ${result.error}`);
+        }
+    };
+
+    const handleSaveAsNew = async () => {
+        const notes = prompt('Notes pour cette nouvelle version (optionnel):');
+
+        const result = await saveSnapshot(
+            activeId,
+            data,
+            assumptions,
+            info,
+            notes || `Copie de v${currentSnapshot?.version || '?'} - ${new Date().toLocaleString()}`,
+            true,  // Mark as current
+            false  // Not auto-fetched
+        );
+
+        if (result.success) {
+            alert('✅ Nouvelle version sauvegardée!');
+            // Reset to normal mode
+            setCurrentSnapshot(null);
+            setIsReadOnly(false);
+        } else {
+            alert(`Erreur: ${result.error}`);
+        }
+    };
+
     const handleSelectTicker = async (symbol: string) => {
         const upperSymbol = symbol.toUpperCase();
         if (library[upperSymbol]) {
@@ -452,12 +574,25 @@ export default function App() {
                         onDelete={handleDeleteTicker}
                         onDuplicate={handleDuplicateTicker}
                         onToggleWatchlist={handleToggleWatchlist}
+                        onLoadVersion={handleLoadSnapshot}
                     />
                 </div>
             </div>
 
             {/* MAIN CONTENT AREA */}
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                {/* Historical Version Banner (if viewing old version) */}
+                {currentSnapshot && currentSnapshot.isHistorical && (
+                    <HistoricalVersionBanner
+                        snapshotDate={currentSnapshot.date}
+                        snapshotVersion={currentSnapshot.version}
+                        isLocked={isReadOnly}
+                        onUnlock={handleUnlockVersion}
+                        onRevertToCurrent={handleRevertToCurrent}
+                        onSaveAsNew={handleSaveAsNew}
+                    />
+                )}
+
                 <div className="flex-1 overflow-y-auto p-4 md:p-8 print-full-width">
                     <div className="max-w-7xl mx-auto">
 

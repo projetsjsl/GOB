@@ -46,9 +46,23 @@ export default async function handler(req, res) {
         const profile = profileData[0];
 
         // 2. Fetch Key Metrics (Annual)
-        const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${cleanSymbol}?period=annual&limit=10&apikey=${FMP_KEY}`);
+        const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${cleanSymbol}?period=annual&limit=20&apikey=${FMP_KEY}`);
         if (!metricsRes.ok) throw new Error(`FMP Metrics error: ${metricsRes.statusText}`);
-        const metricsData = await metricsRes.json();
+        let metricsData = await metricsRes.json();
+
+        // Deduplicate metrics by year (keep the one with the latest date if duplicates exist)
+        const uniqueMetrics = {};
+        metricsData.forEach(metric => {
+            const year = new Date(metric.date).getFullYear();
+            // If year exists, only replace if this metric is 'newer' or has more data (heuristic)
+            // FMP usually returns sorted, but let's be safe.
+            // Actually, FMP sometimes returns multiple entries for same year (restated).
+            // We'll assume the first one encountered (if sorted desc) or latest date is best.
+            if (!uniqueMetrics[year]) {
+                uniqueMetrics[year] = metric;
+            }
+        });
+        metricsData = Object.values(uniqueMetrics);
 
         // 2a. Fetch Dividend History (separate endpoint since key-metrics doesn't include it)
         const dividendRes = await fetch(`${FMP_BASE}/historical-price-full/stock_dividend/${cleanSymbol}?apikey=${FMP_KEY}`);
