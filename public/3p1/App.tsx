@@ -102,20 +102,14 @@ export default function App() {
             } else {
                 setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
             }
-        } else {
+        } catch (e) {
+            console.warn("LocalStorage access failed", e);
             setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
         }
         setIsInitialized(true);
     }, []);
 
-    // --- EVENT LISTENERS ---
-    useEffect(() => {
-        const handleSaveDialog = () => {
-            handleManualSave();
-        };
-        window.addEventListener('open-save-dialog', handleSaveDialog);
-        return () => window.removeEventListener('open-save-dialog', handleSaveDialog);
-    }, [data, assumptions, info, notes, activeId]); // Dependencies for closure capture
+
 
     // --- ACTIVE SESSION STATE ---
     const [data, setData] = useState<AnnualData[]>(INITIAL_DATA);
@@ -420,6 +414,15 @@ export default function App() {
             alert(`Erreur lors de la sauvegarde: ${result.error}`);
         }
     };
+
+    // --- EVENT LISTENERS ---
+    useEffect(() => {
+        const handleSaveDialog = () => {
+            handleManualSave();
+        };
+        window.addEventListener('open-save-dialog', handleSaveDialog);
+        return () => window.removeEventListener('open-save-dialog', handleSaveDialog);
+    }, [data, assumptions, info, notes, activeId]); // Dependencies for closure capture
 
     const handleSaveAsNew = async () => {
         const notes = prompt('Notes pour cette nouvelle version (optionnel):');
