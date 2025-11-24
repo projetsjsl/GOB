@@ -1466,7 +1466,10 @@ const fetchHybridData = async (symbol, dataType) => {
 
                 const newsPromises = tickers.map(async (ticker) => {
                     try {
-                        // PRIORITÉ 1: Finviz "Why Is It Moving?" (explication AI-driven)
+                        // DÉSACTIVÉ: Finviz "Why Is It Moving?" cause des timeouts (504)
+                        // L'API /finviz-why-moving prend trop de temps et timeout constamment
+                        // On utilise maintenant uniquement l'API unifiée (FMP + Finnhub)
+                        /*
                         try {
                             const whyMovingResponse = await fetch(`${API_BASE_URL}/api/finviz-why-moving?ticker=${ticker}`);
                             if (whyMovingResponse.ok) {
@@ -1497,6 +1500,7 @@ const fetchHybridData = async (symbol, dataType) => {
                         } catch (whyMovingError) {
                             console.warn(`⚠️ Finviz Why Moving non disponible pour ${ticker}:`, whyMovingError.message);
                         }
+                        */
 
                         // PRIORITÉ 2: API unifiée /api/news qui agrège FMP, Finnhub, Finviz, RSS
                         // Cette API fait déjà tout le travail d'agrégation et de déduplication
