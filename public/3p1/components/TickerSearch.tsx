@@ -14,34 +14,6 @@ interface TickerSearchProps {
     onClose: () => void;
 }
 
-const FMP_BASE_URL = 'https://financialmodelingprep.com/api/v3';
-
-const getApiKey = (baseName: string): string => {
-    const prefixes = ['VITE_', 'NEXT_PUBLIC_', 'REACT_APP_', ''];
-
-    for (const prefix of prefixes) {
-        const key = `${prefix}${baseName}`;
-
-        // @ts-ignore
-        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
-            // @ts-ignore
-            return import.meta.env[key];
-        }
-
-        // @ts-ignore
-        if (typeof process !== 'undefined' && process.env && process.env[key]) {
-            // @ts-ignore
-            return process.env[key];
-        }
-    }
-
-    if (typeof window !== 'undefined') {
-        return localStorage.getItem(baseName) || '';
-    }
-
-    return '';
-};
-
 export const TickerSearch: React.FC<TickerSearchProps> = ({ onSelect, onClose }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<SearchResult[]>([]);
@@ -61,25 +33,20 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({ onSelect, onClose })
                 return;
             }
 
-            if (!FMP_KEY) {
-                console.error('FMP_API_KEY manquante');
-                return;
-            }
-
             setIsLoading(true);
             try {
+                // Use backend API proxy instead of direct FMP call
                 const response = await fetch(
-                    `${FMP_BASE_URL}/search?query=${encodeURIComponent(query)}&limit=10&apikey=${FMP_KEY}`
+                    `/api/fmp-search?query=${encodeURIComponent(query)}&limit=10`
                 );
+
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+
                 const data = await response.json();
 
-                // Filter for stocks only (exclude indices, crypto, etc)
-                const filtered = data.filter((item: SearchResult) =>
-                    item.exchangeShortName &&
-                    ['NASDAQ', 'NYSE', 'AMEX', 'TSX', 'LSE'].includes(item.exchangeShortName)
-                );
-
-                setResults(filtered);
+                setResults(data);
                 setSelectedIndex(0);
             } catch (error) {
                 console.error('Search error:', error);
@@ -91,7 +58,7 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({ onSelect, onClose })
 
         const debounce = setTimeout(searchTickers, 300);
         return () => clearTimeout(debounce);
-    }, [query, FMP_KEY]);
+    }, [query]);
 
     const handleSelect = (symbol: string) => {
         onSelect(symbol);
