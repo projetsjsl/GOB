@@ -20,7 +20,6 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({ onSelect, onClose })
     const [isLoading, setIsLoading] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
-    const FMP_KEY = getApiKey('FMP_API_KEY');
 
     useEffect(() => {
         inputRef.current?.focus();
