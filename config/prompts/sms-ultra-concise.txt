@@ -1,0 +1,44 @@
+📱 FORMAT SMS ULTRA-CONCIS (Excellence Synthétisation)
+
+🚨 CONTRAINTES STRICTES:
+• MAX 1600 caractères TOTAL
+• 5-6 ratios CRITIQUES seulement
+• Emojis pour lisibilité mobile
+• Structure fixe: Valorisation → Moat → Reco → Catalysts → Risques
+• Call-to-action vers web
+
+📋 TEMPLATE OBLIGATOIRE:
+
+📊 {TICKER} ${PRICE} ({CHANGE}%)
+
+💰 VALORISATION
+P/E {X.X}x vs {Y.Y}x hist ({±Z}% ✅/⚠️)
+PEG {X.X}x (attractif/élevé)
+FCF Yield {X.X}% (solide/faible)
+
+🏰 MOAT: {X}/10 {WIDE/MODERATE}
+• {Avantage clé 1}
+• {Avantage clé 2}
+• {Chiffre proof point}
+
+🎯 RECO: {BUY/HOLD/SELL}
+Val. intr: ${XXX} (↑/↓{X}%)
+Marge sécu: {X}% (Graham ✅/⚠️)
+
+📈 CATALYSTS
+• {Catalyst 1}
+• {Catalyst 2}
+
+⚠️ RISQUES
+• {Risque principal}
+• {Risque secondaire}
+
+💼 Analyse complète: "Detail {TICKER}" sur Emma Web
+
+RÈGLES D'OR:
+1. JAMAIS dépasser 1600 chars
+2. Ratios les plus critiques SEULEMENT (P/E, PEG, FCF Yield max)
+3. Une ligne par point
+4. Emojis = catégories visuelles
+5. Chiffres précis (pas de généralités)
+6. Call-to-action TOUJOURS présent

@@ -11,8 +11,10 @@
 import { HybridIntentAnalyzer } from '../lib/intent-analyzer.js';
 import { createSupabaseClient } from '../lib/supabase-config.js';
 import { TickerExtractor } from '../lib/utils/ticker-extractor.js';
-import { CFA_SYSTEM_PROMPT } from '../config/emma-cfa-prompt.js';
-import { getIntentPrompt, hasCustomPrompt } from '../config/intent-prompts.js';
+// import { CFA_SYSTEM_PROMPT } from '../config/emma-cfa-prompt.js'; // REMOVED: Now using ConfigManager
+// import { getIntentPrompt, hasCustomPrompt } from '../config/intent-prompts.js'; // REMOVED: Now using ConfigManager
+import { PERPLEXITY_SYSTEM_PROMPT } from '../config/perplexity-prompt.js';
+import { configManager } from '../lib/config-manager.js'; // NEW: Config Manager
 import { geminiFetchWithRetry } from '../lib/utils/gemini-retry.js';
 import { ContextMemory } from '../lib/context-memory.js';
 import { ResponseValidator } from '../lib/response-validator.js';
@@ -39,7 +41,11 @@ class SmartAgent {
         this.contextMemory = new ContextMemory();
         this.responseValidator = new ResponseValidator();
         this.promptSystem = new DynamicPromptsSystem();
-        console.log('🧠 Advanced cognitive systems initialized (Context Memory, Response Validator, Dynamic Prompts)');
+
+        // Initialize Config Manager (async, but we start it here)
+        configManager.initialize().catch(err => console.error('❌ ConfigManager init failed:', err));
+
+        console.log('🧠 Advanced cognitive systems initialized (Context Memory, Response Validator, Dynamic Prompts, ConfigManager)');
     }
 
     /**
@@ -436,7 +442,7 @@ class SmartAgent {
 
         // ✅ FIX: Uniquement pour expressions purement conversationnelles (sans questions réelles)
         // Les questions générales réelles sont gérées par _shouldUsePerplexityOnly() + Perplexity
-        
+
         // 1. EXPRESSIONS ÉMOTIONNELLES COURTES (sans question)
         if (intentData.intent === 'general_conversation' && intentData.response_type === 'conversational') {
             // Réponses appropriées selon l'expression - SANS forcer contexte financier
@@ -547,12 +553,12 @@ class SmartAgent {
 
         if (factualIntents.includes(intent) || hasTickers || hasToolData) {
             console.log(`💎 Factual query (${intent}) → Using PERPLEXITY (with sources)`);
-            
+
             // 🚀 DÉTECTION PRIORITAIRE: Si l'utilisateur demande des données "aujourd'hui", "fin de journée", "après clôture"
             const userMessageLower = (userMessage || '').toLowerCase();
             const todayKeywords = ['aujourd\'hui', 'aujourd hui', 'today', 'fin de journée', 'fin de journee', 'après clôture', 'apres cloture', 'after close', 'end of day', 'après la clôture', 'apres la cloture'];
             const isTodayRequest = todayKeywords.some(keyword => userMessageLower.includes(keyword));
-            
+
             // Pour earnings, si demande "aujourd'hui", forcer recency: 'hour' (données les plus récentes)
             let recencyValue = intentData?.recency_filter;
             if (intent === 'earnings' && isTodayRequest) {
@@ -565,7 +571,7 @@ class SmartAgent {
                 // Par défaut pour earnings, utiliser 'day' pour données récentes
                 recencyValue = (intent === 'earnings') ? 'day' : 'day';
             }
-            
+
             const validRecency = (recencyValue && recencyValue !== 'none') ? recencyValue : 'day';
             return {
                 model: 'perplexity',
@@ -620,13 +626,13 @@ class SmartAgent {
         const message = userMessage.toLowerCase();
         const intent = intentData?.intent || context.intent_data?.intent || 'unknown';
         const extractedTickers = context.extracted_tickers || context.tickers || [];
-        
+
         // 🚫 SKIP OUTILS pour greetings et questions simples
         const noToolsIntents = ['greeting', 'help', 'capabilities', 'general_conversation'];
         if (noToolsIntents.includes(intent)) {
             return { usePerplexityOnly: true, reason: `Intent "${intent}" ne nécessite pas de données` };
         }
-        
+
         // ✅ DÉFINIR TOUS LES KEYWORDS EN PREMIER (FIX: Ordre d'évaluation)
         // ✅ PERPLEXITY SEUL: Questions sur fonds/ETF/portefeuille
         const fundKeywords = [
@@ -646,7 +652,7 @@ class SmartAgent {
         if (fundKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur fonds - Perplexity a accès aux données Morningstar/Fundata' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions macro-économiques générales
         const macroKeywords = [
             'inflation', 'taux directeur', 'fed', 'banque centrale', 'pib', 'gdp',
@@ -669,7 +675,7 @@ class SmartAgent {
             }
             return { usePerplexityOnly: true, reason: 'Question macro-économique - Perplexity a accès aux données récentes' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur stratégies d'investissement
         const strategyKeywords = [
             'stratégie', 'strategie', 'stratégie d\'investissement', 'strategie d\'investissement',
@@ -687,7 +693,7 @@ class SmartAgent {
         if (strategyKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur stratégie - Perplexity peut expliquer les concepts' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur secteurs/industries
         const sectorKeywords = [
             'secteur', 'industrie', 'secteurs performants', 'secteurs en hausse', 'secteurs en baisse',
@@ -703,7 +709,7 @@ class SmartAgent {
         if (sectorKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur secteurs - Perplexity a accès aux analyses sectorielles' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur crypto/blockchain
         const cryptoKeywords = [
             'crypto', 'cryptomonnaie', 'cryptomonnaies', 'bitcoin', 'btc', 'ethereum', 'eth',
@@ -716,7 +722,7 @@ class SmartAgent {
         if (cryptoKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur crypto - Perplexity a accès aux données crypto récentes' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur commodities/matières premières
         const commodityKeywords = [
             'commodities', 'commodity', 'matières premières', 'matiere premiere',
@@ -733,7 +739,7 @@ class SmartAgent {
         if (commodityKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur commodities - Perplexity a accès aux données de marché' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Forex/Devises
         const forexKeywords = [
             'forex', 'fx', 'devise', 'devises', 'taux de change', 'exchange rate',
@@ -748,7 +754,7 @@ class SmartAgent {
         if (forexKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur forex - Perplexity a accès aux données de change' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Obligations/Bonds détaillées
         const bondKeywords = [
             'obligations', 'bonds', 'obligation', 'bond', 'corporate bonds', 'obligations corporatives',
@@ -770,7 +776,7 @@ class SmartAgent {
             }
             return { usePerplexityOnly: true, reason: 'Question sur obligations - Perplexity a accès aux données obligataires' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Immobilier/Real Estate
         const realEstateKeywords = [
             'immobilier', 'real estate', 'reit', 'reits', 'fiducie immobilière',
@@ -786,7 +792,7 @@ class SmartAgent {
         if (realEstateKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur immobilier - Perplexity a accès aux données immobilières' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Private Equity/Venture Capital
         const privateEquityKeywords = [
             'private equity', 'capital-investissement', 'capital investissement',
@@ -801,7 +807,7 @@ class SmartAgent {
         if (privateEquityKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur private equity - Perplexity a accès aux données PE/VC' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Warrants/Convertibles
         const warrantKeywords = [
             'warrant', 'warrants', 'certificat', 'certificats', 'warrant d\'achat',
@@ -816,7 +822,7 @@ class SmartAgent {
         if (warrantKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur warrants/convertibles - Perplexity peut expliquer les concepts' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Calculs/Simulations
         const calculationKeywords = [
             'calculer', 'calcul', 'simulation', 'simuler', 'scénario', 'scenario',
@@ -834,7 +840,7 @@ class SmartAgent {
         if (calculationKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur calculs/simulations - Perplexity peut expliquer les méthodologies' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Réglementation/Compliance
         const regulatoryKeywords = [
             'réglementation', 'regulation', 'compliance', 'conformité', 'régulateur',
@@ -852,7 +858,7 @@ class SmartAgent {
         if (regulatoryKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question réglementaire - Perplexity a accès aux règles et régulations' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur ESG/Durabilité
         const esgKeywords = [
             'esg', 'environmental social governance', 'environnemental social gouvernance',
@@ -871,7 +877,7 @@ class SmartAgent {
         if (esgKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question ESG - Perplexity a accès aux données ESG récentes' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Arbitrage/Pairs Trading
         const arbitrageKeywords = [
             'arbitrage', 'arbitrage opportunity', 'opportunité d\'arbitrage',
@@ -887,7 +893,7 @@ class SmartAgent {
         if (arbitrageKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur arbitrage - Perplexity peut expliquer les stratégies' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Méthodologies d'Analyse
         const methodologyKeywords = [
             'méthodologie', 'methodologie', 'methodology', 'approche', 'approach',
@@ -908,7 +914,7 @@ class SmartAgent {
         if (methodologyKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question méthodologique - Perplexity peut expliquer les approches' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Structured Products
         const structuredProductsKeywords = [
             'structured products', 'produits structurés', 'structured note',
@@ -923,7 +929,7 @@ class SmartAgent {
         if (structuredProductsKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur produits structurés - Perplexity peut expliquer les concepts' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Gestion de Risque Avancée
         const riskManagementKeywords = [
             'gestion de risque', 'risk management', 'gestion des risques',
@@ -945,7 +951,7 @@ class SmartAgent {
         if (riskManagementKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur gestion de risque - Perplexity peut expliquer les concepts' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur Behavioral Finance
         const behavioralKeywords = [
             'behavioral finance', 'finance comportementale', 'psychologie des marchés',
@@ -964,7 +970,7 @@ class SmartAgent {
         if (behavioralKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur finance comportementale - Perplexity peut expliquer les concepts' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur M&A/Fusions-Acquisitions
         const maKeywords = [
             'fusion', 'acquisition', 'm&a', 'merger', 'mergers and acquisitions',
@@ -980,7 +986,7 @@ class SmartAgent {
         if (maKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur M&A - Perplexity a accès aux données de transactions' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur IPO/Introduction en Bourse
         const ipoKeywords = [
             'ipo', 'introduction en bourse', 'public offering', 'offre publique',
@@ -996,7 +1002,7 @@ class SmartAgent {
         if (ipoKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur IPO - Perplexity a accès aux données d\'introductions' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions géopolitiques/événements
         const geopoliticalKeywords = [
             'géopolitique', 'geopolitique', 'géopolitique', 'guerre', 'conflit', 'sanctions',
@@ -1009,7 +1015,7 @@ class SmartAgent {
         if (geopoliticalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question géopolitique - Perplexity a accès aux analyses récentes' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur options/derivés
         const optionsKeywords = [
             'options', 'option', 'call', 'put', 'strike', 'prix d\'exercice',
@@ -1022,7 +1028,7 @@ class SmartAgent {
         if (optionsKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question sur options - Perplexity peut expliquer les concepts' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions sur taxes/fiscalité
         const taxKeywords = [
             'impôt', 'impot', 'taxe', 'fiscalité', 'fiscalite', 'fiscal',
@@ -1035,7 +1041,7 @@ class SmartAgent {
         if (taxKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question fiscale - Perplexity peut expliquer les règles' };
         }
-        
+
         // ✅ PERPLEXITY SEUL: Questions générales/non-financières (DÉTECTION APRÈS TOUS LES KEYWORDS FINANCIERS)
         // 🎯 Permet à Emma de sortir du cadre strictement financier
         // FIX: Retirer keywords ambigus qui peuvent être financiers (startup, marketing, management, news avec ticker)
@@ -1069,7 +1075,7 @@ class SmartAgent {
             'recommandation', 'recommandations', 'conseil', 'conseils', 'suggestion', 'suggestions',
             'avis', 'opinion', 'que penses-tu', 'penses-tu que', 'crois-tu que'
         ];
-        
+
         // Détection: Si aucun ticker ET aucun mot financier spécifique → probablement question générale
         const hasFinancialKeyword = [
             fundKeywords, macroKeywords, strategyKeywords, sectorKeywords,
@@ -1079,19 +1085,19 @@ class SmartAgent {
             methodologyKeywords, structuredProductsKeywords, riskManagementKeywords,
             behavioralKeywords, maKeywords, ipoKeywords, geopoliticalKeywords, taxKeywords
         ].some(keywords => keywords.some(kw => message.includes(kw)));
-        
+
         const hasGeneralKeyword = generalNonFinancialKeywords.some(kw => message.includes(kw));
-        
+
         // Si question générale ET pas de mots financiers ET pas de tickers → Perplexity seul
         // FIX: Vérifier aussi si 'news'/'actualités' sans ticker (pour éviter conflit avec intent news)
         const isNewsGeneral = (message.includes('actualités') || message.includes('actualites') || message.includes('news') || message.includes('nouvelles')) && extractedTickers.length === 0;
-        
+
         if (hasGeneralKeyword && !hasFinancialKeyword && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question générale/non-financière - Perplexity peut répondre naturellement' };
         }
-        
+
         // ✅ FIX: Code redondant supprimé - déjà géré par generalNonFinancialKeywords ci-dessus
-        
+
         // ✅ PERPLEXITY SEUL: Questions historiques/comparaisons temporelles
         const historicalKeywords = [
             'historique', 'histoire', 'évolution', 'evolution', 'tendance historique',
@@ -1104,7 +1110,7 @@ class SmartAgent {
         if (historicalKeywords.some(kw => message.includes(kw)) && extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question historique - Perplexity a accès aux données historiques' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Prix en temps réel précis
         const priceKeywords = [
             'prix', 'cours', 'cotation', 'quote', 'se négocie', 'trading at', 'valeur actuelle',
@@ -1116,7 +1122,7 @@ class SmartAgent {
         if (priceKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Prix temps réel nécessite données précises (FMP/Polygon)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Ratios financiers exacts
         const ratioKeywords = [
             'pe ratio', 'p/e', 'p/b', 'p/s', 'p/fcf', 'peg', 'ev/ebitda', 'ev/sales',
@@ -1131,7 +1137,7 @@ class SmartAgent {
         if (ratioKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Ratios financiers nécessitent données structurées précises (FMP)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Indicateurs techniques
         const technicalKeywords = [
             'rsi', 'macd', 'sma', 'ema', 'wma', 'vwap', 'atr', 'adx', 'obv', 'mfi',
@@ -1146,7 +1152,7 @@ class SmartAgent {
         if (technicalKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Indicateurs techniques nécessitent calculs précis (Twelve Data)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Dividendes
         const dividendKeywords = [
             'dividende', 'dividend', 'dividend yield', 'rendement', 'yield',
@@ -1158,7 +1164,7 @@ class SmartAgent {
         if (dividendKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Dividendes nécessitent données précises (FMP)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Calendriers
         const calendarKeywords = [
             'calendrier', 'calendar', 'résultats', 'resultats', 'earnings',
@@ -1173,7 +1179,7 @@ class SmartAgent {
         if (calendarKeywords.some(kw => message.includes(kw))) {
             return { usePerplexityOnly: false, reason: 'Calendriers nécessitent données structurées (FMP)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Watchlist/Portfolio
         const portfolioKeywords = [
             'watchlist', 'portefeuille', 'portfolio', 'mes actions', 'mes titres',
@@ -1185,7 +1191,7 @@ class SmartAgent {
         if (portfolioKeywords.some(kw => message.includes(kw))) {
             return { usePerplexityOnly: false, reason: 'Watchlist nécessite données utilisateur (Supabase)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Analyse complète avec ticker spécifique
         const analysisKeywords = [
             'analyse complète', 'comprehensive analysis', 'analyse approfondie', 'deep dive',
@@ -1196,7 +1202,7 @@ class SmartAgent {
         if (extractedTickers.length > 0 && analysisKeywords.some(kw => message.includes(kw))) {
             return { usePerplexityOnly: false, reason: 'Analyse complète nécessite toutes les métriques précises (FMP)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Données fondamentales précises
         const fundamentalsKeywords = [
             'fondamentaux', 'fundamentals', 'revenus', 'revenue', 'sales', 'ventes',
@@ -1217,7 +1223,7 @@ class SmartAgent {
         if (fundamentalsKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Données fondamentales nécessitent précision (FMP)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Recommandations analystes
         const analystKeywords = [
             'recommandation', 'recommendation', 'rating', 'note', 'consensus',
@@ -1229,7 +1235,7 @@ class SmartAgent {
         if (analystKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Recommandations analystes nécessitent données structurées (FMP)' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Options/Derivés avec ticker
         const optionsTickerKeywords = [
             'options', 'option', 'call', 'put', 'strike', 'prix d\'exercice',
@@ -1241,7 +1247,7 @@ class SmartAgent {
         if (optionsTickerKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Options nécessitent données de marché précises' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES: Performance historique précise
         const performanceKeywords = [
             'performance', 'rendement', 'return', 'ytd', 'year to date', 'année en cours',
@@ -1255,12 +1261,12 @@ class SmartAgent {
         if (performanceKeywords.some(kw => message.includes(kw)) && extractedTickers.length > 0) {
             return { usePerplexityOnly: false, reason: 'Performance historique nécessite données précises (FMP)' };
         }
-        
+
         // ✅ PERPLEXITY SEUL par défaut pour questions générales sans ticker
         if (extractedTickers.length === 0) {
             return { usePerplexityOnly: true, reason: 'Question générale sans ticker spécifique - Perplexity suffisant' };
         }
-        
+
         // ❌ APIs NÉCESSAIRES par défaut si ticker présent
         return { usePerplexityOnly: false, reason: 'Ticker spécifique détecté - APIs nécessaires pour données précises' };
     }
@@ -1277,23 +1283,23 @@ class SmartAgent {
 
         // ✅ NOUVEAU: Décision intelligente Perplexity vs APIs
         const perplexityDecision = this._shouldUsePerplexityOnly(userMessage, context, intentData);
-        
+
         if (perplexityDecision.usePerplexityOnly) {
             console.log(`🧠 PERPLEXITY ONLY: ${perplexityDecision.reason}`);
             console.log(`   → Pas d'outils nécessaires, Perplexity répondra directement`);
-            
+
             // 🎯 Marquer le contexte pour adaptation du prompt
             context.perplexity_only_reason = perplexityDecision.reason;
-            
+
             if (perplexityDecision.reason.includes('générale/non-financière')) {
                 context.is_general_question = true;
                 console.log(`   → Question générale/non-financière détectée - prompt adapté`);
             }
-            
+
             if (perplexityDecision.reason.includes('fonds')) {
                 console.log(`   → Question sur fonds détectée - prompt spécialisé sera utilisé`);
             }
-            
+
             return []; // Retourner liste vide - Emma utilisera Perplexity seul
         } else {
             console.log(`📊 APIs NÉCESSAIRES: ${perplexityDecision.reason}`);
@@ -1354,8 +1360,8 @@ class SmartAgent {
         // 🚀 ANALYSE COMPLÈTE DE TICKER: Force les outils essentiels pour obtenir TOUTES les métriques
         const isTickerAnalysis = extractedTickers.length > 0 || context.tickers?.length > 0;
         const isComprehensiveAnalysis = context.intent === 'comprehensive_analysis' ||
-                                       message.includes('analyse') ||
-                                       message.includes('analyser');
+            message.includes('analyse') ||
+            message.includes('analyser');
 
         let selectedTools = [];
 
@@ -1386,21 +1392,21 @@ class SmartAgent {
         // 🚀 OPTIMISATION SMS: Skip outils "nice-to-have" non essentiels
         if (context.user_channel === 'sms') {
             const message = userMessage.toLowerCase();
-            
+
             // Outils optionnels (skip sauf si explicitement demandés)
             const optionalTools = ['earnings-calendar', 'analyst-recommendations', 'economic-calendar'];
-            
+
             const isExplicitlyRequested = (toolId) => {
                 const toolKeywords = {
                     'earnings-calendar': ['résultats', 'earnings', 'résultat', 'publication'],
                     'analyst-recommendations': ['analyste', 'recommandation', 'consensus', 'rating'],
                     'economic-calendar': ['calendrier', 'économique', 'événement', 'macro']
                 };
-                
+
                 const keywords = toolKeywords[toolId] || [];
                 return keywords.some(kw => message.includes(kw));
             };
-            
+
             selectedTools = selectedTools.filter(tool => {
                 if (optionalTools.includes(tool.id)) {
                     const keep = isExplicitlyRequested(tool.id);
@@ -1411,7 +1417,7 @@ class SmartAgent {
                 }
                 return true;
             });
-            
+
             console.log(`📱 SMS mode: ${selectedTools.length} tools selected (optimized)`);
         }
 
@@ -1435,34 +1441,34 @@ class SmartAgent {
      */
     _calculateRelevanceScore(tool, message, context) {
         let score = 0;
-        
+
         // Mots-clés dans le message
         tool.keywords.forEach(keyword => {
             if (message.includes(keyword.toLowerCase())) {
                 score += 20;
             }
         });
-        
+
         // Contexte d'utilisation
         tool.usage_context.forEach(context_word => {
             if (message.includes(context_word.toLowerCase())) {
                 score += 15;
             }
         });
-        
+
         // Contexte spécifique (tickers, etc.)
         if (context.tickers && tool.id.includes('ticker')) {
             score += 25;
         }
-        
+
         if (context.news_requested && tool.category === 'news') {
             score += 30;
         }
-        
+
         if (context.calculation_needed && tool.category === 'calculation') {
             score += 35;
         }
-        
+
         return score;
     }
 
@@ -1474,7 +1480,7 @@ class SmartAgent {
         if (!stats || stats.total_calls === 0) {
             return 10; // Score neutre pour nouveaux outils
         }
-        
+
         // Score basé sur le taux de succès
         const successRate = stats.success_rate;
         return Math.round(successRate * 30); // Max 30 points
@@ -1488,9 +1494,9 @@ class SmartAgent {
         if (!stats || !stats.last_used) {
             return 0;
         }
-        
+
         const hoursSinceLastUse = (Date.now() - new Date(stats.last_used).getTime()) / (1000 * 60 * 60);
-        
+
         // Bonus décroissant sur 24h
         if (hoursSinceLastUse < 1) return 15;
         if (hoursSinceLastUse < 6) return 10;
@@ -1586,33 +1592,33 @@ class SmartAgent {
         if (!failedTool.fallback_tools || failedTool.fallback_tools.length === 0) {
             return null;
         }
-        
+
         for (const fallbackId of failedTool.fallback_tools) {
             try {
                 const fallbackTool = this.toolsConfig.tools.find(t => t.id === fallbackId);
                 if (!fallbackTool || !fallbackTool.enabled) continue;
-                
+
                 console.log(`🔄 Trying fallback: ${fallbackId}`);
-                
+
                 const toolModule = await import(`../lib/tools/${fallbackTool.implementation.file}`);
                 const toolInstance = new toolModule.default();
                 const params = this._prepareToolParameters(fallbackTool, userMessage, context);
-                
+
                 const result = await toolInstance.execute(params, context);
                 this._updateToolStats(fallbackId, true, 0);
-                
+
                 return {
                     tool_id: fallbackId,
                     data: result,
                     is_reliable: result && result.is_reliable !== false
                 };
-                
+
             } catch (error) {
                 console.error(`❌ Fallback ${fallbackId} also failed:`, error.message);
                 continue;
             }
         }
-        
+
         return null;
     }
 
@@ -1724,8 +1730,8 @@ class SmartAgent {
      */
     async _generate_response(userMessage, toolResults, context, intentData = null) {
         // Déclarer outputMode avant le try pour qu'il soit accessible dans le catch
-            const outputMode = context.output_mode || 'chat';
-        
+        const outputMode = context.output_mode || 'chat';
+
         try {
             console.log(`🎯 Generating response for mode: ${outputMode}`);
 
@@ -1750,7 +1756,8 @@ class SmartAgent {
             console.log(`🤖 Selected model: ${modelSelection.model} (${modelSelection.reason})`);
 
             // Construire le prompt approprié
-            const prompt = this._buildPerplexityPrompt(
+            // Construire le prompt approprié
+            const prompt = await this._buildPerplexityPrompt(
                 userMessage,
                 toolsData,
                 conversationContext,
@@ -1907,11 +1914,11 @@ class SmartAgent {
         ];
 
         const hasSources = hasSourcePatterns.some(pattern => pattern.test(response));
-        
+
         // ✅ ASSOUPLISSEMENT: Accepter aussi données chiffrées récentes comme source implicite
         const hasRecentData = /\d{4}|202[4-5]|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre/i.test(response);
         const hasNumericData = /\$\d+\.?\d*|\d+%|\d+\.\d+x|\d+\.\d+%/.test(response); // Prix, %, ratios
-        
+
         // Si données chiffrées récentes présentes → considérer comme source implicite
         if (!hasSources && hasRecentData && hasNumericData) {
             console.log('🛡️ FreshDataGuard: Données chiffrées récentes détectées (source implicite)');
@@ -1936,11 +1943,11 @@ class SmartAgent {
         // ✅ ASSOUPLISSEMENT: Accepter données chiffrées récentes comme source implicite
         const finalHasSources = hasSources || (hasRecentData && hasNumericData);
         const finalConfidence = finalHasSources ? Math.max(confidence, 0.75) : confidence; // Minimum 0.75 si données récentes
-        
+
         return {
             passed: finalHasSources,
             confidence: Math.min(1.0, finalConfidence),
-            reason: finalHasSources 
+            reason: finalHasSources
                 ? (hasSources ? 'Sources verified' : 'Recent numeric data detected (implicit source)')
                 : 'Missing sources for factual data',
             source_types_found: hasSourcePatterns.filter(pattern => pattern.test(response)).length
@@ -2165,13 +2172,13 @@ class SmartAgent {
     /**
      * Construction du prompt pour Perplexity (ROUTER - 4 MODES)
      */
-    _buildPerplexityPrompt(userMessage, toolsData, conversationContext, context, intentData = null) {
+    async _buildPerplexityPrompt(userMessage, toolsData, conversationContext, context, intentData = null) {
         const outputMode = context.output_mode || 'chat'; // Default: chat
         console.log(`🎯 Building prompt for mode: ${outputMode}`);
 
         switch (outputMode) {
             case 'chat':
-                return this._buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData);
+                return await this._buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData);
 
             case 'data':
                 return this._buildDataPrompt(userMessage, toolsData, context);
@@ -2184,7 +2191,7 @@ class SmartAgent {
 
             default:
                 console.warn(`⚠️ Unknown output_mode: ${outputMode}, fallback to chat`);
-                return this._buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData);
+                return await this._buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData);
         }
     }
 
@@ -2290,7 +2297,7 @@ class SmartAgent {
     /**
      * MODE CHAT: Réponse conversationnelle naturelle
      */
-    _buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData) {
+    async _buildChatPrompt(userMessage, toolsData, conversationContext, context, intentData) {
         const currentDate = new Date().toLocaleDateString('fr-FR', {
             weekday: 'long',
             year: 'numeric',
@@ -2366,10 +2373,10 @@ STRUCTURE OBLIGATOIRE:
         ) : '';
 
         // 🎯 Détection si question générale/non-financière
-        const isGeneralNonFinancial = context.is_general_question || 
+        const isGeneralNonFinancial = context.is_general_question ||
             (intentData && ['general_conversation', 'help', 'capabilities'].includes(intentData.intent)) ||
             (context.perplexity_only_reason && context.perplexity_only_reason.includes('générale/non-financière'));
-        
+
         // Extract product type information from tools data
         let productTypeContext = '';
         const fundamentalsTools = toolsData.filter(t => t.tool.includes('fundamentals'));
@@ -2392,61 +2399,50 @@ ${productTypes.join('\n')}
         }
 
         // CFA®-Level Identity Integration (uniquement pour questions financières)
-        const cfaIdentity = !isGeneralNonFinancial && intentData && ['comprehensive_analysis', 'fundamentals', 'comparative_analysis', 'earnings', 'recommendation'].includes(intentData.intent)
-            ? `${CFA_SYSTEM_PROMPT.identity}
+        let cfaIdentity = '';
+        if (!isGeneralNonFinancial && intentData && ['comprehensive_analysis', 'fundamentals', 'comparative_analysis', 'earnings', 'recommendation'].includes(intentData.intent)) {
+            const cfaIdentityText = await configManager.get('prompts', 'cfa_identity', '');
+            const cfaProductGuidance = await configManager.get('prompts', 'cfa_product_guidance', '');
+            const cfaSmsFormat = await configManager.get('prompts', 'cfa_sms_format', '');
 
-${CFA_SYSTEM_PROMPT.productTypeGuidance}
+            cfaIdentity = `${cfaIdentityText}
 
-${userChannel === 'sms' ? CFA_SYSTEM_PROMPT.smsFormat.split('\n\n')[0] : ''}
+${cfaProductGuidance}
 
-🎯 MISSION: Analyse de niveau institutionnel CFA® avec:
-- Nombre de ratios adaptatif selon question:
-  • Questions simples (prix, 1 ratio) → 1-2 ratios suffisants
-  • Questions ciblées (fondamentaux) → 4-6 ratios pertinents
-  • Analyses complètes → 8-12 ratios (recommandé)
-- ✅ COMPARAISONS HISTORIQUES RECOMMANDÉES (quand disponibles):
-  • Si données historiques disponibles → TOUJOURS comparer vs 5 ans et secteur
-  • Si données historiques PARTIELLES → Comparer avec ce qui est disponible
-  • Si AUCUNE donnée historique → Fournir ratio actuel avec contexte sectoriel si possible
-  • Pour questions simples → Comparaison optionnelle
-  • Exemple idéal (si données disponibles): "P/E 28x vs moyenne 5 ans 24x (+17%) vs secteur 22x"
-- Comparaisons sectorielles recommandées (quand pertinentes)
-- Justifications détaillées chiffrées
-- Sources fiables (FMP, Perplexity, Bloomberg)
-- Formatage Bloomberg Terminal style
-
-`
-            : isGeneralNonFinancial
-            ? (userChannel === 'sms' 
+${userChannel === 'sms' ? cfaSmsFormat.split('\n\n')[0] : ''}`;
+        } else if (isGeneralNonFinancial) {
+            cfaIdentity = userChannel === 'sms'
                 ? `Tu es Emma, une ANALYSTE INTELLIGENTE polyvalente qui utilise Perplexity pour chercher activement des informations RÉELLES et RÉCENTES sur le web.
 
-🎯 TON RÔLE (SMS):
-- Tu es une ANALYSTE qui RECHERCHE et SYNTHÉTISE des informations, pas une assistante qui donne des réponses génériques
-- Tu DOIS utiliser Perplexity pour chercher des données factuelles et à jour
-- Tu réponds à des questions sur de nombreux sujets (météo, actualités, sciences, culture, etc.)
-- Tu es agile et adaptative: si une question sort du domaine financier, tu cherches activement la réponse
+🎯 TON RÔLE(SMS):
+        - Tu es une ANALYSTE qui RECHERCHE et SYNTHÉTISE des informations, pas une assistante qui donne des réponses génériques
+            - Tu DOIS utiliser Perplexity pour chercher des données factuelles et à jour
+                - Tu réponds à des questions sur de nombreux sujets(météo, actualités, sciences, culture, etc.)
+                    - Tu es agile et adaptative: si une question sort du domaine financier, tu cherches activement la réponse
 
-✅ TON COMPORTEMENT (SMS):
-- RECHERCHE ACTIVE: Pour toute question demandant une information spécifique (météo, actualités, données), tu DOIS chercher cette information RÉELLE via Perplexity
-- RÉPONSES DIRECTES: Réponds DIRECTEMENT à la question posée, pas de "Je peux t'aider avec..." ou "Que veux-tu savoir?"
-- FORMAT SMS: Réponse concise (2-3 SMS max), données clés, sources courtes, emojis pour lisibilité
-- DONNÉES RÉELLES: Fournis des données concrètes, chiffres, dates, sources - pas de généralités
-- TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations RÉELLES et UTILES`
+✅ TON COMPORTEMENT(SMS):
+        - RECHERCHE ACTIVE: Pour toute question demandant une information spécifique(météo, actualités, données), tu DOIS chercher cette information RÉELLE via Perplexity
+            - RÉPONSES DIRECTES: Réponds DIRECTEMENT à la question posée, pas de "Je peux t'aider avec..." ou "Que veux-tu savoir?"
+                - FORMAT SMS: Réponse concise(2 - 3 SMS max), données clés, sources courtes, emojis pour lisibilité
+                    - DONNÉES RÉELLES: Fournis des données concrètes, chiffres, dates, sources - pas de généralités
+                        - TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations RÉELLES et UTILES`
                 : `Tu es Emma, une ANALYSTE INTELLIGENTE polyvalente qui utilise Perplexity pour chercher activement des informations RÉELLES et RÉCENTES sur le web.
 
-🎯 TON RÔLE (WEB/EMAIL):
-- Tu es une ANALYSTE qui RECHERCHE et SYNTHÉTISE des informations, pas une assistante qui donne des réponses génériques
-- Tu DOIS utiliser Perplexity pour chercher des données factuelles et à jour
-- Tu réponds à des questions sur de nombreux sujets (météo, actualités, sciences, culture, etc.)
-- Tu es agile et adaptative: si une question sort du domaine financier, tu cherches activement la réponse
+🎯 TON RÔLE(WEB / EMAIL):
+        - Tu es une ANALYSTE qui RECHERCHE et SYNTHÉTISE des informations, pas une assistante qui donne des réponses génériques
+            - Tu DOIS utiliser Perplexity pour chercher des données factuelles et à jour
+                - Tu réponds à des questions sur de nombreux sujets(météo, actualités, sciences, culture, etc.)
+                    - Tu es agile et adaptative: si une question sort du domaine financier, tu cherches activement la réponse
 
-✅ TON COMPORTEMENT (WEB/EMAIL):
-- RECHERCHE ACTIVE: Pour toute question demandant une information spécifique (météo, actualités, données), tu DOIS chercher cette information RÉELLE via Perplexity
-- RÉPONSES DIRECTES: Réponds DIRECTEMENT à la question posée, pas de "Je peux t'aider avec..." ou "Que veux-tu savoir?"
-- FORMAT WEB/EMAIL: Réponse détaillée et complète, sources avec liens, structure claire (paragraphes, bullet points)
-- DONNÉES RÉELLES: Fournis des données concrètes, chiffres, dates, sources - pas de généralités
-- TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations RÉELLES et UTILES`)
-            : `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.`;
+✅ TON COMPORTEMENT(WEB / EMAIL):
+        - RECHERCHE ACTIVE: Pour toute question demandant une information spécifique(météo, actualités, données), tu DOIS chercher cette information RÉELLE via Perplexity
+            - RÉPONSES DIRECTES: Réponds DIRECTEMENT à la question posée, pas de "Je peux t'aider avec..." ou "Que veux-tu savoir?"
+                - FORMAT WEB / EMAIL: Réponse détaillée et complète, sources avec liens, structure claire(paragraphes, bullet points)
+                    - DONNÉES RÉELLES: Fournis des données concrètes, chiffres, dates, sources - pas de généralités
+                        - TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations RÉELLES et UTILES`;
+        } else {
+            cfaIdentity = `Tu es Emma, l'assistante financière intelligente. Réponds en français de manière professionnelle et accessible.`;
+        }
 
         // 🎯 Instructions adaptées selon type de question ET canal
         const generalInstructions = isGeneralNonFinancial ? (userChannel === 'sms' ? `
@@ -2488,9 +2484,9 @@ ${conversationContext.map(c => `- ${c.role}: ${c.content}`).join('\n')}
 ${intentContext}
 ${isGeneralNonFinancial ? '' : `DONNÉES DISPONIBLES DES OUTILS (résumées pour éviter surcharge):
 ${toolsData.map(t => {
-    const reliabilityNote = t.is_reliable === false ? ' [⚠️ SOURCE PARTIELLE - Utiliser avec prudence]' : '';
-    return `- ${t.tool}${reliabilityNote}: ${this._summarizeToolData(t.tool, t.data)}`;
-}).join('\n')}
+            const reliabilityNote = t.is_reliable === false ? ' [⚠️ SOURCE PARTIELLE - Utiliser avec prudence]' : '';
+            return `- ${t.tool}${reliabilityNote}: ${this._summarizeToolData(t.tool, t.data)}`;
+        }).join('\n')}
 
 `}QUESTION DE L'UTILISATEUR: ${userMessage}
 
@@ -3035,9 +3031,9 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         if (intentData?.tickers && intentData.tickers.length > 0) {
             return intentData.tickers[0];
         }
-        
+
         // 2. Extraire tickers du message (mode strict pour éviter faux positifs)
-        const tickers = TickerExtractor.extract(userMessage, { 
+        const tickers = TickerExtractor.extract(userMessage, {
             includeCompanyNames: true,
             filterCommonWords: true,
             strictContext: false // Pas trop strict pour garder flexibilité
@@ -3045,7 +3041,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         if (tickers.length > 0) {
             return tickers[0];
         }
-        
+
         // 3. Chercher des noms d'entreprises dans le message (mots capitalisés qui ne sont pas des mots communs)
         const words = userMessage.split(/\s+/);
         for (const word of words) {
@@ -3058,7 +3054,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -3069,26 +3065,26 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         if (!entity || !toolResults || toolResults.length === 0) {
             return false;
         }
-        
+
         const entityUpper = entity.toUpperCase();
-        
+
         // Vérifier dans chaque résultat d'outil
         for (const result of toolResults) {
             if (!result.data) continue;
-            
+
             const dataStr = JSON.stringify(result.data).toUpperCase();
-            
+
             // Chercher le ticker/entité dans les données
             if (dataStr.includes(entityUpper)) {
                 return true;
             }
-            
+
             // Vérifier aussi les clés de données (ex: "AAPL": {...})
             if (result.data[entityUpper] || result.data[entity]) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -3097,18 +3093,18 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
      */
     _extractCitations(content) {
         const citations = [];
-        
+
         // Pattern pour URLs dans le texte
         const urlRegex = /https?:\/\/[^\s\)]+/g;
         const urls = content.match(urlRegex) || [];
-        
+
         urls.forEach(url => {
             citations.push({
                 url: url,
                 title: url.split('/').pop() || url
             });
         });
-        
+
         return citations;
     }
 
@@ -3116,7 +3112,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
         // ✅ Variables pour gestion de timeout (déclarées avant try pour être accessibles dans catch)
         let timeout = null;
         let timeoutDuration = 60000;  // Valeur par défaut
-        
+
         try {
             // 🚀🚀🚀 RÉPONSES ULTRA-LONGUES PAR DÉFAUT (MAXIMUM DÉTAIL)
             // RÈGLE: Plus c'est long, mieux c'est!
@@ -3138,7 +3134,7 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             } else if (outputMode === 'chat') {
                 // 🧠 Détection automatique de complexité pour ajustement intelligent
                 complexityInfo = this._detectComplexity(userMessage, intentData, toolResults);
-                
+
                 // ✅ FIX: Forcer 15000 tokens pour comprehensive_analysis (12 sections obligatoires)
                 const isComprehensiveAnalysis = intentData?.intent === 'comprehensive_analysis';
                 if (isComprehensiveAnalysis) {
@@ -3155,27 +3151,29 @@ RÉPONSE (NOTE PROFESSIONNELLE POUR ${ticker}):`;
             let systemPrompt = null;
 
             // Vérifier si un prompt custom existe pour cet intent
-            if (intentData && intentData.intent && hasCustomPrompt(intentData.intent)) {
-                systemPrompt = getIntentPrompt(intentData.intent);
+            if (intentData && intentData.intent) {
+                const customPrompt = await configManager.get('prompts', `intent_${intentData.intent}`);
+                if (customPrompt) {
+                    systemPrompt = customPrompt;
 
-                // ✅ Pour earnings, injecter la date actuelle dans le prompt
-                if (intentData.intent === 'earnings') {
-                    const currentDate = new Date().toLocaleDateString('fr-FR', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    systemPrompt = systemPrompt.replace('(date actuelle)', `(${currentDate})`);
-                }
+                    // ✅ Pour earnings, injecter la date actuelle dans le prompt
+                    if (intentData.intent === 'earnings') {
+                        const currentDate = new Date().toLocaleDateString('fr-FR', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        systemPrompt = systemPrompt.replace('(date actuelle)', `(${currentDate})`);
+                    }
 
-                // ✅ ADAPTATION FORMAT SELON CANAL pour comprehensive_analysis
-                if (intentData.intent === 'comprehensive_analysis') {
-                    const channel = context.user_channel || 'web';
+                    // ✅ ADAPTATION FORMAT SELON CANAL pour comprehensive_analysis
+                    if (intentData.intent === 'comprehensive_analysis') {
+                        const channel = context.user_channel || 'web';
 
-                    if (channel === 'sms') {
-                        // 📱 FORMAT SMS: Concis, max 3500 chars, pas de markdown
-                        systemPrompt += `
+                        if (channel === 'sms') {
+                            // 📱 FORMAT SMS: Concis, max 3500 chars, pas de markdown
+                            systemPrompt += `
 
 📱 FORMAT SMS OBLIGATOIRE:
 - MAX 3500 caractères total (environ 6-8 SMS)
@@ -3221,10 +3219,10 @@ Cible: 520$ (+9%)
 ❓ Questions:
 1. Impact Copilot sur marges?
 2. Concurrence cloud?"`;
-                        console.log(`📱 comprehensive_analysis: Format SMS appliqué (max 3500 chars)`);
-                    } else {
-                        // 💻 FORMAT WEB/EMAIL: Détaillé, markdown, 1500+ mots
-                        systemPrompt += `
+                            console.log(`📱 comprehensive_analysis: Format SMS appliqué (max 3500 chars)`);
+                        } else {
+                            // 💻 FORMAT WEB/EMAIL: Détaillé, markdown, 1500+ mots
+                            systemPrompt += `
 
 💻 FORMAT WEB/EMAIL OBLIGATOIRE:
 - MINIMUM 1500 mots (analyse détaillée)
@@ -3233,34 +3231,35 @@ Cible: 520$ (+9%)
 - Explications narratives professionnelles
 - Comparaisons historiques et sectorielles explicites
 - Style rapport CFA® institutionnel`;
-                        console.log(`💻 comprehensive_analysis: Format Web/Email appliqué (1500+ mots)`);
+                            console.log(`💻 comprehensive_analysis: Format Web/Email appliqué (1500+ mots)`);
+                        }
                     }
-                }
 
-                console.log(`🎯 Using custom prompt for intent: ${intentData.intent}, channel: ${context.user_channel || 'web'}`);
+                    console.log(`🎯 Using custom prompt for intent: ${intentData.intent}, channel: ${context.user_channel || 'web'}`);
+                }
             }
 
             // 🚨 DÉTECTION PRIORITAIRE: Questions sur fonds/quartiles/rendements
             // ⚠️ CRITIQUE: Détecter AVANT l'extraction de tickers pour éviter faux positifs (TU, ME, AU, etc.)
             const userMessageLower = (userMessage || '').toLowerCase();
-            const isFundQuestion = userMessageLower.includes('fonds') || 
-                                  userMessageLower.includes('quartile') || 
-                                  userMessageLower.includes('quartiles') ||
-                                  userMessageLower.includes('rendement') ||
-                                  userMessageLower.includes('rendements') ||
-                                  userMessageLower.includes('équilibré') ||
-                                  userMessageLower.includes('equilibre') ||
-                                  userMessageLower.includes('mutual fund') ||
-                                  userMessageLower.includes('fonds mutuels') ||
-                                  userMessageLower.includes('fonds d\'investissement') ||
-                                  userMessageLower.includes('performance des fonds') ||
-                                  userMessageLower.includes('catégorie de fonds') ||
-                                  userMessageLower.includes('categorie de fonds');
-            
+            const isFundQuestion = userMessageLower.includes('fonds') ||
+                userMessageLower.includes('quartile') ||
+                userMessageLower.includes('quartiles') ||
+                userMessageLower.includes('rendement') ||
+                userMessageLower.includes('rendements') ||
+                userMessageLower.includes('équilibré') ||
+                userMessageLower.includes('equilibre') ||
+                userMessageLower.includes('mutual fund') ||
+                userMessageLower.includes('fonds mutuels') ||
+                userMessageLower.includes('fonds d\'investissement') ||
+                userMessageLower.includes('performance des fonds') ||
+                userMessageLower.includes('catégorie de fonds') ||
+                userMessageLower.includes('categorie de fonds');
+
             // ✅ Si question sur fonds → Utiliser directement la question originale sans extraction d'entité
             if (isFundQuestion && outputMode === 'chat') {
                 console.log(`📊 Question sur fonds détectée → Recherche Perplexity directe (sans extraction tickers)`);
-                
+
                 // Construire un prompt spécialisé pour les questions sur fonds
                 const searchPrompt = `${userMessage}
 
@@ -3327,9 +3326,9 @@ Structure ta réponse de manière professionnelle et facile à lire. Sois exhaus
                     const searchData = await searchResponse.json();
                     const searchContent = searchData.choices?.[0]?.message?.content || '';
                     const searchCitations = searchData.citations || this._extractCitations(searchContent);
-                    
+
                     console.log(`✅ Recherche Perplexity réussie pour question sur fonds (${searchContent.length} caractères)`);
-                    
+
                     return {
                         content: searchContent,
                         citations: searchCitations,
@@ -3343,16 +3342,16 @@ Structure ta réponse de manière professionnelle et facile à lire. Sois exhaus
                     // Continuer avec le prompt normal
                 }
             }
-            
+
             // 🚨 DÉTECTION: Si l'utilisateur demande une entreprise/ticker qui n'est PAS dans les données des outils
             // → Forcer une recherche Perplexity spécifique pour cette entreprise
             const requestedEntity = this._extractRequestedEntity(userMessage, intentData);
             const hasDataForRequestedEntity = this._checkIfEntityInToolResults(requestedEntity, toolResults);
-            
+
             // Si l'utilisateur demande une entreprise spécifique mais qu'on n'a pas de données pour elle
             if (requestedEntity && !hasDataForRequestedEntity && outputMode === 'chat') {
                 console.log(`🔍 Entité demandée "${requestedEntity}" non trouvée dans les données des outils → Forcer recherche Perplexity`);
-                
+
                 // Construire un prompt naturel et ouvert pour Perplexity (comme une requête directe)
                 // Note: Les questions sur fonds sont déjà gérées en priorité ci-dessus
                 const searchPrompt = `${userMessage}
@@ -3411,18 +3410,18 @@ Sois exhaustif et cite tes sources.`;
                     const searchData = await searchResponse.json();
                     const searchContent = searchData.choices?.[0]?.message?.content || '';
                     const searchCitations = searchData.citations || this._extractCitations(searchContent);
-                    
+
                     console.log(`✅ Recherche Perplexity réussie pour "${requestedEntity}" (${searchContent.length} caractères)`);
-                    
+
                     // Post-traitement: s'assurer que la réponse concerne bien l'entité demandée
                     const contentUpper = searchContent.toUpperCase();
                     const entityUpper = requestedEntity.toUpperCase();
-                    
+
                     // Si la réponse ne mentionne pas l'entité demandée, ajouter un avertissement
                     if (!contentUpper.includes(entityUpper) && !contentUpper.includes(entityUpper.replace('X', 'XX'))) {
                         console.warn(`⚠️ La réponse Perplexity ne mentionne pas clairement "${requestedEntity}"`);
                     }
-                    
+
                     return {
                         content: searchContent,
                         citations: searchCitations,
@@ -3437,6 +3436,9 @@ Sois exhaustif et cite tes sources.`;
                 }
             }
 
+            // Fetch default system prompt dynamically
+            const defaultPerplexityPrompt = await configManager.get('prompts', 'perplexity_system_prompt', PERPLEXITY_SYSTEM_PROMPT);
+
             const requestBody = {
                 model: 'sonar-pro',  // Modèle premium Perplexity (Jan 2025) - Meilleure qualité, plus de citations, recherche approfondie
                 messages: [
@@ -3445,7 +3447,7 @@ Sois exhaustif et cite tes sources.`;
                         content: systemPrompt || (outputMode === 'data'
                             ? 'Tu es Emma Data Extractor. Retourne UNIQUEMENT du JSON valide, pas de texte explicatif.'
                             : context.user_channel === 'sms'
-                            ? `Tu es Emma, analyste financière CFA inspirée par Warren Buffett, Peter Lynch et Benjamin Graham.
+                                ? `Tu es Emma, analyste financière CFA inspirée par Warren Buffett, Peter Lynch et Benjamin Graham.
 
 📱 FORMAT SMS:
 • Paragraphes courts (2-3 lignes)
@@ -3514,374 +3516,7 @@ ACHETER < 340$ (marge 25%+)
 3. Stratégie DCA?"
 
 ❌ PAS d'astérisques **gras**`
-                            : `Tu es Emma, une assistante financière experte et analyste professionnelle inspirée par les principes de Warren Buffett, Charlie Munger, Peter Lynch et Benjamin Graham (value investing).
-
-🚀🚀🚀 LONGUEUR DES RÉPONSES (RÈGLE #1 ABSOLUE - MAXIMUM DÉTAIL) 🚀🚀🚀:
-• 📏 RÉPONSES ULTRA-LONGUES PAR DÉFAUT: Privilégie TOUJOURS des réponses EXTRÊMEMENT LONGUES et EXHAUSTIVES
-• 📊 Analyses: SMS max 2 parties (~3500 chars), Questions simples 200-400 mots, Analyses complètes PROFONDEUR MAXIMALE (aucune limite)
-• ✅ LONGUEUR = EXCELLENCE: Plus c'est long, plus c'est complet, mieux c'est!
-• 🎯 TOUJOURS choisir "trop long" plutôt que "trop court" - pas de limite supérieure (sauf SMS)!
-• ❌ JAMAIS de réponses brèves sauf questions oui/non évidentes
-• 💡 DÉVELOPPE ABSOLUMENT TOUT: chaque point mérite 2-3 paragraphes détaillés
-• 📖 Structure multi-sections: minimum 10-15 sections avec sous-sections
-• 🔢 CHIFFRES EXHAUSTIFS: tableaux complets, historiques 5-10 ans, comparatifs multiples
-• 📚 CONTEXTE HISTORIQUE: toujours ajouter perspective historique et tendances long-terme
-• 🌍 COMPARAISONS SECTORIELLES: comparer avec d'autres titres UNIQUEMENT si explicitement demandé par l'utilisateur (ex: "compare avec...", "vs...", "comparaison"). Si l'utilisateur demande uniquement l'analyse d'un ticker spécifique, NE PAS inclure de comparaisons avec d'autres titres.
-• 💼 SCÉNARIOS MULTIPLES: toujours 3+ scénarios (optimiste/réaliste/pessimiste) avec chiffres
-
-🌍🏛️ CONTEXTE MACRO-ÉCONOMIQUE & GÉOPOLITIQUE (OBLIGATOIRE) 🌍🏛️:
-• 🌎 ANALYSE PAR PAYS: TOUJOURS différencier les données par pays/région
-  - USA vs Canada vs Europe vs Asie: ratios moyens, contexte économique, réglementation
-  - Taux d'intérêt directeurs par pays (Fed, BoC, BCE, BoJ, BoE)
-  - Inflation par pays (CPI, Core CPI)
-  - PIB et croissance économique par région
-  - Politique fiscale et budgets gouvernementaux
-  - Taux de chômage et santé du marché du travail
-
-• 🏛️ CONTEXTE POLITIQUE (si pertinent pour le ticker):
-  - Élections et changements de gouvernement (impact sur régulation, taxes)
-  - Politiques commerciales (tarifs, accords, tensions USA-Chine, etc.)
-  - Réglementation sectorielle (tech antitrust, pharma, énergie verte)
-  - Politiques monétaires (quantitative easing, tightening)
-  - Subventions gouvernementales et incitations fiscales
-  - Tensions géopolitiques (guerre, sanctions, embargos)
-
-• 📰 ACTUALITÉ ÉCONOMIQUE (liens avec l'entreprise):
-  - Annonces Fed/Banques Centrales → impact sur valorisations
-  - Rapports économiques (emploi, inflation, retail sales) → impact consommateur
-  - Crises sectorielles → exposition du ticker
-  - Tendances macro (récession, expansion, stagflation)
-  - Sentiment de marché (VIX, indices de confiance)
-
-• 🌍 COMPARAISONS INTERNATIONALES:
-  - Ratios sectoriels: USA vs Canada vs Europe vs Asie
-  - Exemple: "P/E tech USA: 28x, Canada: 22x, Europe: 18x, Asie: 15x"
-  - Rendements obligataires par pays (impact sur valorisation actions)
-  - Devises et impact sur revenus internationaux
-  - Différences de normes comptables (GAAP vs IFRS)
-
-📊 VALUE INVESTING PRINCIPLES (Buffett, Munger, Lynch, Graham) 📊:
-• 💰 VALEUR INTRINSÈQUE (Benjamin Graham):
-  - Calculer valeur intrinsèque vs prix de marché
-  - Marge de sécurité (Margin of Safety): prix doit être 30-50% sous valeur intrinsèque
-  - Book Value et P/B ratio (éviter survalorisation)
-  - Net-Net Working Capital (Graham's formula si applicable)
-
-• 🏰 MOAT ANALYSIS (Warren Buffett):
-  - Identifier les avantages compétitifs durables (moat)
-  - Types de moat: brand power, network effects, cost advantages, switching costs, regulatory
-  - Évaluer la largeur et durabilité du moat (5-10-20 ans)
-  - Pricing power: l'entreprise peut-elle augmenter prix sans perdre clients?
-
-• 📈 CROISSANCE RAISONNABLE (Peter Lynch - GARP):
-  - PEG Ratio (P/E / Growth rate): idéal < 1.0
-  - Croissance soutenable vs spéculative
-  - "Invest in what you know" - business model simple et compréhensible
-  - Éviter "diworsification" - focus sur core business
-
-• 💼 QUALITÉ DU MANAGEMENT (Munger):
-  - Intégrité et track record du CEO/management
-  - Allocation de capital intelligente (rachats, dividendes, acquisitions)
-  - Insider ownership (skin in the game)
-  - Culture d'entreprise et rétention talents
-
-• 📊 FREE CASH FLOW FOCUS (Buffett):
-  - Priorité au Free Cash Flow sur earnings comptables
-  - Owner Earnings = FCF - capex maintenance
-  - Cash conversion rate élevé
-  - Éviter les entreprises qui brûlent du cash
-
-• ⏳ VISION LONG-TERME (10+ ans):
-  - "Time in the market beats timing the market"
-  - Où sera cette entreprise dans 10 ans?
-  - Résilience aux cycles économiques
-  - Capacité à traverser les crises
-
-• 🔍 RED FLAGS À SURVEILLER:
-  - Endettement excessif (Debt/Equity > 2.0 pour non-financières)
-  - Marges en déclin sur plusieurs trimestres
-  - Revenus qui stagnent ou décroissent
-  - Changements comptables suspects
-  - Dilution excessive (trop d'émissions d'actions)
-  - Turnover management élevé
-  - Procès en cours importants
-  - Dépendance à un seul client/produit
-
-✅ RATIOS HISTORIQUES & BENCHMARKS - RECOMMANDÉS (quand disponibles)
-
-🎯 RÈGLE ADAPTATIVE: Pour chaque analyse d'action, compare quand possible:
-
-1️⃣ COMPARER RATIOS ACTUELS vs HISTORIQUES (quand données disponibles):
-   ✅ RECOMMANDÉ: "P/E actuel [X]x vs moyenne 5 ans [Y]x ([Z]% différence)" (si données disponibles)
-   ✅ RECOMMANDÉ: "Marges actuelles [X]% vs moyenne historique [Y]% (tendance: ↗️/↘️)" (si données disponibles)
-   ✅ RECOMMANDÉ: "ROE actuel [X]% vs historique [Y]% (cohérence: oui/non)" (si données disponibles)
-   ✅ RECOMMANDÉ: "Dette/Équité actuel [X] vs 5 ans [Y] (amélioration/détérioration)" (si données disponibles)
-
-   ✅ Si données historiques PARTIELLES → Comparer avec ce qui est disponible
-   ✅ Si AUCUNE donnée historique → Fournir ratio actuel avec contexte sectoriel si possible
-   ✅ Pour questions simples (prix, 1 ratio) → Comparaison optionnelle
-
-2️⃣ COMPARER vs SECTEUR ET MARCHÉ (quand pertinent):
-   ✅ RECOMMANDÉ: "P/E [X]x vs secteur [Y]x vs S&P 500 [Z]x" (si données disponibles)
-   ✅ RECOMMANDÉ: Mentionner si valorisation premium/discount vs pairs (si contexte pertinent)
-   
-   ✅ Si comparaison avec titres spécifiques demandée explicitement → Autoriser comparaisons directes
-   ✅ Détecter intent "comparative_analysis" → Comparaisons directes autorisées
-
-   BENCHMARKS DE RÉFÉRENCE (à utiliser):
-   - P/E moyen S&P 500 (USA): ~18-22x
-   - P/E moyen TSX (Canada): ~14-18x
-   - P/E moyen Euro Stoxx 50: ~12-16x
-   - Tech USA: ~25-30x | Tech Canada: ~20-25x
-   - Finance USA: ~12-15x | Finance Canada: ~10-13x
-
-3️⃣ CONTEXTE TEMPOREL OBLIGATOIRE:
-   ✅ TOUJOURS expliquer l'évolution: "↗️ en hausse depuis 3 ans" ou "↘️ en baisse"
-   ✅ TOUJOURS mentionner highs/lows historiques si pertinent
-
-   EXEMPLES CORRECTS:
-   ✅ "P/E 32x est 40% au-dessus de sa moyenne 5 ans (23x) mais sous son high 2021 (38x)"
-   ✅ "Marges à 42% sont près du high historique (43% en 2021), démontrant qualité"
-   ✅ "Dette a baissé de 45% depuis 5 ans (amélioration de structure financière)"
-
-   EXEMPLES INCORRECTS (❌ À NE JAMAIS FAIRE):
-   ❌ "Le P/E est de 28x" (manque comparaison historique)
-   ❌ "ROE de 15%" (manque contexte historique et sectoriel)
-   ❌ "Dette/Équité de 0,8" (manque évolution temporelle)
-
-🎯 VÉRIFICATION AVANT D'ENVOYER TA RÉPONSE:
-   □ J'ai fourni les ratios pertinents pour la question ?
-   □ Si données historiques disponibles → J'ai comparé vs historique ?
-   □ Si données sectorielles disponibles → J'ai comparé vs secteur ?
-   □ J'ai expliqué l'évolution (↗️/↘️) quand pertinent ?
-   □ J'ai mentionné les implications (bon/mauvais signe) ?
-
-   ✅ Réponse complète si ratios fournis avec contexte approprié (historique/secteur si disponible)
-
-EXEMPLE D'ANALYSE COMPLÈTE INTÉGRANT TOUT:
-"Microsoft (MSFT) trade à 32,5x earnings, soit 15% au-dessus de sa moyenne 5 ans (28x) mais sous son high 2021 (38x). Comparativement, le P/E moyen tech USA est 28x vs 22x au Canada (TSX tech). 
-
-CONTEXTE MACRO: La Fed maintient taux à 5,25-5,50%, le plus haut en 22 ans, impactant les valorisations tech. Inflation US à 3,2% (vs 2,9% Canada, 2,4% Europe) justifie ce niveau. Les élections US 2024 créent incertitude réglementaire tech (antitrust).
-
-VALUE INVESTING: MSFT possède un moat exceptionnel (network effects Office/Azure, switching costs élevés, brand power). FCF de 65B$ (+12% YoY) vs market cap 2,85T$ = FCF yield 2,3% (attractif vs T-bills 5,3% mais justifié par croissance). Management (Satya Nadella) excellent track record allocation capital. PEG ratio 1,3x (P/E 32,5 / croissance 25%) = raisonnable pour qualité.
-
-RISQUES POLITIQUES: Antitrust US/EU surveillance intense, potentiel démantèlement. Régulation IA émergente. Tensions USA-Chine impactent cloud Asie.
-
-RECOMMANDATION VALUE: À 380$, MSFT trade à ~0,90x sa valeur intrinsèque estimée (425$ par DCF). Marge de sécurité faible (15% vs 30% idéal Graham). HOLD pour value investors, ACHETER si correction 340-350$ (marge 25%+)."
-
-💡 QUESTIONS SUGGÉRÉES INTELLIGENTES (CONTEXTUELLES) 💡:
-• 🎯 Questions suggérées selon contexte:
-  - Questions simples/fermées (prix, ratio unique) → Pas de questions suggérées
-  - Questions ouvertes/analyses → 2-3 questions pertinentes
-  - SMS → Questions suggérées optionnelles (seulement si très pertinent)
-  - Analyses complètes → 3-5 questions (recommandé)
-• ✅ Questions doivent BONIFIER la compréhension ou OUVRIR de nouvelles perspectives
-• ❌ JAMAIS de redondance - ne pas demander ce qui a déjà été couvert en détail
-• 🔍 Types de questions intelligentes à suggérer:
-
-  📊 APPROFONDISSEMENT STRATÉGIQUE:
-  - "Voulez-vous une analyse détaillée du segment Azure vs AWS/Google Cloud?"
-  - "Dois-je comparer MSFT avec ses concurrents directs (AAPL, GOOGL, AMZN)?"
-  - "Souhaitez-vous un calcul DCF détaillé pour estimer la valeur intrinsèque?"
-  
-  🌍 ÉLARGISSEMENT MACRO:
-  - "Voulez-vous analyser l'impact d'une récession US sur ce secteur?"
-  - "Dois-je explorer les opportunités dans d'autres régions (Europe, Asie)?"
-  - "Souhaitez-vous comprendre l'impact des taux Fed sur les valorisations tech?"
-  
-  💼 CONSTRUCTION PORTFOLIO:
-  - "Voulez-vous des suggestions de diversification pour compléter cette position?"
-  - "Dois-je analyser des alternatives value dans le même secteur?"
-  - "Souhaitez-vous une stratégie d'entrée progressive (DCA) avec prix cibles?"
-  
-  📈 TIMING & TACTIQUE:
-  - "Voulez-vous identifier les niveaux techniques clés pour un point d'entrée?"
-  - "Dois-je analyser le calendrier des prochains catalysts (earnings, événements)?"
-  - "Souhaitez-vous une stratégie options pour cette position?"
-  
-  🔬 ANALYSE SECTORIELLE:
-  - "Voulez-vous une analyse complète du secteur tech avec tendances 2025?"
-  - "Dois-je explorer les sous-secteurs émergents (IA, cloud, cybersécurité)?"
-  - "Souhaitez-vous identifier les leaders et challengers du secteur?"
-  
-  🌐 CONTEXTE GÉOPOLITIQUE:
-  - "Voulez-vous analyser l'impact des tensions USA-Chine sur cette entreprise?"
-  - "Dois-je explorer les risques réglementaires (antitrust, privacy)?"
-  - "Souhaitez-vous comprendre l'exposition aux marchés internationaux?"
-
-• 📝 FORMAT DES QUESTIONS SUGGÉRÉES:
-  Terminer CHAQUE réponse par:
-  
-  "💡 **Questions pour approfondir:**
-  1. [Question stratégique pertinente]
-  2. [Question macro/sectorielle]
-  3. [Question portfolio/tactique]
-  4. [Question timing/catalysts]
-  5. [Question alternative/diversification]
-  
-  Quelle direction vous intéresse le plus?"
-
-• 🎯 RÈGLES POUR CHOISIR LES BONNES QUESTIONS:
-  ✅ Identifier les gaps dans l'analyse actuelle
-  ✅ Proposer des angles complémentaires (pas redondants)
-  ✅ Adapter au niveau de sophistication de l'utilisateur
-  ✅ Prioriser l'actionnable (décisions d'investissement)
-  ✅ Varier les horizons temporels (court/moyen/long terme)
-  ❌ Ne PAS redemander des infos déjà fournies en détail
-  ❌ Ne PAS poser de questions trop basiques si analyse avancée
-  ❌ Ne PAS suggérer > 5 questions (éviter surcharge)
-
-EXEMPLE DE QUESTIONS SUGGÉRÉES (après analyse MSFT):
-"💡 **Questions pour approfondir:**
-1. Voulez-vous une comparaison détaillée MSFT vs GOOGL vs AMZN sur les segments cloud?
-2. Dois-je analyser l'impact d'une potentielle récession US 2024 sur les dépenses IT entreprises?
-3. Souhaitez-vous une stratégie d'allocation progressive avec 3-4 points d'entrée échelonnés?
-4. Voulez-vous explorer les opportunités dans les small-caps tech value (P/E < 15x, croissance > 15%)?
-5. Dois-je analyser les alternatives défensives tech (dividendes > 3%) pour diversifier?
-
-Quelle direction vous intéresse le plus?"'
-
-🚨🚨🚨 RÈGLE ABSOLUE #1 - ZÉRO MENTIONS DE LIMITATIONS 🚨🚨🚨:
-
-❌❌❌ STRICTEMENT INTERDIT (RÉSULTAT EN ÉCHEC IMMÉDIAT):
-• ❌ "Je dois vous informer que..."
-• ❌ "Les résultats de recherche fournis ne contiennent pas..."
-• ❌ "Je n'ai pas accès à..."
-• ❌ "Les données disponibles ne permettent pas..."
-• ❌ "Malheureusement, je ne peux pas..."
-• ❌ "Les informations fournies sont limitées..."
-• ❌ "Je ne dispose pas de..."
-• ❌ "Il semblerait que les données soient incomplètes..."
-• ❌ TOUTE phrase commençant par une limitation ou excuse
-
-✅✅✅ MENTALITÉ OBLIGATOIRE (SOLUTION-ORIENTED):
-• ✅ COMMENCE TOUJOURS par ce que tu PEUX faire et les données que tu AS
-• ✅ UTILISE toutes les données disponibles, même partielles, pour fournir une analyse utile
-• ✅ SI données incomplètes → Analyse ce qui EST disponible avec excellence professionnelle
-• ✅ SI tu as 30% des données → Fournis une analyse experte basée sur ces 30% avec contexte
-• ✅ MAXIMISE la valeur de chaque donnée disponible
-• ✅ Sois PROACTIVE: cherche activement des solutions et des angles d'analyse alternatifs
-• ✅ TOUTE question mérite une réponse complète, substantielle et professionnelle
-
-🎯 APPROCHE SOLUTION-ORIENTED OBLIGATOIRE:
-
-1️⃣ Commence IMMÉDIATEMENT par l'analyse des données disponibles
-2️⃣ Structure ta réponse comme une analyse professionnelle complète
-3️⃣ Utilise TOUT ce que tu as: ratios partiels, données historiques partielles, contexte sectoriel, actualités, etc.
-4️⃣ SI une métrique précise manque → Fournis le contexte général et les métriques connexes
-5️⃣ SI les données sont anciennes → Mentionne la date SANS t'excuser, puis fournis l'analyse
-6️⃣ SEULEMENT À LA FIN (optionnel): "Note: Pour une analyse plus complète, des données additionnelles sur [X] enrichiraient l'analyse"
-
-📊 EXEMPLE TRANSFORMATION (AVANT → APRÈS):
-
-❌ AVANT (INACCEPTABLE):
-"Je dois vous informer que les résultats de recherche fournis ne contiennent pas les données complètes nécessaires pour répondre à votre demande avec le niveau de précision que vous recherchez.
-
-Limitations des données disponibles:
-- Pas de rendements 5 ans complets
-- Pas de classements quartiles Morningstar détaillés
-- Liste non exhaustive
-
-Je vous recommande de consulter Morningstar Canada..."
-
-✅ APRÈS (OBLIGATOIRE):
-"Analyse des fonds équilibrés canadiens performants:
-
-📊 FONDS IDENTIFIÉS (Top Performers):
-
-**Fidelity Croissance Mondiale (FMPG)**
-• Composition: 85% actions, 15% titres à revenu fixe
-• Profil de risque: Faible à moyen (Morningstar)
-• Volatilité: Écart-type 9,16% annualisé
-• Beta: 0,97 (légèrement défensif vs marché)
-• Date des données: 31 octobre 2025
-
-**Analyse Fondamentale:**
-Ce fonds affiche une allocation équilibrée agressive favorisant la croissance. La composition 85/15 actions/obligations le positionne comme un choix dynamique pour investisseurs avec horizon moyen-long terme...
-
-[Continue avec analyse détaillée basée sur les données disponibles]
-
-**Contexte Sectoriel:**
-Les fonds équilibrés canadiens ont historiquement généré des rendements annualisés de 6-8% sur 10 ans, avec une volatilité réduite vs 100% actions...
-
-[Continue avec toutes les données et contexte disponibles]
-
-💡 Pour enrichir cette analyse: Les données Morningstar complètes sur quartiles 2020-2025 permettraient une comparaison approfondie avec les 150+ fonds de cette catégorie."
-
-RÈGLES CRITIQUES:
-1. ❌ NE JAMAIS retourner du JSON brut ou du code dans tes réponses
-2. ✅ TOUJOURS analyser et expliquer les données de manière conversationnelle en français
-3. ✅ TOUJOURS agir en tant qu'analyste financière qui INTERPRÈTE les données, pas juste les affiche
-4. ✅ Ton style: professionnel, accessible, pédagogique
-5. ✅ Structure tes réponses avec des paragraphes, des bullet points, et des insights
-6. ❌ Si tu vois du JSON dans le prompt, c'est pour TON analyse - ne le copie JAMAIS tel quel dans ta réponse
-7. 📰 SOURCES: Quand tu utilises des données récentes, mentionne naturellement la source (ex: "Selon Bloomberg...", "Reuters rapporte que...", "D'après les dernières données de...")
-8. 📊 CHIFFRES ET DONNÉES TEMPS RÉEL: Priorise TOUJOURS les données chiffrées précises et récentes de Perplexity et FMP
-   - ✅ "AAPL: 245,67$ (+2,36%, +5,67$) à 15h42 EST"
-   - ✅ "P/E: 28,5x vs moyenne secteur 22,3x"
-   - ✅ "Volume: 52,3M vs moyenne 67,8M (-23%)"
-   - ❌ "Apple performe bien" (trop vague, pas de chiffres)
-9. 💼 ANALYSE FONDAMENTALE COMPLÈTE - MÉTRIQUES OBLIGATOIRES:
-   Lors de l'analyse d'un ticker, tu DOIS TOUJOURS inclure ces métriques (si disponibles dans les données):
-   
-   📊 VALORISATION (obligatoire):
-      • Prix actuel et variation ($ et %)
-      • P/E Ratio (Price/Earnings) avec comparaison sectorielle
-      • P/FCF Ratio (Price/Free Cash Flow) si disponible
-      • P/B Ratio (Price/Book) si disponible
-      • Market Cap (capitalisation boursière)
-   
-   💰 RENTABILITÉ & DIVIDENDES (obligatoire):
-      • EPS - Bénéfice par action (actuel et historique)
-      • Dividende annuel et rendement (%) si applicable
-      • ROE (Return on Equity)
-      • Marges bénéficiaires (profit margin)
-   
-   📈 PERFORMANCE & CONTEXTE (obligatoire):
-      • Performance YTD (Year-to-Date en %)
-      • Distance depuis 52 semaines high/low (en % et en $)
-      • Distance depuis 5 ans high/low si pertinent (contexte historique)
-   
-   📰 RÉSULTATS & ACTUALITÉS (obligatoire):
-      • Résultats récents (dernier rapport trimestriel avec date)
-      • Prochains résultats attendus (date si disponible)
-      • Nouvelles récentes les plus importantes (2-3 dernières)
-   
-   🎯 CONSENSUS & ATTENTES (obligatoire si disponible):
-      • Consensus d'analystes (Buy/Hold/Sell et nombre d'analystes)
-      • Objectif de prix (price target) moyen des analystes
-      • Attentes vs résultats réels (beat/miss) pour dernier trimestre
-   
-   💡 SANTÉ FINANCIÈRE (obligatoire):
-      • Ratio d'endettement (Debt/Equity)
-      • Current Ratio (liquidité)
-      • Free Cash Flow
-   
-   ⚠️ Indicateurs techniques LIMITÉS (SEULEMENT si demandés explicitement):
-      • Moyennes mobiles 200 jours et 50 jours (tendance long/moyen terme)
-      • RSI UNIQUEMENT si suracheté (>80) ou survendu (<20) - sinon ne pas mentionner
-   
-   ❌ NE JAMAIS mentionner: MACD, Bollinger Bands, Stochastic, Fibonacci, volumes (sauf si demandé)
-   ❌ Si RSI entre 20-80 (zone neutre): Ne pas le mentionner du tout
-10. 📈 GRAPHIQUES: Suggère des graphiques UNIQUEMENT quand explicitement pertinent, PAS systématiquement
-   - ✅ "Voulez-vous que je vous montre le graphique TradingView ?" (si analyse technique demandée)
-   - ❌ Ne pas ajouter [CHART:...] ou [STOCKCARD:...] automatiquement à chaque réponse
-
-Exemple CORRECT: "Apple (AAPL) affiche une performance solide avec un prix de 245,67$, en hausse de 2,36% aujourd'hui (+5,67$). Le volume de 52,3M est 23% sous la moyenne quotidienne, suggérant une faible conviction. P/E de 28,5x reste supérieur au secteur tech (22,3x)."
-
-Exemple INCORRECT: "{\"AAPL\": {\"price\": 245.67, \"change\": 5.67}}"
-
-Exemple SOURCES CORRECT: "Selon Bloomberg, Tesla a annoncé aujourd'hui..."
-
-Exemple SOURCES INCORRECT: "Tesla a annoncé [1] [2] [3]" (❌ Ne pas utiliser [1] [2] [3], mentionner naturellement)
-
-🎨 TAGS MULTIMÉDIAS DISPONIBLES (à utiliser SEULEMENT si explicitement demandé):
-- [STOCKCARD:TICKER] → Carte boursière (si demandé "montre-moi la carte", "résumé visuel")
-- [RATIO_CHART:TICKER:METRIC] → Évolution ratio (si demandé "historique P/E", "évolution marges")
-- [CHART:FINVIZ:TICKER] → Graphique Finviz (si demandé "graphique", "chart")
-- [CHART:TRADINGVIEW:EXCHANGE:TICKER] → Graphique TradingView (si demandé)
-
-Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explicitement demandé)`)
+                                : defaultPerplexityPrompt)
                     },
                     {
                         role: 'user',
@@ -3915,16 +3550,13 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
                 throw new Error('PERPLEXITY_API_KEY not configured');
             }
 
-            console.log('🚀 Calling Perplexity API...');
-
             // ⏱️ Timeout flexible selon le mode et l'intent
             // PRIORITÉ: Intent > Canal
             // - Comprehensive Analysis: 90s (analyses longues avec 12 sections) - PRIORITAIRE même pour SMS
             // - SMS (non-comprehensive): 30s (optimisé pour vitesse)
             // - Autres: 60s (standard)
-            const enableStreaming = false; // DÉSACTIVÉ - Causait corruption de texte
             const isComprehensiveAnalysis = intentData?.intent === 'comprehensive_analysis';
-            
+
             // ✅ FIX: Prioriser l'intent sur le canal pour comprehensive_analysis
             if (isComprehensiveAnalysis) {
                 timeoutDuration = 90000;  // Comprehensive: 90s (12 sections + macro + moat + DCF) - PRIORITAIRE
@@ -3934,96 +3566,69 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
             } else {
                 timeoutDuration = 60000;  // Autres: 60s (standard)
             }
-            
-            const controller = new AbortController();
-            
-            // Streaming désactivé (causait corruption)
-            // if (enableStreaming) {
-            //     requestBody.stream = true;
-            // }
 
-            let response;
+            // ✅ NOUVEAU: Utiliser le système de fallback intelligent Perplexity
+            // Essaie plusieurs modèles Perplexity en cascade (sonar-pro → sonar → sonar-reasoning)
+            const { callPerplexityWithFallback } = await import('../lib/utils/perplexity-fallback.js');
+
+            console.log('🔄 [Perplexity] Appel avec système de fallback intelligent (3 modèles)');
+
             try {
-                timeout = setTimeout(() => {
-                    console.error(`⏱️ Perplexity API timeout after ${timeoutDuration/1000}s (intent: ${intentData?.intent || 'unknown'})`);
-                    controller.abort();
-                }, timeoutDuration);
-
-                response = await fetch('https://api.perplexity.ai/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody),
-                    signal: controller.signal
+                const result = await callPerplexityWithFallback(requestBody, {
+                    apiKey: process.env.PERPLEXITY_API_KEY,
+                    maxRetries: 1, // Perplexity stable, 1 retry suffit
+                    logAttempts: true,
+                    timeoutMs: timeoutDuration
                 });
 
-                // ✅ Nettoyer le timeout après succès
-                clearTimeout(timeout);
-                timeout = null;
-            } catch (fetchError) {
-                // ✅ Nettoyer le timeout en cas d'erreur de fetch
-                if (timeout) {
-                    clearTimeout(timeout);
-                    timeout = null;
+                console.log(`✅ [Perplexity] Succès avec ${result.modelName} (tentative ${result.attemptNumber}/${result.totalAttempts})`);
+
+                // 📰 Extraire les citations/sources de Perplexity pour partage amical
+                const citations = result.citations || [];
+
+                // ✅ Logging détaillé pour diagnostic
+                const wordCount = result.content.split(/\s+/).length;
+                const charCount = result.content.length;
+                const tokensUsed = result.data.usage?.total_tokens || 'unknown';
+                const tokensRequested = maxTokens;
+
+                console.log(`📊 [Perplexity Response Stats]`);
+                console.log(`   - Modèle: ${result.modelName}`);
+                console.log(`   - Words: ${wordCount}`);
+                console.log(`   - Characters: ${charCount}`);
+                console.log(`   - Tokens used: ${tokensUsed}/${tokensRequested}`);
+                console.log(`   - Intent: ${intentData?.intent || 'unknown'}`);
+                console.log(`   - Output mode: ${outputMode}`);
+                console.log(`   - User channel: ${context.user_channel}`);
+                console.log(`   - Citations: ${citations.length}`);
+
+                // Vérifier si réponse semble tronquée
+                const seemsTruncated = !result.content.trim().endsWith('.') &&
+                    !result.content.trim().endsWith('?') &&
+                    !result.content.trim().endsWith('!');
+
+                if (seemsTruncated) {
+                    console.warn(`⚠️ [Perplexity] Réponse semble tronquée (pas de ponctuation finale)`);
                 }
-                throw fetchError;  // Re-throw pour être géré par le catch externe
+
+                if (wordCount < 500 && intentData?.intent === 'comprehensive_analysis') {
+                    console.warn(`⚠️ [Perplexity] Réponse très courte pour comprehensive_analysis: ${wordCount} mots (attendu: 2000+ mots)`);
+                }
+
+                // Retourner contenu + citations pour formatage ultérieur
+                return {
+                    content: result.content,
+                    citations: citations,
+                    model: result.model,
+                    modelUsed: result.modelName
+                };
+
+            } catch (perplexityError) {
+                // Tous les modèles Perplexity ont échoué
+                console.error('❌ [Perplexity] Tous les fallbacks Perplexity ont échoué:', perplexityError.message);
+                // Re-throw pour que le catch externe puisse fallback vers Gemini
+                throw perplexityError;
             }
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error('❌ Perplexity API error details:', errorData);
-                throw new Error(`Perplexity API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
-            }
-
-            console.log('✅ Perplexity API responded');
-
-            // NOUVEAU: Traitement streaming pour SMS
-            if (enableStreaming && requestBody.stream) {
-                return await this._handleStreamingSMS(response, context);
-            }
-
-            // Fallback non-streaming pour autres canaux
-            const data = await response.json();
-            const content = data.choices[0].message.content;
-
-            // 📰 Extraire les citations/sources de Perplexity pour partage amical
-            const citations = data.citations || [];
-            
-            // ✅ NOUVEAU: Logging détaillé pour diagnostic
-            const wordCount = content.split(/\s+/).length;
-            const charCount = content.length;
-            const tokensUsed = data.usage?.total_tokens || 'unknown';
-            const tokensRequested = maxTokens;
-
-            console.log(`📊 [Perplexity Response Stats]`);
-            console.log(`   - Words: ${wordCount}`);
-            console.log(`   - Characters: ${charCount}`);
-            console.log(`   - Tokens used: ${tokensUsed}/${tokensRequested}`);
-            console.log(`   - Intent: ${intentData?.intent || 'unknown'}`);
-            console.log(`   - Output mode: ${outputMode}`);
-            console.log(`   - User channel: ${context.user_channel}`);
-            console.log(`   - Citations: ${citations.length}`);
-
-            // Vérifier si réponse semble tronquée
-            const seemsTruncated = !content.trim().endsWith('.') && 
-                                   !content.trim().endsWith('?') && 
-                                   !content.trim().endsWith('!');
-
-            if (seemsTruncated) {
-                console.warn(`⚠️ [Perplexity] Réponse semble tronquée (pas de ponctuation finale)`);
-            }
-
-            if (wordCount < 500 && intentData?.intent === 'comprehensive_analysis') {
-                console.warn(`⚠️ [Perplexity] Réponse très courte pour comprehensive_analysis: ${wordCount} mots (attendu: 2000+ mots)`);
-            }
-
-            // Retourner contenu + citations pour formatage ultérieur
-            return {
-                content: content,
-                citations: citations
-            };
 
         } catch (error) {
             // ✅ Nettoyer le timeout si pas déjà fait (sécurité)
@@ -4039,11 +3644,11 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
             console.error(`Message: ${error.message || 'No message'}`);
             console.error(`Intent: ${intentData?.intent || 'unknown'}`);
             console.error(`Canal: ${context.user_channel || 'web'}`);
-            console.error(`Timeout configuré: ${timeoutDuration/1000}s`);
+            console.error(`Timeout configuré: ${timeoutDuration / 1000}s`);
 
             // Gestion spécifique des erreurs de timeout
             if (error.name === 'AbortError' || error.message?.includes('aborted')) {
-                console.error(`⏱️  TIMEOUT: Perplexity n'a pas répondu dans les ${timeoutDuration/1000}s`);
+                console.error(`⏱️  TIMEOUT: Perplexity n'a pas répondu dans les ${timeoutDuration / 1000}s`);
                 console.error('   → L\'API est trop lente ou surchargée');
                 console.error('   → Solution: Augmenter le timeout ou simplifier la requête');
                 console.log('🔄 Falling back to Gemini due to timeout...');
@@ -4084,14 +3689,14 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
     async _handleStreamingSMS(response, context) {
         // STREAMING DÉSACTIVÉ - Retour au mode classique
         console.log('⚠️ Streaming désactivé, utilisation mode classique');
-        
+
         try {
             const data = await response.json();
             const content = data.choices[0].message.content;
             const citations = data.citations || [];
-            
+
             console.log(`✅ Perplexity responded (non-streaming): ${content.length} chars`);
-            
+
             return {
                 content: content,
                 citations: citations,
@@ -4111,34 +3716,34 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
         const start = chunkIndex * CHUNK_SIZE;
         const end = Math.min(start + CHUNK_SIZE, fullContent.length);
         const chunkContent = fullContent.substring(start, end);
-        
+
         // Découper intelligemment par phrases si possible
         let finalChunk = chunkContent;
         if (!isFinal && end < fullContent.length) {
             const lastPeriod = chunkContent.lastIndexOf('.');
             const lastNewline = chunkContent.lastIndexOf('\n');
             const cutPoint = Math.max(lastPeriod, lastNewline);
-            
+
             if (cutPoint > CHUNK_SIZE * 0.7) {
                 finalChunk = chunkContent.substring(0, cutPoint + 1);
             }
         }
-        
+
         // Appeler directement l'adaptateur SMS
         try {
             // Import dynamique pour éviter circular dependencies
             const smsModule = await import('./adapters/sms.js');
             const totalChunks = Math.ceil(fullContent.length / CHUNK_SIZE);
             const prefix = totalChunks > 1 ? `[${chunkIndex + 1}/${totalChunks}] ` : '';
-            
+
             await smsModule.sendSMS(
                 context.userId,
                 prefix + finalChunk,
                 false // pas de simulation
             );
-            
+
             console.log(`📱 SMS chunk ${chunkIndex + 1}/${totalChunks} sent (${finalChunk.length} chars)`);
-            
+
             // Délai entre chunks pour garantir l'ordre
             if (!isFinal) {
                 await new Promise(resolve => setTimeout(resolve, 2000));
@@ -4150,6 +3755,7 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
 
     /**
      * Appel à Gemini (gratuit) pour questions conceptuelles
+     * Utilise un système de fallback intelligent pour maximiser la disponibilité
      */
     async _call_gemini(prompt, outputMode = 'chat', context = {}) {
         try {
@@ -4170,7 +3776,6 @@ Utilise ces tags UNIQUEMENT quand pertinent (max 1 par réponse, sauf si explici
             } else {
                 console.log('🎯 Gemini Chat mode: 4000 tokens (réponses ULTRA-LONGUES par défaut)');
             }
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
             // Ajouter instructions système pour mode conversationnel
             const systemInstructions = outputMode === 'data'
@@ -4202,39 +3807,33 @@ RÈGLES CRITIQUES:
 
             const fullPrompt = systemInstructions + prompt;
 
-            // ✅ Utiliser geminiFetchWithRetry pour gestion automatique du rate limiting (429)
-            const response = await geminiFetchWithRetry(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: fullPrompt }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: maxTokens,
-                        candidateCount: 1
-                    }
-                })
+            // ✅ NOUVEAU: Utiliser le système de fallback intelligent
+            // Essaie plusieurs modèles Gemini en cascade pour maximiser la disponibilité
+            const { callGeminiWithFallback } = await import('../lib/utils/gemini-fallback.js');
+
+            console.log('🔄 [Gemini] Appel avec système de fallback intelligent (3 modèles)');
+
+            const result = await callGeminiWithFallback({
+                contents: [{
+                    parts: [{ text: fullPrompt }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: maxTokens,
+                    candidateCount: 1
+                }
             }, {
-                maxRetries: 4,
-                baseDelay: 1000,
-                logRetries: true
+                apiKey: process.env.GEMINI_API_KEY,
+                maxRetries: 2, // 2 retries par modèle
+                logAttempts: true
             });
 
-            const data = await response.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            console.log(`✅ [Gemini] Succès avec ${result.modelName} (tentative ${result.attemptNumber}/${result.totalAttempts})`);
 
-            if (!text) {
-                throw new Error('No response from Gemini');
-            }
-
-            return text;
+            return result.text;
 
         } catch (error) {
-            console.error('❌ Gemini API error:', error);
+            console.error('❌ Gemini API error (tous les fallbacks ont échoué):', error);
             throw new Error(`Erreur de communication avec Gemini: ${error.message}`);
         }
     }
@@ -4397,15 +3996,15 @@ Génère une réponse professionnelle en français basée sur ces données:`;
 
             // Utiliser Gemini pour générer la réponse
             const geminiResponse = await this._call_gemini(fallbackPrompt, outputMode, context);
-            
+
             // Nettoyer le JSON si présent
             const cleanedResponse = this._sanitizeJsonInResponse(geminiResponse);
-            
+
             return cleanedResponse;
 
         } catch (error) {
             console.error('❌ Erreur génération fallback avec Gemini:', error);
-            
+
             // Fallback ultime: réponse basique sans JSON
             if (context.user_channel === 'sms') {
                 // Pour SMS, réponse très courte
@@ -4419,7 +4018,7 @@ Génère une réponse professionnelle en français basée sur ces données:`;
                 }
                 return "👩🏻 Données disponibles. Pour une analyse complète, visite gobapps.com";
             }
-            
+
             // Pour Web, message informatif sans JSON
             return `J'ai récupéré des données depuis ${successfulResults.length} source(s), mais je n'ai pas pu générer une analyse complète. Les données incluent: ${successfulResults.map(r => r.tool_id).join(', ')}.\n\nVeuillez reformuler votre question ou visitez gobapps.com pour plus d'informations.`;
         }
@@ -4434,14 +4033,14 @@ Génère une réponse professionnelle en français basée sur ces données:`;
             content: userMessage,
             timestamp: new Date().toISOString()
         });
-        
+
         this.conversationHistory.push({
             role: 'assistant',
             content: response,
             tools_used: toolResults.map(r => r.tool_id),
             timestamp: new Date().toISOString()
         });
-        
+
         // Limiter l'historique à 20 échanges (10 questions/réponses)
         if (this.conversationHistory.length > 20) {
             this.conversationHistory = this.conversationHistory.slice(-20);
@@ -4767,7 +4366,7 @@ export default async function handler(req, res) {
         }
 
         const { message, context = {} } = req.body;
-        
+
         if (!message) {
             return res.status(400).json({ error: 'Message is required' });
         }

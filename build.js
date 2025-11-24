@@ -26,7 +26,7 @@ async function build() {
         execSync('npm install', { 
           cwd: APP_3P1_DIR, 
           stdio: 'inherit',
-          env: { ...process.env, NODE_ENV: 'production' }
+          env: { ...process.env } // Ne pas forcer production ici pour installer les devDependencies (vite)
         });
         
         // Construire l'application

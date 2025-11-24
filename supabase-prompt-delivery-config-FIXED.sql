@@ -75,8 +75,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 7. Test de la fonction
+-- 8. Test de la fonction
 -- SELECT * FROM get_prompt_delivery_config('briefing_evening');
 
--- 8. Vérifier les prompts actifs
+-- 9. Vérifier les prompts actifs
 -- SELECT * FROM prompt_delivery_configs;

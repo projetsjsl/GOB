@@ -10,7 +10,7 @@
 // ⚠️  Toujours tester en local avant de déployer
 //
 // ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
-// - Modèle: gemini-2.0-flash-exp (PAS gemini-1.5-flash)
+// - Modèle: gemini-1.5-flash-latest (quota plus élevé que gemini-2.0-flash-exp)
 // - SDK: @google/generative-ai (PAS @google/genai)
 // - Function Calling: Activé pour interactions avancées
 // - Safety Settings: Configurés pour Emma (professionnel)
@@ -20,7 +20,7 @@
 // - GEMINI_API_KEY (AI...) : ✅ Configurée
 //
 // ❌ INTERDICTIONS ABSOLUES :
-// - Modifier le modèle sans test (gemini-2.0-flash-exp)
+// - Modifier le modèle sans test (gemini-1.5-flash-latest)
 // - Changer le SDK (doit rester @google/generative-ai)
 // - Modifier les safety settings sans validation
 // - Désactiver Function Calling sans test
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
     console.error('❌ GEMINI_API_KEY manquante');
-    return res.status(503).json({ 
+    return res.status(503).json({
       error: 'Configuration de la clé API Gemini manquante',
       suggestions: [
         'Vérifiez que la clé API Gemini est configurée dans Vercel',
@@ -126,7 +126,7 @@ CONTRAINTES:
 
     // Construire le texte complet pour Gemini
     let fullText = emmaPrompt + '\n\n';
-    
+
     for (const m of messages) {
       fullText += `\nUtilisateur: ${m.content}\n`;
     }
@@ -169,10 +169,10 @@ CONTRAINTES:
     // VERSION SANS SDK (SANS FUNCTION CALLING) - ACTUELLE // OK
     // ========================================
     console.log('🔧 Appel API Gemini REST directe (sans SDK)');
-    console.log('📦 Modèle: gemini-2.0-flash-exp');
+    console.log('📦 Modèle: gemini-1.5-flash-latest');
     console.log('📤 Envoi de la requête...');
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
     // ✅ Utiliser geminiFetchWithRetry pour gestion automatique du rate limiting (429)
     const response = await geminiFetchWithRetry(apiUrl, {
@@ -320,14 +320,14 @@ CONTRAINTES:
     // ========================================
     // Si pas de function calls, retourner la réponse normale
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
+
     if (!text) {
       console.error('❌ Pas de texte dans la réponse:', JSON.stringify(data));
       throw new Error('Aucune réponse générée par Gemini');
     }
 
     console.log('✅ Texte extrait, longueur:', text.length);
-    
+
     // Ajouter des sources génériques
     const sourcesAddition = `
 
@@ -336,21 +336,21 @@ CONTRAINTES:
 • [Gemini AI](https://ai.google.dev/) - Analyse et réponse générée par l'IA
 • [Connaissances d'entraînement](https://ai.google.dev/gemini-api/docs) - Données jusqu'en 2024`;
 
-    return res.status(200).json({ 
-      response: text + sourcesAddition, 
-      source: 'gemini', 
+    return res.status(200).json({
+      response: text + sourcesAddition,
+      source: 'gemini',
       functionsExecuted: []
     });
 
   } catch (e) {
     console.error('❌ Erreur dans le handler Gemini:', e);
     console.error('Stack trace:', e?.stack);
-    
+
     // Messages d'erreur améliorés et plus informatifs
     let errorMessage = 'Erreur de connexion à l\'API Gemini.';
     let suggestions = [];
     let technicalDetails = String(e?.message || e);
-    
+
     // Analyser le type d'erreur pour donner des suggestions pertinentes
     if (technicalDetails.includes('GEMINI_API_KEY')) {
       errorMessage = 'Configuration de la clé API Gemini manquante.';
@@ -408,8 +408,8 @@ CONTRAINTES:
         'Si le problème persiste, contactez le support'
       ];
     }
-    
-    return res.status(500).json({ 
+
+    return res.status(500).json({
       error: errorMessage,
       suggestions: suggestions,
       technical: technicalDetails,

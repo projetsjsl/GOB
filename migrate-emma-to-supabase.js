@@ -14,12 +14,15 @@
  *   - Variables SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY définies
  */
 
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 import { createClient } from '@supabase/supabase-js';
 import { CFA_SYSTEM_PROMPT } from './config/emma-cfa-prompt.js';
+import { DynamicPromptsSystem } from './lib/dynamic-prompts.js';
 import fs from 'fs';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || 'https://gob-watchlist.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
 console.log('🚀 Migration Emma → Supabase');
 console.log('═'.repeat(60));
@@ -376,6 +379,67 @@ async function migrateRouting() {
 }
 
 /**
+ * Migration Section 7: Dynamic Prompts (Fragments)
+ */
+async function migrateDynamicPrompts() {
+    console.log('\n🧩 Migration: Dynamic Prompts Fragments');
+    console.log('─'.repeat(60));
+
+    const dynamicSystem = new DynamicPromptsSystem();
+    let count = 0;
+
+    // 1. Intent Instructions
+    for (const [key, value] of Object.entries(dynamicSystem.intentInstructions)) {
+        if (await upsertConfig(
+            'dynamic_prompts',
+            `intent_${key}`,
+            value,
+            'string',
+            `Instruction dynamique pour intent: ${key}`,
+            'fragment'
+        )) count++;
+    }
+
+    // 2. Channel Instructions
+    for (const [key, value] of Object.entries(dynamicSystem.channelInstructions)) {
+        if (await upsertConfig(
+            'dynamic_prompts',
+            `channel_${key}`,
+            value,
+            'string',
+            `Instruction dynamique pour canal: ${key}`,
+            'fragment'
+        )) count++;
+    }
+
+    // 3. Conversation Context
+    for (const [key, value] of Object.entries(dynamicSystem.conversationContextInstructions)) {
+        if (await upsertConfig(
+            'dynamic_prompts',
+            `context_${key}`,
+            value,
+            'string',
+            `Instruction dynamique pour contexte: ${key}`,
+            'fragment'
+        )) count++;
+    }
+
+    // 4. Expertise Level
+    for (const [key, value] of Object.entries(dynamicSystem.expertiseLevelInstructions)) {
+        if (await upsertConfig(
+            'dynamic_prompts',
+            `expertise_${key}`,
+            value,
+            'string',
+            `Instruction dynamique pour expertise: ${key}`,
+            'fragment'
+        )) count++;
+    }
+
+    console.log(`\n✅ ${count} fragments dynamiques migrés`);
+}
+
+/**
  * Migration principale
  */
 async function migrate() {
@@ -394,6 +458,7 @@ async function migrate() {
         await migrateVariables();
         await migrateDirectives();
         await migrateRouting();
+        await migrateDynamicPrompts();
 
         // Résumé final
         console.log('\n' + '═'.repeat(60));
