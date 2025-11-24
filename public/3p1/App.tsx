@@ -7,6 +7,7 @@ import { SensitivityTable } from './components/SensitivityTable';
 import { NotesEditor } from './components/NotesEditor';
 import { EvaluationDetails } from './components/EvaluationDetails';
 import { InfoTab } from './components/InfoTab';
+import { TickerSearch } from './components/TickerSearch';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation } from './utils/calculations';
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
@@ -14,37 +15,37 @@ import { fetchCompanyData } from './services/financeApi';
 
 // Initial Mock Data mirroring the image
 const INITIAL_DATA: AnnualData[] = [
-  { year: 2021, priceHigh: 417.40, priceLow: 241.70, cashFlowPerShare: 11.96, dividendPerShare: 3.52, bookValuePerShare: 30.87, earningsPerShare: 8.80 },
-  { year: 2022, priceHigh: 415.50, priceLow: 243.00, cashFlowPerShare: 14.19, dividendPerShare: 3.88, bookValuePerShare: 35.00, earningsPerShare: 10.71 },
-  { year: 2023, priceHigh: 355.40, priceLow: 242.80, cashFlowPerShare: 15.46, dividendPerShare: 4.48, bookValuePerShare: 40.87, earningsPerShare: 11.67 },
-  { year: 2024, priceHigh: 387.50, priceLow: 278.70, cashFlowPerShare: 15.61, dividendPerShare: 5.16, bookValuePerShare: 45.24, earningsPerShare: 11.95 },
-  { year: 2025, priceHigh: 398.30, priceLow: 229.40, cashFlowPerShare: 16.13, dividendPerShare: 5.92, bookValuePerShare: 50.16, earningsPerShare: 12.93, isEstimate: true },
-  { year: 2026, priceHigh: 0, priceLow: 0, cashFlowPerShare: 17.90, dividendPerShare: 0, bookValuePerShare: 53.40, earningsPerShare: 13.75, isEstimate: true },
+    { year: 2021, priceHigh: 417.40, priceLow: 241.70, cashFlowPerShare: 11.96, dividendPerShare: 3.52, bookValuePerShare: 30.87, earningsPerShare: 8.80 },
+    { year: 2022, priceHigh: 415.50, priceLow: 243.00, cashFlowPerShare: 14.19, dividendPerShare: 3.88, bookValuePerShare: 35.00, earningsPerShare: 10.71 },
+    { year: 2023, priceHigh: 355.40, priceLow: 242.80, cashFlowPerShare: 15.46, dividendPerShare: 4.48, bookValuePerShare: 40.87, earningsPerShare: 11.67 },
+    { year: 2024, priceHigh: 387.50, priceLow: 278.70, cashFlowPerShare: 15.61, dividendPerShare: 5.16, bookValuePerShare: 45.24, earningsPerShare: 11.95 },
+    { year: 2025, priceHigh: 398.30, priceLow: 229.40, cashFlowPerShare: 16.13, dividendPerShare: 5.92, bookValuePerShare: 50.16, earningsPerShare: 12.93, isEstimate: true },
+    { year: 2026, priceHigh: 0, priceLow: 0, cashFlowPerShare: 17.90, dividendPerShare: 0, bookValuePerShare: 53.40, earningsPerShare: 13.75, isEstimate: true },
 ];
 
 const INITIAL_ASSUMPTIONS: Assumptions = {
-  currentPrice: 250.00,
-  currentDividend: 6.00,
-  growthRateEPS: 5.0,
-  growthRateSales: 5.0,
-  growthRateCF: 5.0,
-  growthRateBV: 3.0,
-  growthRateDiv: 1.0,
-  targetPE: 23.0,
-  targetPCF: 18.0,
-  targetPBV: 6.0,
-  targetYield: 1.8,
-  requiredReturn: 10.0,
-  dividendPayoutRatio: 35.0,
-  baseYear: 2025
+    currentPrice: 250.00,
+    currentDividend: 6.00,
+    growthRateEPS: 5.0,
+    growthRateSales: 5.0,
+    growthRateCF: 5.0,
+    growthRateBV: 3.0,
+    growthRateDiv: 1.0,
+    targetPE: 23.0,
+    targetPCF: 18.0,
+    targetPBV: 6.0,
+    targetYield: 1.8,
+    requiredReturn: 10.0,
+    dividendPayoutRatio: 35.0,
+    baseYear: 2025
 };
 
 const INITIAL_INFO: CompanyInfo = {
-  symbol: 'ACN',
-  name: 'Accenture PLC',
-  sector: 'Services TI',
-  securityRank: 'A+',
-  marketCap: '156.4B'
+    symbol: 'ACN',
+    name: 'Accenture PLC',
+    sector: 'Services TI',
+    securityRank: 'A+',
+    marketCap: '156.4B'
 };
 
 const DEFAULT_PROFILE: AnalysisProfile = {
@@ -60,517 +61,544 @@ const DEFAULT_PROFILE: AnalysisProfile = {
 const STORAGE_KEY = 'finance_pro_profiles';
 
 export default function App() {
-  // --- GLOBAL STATE & PERSISTENCE ---
-  const [library, setLibrary] = useState<Record<string, AnalysisProfile>>({});
-  const [activeId, setActiveId] = useState<string>('ACN');
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'analysis' | 'info'>('analysis');
+    // --- GLOBAL STATE & PERSISTENCE ---
+    const [library, setLibrary] = useState<Record<string, AnalysisProfile>>({});
+    const [activeId, setActiveId] = useState<string>('ACN');
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [currentView, setCurrentView] = useState<'analysis' | 'info'>('analysis');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Load from LocalStorage on Mount
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setLibrary(parsed);
-        if (Object.keys(parsed).length > 0) {
-          setActiveId(Object.keys(parsed)[0]);
-        } else {
-          setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
-        }
-      } catch (e) {
-        console.error("Failed to load profiles", e);
-        setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
-      }
-    } else {
-      setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
-    }
-    setIsInitialized(true);
-  }, []);
-
-  // --- ACTIVE SESSION STATE ---
-  const [data, setData] = useState<AnnualData[]>(INITIAL_DATA);
-  const [assumptions, setAssumptions] = useState<Assumptions>(INITIAL_ASSUMPTIONS);
-  const [info, setInfo] = useState<CompanyInfo>(INITIAL_INFO);
-  const [notes, setNotes] = useState<string>('');
-  const [isWatchlist, setIsWatchlist] = useState<boolean>(false);
-
-  // Load Active Profile when ID changes
-  useEffect(() => {
-    if (!isInitialized) return;
-    const profile = library[activeId];
-    if (profile) {
-        setData(profile.data);
-        setAssumptions({
-            ...INITIAL_ASSUMPTIONS, // ensure new fields are populated for old profiles
-            ...profile.assumptions
-        });
-        setInfo(profile.info);
-        setNotes(profile.notes || '');
-        setIsWatchlist(!!profile.isWatchlist);
-        // Clear Undo/Redo stacks on switch
-        setPastData([]);
-        setFutureData([]);
-    }
-  }, [activeId, isInitialized]);
-
-  // Save to Library when Active State Changes
-  useEffect(() => {
-    if (!isInitialized) return;
-    
-    const timer = setTimeout(() => {
-        setLibrary(prev => {
-            const updated = {
-                ...prev,
-                [activeId]: {
-                    id: activeId,
-                    lastModified: Date.now(),
-                    data,
-                    assumptions,
-                    info,
-                    notes,
-                    isWatchlist
+    // Load from LocalStorage on Mount
+    useEffect(() => {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                setLibrary(parsed);
+                if (Object.keys(parsed).length > 0) {
+                    setActiveId(Object.keys(parsed)[0]);
+                } else {
+                    setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                 }
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-            return updated;
-        });
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [data, assumptions, info, notes, isWatchlist, activeId, isInitialized]);
-
-
-  // --- UNDO/REDO STATE ---
-  const [pastData, setPastData] = useState<AnnualData[][]>([]);
-  const [futureData, setFutureData] = useState<AnnualData[][]>([]);
-
-  const undo = () => {
-    if (pastData.length === 0) return;
-    const previous = pastData[pastData.length - 1];
-    const newPast = pastData.slice(0, pastData.length - 1);
-    
-    setFutureData([data, ...futureData]);
-    setData(previous);
-    setPastData(newPast);
-  };
-
-  const redo = () => {
-    if (futureData.length === 0) return;
-    const next = futureData[0];
-    const newFuture = futureData.slice(1);
-
-    setPastData([...pastData, data]);
-    setData(next);
-    setFutureData(newFuture);
-  };
-
-  // Keyboard Shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-        if (e.shiftKey) {
-          e.preventDefault();
-          redo();
+            } catch (e) {
+                console.error("Failed to load profiles", e);
+                setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
+            }
         } else {
-          e.preventDefault();
-          undo();
+            setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
         }
-      }
-      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
-        e.preventDefault();
-        redo();
-      }
+        setIsInitialized(true);
+    }, []);
+
+    // --- ACTIVE SESSION STATE ---
+    const [data, setData] = useState<AnnualData[]>(INITIAL_DATA);
+    const [assumptions, setAssumptions] = useState<Assumptions>(INITIAL_ASSUMPTIONS);
+    const [info, setInfo] = useState<CompanyInfo>(INITIAL_INFO);
+    const [notes, setNotes] = useState<string>('');
+    const [isWatchlist, setIsWatchlist] = useState<boolean>(false);
+
+    // Load Active Profile when ID changes
+    useEffect(() => {
+        if (!isInitialized) return;
+        const profile = library[activeId];
+        if (profile) {
+            setData(profile.data);
+            setAssumptions({
+                ...INITIAL_ASSUMPTIONS, // ensure new fields are populated for old profiles
+                ...profile.assumptions
+            });
+            setInfo(profile.info);
+            setNotes(profile.notes || '');
+            setIsWatchlist(!!profile.isWatchlist);
+            // Clear Undo/Redo stacks on switch
+            setPastData([]);
+            setFutureData([]);
+        }
+    }, [activeId, isInitialized]);
+
+    // Save to Library when Active State Changes
+    useEffect(() => {
+        if (!isInitialized) return;
+
+        const timer = setTimeout(() => {
+            setLibrary(prev => {
+                const updated = {
+                    ...prev,
+                    [activeId]: {
+                        id: activeId,
+                        lastModified: Date.now(),
+                        data,
+                        assumptions,
+                        info,
+                        notes,
+                        isWatchlist
+                    }
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                return updated;
+            });
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [data, assumptions, info, notes, isWatchlist, activeId, isInitialized]);
+
+
+    // --- UNDO/REDO STATE ---
+    const [pastData, setPastData] = useState<AnnualData[][]>([]);
+    const [futureData, setFutureData] = useState<AnnualData[][]>([]);
+
+    const undo = () => {
+        if (pastData.length === 0) return;
+        const previous = pastData[pastData.length - 1];
+        const newPast = pastData.slice(0, pastData.length - 1);
+
+        setFutureData([data, ...futureData]);
+        setData(previous);
+        setPastData(newPast);
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [pastData, futureData, data]);
+    const redo = () => {
+        if (futureData.length === 0) return;
+        const next = futureData[0];
+        const newFuture = futureData.slice(1);
 
-  // --- HANDLERS ---
+        setPastData([...pastData, data]);
+        setData(next);
+        setFutureData(newFuture);
+    };
 
-  const handleFetchData = async () => {
-      try {
-          const result = await fetchCompanyData(activeId);
-          
-          // Keep existing history for Undo
-          setPastData(prev => [...prev, data]);
-          setFutureData([]);
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                if (e.shiftKey) {
+                    e.preventDefault();
+                    redo();
+                } else {
+                    e.preventDefault();
+                    undo();
+                }
+            }
+            else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+                e.preventDefault();
+                redo();
+            }
+        };
 
-          // Update Data
-          if (result.data.length > 0) {
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [pastData, futureData, data]);
+
+    // --- HANDLERS ---
+
+    const handleFetchData = async () => {
+        try {
+            const result = await fetchCompanyData(activeId);
+
+            // Keep existing history for Undo
+            setPastData(prev => [...prev, data]);
+            setFutureData([]);
+
+            // Update Data
+            if (result.data.length > 0) {
+                setData(result.data);
+            }
+
+            // Update Info
+            if (result.info) {
+                setInfo(prev => ({ ...prev, ...result.info }));
+            }
+
+            // Update Price Assumption
+            if (result.currentPrice > 0) {
+                setAssumptions(prev => ({
+                    ...prev,
+                    currentPrice: result.currentPrice,
+                    // Try to update current dividend from latest year data if available
+                    currentDividend: result.data.length > 0 ? result.data[result.data.length - 1].dividendPerShare : prev.currentDividend,
+                    baseYear: result.data.length > 0 ? result.data[result.data.length - 1].year : prev.baseYear
+                }));
+            }
+
+            alert(`Données synchronisées avec succès pour ${activeId}`);
+
+        } catch (e) {
+            alert(`Erreur lors de la récupération des données : ${(e as Error).message}`);
+        }
+    };
+
+    const handleUpdateRow = (index: number, field: keyof AnnualData, value: number) => {
+        if (data[index][field] === value) return;
+        setPastData(prev => [...prev, data]);
+        setFutureData([]);
+        const newData = [...data];
+        newData[index] = { ...newData[index], [field]: value };
+        setData(newData);
+    };
+
+    const handleUpdateAssumption = (key: keyof Assumptions, value: number) => {
+        setAssumptions(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleUpdateInfo = (key: keyof CompanyInfo, value: string) => {
+        setInfo(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleAddTicker = () => {
+        setIsSearchOpen(true);
+    };
+
+    const handleSelectTicker = async (symbol: string) => {
+        const upperSymbol = symbol.toUpperCase();
+        if (library[upperSymbol]) {
+            alert("Ce ticker existe déjà.");
+            setActiveId(upperSymbol);
+            return;
+        }
+
+        // Create placeholder profile
+        const newProfile: AnalysisProfile = {
+            id: upperSymbol,
+            lastModified: Date.now(),
+            data: INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, year: 2024 })),
+            assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
+            info: { ...INITIAL_INFO, symbol: upperSymbol, name: 'Chargement...', marketCap: '-' },
+            notes: '',
+            isWatchlist: false
+        };
+        setLibrary(prev => ({ ...prev, [upperSymbol]: newProfile }));
+        setActiveId(upperSymbol);
+
+        // Auto-fetch data
+        try {
+            const result = await fetchCompanyData(upperSymbol);
+
             setData(result.data);
-          }
-          
-          // Update Info
-          if (result.info) {
             setInfo(prev => ({ ...prev, ...result.info }));
-          }
-
-          // Update Price Assumption
-          if (result.currentPrice > 0) {
             setAssumptions(prev => ({
                 ...prev,
                 currentPrice: result.currentPrice,
-                // Try to update current dividend from latest year data if available
                 currentDividend: result.data.length > 0 ? result.data[result.data.length - 1].dividendPerShare : prev.currentDividend,
                 baseYear: result.data.length > 0 ? result.data[result.data.length - 1].year : prev.baseYear
             }));
-          }
+        } catch (e) {
+            console.error('Auto-fetch failed:', e);
+            // Profile already created, user can manually sync later
+        }
+    };
 
-          alert(`Données synchronisées avec succès pour ${activeId}`);
+    const handleDeleteTicker = (id: string) => {
+        const newLib = { ...library };
+        delete newLib[id];
+        setLibrary(newLib);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
 
-      } catch (e) {
-          alert(`Erreur lors de la récupération des données : ${(e as Error).message}`);
-      }
-  };
+        if (activeId === id) {
+            const remaining = Object.keys(newLib);
+            if (remaining.length > 0) {
+                setActiveId(remaining[0]);
+            } else {
+                setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
+                setActiveId(DEFAULT_PROFILE.id);
+            }
+        }
+    };
 
-  const handleUpdateRow = (index: number, field: keyof AnnualData, value: number) => {
-    if (data[index][field] === value) return;
-    setPastData(prev => [...prev, data]);
-    setFutureData([]); 
-    const newData = [...data];
-    newData[index] = { ...newData[index], [field]: value };
-    setData(newData);
-  };
+    const handleDuplicateTicker = (id: string) => {
+        const newId = prompt(`Nom du nouveau profil (ex: ${id}_OPTIMISTE):`, `${id}_COPY`);
+        if (newId) {
+            const upperId = newId.toUpperCase();
+            if (library[upperId]) {
+                alert("Ce nom existe déjà.");
+                return;
+            }
+            const source = library[id];
+            const newProfile = {
+                ...source,
+                id: upperId,
+                lastModified: Date.now(),
+                info: { ...source.info, symbol: upperId }
+            };
+            setLibrary(prev => ({ ...prev, [upperId]: newProfile }));
+            setActiveId(upperId);
+        }
+    };
 
-  const handleUpdateAssumption = (key: keyof Assumptions, value: number) => {
-    setAssumptions(prev => ({ ...prev, [key]: value }));
-  };
+    const handleToggleWatchlist = (id: string) => {
+        setLibrary(prev => {
+            const profile = prev[id];
+            if (!profile) return prev;
 
-  const handleUpdateInfo = (key: keyof CompanyInfo, value: string) => {
-    setInfo(prev => ({ ...prev, [key]: value }));
-  };
+            const updated = {
+                ...profile,
+                isWatchlist: !profile.isWatchlist
+            };
 
-  const handleAddTicker = () => {
-      const symbol = prompt("Entrez le symbole du nouveau ticker (ex: AAPL):");
-      if (symbol) {
-          const upperSymbol = symbol.toUpperCase();
-          if (library[upperSymbol]) {
-              alert("Ce ticker existe déjà.");
-              setActiveId(upperSymbol);
-              return;
-          }
-          const newProfile: AnalysisProfile = {
-              id: upperSymbol,
-              lastModified: Date.now(),
-              data: INITIAL_DATA.map(d => ({...d, priceHigh: 0, priceLow: 0, year: 2024})), // Placeholder dates
-              assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
-              info: { ...INITIAL_INFO, symbol: upperSymbol, name: 'Nouvelle Société', marketCap: '-' },
-              notes: '',
-              isWatchlist: false
-          };
-          setLibrary(prev => ({ ...prev, [upperSymbol]: newProfile }));
-          setActiveId(upperSymbol);
-      }
-  };
+            const newLib = { ...prev, [id]: updated };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
 
-  const handleDeleteTicker = (id: string) => {
-      const newLib = { ...library };
-      delete newLib[id];
-      setLibrary(newLib);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
-      
-      if (activeId === id) {
-          const remaining = Object.keys(newLib);
-          if (remaining.length > 0) {
-              setActiveId(remaining[0]);
-          } else {
-              setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
-              setActiveId(DEFAULT_PROFILE.id);
-          }
-      }
-  };
+            // If modifying currently active profile, sync local state
+            if (id === activeId) {
+                setIsWatchlist(updated.isWatchlist);
+            }
 
-  const handleDuplicateTicker = (id: string) => {
-      const newId = prompt(`Nom du nouveau profil (ex: ${id}_OPTIMISTE):`, `${id}_COPY`);
-      if (newId) {
-          const upperId = newId.toUpperCase();
-          if (library[upperId]) {
-              alert("Ce nom existe déjà.");
-              return;
-          }
-          const source = library[id];
-          const newProfile = {
-              ...source,
-              id: upperId,
-              lastModified: Date.now(),
-              info: { ...source.info, symbol: upperId }
-          };
-          setLibrary(prev => ({ ...prev, [upperId]: newProfile }));
-          setActiveId(upperId);
-      }
-  };
+            return newLib;
+        });
+    };
 
-  const handleToggleWatchlist = (id: string) => {
-      setLibrary(prev => {
-          const profile = prev[id];
-          if (!profile) return prev;
-          
-          const updated = {
-              ...profile,
-              isWatchlist: !profile.isWatchlist
-          };
-          
-          const newLib = { ...prev, [id]: updated };
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(newLib));
-          
-          // If modifying currently active profile, sync local state
-          if (id === activeId) {
-              setIsWatchlist(updated.isWatchlist);
-          }
-          
-          return newLib;
-      });
-  };
+    const handleResetData = () => {
+        if (confirm("Voulez-vous remettre à zéro toutes les données historiques de ce profil ?")) {
+            setData(INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, earningsPerShare: 0, dividendPerShare: 0, cashFlowPerShare: 0, bookValuePerShare: 0 })));
+        }
+    };
 
-  const handleResetData = () => {
-      if(confirm("Voulez-vous remettre à zéro toutes les données historiques de ce profil ?")) {
-          setData(INITIAL_DATA.map(d => ({...d, priceHigh: 0, priceLow: 0, earningsPerShare: 0, dividendPerShare: 0, cashFlowPerShare: 0, bookValuePerShare: 0})));
-      }
-  };
+    // --- CALCULATIONS CORE ---
+    // Use central logic to ensure chart matches sidebar
+    const validHistory = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
+    const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
+    const baseEPS = baseYearData?.earningsPerShare || 0;
+    const effectiveBaseYear = baseYearData?.year || new Date().getFullYear();
 
-  // --- CALCULATIONS CORE ---
-  // Use central logic to ensure chart matches sidebar
-  const validHistory = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
-  const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
-  const baseEPS = baseYearData?.earningsPerShare || 0;
-  const effectiveBaseYear = baseYearData?.year || new Date().getFullYear();
-  
-  // History CAGR
-  const firstYearData = data[0];
-  const historicalCAGR_EPS = calculateCAGR(firstYearData?.earningsPerShare || 0, baseEPS, effectiveBaseYear - (firstYearData?.year || effectiveBaseYear));
+    // History CAGR
+    const firstYearData = data[0];
+    const historicalCAGR_EPS = calculateCAGR(firstYearData?.earningsPerShare || 0, baseEPS, effectiveBaseYear - (firstYearData?.year || effectiveBaseYear));
 
-  // Get Valuation Status
-  const { recommendation, targetPrice, buyLimit, sellLimit } = calculateRecommendation(data, assumptions);
+    // Get Valuation Status
+    const { recommendation, targetPrice, buyLimit, sellLimit } = calculateRecommendation(data, assumptions);
 
-  const availableYears = data.map(d => d.year);
+    const availableYears = data.map(d => d.year);
 
-  if (!isInitialized) return <div className="flex items-center justify-center h-screen text-slate-500">Chargement...</div>;
+    if (!isInitialized) return <div className="flex items-center justify-center h-screen text-slate-500">Chargement...</div>;
 
-  return (
-    <div className="flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden">
-      
-      {/* SIDEBAR NAVIGATION */}
-      <div 
-        className={`bg-slate-900 h-full transition-all duration-300 ease-in-out flex-shrink-0 overflow-hidden ${isSidebarOpen ? 'w-72' : 'w-0'} no-print`}
-      >
-          <div className="w-72 h-full">
-            <Sidebar 
-                profiles={Object.values(library)}
-                currentId={activeId}
-                onSelect={setActiveId}
-                onAdd={handleAddTicker}
-                onDelete={handleDeleteTicker}
-                onDuplicate={handleDuplicateTicker}
-                onToggleWatchlist={handleToggleWatchlist}
-            />
-          </div>
-      </div>
+    return (
+        <div className="flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden">
 
-      {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-4 md:p-8 print-full-width">
-            <div className="max-w-7xl mx-auto">
-                
-                {/* TOP BAR & NAVIGATION */}
-                <div className="flex items-center justify-between mb-6 no-print">
-                    <div className="flex items-center gap-4">
-                        <button 
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="p-2 bg-white rounded-md shadow-sm border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                            title={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
-                        >
-                            <Bars3Icon className="w-6 h-6" />
-                        </button>
-                        {!isSidebarOpen && (
-                                <h1 className="text-xl font-bold text-gray-700">Analyse Financière Pro</h1>
+            {/* SIDEBAR NAVIGATION */}
+            <div
+                className={`bg-slate-900 h-full transition-all duration-300 ease-in-out flex-shrink-0 overflow-hidden ${isSidebarOpen ? 'w-72' : 'w-0'} no-print`}
+            >
+                <div className="w-72 h-full">
+                    <Sidebar
+                        profiles={Object.values(library)}
+                        currentId={activeId}
+                        onSelect={setActiveId}
+                        onAdd={handleAddTicker}
+                        onDelete={handleDeleteTicker}
+                        onDuplicate={handleDuplicateTicker}
+                        onToggleWatchlist={handleToggleWatchlist}
+                    />
+                </div>
+            </div>
+
+            {/* MAIN CONTENT AREA */}
+            <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                <div className="flex-1 overflow-y-auto p-4 md:p-8 print-full-width">
+                    <div className="max-w-7xl mx-auto">
+
+                        {/* TOP BAR & NAVIGATION */}
+                        <div className="flex items-center justify-between mb-6 no-print">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                    className="p-2 bg-white rounded-md shadow-sm border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                                    title={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
+                                >
+                                    <Bars3Icon className="w-6 h-6" />
+                                </button>
+                                {!isSidebarOpen && (
+                                    <h1 className="text-xl font-bold text-gray-700">Analyse Financière Pro</h1>
+                                )}
+                            </div>
+
+                            {/* VIEW TABS */}
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 flex items-center gap-1">
+                                <button
+                                    onClick={() => setCurrentView('analysis')}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${currentView === 'analysis'
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    <ChartBarSquareIcon className="w-5 h-5" />
+                                    Analyse
+                                </button>
+                                <button
+                                    onClick={() => setCurrentView('info')}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${currentView === 'info'
+                                        ? 'bg-blue-50 text-blue-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    <InformationCircleIcon className="w-5 h-5" />
+                                    Mode d'emploi
+                                </button>
+                            </div>
+                        </div>
+
+                        <Header
+                            info={info}
+                            assumptions={assumptions}
+                            availableYears={availableYears}
+                            recommendation={recommendation}
+                            isWatchlist={isWatchlist}
+                            onUpdateInfo={handleUpdateInfo}
+                            onUpdateAssumption={handleUpdateAssumption}
+                            onFetchData={handleFetchData}
+                        />
+
+                        {/* CONDITIONAL RENDER: ANALYSIS VS INFO */}
+                        {currentView === 'info' ? (
+                            <InfoTab />
+                        ) : (
+                            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+
+                                {/* LEFT COLUMN - MAIN DATA */}
+                                <div className="xl:col-span-3">
+                                    <div className="flex items-center justify-between mb-2 px-1">
+                                        <h3 className="text-lg font-bold text-gray-700 flex items-center gap-2">
+                                            Données Historiques
+                                            {historicalCAGR_EPS > 0 && (
+                                                <span className="text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full" title="Taux de croissance annuel composé des EPS sur la période affichée">
+                                                    CAGR EPS: {historicalCAGR_EPS.toFixed(1)}%
+                                                </span>
+                                            )}
+                                        </h3>
+                                        <div className="flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print">
+                                            <button onClick={undo} disabled={pastData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30">
+                                                <ArrowUturnLeftIcon className="w-4 h-4" />
+                                            </button>
+                                            <div className="w-px bg-gray-200 my-1"></div>
+                                            <button onClick={redo} disabled={futureData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30">
+                                                <ArrowUturnRightIcon className="w-4 h-4" />
+                                            </button>
+                                            <div className="w-px bg-gray-200 my-1"></div>
+                                            <button onClick={handleResetData} className="p-1.5 rounded hover:bg-red-50 text-red-600" title="Réinitialiser les données">
+                                                <ArrowPathIcon className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <HistoricalTable data={data} onUpdateRow={handleUpdateRow} />
+
+                                    <ValuationCharts
+                                        history={validHistory}
+                                        currentPrice={assumptions.currentPrice}
+                                        buyPrice={buyLimit}
+                                        sellPrice={sellLimit}
+                                        targetPrice={targetPrice}
+                                        recommendation={recommendation}
+                                    />
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                                        {/* Sensitivity Matrix */}
+                                        <SensitivityTable
+                                            baseEPS={baseEPS}
+                                            baseGrowth={assumptions.growthRateEPS}
+                                            basePE={assumptions.targetPE}
+                                        />
+                                        {/* Analyst Notes */}
+                                        <NotesEditor initialNotes={notes} onSave={setNotes} />
+                                    </div>
+
+                                    {/* Comprehensive Evaluation Grid */}
+                                    <EvaluationDetails
+                                        data={data}
+                                        assumptions={assumptions}
+                                        onUpdateAssumption={handleUpdateAssumption}
+                                    />
+
+                                </div>
+
+                                {/* RIGHT COLUMN - SUMMARY & PARAMS */}
+                                <div className="xl:col-span-1 space-y-6 no-print">
+
+                                    {/* Summary Card */}
+                                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-6 rounded-lg shadow-lg">
+                                        <h2 className="text-xl font-bold mb-4 border-b border-slate-600 pb-2">Résumé Exécutif</h2>
+                                        <p className="text-slate-300 text-sm mb-4 leading-relaxed">
+                                            L'analyse de {info.name} suggère une position <strong className="text-white uppercase">{recommendation}</strong> au prix actuel de {formatCurrency(assumptions.currentPrice)}.
+                                        </p>
+                                        <p className="text-slate-300 text-sm mb-4 leading-relaxed">
+                                            Le titre se négocie à <strong className="text-white">{formatPercent(Math.abs(1 - (assumptions.currentPrice / targetPrice)) * 100)} {assumptions.currentPrice < targetPrice ? 'sous' : 'au-dessus de'}</strong> l'objectif de prix EPS de {formatCurrency(targetPrice)}.
+                                        </p>
+
+                                        <div className="bg-slate-700/50 p-3 rounded mt-6">
+                                            <div className="text-xs text-slate-400 uppercase">Score de Sécurité</div>
+                                            <div className="text-2xl font-bold text-green-400">{info.securityRank}</div>
+                                        </div>
+                                    </div>
+
+                                    {/* Editable Company Info */}
+                                    <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+                                        <h3 className="text-sm font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                                            <Cog6ToothIcon className="w-4 h-4" />
+                                            Configuration
+                                        </h3>
+                                        <div className="space-y-3 text-sm">
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Nom Société</label>
+                                                <input
+                                                    type="text"
+                                                    value={info.name}
+                                                    onChange={(e) => handleUpdateInfo('name', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Secteur</label>
+                                                <input
+                                                    type="text"
+                                                    value={info.sector}
+                                                    onChange={(e) => handleUpdateInfo('sector', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Capitalisation</label>
+                                                <input
+                                                    type="text"
+                                                    value={info.marketCap}
+                                                    onChange={(e) => handleUpdateInfo('marketCap', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Score Sécurité</label>
+                                                <input
+                                                    type="text"
+                                                    value={info.securityRank}
+                                                    onChange={(e) => handleUpdateInfo('securityRank', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                />
+                                            </div>
+                                            <div className="pt-2 mt-2 border-t border-gray-100">
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isWatchlist}
+                                                        onChange={() => handleToggleWatchlist(activeId)}
+                                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                                    />
+                                                    <span className="text-xs text-gray-600">Suivre seulement (Watchlist)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* TickerSearch Modal Placeholder */}
+                                </div>
+                            </div>
                         )}
                     </div>
-
-                    {/* VIEW TABS */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 flex items-center gap-1">
-                        <button
-                            onClick={() => setCurrentView('analysis')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                                currentView === 'analysis' 
-                                ? 'bg-blue-50 text-blue-700 shadow-sm' 
-                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                            }`}
-                        >
-                            <ChartBarSquareIcon className="w-5 h-5" />
-                            Analyse
-                        </button>
-                        <button
-                            onClick={() => setCurrentView('info')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                                currentView === 'info' 
-                                ? 'bg-blue-50 text-blue-700 shadow-sm' 
-                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                            }`}
-                        >
-                            <InformationCircleIcon className="w-5 h-5" />
-                            Mode d'emploi
-                        </button>
-                    </div>
                 </div>
-
-                <Header 
-                    info={info} 
-                    assumptions={assumptions} 
-                    availableYears={availableYears}
-                    recommendation={recommendation}
-                    isWatchlist={isWatchlist}
-                    onUpdateInfo={handleUpdateInfo}
-                    onUpdateAssumption={handleUpdateAssumption}
-                    onFetchData={handleFetchData}
-                />
-
-                {/* CONDITIONAL RENDER: ANALYSIS VS INFO */}
-                {currentView === 'info' ? (
-                    <InfoTab />
-                ) : (
-                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-                    
-                    {/* LEFT COLUMN - MAIN DATA */}
-                    <div className="xl:col-span-3">
-                        <div className="flex items-center justify-between mb-2 px-1">
-                        <h3 className="text-lg font-bold text-gray-700 flex items-center gap-2">
-                            Données Historiques
-                            {historicalCAGR_EPS > 0 && (
-                                <span className="text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full" title="Taux de croissance annuel composé des EPS sur la période affichée">
-                                    CAGR EPS: {historicalCAGR_EPS.toFixed(1)}%
-                                </span>
-                            )}
-                        </h3>
-                        <div className="flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print">
-                            <button onClick={undo} disabled={pastData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30">
-                                <ArrowUturnLeftIcon className="w-4 h-4" />
-                            </button>
-                            <div className="w-px bg-gray-200 my-1"></div>
-                            <button onClick={redo} disabled={futureData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30">
-                                <ArrowUturnRightIcon className="w-4 h-4" />
-                            </button>
-                            <div className="w-px bg-gray-200 my-1"></div>
-                            <button onClick={handleResetData} className="p-1.5 rounded hover:bg-red-50 text-red-600" title="Réinitialiser les données">
-                                <ArrowPathIcon className="w-4 h-4" />
-                            </button>
-                        </div>
-                        </div>
-
-                        <HistoricalTable data={data} onUpdateRow={handleUpdateRow} />
-                        
-                        <ValuationCharts 
-                        history={validHistory}
-                        currentPrice={assumptions.currentPrice}
-                        buyPrice={buyLimit}
-                        sellPrice={sellLimit}
-                        targetPrice={targetPrice}
-                        recommendation={recommendation}
-                        />
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                            {/* Sensitivity Matrix */}
-                            <SensitivityTable 
-                                baseEPS={baseEPS}
-                                baseGrowth={assumptions.growthRateEPS}
-                                basePE={assumptions.targetPE}
-                            />
-                            {/* Analyst Notes */}
-                            <NotesEditor initialNotes={notes} onSave={setNotes} />
-                        </div>
-
-                        {/* Comprehensive Evaluation Grid */}
-                        <EvaluationDetails 
-                            data={data}
-                            assumptions={assumptions}
-                            onUpdateAssumption={handleUpdateAssumption}
-                        />
-
-                    </div>
-
-                    {/* RIGHT COLUMN - SUMMARY & PARAMS */}
-                    <div className="xl:col-span-1 space-y-6 no-print">
-                        
-                        {/* Summary Card */}
-                        <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-6 rounded-lg shadow-lg">
-                            <h2 className="text-xl font-bold mb-4 border-b border-slate-600 pb-2">Résumé Exécutif</h2>
-                            <p className="text-slate-300 text-sm mb-4 leading-relaxed">
-                                L'analyse de {info.name} suggère une position <strong className="text-white uppercase">{recommendation}</strong> au prix actuel de {formatCurrency(assumptions.currentPrice)}.
-                            </p>
-                            <p className="text-slate-300 text-sm mb-4 leading-relaxed">
-                                Le titre se négocie à <strong className="text-white">{formatPercent(Math.abs(1 - (assumptions.currentPrice / targetPrice)) * 100)} {assumptions.currentPrice < targetPrice ? 'sous' : 'au-dessus de'}</strong> l'objectif de prix EPS de {formatCurrency(targetPrice)}.
-                            </p>
-                            
-                            <div className="bg-slate-700/50 p-3 rounded mt-6">
-                                <div className="text-xs text-slate-400 uppercase">Score de Sécurité</div>
-                                <div className="text-2xl font-bold text-green-400">{info.securityRank}</div>
-                            </div>
-                        </div>
-
-                        {/* Editable Company Info */}
-                        <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-                            <h3 className="text-sm font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-                                <Cog6ToothIcon className="w-4 h-4"/>
-                                Configuration
-                            </h3>
-                            <div className="space-y-3 text-sm">
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Nom Société</label>
-                                    <input 
-                                        type="text" 
-                                        value={info.name}
-                                        onChange={(e) => handleUpdateInfo('name', e.target.value)}
-                                        className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Secteur</label>
-                                    <input 
-                                        type="text" 
-                                        value={info.sector}
-                                        onChange={(e) => handleUpdateInfo('sector', e.target.value)}
-                                        className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Capitalisation</label>
-                                    <input 
-                                        type="text" 
-                                        value={info.marketCap}
-                                        onChange={(e) => handleUpdateInfo('marketCap', e.target.value)}
-                                        className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Score Sécurité</label>
-                                    <input 
-                                        type="text" 
-                                        value={info.securityRank}
-                                        onChange={(e) => handleUpdateInfo('securityRank', e.target.value)}
-                                        className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
-                                    />
-                                </div>
-                                <div className="pt-2 mt-2 border-t border-gray-100">
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input 
-                                            type="checkbox" 
-                                            checked={isWatchlist}
-                                            onChange={() => handleToggleWatchlist(activeId)}
-                                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                        />
-                                        <span className="text-xs text-gray-600">Suivre seulement (Watchlist)</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                )}
             </div>
+            {/* Ticker Search Modal */}
+            {isSearchOpen && (
+                <TickerSearch
+                    onSelect={handleSelectTicker}
+                    onClose={() => setIsSearchOpen(false)}
+                />
+            )}
         </div>
-      </div>
-    </div>
-  );
+    );
 }
