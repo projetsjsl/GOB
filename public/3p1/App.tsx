@@ -8,10 +8,12 @@ import { NotesEditor } from './components/NotesEditor';
 import { EvaluationDetails } from './components/EvaluationDetails';
 import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
+import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation } from './utils/calculations';
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
+import { saveSnapshot, hasManualEdits } from './services/snapshotApi';
 
 // Initial Mock Data mirroring the image
 const INITIAL_DATA: AnnualData[] = [
@@ -68,6 +70,7 @@ export default function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [currentView, setCurrentView] = useState<'analysis' | 'info'>('analysis');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [showConfirmSync, setShowConfirmSync] = useState(false);
 
     // Load from LocalStorage on Mount
     useEffect(() => {
@@ -193,7 +196,41 @@ export default function App() {
     // --- HANDLERS ---
 
     const handleFetchData = async () => {
+        // Check if manual edits exist
+        const hasEdits = hasManualEdits(data);
+
+        if (hasEdits) {
+            // Show confirmation dialog
+            setShowConfirmSync(true);
+        } else {
+            // No manual edits, sync directly
+            await performSync(false);
+        }
+    };
+
+    const performSync = async (saveCurrentVersion: boolean) => {
         try {
+            // Save current version if requested
+            if (saveCurrentVersion) {
+                console.log('💾 Saving current version before sync...');
+                const saveResult = await saveSnapshot(
+                    activeId,
+                    data,
+                    assumptions,
+                    info,
+                    `Before API sync - ${new Date().toLocaleString()}`,
+                    false, // Not current (we're about to replace it)
+                    false  // Not auto-fetched
+                );
+
+                if (!saveResult.success) {
+                    console.error('Failed to save snapshot:', saveResult.error);
+                    alert(`Erreur lors de la sauvegarde: ${saveResult.error}`);
+                    // Continue anyway?
+                }
+            }
+
+            // Fetch new data from API
             const result = await fetchCompanyData(activeId);
 
             // Keep existing history for Undo
@@ -220,6 +257,18 @@ export default function App() {
                     baseYear: result.data.length > 0 ? result.data[result.data.length - 1].year : prev.baseYear
                 }));
             }
+
+            // Auto-save snapshot after successful sync
+            console.log('💾 Auto-saving snapshot after API sync...');
+            await saveSnapshot(
+                activeId,
+                result.data,
+                assumptions,
+                info,
+                `API sync - ${new Date().toLocaleString()}`,
+                true,  // Mark as current
+                true   // Auto-fetched
+            );
 
             alert(`Données synchronisées avec succès pour ${activeId}`);
 
@@ -599,6 +648,18 @@ export default function App() {
                     onClose={() => setIsSearchOpen(false)}
                 />
             )}
+
+            {/* Confirmation Dialog for API Sync */}
+            <ConfirmSyncDialog
+                isOpen={showConfirmSync}
+                ticker={activeId}
+                hasManualData={hasManualEdits(data)}
+                onCancel={() => setShowConfirmSync(false)}
+                onConfirm={async (saveSnapshot) => {
+                    setShowConfirmSync(false);
+                    await performSync(saveSnapshot);
+                }}
+            />
         </div>
     );
 }
