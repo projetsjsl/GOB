@@ -84,18 +84,22 @@ export default function App() {
 
     // Load from LocalStorage on Mount
     useEffect(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                setLibrary(parsed);
-                if (Object.keys(parsed).length > 0) {
-                    setActiveId(Object.keys(parsed)[0]);
-                } else {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    setLibrary(parsed);
+                    if (Object.keys(parsed).length > 0) {
+                        setActiveId(Object.keys(parsed)[0]);
+                    } else {
+                        setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
+                    }
+                } catch (e) {
+                    console.error("Failed to parse profiles from localStorage", e);
                     setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                 }
-            } catch (e) {
-                console.error("Failed to load profiles", e);
+            } else {
                 setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
             }
         } else {
@@ -157,7 +161,11 @@ export default function App() {
                         isWatchlist
                     }
                 };
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                } catch (e) {
+                    console.warn('Failed to save to LocalStorage:', e);
+                }
                 return updated;
             });
         }, 500);
