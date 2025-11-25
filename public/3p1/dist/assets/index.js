@@ -32455,7 +32455,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2", children: "Croissance %" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 bg-slate-50", children: "5 Ans (Proj)" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2", children: "Ratio Cible" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 bg-blue-50 text-blue-900", children: "Prix Cible" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 bg-green-50 text-green-900", children: "Prix Cible" })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { className: "divide-y divide-gray-100", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
@@ -32464,7 +32464,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateEPS, onChange: (e) => handleInput(e, "growthRateEPS"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-slate-50 text-gray-800 font-medium", children: futureValues.eps.toFixed(2) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPE, onChange: (e) => handleInput(e, "targetPE"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-blue-50 font-bold text-blue-700", children: formatCurrency(targets.eps) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 font-bold text-green-700", children: formatCurrency(targets.eps) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-left font-bold text-gray-700", children: "CFA (Cash Flow)" }),
@@ -32472,7 +32472,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateCF, onChange: (e) => handleInput(e, "growthRateCF"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-slate-50 text-gray-800 font-medium", children: futureValues.cf.toFixed(2) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPCF, onChange: (e) => handleInput(e, "targetPCF"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-blue-50 font-bold text-blue-700", children: formatCurrency(targets.cf) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 font-bold text-green-700", children: formatCurrency(targets.cf) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-left font-bold text-gray-700", children: "BV (Book Value)" }),
@@ -32480,7 +32480,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateBV, onChange: (e) => handleInput(e, "growthRateBV"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-slate-50 text-gray-800 font-medium", children: futureValues.bv.toFixed(2) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPBV, onChange: (e) => handleInput(e, "targetPBV"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-blue-50 font-bold text-blue-700", children: formatCurrency(targets.bv) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 font-bold text-green-700", children: formatCurrency(targets.bv) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-left font-bold text-gray-700", children: "DIV (Dividende)" }),
@@ -32491,7 +32491,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption }) => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetYield, step: "0.1", onChange: (e) => handleInput(e, "targetYield"), className: "w-12 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500", children: "%" })
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-blue-50 font-bold text-blue-700", children: formatCurrency(targets.div) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 font-bold text-green-700", children: formatCurrency(targets.div) })
         ] })
       ] })
     ] }) }),
@@ -33311,8 +33311,13 @@ function App() {
   const handleSelectTicker = async (symbol) => {
     const upperSymbol = symbol.toUpperCase();
     if (library[upperSymbol]) {
-      alert("Ce ticker existe déjà.");
+      const existingProfile = library[upperSymbol];
       setActiveId(upperSymbol);
+      setData(existingProfile.data);
+      setAssumptions(existingProfile.assumptions);
+      setInfo(existingProfile.info);
+      setNotes(existingProfile.notes);
+      console.log(`✅ Loaded existing profile for ${upperSymbol}`);
       return;
     }
     const newProfile = {
@@ -33355,6 +33360,10 @@ function App() {
         targetPCF: parseFloat(avgPCF.toFixed(1)),
         targetYield: parseFloat(avgYield.toFixed(2))
       }));
+      console.log("✅ Auto-filled assumptions:", {
+        growthEPS: histGrowthEPS,
+        targetPE: avgPE
+      });
       setData(result.data);
       setInfo((prev) => ({ ...prev, ...result.info }));
     } catch (e) {

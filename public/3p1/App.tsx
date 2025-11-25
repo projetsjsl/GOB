@@ -454,8 +454,14 @@ export default function App() {
     const handleSelectTicker = async (symbol: string) => {
         const upperSymbol = symbol.toUpperCase();
         if (library[upperSymbol]) {
-            alert("Ce ticker existe déjà.");
+            // Load existing profile data
+            const existingProfile = library[upperSymbol];
             setActiveId(upperSymbol);
+            setData(existingProfile.data);
+            setAssumptions(existingProfile.assumptions);
+            setInfo(existingProfile.info);
+            setNotes(existingProfile.notes);
+            console.log(`✅ Loaded existing profile for ${upperSymbol}`);
             return;
         }
 
