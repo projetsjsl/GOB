@@ -86,6 +86,7 @@ export const ValuationCharts: React.FC<ValuationChartsProps> = ({
         year: row.year,
         avgPE: (ratios.peHigh + ratios.peLow) / 2,
         avgPCF: (ratios.pcfHigh + ratios.pcfLow) / 2,
+        isEstimate: row.isEstimate || false
       };
     });
 
@@ -97,7 +98,16 @@ export const ValuationCharts: React.FC<ValuationChartsProps> = ({
           <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Historique Prix vs BPA</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={history}>
+              <LineChart data={history.map(row => ({
+                ...row,
+                // Split into actual and estimated values
+                priceHighActual: !row.isEstimate && row.priceHigh > 0 ? row.priceHigh : null,
+                priceLowActual: !row.isEstimate && row.priceLow > 0 ? row.priceLow : null,
+                epsActual: !row.isEstimate && row.earningsPerShare > 0 ? row.earningsPerShare : null,
+                priceHighEst: row.isEstimate ? row.priceHigh : null,
+                priceLowEst: row.isEstimate ? row.priceLow : null,
+                epsEst: row.isEstimate ? row.earningsPerShare : null
+              }))}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                 <XAxis dataKey="year" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis yAxisId="left" orientation="left" stroke="#2563eb" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
@@ -106,9 +116,14 @@ export const ValuationCharts: React.FC<ValuationChartsProps> = ({
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 />
                 <Legend />
-                <Line yAxisId="left" type="monotone" dataKey="priceHigh" stroke="#93c5fd" name="Prix Haut" dot={false} strokeWidth={2} />
-                <Line yAxisId="left" type="monotone" dataKey="priceLow" stroke="#1e40af" name="Prix Bas" dot={false} strokeWidth={2} />
-                <Line yAxisId="right" type="monotone" dataKey="earningsPerShare" stroke="#dc2626" name="BPA (EPS)" strokeWidth={2} />
+                {/* Actual data - solid lines */}
+                <Line yAxisId="left" type="monotone" dataKey="priceHighActual" stroke="#93c5fd" name="Prix Haut" dot={false} strokeWidth={2} connectNulls />
+                <Line yAxisId="left" type="monotone" dataKey="priceLowActual" stroke="#1e40af" name="Prix Bas" dot={false} strokeWidth={2} connectNulls />
+                <Line yAxisId="right" type="monotone" dataKey="epsActual" stroke="#dc2626" name="BPA (EPS)" strokeWidth={2} connectNulls />
+                {/* Estimated data - dashed lines */}
+                <Line yAxisId="left" type="monotone" dataKey="priceHighEst" stroke="#93c5fd" strokeDasharray="5 5" dot={false} strokeWidth={2} connectNulls legendType="none" />
+                <Line yAxisId="left" type="monotone" dataKey="priceLowEst" stroke="#1e40af" strokeDasharray="5 5" dot={false} strokeWidth={2} connectNulls legendType="none" />
+                <Line yAxisId="right" type="monotone" dataKey="epsEst" stroke="#dc2626" strokeDasharray="5 5" strokeWidth={2} connectNulls legendType="none" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -202,7 +217,14 @@ export const ValuationCharts: React.FC<ValuationChartsProps> = ({
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={ratioData}
+                data={ratioData.map(row => ({
+                  ...row,
+                  // Split into actual and estimated
+                  avgPEActual: !row.isEstimate && row.avgPE > 0 ? row.avgPE : null,
+                  avgPCFActual: !row.isEstimate && row.avgPCF > 0 ? row.avgPCF : null,
+                  avgPEEst: row.isEstimate ? row.avgPE : null,
+                  avgPCFEst: row.isEstimate ? row.avgPCF : null
+                }))}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
@@ -224,23 +246,48 @@ export const ValuationCharts: React.FC<ValuationChartsProps> = ({
                 />
                 <Legend wrapperStyle={{ paddingTop: '10px' }} />
 
+                {/* Actual data - solid lines */}
                 <Line
                   type="monotone"
-                  dataKey="avgPE"
+                  dataKey="avgPEActual"
                   stroke="#dc2626"
                   name="P/E Moyen"
                   strokeWidth={2}
                   dot={{ r: 4, strokeWidth: 0, fill: '#dc2626' }}
                   activeDot={{ r: 6 }}
+                  connectNulls
                 />
                 <Line
                   type="monotone"
-                  dataKey="avgPCF"
+                  dataKey="avgPCFActual"
                   stroke="#16a34a"
                   name="P/CF Moyen"
                   strokeWidth={2}
                   dot={{ r: 4, strokeWidth: 0, fill: '#16a34a' }}
                   activeDot={{ r: 6 }}
+                  connectNulls
+                />
+
+                {/* Estimated data - dashed lines */}
+                <Line
+                  type="monotone"
+                  dataKey="avgPEEst"
+                  stroke="#dc2626"
+                  strokeDasharray="5 5"
+                  strokeWidth={2}
+                  dot={false}
+                  connectNulls
+                  legendType="none"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="avgPCFEst"
+                  stroke="#16a34a"
+                  strokeDasharray="5 5"
+                  strokeWidth={2}
+                  dot={false}
+                  connectNulls
+                  legendType="none"
                 />
 
                 <Brush
