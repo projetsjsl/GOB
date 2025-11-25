@@ -1,0 +1,16 @@
+{
+    "name": "gob-scripts",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Utility scripts for GOB Finance Pro",
+    "scripts": {
+        "bulk-load": "node bulk-load-tickers.js",
+        "enrich-watchlist": "node enrich-watchlist.js",
+        "full-setup": "node enrich-watchlist.js && node bulk-load-tickers.js"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.39.0",
+        "node-fetch": "^3.3.2",
+        "dotenv": "^16.3.1"
+    }
+}
