@@ -97,13 +97,13 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
             {/* BPA Row */}
             <tr>
               <td className="p-3 text-left font-bold text-gray-700">BPA (EPS)</td>
-              <td className="p-3 text-gray-600">{baseValues.eps.toFixed(2)}</td>
-              <td className="p-3">
-                <input type="number" value={assumptions.growthRateEPS} onChange={(e) => handleInput(e, 'growthRateEPS')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+              <td className="p-3 bg-green-50 text-green-800 font-semibold">{baseValues.eps.toFixed(2)}</td>
+              <td className="p-3 bg-orange-50">
+                <input type="number" value={assumptions.growthRateEPS} onChange={(e) => handleInput(e, 'growthRateEPS')} className="w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" />
               </td>
               <td className="p-3 bg-slate-50 text-gray-800 font-medium">{futureValues.eps.toFixed(2)}</td>
-              <td className="p-3">
-                <input type="number" value={assumptions.targetPE} onChange={(e) => handleInput(e, 'targetPE')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+              <td className="p-3 bg-orange-50">
+                <input type="number" value={assumptions.targetPE} onChange={(e) => handleInput(e, 'targetPE')} className="w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" />
               </td>
               <td className="p-3 bg-green-50 font-bold text-green-700">{formatCurrency(targets.eps)}</td>
             </tr>
@@ -111,13 +111,13 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
             {/* CFA Row */}
             <tr>
               <td className="p-3 text-left font-bold text-gray-700">CFA (Cash Flow)</td>
-              <td className="p-3 text-gray-600">{baseValues.cf.toFixed(2)}</td>
-              <td className="p-3">
-                <input type="number" value={assumptions.growthRateCF} onChange={(e) => handleInput(e, 'growthRateCF')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+              <td className="p-3 bg-green-50 text-green-800 font-semibold">{baseValues.cf.toFixed(2)}</td>
+              <td className="p-3 bg-orange-50">
+                <input type="number" value={assumptions.growthRateCF} onChange={(e) => handleInput(e, 'growthRateCF')} className="w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" />
               </td>
               <td className="p-3 bg-slate-50 text-gray-800 font-medium">{futureValues.cf.toFixed(2)}</td>
-              <td className="p-3">
-                <input type="number" value={assumptions.targetPCF} onChange={(e) => handleInput(e, 'targetPCF')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+              <td className="p-3 bg-orange-50">
+                <input type="number" value={assumptions.targetPCF} onChange={(e) => handleInput(e, 'targetPCF')} className="w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" />
               </td>
               <td className="p-3 bg-green-50 font-bold text-green-700">{formatCurrency(targets.cf)}</td>
             </tr>
@@ -125,13 +125,13 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
             {/* BV Row */}
             <tr>
               <td className="p-3 text-left font-bold text-gray-700">BV (Book Value)</td>
-              <td className="p-3 text-gray-600">{baseValues.bv.toFixed(2)}</td>
-              <td className="p-3">
-                <input type="number" value={assumptions.growthRateBV} onChange={(e) => handleInput(e, 'growthRateBV')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+              <td className="p-3 bg-green-50 text-green-800 font-semibold">{baseValues.bv.toFixed(2)}</td>
+              <td className="p-3 bg-orange-50">
+                <input type="number" value={assumptions.growthRateBV} onChange={(e) => handleInput(e, 'growthRateBV')} className="w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" />
               </td>
               <td className="p-3 bg-slate-50 text-gray-800 font-medium">{futureValues.bv.toFixed(2)}</td>
-              <td className="p-3">
-                <input type="number" value={assumptions.targetPBV} onChange={(e) => handleInput(e, 'targetPBV')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+              <td className="p-3 bg-orange-50">
+                <input type="number" value={assumptions.targetPBV} onChange={(e) => handleInput(e, 'targetPBV')} className="w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" />
               </td>
               <td className="p-3 bg-green-50 font-bold text-green-700">{formatCurrency(targets.bv)}</td>
             </tr>
@@ -139,15 +139,15 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
             {/* DIV Row */}
             <tr>
               <td className="p-3 text-left font-bold text-gray-700">DIV (Dividende)</td>
-              <td className="p-3 text-gray-600">{baseValues.div.toFixed(2)}</td>
-              <td className="p-3">
-                <input type="number" value={assumptions.growthRateDiv} onChange={(e) => handleInput(e, 'growthRateDiv')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+              <td className="p-3 bg-green-50 text-green-800 font-semibold">{baseValues.div.toFixed(2)}</td>
+              <td className="p-3 bg-orange-50">
+                <input type="number" value={assumptions.growthRateDiv} onChange={(e) => handleInput(e, 'growthRateDiv')} className="w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" />
               </td>
               <td className="p-3 bg-slate-50 text-gray-800 font-medium">{futureValues.div.toFixed(2)}</td>
-              <td className="p-3">
+              <td className="p-3 bg-orange-50">
                 <div className="flex items-center justify-end gap-1">
-                  <input type="number" value={assumptions.targetYield} step="0.1" onChange={(e) => handleInput(e, 'targetYield')} className="w-12 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
-                  <span className="text-xs text-gray-500">%</span>
+                  <input type="number" value={assumptions.targetYield} step="0.1" onChange={(e) => handleInput(e, 'targetYield')} className="w-12 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" />
+                  <span className="text-xs text-orange-600">%</span>
                 </div>
               </td>
               <td className="p-3 bg-green-50 font-bold text-green-700">{formatCurrency(targets.div)}</td>
@@ -176,6 +176,6 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };

@@ -32460,36 +32460,36 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { className: "divide-y divide-gray-100", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-left font-bold text-gray-700", children: "BPA (EPS)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-gray-600", children: baseValues.eps.toFixed(2) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateEPS, onChange: (e) => handleInput(e, "growthRateEPS"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 text-green-800 font-semibold", children: baseValues.eps.toFixed(2) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateEPS, onChange: (e) => handleInput(e, "growthRateEPS"), className: "w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-slate-50 text-gray-800 font-medium", children: futureValues.eps.toFixed(2) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPE, onChange: (e) => handleInput(e, "targetPE"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPE, onChange: (e) => handleInput(e, "targetPE"), className: "w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 font-bold text-green-700", children: formatCurrency(targets.eps) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-left font-bold text-gray-700", children: "CFA (Cash Flow)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-gray-600", children: baseValues.cf.toFixed(2) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateCF, onChange: (e) => handleInput(e, "growthRateCF"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 text-green-800 font-semibold", children: baseValues.cf.toFixed(2) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateCF, onChange: (e) => handleInput(e, "growthRateCF"), className: "w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-slate-50 text-gray-800 font-medium", children: futureValues.cf.toFixed(2) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPCF, onChange: (e) => handleInput(e, "targetPCF"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPCF, onChange: (e) => handleInput(e, "targetPCF"), className: "w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 font-bold text-green-700", children: formatCurrency(targets.cf) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-left font-bold text-gray-700", children: "BV (Book Value)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-gray-600", children: baseValues.bv.toFixed(2) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateBV, onChange: (e) => handleInput(e, "growthRateBV"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 text-green-800 font-semibold", children: baseValues.bv.toFixed(2) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateBV, onChange: (e) => handleInput(e, "growthRateBV"), className: "w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-slate-50 text-gray-800 font-medium", children: futureValues.bv.toFixed(2) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPBV, onChange: (e) => handleInput(e, "targetPBV"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetPBV, onChange: (e) => handleInput(e, "targetPBV"), className: "w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 font-bold text-green-700", children: formatCurrency(targets.bv) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-left font-bold text-gray-700", children: "DIV (Dividende)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-gray-600", children: baseValues.div.toFixed(2) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateDiv, onChange: (e) => handleInput(e, "growthRateDiv"), className: "w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 text-green-800 font-semibold", children: baseValues.div.toFixed(2) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.growthRateDiv, onChange: (e) => handleInput(e, "growthRateDiv"), className: "w-16 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-slate-50 text-gray-800 font-medium", children: futureValues.div.toFixed(2) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetYield, step: "0.1", onChange: (e) => handleInput(e, "targetYield"), className: "w-12 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500", children: "%" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "number", value: assumptions.targetYield, step: "0.1", onChange: (e) => handleInput(e, "targetYield"), className: "w-12 text-right border-b border-orange-300 outline-none focus:border-orange-500 bg-transparent text-orange-700 font-medium" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-orange-600", children: "%" })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 bg-green-50 font-bold text-green-700", children: formatCurrency(targets.div) })
         ] })
@@ -32509,6 +32509,104 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[10px] text-green-700 mt-1 opacity-80", children: "(Gain Prix + Dividendes)" })
       ] })
     ] })
+  ] });
+};
+const DataSourcesInfo = () => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg shadow-sm border border-blue-200 mt-8", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 mb-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$c, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800", children: "📊 Sources des Données et Méthodologie de Calcul" })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "font-bold text-green-700 mb-2 flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-3 h-3 bg-green-500 rounded-full" }),
+          "Données Officielles (Vert)"
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-gray-700 space-y-1.5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source :" }),
+            " Financial Modeling Prep (FMP) API"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "BPA (EPS) :" }),
+            " Bénéfice net par action (données annuelles auditées)"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "CFA (Cash Flow) :" }),
+            " Flux de trésorerie opérationnel par action"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "BV (Book Value) :" }),
+            " Valeur comptable par action"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "DIV (Dividende) :" }),
+            " Somme des dividendes versés par année fiscale"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Haut/Bas :" }),
+            " Prix maximum et minimum observés durant l'année"
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "font-bold text-orange-700 mb-2 flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-3 h-3 bg-orange-500 rounded-full" }),
+          "Projections Basées sur Hypothèses (Orange)"
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-gray-700 space-y-1.5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Taux de Croissance :" }),
+            " CAGR calculé sur l'historique disponible (plafonné à 0-20%)"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Ratios Cibles :" }),
+            " Moyenne historique des ratios P/E, P/CF, P/BV (filtrage des valeurs aberrantes)"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Rendement Cible :" }),
+            " Moyenne historique du rendement en dividendes"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Valeurs Projetées (5 ans) :" }),
+            " Calculées avec la formule : ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-gray-100 px-1 rounded", children: "Valeur × (1 + Taux)^5" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Cible :" }),
+            " Valeur projetée × Ratio cible (ex: EPS projeté × P/E cible)"
+          ] })
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow-sm mt-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-indigo-700 mb-2", children: "🧮 Formules de Calcul" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "CAGR (Taux de Croissance Annuel Composé) :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "((Valeur Finale / Valeur Initiale)^(1/Années)) - 1" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Cible (Méthode P/E) :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "BPA Projeté (An 5) × P/E Cible" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Cible (Méthode Dividende) :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "Dividende Projeté (An 5) / (Rendement Cible / 100)" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Rendement Potentiel Total :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "((Prix Cible Moyen / Prix Actuel) - 1) × 100" })
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-yellow-800", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "⚠️ Avertissement :" }),
+      " Les projections sont basées sur des hypothèses et l'historique. Elles ne constituent pas une garantie de performance future. Les données en ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600 font-semibold", children: "orange" }),
+      " sont des estimations calculées automatiquement et doivent être ajustées selon votre analyse personnelle."
+    ] }) })
   ] });
 };
 const InfoTab = () => {
@@ -33595,7 +33693,8 @@ function App() {
                 assumptions,
                 onUpdateAssumption: handleUpdateAssumption
               }
-            )
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DataSourcesInfo, {})
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "xl:col-span-1 space-y-6 no-print", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-br from-slate-800 to-slate-900 text-white p-6 rounded-lg shadow-lg", children: [

@@ -10,6 +10,7 @@ import { Sidebar } from './components/Sidebar';
 import { SensitivityTable } from './components/SensitivityTable';
 import { NotesEditor } from './components/NotesEditor';
 import { EvaluationDetails } from './components/EvaluationDetails';
+import { DataSourcesInfo } from './components/DataSourcesInfo';
 import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
@@ -818,6 +819,9 @@ export default function App() {
                                         assumptions={assumptions}
                                         onUpdateAssumption={handleUpdateAssumption}
                                     />
+
+                                    {/* Data Sources and Methodology Info */}
+                                    <DataSourcesInfo />
 
                                 </div>
 
