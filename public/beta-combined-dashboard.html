@@ -23157,18 +23157,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         };
                         document.head.appendChild(script);
 
-                        // Timeout pour détecter si le script ne charge pas
+                        // Timeout de sécurité (si React ne monte pas)
                         setTimeout(() => {
-                            if (!isLoaded && !loadError) {
-                                console.warn('⚠️ Timeout de chargement de 3p1');
-                                setLoadError(true);
+                            const root = document.getElementById('finance-pro-root');
+                            if (!root || root.innerHTML.trim() === '') {
+                                console.warn("Timeout de chargement de 3p1 - Vérifiez la console");
+                                document.getElementById('finance-pro-error').classList.remove('hidden');
                             }
-                        }, 10000);
+                        }, 15000); // Increased to 15s for bundled app
 
                         return () => {
                             // Cleanup
                             if (style.parentNode) style.parentNode.removeChild(style);
-                            if (importMap.parentNode) importMap.parentNode.removeChild(importMap);
+                            // if (importMap.parentNode) importMap.parentNode.removeChild(importMap); // This line was commented out or removed in the original context
                             if (script.parentNode) script.parentNode.removeChild(script);
                         };
                     }, []);

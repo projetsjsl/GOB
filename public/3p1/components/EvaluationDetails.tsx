@@ -10,10 +10,13 @@ interface EvaluationDetailsProps {
 }
 
 export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assumptions, onUpdateAssumption }) => {
-  
+
   // Determine base values from selected base year
-  const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
-  
+  // Robust fallback: 1. Match Base Year & Valid EPS -> 2. Any Valid EPS -> 3. Last Data
+  const baseYearData = data.find(d => d.year === assumptions.baseYear && d.earningsPerShare > 0)
+    || [...data].reverse().find(d => d.earningsPerShare > 0)
+    || data[data.length - 1];
+
   const baseValues = {
     eps: baseYearData?.earningsPerShare || 0,
     cf: baseYearData?.cashFlowPerShare || 0,
@@ -41,7 +44,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
 
   // Average Target Price
   const validTargets = [targets.eps, targets.cf, targets.bv, targets.div].filter(t => t > 0);
-  const avgTargetPrice = validTargets.length > 0 
+  const avgTargetPrice = validTargets.length > 0
     ? validTargets.reduce((a, b) => a + b, 0) / validTargets.length
     : 0;
 
@@ -49,14 +52,14 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   // D1 = D0(1+g), D2=D0(1+g)^2...
   let totalDividends = 0;
   let currentD = baseValues.div;
-  for(let i=0; i<5; i++) {
-      currentD = currentD * (1 + assumptions.growthRateDiv / 100);
-      totalDividends += currentD;
+  for (let i = 0; i < 5; i++) {
+    currentD = currentD * (1 + assumptions.growthRateDiv / 100);
+    totalDividends += currentD;
   }
 
   // Total Return Calculation
   // Formula: ((Target Price + Accumulated Dividends) - Current Price) / Current Price
-  const totalReturnPercent = assumptions.currentPrice > 0 
+  const totalReturnPercent = assumptions.currentPrice > 0
     ? ((avgTargetPrice + totalDividends - assumptions.currentPrice) / assumptions.currentPrice) * 100
     : 0;
 
@@ -67,14 +70,14 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
   // We stick to totalReturnPercent.
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>, key: keyof Assumptions) => {
-      const val = parseFloat(e.target.value);
-      if(!isNaN(val)) onUpdateAssumption(key, val);
+    const val = parseFloat(e.target.value);
+    if (!isNaN(val)) onUpdateAssumption(key, val);
   };
 
   return (
     <div className="bg-white p-5 rounded-lg shadow border border-gray-200 print-break-inside-avoid">
       <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-        <CalculatorIcon className="w-5 h-5 text-blue-600"/>
+        <CalculatorIcon className="w-5 h-5 text-blue-600" />
         ÉVALUATION PERSONNELLE (Projection 5 Ans)
       </h3>
 
@@ -100,13 +103,13 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               </td>
               <td className="p-3 bg-slate-50 text-gray-800 font-medium">{futureValues.eps.toFixed(2)}</td>
               <td className="p-3">
-                 <input type="number" value={assumptions.targetPE} onChange={(e) => handleInput(e, 'targetPE')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+                <input type="number" value={assumptions.targetPE} onChange={(e) => handleInput(e, 'targetPE')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
               </td>
               <td className="p-3 bg-blue-50 font-bold text-blue-700">{formatCurrency(targets.eps)}</td>
             </tr>
 
             {/* CFA Row */}
-             <tr>
+            <tr>
               <td className="p-3 text-left font-bold text-gray-700">CFA (Cash Flow)</td>
               <td className="p-3 text-gray-600">{baseValues.cf.toFixed(2)}</td>
               <td className="p-3">
@@ -114,13 +117,13 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               </td>
               <td className="p-3 bg-slate-50 text-gray-800 font-medium">{futureValues.cf.toFixed(2)}</td>
               <td className="p-3">
-                 <input type="number" value={assumptions.targetPCF} onChange={(e) => handleInput(e, 'targetPCF')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+                <input type="number" value={assumptions.targetPCF} onChange={(e) => handleInput(e, 'targetPCF')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
               </td>
               <td className="p-3 bg-blue-50 font-bold text-blue-700">{formatCurrency(targets.cf)}</td>
             </tr>
 
             {/* BV Row */}
-             <tr>
+            <tr>
               <td className="p-3 text-left font-bold text-gray-700">BV (Book Value)</td>
               <td className="p-3 text-gray-600">{baseValues.bv.toFixed(2)}</td>
               <td className="p-3">
@@ -128,13 +131,13 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               </td>
               <td className="p-3 bg-slate-50 text-gray-800 font-medium">{futureValues.bv.toFixed(2)}</td>
               <td className="p-3">
-                 <input type="number" value={assumptions.targetPBV} onChange={(e) => handleInput(e, 'targetPBV')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+                <input type="number" value={assumptions.targetPBV} onChange={(e) => handleInput(e, 'targetPBV')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
               </td>
               <td className="p-3 bg-blue-50 font-bold text-blue-700">{formatCurrency(targets.bv)}</td>
             </tr>
 
             {/* DIV Row */}
-             <tr>
+            <tr>
               <td className="p-3 text-left font-bold text-gray-700">DIV (Dividende)</td>
               <td className="p-3 text-gray-600">{baseValues.div.toFixed(2)}</td>
               <td className="p-3">
@@ -142,10 +145,10 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               </td>
               <td className="p-3 bg-slate-50 text-gray-800 font-medium">{futureValues.div.toFixed(2)}</td>
               <td className="p-3">
-                 <div className="flex items-center justify-end gap-1">
-                    <input type="number" value={assumptions.targetYield} step="0.1" onChange={(e) => handleInput(e, 'targetYield')} className="w-12 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
-                    <span className="text-xs text-gray-500">%</span>
-                 </div>
+                <div className="flex items-center justify-end gap-1">
+                  <input type="number" value={assumptions.targetYield} step="0.1" onChange={(e) => handleInput(e, 'targetYield')} className="w-12 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
+                  <span className="text-xs text-gray-500">%</span>
+                </div>
               </td>
               <td className="p-3 bg-blue-50 font-bold text-blue-700">{formatCurrency(targets.div)}</td>
             </tr>
@@ -154,24 +157,24 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
       </div>
 
       <div className="mt-6 flex flex-col md:flex-row justify-end gap-6 items-end">
-          <div className="text-right">
-              <div className="text-xs text-gray-500 uppercase mb-1">Prix Cible Moyen (5 ans)</div>
-              <div className="text-3xl font-bold text-gray-800 border-b-2 border-gray-800 inline-block px-2">
-                  {formatCurrency(avgTargetPrice)}
-              </div>
+        <div className="text-right">
+          <div className="text-xs text-gray-500 uppercase mb-1">Prix Cible Moyen (5 ans)</div>
+          <div className="text-3xl font-bold text-gray-800 border-b-2 border-gray-800 inline-block px-2">
+            {formatCurrency(avgTargetPrice)}
           </div>
+        </div>
 
-          <div className="bg-green-50 p-4 rounded-lg border border-green-200 text-right min-w-[200px]">
-              <div className="text-xs text-green-800 uppercase font-bold mb-1" title="Incluant appréciation du prix et dividendes cumulés">
-                  Rendement Total Potentiel
-              </div>
-              <div className="text-3xl font-black text-green-600">
-                  {totalReturnPercent.toFixed(2)}%
-              </div>
-              <div className="text-[10px] text-green-700 mt-1 opacity-80">
-                  (Gain Prix + Dividendes)
-              </div>
+        <div className="bg-green-50 p-4 rounded-lg border border-green-200 text-right min-w-[200px]">
+          <div className="text-xs text-green-800 uppercase font-bold mb-1" title="Incluant appréciation du prix et dividendes cumulés">
+            Rendement Total Potentiel
           </div>
+          <div className="text-3xl font-black text-green-600">
+            {totalReturnPercent.toFixed(2)}%
+          </div>
+          <div className="text-[10px] text-green-700 mt-1 opacity-80">
+            (Gain Prix + Dividendes)
+          </div>
+        </div>
       </div>
     </div>
   );

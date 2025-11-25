@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       assetsDir: 'assets',
       emptyOutDir: true,
+      minify: false, // Disable minification for debugging
       rollupOptions: {
         output: {
           entryFileNames: 'assets/index.js',
