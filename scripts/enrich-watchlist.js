@@ -79,7 +79,7 @@ async function addTickersToWatchlist(tickers, region) {
     for (const ticker of tickers) {
         // Check if ticker already exists
         const { data: existing } = await supabase
-            .from('ticker_watchlist')
+            .from('watchlist')
             .select('ticker')
             .eq('ticker', ticker)
             .single();
@@ -92,11 +92,14 @@ async function addTickersToWatchlist(tickers, region) {
 
         // Add ticker
         const { error } = await supabase
-            .from('ticker_watchlist')
+            .from('watchlist')
             .insert({
                 ticker: ticker,
-                is_favorite: true, // Mark as favorite (star)
-                added_at: new Date().toISOString()
+                company_name: null,
+                added_at: new Date().toISOString(),
+                notes: 'Large cap - Auto-added',
+                target_price: null,
+                stop_loss: null
             });
 
         if (error) {

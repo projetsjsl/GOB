@@ -10,10 +10,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Supabase config
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     console.error('❌ Missing Supabase credentials');
@@ -145,7 +148,7 @@ async function bulkLoadTickers() {
     // 2. Fetch watchlist tickers
     console.log('📊 Fetching watchlist tickers...');
     const { data: watchlistTickers, error: watchlistError } = await supabase
-        .from('ticker_watchlist')
+        .from('watchlist')
         .select('ticker');
 
     if (watchlistError) {
