@@ -33164,15 +33164,40 @@ function App() {
       if (result.info) {
         setInfo((prev) => ({ ...prev, ...result.info }));
       }
-      if (result.currentPrice > 0) {
-        setAssumptions((prev) => ({
-          ...prev,
-          currentPrice: result.currentPrice,
-          // Try to update current dividend from latest year data if available
-          currentDividend: result.data.length > 0 ? result.data[result.data.length - 1].dividendPerShare : prev.currentDividend,
-          baseYear: result.data.length > 0 ? result.data[result.data.length - 1].year : prev.baseYear
-        }));
-      }
+      const validHistory2 = result.data.filter((d) => d.priceHigh > 0 && d.priceLow > 0);
+      const lastValidData = [...result.data].reverse().find((d) => d.earningsPerShare > 0) || result.data[result.data.length - 1];
+      const lastData = result.data[result.data.length - 1];
+      const firstData = result.data[0];
+      const yearsDiff = lastValidData.year - firstData.year;
+      const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
+      const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
+      const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
+      const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
+      const peRatios = validHistory2.map((d) => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2).filter((v) => isFinite(v) && v > 0);
+      const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
+      const pcfRatios = validHistory2.map((d) => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2).filter((v) => isFinite(v) && v > 0);
+      const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
+      const yieldValues = validHistory2.map((d) => d.dividendPerShare / d.priceHigh * 100).filter((v) => isFinite(v) && v >= 0);
+      const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2;
+      setAssumptions((prev) => ({
+        ...prev,
+        currentPrice: result.currentPrice,
+        currentDividend: lastData.dividendPerShare,
+        baseYear: lastValidData.year,
+        growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
+        growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
+        growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
+        growthRateBV: Math.min(Math.max(histGrowthBV, 0), 20),
+        growthRateDiv: Math.min(Math.max(histGrowthDiv, 0), 20),
+        targetPE: parseFloat(avgPE.toFixed(1)),
+        targetPCF: parseFloat(avgPCF.toFixed(1)),
+        targetYield: parseFloat(avgYield.toFixed(2))
+      }));
+      console.log("✅ Auto-filled assumptions in performSync:", {
+        growthEPS: histGrowthEPS,
+        targetPE: avgPE,
+        targetPCF: avgPCF
+      });
       console.log("💾 Auto-saving snapshot after API sync...");
       await saveSnapshot(
         activeId,
@@ -33342,9 +33367,12 @@ function App() {
       const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
       const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
       const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
-      const avgPE = validHistory2.length > 0 ? calculateAverage(validHistory2.map((d) => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2)) : 15;
-      const avgPCF = validHistory2.length > 0 ? calculateAverage(validHistory2.map((d) => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2)) : 10;
-      const avgYield = validHistory2.length > 0 ? calculateAverage(validHistory2.map((d) => d.dividendPerShare / d.priceHigh * 100)) : 2;
+      const peRatios = validHistory2.map((d) => (d.priceHigh / d.earningsPerShare + d.priceLow / d.earningsPerShare) / 2).filter((v) => isFinite(v) && v > 0);
+      const avgPE = peRatios.length > 0 ? calculateAverage(peRatios) : 15;
+      const pcfRatios = validHistory2.map((d) => (d.priceHigh / d.cashFlowPerShare + d.priceLow / d.cashFlowPerShare) / 2).filter((v) => isFinite(v) && v > 0);
+      const avgPCF = pcfRatios.length > 0 ? calculateAverage(pcfRatios) : 10;
+      const yieldValues = validHistory2.map((d) => d.dividendPerShare / d.priceHigh * 100).filter((v) => isFinite(v) && v >= 0);
+      const avgYield = yieldValues.length > 0 ? calculateAverage(yieldValues) : 2;
       setAssumptions((prev) => ({
         ...prev,
         currentPrice: result.currentPrice,
