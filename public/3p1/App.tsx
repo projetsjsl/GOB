@@ -11,6 +11,7 @@ import { SensitivityTable } from './components/SensitivityTable';
 import { NotesEditor } from './components/NotesEditor';
 import { EvaluationDetails } from './components/EvaluationDetails';
 import { DataSourcesInfo } from './components/DataSourcesInfo';
+import { AdditionalMetrics } from './components/AdditionalMetrics';
 import { InfoTab } from './components/InfoTab';
 import { TickerSearch } from './components/TickerSearch';
 import { ConfirmSyncDialog } from './components/ConfirmSyncDialog';
@@ -819,6 +820,14 @@ export default function App() {
                                         assumptions={assumptions}
                                         onUpdateAssumption={handleUpdateAssumption}
                                     />
+
+                                    <div className="mt-8">
+                                        <AdditionalMetrics
+                                            data={data}
+                                            assumptions={assumptions}
+                                            info={info}
+                                        />
+                                    </div>
 
                                     {/* Data Sources and Methodology Info */}
                                     <DataSourcesInfo />
