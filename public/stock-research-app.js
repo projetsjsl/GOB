@@ -77,33 +77,39 @@ async function fetchCompanyProfile(ticker) {
 }
 
 async function fetchKeyMetrics(ticker) {
-    const response = await fetch(`https://financialmodelingprep.com/api/v3/key-metrics-ttm/${ticker}?apikey=demo`);
+    const response = await fetch(`${API_BASE}/api/fmp-proxy?endpoint=key-metrics-ttm/${ticker}`);
     if (!response.ok) throw new Error('Failed to fetch metrics');
     const data = await response.json();
     return data[0] || {};
 }
 
 async function fetchQuote(ticker) {
-    const response = await fetch(`https://financialmodelingprep.com/api/v3/quote/${ticker}?apikey=demo`);
+    const response = await fetch(`${API_BASE}/api/fmp-proxy?endpoint=quote/${ticker}`);
     if (!response.ok) throw new Error('Failed to fetch quote');
     const data = await response.json();
     return data[0] || {};
 }
 
 async function fetchNews(ticker) {
-    const response = await fetch(`https://financialmodelingprep.com/api/v3/stock_news?tickers=${ticker}&limit=5&apikey=demo`);
+    const response = await fetch(`${API_BASE}/api/fmp-proxy?endpoint=stock_news&params=tickers=${ticker}&limit=5`);
     if (!response.ok) return [];
     return await response.json();
 }
 
 async function fetchPeers(ticker) {
-    // Mock peers for now - would use FMP peers endpoint
-    const peerMap = {
-        'AAPL': ['MSFT', 'GOOGL', 'NVDA', 'META', 'TSLA'],
-        'MSFT': ['AAPL', 'GOOGL', 'NVDA', 'META', 'ORCL'],
-        'GOOGL': ['AAPL', 'MSFT', 'META', 'AMZN', 'NFLX']
-    };
-    return peerMap[ticker] || ['MSFT', 'GOOGL', 'AAPL'];
+    // Use FMP peers endpoint through proxy
+    const response = await fetch(`${API_BASE}/api/fmp-proxy?endpoint=stock_peers&params=symbol=${ticker}`);
+    if (!response.ok) {
+        // Fallback to hardcoded peers
+        const peerMap = {
+            'AAPL': ['MSFT', 'GOOGL', 'NVDA', 'META', 'TSLA'],
+            'MSFT': ['AAPL', 'GOOGL', 'NVDA', 'META', 'ORCL'],
+            'GOOGL': ['AAPL', 'MSFT', 'META', 'AMZN', 'NFLX']
+        };
+        return peerMap[ticker] || ['MSFT', 'GOOGL', 'AAPL'];
+    }
+    const data = await response.json();
+    return data[0]?.peersList || [];
 }
 
 // Render Column 1: Ticker Info
