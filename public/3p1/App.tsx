@@ -478,15 +478,18 @@ export default function App() {
 
             // Auto-fill assumptions based on historical data
             const validHistory = result.data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
+
+            // Find last year with valid EPS
+            const lastValidData = [...result.data].reverse().find(d => d.earningsPerShare > 0) || result.data[result.data.length - 1];
             const lastData = result.data[result.data.length - 1];
             const firstData = result.data[0];
-            const yearsDiff = lastData.year - firstData.year;
+            const yearsDiff = lastValidData.year - firstData.year;
 
             // Calculate historical CAGRs
-            const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastData.earningsPerShare, yearsDiff);
-            const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastData.cashFlowPerShare, yearsDiff);
-            const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastData.bookValuePerShare, yearsDiff);
-            const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastData.dividendPerShare, yearsDiff);
+            const histGrowthEPS = calculateCAGR(firstData.earningsPerShare, lastValidData.earningsPerShare, yearsDiff);
+            const histGrowthSales = calculateCAGR(firstData.cashFlowPerShare, lastValidData.cashFlowPerShare, yearsDiff);
+            const histGrowthBV = calculateCAGR(firstData.bookValuePerShare, lastValidData.bookValuePerShare, yearsDiff);
+            const histGrowthDiv = calculateCAGR(firstData.dividendPerShare, lastValidData.dividendPerShare, yearsDiff);
 
             // Calculate Average Ratios
             const avgPE = validHistory.length > 0
@@ -505,7 +508,7 @@ export default function App() {
                 ...prev,
                 currentPrice: result.currentPrice,
                 currentDividend: lastData.dividendPerShare,
-                baseYear: lastData.year,
+                baseYear: lastValidData.year, // Use valid data year
                 growthRateEPS: Math.min(Math.max(histGrowthEPS, 0), 20),
                 growthRateSales: Math.min(Math.max(histGrowthSales, 0), 20),
                 growthRateCF: Math.min(Math.max(histGrowthSales, 0), 20),
