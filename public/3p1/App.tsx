@@ -518,6 +518,15 @@ export default function App() {
                 targetPCF: parseFloat(avgPCF.toFixed(1)),
                 targetYield: parseFloat(avgYield.toFixed(2))
             }));
+
+            console.log('✅ Auto-filled assumptions:', {
+                growthEPS: histGrowthEPS,
+                targetPE: avgPE
+            });
+
+            // Notify user of auto-fill
+            // setTimeout(() => alert(`Hypothèses mises à jour basées sur l'historique :\nCroissance BPA: ${histGrowthEPS.toFixed(1)}%\nP/E Cible: ${avgPE.toFixed(1)}x`), 500);
+
             setData(result.data);
             setInfo(prev => ({ ...prev, ...result.info }));
         } catch (e) {

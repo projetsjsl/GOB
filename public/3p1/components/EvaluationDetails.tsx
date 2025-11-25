@@ -90,7 +90,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               <th className="p-2">Croissance %</th>
               <th className="p-2 bg-slate-50">5 Ans (Proj)</th>
               <th className="p-2">Ratio Cible</th>
-              <th className="p-2 bg-blue-50 text-blue-900">Prix Cible</th>
+              <th className="p-2 bg-green-50 text-green-900">Prix Cible</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -105,7 +105,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               <td className="p-3">
                 <input type="number" value={assumptions.targetPE} onChange={(e) => handleInput(e, 'targetPE')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
               </td>
-              <td className="p-3 bg-blue-50 font-bold text-blue-700">{formatCurrency(targets.eps)}</td>
+              <td className="p-3 bg-green-50 font-bold text-green-700">{formatCurrency(targets.eps)}</td>
             </tr>
 
             {/* CFA Row */}
@@ -119,7 +119,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               <td className="p-3">
                 <input type="number" value={assumptions.targetPCF} onChange={(e) => handleInput(e, 'targetPCF')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
               </td>
-              <td className="p-3 bg-blue-50 font-bold text-blue-700">{formatCurrency(targets.cf)}</td>
+              <td className="p-3 bg-green-50 font-bold text-green-700">{formatCurrency(targets.cf)}</td>
             </tr>
 
             {/* BV Row */}
@@ -133,7 +133,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
               <td className="p-3">
                 <input type="number" value={assumptions.targetPBV} onChange={(e) => handleInput(e, 'targetPBV')} className="w-16 text-right border-b border-gray-300 outline-none focus:border-blue-500 bg-transparent" />
               </td>
-              <td className="p-3 bg-blue-50 font-bold text-blue-700">{formatCurrency(targets.bv)}</td>
+              <td className="p-3 bg-green-50 font-bold text-green-700">{formatCurrency(targets.bv)}</td>
             </tr>
 
             {/* DIV Row */}
@@ -150,7 +150,7 @@ export const EvaluationDetails: React.FC<EvaluationDetailsProps> = ({ data, assu
                   <span className="text-xs text-gray-500">%</span>
                 </div>
               </td>
-              <td className="p-3 bg-blue-50 font-bold text-blue-700">{formatCurrency(targets.div)}</td>
+              <td className="p-3 bg-green-50 font-bold text-green-700">{formatCurrency(targets.div)}</td>
             </tr>
           </tbody>
         </table>
