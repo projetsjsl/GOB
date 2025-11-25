@@ -106,12 +106,13 @@ function calculateAssumptions(data, currentPrice) {
 async function saveSnapshot(ticker, data, assumptions, info) {
     try {
         const { error } = await supabase
-            .from('finance_snapshots')
+            .from('finance_pro_snapshots')
             .insert({
                 ticker: ticker,
-                data: data,
+                annual_data: data,
                 assumptions: assumptions,
-                info: info,
+                company_info: info,
+                profile_id: ticker,
                 notes: `Auto-generated snapshot from bulk loader - ${new Date().toLocaleString()}`,
                 is_current: true,
                 auto_fetched: true
