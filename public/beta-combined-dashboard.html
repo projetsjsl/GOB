@@ -970,7 +970,7 @@
 
             const BetaCombinedDashboard = () => {
                 // États principaux
-                const [activeTab, setActiveTab] = useState('stocks-news'); // Onglet par défaut pour afficher les sections Top Movers, Analyses, et Titres
+                const [activeTab, setActiveTab] = useState('intellistocks'); // Onglet par défaut: JLab™ (contient Titres & Nouvelles et Finance Pro)
                 const [tickers, setTickers] = useState([]);
                 const [teamTickers, setTeamTickers] = useState([]);
                 const [watchlistTickers, setWatchlistTickers] = useState([]);
@@ -7926,13 +7926,13 @@ STRUCTURE JSON OBLIGATOIRE:
                                         Aucun ticker disponible
                                     </h3>
                                     <p className={`mb-4 ${isDarkMode ? 'text-yellow-300' : 'text-yellow-700'}`}>
-                                        Ajoutez des tickers dans l'onglet "Titres & Nouvelles" pour commencer.
+                                        Ajoutez des tickers dans l'onglet JLab™ pour commencer.
                                     </p>
                                     <button
-                                        onClick={() => setActiveTab('stocks-news')}
+                                        onClick={() => setActiveTab('intellistocks')}
                                         className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                     >
-                                        Aller à Titres & Nouvelles →
+                                        Aller à JLab™ →
                                     </button>
                                 </div>
                             </div>
@@ -8072,12 +8072,12 @@ STRUCTURE JSON OBLIGATOIRE:
                                     Analyses Seeking Alpha
                                 </h3>
                                 <div className="text-center py-8">
-                                    <p className="text-gray-400 mb-4">Aucun ticker disponible. Ajoutez des tickers dans l'onglet "Titres & Nouvelles".</p>
+                                    <p className="text-gray-400 mb-4">Aucun ticker disponible. Ajoutez des tickers dans l'onglet JLab™.</p>
                                     <button
-                                        onClick={() => setActiveTab('stocks-news')}
+                                        onClick={() => setActiveTab('intellistocks')}
                                         className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                     >
-                                        Aller à Titres & Nouvelles →
+                                        Aller à JLab™ →
                                     </button>
                                 </div>
                             </div>
@@ -17148,6 +17148,55 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // ============================================
                 // COMPOSANT INTELLISTOCKS
                 // ============================================
+                // Composant JLab unifié avec navigation interne
+                const JLabUnifiedTab = () => {
+                    const [jlabView, setJlabView] = useState('stocks-news'); // 'stocks-news' ou 'finance-pro'
+                    
+                    return (
+                        <div className="w-full h-full">
+                            {/* Navigation interne JLab */}
+                            <div className={`mb-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setJlabView('stocks-news')}
+                                        className={`px-6 py-3 font-semibold transition-all duration-200 ${
+                                            jlabView === 'stocks-news'
+                                                ? isDarkMode
+                                                    ? 'bg-green-600 text-white border-b-2 border-green-400'
+                                                    : 'bg-green-100 text-green-800 border-b-2 border-green-600'
+                                                : isDarkMode
+                                                    ? 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        📊 Titres & Nouvelles
+                                    </button>
+                                    <button
+                                        onClick={() => setJlabView('finance-pro')}
+                                        className={`px-6 py-3 font-semibold transition-all duration-200 ${
+                                            jlabView === 'finance-pro'
+                                                ? isDarkMode
+                                                    ? 'bg-green-600 text-white border-b-2 border-green-400'
+                                                    : 'bg-green-100 text-green-800 border-b-2 border-green-600'
+                                                : isDarkMode
+                                                    ? 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        💼 Finance Pro
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {/* Contenu conditionnel */}
+                            <div className="w-full h-full">
+                                {jlabView === 'stocks-news' && <StocksNewsTab />}
+                                {jlabView === 'finance-pro' && <FinanceProTab />}
+                            </div>
+                        </div>
+                    );
+                };
+
                 const IntelliStocksTab = () => {
                     const [time, setTime] = useState(new Date());
                     const [selectedStock, setSelectedStock] = useState('AAPL');
@@ -23260,11 +23309,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
                 const tabs = [
                     { id: 'markets-economy', label: 'Marchés & Économie', component: MarketsEconomyTab },
-                    { id: 'stocks-news', label: 'Titres & Nouvelles', component: StocksNewsTab },
+                    { id: 'intellistocks', label: 'JLab™', component: JLabUnifiedTab },
                     { id: 'ask-emma', label: 'Emma IA™', component: AskEmmaTab },
                     { id: 'yield-curve', label: '📈 Yield Curve', component: YieldCurveTab },
-                    { id: 'intellistocks', label: 'JLab™', component: IntelliStocksTab },
-                    { id: 'finance-pro', label: 'Finance Pro', component: FinanceProTab },
                     { id: 'plus', label: 'Plus', component: PlusTab },
                     { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
                     { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab },
@@ -23760,10 +23807,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {/* Contenu principal */}
                         <main className={`max-w-7xl mx-auto p-6 md:ml-20 pb-24 md:pb-6 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
                             }`}>
-                            {activeTab === 'stocks-news' && <StocksNewsTab />}
                             {activeTab === 'markets-economy' && <MarketsEconomyTab />}
                             {activeTab === 'yield-curve' && <YieldCurveTab />}
-                            {activeTab === 'intellistocks' && <IntelliStocksTab />}
+                            {activeTab === 'intellistocks' && <JLabUnifiedTab />}
                             {activeTab === 'ask-emma' && <AskEmmaTab
                                 prefillMessage={emmaPrefillMessage}
                                 setPrefillMessage={setEmmaPrefillMessage}
@@ -23795,7 +23841,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                             {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                             {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
-                            {activeTab === 'finance-pro' && <FinanceProTab />}
                         </main>
 
                         {/* Messages */}
