@@ -1012,9 +1012,34 @@
                         const originalParent = content.parentNode;
                         const originalNextSibling = content.nextSibling;
                         const originalDisplay = content.style.display;
+                        const originalHeight = content.style.height;
                         
                         modalContent.appendChild(content);
                         content.style.display = 'block';
+                        
+                        // Agrandir les widgets TradingView dans la modal
+                        const tradingViewContainers = content.querySelectorAll('.tradingview-widget-container, [style*="height"]');
+                        tradingViewContainers.forEach(container => {
+                            const currentHeight = container.style.height || container.getAttribute('style');
+                            if (currentHeight && currentHeight.includes('px')) {
+                                const heightValue = parseInt(currentHeight.match(/\d+/)?.[0] || '400');
+                                // Augmenter la hauteur de 50% à 100% selon le contexte
+                                const newHeight = Math.max(heightValue * 1.5, window.innerHeight * 0.7);
+                                container.style.height = `${newHeight}px`;
+                            } else if (!currentHeight) {
+                                // Si pas de hauteur définie, utiliser une hauteur généreuse
+                                container.style.height = `${window.innerHeight * 0.7}px`;
+                            }
+                        });
+                        
+                        // Agrandir les canvas et autres éléments graphiques
+                        const canvasElements = content.querySelectorAll('canvas');
+                        canvasElements.forEach(canvas => {
+                            const parent = canvas.parentElement;
+                            if (parent && !parent.style.height) {
+                                parent.style.height = `${window.innerHeight * 0.7}px`;
+                            }
+                        });
                         
                         return () => {
                             // Restaurer le contenu à sa position originale
@@ -1024,6 +1049,9 @@
                                 originalParent.appendChild(content);
                             }
                             content.style.display = originalDisplay;
+                            if (originalHeight) {
+                                content.style.height = originalHeight;
+                            }
                         };
                     }
                 }, [isExpanded]);
