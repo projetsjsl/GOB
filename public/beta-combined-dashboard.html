@@ -23117,37 +23117,34 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
 
                             {/* Widget TradingView Stock Heatmap */}
-                            <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                                }`}>
-                                <div className="mb-3 md:mb-6">
-                                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>
-                                        🇺🇸 Stock Heatmap All USA
-                                    </h2>
-                                    <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                        }`}>
-                                        Carte thermique de toutes les actions américaines - Performance par secteur et capitalisation
-                                    </p>
-                                </div>
+                            <ExpandableComponent title="Stock Heatmap All USA" icon="🇺🇸" isDarkMode={isDarkMode}>
+                                <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className="mb-3 md:mb-6">
+                                        <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            🇺🇸 Stock Heatmap All USA
+                                        </h2>
+                                        <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Carte thermique de toutes les actions américaines - Performance par secteur et capitalisation
+                                        </p>
+                                    </div>
 
-                                <div className="h-[500px] md:h-[700px] lg:h-[900px]">
-                                    <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapRef}>
-                                        <div className="tradingview-widget-container__widget"></div>
-                                        <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                            <a
-                                                href="https://fr.tradingview.com/heatmap/stock/"
-                                                rel="noopener nofollow"
-                                                target="_blank"
-                                                className={`underline transition-colors duration-300 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
-                                                    }`}
-                                            >
-                                                <span className="blue-text">Track all markets on TradingView</span>
-                                            </a>
+                                    <div className="h-[500px] md:h-[700px] lg:h-[900px]">
+                                        <div className="tradingview-widget-container h-full" ref={tradingViewHeatmapRef}>
+                                            <div className="tradingview-widget-container__widget"></div>
+                                            <div className={`tradingview-widget-copyright text-center text-xs mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                <a
+                                                    href="https://fr.tradingview.com/heatmap/stock/"
+                                                    rel="noopener nofollow"
+                                                    target="_blank"
+                                                    className={`underline transition-colors duration-300 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+                                                >
+                                                    <span className="blue-text">Track all markets on TradingView</span>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </ExpandableComponent>
 
                             {/* Widget TradingView Stock Heatmap TSX */}
                             <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
