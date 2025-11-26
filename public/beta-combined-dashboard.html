@@ -23228,17 +23228,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     useEffect(() => {
                         if (!containerRef.current) return;
                         
-                        // Ne charger qu'une seule fois, même si le composant se re-rend
-                        if (isInitializedRef.current) {
-                            // L'application est déjà chargée, juste vérifier qu'elle existe toujours
-                            const existingRoot = document.getElementById('finance-pro-root');
-                            if (existingRoot && existingRoot.innerHTML.trim() !== '') {
+                        // Vérifier si l'application est déjà chargée et si le root existe toujours dans le DOM
+                        const existingRoot = document.getElementById('finance-pro-root');
+                        if (isInitializedRef.current && existingRoot && existingRoot.innerHTML.trim() !== '') {
+                            // Vérifier que le root est bien dans notre conteneur
+                            if (existingRoot.parentNode === containerRef.current) {
                                 setIsLoaded(true);
                                 setLoadError(false);
+                                return;
+                            } else {
+                                // Le root existe mais n'est pas dans notre conteneur, le déplacer
+                                containerRef.current.innerHTML = '';
+                                containerRef.current.appendChild(existingRoot);
+                                setIsLoaded(true);
+                                setLoadError(false);
+                                return;
                             }
-                            return;
                         }
 
+                        // Si on arrive ici, l'application n'est pas encore chargée ou a été supprimée
                         isInitializedRef.current = true;
 
                         // Nettoyer les références précédentes si elles existent
@@ -23254,6 +23262,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         // Vérifier si le conteneur existe déjà (évite de le recréer lors des re-renders)
                         let rootDiv = document.getElementById('finance-pro-root');
                         if (!rootDiv) {
+                            // Créer un nouveau root
                             rootDiv = document.createElement('div');
                             rootDiv.id = 'finance-pro-root';
                             rootDiv.className = 'w-full h-full';
@@ -23262,8 +23271,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         } else {
                             // Le conteneur existe déjà, s'assurer qu'il est dans le bon parent
                             if (rootDiv.parentNode !== containerRef.current) {
+                                // Déplacer le root vers notre conteneur
                                 containerRef.current.innerHTML = '';
                                 containerRef.current.appendChild(rootDiv);
+                            } else if (rootDiv.innerHTML.trim() === '') {
+                                // Le root existe mais est vide, le réinitialiser
+                                rootDiv.innerHTML = '';
                             }
                         }
 
@@ -23308,28 +23321,46 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         // const importMap = document.createElement('script'); ...
 
                         // Charger le script compilé de l'application 3p1
-                        // Vérifier si le script existe déjà et le supprimer
+                        // Vérifier si le script existe déjà
                         const existingScript = document.querySelector('script[data-finance-pro="true"]');
                         if (existingScript) {
-                            existingScript.remove();
+                            // Le script existe déjà, vérifier si l'application est montée
+                            scriptRef.current = existingScript;
+                            // Vérifier si l'application React est déjà montée
+                            const root = document.getElementById('finance-pro-root');
+                            if (root && root.querySelector('#root')) {
+                                // L'application est déjà montée
+                                setIsLoaded(true);
+                                setLoadError(false);
+                            } else {
+                                // Le script est chargé mais l'app n'est pas montée, attendre un peu
+                                setTimeout(() => {
+                                    const rootCheck = document.getElementById('finance-pro-root');
+                                    if (rootCheck && rootCheck.querySelector('#root')) {
+                                        setIsLoaded(true);
+                                        setLoadError(false);
+                                    }
+                                }, 1000);
+                            }
+                        } else {
+                            // Le script n'existe pas, le charger
+                            const script = document.createElement('script');
+                            script.type = 'module';
+                            script.src = '/3p1/dist/assets/index.js';
+                            script.setAttribute('data-finance-pro', 'true'); // Marquer pour identification
+                            script.onload = () => {
+                                setIsLoaded(true);
+                                setLoadError(false);
+                            };
+                            script.onerror = (error) => {
+                                console.error('❌ Erreur de chargement de 3p1:', error);
+                                console.error('❌ Chemin tenté: /3p1/dist/assets/index.js');
+                                setLoadError(true);
+                                setIsLoaded(false);
+                            };
+                            document.head.appendChild(script);
+                            scriptRef.current = script;
                         }
-
-                        const script = document.createElement('script');
-                        script.type = 'module';
-                        script.src = '/3p1/dist/assets/index.js';
-                        script.setAttribute('data-finance-pro', 'true'); // Marquer pour identification
-                        script.onload = () => {
-                            setIsLoaded(true);
-                            setLoadError(false);
-                        };
-                        script.onerror = (error) => {
-                            console.error('❌ Erreur de chargement de 3p1:', error);
-                            console.error('❌ Chemin tenté: /3p1/dist/assets/index.js');
-                            setLoadError(true);
-                            setIsLoaded(false);
-                        };
-                        document.head.appendChild(script);
-                        scriptRef.current = script;
 
                         // Timeout de sécurité (si React ne monte pas)
                         setTimeout(() => {
@@ -23341,10 +23372,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }, 15000); // Increased to 15s for bundled app
 
                         return () => {
-                            // Cleanup seulement si le composant est démonté (pas lors du changement de thème)
-                            // On ne nettoie pas ici car on veut que l'application reste chargée même si le thème change
+                            // Cleanup seulement si le composant est démonté
+                            // On ne nettoie PAS le root ni le script car on veut que l'application reste chargée
+                            // même si l'utilisateur change de vue (portfolio/watchlist/3pour1)
+                            // Le root et le script restent dans le DOM pour être réutilisés lors du remontage
                         };
-                    }, []); // Seulement au montage initial, pas lors du changement de thème
+                    }, []); // Seulement au montage initial, pas lors du changement de thème ou de vue
 
                     return (
                         <div className="w-full h-full flex flex-col">
