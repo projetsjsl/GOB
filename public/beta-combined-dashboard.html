@@ -22270,8 +22270,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         )}
                                     </div>
                                 ) : (
-                                    <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg overflow-hidden shadow-lg`}>
-                                        {filteredCalendarData.map((day, dayIndex) => (
+                                    <ExpandableComponent title="Calendrier financier" icon="📅" isDarkMode={isDarkMode}>
+                                        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg overflow-hidden shadow-lg`}>
+                                            {filteredCalendarData.map((day, dayIndex) => (
                                             <div key={dayIndex} className="border-b border-gray-700 last:border-b-0">
                                                 {/* Day Header */}
                                                 <div className={`${isDarkMode ? 'bg-gray-750' : 'bg-gray-200'} px-4 py-2 font-semibold text-sm`}>
