@@ -71,6 +71,40 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
     const buyLimit = floorPrice + (projectedPrice5Y - floorPrice) * 0.33;
     const sellLimit = projectedPrice5Y * 0.95;
 
+    // Helper function pour obtenir la couleur et la position du JPEGY
+    // Zones: 0-0.5 (11.1%), 0.5-1.5 (55.6%), 1.5-1.75 (5.6%), 1.75-2.0 (5.6%), 2.0+ (22.2%)
+    const getJpegyColor = (value: number): { color: string; bgColor: string; position: number } => {
+        if (value <= 0) {
+            return { color: '#6b7280', bgColor: '#f3f4f6', position: 0 };
+        }
+        if (value <= 0.5) {
+            // Vert pâle (0 à 0.5) - 11.1% de la barre
+            const position = (value / 0.5) * 11.1; // 0-11.1% de la barre
+            return { color: '#86efac', bgColor: '#dcfce7', position };
+        } else if (value <= 1.5) {
+            // Vert foncé (0.5 à 1.5) - 55.6% de la barre
+            const position = 11.1 + ((value - 0.5) / 1.0) * 55.6; // 11.1-66.7% de la barre
+            return { color: '#16a34a', bgColor: '#bbf7d0', position };
+        } else if (value <= 1.75) {
+            // Jaune (1.5 à 1.75) - 5.6% de la barre
+            const position = 66.7 + ((value - 1.5) / 0.25) * 5.6; // 66.7-72.3% de la barre
+            return { color: '#eab308', bgColor: '#fef9c3', position };
+        } else if (value <= 2.0) {
+            // Orange (1.75 à 2.0) - 5.6% de la barre
+            const position = 72.3 + ((value - 1.75) / 0.25) * 5.6; // 72.3-77.9% de la barre
+            return { color: '#f97316', bgColor: '#fed7aa', position };
+        } else {
+            // Rouge (au-dessus de 2.0) - 22.2% de la barre
+            // Pour les valeurs > 2.0, on limite à 100% mais on peut aller jusqu'à ~4.0 pour utiliser toute la zone rouge
+            const maxValue = 4.0; // Valeur maximale pour utiliser toute la zone rouge
+            const position = Math.min(77.9 + ((value - 2.0) / (maxValue - 2.0)) * 22.2, 100);
+            return { color: '#dc2626', bgColor: '#fecaca', position };
+        }
+    };
+
+    const jpegyColor = getJpegyColor(jpegy);
+    const forwardJpegyColor = getJpegyColor(forwardJpegy);
+
     return (
         <div className="space-y-6">
             {/* Indicateur JPEGY */}
@@ -82,11 +116,36 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                     Ratio = P/E ÷ (Growth % + Yield %). Plus le ratio est bas, plus l'action est attractive.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
+                    {/* JPEGY (P/E Actuel) */}
                     <div className="bg-white p-4 rounded-lg border border-purple-200">
                         <div className="text-sm text-gray-600 mb-1">JPEGY (P/E Actuel)</div>
-                        <div className="text-3xl font-bold text-purple-600">
+                        <div className="text-3xl font-bold mb-3" style={{ color: jpegyColor.color }}>
                             {jpegy > 0 ? jpegy.toFixed(2) : 'N/A'}
                         </div>
+                        
+                        {/* Zone de couleur avec indicateur */}
+                        <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden mb-3">
+                            {/* Segments de couleur - proportions: 0-0.5 (11.1%), 0.5-1.5 (55.6%), 1.5-1.75 (5.6%), 1.75-2.0 (5.6%), 2.0+ (22.1%) */}
+                            <div className="absolute inset-0 flex">
+                                <div className="bg-green-200" style={{ width: '11.1%' }}></div>
+                                <div className="bg-green-600" style={{ width: '55.6%' }}></div>
+                                <div className="bg-yellow-400" style={{ width: '5.6%' }}></div>
+                                <div className="bg-orange-500" style={{ width: '5.6%' }}></div>
+                                <div className="bg-red-600" style={{ width: '22.1%' }}></div>
+                            </div>
+                            {/* Indicateur de position */}
+                            {jpegy > 0 && (
+                                <div
+                                    className="absolute top-0 bottom-0 w-1 bg-black z-10 transition-all duration-300"
+                                    style={{ left: `${jpegyColor.position}%` }}
+                                >
+                                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap">
+                                        {jpegy.toFixed(2)}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        
                         <div className="text-xs text-gray-500 mt-2">
                             P/E: {currentPE > 0 ? currentPE.toFixed(2) : 'N/A'}x
                         </div>
@@ -94,11 +153,37 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                             (Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%)
                         </div>
                     </div>
+                    
+                    {/* JPEGY (Forward P/E) */}
                     <div className="bg-white p-4 rounded-lg border border-purple-200">
                         <div className="text-sm text-gray-600 mb-1">JPEGY (Forward P/E)</div>
-                        <div className="text-3xl font-bold text-indigo-600">
+                        <div className="text-3xl font-bold mb-3" style={{ color: forwardJpegyColor.color }}>
                             {forwardJpegy > 0 ? forwardJpegy.toFixed(2) : 'N/A'}
                         </div>
+                        
+                        {/* Zone de couleur avec indicateur */}
+                        <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden mb-3">
+                            {/* Segments de couleur - proportions: 0-0.5 (11.1%), 0.5-1.5 (55.6%), 1.5-1.75 (5.6%), 1.75-2.0 (5.6%), 2.0+ (22.1%) */}
+                            <div className="absolute inset-0 flex">
+                                <div className="bg-green-200" style={{ width: '11.1%' }}></div>
+                                <div className="bg-green-600" style={{ width: '55.6%' }}></div>
+                                <div className="bg-yellow-400" style={{ width: '5.6%' }}></div>
+                                <div className="bg-orange-500" style={{ width: '5.6%' }}></div>
+                                <div className="bg-red-600" style={{ width: '22.1%' }}></div>
+                            </div>
+                            {/* Indicateur de position */}
+                            {forwardJpegy > 0 && (
+                                <div
+                                    className="absolute top-0 bottom-0 w-1 bg-black z-10 transition-all duration-300"
+                                    style={{ left: `${forwardJpegyColor.position}%` }}
+                                >
+                                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap">
+                                        {forwardJpegy.toFixed(2)}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        
                         <div className="text-xs text-gray-500 mt-2">
                             Forward P/E: {forwardPE > 0 ? forwardPE.toFixed(2) : 'N/A'}x
                         </div>
@@ -107,9 +192,32 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                         </div>
                     </div>
                 </div>
-                <div className="mt-4 p-3 bg-purple-100 rounded-lg text-xs text-gray-700">
-                    <strong>Interprétation :</strong> Un JPEGY &lt; 1.0 indique que le P/E est inférieur à la somme de la croissance et du rendement, 
-                    suggérant une valorisation attractive. Un JPEGY &gt; 1.5 peut indiquer une survalorisation relative.
+                
+                {/* Légende des zones de couleur */}
+                <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
+                    <div className="text-xs font-semibold text-gray-700 mb-2">Légende des zones :</div>
+                    <div className="flex flex-wrap gap-2 text-xs">
+                        <div className="flex items-center gap-1">
+                            <div className="w-4 h-4 bg-green-200 rounded"></div>
+                            <span className="text-gray-600">0.0 - 0.5 (Vert pâle)</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-4 h-4 bg-green-600 rounded"></div>
+                            <span className="text-gray-600">0.5 - 1.5 (Vert foncé)</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-4 h-4 bg-yellow-400 rounded"></div>
+                            <span className="text-gray-600">1.5 - 1.75 (Jaune)</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-4 h-4 bg-orange-500 rounded"></div>
+                            <span className="text-gray-600">1.75 - 2.0 (Orange)</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-4 h-4 bg-red-600 rounded"></div>
+                            <span className="text-gray-600">&gt; 2.0 (Rouge)</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
