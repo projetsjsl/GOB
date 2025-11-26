@@ -23658,11 +23658,178 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
                     const [selectedTheme, setSelectedTheme] = useState('all'); // Filtre thème
                     const [localFilteredNews, setLocalFilteredNews] = useState([]);
+                    
+                    // États pour la courbe des taux (intégrée depuis YieldCurveTab)
+                    const [yieldData, setYieldData] = useState(null);
+                    const [yieldLoading, setYieldLoading] = useState(true);
+                    const [yieldError, setYieldError] = useState(null);
+                    const [selectedCountry, setSelectedCountry] = useState('both');
+                    const yieldChartRef = useRef(null);
+                    const yieldChartInstance = useRef(null);
 
                     // Refs pour les widgets TradingView
                     const marketOverviewRef = useRef(null);
                     const heatmapRef = useRef(null);
                     const screenerRef = useRef(null);
+                    
+                    // Fonction helper pour convertir maturité en mois
+                    const maturityToMonths = (maturity) => {
+                        if (maturity.includes('M')) return parseInt(maturity) || 0;
+                        if (maturity.includes('Y')) return (parseInt(maturity) || 0) * 12;
+                        return 0;
+                    };
+                    
+                    // Charger les données de yield curve au montage
+                    React.useEffect(() => {
+                        const fetchYieldCurve = async () => {
+                            setYieldLoading(true);
+                            setYieldError(null);
+                            try {
+                                const response = await fetch(`/api/yield-curve?country=${selectedCountry}`);
+                                if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+                                const data = await response.json();
+                                setYieldData(data);
+                                setYieldLoading(false);
+                            } catch (err) {
+                                setYieldError(err.message);
+                                setYieldLoading(false);
+                            }
+                        };
+                        fetchYieldCurve();
+                    }, [selectedCountry]);
+                    
+                    // Créer/mettre à jour le graphique Chart.js pour yield curve
+                    React.useEffect(() => {
+                        if (!yieldData || !yieldChartRef.current) return;
+                        if (typeof Chart === 'undefined') {
+                            console.error('❌ Chart.js n\'est pas chargé');
+                            return;
+                        }
+                        
+                        // Détruire l'ancien graphique
+                        if (yieldChartInstance.current) {
+                            yieldChartInstance.current.destroy();
+                        }
+                        
+                        const ctx = yieldChartRef.current.getContext('2d');
+                        const datasets = [];
+                        
+                        // Données US
+                        if (yieldData.data?.us?.rates) {
+                            datasets.push({
+                                label: 'US Treasury',
+                                data: yieldData.data.us.rates.map(r => ({
+                                    x: r.maturity,
+                                    y: r.rate
+                                })),
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                pointRadius: 6,
+                                pointHoverRadius: 8,
+                                pointBackgroundColor: '#3b82f6',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            });
+                        }
+                        
+                        // Données Canada
+                        if (yieldData.data?.canada?.rates) {
+                            datasets.push({
+                                label: 'Canada Bonds',
+                                data: yieldData.data.canada.rates.map(r => ({
+                                    x: r.maturity,
+                                    y: r.rate
+                                })),
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                pointRadius: 6,
+                                pointHoverRadius: 8,
+                                pointBackgroundColor: '#ef4444',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            });
+                        }
+                        
+                        if (datasets.length === 0) return;
+                        
+                        yieldChartInstance.current = new Chart(ctx, {
+                            type: 'line',
+                            data: { datasets },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top',
+                                        labels: {
+                                            color: isDarkMode ? '#e5e7eb' : '#1f2937',
+                                            font: { size: 14, weight: 'bold' },
+                                            padding: 20
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                                        titleColor: isDarkMode ? '#e5e7eb' : '#1f2937',
+                                        bodyColor: isDarkMode ? '#e5e7eb' : '#1f2937',
+                                        borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                                        borderWidth: 1,
+                                        padding: 12,
+                                        displayColors: true,
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        type: 'category',
+                                        title: {
+                                            display: true,
+                                            text: 'Maturité',
+                                            color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                            font: { size: 14, weight: 'bold' }
+                                        },
+                                        grid: {
+                                            color: isDarkMode ? '#374151' : '#e5e7eb'
+                                        },
+                                        ticks: {
+                                            color: isDarkMode ? '#9ca3af' : '#6b7280'
+                                        }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Taux (%)',
+                                            color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                            font: { size: 14, weight: 'bold' }
+                                        },
+                                        grid: {
+                                            color: isDarkMode ? '#374151' : '#e5e7eb'
+                                        },
+                                        ticks: {
+                                            color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                            callback: function (value) {
+                                                return value.toFixed(2) + '%';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        
+                        return () => {
+                            if (yieldChartInstance.current) {
+                                yieldChartInstance.current.destroy();
+                            }
+                        };
+                    }, [yieldData, isDarkMode]);
 
                     // Listes de filtres
                     const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
@@ -24241,6 +24408,233 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     })
                                 )}
                             </div>
+                            
+                            {/* ===== COURBE DES TAUX (YIELD CURVE) - INTÉGRÉE ===== */}
+                            <div className="mt-8 pt-8 border-t border-gray-700">
+                                {/* En-tête Courbe des Taux */}
+                                <div className={`p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <div>
+                                            <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                📈 Courbe des Taux (Yield Curve)
+                                            </h2>
+                                            <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                Visualisation des taux obligataires US Treasury et Canada par maturité
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <select
+                                                value={selectedCountry}
+                                                onChange={(e) => setSelectedCountry(e.target.value)}
+                                                className={`px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white'
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                                    }`}
+                                            >
+                                                <option value="both">US + Canada</option>
+                                                <option value="us">US uniquement</option>
+                                                <option value="canada">Canada uniquement</option>
+                                            </select>
+                                            <button
+                                                onClick={async () => {
+                                                    setYieldLoading(true);
+                                                    setYieldError(null);
+                                                    try {
+                                                        const response = await fetch(`/api/yield-curve?country=${selectedCountry}`);
+                                                        if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+                                                        const data = await response.json();
+                                                        setYieldData(data);
+                                                        setYieldLoading(false);
+                                                    } catch (err) {
+                                                        setYieldError(err.message);
+                                                        setYieldLoading(false);
+                                                    }
+                                                }}
+                                                disabled={yieldLoading}
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+                                            >
+                                                {yieldLoading ? '🔄 Chargement...' : '🔄 Actualiser'}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Indicateur de récession (spread 10Y-2Y) */}
+                                    {yieldData?.data?.us?.spread_10y_2y !== undefined && (
+                                        <div className={`p-4 rounded-lg border-l-4 ${yieldData.data.us.inverted
+                                            ? 'bg-red-50 border-red-500 dark:bg-red-900/20'
+                                            : 'bg-green-50 border-green-500 dark:bg-green-900/20'
+                                            }`}>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h3 className={`font-bold ${yieldData.data.us.inverted
+                                                        ? 'text-red-800 dark:text-red-300'
+                                                        : 'text-green-800 dark:text-green-300'
+                                                        }`}>
+                                                        {yieldData.data.us.inverted ? '⚠️ Courbe Inversée' : '✅ Courbe Normale'}
+                                                    </h3>
+                                                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        Spread 10Y-2Y: <strong>{yieldData.data.us.spread_10y_2y.toFixed(2)}%</strong>
+                                                    </p>
+                                                </div>
+                                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    {yieldData.data.us.inverted
+                                                        ? 'Indicateur historique de récession potentielle'
+                                                        : 'Conditions économiques normales'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Graphique et données Yield Curve */}
+                                {yieldLoading && (
+                                    <div className={`p-12 rounded-lg text-center transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Chargement des données...</p>
+                                    </div>
+                                )}
+
+                                {yieldError && (
+                                    <div className={`p-6 rounded-lg border-l-4 border-red-500 ${isDarkMode ? 'bg-red-900/20' : 'bg-red-50'}`}>
+                                        <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>❌ Erreur</h3>
+                                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{yieldError}</p>
+                                    </div>
+                                )}
+
+                                {!yieldLoading && !yieldError && yieldData && (
+                                    <>
+                                        {/* Graphique */}
+                                        {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
+                                            <div className={`p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                                <div style={{ height: '400px', position: 'relative' }}>
+                                                    <canvas ref={yieldChartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${isDarkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'}`}>
+                                                <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-yellow-300' : 'text-yellow-800'}`}>⚠️ Aucune donnée disponible</h3>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+                                                    Les données de yield curve ne sont pas disponibles. Vérifiez que la clé API FRED_API_KEY est configurée.
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                            {yieldData.data.us && (() => {
+                                                const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
+                                                return (
+                                                    <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <div className="flex items-center gap-2 font-semibold">
+                                                                <span>🇺🇸</span>
+                                                                <span>US Treasury</span>
+                                                            </div>
+                                                            <span className="text-xs opacity-70">{yieldData.data.us.date || '—'}</span>
+                                                        </div>
+                                                        {yieldData.data.us.rates?.length ? (
+                                                            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                                                {yieldData.data.us.rates.map(rate => (
+                                                                    <div key={`us-${rate.maturity}`} className="flex items-center justify-between border-b border-dashed border-gray-600/30 pb-1">
+                                                                        <span className="uppercase tracking-tight">{rate.maturity}</span>
+                                                                        <span className="font-semibold">{formatRate(rate.rate)}%</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-sm opacity-70">Données non disponibles.</p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+                                            {yieldData.data.canada && (() => {
+                                                const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
+                                                return (
+                                                    <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <div className="flex items-center gap-2 font-semibold">
+                                                                <span>🇨🇦</span>
+                                                                <span>Obligations Canada</span>
+                                                            </div>
+                                                            <span className="text-xs opacity-70">{yieldData.data.canada.date || '—'}</span>
+                                                        </div>
+                                                        {yieldData.data.canada.rates?.length ? (
+                                                            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                                                {yieldData.data.canada.rates.map(rate => (
+                                                                    <div key={`ca-${rate.maturity}`} className="flex items-center justify-between border-b border-dashed border-gray-600/30 pb-1">
+                                                                        <span className="uppercase tracking-tight">{rate.maturity}</span>
+                                                                        <span className="font-semibold">{formatRate(rate.rate)}%</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-sm opacity-70">Données non disponibles.</p>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+
+                                        {/* Tableau des maturités */}
+                                        {yieldData.data.us && yieldData.data.canada && (
+                                            <div className={`p-6 rounded-lg transition-colors duration-300 mt-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                                <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>📊 Tableau des Maturités</h3>
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full text-xs">
+                                                        <thead>
+                                                            <tr className={`border-b-2 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                                                <th className={`px-3 py-2 text-left font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Maturité</th>
+                                                                <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>🇺🇸 US Treasury (%)</th>
+                                                                <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>🇨🇦 Canada Bonds (%)</th>
+                                                                <th className={`px-3 py-2 text-right font-bold text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Écart (bps)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {(() => {
+                                                                const maturityToMonths = (maturity) => {
+                                                                    if (maturity.includes('M')) return parseInt(maturity) || 0;
+                                                                    if (maturity.includes('Y')) return (parseInt(maturity) || 0) * 12;
+                                                                    return 0;
+                                                                };
+                                                                const maturities = new Set();
+                                                                yieldData.data.us.rates.forEach(r => maturities.add(r.maturity));
+                                                                yieldData.data.canada.rates.forEach(r => maturities.add(r.maturity));
+                                                                return Array.from(maturities)
+                                                                    .sort((a, b) => maturityToMonths(a) - maturityToMonths(b))
+                                                                    .map((maturity, idx) => {
+                                                                        const usRate = yieldData.data.us.rates.find(r => r.maturity === maturity);
+                                                                        const caRate = yieldData.data.canada.rates.find(r => r.maturity === maturity);
+                                                                        const spread = usRate && caRate ? ((usRate.rate - caRate.rate) * 100).toFixed(0) : null;
+                                                                        return (
+                                                                            <tr key={maturity} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} ${idx % 2 === 0 ? (isDarkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
+                                                                                <td className={`px-3 py-2 font-semibold text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{maturity}</td>
+                                                                                <td className={`px-3 py-2 text-right text-xs ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{usRate ? usRate.rate.toFixed(2) : '-'}</td>
+                                                                                <td className={`px-3 py-2 text-right text-xs ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>{caRate ? caRate.rate.toFixed(2) : '-'}</td>
+                                                                                <td className={`px-3 py-2 text-right font-mono text-xs ${spread > 0 ? (isDarkMode ? 'text-green-400' : 'text-green-600') : spread < 0 ? (isDarkMode ? 'text-red-400' : 'text-red-600') : (isDarkMode ? 'text-gray-400' : 'text-gray-600')}`}>
+                                                                                    {spread !== null ? (spread > 0 ? '+' : '') + spread : '-'}
+                                                                                </td>
+                                                                            </tr>
+                                                                        );
+                                                                    });
+                                                            })()}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Note explicative */}
+                                        <div className={`p-4 rounded-lg mt-6 ${isDarkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
+                                            <h4 className={`font-bold mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-800'}`}>💡 À propos de la courbe des taux</h4>
+                                            <ul className={`text-sm space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                <li>• <strong>Courbe normale:</strong> Les taux longs sont supérieurs aux taux courts (économie saine)</li>
+                                                <li>• <strong>Courbe inversée:</strong> Les taux courts dépassent les taux longs (possibilité de récession)</li>
+                                                <li>• <strong>Spread 10Y-2Y:</strong> Indicateur clé surveillé par les économistes et investisseurs</li>
+                                                <li>• <strong>Sources:</strong> FRED (Federal Reserve Economic Data) et FMP (Financial Modeling Prep)</li>
+                                            </ul>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     );
                 };
@@ -24517,7 +24911,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     { id: 'markets-economy', label: 'Marchés & Économie', component: MarketsEconomyTab },
                     { id: 'intellistocks', label: 'JLab™', component: JLabUnifiedTab },
                     { id: 'ask-emma', label: 'Emma IA™', component: AskEmmaTab },
-                    { id: 'yield-curve', label: '📈 Yield Curve', component: YieldCurveTab },
+                    // { id: 'yield-curve', label: '📈 Yield Curve', component: YieldCurveTab }, // Intégré dans Marchés & Économie
                     { id: 'plus', label: 'Plus', component: PlusTab },
                     { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
                     { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab },
@@ -25014,7 +25408,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         <main className={`max-w-7xl mx-auto p-6 md:ml-20 pb-24 md:pb-6 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
                             }`}>
                             {activeTab === 'markets-economy' && <MarketsEconomyTab />}
-                            {activeTab === 'yield-curve' && <YieldCurveTab />}
+                            {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
                             {activeTab === 'intellistocks' && <JLabUnifiedTab />}
                             {activeTab === 'ask-emma' && <AskEmmaTab
                                 prefillMessage={emmaPrefillMessage}
