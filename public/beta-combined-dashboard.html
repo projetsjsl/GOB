@@ -23542,20 +23542,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </ExpandableComponent>
 
                                         {/* 2. Advanced Chart - PLEINE LARGEUR */}
-                                        <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
-                                            }`}>
-                                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>
-                                                📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
-                                            </h3>
-                                            <p className={`text-xs mb-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                                }`}>
-                                                Cliquez sur un symbole dans la watchlist pour changer tous les widgets
-                                            </p>
-                                            <div className="h-[400px] md:h-[650px] lg:h-[750px]">
-                                                <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}></div>
+                                        <ExpandableComponent title={`${timelineSymbol.split(':')[1]} - Graphique Avancé`} icon="📊" className="lg:col-span-2" isDarkMode={isDarkMode}>
+                                            <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
+                                                <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
+                                                </h3>
+                                                <p className={`text-xs mb-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    Cliquez sur un symbole dans la watchlist pour changer tous les widgets
+                                                </p>
+                                                <div className="h-[400px] md:h-[650px] lg:h-[750px]">
+                                                    <div className="tradingview-widget-container h-full" ref={tradingViewChartSPYRef}></div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ExpandableComponent>
 
                                         {/* 3. Symbol Profile - 1 COLONNE */}
                                         <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
