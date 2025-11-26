@@ -26,9 +26,12 @@ interface SidebarProps {
   onLoadVersion: (snapshotId: string) => void;
   onSyncFromSupabase?: () => void;
   isLoadingTickers?: boolean;
+  onBulkSyncAll?: () => void;
+  isBulkSyncing?: boolean;
+  bulkSyncProgress?: { current: number; total: number };
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, isBulkSyncing = false, bulkSyncProgress }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredProfiles = profiles
@@ -91,12 +94,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
         {onSyncFromSupabase && (
           <button
             onClick={onSyncFromSupabase}
-            disabled={isLoadingTickers}
-            className="w-full bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-3 py-2 rounded flex items-center justify-center gap-2 text-sm font-medium transition-colors"
+            disabled={isLoadingTickers || isBulkSyncing}
+            className="w-full bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-3 py-2 rounded flex items-center justify-center gap-2 text-sm font-medium transition-colors mb-2"
             title="Synchroniser avec Supabase"
           >
             <ArrowPathIcon className={`w-4 h-4 ${isLoadingTickers ? 'animate-spin' : ''}`} />
             <span>{isLoadingTickers ? 'Synchronisation...' : 'Synchroniser Supabase'}</span>
+          </button>
+        )}
+        {onBulkSyncAll && (
+          <button
+            onClick={onBulkSyncAll}
+            disabled={isBulkSyncing || isLoadingTickers}
+            className="w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-3 py-2 rounded flex items-center justify-center gap-2 text-sm font-medium transition-colors"
+            title="Synchroniser tous les tickers (sauvegarde automatique avant sync, préserve données manuelles)"
+          >
+            <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
+            <span className="flex-1 text-left">
+              {isBulkSyncing && bulkSyncProgress
+                ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`
+                : 'Sync Tous les Tickers'}
+            </span>
           </button>
         )}
       </div>

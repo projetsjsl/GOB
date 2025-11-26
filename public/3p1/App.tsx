@@ -805,6 +805,172 @@ export default function App() {
         }
     };
 
+    // --- BULK SYNC ALL TICKERS HANDLER ---
+    const [isBulkSyncing, setIsBulkSyncing] = useState(false);
+    const [bulkSyncProgress, setBulkSyncProgress] = useState({ current: 0, total: 0 });
+
+    const handleBulkSyncAllTickers = async () => {
+        if (!confirm(`Synchroniser tous les ${Object.keys(library).length} tickers ?\n\nChaque version sera sauvegardée avant la synchronisation.\nLes données manuelles et hypothèses (orange) seront préservées.`)) {
+            return;
+        }
+
+        setIsBulkSyncing(true);
+        const allTickers = Object.keys(library);
+        setBulkSyncProgress({ current: 0, total: allTickers.length });
+
+        let successCount = 0;
+        let errorCount = 0;
+        const errors: string[] = [];
+
+        // Traiter par batch pour éviter de surcharger
+        const batchSize = 3;
+        const delayBetweenBatches = 1000;
+
+        for (let i = 0; i < allTickers.length; i += batchSize) {
+            const batch = allTickers.slice(i, i + batchSize);
+
+            // Attendre entre les batches
+            if (i > 0) {
+                await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+            }
+
+            // Traiter le batch en parallèle
+            await Promise.allSettled(
+                batch.map(async (tickerSymbol) => {
+                    try {
+                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
+
+                        const profile = library[tickerSymbol];
+                        if (!profile) return;
+
+                        // 1. Sauvegarder un snapshot avant la sync
+                        console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                        await saveSnapshot(
+                            tickerSymbol,
+                            profile.data,
+                            profile.assumptions,
+                            profile.info,
+                            `Avant synchronisation globale - ${new Date().toLocaleString()}`,
+                            false, // Not current (on va le remplacer)
+                            false  // Not auto-fetched
+                        );
+
+                        // 2. Charger les nouvelles données FMP
+                        console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+                        const result = await fetchCompanyData(tickerSymbol);
+
+                        // 3. Merge intelligent : préserver les données manuelles
+                        // Créer un map des nouvelles données par année pour faciliter le merge
+                        const newDataByYear = new Map(result.data.map(row => [row.year, row]));
+                        
+                        const mergedData = profile.data.map((existingRow) => {
+                            const newRow = newDataByYear.get(existingRow.year);
+                            
+                            // Si pas de nouvelle donnée pour cette année, garder l'existant
+                            if (!newRow) {
+                                return existingRow;
+                            }
+
+                            // Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
+                            if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
+                                return existingRow; // Préserver la donnée manuelle
+                            }
+
+                            // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                            return {
+                                ...newRow,
+                                autoFetched: true
+                            };
+                        });
+
+                        // Ajouter les nouvelles années qui n'existent pas dans les données existantes
+                        result.data.forEach(newRow => {
+                            const exists = mergedData.some(row => row.year === newRow.year);
+                            if (!exists) {
+                                mergedData.push({
+                                    ...newRow,
+                                    autoFetched: true
+                                });
+                            }
+                        });
+
+                        // Trier par année
+                        mergedData.sort((a, b) => a.year - b.year);
+
+                        // 4. Mettre à jour le profil
+                        // - Garder les assumptions telles quelles (ne pas les modifier)
+                        // - Mettre à jour seulement currentPrice dans assumptions
+                        // - Mettre à jour les infos de l'entreprise
+                        setLibrary(prev => {
+                            const updated = {
+                                ...prev,
+                                [tickerSymbol]: {
+                                    ...profile,
+                                    data: mergedData,
+                                    info: {
+                                        ...profile.info,
+                                        ...result.info // Mettre à jour les infos (nom, secteur, etc.)
+                                    },
+                                    assumptions: {
+                                        ...profile.assumptions, // Garder toutes les hypothèses (orange)
+                                        currentPrice: result.currentPrice // Mettre à jour seulement le prix actuel
+                                    },
+                                    lastModified: Date.now()
+                                }
+                            };
+
+                            try {
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                            } catch (e) {
+                                console.warn('Failed to save to LocalStorage:', e);
+                            }
+
+                            return updated;
+                        });
+
+                        // 5. Sauvegarder le snapshot après sync
+                        await saveSnapshot(
+                            tickerSymbol,
+                            mergedData,
+                            {
+                                ...profile.assumptions,
+                                currentPrice: result.currentPrice
+                            },
+                            {
+                                ...profile.info,
+                                ...result.info
+                            },
+                            `Synchronisation globale - ${new Date().toLocaleString()}`,
+                            true,  // Mark as current
+                            true   // Auto-fetched
+                        );
+
+                        successCount++;
+                        console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+
+                    } catch (error: any) {
+                        errorCount++;
+                        const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
+                        errors.push(errorMsg);
+                        console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+                    }
+                })
+            );
+        }
+
+        setIsBulkSyncing(false);
+        setBulkSyncProgress({ current: 0, total: 0 });
+
+        // Afficher le résultat
+        const message = `✅ Synchronisation terminée\n\n` +
+            `Réussies: ${successCount}\n` +
+            `Erreurs: ${errorCount}` +
+            (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
+        
+        alert(message);
+        console.log(message);
+    };
+
     // --- SYNC FROM SUPABASE HANDLER ---
     const handleSyncFromSupabase = async () => {
         setIsLoadingTickers(true);
@@ -988,6 +1154,9 @@ export default function App() {
                         onLoadVersion={handleLoadSnapshot}
                         onSyncFromSupabase={handleSyncFromSupabase}
                         isLoadingTickers={isLoadingTickers}
+                        onBulkSyncAll={handleBulkSyncAllTickers}
+                        isBulkSyncing={isBulkSyncing}
+                        bulkSyncProgress={bulkSyncProgress}
                     />
                 </div>
             </div>
