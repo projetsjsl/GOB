@@ -25003,6 +25003,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </>
                                 )}
                             </div>
+                            
+                            {/* ===== CALENDRIER ÉCONOMIQUE - INTÉGRÉ ===== */}
+                            <div className="mt-8 pt-8 border-t border-gray-700">
+                                <EconomicCalendarTab />
+                            </div>
                         </div>
                     );
                 };
@@ -25280,13 +25285,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     { id: 'intellistocks', label: 'JLab™', component: JLabUnifiedTab },
                     { id: 'ask-emma', label: 'Emma IA™', component: AskEmmaTab },
                     // { id: 'yield-curve', label: '📈 Yield Curve', component: YieldCurveTab }, // Intégré dans Marchés & Économie
+                    // { id: 'economic-calendar', label: 'Calendrier Économique', component: EconomicCalendarTab }, // Intégré dans Marchés & Économie
+                    // { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab }, // Supprimé - fonctionnalités disponibles dans JLab → Dan's watchlist
                     { id: 'plus', label: 'Plus', component: PlusTab },
                     { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
-                    { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab },
                     { id: 'scrapping-sa', label: 'Seeking Alpha', component: ScrappingSATab },
                     { id: 'seeking-alpha', label: 'Stocks News', component: SeekingAlphaTab },
                     { id: 'email-briefings', label: 'Emma En Direct', component: EmailBriefingsTab },
-                    { id: 'economic-calendar', label: 'Calendrier Économique', component: EconomicCalendarTab },
                     { id: 'investing-calendar', label: 'TESTS JS', component: InvestingCalendarTab }
                 ];
 
