@@ -23530,16 +23530,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-4">
 
                                         {/* 1. Symbol Info - PLEINE LARGEUR */}
-                                        <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
-                                            }`}>
-                                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>
-                                                📊 Symbol Info
-                                            </h3>
-                                            <div className="h-[300px] md:h-[380px]">
-                                                <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}></div>
+                                        <ExpandableComponent title="Symbol Info" icon="📊" className="lg:col-span-2" isDarkMode={isDarkMode}>
+                                            <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
+                                                <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    📊 Symbol Info
+                                                </h3>
+                                                <div className="h-[300px] md:h-[380px]">
+                                                    <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}></div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ExpandableComponent>
 
                                         {/* 2. Advanced Chart - PLEINE LARGEUR */}
                                         <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
