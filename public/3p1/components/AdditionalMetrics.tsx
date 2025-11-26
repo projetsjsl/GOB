@@ -13,11 +13,25 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
     const lastData = data[data.length - 1];
     const validHistory = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
 
+    // Trouver les données de l'année de base pour les calculs
+    const baseYearData = data.find(d => d.year === assumptions.baseYear) || lastData;
+    const baseEPS = baseYearData?.earningsPerShare || 0;
+
     // Ratio Moyen Actuel
-    const currentPE = assumptions.currentPrice / (lastData?.earningsPerShare || 1);
+    const currentPE = baseEPS > 0 ? assumptions.currentPrice / baseEPS : 0;
     const currentPCF = assumptions.currentPrice / (lastData?.cashFlowPerShare || 1);
     const currentPBV = assumptions.currentPrice / (lastData?.bookValuePerShare || 1);
-    const currentYield = (lastData?.dividendPerShare || 0) / assumptions.currentPrice * 100;
+    const currentYield = (assumptions.currentDividend / assumptions.currentPrice) * 100;
+
+    // Calcul du Forward P/E (P/E basé sur les earnings projetés)
+    const forwardEPS = baseEPS * (1 + assumptions.growthRateEPS / 100);
+    const forwardPE = forwardEPS > 0 ? assumptions.currentPrice / forwardEPS : 0;
+
+    // Calcul JPEGY (Jean-Sebastien's Price to Earning adjusted for Growth and Yield)
+    // JPEGY = P/E / (Growth % + Yield %)
+    const growthPlusYield = assumptions.growthRateEPS + currentYield;
+    const jpegy = growthPlusYield > 0 ? currentPE / growthPlusYield : 0;
+    const forwardJpegy = growthPlusYield > 0 ? forwardPE / growthPlusYield : 0;
 
     // Ratios historiques moyens
     const avgPE = calculateAverage(
@@ -59,6 +73,46 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
 
     return (
         <div className="space-y-6">
+            {/* Indicateur JPEGY */}
+            <div className="card bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-200">
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    🎯 JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield)
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                    Ratio = P/E ÷ (Growth % + Yield %). Plus le ratio est bas, plus l'action est attractive.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded-lg border border-purple-200">
+                        <div className="text-sm text-gray-600 mb-1">JPEGY (P/E Actuel)</div>
+                        <div className="text-3xl font-bold text-purple-600">
+                            {jpegy > 0 ? jpegy.toFixed(2) : 'N/A'}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">
+                            P/E: {currentPE > 0 ? currentPE.toFixed(2) : 'N/A'}x
+                        </div>
+                        <div className="text-xs text-gray-500">
+                            (Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%)
+                        </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg border border-purple-200">
+                        <div className="text-sm text-gray-600 mb-1">JPEGY (Forward P/E)</div>
+                        <div className="text-3xl font-bold text-indigo-600">
+                            {forwardJpegy > 0 ? forwardJpegy.toFixed(2) : 'N/A'}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">
+                            Forward P/E: {forwardPE > 0 ? forwardPE.toFixed(2) : 'N/A'}x
+                        </div>
+                        <div className="text-xs text-gray-500">
+                            (Growth: {assumptions.growthRateEPS.toFixed(1)}% + Yield: {currentYield.toFixed(2)}% = {growthPlusYield.toFixed(2)}%)
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-4 p-3 bg-purple-100 rounded-lg text-xs text-gray-700">
+                    <strong>Interprétation :</strong> Un JPEGY &lt; 1.0 indique que le P/E est inférieur à la somme de la croissance et du rendement, 
+                    suggérant une valorisation attractive. Un JPEGY &gt; 1.5 peut indiquer une survalorisation relative.
+                </div>
+            </div>
+
             {/* Ratios Actuels vs Historiques */}
             <div className="card">
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
