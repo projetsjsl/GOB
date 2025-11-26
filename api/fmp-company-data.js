@@ -151,11 +151,49 @@ export default async function handler(req, res) {
             };
         }).sort((a, b) => a.year - b.year);
 
-        // 7. Info Object
+        // 7. Helper function to determine preferred symbol
+        const getPreferredSymbol = (profile) => {
+            const country = profile.country || '';
+            const exchange = profile.exchangeShortName || '';
+            const symbol = cleanSymbol;
+            
+            // Pour les titres canadiens, prioriser le symbole TSX
+            if (country === 'CA' || exchange === 'TSX' || exchange === 'TSXV') {
+                // Si le symbole actuel n'est pas sur TSX, chercher le symbole TSX
+                // Pour l'instant, on garde le symbole actuel mais on pourrait chercher l'équivalent TSX
+                return symbol;
+            }
+            
+            // Pour les titres européens ou asiatiques, prioriser l'ADR sur bourse US
+            const europeanCountries = ['GB', 'FR', 'DE', 'IT', 'ES', 'NL', 'CH', 'SE', 'NO', 'DK', 'FI', 'BE', 'AT', 'IE', 'PT'];
+            const asianCountries = ['JP', 'CN', 'KR', 'TW', 'HK', 'SG', 'IN', 'AU', 'NZ'];
+            
+            if (europeanCountries.includes(country) || asianCountries.includes(country)) {
+                // Si le symbole actuel est déjà sur une bourse US (NASDAQ, NYSE, etc.), on le garde
+                if (['NASDAQ', 'NYSE', 'AMEX'].includes(exchange)) {
+                    return symbol;
+                }
+                // Sinon, on pourrait chercher l'ADR, mais pour l'instant on garde le symbole actuel
+                return symbol;
+            }
+            
+            return symbol;
+        };
+
+        // 8. Info Object avec toutes les informations
+        const logoUrl = profile.image 
+            ? profile.image 
+            : `https://financialmodelingprep.com/image-stock/${cleanSymbol}.png`;
+        
         const mappedInfo = {
             name: profile.companyName,
             sector: profile.sector,
             marketCap: (profile.mktCap / 1000000000).toFixed(1) + 'B',
+            logo: logoUrl,
+            country: profile.country || '',
+            exchange: profile.exchangeShortName || profile.exchange || '',
+            currency: profile.currency || 'USD',
+            preferredSymbol: getPreferredSymbol(profile)
         };
 
         return res.status(200).json({

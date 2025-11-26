@@ -47,6 +47,11 @@ export interface CompanyInfo {
   sector: string;
   securityRank: string;
   marketCap: string; // formatted string for display
+  logo?: string; // URL du logo de l'entreprise
+  country?: string; // Pays de l'entreprise
+  exchange?: string; // Bourse (ex: NASDAQ, NYSE, TSX, etc.)
+  currency?: string; // Devise (ex: USD, CAD, EUR, etc.)
+  preferredSymbol?: string; // Symbole préféré (TSX pour Canada, ADR pour Europe/Asie)
 }
 
 export enum Recommendation {

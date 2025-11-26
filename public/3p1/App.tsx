@@ -56,7 +56,12 @@ const INITIAL_INFO: CompanyInfo = {
     name: 'Accenture PLC',
     sector: 'Services TI',
     securityRank: 'A+',
-    marketCap: '156.4B'
+    marketCap: '156.4B',
+    logo: undefined,
+    country: undefined,
+    exchange: undefined,
+    currency: 'USD',
+    preferredSymbol: undefined
 };
 
 const DEFAULT_PROFILE: AnalysisProfile = {
@@ -177,7 +182,12 @@ export default function App() {
                                 name: supabaseTicker.company_name || 'Chargement...',
                                 sector: supabaseTicker.sector || '',
                                 securityRank: 'N/A',
-                                marketCap: '-'
+                                marketCap: '-',
+                                logo: undefined,
+                                country: undefined,
+                                exchange: undefined,
+                                currency: 'USD',
+                                preferredSymbol: undefined
                             },
                             notes: '',
                             isWatchlist
@@ -1025,7 +1035,12 @@ export default function App() {
                             name: supabaseTicker.company_name || 'Chargement...',
                             sector: supabaseTicker.sector || '',
                             securityRank: 'N/A',
-                            marketCap: '-'
+                            marketCap: '-',
+                            logo: undefined,
+                            country: undefined,
+                            exchange: undefined,
+                            currency: 'USD',
+                            preferredSymbol: undefined
                         },
                         notes: '',
                         isWatchlist: shouldBeWatchlist

@@ -68,9 +68,22 @@ export const Header: React.FC<HeaderProps> = ({
     <div className="bg-white p-4 rounded-lg shadow mb-4 border-l-4 border-blue-600 print-full-width">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-2">
         <div className="flex items-center gap-3">
+          {/* Logo */}
+          {info.logo && (
+            <img 
+              src={info.logo} 
+              alt={info.name}
+              className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200"
+              onError={(e) => {
+                // Fallback si le logo ne charge pas
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          )}
+          
           <div className="relative">
             <div className="bg-blue-100 p-2 rounded text-blue-700 font-bold text-xl min-w-[60px] text-center select-none">
-              {info.symbol}
+              {info.preferredSymbol || info.symbol}
             </div>
             {/* Recommendation Status Dot */}
             <div
@@ -94,7 +107,24 @@ export const Header: React.FC<HeaderProps> = ({
             <h1 className="text-2xl font-bold text-gray-800 uppercase truncate max-w-[300px] md:max-w-[500px] flex items-center gap-2">
               {info.name}
             </h1>
-            <p className="text-sm text-gray-500">GROUPE OUELLET BOLDUC - GESTIONNAIRES DE PORTEFEUILLE</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm text-gray-500">GROUPE OUELLET BOLDUC - GESTIONNAIRES DE PORTEFEUILLE</p>
+              {info.exchange && (
+                <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                  {info.exchange}
+                </span>
+              )}
+              {info.currency && (
+                <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                  {info.currency}
+                </span>
+              )}
+              {info.country && (
+                <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                  {info.country}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <div className="mt-2 md:mt-0 flex items-center gap-4 text-sm shrink-0">

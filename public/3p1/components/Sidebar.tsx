@@ -147,11 +147,39 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                   {/* Recommendation Dot */}
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)}`} title={`Signal: ${recommendation}`}></div>
 
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-bold text-sm truncate flex items-center gap-2">
-                      {profile.id}
-                    </span>
+                  {/* Logo */}
+                  {profile.info.logo && (
+                    <img 
+                      src={profile.info.logo} 
+                      alt={profile.info.name}
+                      className="w-8 h-8 rounded object-cover flex-shrink-0"
+                      onError={(e) => {
+                        // Fallback si le logo ne charge pas
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm truncate">{profile.info.preferredSymbol || profile.id}</span>
+                      {profile.info.exchange && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-slate-700 text-slate-300 rounded">
+                          {profile.info.exchange}
+                        </span>
+                      )}
+                      {profile.info.currency && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-slate-700 text-slate-300 rounded">
+                          {profile.info.currency}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-xs truncate opacity-70">{profile.info.name}</span>
+                    {profile.info.country && (
+                      <span className="text-[10px] text-slate-500 truncate">
+                        {profile.info.country}
+                      </span>
+                    )}
                   </div>
                 </div>
 
