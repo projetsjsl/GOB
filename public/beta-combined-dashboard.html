@@ -14080,6 +14080,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     // Sections par défaut (fallback si Supabase échoue)
                     const DEFAULT_SECTIONS = [
                         {
+                            id: 'default-0',
                             name: 'Emma Expert (Prompt Système)',
                             icon: '👩‍💼',
                             prompt_type: 'existing',
@@ -14090,6 +14091,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             order_index: 0
                         },
                         {
+                            id: 'default-1',
                             name: 'Question Générale (LLM Standard)',
                             icon: '🤖',
                             prompt_type: 'existing',
@@ -14100,6 +14102,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             order_index: 1
                         },
                         {
+                            id: 'default-2',
                             name: 'Analyse Rapide de Titre',
                             icon: '📈',
                             prompt_type: 'existing',
@@ -14113,6 +14116,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             order_index: 2
                         },
                         {
+                            id: 'default-3',
                             name: 'Recherche d\'Actualités',
                             icon: '📰',
                             prompt_type: 'existing',
@@ -14123,6 +14127,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             order_index: 3
                         },
                         {
+                            id: 'default-4',
                             name: 'Comparaison de Titres',
                             icon: '⚖️',
                             prompt_type: 'existing',
@@ -14197,12 +14202,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     
                     // Charger les sections au montage du composant
                     useEffect(() => {
+                        // Initialiser avec les sections par défaut immédiatement
+                        setPromptSections(DEFAULT_SECTIONS);
+                        setSectionsLoading(false);
+                        
+                        // Initialiser les inputs pour les sections par défaut
+                        const inputsState = {};
+                        DEFAULT_SECTIONS.forEach(section => {
+                            section.inputs?.forEach(input => {
+                                inputsState[`${section.id}_${input.name}`] = '';
+                            });
+                        });
+                        setSectionInputs(inputsState);
+                        
+                        // Si Supabase est disponible, charger depuis la base de données
                         if (supabaseClient) {
                             loadPromptSections();
-                        } else {
-                            // Utiliser les sections par défaut si Supabase n'est pas disponible
-                            setPromptSections(DEFAULT_SECTIONS);
-                            setSectionsLoading(false);
                         }
                     }, [supabaseClient]);
                     
@@ -14254,6 +14269,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     
                     // Supprimer une section (soft delete)
                     const removeSection = async (id) => {
+                        // Ne pas permettre la suppression des sections par défaut
+                        if (!id || id.startsWith('default-')) {
+                            alert('Les sections par défaut ne peuvent pas être supprimées');
+                            return;
+                        }
+                        
                         if (!confirm('Êtes-vous sûr de vouloir supprimer cette section ?')) return;
                         
                         try {
@@ -15772,34 +15793,38 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                     ↓
                                                                 </button>
                                                             )}
-                                                            <button
-                                                                onClick={() => {
-                                                                    setSectionForm({
-                                                                        name: section.name || '',
-                                                                        icon: section.icon || '📝',
-                                                                        placeholder: section.placeholder || '',
-                                                                        button_color: section.button_color || 'bg-blue-600',
-                                                                        button_hover_color: section.button_hover_color || 'hover:bg-blue-700',
-                                                                        prompt_type: section.prompt_type || 'existing',
-                                                                        prompt_key: section.prompt_key || '',
-                                                                        custom_prompt: section.custom_prompt || '',
-                                                                        inputs: section.inputs || [{ name: 'query', placeholder: 'Saisissez...', type: 'text', width: 'flex-1' }]
-                                                                    });
-                                                                    setEditingSection(section);
-                                                                    setShowSectionModal(true);
-                                                                }}
-                                                                className="p-1 rounded hover:bg-gray-200"
-                                                                title="Modifier"
-                                                            >
-                                                                ✏️
-                                                            </button>
-                                                            <button
-                                                                onClick={() => removeSection(section.id)}
-                                                                className="p-1 rounded hover:bg-red-200 text-red-600"
-                                                                title="Supprimer"
-                                                            >
-                                                                🗑️
-                                                            </button>
+                                                            {section.id && !section.id.startsWith('default-') && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setSectionForm({
+                                                                            name: section.name || '',
+                                                                            icon: section.icon || '📝',
+                                                                            placeholder: section.placeholder || '',
+                                                                            button_color: section.button_color || 'bg-blue-600',
+                                                                            button_hover_color: section.button_hover_color || 'hover:bg-blue-700',
+                                                                            prompt_type: section.prompt_type || 'existing',
+                                                                            prompt_key: section.prompt_key || '',
+                                                                            custom_prompt: section.custom_prompt || '',
+                                                                            inputs: section.inputs || [{ name: 'query', placeholder: 'Saisissez...', type: 'text', width: 'flex-1' }]
+                                                                        });
+                                                                        setEditingSection(section);
+                                                                        setShowSectionModal(true);
+                                                                    }}
+                                                                    className="p-1 rounded hover:bg-gray-200"
+                                                                    title="Modifier"
+                                                                >
+                                                                    ✏️
+                                                                </button>
+                                                            )}
+                                                            {section.id && !section.id.startsWith('default-') && (
+                                                                <button
+                                                                    onClick={() => removeSection(section.id)}
+                                                                    className="p-1 rounded hover:bg-red-200 text-red-600"
+                                                                    title="Supprimer"
+                                                                >
+                                                                    🗑️
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
