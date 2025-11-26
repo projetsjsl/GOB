@@ -16210,7 +16210,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 Top Gainers
                                             </h4>
                                             <div className="space-y-2.5 sm:space-y-2">
-                                                {tickers
+                                                {displayedTickers
                                                     .map(ticker => ({
                                                         ticker,
                                                         change: stockData[ticker]?.dp || 0,
@@ -16297,7 +16297,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 Top Losers
                                             </h4>
                                             <div className="space-y-2">
-                                                {tickers
+                                                {displayedTickers
                                                     .map(ticker => ({
                                                         ticker,
                                                         change: stockData[ticker]?.dp || 0,
