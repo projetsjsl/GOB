@@ -234,7 +234,9 @@ export default function App() {
                                                 data: result.data,
                                                 info: {
                                                     ...profile.info,
-                                                    ...result.info
+                                                    ...result.info,
+                                                    // S'assurer que le nom de FMP remplace toujours celui de Supabase
+                                                    name: result.info.name || profile.info.name
                                                 },
                                                 assumptions: {
                                                     ...profile.assumptions,
@@ -910,7 +912,9 @@ export default function App() {
                                     data: mergedData,
                                     info: {
                                         ...profile.info,
-                                        ...result.info // Mettre à jour les infos (nom, secteur, etc.)
+                                        ...result.info, // Mettre à jour les infos (nom, secteur, etc.)
+                                        // S'assurer que le nom de FMP remplace toujours celui de Supabase
+                                        name: result.info.name || profile.info.name
                                     },
                                     assumptions: {
                                         ...profile.assumptions, // Garder toutes les hypothèses (orange)
@@ -1074,7 +1078,9 @@ export default function App() {
                                             data: result.data,
                                             info: {
                                                 ...profile.info,
-                                                ...result.info
+                                                ...result.info,
+                                                // S'assurer que le nom de FMP remplace toujours celui de Supabase
+                                                name: result.info.name || profile.info.name
                                             },
                                             assumptions: {
                                                 ...profile.assumptions,
