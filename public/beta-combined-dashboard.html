@@ -15668,6 +15668,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 </button>
                                             )}
                                         </div>
+                                        <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Prompt: emma-config.prompts.expertSystem
+                                        </div>
                                     </div>
 
                                     {/* 2. Question Générale (LLM Standard) */}
@@ -15699,6 +15702,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             >
                                                 {emmaLoading ? '⏳' : '📤'}
                                             </button>
+                                        </div>
+                                        <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Prompt: emma-config.prompts.generalAssistant
                                         </div>
                                     </div>
 
@@ -15756,6 +15762,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 {emmaLoading ? '⏳' : 'Analyse 📊'}
                                             </button>
                                         </div>
+                                        <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Prompt: emma-config.prompts.institutionalAnalysis
+                                        </div>
                                     </div>
 
                                     {/* 4. Recherche Actualités */}
@@ -15795,6 +15804,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 {emmaLoading ? '⏳' : 'Rechercher 🔍'}
                                             </button>
                                         </div>
+                                        <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Prompt: emma-config.prompts.newsSearch
+                                        </div>
                                     </div>
 
                                     {/* 5. Comparaison Titres */}
@@ -15833,6 +15845,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             >
                                                 {emmaLoading ? '⏳' : 'Comparer ⚖️'}
                                             </button>
+                                        </div>
+                                        <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            Prompt: emma-config.prompts.tickerComparison
                                         </div>
                                     </div>
                                 </div>

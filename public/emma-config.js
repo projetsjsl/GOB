@@ -36,7 +36,56 @@ export const emmaConfig = {
   },
 
   // Configuration du prompt
+  prompt: {
+    maxLength: 10000,
+    minLength: 100,
+    variables: {
+      userMessage: '{userMessage}',
+      dashboardData: '{dashboardData}',
+      currentTime: '{currentTime}',
+      userLevel: '{userLevel}',
+      userStyle: '{userStyle}'
+    }
+  },
 
+  // Prompts spécialisés
+  prompts: {
+    // Prompt système expert (utilise le prompt principal Emma)
+    expertSystem: {
+      name: 'Emma Expert (Système)',
+      key: 'expertSystem',
+      description: 'Analyse financière experte avec le prompt système complet'
+    },
+
+    // Assistant général
+    generalAssistant: {
+      name: 'Assistant Général',
+      key: 'generalAssistant',
+      prompt: 'Tu es un assistant IA utile et polyvalent.',
+      description: 'Questions générales sans contexte financier strict'
+    },
+
+    // Analyse institutionnelle
+    institutionalAnalysis: {
+      name: 'Analyse Institutionnelle',
+      key: 'institutionalAnalysis',
+      description: 'Rapport de recherche institutionnel détaillé'
+    },
+
+    // Recherche d'actualités
+    newsSearch: {
+      name: 'Recherche Actualités',
+      key: 'newsSearch',
+      description: 'Recherche et synthèse d\'actualités financières'
+    },
+
+    // Comparaison de titres
+    tickerComparison: {
+      name: 'Comparaison Titres',
+      key: 'tickerComparison',
+      description: 'Analyse comparative de plusieurs titres'
+    }
+  },
 
   // Prompt d'analyse institutionnelle
   institutionalAnalysis: `🧩 EN-TÊTE À PRODUIRE AUTOMATIQUEMENT
@@ -205,17 +254,6 @@ Tableaux obligatoires (3+)
 2. Recommandation & allocation
 3. Risques limitants / catalyseurs confirmants
 Niveau de confiance global.`,
-  prompt: {
-    maxLength: 10000,
-    minLength: 100,
-    variables: {
-      userMessage: '{userMessage}',
-      dashboardData: '{dashboardData}',
-      currentTime: '{currentTime}',
-      userLevel: '{userLevel}',
-      userStyle: '{userStyle}'
-    }
-  },
 
   // Configuration des spécialités
   specialties: [
