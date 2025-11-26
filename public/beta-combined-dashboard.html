@@ -48,6 +48,9 @@
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.10.3/dist/Recharts.js"></script>
     <!-- Iconoir - Beautiful open source icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 
     <!-- Script pour exposer les bibliothèques globalement -->
     <script>
@@ -13145,6 +13148,28 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                     const [emmaLoading, setEmmaLoading] = useState(false);
                     const chatContainerRef = useRef(null);
                     const [emmaApiKey, setEmmaApiKey] = useState('');
+                    
+                    // États pour la gestion dynamique des sections de prompt
+                    const [promptSections, setPromptSections] = useState([]);
+                    const [sectionsLoading, setSectionsLoading] = useState(true);
+                    const [editMode, setEditMode] = useState(false);
+                    const [showSectionModal, setShowSectionModal] = useState(false);
+                    const [editingSection, setEditingSection] = useState(null);
+                    const [sectionInputs, setSectionInputs] = useState({}); // État pour les inputs de chaque section
+                    const [sectionForm, setSectionForm] = useState({
+                        name: '',
+                        icon: '📝',
+                        placeholder: '',
+                        button_color: 'bg-blue-600',
+                        button_hover_color: 'hover:bg-blue-700',
+                        prompt_type: 'existing',
+                        prompt_key: '',
+                        custom_prompt: '',
+                        inputs: [{ name: 'query', placeholder: 'Saisissez...', type: 'text', width: 'flex-1' }]
+                    });
+                    
+                    // Client Supabase
+                    const [supabaseClient, setSupabaseClient] = useState(null);
                     // emmaConnected, showPromptEditor, showTemperatureEditor, showLengthEditor maintenant dans le parent
                     const [emmaTemperature, setEmmaTemperature] = useState(0.3); // Température par défaut pour analyses financières
                     const [emmaMaxTokens, setEmmaMaxTokens] = useState(4096); // Longueur de réponse par défaut
@@ -14046,6 +14071,338 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         setEmmaMessages(resetMessages);
                         sessionStorage.removeItem('emma-chat-history');
                         console.log('🗑️ Historique Emma vidé (mémoire + sessionStorage)');
+                    };
+
+                    // ========================================
+                    // GESTION DYNAMIQUE DES SECTIONS DE PROMPT
+                    // ========================================
+                    
+                    // Sections par défaut (fallback si Supabase échoue)
+                    const DEFAULT_SECTIONS = [
+                        {
+                            name: 'Emma Expert (Prompt Système)',
+                            icon: '👩‍💼',
+                            prompt_type: 'existing',
+                            prompt_key: 'prompts.expertSystem',
+                            inputs: [{ name: 'query', placeholder: 'Posez votre question...', type: 'text', width: 'flex-1' }],
+                            button_color: 'bg-gray-800',
+                            button_hover_color: 'hover:bg-gray-700',
+                            order_index: 0
+                        },
+                        {
+                            name: 'Question Générale (LLM Standard)',
+                            icon: '🤖',
+                            prompt_type: 'existing',
+                            prompt_key: 'prompts.generalAssistant',
+                            inputs: [{ name: 'query', placeholder: 'Question générale sans contexte financier strict...', type: 'text', width: 'flex-1' }],
+                            button_color: 'bg-blue-600',
+                            button_hover_color: 'hover:bg-blue-700',
+                            order_index: 1
+                        },
+                        {
+                            name: 'Analyse Rapide de Titre',
+                            icon: '📈',
+                            prompt_type: 'existing',
+                            prompt_key: 'prompts.institutionalAnalysis',
+                            inputs: [
+                                { name: 'stockTitle', placeholder: 'Nom (ex: Apple)', type: 'text', width: 'flex-1' },
+                                { name: 'stockTicker', placeholder: 'Ticker (ex: AAPL)', type: 'text', width: 'w-32' }
+                            ],
+                            button_color: 'bg-emerald-600',
+                            button_hover_color: 'hover:bg-emerald-700',
+                            order_index: 2
+                        },
+                        {
+                            name: 'Recherche d\'Actualités',
+                            icon: '📰',
+                            prompt_type: 'existing',
+                            prompt_key: 'prompts.newsSearch',
+                            inputs: [{ name: 'newsQuery', placeholder: 'Sujet (ex: Intelligence Artificielle, Taux d\'intérêt)', type: 'text', width: 'flex-1' }],
+                            button_color: 'bg-purple-600',
+                            button_hover_color: 'hover:bg-purple-700',
+                            order_index: 3
+                        },
+                        {
+                            name: 'Comparaison de Titres',
+                            icon: '⚖️',
+                            prompt_type: 'existing',
+                            prompt_key: 'prompts.tickerComparison',
+                            inputs: [{ name: 'compareTickers', placeholder: 'Tickers (ex: AAPL, MSFT, GOOGL)', type: 'text', width: 'flex-1' }],
+                            button_color: 'bg-orange-600',
+                            button_hover_color: 'hover:bg-orange-700',
+                            order_index: 4
+                        }
+                    ];
+                    
+                    // Initialiser le client Supabase
+                    useEffect(() => {
+                        if (typeof window.supabase !== 'undefined') {
+                            try {
+                                // URL Supabase (déduite de la clé fournie)
+                                const supabaseUrl = 'https://boyuxgdpbkpknplxbxp.supabase.co';
+                                // Clé par défaut (peut être surchargée via localStorage)
+                                const defaultSupabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
+                                const supabaseKey = localStorage.getItem('SUPABASE_ANON_KEY') || defaultSupabaseKey;
+                                
+                                const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+                                setSupabaseClient(client);
+                                console.log('✅ Client Supabase initialisé avec URL:', supabaseUrl);
+                            } catch (error) {
+                                console.error('❌ Erreur initialisation Supabase:', error);
+                                console.warn('⚠️ Utilisation des sections par défaut');
+                            }
+                        } else {
+                            console.warn('⚠️ Bibliothèque Supabase non chargée, utilisation des sections par défaut');
+                        }
+                    }, []);
+                    
+                    // Charger les sections depuis Supabase
+                    const loadPromptSections = async () => {
+                        setSectionsLoading(true);
+                        try {
+                            if (!supabaseClient) {
+                                console.warn('⚠️ Client Supabase non disponible, utilisation des sections par défaut');
+                                setPromptSections(DEFAULT_SECTIONS);
+                                return;
+                            }
+                            
+                            const { data, error } = await supabaseClient
+                                .from('emma_prompt_sections')
+                                .select('*')
+                                .eq('is_active', true)
+                                .order('order_index', { ascending: true });
+                            
+                            if (error) throw error;
+                            
+                            if (data && data.length > 0) {
+                                setPromptSections(data);
+                                // Initialiser les inputs pour chaque section
+                                const inputsState = {};
+                                data.forEach(section => {
+                                    section.inputs?.forEach(input => {
+                                        inputsState[`${section.id}_${input.name}`] = '';
+                                    });
+                                });
+                                setSectionInputs(inputsState);
+                            } else {
+                                setPromptSections(DEFAULT_SECTIONS);
+                            }
+                        } catch (error) {
+                            console.error('❌ Erreur chargement sections:', error);
+                            setPromptSections(DEFAULT_SECTIONS);
+                        } finally {
+                            setSectionsLoading(false);
+                        }
+                    };
+                    
+                    // Charger les sections au montage du composant
+                    useEffect(() => {
+                        if (supabaseClient) {
+                            loadPromptSections();
+                        } else {
+                            // Utiliser les sections par défaut si Supabase n'est pas disponible
+                            setPromptSections(DEFAULT_SECTIONS);
+                            setSectionsLoading(false);
+                        }
+                    }, [supabaseClient]);
+                    
+                    // Ajouter une section
+                    const addSection = async (config) => {
+                        try {
+                            if (!supabaseClient) {
+                                alert('Client Supabase non disponible');
+                                return;
+                            }
+                            
+                            const { data, error } = await supabaseClient
+                                .from('emma_prompt_sections')
+                                .insert([{
+                                    ...config,
+                                    order_index: promptSections.length
+                                }])
+                                .select()
+                                .single();
+                            
+                            if (error) throw error;
+                            await loadPromptSections();
+                        } catch (error) {
+                            console.error('❌ Erreur ajout section:', error);
+                            alert('Erreur lors de l\'ajout de la section');
+                        }
+                    };
+                    
+                    // Mettre à jour une section
+                    const updateSection = async (id, config) => {
+                        try {
+                            if (!supabaseClient) {
+                                alert('Client Supabase non disponible');
+                                return;
+                            }
+                            
+                            const { error } = await supabaseClient
+                                .from('emma_prompt_sections')
+                                .update({ ...config, updated_at: new Date().toISOString() })
+                                .eq('id', id);
+                            
+                            if (error) throw error;
+                            await loadPromptSections();
+                        } catch (error) {
+                            console.error('❌ Erreur mise à jour section:', error);
+                            alert('Erreur lors de la mise à jour');
+                        }
+                    };
+                    
+                    // Supprimer une section (soft delete)
+                    const removeSection = async (id) => {
+                        if (!confirm('Êtes-vous sûr de vouloir supprimer cette section ?')) return;
+                        
+                        try {
+                            if (!supabaseClient) {
+                                alert('Client Supabase non disponible');
+                                return;
+                            }
+                            
+                            const { error } = await supabaseClient
+                                .from('emma_prompt_sections')
+                                .update({ is_active: false })
+                                .eq('id', id);
+                            
+                            if (error) throw error;
+                            await loadPromptSections();
+                        } catch (error) {
+                            console.error('❌ Erreur suppression section:', error);
+                            alert('Erreur lors de la suppression');
+                        }
+                    };
+                    
+                    // Réordonner les sections
+                    const reorderSections = async (fromIndex, toIndex) => {
+                        const updated = [...promptSections];
+                        const [moved] = updated.splice(fromIndex, 1);
+                        updated.splice(toIndex, 0, moved);
+                        
+                        // Mettre à jour l'ordre dans Supabase
+                        const updates = updated.map((section, index) => ({
+                            id: section.id,
+                            order_index: index
+                        }));
+                        
+                        try {
+                            if (!supabaseClient) {
+                                // Mise à jour locale seulement
+                                setPromptSections(updated);
+                                return;
+                            }
+                            
+                            for (const update of updates) {
+                                await supabaseClient
+                                    .from('emma_prompt_sections')
+                                    .update({ order_index: update.order_index })
+                                    .eq('id', update.id);
+                            }
+                            await loadPromptSections();
+                        } catch (error) {
+                            console.error('❌ Erreur réordonnancement:', error);
+                            alert('Erreur lors du réordonnancement');
+                        }
+                    };
+                    
+                    // Résoudre le prompt d'une section (existing vs custom)
+                    const resolveSectionPrompt = (section) => {
+                        if (section.prompt_type === 'custom' && section.custom_prompt) {
+                            return section.custom_prompt;
+                        } else if (section.prompt_type === 'existing' && section.prompt_key) {
+                            // Résoudre depuis window.emmaConfig
+                            const keys = section.prompt_key.split('.');
+                            let value = window.emmaConfig;
+                            for (const key of keys) {
+                                if (value && typeof value === 'object' && key in value) {
+                                    value = value[key];
+                                } else {
+                                    console.warn(`⚠️ Prompt key non trouvée: ${section.prompt_key}`);
+                                    return null;
+                                }
+                            }
+                            // Si c'est un objet avec une propriété prompt, l'utiliser
+                            if (typeof value === 'object' && value.prompt) {
+                                return value.prompt;
+                            }
+                            // Sinon, utiliser la valeur directement si c'est une string
+                            if (typeof value === 'string') {
+                                return value;
+                            }
+                            return null;
+                        }
+                        return null;
+                    };
+                    
+                    // Envoyer un message depuis une section
+                    const sendMessageFromSection = async (section) => {
+                        const inputs = section.inputs || [];
+                        const values = {};
+                        
+                        // Récupérer les valeurs des inputs
+                        inputs.forEach(input => {
+                            const key = `${section.id}_${input.name}`;
+                            values[input.name] = sectionInputs[key] || '';
+                        });
+                        
+                        // Vérifier que tous les inputs requis sont remplis
+                        const requiredInputs = inputs.filter(i => !i.optional);
+                        const missingInputs = requiredInputs.filter(i => !values[i.name]?.trim());
+                        
+                        if (missingInputs.length > 0) {
+                            alert(`Veuillez remplir tous les champs requis: ${missingInputs.map(i => i.name).join(', ')}`);
+                            return;
+                        }
+                        
+                        // Construire le message utilisateur
+                        let userMessage = '';
+                        if (section.prompt_key === 'prompts.institutionalAnalysis') {
+                            // Cas spécial pour l'analyse institutionnelle
+                            userMessage = `Analyse institutionnelle de ${values.stockTitle} (${values.stockTicker})`;
+                            const promptTemplate = resolveSectionPrompt(section);
+                            if (promptTemplate) {
+                                const fullPrompt = promptTemplate
+                                    .replace(/\[NOM ENTREPRISE\]/g, values.stockTitle || '')
+                                    .replace(/TICKER/g, values.stockTicker || '');
+                                sendMessageToEmma(userMessage, { promptOverride: fullPrompt }, () => {
+                                    // Réinitialiser les inputs
+                                    inputs.forEach(input => {
+                                        const key = `${section.id}_${input.name}`;
+                                        setSectionInputs(prev => ({ ...prev, [key]: '' }));
+                                    });
+                                });
+                                return;
+                            }
+                        } else if (section.prompt_key === 'prompts.newsSearch') {
+                            userMessage = `Quelles sont les dernières actualités financières concernant : ${values.newsQuery} ? Résume les points clés et l'impact potentiel sur le marché.`;
+                        } else if (section.prompt_key === 'prompts.tickerComparison') {
+                            userMessage = `Peux-tu comparer les titres suivants : ${values.compareTickers} ? Compare leurs fondamentaux, valorisations, performances récentes et perspectives d'avenir.`;
+                        } else {
+                            // Utiliser le premier input comme message
+                            const firstInput = inputs[0];
+                            if (firstInput) {
+                                userMessage = values[firstInput.name] || '';
+                            }
+                        }
+                        
+                        if (!userMessage.trim()) {
+                            alert('Veuillez saisir un message');
+                            return;
+                        }
+                        
+                        // Résoudre le prompt
+                        const promptOverride = resolveSectionPrompt(section);
+                        
+                        // Envoyer le message
+                        sendMessageToEmma(userMessage, promptOverride ? { promptOverride } : {}, () => {
+                            // Réinitialiser les inputs
+                            inputs.forEach(input => {
+                                const key = `${section.id}_${input.name}`;
+                                setSectionInputs(prev => ({ ...prev, [key]: '' }));
+                            });
+                        });
                     };
 
                     // Fonction d'auto-scroll vers le bas du chat avec animation fluide
@@ -15337,8 +15694,168 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
                                 </div>
 
-                                {/* Zone Multi-Inputs */}
-                                <div className="grid grid-cols-1 gap-6">
+                                {/* Zone Multi-Inputs - Dynamique depuis Supabase */}
+                                <div className="mb-4 flex items-center justify-between">
+                                    <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Sections de Prompt
+                                    </h3>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setEditMode(!editMode)}
+                                            className={`px-3 py-1 rounded text-sm transition-colors ${isDarkMode
+                                                ? editMode ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-700 hover:bg-gray-600'
+                                                : editMode ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-200 hover:bg-gray-300'
+                                                } text-white`}
+                                        >
+                                            {editMode ? '✅ Terminer' : '⚙️ Gérer'}
+                                        </button>
+                                        {editMode && (
+                                            <button
+                                                onClick={() => {
+                                                    setSectionForm({
+                                                        name: '',
+                                                        icon: '📝',
+                                                        placeholder: '',
+                                                        button_color: 'bg-blue-600',
+                                                        button_hover_color: 'hover:bg-blue-700',
+                                                        prompt_type: 'existing',
+                                                        prompt_key: '',
+                                                        custom_prompt: '',
+                                                        inputs: [{ name: 'query', placeholder: 'Saisissez...', type: 'text', width: 'flex-1' }]
+                                                    });
+                                                    setEditingSection(null);
+                                                    setShowSectionModal(true);
+                                                }}
+                                                className="px-3 py-1 rounded text-sm bg-green-600 hover:bg-green-700 text-white"
+                                            >
+                                                ➕ Ajouter
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                                
+                                {sectionsLoading ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <div className="text-gray-500">Chargement des sections...</div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-6">
+                                        {promptSections.map((section, index) => (
+                                            <div 
+                                                key={section.id || index} 
+                                                className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}
+                                            >
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xl">{section.icon || '📝'}</span>
+                                                        <h4 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                            {section.name}
+                                                        </h4>
+                                                    </div>
+                                                    {editMode && (
+                                                        <div className="flex gap-1">
+                                                            {index > 0 && (
+                                                                <button
+                                                                    onClick={() => reorderSections(index, index - 1)}
+                                                                    className="p-1 rounded hover:bg-gray-200"
+                                                                    title="Déplacer vers le haut"
+                                                                >
+                                                                    ↑
+                                                                </button>
+                                                            )}
+                                                            {index < promptSections.length - 1 && (
+                                                                <button
+                                                                    onClick={() => reorderSections(index, index + 1)}
+                                                                    className="p-1 rounded hover:bg-gray-200"
+                                                                    title="Déplacer vers le bas"
+                                                                >
+                                                                    ↓
+                                                                </button>
+                                                            )}
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSectionForm({
+                                                                        name: section.name || '',
+                                                                        icon: section.icon || '📝',
+                                                                        placeholder: section.placeholder || '',
+                                                                        button_color: section.button_color || 'bg-blue-600',
+                                                                        button_hover_color: section.button_hover_color || 'hover:bg-blue-700',
+                                                                        prompt_type: section.prompt_type || 'existing',
+                                                                        prompt_key: section.prompt_key || '',
+                                                                        custom_prompt: section.custom_prompt || '',
+                                                                        inputs: section.inputs || [{ name: 'query', placeholder: 'Saisissez...', type: 'text', width: 'flex-1' }]
+                                                                    });
+                                                                    setEditingSection(section);
+                                                                    setShowSectionModal(true);
+                                                                }}
+                                                                className="p-1 rounded hover:bg-gray-200"
+                                                                title="Modifier"
+                                                            >
+                                                                ✏️
+                                                            </button>
+                                                            <button
+                                                                onClick={() => removeSection(section.id)}
+                                                                className="p-1 rounded hover:bg-red-200 text-red-600"
+                                                                title="Supprimer"
+                                                            >
+                                                                🗑️
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                
+                                                {/* Rendu dynamique des inputs */}
+                                                <div className={`flex gap-2 ${section.inputs?.length > 1 ? 'flex-wrap md:flex-nowrap' : ''}`}>
+                                                    {section.inputs?.map((input, inputIndex) => (
+                                                        <input
+                                                            key={inputIndex}
+                                                            type={input.type || 'text'}
+                                                            value={sectionInputs[`${section.id}_${input.name}`] || ''}
+                                                            onChange={(e) => {
+                                                                const key = `${section.id}_${input.name}`;
+                                                                setSectionInputs(prev => ({ ...prev, [key]: e.target.value }));
+                                                            }}
+                                                            placeholder={input.placeholder || section.placeholder || 'Saisissez...'}
+                                                            className={`${input.width || 'flex-1'} px-4 py-2 h-12 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                                }`}
+                                                            disabled={emmaLoading}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter' && inputIndex === section.inputs.length - 1) {
+                                                                    sendMessageFromSection(section);
+                                                                }
+                                                            }}
+                                                        />
+                                                    ))}
+                                                    <button
+                                                        onClick={() => sendMessageFromSection(section)}
+                                                        disabled={emmaLoading || !section.inputs?.some(input => {
+                                                            const key = `${section.id}_${input.name}`;
+                                                            return sectionInputs[key]?.trim();
+                                                        })}
+                                                        className={`px-6 py-2 h-12 rounded-lg font-medium transition-colors duration-300 ${emmaLoading || !section.inputs?.some(input => {
+                                                            const key = `${section.id}_${input.name}`;
+                                                            return sectionInputs[key]?.trim();
+                                                        })
+                                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                                            : `${section.button_color || 'bg-blue-600'} ${section.button_hover_color || 'hover:bg-blue-700'} text-white`
+                                                        }`}
+                                                    >
+                                                        {emmaLoading ? '⏳' : '📤'}
+                                                    </button>
+                                                </div>
+                                                
+                                                <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                    Prompt: {section.prompt_type === 'existing' ? section.prompt_key : 'Personnalisé'}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                
+                                {/* Section originale Emma Expert (conservée pour compatibilité) */}
+                                <div className="grid grid-cols-1 gap-6 mt-6" style={{ display: 'none' }}>
                                     {/* 1. Emma Expert (Système) */}
                                     <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
                                         <div className="flex items-center gap-2 mb-3">
@@ -15698,6 +16215,120 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </div>
                                     </div>
                                 </div>
+                                
+                                {/* Modal de gestion de section */}
+                                {showSectionModal && (
+                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                        <div className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                            <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                {editingSection ? 'Modifier la section' : 'Ajouter une section'}
+                                            </h3>
+                                            
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Nom</label>
+                                                    <input
+                                                        type="text"
+                                                        value={sectionForm.name}
+                                                        onChange={(e) => setSectionForm({ ...sectionForm, name: e.target.value })}
+                                                        className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                        placeholder="Nom de la section"
+                                                    />
+                                                </div>
+                                                
+                                                <div>
+                                                    <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Icône</label>
+                                                    <input
+                                                        type="text"
+                                                        value={sectionForm.icon}
+                                                        onChange={(e) => setSectionForm({ ...sectionForm, icon: e.target.value })}
+                                                        className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                        placeholder="📝"
+                                                    />
+                                                </div>
+                                                
+                                                <div>
+                                                    <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Type de prompt</label>
+                                                    <select
+                                                        value={sectionForm.prompt_type}
+                                                        onChange={(e) => setSectionForm({ ...sectionForm, prompt_type: e.target.value })}
+                                                        className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                    >
+                                                        <option value="existing">Depuis emma-config</option>
+                                                        <option value="custom">Personnalisé</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                {sectionForm.prompt_type === 'existing' ? (
+                                                    <div>
+                                                        <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Clé du prompt</label>
+                                                        <select
+                                                            value={sectionForm.prompt_key}
+                                                            onChange={(e) => setSectionForm({ ...sectionForm, prompt_key: e.target.value })}
+                                                            className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                        >
+                                                            <option value="">Sélectionner...</option>
+                                                            {window.emmaConfig?.prompts && Object.keys(window.emmaConfig.prompts).map(key => (
+                                                                <option key={key} value={`prompts.${key}`}>
+                                                                    {window.emmaConfig.prompts[key].name || key}
+                                                                </option>
+                                                            ))}
+                                                            <option value="prompts.institutionalAnalysis">Analyse Institutionnelle</option>
+                                                        </select>
+                                                    </div>
+                                                ) : (
+                                                    <div>
+                                                        <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Prompt personnalisé</label>
+                                                        <textarea
+                                                            value={sectionForm.custom_prompt}
+                                                            onChange={(e) => setSectionForm({ ...sectionForm, custom_prompt: e.target.value })}
+                                                            className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                            rows={5}
+                                                            placeholder="Saisissez votre prompt personnalisé..."
+                                                        />
+                                                    </div>
+                                                )}
+                                                
+                                                <div>
+                                                    <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Couleur du bouton</label>
+                                                    <input
+                                                        type="text"
+                                                        value={sectionForm.button_color}
+                                                        onChange={(e) => setSectionForm({ ...sectionForm, button_color: e.target.value })}
+                                                        className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                        placeholder="bg-blue-600"
+                                                    />
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="flex gap-2 mt-6">
+                                                <button
+                                                    onClick={() => {
+                                                        if (editingSection?.id) {
+                                                            updateSection(editingSection.id, sectionForm);
+                                                        } else {
+                                                            addSection(sectionForm);
+                                                        }
+                                                        setShowSectionModal(false);
+                                                        setEditingSection(null);
+                                                    }}
+                                                    className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
+                                                >
+                                                    {editingSection?.id ? 'Mettre à jour' : 'Ajouter'}
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setShowSectionModal(false);
+                                                        setEditingSection(null);
+                                                    }}
+                                                    className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+                                                >
+                                                    Annuler
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Éditeur de prompt */}
