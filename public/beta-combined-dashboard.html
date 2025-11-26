@@ -23912,12 +23912,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <>
                                     {/* Graphique */}
                                     {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
-                                        <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'
-                                            }`}>
-                                            <div style={{ height: '400px', position: 'relative' }}>
-                                                <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                                        <ExpandableComponent title="Courbe des Taux" icon="📈" isDarkMode={darkMode}>
+                                            <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                                <div style={{ height: '400px', position: 'relative' }}>
+                                                    <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ExpandableComponent>
                                     ) : (
                                         <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${darkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'
                                             }`}>
