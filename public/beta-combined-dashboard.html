@@ -16958,36 +16958,56 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     // Filtrer les tickers selon la source
                     const displayedTickers = tickerSource === 'watchlist' ? watchlistTickers : teamTickers;
                     
-                    // Fonction pour ajouter un ticker à la watchlist
+                    // Fonction pour ajouter un ticker à la watchlist (utilise la logique de DansWatchlistTab)
                     const addTickerToWatchlist = async () => {
                         if (tickerSource !== 'watchlist' || !newTicker.trim()) return;
-                        
+
                         const ticker = newTicker.trim().toUpperCase();
-                        
                         if (watchlistTickers.includes(ticker)) {
                             alert(`Le ticker ${ticker} est déjà dans la watchlist`);
                             return;
                         }
-                        
-                        try {
-                            // Ajouter localement
-                            const updatedTickers = [...watchlistTickers, ticker];
-                            setWatchlistTickers(updatedTickers);
-                            
-                            // Sauvegarder dans Supabase
-                            if (supabaseClient) {
+
+                        // 1. AFFICHAGE IMMÉDIAT : Ajouter le ticker à la liste TOUT DE SUITE
+                        const updatedTickers = [...watchlistTickers, ticker];
+                        setWatchlistTickers(updatedTickers);
+                        localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
+                        setNewTicker('');
+                        console.log(`✅ ${ticker} ajouté à la watchlist`);
+
+                        // 2. Ajouter un placeholder avec état "loading" pour affichage immédiat
+                        if (typeof setWatchlistStockData !== 'undefined') {
+                            setWatchlistStockData(prev => ({
+                                ...prev,
+                                [ticker]: {
+                                    symbol: ticker,
+                                    loading: true,
+                                    timestamp: new Date().toISOString()
+                                }
+                            }));
+                        }
+
+                        // 3. ARRIÈRE-PLAN : Charger les vraies données (sans bloquer l'UI)
+                        if (typeof loadWatchlistData !== 'undefined') {
+                            loadWatchlistData([ticker], true).catch(err => {
+                                console.error('Erreur chargement:', err);
+                            });
+                        }
+
+                        // 4. ARRIÈRE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
+                        if (typeof saveWatchlistToSupabaseAuto !== 'undefined' && supabaseClient) {
+                            saveWatchlistToSupabaseAuto(ticker, 'add').catch(err => {
+                                console.error('Erreur sauvegarde Supabase:', err);
+                            });
+                        } else if (supabaseClient) {
+                            // Fallback: sauvegarde directe Supabase
+                            try {
                                 await supabaseClient
                                     .from('watchlist')
                                     .insert([{ ticker, user_id: getUserLoginId() }]);
+                            } catch (err) {
+                                console.error('Erreur sauvegarde Supabase:', err);
                             }
-                            
-                            // Sauvegarder dans localStorage
-                            localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
-                            
-                            setNewTicker('');
-                            console.log(`✅ Ticker ${ticker} ajouté à la watchlist`);
-                        } catch (error) {
-                            console.error('Erreur lors de l\'ajout du ticker:', error);
                         }
                     };
                     
