@@ -981,7 +981,7 @@
             // ============================================================================
             // COMPOSANT RÉUTILISABLE POUR AGRANDIR LES COMPOSANTS
             // ============================================================================
-            const ExpandableComponent = ({ children, title = '', className = '', icon = '🔍' }) => {
+            const ExpandableComponent = ({ children, title = '', className = '', icon = '🔍', isDarkMode = false }) => {
                 const [isExpanded, setIsExpanded] = useState(false);
                 
                 // Gérer la touche ESC pour fermer
