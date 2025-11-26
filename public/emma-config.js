@@ -36,6 +36,175 @@ export const emmaConfig = {
   },
 
   // Configuration du prompt
+
+
+  // Prompt d'analyse institutionnelle
+  institutionalAnalysis: `🧩 EN-TÊTE À PRODUIRE AUTOMATIQUEMENT
+En ouverture, génère un en-tête professionnel complet :
+* Titre de l’analyse : « Analyse institutionnelle complète – [NOM ENTREPRISE] (TICKER) »
+* Prix actuel (en temps réel ou au jour près, selon données disponibles)
+* Date du rapport
+* Bourse d’origine (si US/CA, sinon ADR NYSE/NASDAQ prioritaire)
+* Secteur / sous-secteur GICS
+* Capitalisation boursière
+* Avertissement : non-conseil financier personnalisé
+
+🎯 OBJECTIF
+Produire un rapport de recherche institutionnel très long, extrêmement détaillé, rédigé, et exploitable, du niveau d’un analyste senior sell-side/buy-side, sur :
+Entreprise : [NOM ENTREPRISE]
+Ticker : TICKER
+Rapport attendu : 25–40 pages en densité de texte si converti Word/PDF. Analyse narrative complète, chiffres + tableaux + sources + niveaux de confiance.
+
+📡 INSTRUCTIONS DE RECHERCHE – SPÉCIALES PERPLEXITY SONAR
+Toujours :
+* Multiplier les recherches ciblées (IR, SEC, transcripts, press releases, consensus).
+* Extraire de longs passages narratifs.
+* Prioriser données 2023–2025, TTM, guidance.
+* Citer toutes les sources de chiffres importantes.
+* Ne rien inventer : indiquer « donnée manquante » si nécessaire.
+Recherche obligatoire :
+* 10-K / 20-F / 40-F / 10-Q
+* Présentations investisseurs
+* Rapports ESG
+* Communiqués de résultats récents
+* Consensus analystes actuels
+* Comparables sectoriels
+
+🧱 STRUCTURE OBLIGATOIRE – TEXTE LONG & TABLEAUX
+
+1. PROFIL DE L’ENTREPRISE (rédaction longue)
+Rédaction exhaustive :
+* Histoire, transformation stratégique, acquisitions, virages.
+* Vision, mission, positionnement global et régional.
+* Modèle d’affaires extrêmement détaillé.
+* Segments opérationnels : explication narrative + chiffres.
+* Marchés adressables (TAM/SAM/SOM) avec narration économique.
+* Analyse profonde du moat (IP, licences, technologies, réseaux, switching costs, coûts, données).
+* Gouvernance : qualité du management, stabilité, structure organisationnelle.
+* ESG : engagements, controverses, impacts financiers.
+Tableaux obligatoires (3+)
+1. Segments opérationnels
+2. Marchés adressables
+3. Avantages compétitifs
+Niveau de confiance.
+
+2. ANALYSE FONDAMENTALE (rédaction très longue)
+Inclure :
+* Revenus, EBITDA, marges, bénéfice net, BPA 5 ans + TTM, avec analyse narrative.
+* Explication détaillée des moteurs de croissance.
+* Analyse qualitative des marges : mix produit, pricing power, coûts fixes/variables.
+* Analyse des capex, R&D, innovations.
+* Bilan complet : qualité, risques, structure dette.
+* FCF, conversion, yield, robustesse.
+* Qualité des profits : charges non récurrentes, cyclicité.
+* Vision institutionnelle sur la durabilité de la rentabilité.
+* Politique de capital : buybacks, dividendes, dilution.
+Tableaux obligatoires (3+)
+1. États financiers 5 ans
+2. Structure du bilan
+3. Allocation du capital & FCF
+Niveau de confiance.
+
+3. ANALYSE SECTORIELLE ET CONCURRENTS (long)
+Rédiger :
+* Analyse macro sectorielle complète.
+* Tendances globales (IA, réglementations, consolidation, cycles).
+* Forces/faiblesses structurelles du secteur.
+* Analyse profonde du paysage concurrentiel (6–10 pairs).
+* Avantages/disavantages structurels vs comparables.
+* Analyse prospective sectorielle 12–36 mois.
+Tableaux obligatoires (3+)
+1. Comparatif pairs
+2. SWOT secteur
+3. Positionnement concurrentiel
+Niveau de confiance.
+
+4. CATALYSEURS ET RISQUES MAJEURS (long)
+Rédiger :
+* Catalyseurs court/moyen/long terme.
+* Drivers opérationnels, stratégiques, macro.
+* Risques majeurs : exécution, réglementation, finances, clients, géopolitique.
+* Analyse détaillée de probabilité & impact.
+Tableaux obligatoires (2+)
+1. Catalyseurs
+2. Risques
+Niveau de confiance.
+
+5. ANALYSE BOURSIÈRE ET TECHNIQUE (long)
+Inclure :
+* Prix actuel, historique, volatilité, momentum.
+* Performance relative vs secteur & indice.
+* Indicateurs techniques (SMA20/50/200, RSI, MACD).
+* Analyse narrative des flux directionnels.
+* Sentiment analystes.
+* Insider trading.
+Tableaux obligatoires (4+)
+1. Indicateurs techniques
+2. Sentiment analystes
+3. Insider trading
+4. Performance relative
+Niveau de confiance.
+
+6. VALORISATION & FAIR VALUE (long)
+Inclure narration détaillée :
+* Construction du DCF (méthodologie, hypothèses, justification).
+* Interprétation des résultats.
+* Analyse par multiples : P/E, PEG, EV/EBITDA, EV/FCF, P/S.
+* Comparaison profonde avec les pairs.
+* Synthèse institutionnelle.
+Tableaux obligatoires (3+)
+1. DCF – 3 scénarios
+2. Multiples relatifs
+3. Fair value composite
+Niveau de confiance.
+
+7. SCÉNARIOS 12–24 MOIS (long)
+Pour chaque scénario (Haussier / Neutre / Baissier) :
+* Narration détaillée.
+* Drivers macro/sectoriels/entreprise.
+* Projection (revenus, marges, BPA, FCF).
+* Prix cible 12 & 24 mois.
+* Probabilité institutionnelle.
+* Analyse du rerating ou derating des multiples.
+Tableaux obligatoires (2+)
+1. Résumé scénarios
+2. Synthèse pondérée
+Niveau de confiance.
+
+8. VERDICT FINAL (long + thèse d’investissement complète)
+Produire une conclusion institutionnelle très rédigée :
+* Résumé stratégique.
+* Qualité du business & moat.
+* Vision long terme.
+* Profil de risque.
+* Alignement management/capital.
+* Point de vue institutionnel (argumenté, nuancé).
+* Stratégie d’entrée graduée (ex : 50/30/20).
+* Signaux d’alerte et triggers de sortie.
+🔥 Inclure obligatoirement une THÈSE D’INVESTISSEMENT COMPLÈTE :
+Structurée ainsi :
+Bull Case (Thèse positive)
+* Drivers structurels
+* Catalyseurs
+* Valorisation implicite
+* Momentum / rerating
+* Résilience FCF
+* Conditions de validation
+Bear Case (Thèse négative)
+* Pressions marges
+* Risques exécution
+* Risques réglementaires
+* Compression multiples
+* Conditions de validation
+Key Debate (les points où les analystes se trompent / biais institutionnels)
+Conditions de succès (checklist)
+Triggers de sortie / invalidation de la thèse
+Conviction finale (sur 10)
+Tableaux obligatoires (3+)
+1. Notation globale
+2. Recommandation & allocation
+3. Risques limitants / catalyseurs confirmants
+Niveau de confiance global.`,
   prompt: {
     maxLength: 10000,
     minLength: 100,
@@ -198,7 +367,7 @@ export const resetEmmaConfig = () => {
 export const getConfigValue = (path) => {
   const keys = path.split('.');
   let value = emmaConfig;
-  
+
   for (const key of keys) {
     if (value && typeof value === 'object' && key in value) {
       value = value[key];
@@ -206,7 +375,7 @@ export const getConfigValue = (path) => {
       return undefined;
     }
   }
-  
+
   return value;
 };
 
@@ -215,14 +384,14 @@ export const setConfigValue = (path, value) => {
   const keys = path.split('.');
   const lastKey = keys.pop();
   let target = emmaConfig;
-  
+
   for (const key of keys) {
     if (!target[key] || typeof target[key] !== 'object') {
       target[key] = {};
     }
     target = target[key];
   }
-  
+
   target[lastKey] = value;
   localStorage.setItem('emma-config', JSON.stringify(emmaConfig));
   return emmaConfig;
