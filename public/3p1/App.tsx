@@ -21,6 +21,7 @@ import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrenc
 import { Cog6ToothIcon, CalculatorIcon, ArrowUturnLeftIcon, ArrowUturnRightIcon, Bars3Icon, ArrowPathIcon, ChartBarSquareIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
+import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 
 // Initial Mock Data mirroring the image
 const INITIAL_DATA: AnnualData[] = [
@@ -115,7 +116,159 @@ export default function App() {
         setIsInitialized(true);
     }, []);
 
+    // --- LOAD TICKERS FROM SUPABASE ON INITIALIZATION ---
+    const [isLoadingTickers, setIsLoadingTickers] = useState(false);
+    const [tickersLoadError, setTickersLoadError] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (!isInitialized) return;
+
+        const loadTickersFromSupabase = async () => {
+            setIsLoadingTickers(true);
+            setTickersLoadError(null);
+
+            try {
+                const result = await loadAllTickersFromSupabase();
+
+                if (!result.success) {
+                    setTickersLoadError(result.error || 'Erreur lors du chargement des tickers');
+                    setIsLoadingTickers(false);
+                    return;
+                }
+
+                // Identifier les nouveaux tickers avant la mise à jour
+                const existingSymbols = new Set(Object.keys(library));
+                const newTickers = result.tickers.filter(t => {
+                    const symbol = t.ticker.toUpperCase();
+                    return !existingSymbols.has(symbol);
+                });
+
+                // Merge intelligent : ne pas écraser les profils existants
+                setLibrary(prev => {
+                    const updated = { ...prev };
+                    let newTickersCount = 0;
+
+                    result.tickers.forEach(supabaseTicker => {
+                        const tickerSymbol = supabaseTicker.ticker.toUpperCase();
+                        
+                        // Ne pas écraser si le profil existe déjà
+                        if (updated[tickerSymbol]) {
+                            // Mettre à jour isWatchlist si nécessaire (basé sur source Supabase)
+                            const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                            if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
+                                updated[tickerSymbol] = {
+                                    ...updated[tickerSymbol],
+                                    isWatchlist: shouldBeWatchlist
+                                };
+                            }
+                            return;
+                        }
+
+                        // Créer un nouveau profil pour ce ticker
+                        const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                        const newProfile: AnalysisProfile = {
+                            id: tickerSymbol,
+                            lastModified: Date.now(),
+                            data: INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, year: 2024 })),
+                            assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
+                            info: {
+                                symbol: tickerSymbol,
+                                name: supabaseTicker.company_name || 'Chargement...',
+                                sector: supabaseTicker.sector || '',
+                                securityRank: 'N/A',
+                                marketCap: '-'
+                            },
+                            notes: '',
+                            isWatchlist
+                        };
+
+                        updated[tickerSymbol] = newProfile;
+                        newTickersCount++;
+                    });
+
+                    // Sauvegarder dans localStorage
+                    try {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                    } catch (e) {
+                        console.warn('Failed to save to LocalStorage:', e);
+                    }
+
+                    if (newTickersCount > 0) {
+                        console.log(`✅ ${newTickersCount} nouveaux tickers chargés depuis Supabase`);
+                    }
+
+                    return updated;
+                });
+
+                // Charger les données FMP en arrière-plan pour les nouveaux tickers (batch avec délai)
+                if (newTickers.length > 0) {
+                    // Charger par batch de 5 avec délai de 500ms entre chaque batch
+                    const batchSize = 5;
+                    const delayBetweenBatches = 500;
+
+                    for (let i = 0; i < newTickers.length; i += batchSize) {
+                        const batch = newTickers.slice(i, i + batchSize);
+                        
+                        // Attendre avant de charger le batch suivant
+                        if (i > 0) {
+                            await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+                        }
+
+                        // Charger les données FMP pour ce batch en parallèle
+                        await Promise.allSettled(
+                            batch.map(async (supabaseTicker) => {
+                                const symbol = supabaseTicker.ticker.toUpperCase();
+                                try {
+                                    const result = await fetchCompanyData(symbol);
+                                    
+                                    // Mettre à jour le profil avec les données réelles
+                                    setLibrary(prev => {
+                                        const profile = prev[symbol];
+                                        if (!profile) return prev;
+
+                                        const updated = {
+                                            ...prev,
+                                            [symbol]: {
+                                                ...profile,
+                                                data: result.data,
+                                                info: {
+                                                    ...profile.info,
+                                                    ...result.info
+                                                },
+                                                assumptions: {
+                                                    ...profile.assumptions,
+                                                    currentPrice: result.currentPrice
+                                                }
+                                            }
+                                        };
+
+                                        try {
+                                            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                                        } catch (e) {
+                                            console.warn('Failed to save to LocalStorage:', e);
+                                        }
+
+                                        return updated;
+                                    });
+                                } catch (error) {
+                                    console.warn(`⚠️ Impossible de charger les données pour ${symbol}:`, error);
+                                    // On continue avec les données par défaut
+                                }
+                            })
+                        );
+                    }
+                }
+
+            } catch (error: any) {
+                console.error('❌ Erreur lors du chargement des tickers:', error);
+                setTickersLoadError(error.message || 'Erreur inconnue');
+            } finally {
+                setIsLoadingTickers(false);
+            }
+        };
+
+        loadTickersFromSupabase();
+    }, [isInitialized]); // Seulement après l'initialisation
 
     // --- ACTIVE SESSION STATE ---
     const [data, setData] = useState<AnnualData[]>(INITIAL_DATA);
@@ -652,6 +805,152 @@ export default function App() {
         }
     };
 
+    // --- SYNC FROM SUPABASE HANDLER ---
+    const handleSyncFromSupabase = async () => {
+        setIsLoadingTickers(true);
+        setTickersLoadError(null);
+
+        try {
+            const result = await loadAllTickersFromSupabase();
+
+            if (!result.success) {
+                setTickersLoadError(result.error || 'Erreur lors de la synchronisation');
+                alert(`❌ Erreur: ${result.error || 'Impossible de synchroniser avec Supabase'}`);
+                setIsLoadingTickers(false);
+                return;
+            }
+
+            let newTickersCount = 0;
+            let updatedTickersCount = 0;
+
+            // Merge intelligent : ne pas écraser les profils existants
+            setLibrary(prev => {
+                const updated = { ...prev };
+
+                result.tickers.forEach(supabaseTicker => {
+                    const tickerSymbol = supabaseTicker.ticker.toUpperCase();
+                    const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+                    
+                    if (updated[tickerSymbol]) {
+                        // Mettre à jour isWatchlist si nécessaire
+                        if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
+                            updated[tickerSymbol] = {
+                                ...updated[tickerSymbol],
+                                isWatchlist: shouldBeWatchlist
+                            };
+                            updatedTickersCount++;
+                        }
+                        return;
+                    }
+
+                    // Créer un nouveau profil
+                    const newProfile: AnalysisProfile = {
+                        id: tickerSymbol,
+                        lastModified: Date.now(),
+                        data: INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, year: 2024 })),
+                        assumptions: { ...INITIAL_ASSUMPTIONS, currentPrice: 100, currentDividend: 0 },
+                        info: {
+                            symbol: tickerSymbol,
+                            name: supabaseTicker.company_name || 'Chargement...',
+                            sector: supabaseTicker.sector || '',
+                            securityRank: 'N/A',
+                            marketCap: '-'
+                        },
+                        notes: '',
+                        isWatchlist: shouldBeWatchlist
+                    };
+
+                    updated[tickerSymbol] = newProfile;
+                    newTickersCount++;
+                });
+
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                } catch (e) {
+                    console.warn('Failed to save to LocalStorage:', e);
+                }
+
+                return updated;
+            });
+
+            // Charger les données FMP pour les nouveaux tickers en arrière-plan
+            const newTickers = result.tickers.filter(t => {
+                const symbol = t.ticker.toUpperCase();
+                return !library[symbol];
+            });
+
+            if (newTickers.length > 0) {
+                const batchSize = 5;
+                const delayBetweenBatches = 500;
+
+                for (let i = 0; i < newTickers.length; i += batchSize) {
+                    const batch = newTickers.slice(i, i + batchSize);
+                    
+                    if (i > 0) {
+                        await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+                    }
+
+                    await Promise.allSettled(
+                        batch.map(async (supabaseTicker) => {
+                            const symbol = supabaseTicker.ticker.toUpperCase();
+                            try {
+                                const result = await fetchCompanyData(symbol);
+                                
+                                setLibrary(prev => {
+                                    const profile = prev[symbol];
+                                    if (!profile) return prev;
+
+                                    const updated = {
+                                        ...prev,
+                                        [symbol]: {
+                                            ...profile,
+                                            data: result.data,
+                                            info: {
+                                                ...profile.info,
+                                                ...result.info
+                                            },
+                                            assumptions: {
+                                                ...profile.assumptions,
+                                                currentPrice: result.currentPrice
+                                            }
+                                        }
+                                    };
+
+                                    try {
+                                        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                                    } catch (e) {
+                                        console.warn('Failed to save to LocalStorage:', e);
+                                    }
+
+                                    return updated;
+                                });
+                            } catch (error) {
+                                console.warn(`⚠️ Impossible de charger les données pour ${symbol}:`, error);
+                            }
+                        })
+                    );
+                }
+            }
+
+            // Afficher un message de succès
+            const message = newTickersCount > 0 
+                ? `✅ ${newTickersCount} nouveau(x) ticker(s) ajouté(s)${updatedTickersCount > 0 ? `, ${updatedTickersCount} mis à jour` : ''}`
+                : updatedTickersCount > 0
+                ? `✅ ${updatedTickersCount} ticker(s) mis à jour`
+                : '✅ Synchronisation terminée (aucun changement)';
+            
+            alert(message);
+            console.log(message);
+
+        } catch (error: any) {
+            console.error('❌ Erreur lors de la synchronisation:', error);
+            setTickersLoadError(error.message || 'Erreur inconnue');
+            alert(`❌ Erreur: ${error.message || 'Impossible de synchroniser avec Supabase'}`);
+        } finally {
+            setIsLoadingTickers(false);
+        }
+    };
+
     // --- CALCULATIONS CORE ---
     // Use central logic to ensure chart matches sidebar
     const validHistory = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
@@ -687,6 +986,8 @@ export default function App() {
                         onDuplicate={handleDuplicateTicker}
                         onToggleWatchlist={handleToggleWatchlist}
                         onLoadVersion={handleLoadSnapshot}
+                        onSyncFromSupabase={handleSyncFromSupabase}
+                        isLoadingTickers={isLoadingTickers}
                     />
                 </div>
             </div>

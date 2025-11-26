@@ -8,7 +8,8 @@ import {
   DocumentMagnifyingGlassIcon,
   DocumentDuplicateIcon,
   EyeIcon,
-  StarIcon
+  StarIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
@@ -23,9 +24,11 @@ interface SidebarProps {
   onDuplicate: (id: string) => void;
   onToggleWatchlist: (id: string) => void;
   onLoadVersion: (snapshotId: string) => void;
+  onSyncFromSupabase?: () => void;
+  isLoadingTickers?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredProfiles = profiles
@@ -65,7 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
 
       {/* Search & Add */}
       <div className="p-4 border-b border-slate-800/50">
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-2">
           <div className="relative flex-1">
             <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
@@ -85,6 +88,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
             <span className="hidden xl:inline">Ajouter</span>
           </button>
         </div>
+        {onSyncFromSupabase && (
+          <button
+            onClick={onSyncFromSupabase}
+            disabled={isLoadingTickers}
+            className="w-full bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-3 py-2 rounded flex items-center justify-center gap-2 text-sm font-medium transition-colors"
+            title="Synchroniser avec Supabase"
+          >
+            <ArrowPathIcon className={`w-4 h-4 ${isLoadingTickers ? 'animate-spin' : ''}`} />
+            <span>{isLoadingTickers ? 'Synchronisation...' : 'Synchroniser Supabase'}</span>
+          </button>
+        )}
       </div>
 
       {/* Ticker List */}
