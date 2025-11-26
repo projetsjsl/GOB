@@ -14248,9 +14248,41 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     
                     // Mettre à jour une section
                     const updateSection = async (id, config) => {
+                        // Si c'est une section par défaut, mettre à jour l'état local
+                        if (!id || id.startsWith('default-')) {
+                            setPromptSections(prev => prev.map(s => 
+                                s.id === id ? { ...s, ...config } : s
+                            ));
+                            // Si Supabase est disponible, créer une nouvelle section dans Supabase
+                            if (supabaseClient) {
+                                try {
+                                    const { data, error } = await supabaseClient
+                                        .from('emma_prompt_sections')
+                                        .insert([{
+                                            ...config,
+                                            order_index: promptSections.findIndex(s => s.id === id)
+                                        }])
+                                        .select()
+                                        .single();
+                                    
+                                    if (error) throw error;
+                                    // Recharger depuis Supabase pour avoir le vrai ID
+                                    await loadPromptSections();
+                                } catch (error) {
+                                    console.error('❌ Erreur création section Supabase:', error);
+                                    // On continue avec la mise à jour locale
+                                }
+                            }
+                            return;
+                        }
+                        
+                        // Si c'est une section Supabase, mettre à jour dans Supabase
                         try {
                             if (!supabaseClient) {
-                                alert('Client Supabase non disponible');
+                                // Si pas de Supabase, mettre à jour l'état local
+                                setPromptSections(prev => prev.map(s => 
+                                    s.id === id ? { ...s, ...config } : s
+                                ));
                                 return;
                             }
                             
@@ -14269,17 +14301,34 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     
                     // Supprimer une section (soft delete)
                     const removeSection = async (id) => {
-                        // Ne pas permettre la suppression des sections par défaut
+                        if (!confirm('Êtes-vous sûr de vouloir supprimer cette section ?')) return;
+                        
+                        // Si c'est une section par défaut, la supprimer simplement de l'état local
                         if (!id || id.startsWith('default-')) {
-                            alert('Les sections par défaut ne peuvent pas être supprimées');
+                            setPromptSections(prev => prev.filter(s => s.id !== id));
+                            // Supprimer aussi les inputs associés
+                            const inputsToRemove = {};
+                            const section = promptSections.find(s => s.id === id);
+                            if (section) {
+                                section.inputs?.forEach(input => {
+                                    inputsToRemove[`${id}_${input.name}`] = '';
+                                });
+                                setSectionInputs(prev => {
+                                    const updated = { ...prev };
+                                    Object.keys(inputsToRemove).forEach(key => {
+                                        delete updated[key];
+                                    });
+                                    return updated;
+                                });
+                            }
                             return;
                         }
                         
-                        if (!confirm('Êtes-vous sûr de vouloir supprimer cette section ?')) return;
-                        
+                        // Si c'est une section Supabase, faire un soft delete
                         try {
                             if (!supabaseClient) {
-                                alert('Client Supabase non disponible');
+                                // Si pas de Supabase, supprimer de l'état local
+                                setPromptSections(prev => prev.filter(s => s.id !== id));
                                 return;
                             }
                             
@@ -15793,38 +15842,34 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                     ↓
                                                                 </button>
                                                             )}
-                                                            {section.id && !section.id.startsWith('default-') && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setSectionForm({
-                                                                            name: section.name || '',
-                                                                            icon: section.icon || '📝',
-                                                                            placeholder: section.placeholder || '',
-                                                                            button_color: section.button_color || 'bg-blue-600',
-                                                                            button_hover_color: section.button_hover_color || 'hover:bg-blue-700',
-                                                                            prompt_type: section.prompt_type || 'existing',
-                                                                            prompt_key: section.prompt_key || '',
-                                                                            custom_prompt: section.custom_prompt || '',
-                                                                            inputs: section.inputs || [{ name: 'query', placeholder: 'Saisissez...', type: 'text', width: 'flex-1' }]
-                                                                        });
-                                                                        setEditingSection(section);
-                                                                        setShowSectionModal(true);
-                                                                    }}
-                                                                    className="p-1 rounded hover:bg-gray-200"
-                                                                    title="Modifier"
-                                                                >
-                                                                    ✏️
-                                                                </button>
-                                                            )}
-                                                            {section.id && !section.id.startsWith('default-') && (
-                                                                <button
-                                                                    onClick={() => removeSection(section.id)}
-                                                                    className="p-1 rounded hover:bg-red-200 text-red-600"
-                                                                    title="Supprimer"
-                                                                >
-                                                                    🗑️
-                                                                </button>
-                                                            )}
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSectionForm({
+                                                                        name: section.name || '',
+                                                                        icon: section.icon || '📝',
+                                                                        placeholder: section.placeholder || '',
+                                                                        button_color: section.button_color || 'bg-blue-600',
+                                                                        button_hover_color: section.button_hover_color || 'hover:bg-blue-700',
+                                                                        prompt_type: section.prompt_type || 'existing',
+                                                                        prompt_key: section.prompt_key || '',
+                                                                        custom_prompt: section.custom_prompt || '',
+                                                                        inputs: section.inputs || [{ name: 'query', placeholder: 'Saisissez...', type: 'text', width: 'flex-1' }]
+                                                                    });
+                                                                    setEditingSection(section);
+                                                                    setShowSectionModal(true);
+                                                                }}
+                                                                className="p-1 rounded hover:bg-gray-200"
+                                                                title="Modifier"
+                                                            >
+                                                                ✏️
+                                                            </button>
+                                                            <button
+                                                                onClick={() => removeSection(section.id)}
+                                                                className="p-1 rounded hover:bg-red-200 text-red-600"
+                                                                title="Supprimer"
+                                                            >
+                                                                🗑️
+                                                            </button>
                                                         </div>
                                                     )}
                                                 </div>
@@ -16323,6 +16368,102 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
                                                         placeholder="bg-blue-600"
                                                     />
+                                                </div>
+                                                
+                                                <div>
+                                                    <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Couleur hover du bouton</label>
+                                                    <input
+                                                        type="text"
+                                                        value={sectionForm.button_hover_color}
+                                                        onChange={(e) => setSectionForm({ ...sectionForm, button_hover_color: e.target.value })}
+                                                        className={`w-full px-3 py-2 rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                        placeholder="hover:bg-blue-700"
+                                                    />
+                                                </div>
+                                                
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <label className={`block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Champs de saisie</label>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setSectionForm({
+                                                                    ...sectionForm,
+                                                                    inputs: [...(sectionForm.inputs || []), { 
+                                                                        name: `field${(sectionForm.inputs?.length || 0) + 1}`, 
+                                                                        placeholder: 'Saisissez...', 
+                                                                        type: 'text', 
+                                                                        width: 'flex-1' 
+                                                                    }]
+                                                                });
+                                                            }}
+                                                            className="px-2 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded"
+                                                        >
+                                                            ➕ Ajouter un champ
+                                                        </button>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        {sectionForm.inputs?.map((input, idx) => (
+                                                            <div key={idx} className="flex gap-2 items-end">
+                                                                <div className="flex-1">
+                                                                    <label className={`block mb-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Nom du champ</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={input.name}
+                                                                        onChange={(e) => {
+                                                                            const newInputs = [...sectionForm.inputs];
+                                                                            newInputs[idx] = { ...newInputs[idx], name: e.target.value };
+                                                                            setSectionForm({ ...sectionForm, inputs: newInputs });
+                                                                        }}
+                                                                        className={`w-full px-2 py-1 text-sm rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                                        placeholder="query"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <label className={`block mb-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Placeholder</label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={input.placeholder}
+                                                                        onChange={(e) => {
+                                                                            const newInputs = [...sectionForm.inputs];
+                                                                            newInputs[idx] = { ...newInputs[idx], placeholder: e.target.value };
+                                                                            setSectionForm({ ...sectionForm, inputs: newInputs });
+                                                                        }}
+                                                                        className={`w-full px-2 py-1 text-sm rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                                        placeholder="Saisissez..."
+                                                                    />
+                                                                </div>
+                                                                <div className="w-24">
+                                                                    <label className={`block mb-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Largeur</label>
+                                                                    <select
+                                                                        value={input.width || 'flex-1'}
+                                                                        onChange={(e) => {
+                                                                            const newInputs = [...sectionForm.inputs];
+                                                                            newInputs[idx] = { ...newInputs[idx], width: e.target.value };
+                                                                            setSectionForm({ ...sectionForm, inputs: newInputs });
+                                                                        }}
+                                                                        className={`w-full px-2 py-1 text-sm rounded border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                                                    >
+                                                                        <option value="flex-1">Flexible</option>
+                                                                        <option value="w-32">Petit</option>
+                                                                        <option value="w-48">Moyen</option>
+                                                                        <option value="w-64">Grand</option>
+                                                                    </select>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        const newInputs = sectionForm.inputs.filter((_, i) => i !== idx);
+                                                                        setSectionForm({ ...sectionForm, inputs: newInputs });
+                                                                    }}
+                                                                    className="px-2 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded"
+                                                                    title="Supprimer ce champ"
+                                                                >
+                                                                    🗑️
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                             
