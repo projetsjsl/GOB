@@ -14029,16 +14029,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
 
                     // 📱 Fonction pour découper un message en segments SMS
                     const splitIntoSMS = (text, maxLength = 1500) => {
-                        if (text.length <= maxLength) {
-                            return [text];
+                        if (!text || text.length === 0) {
+                            return [''];
+                        }
+                        
+                        // Ne pas trim au début pour préserver le début du message
+                        const originalText = text;
+                        
+                        if (originalText.length <= maxLength) {
+                            return [originalText];
                         }
 
                         const segments = [];
-                        let remaining = text;
+                        let remaining = originalText;
 
                         while (remaining.length > 0) {
                             if (remaining.length <= maxLength) {
-                                segments.push(remaining);
+                                // Pour le dernier segment, on peut trim seulement la fin
+                                segments.push(remaining.trimEnd());
                                 break;
                             }
 
@@ -14054,8 +14062,23 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                 }
                             }
 
-                            segments.push(remaining.substring(0, cutPoint).trim());
-                            remaining = remaining.substring(cutPoint).trim();
+                            // Pour les segments intermédiaires, trim seulement la fin pour éviter de couper le début
+                            const segment = remaining.substring(0, cutPoint);
+                            segments.push(segment.trimEnd());
+                            
+                            // Pour remaining, ne pas trim au début pour préserver le contenu
+                            remaining = remaining.substring(cutPoint);
+                            
+                            // Trim seulement les espaces en début si c'est un saut de ligne ou espace multiple
+                            // mais préserver au moins un espace si nécessaire
+                            remaining = remaining.replace(/^\s+/, (match) => {
+                                // Si c'est juste des espaces simples, les garder
+                                if (match === ' ' || match.length === 1) return ' ';
+                                // Si c'est un saut de ligne, le garder
+                                if (match.includes('\n')) return '\n';
+                                // Sinon, supprimer les espaces multiples
+                                return '';
+                            });
                         }
 
                         return segments;
