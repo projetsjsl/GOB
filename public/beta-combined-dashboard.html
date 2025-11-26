@@ -3622,26 +3622,29 @@
                 // Charger les données de stocks une fois que les tickers sont disponibles (méthode batch optimisée)
                 // Charger TOUS les tickers pour que les sections Top Movers, Top Gainers, Top Losers et Analyses fonctionnent
                 useEffect(() => {
+                    // Combiner tous les tickers (portefeuille + watchlist) pour charger les données
+                    const allTickers = [...new Set([...teamTickers, ...watchlistTickers])]; // Utiliser Set pour éviter les doublons
+                    
                     // Ne charger que si on a des tickers, que l'initialisation est terminée, et qu'on n'est pas déjà en train de charger
-                    if (tickers.length === 0 || !initialLoadComplete || stocksLoadingRef.current) return;
+                    if (allTickers.length === 0 || !initialLoadComplete || stocksLoadingRef.current) return;
 
-                    // Vérifier si on a déjà des données complètes
-                    const tickersWithData = tickers.filter(ticker => {
+                    // Vérifier si on a déjà des données complètes pour tous les tickers
+                    const tickersWithData = allTickers.filter(ticker => {
                         const data = stockData[ticker];
                         return data && data.c !== undefined && data.c !== 0;
                     });
 
                     // Si on a déjà des données pour tous les tickers, ne pas recharger
-                    if (tickersWithData.length === tickers.length && tickers.length > 0) {
-                        console.log(`✅ Données déjà complètes pour ${tickersWithData.length}/${tickers.length} tickers`);
+                    if (tickersWithData.length === allTickers.length && allTickers.length > 0) {
+                        console.log(`✅ Données déjà complètes pour ${tickersWithData.length}/${allTickers.length} tickers (portefeuille + watchlist)`);
                         return;
                     }
 
-                    console.log('💹 Chargement automatique des données de stocks via batch (tous les tickers pour sections complètes)...');
+                    console.log(`💹 Chargement automatique des données de stocks via batch (${allTickers.length} tickers: ${teamTickers.length} portefeuille + ${watchlistTickers.length} watchlist)...`);
                     stocksLoadingRef.current = true; // Marquer comme en cours de chargement
 
                     // Charger TOUS les tickers pour que les sections Top Movers, Gainers, Losers et Analyses fonctionnent
-                    const initialTickers = tickers; // Charger tous les tickers, pas seulement les 5 premiers
+                    const initialTickers = allTickers; // Charger tous les tickers (portefeuille + watchlist)
 
                     // Utiliser la fonction batch optimisée
                     const loadInitialStocks = async () => {
@@ -3718,7 +3721,7 @@
                     };
 
                     loadInitialStocks();
-                }, [tickers.length, initialLoadComplete]); // Se déclenche quand les tickers changent et que l'initialisation est terminée
+                }, [teamTickers.length, watchlistTickers.length, initialLoadComplete]); // Se déclenche quand les tickers (portefeuille ou watchlist) changent et que l'initialisation est terminée
 
                 // Chargement automatique du calendrier économique à l'ouverture de l'onglet
                 // OBSOLÈTE: EconomicCalendarTab gère maintenant son propre chargement de données
