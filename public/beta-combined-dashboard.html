@@ -23231,26 +23231,63 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     useEffect(() => {
                         if (!containerRef.current) return;
                         
+                        // Fonction pour vérifier si l'application est chargée
+                        const checkIfLoaded = () => {
+                            const root = document.getElementById('finance-pro-root');
+                            if (root) {
+                                // Vérifier si React a monté l'application (chercher des éléments React typiques)
+                                const hasReactContent = root.querySelector('#root') || 
+                                                       root.querySelector('[class*="App"]') ||
+                                                       root.querySelector('[class*="container"]') ||
+                                                       root.innerHTML.trim().length > 100; // Contenu significatif
+                                
+                                return hasReactContent;
+                            }
+                            return false;
+                        };
+                        
+                        // Vérifier immédiatement si l'application est déjà chargée
+                        if (checkIfLoaded()) {
+                            const existingRoot = document.getElementById('finance-pro-root');
+                            if (existingRoot) {
+                                // S'assurer que le root est dans notre conteneur
+                                if (existingRoot.parentNode !== containerRef.current) {
+                                    containerRef.current.innerHTML = '';
+                                    containerRef.current.appendChild(existingRoot);
+                                }
+                                setIsLoaded(true);
+                                setLoadError(false);
+                                console.log('✅ Application 3p1 déjà chargée');
+                                return;
+                            }
+                        }
+                        
                         // Vérifier si l'application est déjà chargée et si le root existe toujours dans le DOM
                         const existingRoot = document.getElementById('finance-pro-root');
                         if (isInitializedRef.current && existingRoot && existingRoot.innerHTML.trim() !== '') {
                             // Vérifier que le root est bien dans notre conteneur
                             if (existingRoot.parentNode === containerRef.current) {
-                                setIsLoaded(true);
-                                setLoadError(false);
-                                return;
+                                if (checkIfLoaded()) {
+                                    setIsLoaded(true);
+                                    setLoadError(false);
+                                    return;
+                                }
                             } else {
                                 // Le root existe mais n'est pas dans notre conteneur, le déplacer
                                 containerRef.current.innerHTML = '';
                                 containerRef.current.appendChild(existingRoot);
-                                setIsLoaded(true);
-                                setLoadError(false);
-                                return;
+                                if (checkIfLoaded()) {
+                                    setIsLoaded(true);
+                                    setLoadError(false);
+                                    return;
+                                }
                             }
                         }
 
                         // Si on arrive ici, l'application n'est pas encore chargée ou a été supprimée
                         isInitializedRef.current = true;
+                        setIsLoaded(false); // Réinitialiser l'état de chargement
+                        setLoadError(false);
 
                         // Nettoyer les références précédentes si elles existent
                         if (scriptRef.current && scriptRef.current.parentNode) {
@@ -23329,50 +23366,81 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         if (existingScript) {
                             // Le script existe déjà, vérifier si l'application est montée
                             scriptRef.current = existingScript;
-                            // Vérifier si l'application React est déjà montée
-                            const root = document.getElementById('finance-pro-root');
-                            if (root && root.querySelector('#root')) {
-                                // L'application est déjà montée
+                            
+                            // Vérifier immédiatement
+                            if (checkIfLoaded()) {
                                 setIsLoaded(true);
                                 setLoadError(false);
-                            } else {
-                                // Le script est chargé mais l'app n'est pas montée, attendre un peu
-                                setTimeout(() => {
-                                    const rootCheck = document.getElementById('finance-pro-root');
-                                    if (rootCheck && rootCheck.querySelector('#root')) {
-                                        setIsLoaded(true);
-                                        setLoadError(false);
-                                    }
-                                }, 1000);
+                                console.log('✅ Application 3p1 détectée comme chargée');
+                                return; // Déjà chargé
                             }
+                            
+                            // Si pas encore chargé, vérifier périodiquement
+                            let checkCount = 0;
+                            const maxChecks = 20; // 20 * 500ms = 10 secondes max
+                            const checkInterval = setInterval(() => {
+                                checkCount++;
+                                if (checkIfLoaded()) {
+                                    setIsLoaded(true);
+                                    setLoadError(false);
+                                    clearInterval(checkInterval);
+                                    console.log(`✅ Application 3p1 chargée après ${checkCount * 500}ms`);
+                                } else if (checkCount >= maxChecks) {
+                                    clearInterval(checkInterval);
+                                    console.warn('⚠️ Application 3p1 pas encore montée après 10s');
+                                    // Forcer l'affichage si le root existe avec du contenu
+                                    const root = document.getElementById('finance-pro-root');
+                                    if (root && root.innerHTML.trim().length > 50) {
+                                        setIsLoaded(true);
+                                    }
+                                }
+                            }, 500);
                         } else {
                             // Le script n'existe pas, le charger
                             const script = document.createElement('script');
                             script.type = 'module';
                             script.src = '/3p1/dist/assets/index.js';
                             script.setAttribute('data-finance-pro', 'true'); // Marquer pour identification
+                            
                             script.onload = () => {
-                                setIsLoaded(true);
-                                setLoadError(false);
+                                console.log('✅ Script 3p1 chargé, attente du montage React...');
+                                // Vérifier périodiquement si React a monté l'app
+                                let checkCount = 0;
+                                const maxChecks = 20; // 20 * 500ms = 10 secondes max
+                                const checkInterval = setInterval(() => {
+                                    checkCount++;
+                                    if (checkIfLoaded()) {
+                                        clearInterval(checkInterval);
+                                        console.log(`✅ Application 3p1 montée après ${checkCount * 500}ms`);
+                                    } else if (checkCount >= maxChecks) {
+                                        clearInterval(checkInterval);
+                                        console.warn('⚠️ React n\'a pas monté l\'application après 10s');
+                                        setLoadError(true);
+                                    }
+                                }, 500);
                             };
+                            
                             script.onerror = (error) => {
                                 console.error('❌ Erreur de chargement de 3p1:', error);
                                 console.error('❌ Chemin tenté: /3p1/dist/assets/index.js');
                                 setLoadError(true);
                                 setIsLoaded(false);
                             };
+                            
                             document.head.appendChild(script);
                             scriptRef.current = script;
                         }
 
-                        // Timeout de sécurité (si React ne monte pas)
+                        // Timeout de sécurité global (si React ne monte pas)
                         setTimeout(() => {
-                            const root = document.getElementById('finance-pro-root');
-                            if (!root || root.innerHTML.trim() === '') {
-                                console.warn("Timeout de chargement de 3p1 - Vérifiez la console");
-                                document.getElementById('finance-pro-error').classList.remove('hidden');
+                            if (!checkIfLoaded() && !isLoaded) {
+                                console.warn("⚠️ Timeout global de chargement de 3p1 - Vérifiez la console");
+                                const errorDiv = document.getElementById('finance-pro-error');
+                                if (errorDiv) {
+                                    errorDiv.classList.remove('hidden');
+                                }
                             }
-                        }, 15000); // Increased to 15s for bundled app
+                        }, 15000); // 15 secondes
 
                         return () => {
                             // Cleanup seulement si le composant est démonté
