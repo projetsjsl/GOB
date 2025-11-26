@@ -3624,7 +3624,7 @@
                 useEffect(() => {
                     // Combiner tous les tickers (portefeuille + watchlist) pour charger les données
                     const allTickers = [...new Set([...teamTickers, ...watchlistTickers])]; // Utiliser Set pour éviter les doublons
-                    
+
                     // Ne charger que si on a des tickers, que l'initialisation est terminée, et qu'on n'est pas déjà en train de charger
                     if (allTickers.length === 0 || !initialLoadComplete || stocksLoadingRef.current) return;
 
@@ -13128,6 +13128,11 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }
                     });
                     const [emmaInput, setEmmaInput] = useState('');
+                    const [generalInput, setGeneralInput] = useState('');
+                    const [stockTitle, setStockTitle] = useState('');
+                    const [stockTicker, setStockTicker] = useState('');
+                    const [newsQuery, setNewsQuery] = useState('');
+                    const [compareTickers, setCompareTickers] = useState('');
                     const [emmaLoading, setEmmaLoading] = useState(false);
                     const chatContainerRef = useRef(null);
                     const [emmaApiKey, setEmmaApiKey] = useState('');
@@ -13686,9 +13691,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         setEmmaConnected(!!localKey);
                     };
 
-                    const sendMessageToEmma = async () => {
-                        console.log('🔍 sendMessageToEmma appelée avec:', emmaInput);
-                        if (!emmaInput.trim()) {
+                    const sendMessageToEmma = async (text = emmaInput, options = {}, onSuccess = null) => {
+                        const messageText = typeof text === 'string' ? text : emmaInput;
+                        console.log('🔍 sendMessageToEmma appelée avec:', messageText);
+
+                        if (!messageText || !messageText.trim()) {
                             console.log('❌ Input vide, sortie de la fonction');
                             return;
                         }
@@ -13696,7 +13703,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         const userMessage = {
                             id: Date.now(),
                             type: 'user',
-                            content: emmaInput,
+                            content: messageText,
                             timestamp: new Date().toLocaleTimeString('fr-FR')
                         };
 
@@ -13707,7 +13714,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         setEmmaLoading(true);
 
                         // Feedback visuel immédiat
-                        console.log('📤 Message envoyé à Emma:', emmaInput);
+                        console.log('📤 Message envoyé à Emma:', messageText);
 
                         // Ajouter un message temporaire de confirmation
                         const confirmMessage = {
@@ -13730,7 +13737,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             console.log('✅ Utilisation des données existantes du dashboard');
 
                             // Utiliser l'API Perplexity avec les données fraîches
-                            const responseData = await generatePerplexityResponse(emmaInput);
+                            const responseData = await generatePerplexityResponse(messageText, options);
                             const response = typeof responseData === 'string' ? responseData : responseData.text;
                             const model = typeof responseData === 'object' ? responseData.model : null;
                             const modelReason = typeof responseData === 'object' ? responseData.modelReason : null;
@@ -13877,11 +13884,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         } finally {
                             setEmmaLoading(false);
                             // Vider l'input après envoi
-                            setEmmaInput('');
+                            if (onSuccess) {
+                                onSuccess();
+                            } else if (messageText === emmaInput) {
+                                setEmmaInput('');
+                            }
                         }
                     };
 
-                    const generatePerplexityResponse = async (userMessage) => {
+                    const generatePerplexityResponse = async (userMessage, options = {}) => {
                         try {
                             console.log('🔍 Génération de réponse Emma Agent pour:', userMessage);
 
@@ -13915,7 +13926,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                         stockData: currentStockData,
                                         newsData: currentNewsData,
                                         apiStatus: currentApiStatus,
-                                        emmaPrompt: emmaPrompt,
+                                        emmaPrompt: options.promptOverride || emmaPrompt,
                                         temperature: emmaTemperature,
                                         max_tokens: emmaMaxTokens
                                     }
@@ -15317,176 +15328,332 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
                                 </div>
 
-                                {/* Input avec suggestions slash commands */}
-                                <div className="relative flex gap-2">
-                                    <div className="flex-1 relative">
-                                        <input
-                                            type="text"
-                                            value={emmaInput}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                setEmmaInput(value);
+                                {/* Zone Multi-Inputs */}
+                                <div className="grid grid-cols-1 gap-6">
+                                    {/* 1. Emma Expert (Système) */}
+                                    <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="text-xl">👩‍💼</span>
+                                            <h4 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Emma Expert (Prompt Système)</h4>
+                                        </div>
+                                        <div className="relative flex gap-2">
+                                            <div className="flex-1 relative">
+                                                <input
+                                                    type="text"
+                                                    value={emmaInput}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        setEmmaInput(value);
 
-                                                // Détecter si l'utilisateur tape un slash command
-                                                if (value.startsWith('/')) {
-                                                    const query = value.slice(1).toLowerCase();
-                                                    const commands = [
-                                                        { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
-                                                        { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
-                                                        { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
-                                                        { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
-                                                        { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
-                                                        { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
-                                                        { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
-                                                        { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
-                                                        { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
-                                                        { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
-                                                    ];
+                                                        // Détecter si l'utilisateur tape un slash command
+                                                        if (value.startsWith('/')) {
+                                                            const query = value.slice(1).toLowerCase();
+                                                            const commands = [
+                                                                { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
+                                                                { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
+                                                                { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
+                                                                { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
+                                                                { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
+                                                                { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
+                                                                { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
+                                                                { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
+                                                                { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
+                                                                { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
+                                                            ];
 
-                                                    const filtered = commands.filter(c =>
-                                                        c.cmd.slice(1).toLowerCase().startsWith(query) ||
-                                                        c.desc.toLowerCase().includes(query)
-                                                    );
+                                                            const filtered = commands.filter(c =>
+                                                                c.cmd.slice(1).toLowerCase().startsWith(query) ||
+                                                                c.desc.toLowerCase().includes(query)
+                                                            );
 
-                                                    if (filtered.length > 0 && query.length > 0) {
-                                                        setSlashSuggestions(filtered);
-                                                        setShowSlashSuggestions(true);
-                                                        setSelectedSuggestionIndex(-1);
-                                                    } else if (query.length === 0) {
-                                                        setSlashSuggestions(commands);
-                                                        setShowSlashSuggestions(true);
-                                                        setSelectedSuggestionIndex(-1);
-                                                    } else {
-                                                        setShowSlashSuggestions(false);
-                                                    }
-                                                } else {
-                                                    setShowSlashSuggestions(false);
-                                                }
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (showSlashSuggestions && slashSuggestions.length > 0) {
-                                                    if (e.key === 'ArrowDown') {
-                                                        e.preventDefault();
-                                                        setSelectedSuggestionIndex(prev =>
-                                                            prev < slashSuggestions.length - 1 ? prev + 1 : prev
-                                                        );
-                                                    } else if (e.key === 'ArrowUp') {
-                                                        e.preventDefault();
-                                                        setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
-                                                    } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
-                                                        e.preventDefault();
-                                                        const selected = slashSuggestions[selectedSuggestionIndex];
-                                                        setEmmaInput(selected.cmd + ' ');
-                                                        setShowSlashSuggestions(false);
-                                                        setSelectedSuggestionIndex(-1);
-                                                    } else if (e.key === 'Escape') {
-                                                        setShowSlashSuggestions(false);
-                                                        setSelectedSuggestionIndex(-1);
-                                                    } else if (e.key === 'Enter' && !showSlashSuggestions) {
-                                                        sendMessageToEmma();
-                                                    }
-                                                } else if (e.key === 'Enter') {
-                                                    sendMessageToEmma();
-                                                }
-                                            }}
-                                            onFocus={() => {
-                                                if (emmaInput.startsWith('/')) {
-                                                    const query = emmaInput.slice(1).toLowerCase();
-                                                    const commands = [
-                                                        { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
-                                                        { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
-                                                        { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
-                                                        { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
-                                                        { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
-                                                        { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
-                                                        { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
-                                                        { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
-                                                        { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
-                                                        { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
-                                                    ];
-                                                    const filtered = query.length > 0
-                                                        ? commands.filter(c => c.cmd.slice(1).toLowerCase().startsWith(query))
-                                                        : commands;
-                                                    setSlashSuggestions(filtered);
-                                                    setShowSlashSuggestions(filtered.length > 0);
-                                                }
-                                            }}
-                                            onBlur={() => {
-                                                // Délai pour permettre le clic sur une suggestion
-                                                setTimeout(() => setShowSlashSuggestions(false), 200);
-                                            }}
-                                            placeholder="Posez votre question à Emma... (Tapez / pour voir les commandes)"
-                                            className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                                }`}
-                                            disabled={emmaLoading}
-                                        />
-
-                                        {/* Suggestions de slash commands */}
-                                        {showSlashSuggestions && slashSuggestions.length > 0 && (
-                                            <div className={`absolute z-[9999] w-full mt-1 rounded-lg border shadow-lg max-h-64 overflow-y-auto ${isDarkMode
-                                                ? 'bg-gray-800 border-gray-700'
-                                                : 'bg-white border-gray-300'
-                                                }`}>
-                                                {slashSuggestions.map((suggestion, index) => (
-                                                    <div
-                                                        key={suggestion.cmd}
-                                                        onClick={() => {
-                                                            setEmmaInput(suggestion.cmd + ' ');
+                                                            if (filtered.length > 0 && query.length > 0) {
+                                                                setSlashSuggestions(filtered);
+                                                                setShowSlashSuggestions(true);
+                                                                setSelectedSuggestionIndex(-1);
+                                                            } else if (query.length === 0) {
+                                                                setSlashSuggestions(commands);
+                                                                setShowSlashSuggestions(true);
+                                                                setSelectedSuggestionIndex(-1);
+                                                            } else {
+                                                                setShowSlashSuggestions(false);
+                                                            }
+                                                        } else {
                                                             setShowSlashSuggestions(false);
-                                                            setSelectedSuggestionIndex(-1);
-                                                        }}
-                                                        className={`px-4 py-2 cursor-pointer transition-colors ${index === selectedSuggestionIndex
-                                                            ? isDarkMode
-                                                                ? 'bg-gray-700'
-                                                                : 'bg-gray-100'
-                                                            : ''
-                                                            } ${isDarkMode
-                                                                ? 'hover:bg-gray-700 text-gray-200'
-                                                                : 'hover:bg-gray-50 text-gray-900'
-                                                            }`}
-                                                    >
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-lg">{suggestion.icon}</span>
-                                                            <div className="flex-1">
-                                                                <div className="font-semibold text-sm">{suggestion.cmd}</div>
-                                                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                                    }`}>
-                                                                    {suggestion.desc}
+                                                        }
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (showSlashSuggestions && slashSuggestions.length > 0) {
+                                                            if (e.key === 'ArrowDown') {
+                                                                e.preventDefault();
+                                                                setSelectedSuggestionIndex(prev =>
+                                                                    prev < slashSuggestions.length - 1 ? prev + 1 : prev
+                                                                );
+                                                            } else if (e.key === 'ArrowUp') {
+                                                                e.preventDefault();
+                                                                setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+                                                            } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+                                                                e.preventDefault();
+                                                                const selected = slashSuggestions[selectedSuggestionIndex];
+                                                                setEmmaInput(selected.cmd + ' ');
+                                                                setShowSlashSuggestions(false);
+                                                                setSelectedSuggestionIndex(-1);
+                                                            } else if (e.key === 'Escape') {
+                                                                setShowSlashSuggestions(false);
+                                                                setSelectedSuggestionIndex(-1);
+                                                            } else if (e.key === 'Enter' && !showSlashSuggestions) {
+                                                                sendMessageToEmma(emmaInput, {}, () => setEmmaInput(''));
+                                                            }
+                                                        } else if (e.key === 'Enter') {
+                                                            sendMessageToEmma(emmaInput, {}, () => setEmmaInput(''));
+                                                        }
+                                                    }}
+                                                    onFocus={() => {
+                                                        if (emmaInput.startsWith('/')) {
+                                                            const query = emmaInput.slice(1).toLowerCase();
+                                                            const commands = [
+                                                                { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
+                                                                { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
+                                                                { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
+                                                                { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
+                                                                { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
+                                                                { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
+                                                                { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
+                                                                { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
+                                                                { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
+                                                                { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
+                                                            ];
+                                                            const filtered = query.length > 0
+                                                                ? commands.filter(c => c.cmd.slice(1).toLowerCase().startsWith(query))
+                                                                : commands;
+                                                            setSlashSuggestions(filtered);
+                                                            setShowSlashSuggestions(filtered.length > 0);
+                                                        }
+                                                    }}
+                                                    onBlur={() => {
+                                                        setTimeout(() => setShowSlashSuggestions(false), 200);
+                                                    }}
+                                                    placeholder="Posez votre question à Emma... (Tapez / pour voir les commandes)"
+                                                    className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                        }`}
+                                                    disabled={emmaLoading}
+                                                />
+
+                                                {/* Suggestions de slash commands */}
+                                                {showSlashSuggestions && slashSuggestions.length > 0 && (
+                                                    <div className={`absolute z-[9999] w-full mt-1 rounded-lg border shadow-lg max-h-64 overflow-y-auto ${isDarkMode
+                                                        ? 'bg-gray-800 border-gray-700'
+                                                        : 'bg-white border-gray-300'
+                                                        }`}>
+                                                        {slashSuggestions.map((suggestion, index) => (
+                                                            <div
+                                                                key={suggestion.cmd}
+                                                                onClick={() => {
+                                                                    setEmmaInput(suggestion.cmd + ' ');
+                                                                    setShowSlashSuggestions(false);
+                                                                    setSelectedSuggestionIndex(-1);
+                                                                }}
+                                                                className={`px-4 py-2 cursor-pointer transition-colors ${index === selectedSuggestionIndex
+                                                                    ? isDarkMode
+                                                                        ? 'bg-gray-700'
+                                                                        : 'bg-gray-100'
+                                                                    : ''
+                                                                    } ${isDarkMode
+                                                                        ? 'hover:bg-gray-700 text-gray-200'
+                                                                        : 'hover:bg-gray-50 text-gray-900'
+                                                                    }`}
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-lg">{suggestion.icon}</span>
+                                                                    <div className="flex-1">
+                                                                        <div className="font-semibold text-sm">{suggestion.cmd}</div>
+                                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                            }`}>
+                                                                            {suggestion.desc}
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        ))}
                                                     </div>
-                                                ))}
+                                                )}
                                             </div>
-                                        )}
+                                            <button
+                                                data-emma-send-button
+                                                onClick={() => sendMessageToEmma(emmaInput, {}, () => setEmmaInput(''))}
+                                                disabled={emmaLoading || !emmaInput.trim()}
+                                                className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${emmaLoading || !emmaInput.trim()
+                                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                                    : 'bg-gray-800 text-white hover:bg-gray-700'
+                                                    }`}
+                                            >
+                                                {emmaLoading ? '⏳' : '📤'}
+                                            </button>
+                                            {emmaInput.trim() && (
+                                                <button
+                                                    onClick={() => setEmmaInput('')}
+                                                    className="px-3 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600 transition-colors"
+                                                    title="Vider l'input"
+                                                >
+                                                    ✕
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                    <button
-                                        data-emma-send-button
-                                        onClick={() => {
-                                            console.log('🔘 Bouton Envoyer cliqué !');
-                                            console.log('📝 Contenu de emmaInput:', emmaInput);
-                                            console.log('📊 État de emmaLoading:', emmaLoading);
-                                            sendMessageToEmma();
-                                        }}
-                                        disabled={emmaLoading || !emmaInput.trim()}
-                                        className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${emmaLoading || !emmaInput.trim()
-                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                            : 'bg-gray-800 text-white hover:bg-gray-700'
-                                            }`}
-                                    >
-                                        {emmaLoading ? '⏳' : '📤'}
-                                    </button>
-                                    {emmaInput.trim() && (
-                                        <button
-                                            onClick={() => setEmmaInput('')}
-                                            className="px-3 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600 transition-colors"
-                                            title="Vider l'input"
-                                        >
-                                            ✕
-                                        </button>
-                                    )}
+
+                                    {/* 2. Question Générale (LLM Standard) */}
+                                    <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="text-xl">🤖</span>
+                                            <h4 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Question Générale (LLM Standard)</h4>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={generalInput}
+                                                onChange={(e) => setGeneralInput(e.target.value)}
+                                                placeholder="Question générale sans contexte financier strict..."
+                                                className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                    }`}
+                                                disabled={emmaLoading}
+                                                onKeyDown={(e) => e.key === 'Enter' && sendMessageToEmma(generalInput, { promptOverride: 'Tu es un assistant IA utile et polyvalent.' }, () => setGeneralInput(''))}
+                                            />
+                                            <button
+                                                onClick={() => sendMessageToEmma(generalInput, { promptOverride: 'Tu es un assistant IA utile et polyvalent.' }, () => setGeneralInput(''))}
+                                                disabled={emmaLoading || !generalInput.trim()}
+                                                className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${emmaLoading || !generalInput.trim()
+                                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                                                    }`}
+                                            >
+                                                {emmaLoading ? '⏳' : '📤'}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* 3. Analyse Titre */}
+                                    <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="text-xl">📈</span>
+                                            <h4 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Analyse Rapide de Titre</h4>
+                                        </div>
+                                        <div className="flex gap-2 flex-wrap md:flex-nowrap">
+                                            <input
+                                                value={stockTitle}
+                                                onChange={(e) => setStockTitle(e.target.value)}
+                                                placeholder="Nom (ex: Apple)"
+                                                className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                    }`}
+                                                disabled={emmaLoading}
+                                            />
+                                            <input
+                                                value={stockTicker}
+                                                onChange={(e) => setStockTicker(e.target.value)}
+                                                placeholder="Ticker (ex: AAPL)"
+                                                className={`w-32 px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                    }`}
+                                                disabled={emmaLoading}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const msg = `Peux-tu analyser le titre ${stockTitle} (${stockTicker}) ? Je veux une analyse complète incluant la valorisation, les risques et les opportunités.`;
+                                                    sendMessageToEmma(msg, {}, () => { setStockTitle(''); setStockTicker(''); });
+                                                }}
+                                                disabled={emmaLoading || !stockTitle.trim() || !stockTicker.trim()}
+                                                className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${emmaLoading || !stockTitle.trim() || !stockTicker.trim()
+                                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                                                    }`}
+                                            >
+                                                {emmaLoading ? '⏳' : 'Analyse 📊'}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* 4. Recherche Actualités */}
+                                    <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="text-xl">📰</span>
+                                            <h4 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Recherche d'Actualités</h4>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <input
+                                                value={newsQuery}
+                                                onChange={(e) => setNewsQuery(e.target.value)}
+                                                placeholder="Sujet (ex: Intelligence Artificielle, Taux d'intérêt)"
+                                                className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                    }`}
+                                                disabled={emmaLoading}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        const msg = `Quelles sont les dernières actualités financières concernant : ${newsQuery} ? Résume les points clés et l'impact potentiel sur le marché.`;
+                                                        sendMessageToEmma(msg, {}, () => setNewsQuery(''));
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const msg = `Quelles sont les dernières actualités financières concernant : ${newsQuery} ? Résume les points clés et l'impact potentiel sur le marché.`;
+                                                    sendMessageToEmma(msg, {}, () => setNewsQuery(''));
+                                                }}
+                                                disabled={emmaLoading || !newsQuery.trim()}
+                                                className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${emmaLoading || !newsQuery.trim()
+                                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                                                    }`}
+                                            >
+                                                {emmaLoading ? '⏳' : 'Rechercher 🔍'}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* 5. Comparaison Titres */}
+                                    <div className={`p-4 rounded-lg border transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="text-xl">⚖️</span>
+                                            <h4 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Comparaison de Titres</h4>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <input
+                                                value={compareTickers}
+                                                onChange={(e) => setCompareTickers(e.target.value)}
+                                                placeholder="Tickers (ex: AAPL, MSFT, GOOGL)"
+                                                className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                    }`}
+                                                disabled={emmaLoading}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        const msg = `Peux-tu comparer les titres suivants : ${compareTickers} ? Compare leurs fondamentaux, valorisations, performances récentes et perspectives d'avenir.`;
+                                                        sendMessageToEmma(msg, {}, () => setCompareTickers(''));
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const msg = `Peux-tu comparer les titres suivants : ${compareTickers} ? Compare leurs fondamentaux, valorisations, performances récentes et perspectives d'avenir.`;
+                                                    sendMessageToEmma(msg, {}, () => setCompareTickers(''));
+                                                }}
+                                                disabled={emmaLoading || !compareTickers.trim()}
+                                                className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${emmaLoading || !compareTickers.trim()
+                                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                                                    }`}
+                                            >
+                                                {emmaLoading ? '⏳' : 'Comparer ⚖️'}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -15909,7 +16076,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
                     const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
                     const [expandedStock, setExpandedStock] = useState(null);
-                    
+
                     // Filtrer les tickers selon la source
                     const displayedTickers = tickerSource === 'watchlist' ? watchlistTickers : teamTickers;
 
@@ -16006,20 +16173,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     // Fonction helper pour obtenir les 5 dernières nouvelles d'un ticker
                     const getTickerNews = (ticker, limit = 5) => {
                         if (!ticker || !newsData || newsData.length === 0) return [];
-                        
+
                         // Filtrer les nouvelles contenant le ticker dans le titre ou la description
                         const tickerNews = newsData.filter(article => {
                             const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
                             return text.includes(ticker.toLowerCase());
                         });
-                        
+
                         // Trier par date de publication (plus récentes en premier)
                         const sortedNews = tickerNews.sort((a, b) => {
                             const dateA = new Date(a.publishedAt || a.publishedDate || 0);
                             const dateB = new Date(b.publishedAt || b.publishedDate || 0);
                             return dateB - dateA;
                         });
-                        
+
                         // Si on a une nouvelle dans tickerLatestNews, l'utiliser comme première
                         const latestNews = tickerLatestNews[ticker];
                         if (latestNews) {
@@ -16029,7 +16196,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 sortedNews.unshift(latestNews);
                             }
                         }
-                        
+
                         return sortedNews.slice(0, limit);
                     };
 
@@ -16042,7 +16209,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         const diffMins = Math.floor(diffMs / 60000);
                         const diffHours = Math.floor(diffMs / 3600000);
                         const diffDays = Math.floor(diffMs / 86400000);
-                        
+
                         if (diffMins < 1) return 'À l\'instant';
                         if (diffMins < 60) return `Il y a ${diffMins} min`;
                         if (diffHours < 24) return `Il y a ${diffHours}h`;
@@ -16053,7 +16220,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     // Composant pour afficher les 5 dernières nouvelles d'un ticker
                     const TickerNewsList = ({ ticker, maxItems = 5 }) => {
                         const tickerNews = getTickerNews(ticker, maxItems);
-                        
+
                         if (tickerNews.length === 0) {
                             return (
                                 <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
@@ -16061,7 +16228,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                             );
                         }
-                        
+
                         return (
                             <div className="flex flex-col gap-1 max-w-xs max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
                                 {tickerNews.map((article, index) => (
@@ -16070,11 +16237,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         href={article.url || '#'}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className={`text-xs p-1.5 rounded transition-all hover:scale-[1.02] ${
-                                            isDarkMode
+                                        className={`text-xs p-1.5 rounded transition-all hover:scale-[1.02] ${isDarkMode
                                                 ? 'bg-gray-700/50 hover:bg-gray-700/70 border border-gray-600/50'
                                                 : 'bg-gray-100 hover:bg-gray-200 border border-gray-200'
-                                        }`}
+                                            }`}
                                         onClick={(e) => {
                                             if (article.url) {
                                                 e.stopPropagation();
@@ -17215,7 +17381,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 // Composant JLab unifié avec navigation interne
                 const JLabUnifiedTab = () => {
                     const [jlabView, setJlabView] = useState('portfolio'); // 'portfolio', 'watchlist', ou '3pour1'
-                    
+
                     return (
                         <div className="w-full h-full">
                             {/* Navigation interne JLab */}
@@ -17223,49 +17389,46 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setJlabView('portfolio')}
-                                        className={`px-6 py-3 font-semibold transition-all duration-200 ${
-                                            jlabView === 'portfolio'
+                                        className={`px-6 py-3 font-semibold transition-all duration-200 ${jlabView === 'portfolio'
                                                 ? isDarkMode
                                                     ? 'bg-green-600 text-white border-b-2 border-green-400'
                                                     : 'bg-green-100 text-green-800 border-b-2 border-green-600'
                                                 : isDarkMode
                                                     ? 'text-gray-400 hover:text-white hover:bg-gray-800'
                                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                        }`}
+                                            }`}
                                     >
                                         Titres en portefeuille
                                     </button>
                                     <button
                                         onClick={() => setJlabView('watchlist')}
-                                        className={`px-6 py-3 font-semibold transition-all duration-200 ${
-                                            jlabView === 'watchlist'
+                                        className={`px-6 py-3 font-semibold transition-all duration-200 ${jlabView === 'watchlist'
                                                 ? isDarkMode
                                                     ? 'bg-green-600 text-white border-b-2 border-green-400'
                                                     : 'bg-green-100 text-green-800 border-b-2 border-green-600'
                                                 : isDarkMode
                                                     ? 'text-gray-400 hover:text-white hover:bg-gray-800'
                                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                        }`}
+                                            }`}
                                     >
                                         Dan's watchlist
                                     </button>
                                     <button
                                         onClick={() => setJlabView('3pour1')}
-                                        className={`px-6 py-3 font-semibold transition-all duration-200 ${
-                                            jlabView === '3pour1'
+                                        className={`px-6 py-3 font-semibold transition-all duration-200 ${jlabView === '3pour1'
                                                 ? isDarkMode
                                                     ? 'bg-green-600 text-white border-b-2 border-green-400'
                                                     : 'bg-green-100 text-green-800 border-b-2 border-green-600'
                                                 : isDarkMode
                                                     ? 'text-gray-400 hover:text-white hover:bg-gray-800'
                                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                                        }`}
+                                            }`}
                                     >
                                         3pour1
                                     </button>
                                 </div>
                             </div>
-                            
+
                             {/* Contenu conditionnel */}
                             <div className="w-full h-full">
                                 {jlabView === 'portfolio' && <StocksNewsTab tickerSource="portfolio" />}
@@ -23230,22 +23393,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     useEffect(() => {
                         if (!containerRef.current) return;
-                        
+
                         // Fonction pour vérifier si l'application est chargée
                         const checkIfLoaded = () => {
                             const root = document.getElementById('finance-pro-root');
                             if (root) {
                                 // Vérifier si React a monté l'application (chercher des éléments React typiques)
-                                const hasReactContent = root.querySelector('#root') || 
-                                                       root.querySelector('[class*="App"]') ||
-                                                       root.querySelector('[class*="container"]') ||
-                                                       root.innerHTML.trim().length > 100; // Contenu significatif
-                                
+                                const hasReactContent = root.querySelector('#root') ||
+                                    root.querySelector('[class*="App"]') ||
+                                    root.querySelector('[class*="container"]') ||
+                                    root.innerHTML.trim().length > 100; // Contenu significatif
+
                                 return hasReactContent;
                             }
                             return false;
                         };
-                        
+
                         // Vérifier immédiatement si l'application est déjà chargée
                         if (checkIfLoaded()) {
                             const existingRoot = document.getElementById('finance-pro-root');
@@ -23261,7 +23424,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 return;
                             }
                         }
-                        
+
                         // Vérifier si l'application est déjà chargée et si le root existe toujours dans le DOM
                         const existingRoot = document.getElementById('finance-pro-root');
                         if (isInitializedRef.current && existingRoot && existingRoot.innerHTML.trim() !== '') {
@@ -23366,7 +23529,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         if (existingScript) {
                             // Le script existe déjà, vérifier si l'application est montée
                             scriptRef.current = existingScript;
-                            
+
                             // Vérifier immédiatement
                             if (checkIfLoaded()) {
                                 setIsLoaded(true);
@@ -23374,7 +23537,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 console.log('✅ Application 3p1 détectée comme chargée');
                                 return; // Déjà chargé
                             }
-                            
+
                             // Si pas encore chargé, vérifier périodiquement
                             let checkCount = 0;
                             const maxChecks = 20; // 20 * 500ms = 10 secondes max
@@ -23401,7 +23564,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             script.type = 'module';
                             script.src = '/3p1/dist/assets/index.js';
                             script.setAttribute('data-finance-pro', 'true'); // Marquer pour identification
-                            
+
                             script.onload = () => {
                                 console.log('✅ Script 3p1 chargé, attente du montage React...');
                                 // Vérifier périodiquement si React a monté l'app
@@ -23419,14 +23582,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     }
                                 }, 500);
                             };
-                            
+
                             script.onerror = (error) => {
                                 console.error('❌ Erreur de chargement de 3p1:', error);
                                 console.error('❌ Chemin tenté: /3p1/dist/assets/index.js');
                                 setLoadError(true);
                                 setIsLoaded(false);
                             };
-                            
+
                             document.head.appendChild(script);
                             scriptRef.current = script;
                         }
