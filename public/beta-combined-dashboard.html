@@ -23557,52 +23557,52 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         </ExpandableComponent>
 
                                         {/* 3. Symbol Profile - 1 COLONNE */}
-                                        <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
-                                            }`}>
-                                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>
-                                                🏢 Profil de l'Entreprise
-                                            </h3>
-                                            <div className="h-[300px] md:h-[400px]">
-                                                <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}></div>
+                                        <ExpandableComponent title="Profil de l'Entreprise" icon="🏢" isDarkMode={isDarkMode}>
+                                            <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
+                                                <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    🏢 Profil de l'Entreprise
+                                                </h3>
+                                                <div className="h-[300px] md:h-[400px]">
+                                                    <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}></div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ExpandableComponent>
 
                                         {/* 4. Timeline - 1 COLONNE */}
-                                        <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
-                                            }`}>
-                                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>
-                                                📰 Timeline - Fil d'Actualité
-                                            </h3>
-                                            <div className="h-[300px] md:h-[400px]">
-                                                <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}></div>
+                                        <ExpandableComponent title="Timeline - Fil d'Actualité" icon="📰" isDarkMode={isDarkMode}>
+                                            <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
+                                                <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    📰 Timeline - Fil d'Actualité
+                                                </h3>
+                                                <div className="h-[300px] md:h-[400px]">
+                                                    <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}></div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ExpandableComponent>
 
                                         {/* 5. Financials - PLEINE LARGEUR */}
-                                        <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
-                                            }`}>
-                                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>
-                                                💰 États Financiers
-                                            </h3>
-                                            <div className="h-[350px] md:h-[450px]">
-                                                <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}></div>
+                                        <ExpandableComponent title="États Financiers" icon="💰" className="lg:col-span-2" isDarkMode={isDarkMode}>
+                                            <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
+                                                <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    💰 États Financiers
+                                                </h3>
+                                                <div className="h-[350px] md:h-[450px]">
+                                                    <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}></div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ExpandableComponent>
 
                                         {/* 6. Technical Analysis - PLEINE LARGEUR */}
-                                        <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
-                                            }`}>
-                                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}>
-                                                📈 Analyse Technique
-                                            </h3>
-                                            <div className="h-[300px] md:h-[400px]">
-                                                <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}></div>
+                                        <ExpandableComponent title="Analyse Technique" icon="📈" className="lg:col-span-2" isDarkMode={isDarkMode}>
+                                            <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'}`}>
+                                                <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                    📈 Analyse Technique
+                                                </h3>
+                                                <div className="h-[300px] md:h-[400px]">
+                                                    <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}></div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ExpandableComponent>
 
                                     </div>
                                 </div>
