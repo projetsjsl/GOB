@@ -23044,25 +23044,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
 
                             {/* Widget TradingView Forex Heat Map */}
-                            <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                                }`}>
-                                <div className="mb-3 md:mb-6">
-                                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>
-                                        💱 Forex Heat Map
-                                    </h2>
-                                    <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                        }`}>
-                                        Carte de chaleur des devises en temps réel (EUR, USD, JPY, GBP, CHF, AUD, CAD, CNY)
-                                    </p>
-                                </div>
+                            <ExpandableComponent title="Forex Heat Map" icon="💱" isDarkMode={isDarkMode}>
+                                <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                                    <div className="mb-3 md:mb-6">
+                                        <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            💱 Forex Heat Map
+                                        </h2>
+                                        <p className={`text-xs md:text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Carte de chaleur des devises en temps réel (EUR, USD, JPY, GBP, CHF, AUD, CAD, CNY)
+                                        </p>
+                                    </div>
 
-                                <div className="h-[350px] md:h-[400px] lg:h-[450px]">
-                                    <div className="tradingview-widget-container h-full" ref={tradingViewForexRef}>
-                                        {/* Le widget sera injecté ici par le script */}
+                                    <div className="h-[350px] md:h-[400px] lg:h-[450px]">
+                                        <div className="tradingview-widget-container h-full" ref={tradingViewForexRef}>
+                                            {/* Le widget sera injecté ici par le script */}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </ExpandableComponent>
 
                             {/* Widget TradingView Economic Calendar Events */}
                             <div className={`p-3 md:p-6 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
