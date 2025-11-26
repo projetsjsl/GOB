@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { AnnualData, CompanyInfo, Assumptions } from '../types';
 import { calculateCAGR, projectFutureValue } from '../utils/calculations';
 
@@ -17,7 +17,44 @@ interface Range {
 }
 
 export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ data, info, sector, assumptions }) => {
-  
+  const [sectorDataFromAPI, setSectorDataFromAPI] = useState<any>(null);
+  const [isLoadingSector, setIsLoadingSector] = useState(false);
+  const [sectorError, setSectorError] = useState<string | null>(null);
+
+  // Charger les données sectorielles depuis l'API
+  useEffect(() => {
+    const loadSectorData = async () => {
+      const sectorKey = sector || info.sector;
+      if (!sectorKey) return;
+
+      setIsLoadingSector(true);
+      setSectorError(null);
+
+      try {
+        const response = await fetch(`/api/fmp-sector-data?sector=${encodeURIComponent(sectorKey)}`);
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.success && result.data) {
+          setSectorDataFromAPI(result.data);
+        } else {
+          // API n'a pas retourné de données, on utilisera les valeurs par défaut
+          console.warn(`⚠️ Aucune donnée sectorielle disponible pour "${sectorKey}", utilisation des valeurs par défaut`);
+        }
+      } catch (error: any) {
+        console.error('❌ Erreur chargement données sectorielles:', error);
+        setSectorError(error.message);
+        // En cas d'erreur, on utilisera les valeurs par défaut
+      } finally {
+        setIsLoadingSector(false);
+      }
+    };
+
+    loadSectorData();
+  }, [sector, info.sector]);
+
   // Calculer les intervalles historiques du titre
   const titleRanges = useMemo(() => {
     const validData = data.filter(d => d.priceHigh > 0 && d.priceLow > 0 && d.earningsPerShare > 0);
@@ -130,9 +167,23 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     };
   }, [data]);
 
-  // Valeurs de référence sectorielles (à remplacer par données réelles plus tard)
+  // Valeurs de référence sectorielles (depuis API FMP ou valeurs par défaut)
   const sectorRanges = useMemo(() => {
-    // Valeurs typiques par secteur (peuvent être remplacées par API)
+    // Si on a des données depuis l'API, les utiliser
+    if (sectorDataFromAPI) {
+      return {
+        pe: sectorDataFromAPI.pe || null,
+        pcf: sectorDataFromAPI.pcf || null,
+        pbv: sectorDataFromAPI.pbv || null,
+        yield: sectorDataFromAPI.yield || null,
+        epsGrowth: sectorDataFromAPI.epsGrowth || null,
+        cfGrowth: sectorDataFromAPI.cfGrowth || null,
+        bvGrowth: sectorDataFromAPI.bvGrowth || null,
+        divGrowth: sectorDataFromAPI.divGrowth || null
+      };
+    }
+
+    // Fallback: Valeurs typiques par secteur (utilisées si API non disponible)
     const sectorDefaults: Record<string, any> = {
       'Technology': {
         pe: { min: 15, max: 35, avg: 25 },
@@ -204,7 +255,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       matchedSector = sectorDefaults['Energy'];
     }
 
-    // Valeurs par défaut génériques si secteur non trouvé
+    // Valeurs par défaut génériques si secteur non trouvé (fallback uniquement)
     return matchedSector || {
       pe: { min: 10, max: 25, avg: 17 },
       pcf: { min: 8, max: 20, avg: 14 },
@@ -215,7 +266,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       bvGrowth: { min: 3, max: 12, avg: 7 },
       divGrowth: { min: 1, max: 8, avg: 4 }
     };
-  }, [sector, info.sector]);
+  }, [sector, info.sector, sectorDataFromAPI]);
 
   // Calculer les projections 5 ans pour le titre (basées sur les assumptions actuelles)
   const title5YearProjections = useMemo(() => {
@@ -448,8 +499,16 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       </div>
 
       <div className="mt-4 text-xs text-gray-500">
-        <p><strong>Titre Historique:</strong> Calculé à partir de vos données historiques ({data[0]?.year || 'N/A'} - {data[data.length - 1]?.year || 'N/A'})</p>
-        <p><strong>Secteur Typique:</strong> Valeurs de référence pour le secteur {info.sector || 'non spécifié'}</p>
+        <p><strong>Titre Historique:</strong> Calculé à partir de vos données historiques récupérées par API ({data[0]?.year || 'N/A'} - {data[data.length - 1]?.year || 'N/A'})</p>
+        <p><strong>Secteur Typique:</strong> {isLoadingSector ? (
+          <span className="text-blue-600">Chargement des données sectorielles depuis l'API...</span>
+        ) : sectorDataFromAPI ? (
+          <span className="text-green-600">Données récupérées depuis FMP API (secteur: {info.sector || sector || 'non spécifié'})</span>
+        ) : sectorError ? (
+          <span className="text-orange-600">Valeurs par défaut (erreur API: {sectorError})</span>
+        ) : (
+          <span>Valeurs de référence pour le secteur {info.sector || sector || 'non spécifié'} (valeurs par défaut)</span>
+        )}</p>
         <p><strong>5 Ans Titre:</strong> Projections basées sur vos hypothèses actuelles (champs orange)</p>
         <p><strong>5 Ans Secteur:</strong> Projections typiques pour le secteur basées sur les moyennes sectorielles</p>
       </div>

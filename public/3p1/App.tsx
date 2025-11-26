@@ -24,7 +24,8 @@ import { fetchCompanyData } from './services/financeApi';
 import { saveSnapshot, hasManualEdits, loadSnapshot, listSnapshots } from './services/snapshotApi';
 import { loadAllTickersFromSupabase, mapSourceToIsWatchlist } from './services/tickersApi';
 
-// Initial Mock Data mirroring the image
+// Données initiales par défaut (placeholder uniquement - les données réelles sont toujours récupérées depuis l'API FMP)
+// Ces données ne sont utilisées que temporairement avant le chargement des données réelles depuis l'API
 const INITIAL_DATA: AnnualData[] = [
     { year: 2021, priceHigh: 417.40, priceLow: 241.70, cashFlowPerShare: 11.96, dividendPerShare: 3.52, bookValuePerShare: 30.87, earningsPerShare: 8.80 },
     { year: 2022, priceHigh: 415.50, priceLow: 243.00, cashFlowPerShare: 14.19, dividendPerShare: 3.88, bookValuePerShare: 35.00, earningsPerShare: 10.71 },
