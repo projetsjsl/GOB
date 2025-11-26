@@ -10,6 +10,7 @@ import { Sidebar } from './components/Sidebar';
 import { SensitivityTable } from './components/SensitivityTable';
 import { NotesEditor } from './components/NotesEditor';
 import { EvaluationDetails } from './components/EvaluationDetails';
+import { HistoricalRangesTable } from './components/HistoricalRangesTable';
 import { DataSourcesInfo } from './components/DataSourcesInfo';
 import { AdditionalMetrics } from './components/AdditionalMetrics';
 import { InfoTab } from './components/InfoTab';
@@ -1289,6 +1290,13 @@ export default function App() {
                                         data={data}
                                         assumptions={assumptions}
                                         onUpdateAssumption={handleUpdateAssumption}
+                                    />
+
+                                    {/* Historical Ranges Table - Aide pour les hypothèses */}
+                                    <HistoricalRangesTable
+                                        data={data}
+                                        info={info}
+                                        sector={info.sector}
                                     />
 
                                     <div className="mt-8">
