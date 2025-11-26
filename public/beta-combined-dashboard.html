@@ -983,6 +983,8 @@
             // ============================================================================
             const ExpandableComponent = ({ children, title = '', className = '', icon = '🔍', isDarkMode = false }) => {
                 const [isExpanded, setIsExpanded] = useState(false);
+                const contentRef = React.useRef(null);
+                const modalRef = React.useRef(null);
                 
                 // Gérer la touche ESC pour fermer
                 React.useEffect(() => {
@@ -998,9 +1000,37 @@
                     return () => document.removeEventListener('keydown', handleEscape);
                 }, [isExpanded]);
                 
+                // Déplacer le contenu dans la modal au lieu de le cloner
+                React.useEffect(() => {
+                    if (!isExpanded || !contentRef.current || !modalRef.current) return;
+                    
+                    const content = contentRef.current;
+                    const modalContent = modalRef.current.querySelector('.expandable-modal-content');
+                    
+                    if (modalContent && content) {
+                        // Déplacer le contenu dans la modal
+                        const originalParent = content.parentNode;
+                        const originalNextSibling = content.nextSibling;
+                        const originalDisplay = content.style.display;
+                        
+                        modalContent.appendChild(content);
+                        content.style.display = 'block';
+                        
+                        return () => {
+                            // Restaurer le contenu à sa position originale
+                            if (originalNextSibling) {
+                                originalParent.insertBefore(content, originalNextSibling);
+                            } else {
+                                originalParent.appendChild(content);
+                            }
+                            content.style.display = originalDisplay;
+                        };
+                    }
+                }, [isExpanded]);
+                
                 return (
                     <>
-                        <div className={`relative ${className}`}>
+                        <div ref={contentRef} className={`relative ${className}`}>
                             {/* Bouton d'agrandissement */}
                             <button
                                 onClick={() => setIsExpanded(true)}
@@ -1021,6 +1051,7 @@
                         {/* Modal fullscreen */}
                         {isExpanded && (
                             <div
+                                ref={modalRef}
                                 className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-95 backdrop-blur-sm"
                                 onClick={() => setIsExpanded(false)}
                             >
@@ -1053,11 +1084,9 @@
                                         </div>
                                     </div>
                                     
-                                    {/* Contenu agrandi */}
-                                    <div className="h-[calc(100%-80px)] overflow-auto">
-                                        <div className="scale-100">
-                                            {children}
-                                        </div>
+                                    {/* Contenu agrandi - le contenu original sera déplacé ici */}
+                                    <div className="expandable-modal-content h-[calc(100%-80px)] overflow-auto">
+                                        {/* Le contenu sera déplacé ici dynamiquement */}
                                     </div>
                                 </div>
                             </div>
