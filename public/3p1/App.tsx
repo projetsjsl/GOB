@@ -1297,6 +1297,7 @@ export default function App() {
                                         data={data}
                                         info={info}
                                         sector={info.sector}
+                                        assumptions={assumptions}
                                     />
 
                                     <div className="mt-8">

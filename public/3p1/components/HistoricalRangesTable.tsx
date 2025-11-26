@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
-import { AnnualData, CompanyInfo } from '../types';
-import { calculateCAGR } from '../utils/calculations';
+import { AnnualData, CompanyInfo, Assumptions } from '../types';
+import { calculateCAGR, projectFutureValue } from '../utils/calculations';
 
 interface HistoricalRangesTableProps {
   data: AnnualData[];
   info: CompanyInfo;
   sector?: string;
+  assumptions: Assumptions;
 }
 
 interface Range {
@@ -15,7 +16,7 @@ interface Range {
   current?: number;
 }
 
-export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ data, info, sector }) => {
+export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ data, info, sector, assumptions }) => {
   
   // Calculer les intervalles historiques du titre
   const titleRanges = useMemo(() => {
@@ -216,6 +217,57 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     };
   }, [sector, info.sector]);
 
+  // Calculer les projections 5 ans pour le titre (basées sur les assumptions actuelles)
+  const title5YearProjections = useMemo(() => {
+    if (!titleRanges) return null;
+
+    // Utiliser les valeurs de base actuelles depuis les assumptions
+    const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
+    const baseEPS = baseYearData?.earningsPerShare || 0;
+    const baseCF = baseYearData?.cashFlowPerShare || 0;
+    const baseBV = baseYearData?.bookValuePerShare || 0;
+    const baseDiv = assumptions.currentDividend || 0;
+
+    // Projections 5 ans avec les taux de croissance actuels
+    const eps5Y = projectFutureValue(baseEPS, assumptions.growthRateEPS, 5);
+    const cf5Y = projectFutureValue(baseCF, assumptions.growthRateCF, 5);
+    const bv5Y = projectFutureValue(baseBV, assumptions.growthRateBV, 5);
+    const div5Y = projectFutureValue(baseDiv, assumptions.growthRateDiv, 5);
+
+    // Calculer les ratios projetés
+    const targetPriceEPS = eps5Y * assumptions.targetPE;
+    const targetPriceCF = cf5Y * assumptions.targetPCF;
+    const targetPriceBV = bv5Y * assumptions.targetPBV;
+    const targetPriceDiv = assumptions.targetYield > 0 ? div5Y / (assumptions.targetYield / 100) : 0;
+
+    // Pour les ratios, utiliser les ratios cibles actuels
+    return {
+      pe: { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE },
+      pcf: { min: assumptions.targetPCF * 0.9, max: assumptions.targetPCF * 1.1, avg: assumptions.targetPCF },
+      pbv: { min: assumptions.targetPBV * 0.9, max: assumptions.targetPBV * 1.1, avg: assumptions.targetPBV },
+      yield: { min: assumptions.targetYield * 0.9, max: assumptions.targetYield * 1.1, avg: assumptions.targetYield },
+      epsGrowth: { min: assumptions.growthRateEPS * 0.8, max: assumptions.growthRateEPS * 1.2, avg: assumptions.growthRateEPS },
+      cfGrowth: { min: assumptions.growthRateCF * 0.8, max: assumptions.growthRateCF * 1.2, avg: assumptions.growthRateCF },
+      bvGrowth: { min: assumptions.growthRateBV * 0.8, max: assumptions.growthRateBV * 1.2, avg: assumptions.growthRateBV },
+      divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv }
+    };
+  }, [titleRanges, assumptions, data]);
+
+  // Projections 5 ans typiques pour le secteur (basées sur les moyennes sectorielles)
+  const sector5YearProjections = useMemo(() => {
+    // Utiliser les moyennes sectorielles comme base pour les projections
+    return {
+      pe: { min: sectorRanges.pe.avg * 0.9, max: sectorRanges.pe.avg * 1.1, avg: sectorRanges.pe.avg },
+      pcf: { min: sectorRanges.pcf.avg * 0.9, max: sectorRanges.pcf.avg * 1.1, avg: sectorRanges.pcf.avg },
+      pbv: { min: sectorRanges.pbv.avg * 0.9, max: sectorRanges.pbv.avg * 1.1, avg: sectorRanges.pbv.avg },
+      yield: { min: sectorRanges.yield.avg * 0.9, max: sectorRanges.yield.avg * 1.1, avg: sectorRanges.yield.avg },
+      epsGrowth: { min: sectorRanges.epsGrowth.avg * 0.8, max: sectorRanges.epsGrowth.avg * 1.2, avg: sectorRanges.epsGrowth.avg },
+      cfGrowth: { min: sectorRanges.cfGrowth.avg * 0.8, max: sectorRanges.cfGrowth.avg * 1.2, avg: sectorRanges.cfGrowth.avg },
+      bvGrowth: { min: sectorRanges.bvGrowth.avg * 0.8, max: sectorRanges.bvGrowth.avg * 1.2, avg: sectorRanges.bvGrowth.avg },
+      divGrowth: { min: sectorRanges.divGrowth.avg * 0.8, max: sectorRanges.divGrowth.avg * 1.2, avg: sectorRanges.divGrowth.avg }
+    };
+  }, [sectorRanges]);
+
   const formatRange = (range: Range | null, suffix: string = '') => {
     if (!range) return 'N/A';
     return `${range.min.toFixed(1)} - ${range.max.toFixed(1)}${suffix} (moy: ${range.avg.toFixed(1)}${suffix})`;
@@ -251,6 +303,8 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               <th className="p-2 text-left border">Métrique</th>
               <th className="p-2 border bg-blue-50">Titre Historique</th>
               <th className="p-2 border bg-purple-50">Secteur Typique</th>
+              <th className="p-2 border bg-green-50">5 Ans Titre</th>
+              <th className="p-2 border bg-yellow-50">5 Ans Secteur</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -263,6 +317,12 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               <td className="p-3 text-center border bg-purple-50 text-purple-800">
                 {formatRange(sectorRanges.pe, 'x')}
               </td>
+              <td className="p-3 text-center border bg-green-50 text-green-800">
+                {title5YearProjections ? formatRange(title5YearProjections.pe, 'x') : 'N/A'}
+              </td>
+              <td className="p-3 text-center border bg-yellow-50 text-yellow-800">
+                {formatRange(sector5YearProjections.pe, 'x')}
+              </td>
             </tr>
 
             {/* P/CF Ratio */}
@@ -273,6 +333,12 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               </td>
               <td className="p-3 text-center border bg-purple-50 text-purple-800">
                 {formatRange(sectorRanges.pcf, 'x')}
+              </td>
+              <td className="p-3 text-center border bg-green-50 text-green-800">
+                {title5YearProjections ? formatRange(title5YearProjections.pcf, 'x') : 'N/A'}
+              </td>
+              <td className="p-3 text-center border bg-yellow-50 text-yellow-800">
+                {formatRange(sector5YearProjections.pcf, 'x')}
               </td>
             </tr>
 
@@ -285,6 +351,12 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               <td className="p-3 text-center border bg-purple-50 text-purple-800">
                 {formatRange(sectorRanges.pbv, 'x')}
               </td>
+              <td className="p-3 text-center border bg-green-50 text-green-800">
+                {title5YearProjections ? formatRange(title5YearProjections.pbv, 'x') : 'N/A'}
+              </td>
+              <td className="p-3 text-center border bg-yellow-50 text-yellow-800">
+                {formatRange(sector5YearProjections.pbv, 'x')}
+              </td>
             </tr>
 
             {/* Dividend Yield */}
@@ -295,6 +367,12 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               </td>
               <td className="p-3 text-center border bg-purple-50 text-purple-800">
                 {formatRange(sectorRanges.yield, '%')}
+              </td>
+              <td className="p-3 text-center border bg-green-50 text-green-800">
+                {title5YearProjections ? formatRange(title5YearProjections.yield, '%') : 'N/A'}
+              </td>
+              <td className="p-3 text-center border bg-yellow-50 text-yellow-800">
+                {formatRange(sector5YearProjections.yield, '%')}
               </td>
             </tr>
 
@@ -307,6 +385,12 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               <td className="p-3 text-center border bg-purple-50 text-purple-800">
                 {formatGrowthRange(sectorRanges.epsGrowth)}
               </td>
+              <td className="p-3 text-center border bg-green-50 text-green-800">
+                {title5YearProjections ? formatGrowthRange(title5YearProjections.epsGrowth) : 'N/A'}
+              </td>
+              <td className="p-3 text-center border bg-yellow-50 text-yellow-800">
+                {formatGrowthRange(sector5YearProjections.epsGrowth)}
+              </td>
             </tr>
 
             {/* CF Growth */}
@@ -317,6 +401,12 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               </td>
               <td className="p-3 text-center border bg-purple-50 text-purple-800">
                 {formatGrowthRange(sectorRanges.cfGrowth)}
+              </td>
+              <td className="p-3 text-center border bg-green-50 text-green-800">
+                {title5YearProjections ? formatGrowthRange(title5YearProjections.cfGrowth) : 'N/A'}
+              </td>
+              <td className="p-3 text-center border bg-yellow-50 text-yellow-800">
+                {formatGrowthRange(sector5YearProjections.cfGrowth)}
               </td>
             </tr>
 
@@ -329,6 +419,12 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               <td className="p-3 text-center border bg-purple-50 text-purple-800">
                 {formatGrowthRange(sectorRanges.bvGrowth)}
               </td>
+              <td className="p-3 text-center border bg-green-50 text-green-800">
+                {title5YearProjections ? formatGrowthRange(title5YearProjections.bvGrowth) : 'N/A'}
+              </td>
+              <td className="p-3 text-center border bg-yellow-50 text-yellow-800">
+                {formatGrowthRange(sector5YearProjections.bvGrowth)}
+              </td>
             </tr>
 
             {/* Dividend Growth */}
@@ -340,6 +436,12 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
               <td className="p-3 text-center border bg-purple-50 text-purple-800">
                 {formatGrowthRange(sectorRanges.divGrowth)}
               </td>
+              <td className="p-3 text-center border bg-green-50 text-green-800">
+                {title5YearProjections ? formatGrowthRange(title5YearProjections.divGrowth) : 'N/A'}
+              </td>
+              <td className="p-3 text-center border bg-yellow-50 text-yellow-800">
+                {formatGrowthRange(sector5YearProjections.divGrowth)}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -348,6 +450,8 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       <div className="mt-4 text-xs text-gray-500">
         <p><strong>Titre Historique:</strong> Calculé à partir de vos données historiques ({data[0]?.year || 'N/A'} - {data[data.length - 1]?.year || 'N/A'})</p>
         <p><strong>Secteur Typique:</strong> Valeurs de référence pour le secteur {info.sector || 'non spécifié'}</p>
+        <p><strong>5 Ans Titre:</strong> Projections basées sur vos hypothèses actuelles (champs orange)</p>
+        <p><strong>5 Ans Secteur:</strong> Projections typiques pour le secteur basées sur les moyennes sectorielles</p>
       </div>
     </div>
   );
