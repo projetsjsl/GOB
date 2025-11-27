@@ -1325,4 +1325,4 @@ const StocksNewsTab = ({ isDarkMode, tickers = [], stockData = {}, newsData = []
     );
 };
 
-window.StocksNewsTab = StocksNewsTab;
+window.StocksNewsTab = StocksNewsTab;// Force cache bust
