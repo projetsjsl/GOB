@@ -562,8 +562,8 @@
                 }
                 const code = await response.text();
                 
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:567',message:'Script fetched, transpiling',data:{src:src,codeLength:code.length,babelAvailable:typeof Babel!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #region agent log (désactivé en production)
+                // Logging désactivé pour éviter les erreurs CORS en production
                 // #endregion
                 
                 // Transpiler avec Babel
@@ -572,8 +572,8 @@
                         presets: ['react', 'env']
                     }).code;
                     
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:576',message:'Script transpiled, executing',data:{src:src,transpiledLength:transpiled.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #region agent log (désactivé en production)
+                    // Logging désactivé pour éviter les erreurs CORS en production
                     // #endregion
                     
                     // Exécuter le code transpilé
@@ -584,8 +584,8 @@
             } catch (error) {
                 console.error(`❌ Error loading script ${src}:`, error);
                 
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:590',message:'Script load error',data:{src:src,error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B'})}).catch(()=>{});
+                // #region agent log (désactivé en production)
+                // Logging désactivé pour éviter les erreurs CORS en production
                 // #endregion
                 
                 throw error;
@@ -594,8 +594,8 @@
         
         // Charger tous les scripts séquentiellement
         (async function() {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:597',message:'Starting sequential script loading',data:{totalScripts:scriptsToLoad.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #region agent log (désactivé en production)
+            // Logging désactivé pour éviter les erreurs CORS en production
             // #endregion
             
             for (const src of scriptsToLoad) {
@@ -607,8 +607,8 @@
                 }
             }
             
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:609',message:'All scripts loaded',data:{betaCombinedDashboard:typeof window.BetaCombinedDashboard,plusTab:typeof window.PlusTab},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,C,D'})}).catch(()=>{});
+            // #region agent log (désactivé en production)
+            // Logging désactivé pour éviter les erreurs CORS en production
             // #endregion
             
             console.log('✅ [DEBUG] All scripts loaded. BetaCombinedDashboard:', typeof window.BetaCombinedDashboard);
@@ -621,20 +621,20 @@
     
     <!-- Render Dashboard Component -->
     <script type="text/babel">
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:620',message:'Script render init',data:{timestamp:Date.now(),babelLoaded:typeof Babel!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #region agent log (désactivé en production)
+        // Logging désactivé pour éviter les erreurs CORS en production
         // #endregion
         
         // Fonction pour rendre le dashboard
         function renderDashboard() {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:556',message:'Window load event fired',data:{betaCombinedDashboard:typeof window.BetaCombinedDashboard,react:typeof window.React,reactDOM:typeof window.ReactDOM,plusTab:typeof window.PlusTab},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C,D'})}).catch(()=>{});
+            // #region agent log (désactivé en production)
+            // Logging désactivé pour éviter les erreurs CORS en production
             // #endregion
             
             // Vérifier que BetaCombinedDashboard est disponible
             if (typeof window.BetaCombinedDashboard !== 'undefined') {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:560',message:'BetaCombinedDashboard found, rendering',data:{rootExists:!!document.getElementById('root')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #region agent log (désactivé en production)
+                // Logging désactivé pour éviter les erreurs CORS en production
                 // #endregion
                 
                 console.log('✅ Rendering BetaCombinedDashboard...');
@@ -647,21 +647,21 @@
                     window.dashboardRoot.render(React.createElement(window.BetaCombinedDashboard));
                     console.log('✅ Dashboard rendered successfully!');
                     
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:567',message:'Render completed',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #region agent log (désactivé en production)
+                    // Logging désactivé pour éviter les erreurs CORS en production
                     // #endregion
                 } else {
                     console.error('❌ Root element not found!');
                     
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:570',message:'Root element not found',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #region agent log (désactivé en production)
+                    // Logging désactivé pour éviter les erreurs CORS en production
                     // #endregion
                 }
             } else {
                 console.error('❌ BetaCombinedDashboard not found! Make sure dashboard-main.js is loaded.');
                 
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/467e26a0-12db-44f2-83b9-21df059a1bff',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'beta-combined-dashboard.html:643',message:'BetaCombinedDashboard not found',data:{allScripts:Array.from(document.querySelectorAll('script[type="text/babel"][src]')).map(s=>s.src),inlineScripts:Array.from(document.querySelectorAll('script[type="text/babel"]:not([src])')).length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C'})}).catch(()=>{});
+                // #region agent log (désactivé en production)
+                // Logging désactivé pour éviter les erreurs CORS en production
                 // #endregion
             }
         }
