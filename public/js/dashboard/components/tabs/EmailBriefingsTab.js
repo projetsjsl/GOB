@@ -3,7 +3,7 @@
 
 const { useState, useEffect, useCallback, useMemo } = React;
 
-const EmailBriefingsTab = () => {
+const EmailBriefingsTab = ({ isDarkMode = true }) => {
                 const [loading, setLoading] = useState(false);
                 const [currentBriefing, setCurrentBriefing] = useState(null);
                 const [previewHtml, setPreviewHtml] = useState('');

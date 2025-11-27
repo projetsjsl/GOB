@@ -4,7 +4,7 @@
 
 
 const AdminJSLaiTab = ({
-                isDarkMode,
+                isDarkMode = true,
                 emmaConnected,
                 setEmmaConnected,
                 showPromptEditor,

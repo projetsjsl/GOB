@@ -843,21 +843,17 @@ const BetaCombinedDashboard = () => {
             return iconMap[tabId] || 'iconoir-graph-up';
         };
 
-        // Configuration des onglets
+        // Configuration des onglets (9 onglets fonctionnels - version da3fc96)
         const tabs = [
             { id: 'markets-economy', label: 'Marchés & Économie' },
             { id: 'intellistocks', label: 'JLab™' },
             { id: 'ask-emma', label: 'Emma IA™' },
             { id: 'plus', label: 'Plus' },
-            { id: 'admin-jslai', label: 'Admin JSLAI' },
+            { id: 'admin-jsla', label: 'Admin JSLAI' },
             { id: 'scrapping-sa', label: 'Seeking Alpha' },
             { id: 'seeking-alpha', label: 'Stocks News' },
             { id: 'email-briefings', label: 'Emma En Direct' },
-            { id: 'investing-calendar', label: 'TESTS JS' },
-            { id: 'economic-calendar', label: 'Calendrier Économique' },
-            { id: 'dans-watchlist', label: 'Dan\'s Watchlist' },
-            { id: 'yield-curve', label: 'Courbe des Rendements' },
-            { id: 'stocks-news', label: 'Titres & Nouvelles' }
+            { id: 'investing-calendar', label: 'TESTS JS' }
         ];
 
         // Fonction pour parser le texte brut Seeking Alpha
@@ -1560,22 +1556,6 @@ const BetaCombinedDashboard = () => {
                 </div>
             )}
 
-            {/* Intro Dan's Watchlist - première visite de session */}
-            {showDanIntro && activeTab === 'dans-watchlist' && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
-                    <div className="text-center">
-                        <div className="mb-6">
-                            <img
-                                src={`images/daniel-ouellet2.jpg?v=${Date.now()}`}
-                                alt="Daniel Ouellet"
-                                className="emma-intro-image w-72 h-72 md:w-96 md:h-96 rounded-full object-cover shadow-2xl border-4 border-blue-500"
-                            />
-                        </div>
-                        <h2 className="text-white text-3xl md:text-4xl font-bold mb-2">Dan's Watchlist</h2>
-                        <p className="text-blue-300 text-lg">Watchlist Daniel Ouellet • GOB</p>
-                    </div>
-                </div>
-            )}
 
             {/* Intro JLab - première visite de session */}
             {showJLabIntro && activeTab === 'intellistocks' && (
@@ -2047,7 +2027,7 @@ const BetaCombinedDashboard = () => {
                     setShowLengthEditor
                 })}
                 {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode, isProfessionalMode })}
-                {activeTab === 'admin-jslai' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, { 
+                {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, { 
                     isDarkMode,
                     emmaConnected,
                     setEmmaConnected,
@@ -2058,25 +2038,10 @@ const BetaCombinedDashboard = () => {
                     showLengthEditor,
                     setShowLengthEditor
                 })}
-                {activeTab === 'dans-watchlist' && window.DansWatchlistTab && React.createElement(window.DansWatchlistTab, { isDarkMode })}
                 {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { isDarkMode })}
                 {activeTab === 'email-briefings' && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab, { isDarkMode })}
                 {activeTab === 'seeking-alpha' && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab, { isDarkMode })}
-                {activeTab === 'economic-calendar' && window.EconomicCalendarTab && React.createElement(window.EconomicCalendarTab, { isDarkMode })}
                 {activeTab === 'investing-calendar' && window.InvestingCalendarTab && React.createElement(window.InvestingCalendarTab, { isDarkMode })}
-                {activeTab === 'yield-curve' && window.YieldCurveTab && React.createElement(window.YieldCurveTab, { isDarkMode })}
-                {activeTab === 'stocks-news' && window.StocksNewsTab && React.createElement(window.StocksNewsTab, { 
-                    isDarkMode,
-                    tickers,
-                    stockData,
-                    newsData,
-                    loading,
-                    lastUpdate,
-                    loadTickersFromSupabase,
-                    fetchNews,
-                    refreshAllStocks,
-                    fetchLatestNewsForTickers
-                })}
             </main>
 
             {/* Messages */}
