@@ -8,7 +8,8 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join, extname } from 'path';
-import { existsSync, readdir } from 'fs/promises';
+import { existsSync } from 'fs';
+import { readdir } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -152,18 +153,43 @@ console.log('🔍 Scan automatique des routes API...');
 const autoMounted = await scanAndMountApiRoutes();
 console.log(`✅ ${priorityMounted + autoMounted} routes API montées au total`);
 
-// Servir les fichiers statiques depuis dist/ (après build) ou public/
-const staticDirs = ['dist', 'public'];
+// Servir les fichiers statiques UNIQUEMENT depuis public/ (source de vérité unique)
+// Les fichiers dans dist/ sont des copies synchronisées automatiquement
+const staticDirs = ['public'];
 let staticDir = null;
 
 for (const dir of staticDirs) {
   const fullPath = join(__dirname, dir);
   if (existsSync(fullPath)) {
     staticDir = fullPath;
-    app.use(express.static(fullPath));
-    console.log(`✅ Fichiers statiques servis depuis: ${dir}/`);
+    // Désactiver le cache pour les fichiers JavaScript et HTML
+    app.use(express.static(fullPath, {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.js') || filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
+          // Ajouter un timestamp pour forcer le rechargement
+          res.setHeader('Last-Modified', new Date().toUTCString());
+        }
+      }
+    }));
+    console.log(`✅ Fichiers statiques servis depuis: ${dir}/ (source unique, cache désactivé)`);
     break;
   }
+}
+
+// Synchroniser automatiquement les fichiers dashboard au démarrage
+try {
+  const { syncDirectory } = require('./scripts/sync-dashboard-files.cjs');
+  const sourceDir = join(__dirname, 'public/js/dashboard');
+  const targetDir = join(__dirname, 'dist/js/dashboard');
+  if (existsSync(sourceDir) && existsSync(join(__dirname, 'dist'))) {
+    syncDirectory(sourceDir, targetDir);
+    console.log('✅ Fichiers dashboard synchronisés automatiquement');
+  }
+} catch (error) {
+  console.warn('⚠️  Synchronisation automatique non disponible:', error.message);
 }
 
 // Route de fallback pour SPA - rediriger vers le dashboard

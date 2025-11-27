@@ -4,6 +4,7 @@
 
 
 const AdminJSLaiTab = ({
+                isDarkMode,
                 emmaConnected,
                 setEmmaConnected,
                 showPromptEditor,
@@ -20,7 +21,7 @@ const AdminJSLaiTab = ({
                         }`}>⚙️ Admin-JSLAI</h2>
                     </div>
 
-                    <EmmaSmsPanel />
+                    {window.EmmaSmsPanel && React.createElement(window.EmmaSmsPanel, { isDarkMode })}
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${

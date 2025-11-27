@@ -822,11 +822,42 @@ export default function App() {
     // --- BULK SYNC ALL TICKERS HANDLER ---
     const [isBulkSyncing, setIsBulkSyncing] = useState(false);
     const [bulkSyncProgress, setBulkSyncProgress] = useState({ current: 0, total: 0 });
+    const bulkSyncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    // Compteur atomique pour suivre la progression réelle (évite les valeurs obsolètes)
+    const progressCounterRef = useRef<number>(0);
+    // ID de session pour isoler les mises à jour de progression et éviter les race conditions
+    const syncSessionIdRef = useRef<number>(0);
+
+    // Nettoyer le timeout lors du démontage du composant
+    useEffect(() => {
+        return () => {
+            if (bulkSyncTimeoutRef.current) {
+                clearTimeout(bulkSyncTimeoutRef.current);
+                bulkSyncTimeoutRef.current = null;
+            }
+        };
+    }, []);
 
     const handleBulkSyncAllTickers = async () => {
         if (!confirm(`Synchroniser tous les ${Object.keys(library).length} tickers ?\n\nChaque version sera sauvegardée avant la synchronisation.\nLes données manuelles et hypothèses (orange) seront préservées.`)) {
             return;
         }
+
+        // CRITIQUE: Nettoyer le timeout d'une synchronisation précédente AVANT toute autre opération
+        // pour éviter que le timeout précédent ne réinitialise l'état après qu'on ait commencé la nouvelle sync
+        if (bulkSyncTimeoutRef.current) {
+            clearTimeout(bulkSyncTimeoutRef.current);
+            bulkSyncTimeoutRef.current = null;
+        }
+
+        // Incrémenter l'ID de session pour isoler cette synchronisation des précédentes
+        // Cela garantit que les mises à jour de progression en retard ne s'appliquent pas à cette nouvelle sync
+        syncSessionIdRef.current = (syncSessionIdRef.current || 0) + 1;
+        const currentSessionId = syncSessionIdRef.current;
+
+        // Réinitialiser le compteur atomique APRÈS avoir incrémenté l'ID de session
+        // pour éviter les race conditions avec les mises à jour de progression en retard
+        progressCounterRef.current = 0;
 
         setIsBulkSyncing(true);
         const allTickers = Object.keys(library);
@@ -834,6 +865,7 @@ export default function App() {
 
         let successCount = 0;
         let errorCount = 0;
+        let skippedCount = 0; // Nouveau compteur pour profils manquants
         const errors: string[] = [];
 
         // Traiter par batch pour éviter de surcharger
@@ -849,27 +881,42 @@ export default function App() {
             }
 
             // Traiter le batch en parallèle
-            await Promise.allSettled(
+            // IMPORTANT: Accumuler les mises à jour dans un objet pour éviter la perte de données
+            // causée par les mises à jour d'état concurrentes batchées par React
+            const batchLibraryUpdates: Record<string, any> = {};
+            
+            const batchResults = await Promise.allSettled(
                 batch.map(async (tickerSymbol) => {
                     try {
-                        setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
-
                         const profile = library[tickerSymbol];
-                        if (!profile) return;
+                        if (!profile) {
+                            // Profil manquant - retourner skipped (sera compté dans la boucle de traitement)
+                            // Ne pas incrémenter ici pour éviter le double comptage
+                            return { type: 'skipped', ticker: tickerSymbol };
+                        }
 
                         // 1. Sauvegarder un snapshot avant la sync
+                        // CRITIQUE: Cette opération doit réussir avant de continuer pour garantir l'intégrité
+                        // Si elle échoue, on ne continue pas pour éviter de corrompre l'historique des snapshots
                         console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-                        await saveSnapshot(
-                            tickerSymbol,
-                            profile.data,
-                            profile.assumptions,
-                            profile.info,
-                            `Avant synchronisation globale - ${new Date().toLocaleString()}`,
-                            false, // Not current (on va le remplacer)
-                            false  // Not auto-fetched
-                        );
+                        try {
+                            await saveSnapshot(
+                                tickerSymbol,
+                                profile.data,
+                                profile.assumptions,
+                                profile.info,
+                                `Avant synchronisation globale - ${new Date().toLocaleString()}`,
+                                false, // Not current (on va le remplacer)
+                                false  // Not auto-fetched
+                            );
+                        } catch (snapshotError: any) {
+                            // Si la sauvegarde du snapshot échoue, on ne continue pas
+                            // pour éviter de corrompre l'historique des snapshots
+                            throw new Error(`Échec sauvegarde snapshot pré-sync: ${snapshotError.message || 'Erreur inconnue'}`);
+                        }
 
                         // 2. Charger les nouvelles données FMP
+                        // UNIQUEMENT si la sauvegarde du snapshot a réussi
                         console.log(`🔄 Synchronisation ${tickerSymbol}...`);
                         const result = await fetchCompanyData(tickerSymbol);
 
@@ -911,40 +958,9 @@ export default function App() {
                         // Trier par année
                         mergedData.sort((a, b) => a.year - b.year);
 
-                        // 4. Mettre à jour le profil
-                        // - Garder les assumptions telles quelles (ne pas les modifier)
-                        // - Mettre à jour seulement currentPrice dans assumptions
-                        // - Mettre à jour les infos de l'entreprise
-                        setLibrary(prev => {
-                            const updated = {
-                                ...prev,
-                                [tickerSymbol]: {
-                                    ...profile,
-                                    data: mergedData,
-                                    info: {
-                                        ...profile.info,
-                                        ...result.info, // Mettre à jour les infos (nom, secteur, etc.)
-                                        // S'assurer que le nom de FMP remplace toujours celui de Supabase
-                                        name: result.info.name || profile.info.name
-                                    },
-                                    assumptions: {
-                                        ...profile.assumptions, // Garder toutes les hypothèses (orange)
-                                        currentPrice: result.currentPrice // Mettre à jour seulement le prix actuel
-                                    },
-                                    lastModified: Date.now()
-                                }
-                            };
-
-                            try {
-                                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-                            } catch (e) {
-                                console.warn('Failed to save to LocalStorage:', e);
-                            }
-
-                            return updated;
-                        });
-
-                        // 5. Sauvegarder le snapshot après sync
+                        // 4. Sauvegarder le snapshot après sync (AVANT d'accumuler dans batchLibraryUpdates)
+                        // CRITIQUE: Cette opération doit réussir avant de persister les données
+                        // pour garantir l'atomicité de l'opération complète
                         await saveSnapshot(
                             tickerSymbol,
                             mergedData,
@@ -961,26 +977,138 @@ export default function App() {
                             true   // Auto-fetched
                         );
 
-                        successCount++;
+                        // 5. Accumuler la mise à jour du profil dans l'objet batchLibraryUpdates
+                        // UNIQUEMENT après que toutes les opérations critiques aient réussi
+                        // (sauvegarde snapshot avant, fetch, merge, sauvegarde snapshot après)
+                        // Cela garantit l'atomicité : si une opération échoue, les données ne sont pas persistées
+                        batchLibraryUpdates[tickerSymbol] = {
+                            ...profile,
+                            data: mergedData,
+                            info: {
+                                ...profile.info,
+                                ...result.info, // Mettre à jour les infos (nom, secteur, etc.)
+                                // S'assurer que le nom de FMP remplace toujours celui de Supabase
+                                name: result.info.name || profile.info.name
+                            },
+                            assumptions: {
+                                ...profile.assumptions, // Garder toutes les hypothèses (orange)
+                                currentPrice: result.currentPrice // Mettre à jour seulement le prix actuel
+                            },
+                            lastModified: Date.now()
+                        };
+
                         console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+                        return { type: 'success', ticker: tickerSymbol };
 
                     } catch (error: any) {
-                        errorCount++;
+                        // Ne pas muter errors ici - l'accumulation se fera après Promise.allSettled()
+                        // pour respecter l'immutabilité et éviter les problèmes de concurrence
                         const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
-                        errors.push(errorMsg);
                         console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+                        
+                        return { type: 'error', ticker: tickerSymbol, error: errorMsg };
                     }
                 })
             );
+
+            // Mettre à jour la progression et la bibliothèque APRÈS que tous les tickers du batch soient traités
+            // Cela garantit qu'aucune mise à jour d'état n'est perdue, même si React batch les mises à jour
+            let batchCompleted = 0;
+            
+            // Compter les résultats du batch pour les statistiques finales ET la progression UI
+            // IMPORTANT: Compter TOUS les résultats (fulfilled et rejected) pour maintenir la cohérence
+            // entre le compteur UI (batchCompleted) et les statistiques finales (successCount, errorCount, skippedCount)
+            // CRITIQUE: Accumuler les erreurs APRÈS que toutes les promesses soient réglées pour respecter l'immutabilité
+            batchResults.forEach((result) => {
+                if (result.status === 'fulfilled') {
+                    const data = result.value;
+                    // Compter TOUS les fulfilled promises pour batchCompleted (même types inattendus)
+                    batchCompleted++;
+                    
+                    // Compter pour les statistiques finales (chaque item doit être compté exactement une fois)
+                    if (data && data.type === 'success') {
+                        successCount++;
+                    } else if (data && data.type === 'error') {
+                        errorCount++;
+                        // Accumuler l'erreur APRÈS que la promesse soit réglée (immutabilité)
+                        if (data.error) {
+                            errors.push(data.error);
+                        }
+                    } else if (data && data.type === 'skipped') {
+                        skippedCount++;
+                    } else {
+                        // Type inattendu ou data manquant - traiter comme erreur
+                        // Ce cas est déjà compté dans batchCompleted ci-dessus, donc pas de double comptage
+                        console.warn('⚠️ Résultat batch avec type inattendu:', data);
+                        errorCount++;
+                        errors.push(`Type inattendu pour ${data?.ticker || 'inconnu'}`);
+                    }
+                } else {
+                    // Promise rejetée (ne devrait pas arriver avec allSettled, mais au cas où)
+                    // Compter pour batchCompleted ET errorCount
+                    batchCompleted++;
+                    errorCount++;
+                    // Accumuler l'erreur de la promesse rejetée
+                    const rejectionError = result.reason?.message || result.reason || 'Erreur inconnue';
+                    errors.push(`Promise rejetée: ${rejectionError}`);
+                }
+            });
+
+            // Mettre à jour la progression UI
+            // CRITIQUE: Vérifier que cette mise à jour appartient à la session actuelle
+            // pour éviter que les mises à jour en retard d'une sync précédente ne corrompent la progression
+            if (syncSessionIdRef.current === currentSessionId) {
+                const newCurrent = progressCounterRef.current + batchCompleted;
+                progressCounterRef.current = newCurrent;
+                setBulkSyncProgress(prev => ({ ...prev, current: newCurrent }));
+            } else {
+                // Cette mise à jour appartient à une session précédente, l'ignorer
+                console.warn(`⚠️ Mise à jour de progression ignorée (session ${currentSessionId} vs ${syncSessionIdRef.current})`);
+            }
+
+            // Appliquer toutes les mises à jour de la bibliothèque en une seule opération atomique
+            // Cela évite la perte de données causée par les mises à jour concurrentes batchées
+            if (Object.keys(batchLibraryUpdates).length > 0) {
+                setLibrary(prev => {
+                    const updated = {
+                        ...prev,
+                        ...batchLibraryUpdates
+                    };
+
+                    try {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                    } catch (e) {
+                        console.warn('Failed to save to LocalStorage:', e);
+                    }
+
+                    return updated;
+                });
+            }
         }
 
-        setIsBulkSyncing(false);
-        setBulkSyncProgress({ current: 0, total: 0 });
+        // Ne pas réinitialiser immédiatement - garder le dernier état visible pendant 3 secondes
+        // pour une transition UI plus douce. Garder isBulkSyncing à true pendant ce temps
+        // pour maintenir la cohérence UI (bouton désactivé + texte de progression visible)
+        // Stocker le timeout dans un ref pour pouvoir le nettoyer si une nouvelle sync démarre
+        // CRITIQUE: Vérifier que cette session est toujours active avant de réinitialiser
+        const timeoutSessionId = currentSessionId;
+        bulkSyncTimeoutRef.current = setTimeout(() => {
+            // Vérifier que cette session est toujours active (pas de nouvelle sync démarrée)
+            if (syncSessionIdRef.current === timeoutSessionId) {
+                setIsBulkSyncing(false);
+                setBulkSyncProgress({ current: 0, total: 0 });
+                bulkSyncTimeoutRef.current = null;
+            } else {
+                // Une nouvelle sync a démarré, ne pas réinitialiser l'état
+                console.log(`⏭️ Timeout ignoré (session ${timeoutSessionId} remplacée par ${syncSessionIdRef.current})`);
+            }
+        }, 3000);
 
-        // Afficher le résultat
+        // Afficher le résultat avec le compteur des profils manquants
         const message = `✅ Synchronisation terminée\n\n` +
             `Réussies: ${successCount}\n` +
             `Erreurs: ${errorCount}` +
+            (skippedCount > 0 ? `\nIgnorés (profil manquant): ${skippedCount}` : '') +
             (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
         
         alert(message);

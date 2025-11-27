@@ -285,13 +285,19 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     const bv5Y = projectFutureValue(baseBV, assumptions.growthRateBV, 5);
     const div5Y = projectFutureValue(baseDiv, assumptions.growthRateDiv, 5);
 
-    // Calculer les ratios projetés
+    // Calculer les prix cibles projetés (5 ans)
     const targetPriceEPS = eps5Y * assumptions.targetPE;
     const targetPriceCF = cf5Y * assumptions.targetPCF;
     const targetPriceBV = bv5Y * assumptions.targetPBV;
     const targetPriceDiv = assumptions.targetYield > 0 ? div5Y / (assumptions.targetYield / 100) : 0;
 
-    // Pour les ratios, utiliser les ratios cibles actuels
+    // Calculer le prix cible moyen (moyenne des prix cibles valides)
+    const validTargetPrices = [targetPriceEPS, targetPriceCF, targetPriceBV, targetPriceDiv].filter(p => p > 0);
+    const avgTargetPrice = validTargetPrices.length > 0
+      ? validTargetPrices.reduce((a, b) => a + b, 0) / validTargetPrices.length
+      : 0;
+
+    // Retourner les ratios ET les prix cibles calculés
     return {
       pe: { min: assumptions.targetPE * 0.9, max: assumptions.targetPE * 1.1, avg: assumptions.targetPE },
       pcf: { min: assumptions.targetPCF * 0.9, max: assumptions.targetPCF * 1.1, avg: assumptions.targetPCF },
@@ -300,7 +306,15 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       epsGrowth: { min: assumptions.growthRateEPS * 0.8, max: assumptions.growthRateEPS * 1.2, avg: assumptions.growthRateEPS },
       cfGrowth: { min: assumptions.growthRateCF * 0.8, max: assumptions.growthRateCF * 1.2, avg: assumptions.growthRateCF },
       bvGrowth: { min: assumptions.growthRateBV * 0.8, max: assumptions.growthRateBV * 1.2, avg: assumptions.growthRateBV },
-      divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv }
+      divGrowth: { min: assumptions.growthRateDiv * 0.8, max: assumptions.growthRateDiv * 1.2, avg: assumptions.growthRateDiv },
+      // Prix cibles calculés (disponibles pour utilisation future)
+      targetPrices: {
+        eps: targetPriceEPS,
+        cf: targetPriceCF,
+        bv: targetPriceBV,
+        div: targetPriceDiv,
+        avg: avgTargetPrice
+      }
     };
   }, [titleRanges, assumptions, data]);
 

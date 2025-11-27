@@ -21,8 +21,25 @@ export default async function handler(req, res) {
         const supabaseUrl = process.env.SUPABASE_URL;
         const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+        // Si Supabase n'est pas configuré, retourner directement le fallback
         if (!supabaseUrl || !supabaseKey) {
-            throw new Error('Supabase configuration missing');
+            console.warn('⚠️ Supabase configuration missing - using fallback tickers');
+            const fallbackTickers = [
+                'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
+                'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
+                'TRP', 'UNH', 'UL', 'VZ', 'WFC'
+            ];
+            return res.status(200).json({
+                success: true,
+                timestamp: new Date().toISOString(),
+                team_tickers: fallbackTickers,
+                team_count: fallbackTickers.length,
+                team_source: 'fallback',
+                watchlist_tickers: fallbackTickers,
+                watchlist_count: fallbackTickers.length,
+                watchlist_source: 'fallback',
+                source: 'fallback_no_config'
+            });
         }
 
         let result = {};

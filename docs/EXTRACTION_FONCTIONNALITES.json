@@ -1,0 +1,78 @@
+{
+  "tabComponents": [
+    "AdminJSLaiTab",
+    "AskEmmaTab",
+    "DansWatchlistTab",
+    "EconomicCalendarTab",
+    "EmailBriefingsTab",
+    "EmmaSmsPanel",
+    "FinanceProTab",
+    "IntelliStocksTab",
+    "InvestingCalendarTab",
+    "JLabUnifiedTab",
+    "MarketsEconomyTab",
+    "PlusTab",
+    "ScrappingSATab",
+    "SeekingAlphaTab",
+    "StocksNewsTab",
+    "YieldCurveTab"
+  ],
+  "useStateCount": 203,
+  "useStateByDomain": {
+    "ui": 0,
+    "data": 4,
+    "cache": 0,
+    "emma": 2,
+    "admin": 1
+  },
+  "useEffectCount": 60,
+  "apiEffectsCount": 0,
+  "utilityFunctions": [
+    "cleanText",
+    "fetchEconomicCalendar",
+    "fetchLatestNewsForTickers",
+    "fetchNews",
+    "fetchSeekingAlpha",
+    "fetchStockData",
+    "fetchYieldCurve",
+    "formatNumber",
+    "getCompanyLogo",
+    "getGradeColor",
+    "getNewsIcon",
+    "getSourceCredibility",
+    "getTabIcon",
+    "isFrenchArticle",
+    "loadTickersFromSupabase",
+    "parseSeekingAlphaRawText",
+    "refreshAllStocks",
+    "sortNewsByCredibility"
+  ],
+  "integrations": {
+    "APIs": [
+      "/api/fmp",
+      "/api/marketdata",
+      "/api/gemini/chat",
+      "/api/emma-agent",
+      "/api/chat",
+      "/api/finance-snapshots",
+      "/api/supabase-watchlist"
+    ],
+    "Services": [
+      "Twilio",
+      "Resend",
+      "Facebook Messenger",
+      "Supabase"
+    ],
+    "Widgets": [
+      "TradingView",
+      "Chart.js",
+      "Recharts",
+      "Lightweight Charts"
+    ],
+    "Bibliothèques": [
+      "React",
+      "Babel",
+      "Tailwind"
+    ]
+  }
+}

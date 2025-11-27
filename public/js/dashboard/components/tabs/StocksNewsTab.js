@@ -1,14 +1,14 @@
 // Auto-converted from monolithic dashboard file
 // Component: StocksNewsTab
 
+const { useState, useEffect, useCallback, useMemo } = React;
 
-
-
-const StocksNewsTab = () => {
+const StocksNewsTab = ({ isDarkMode, tickers = [], stockData = {}, newsData = [], loading = false, lastUpdate = null, loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers }) => {
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
 
-        const renderMarketBadge = (type) => {
+        // Optimisation: useCallback pour renderMarketBadge
+        const renderMarketBadge = useCallback((type) => {
             const isBull = type === 'bull';
             return (
                 <span
@@ -25,10 +25,10 @@ const StocksNewsTab = () => {
                     {isBull ? '🐂' : '🐻'}
                 </span>
             );
-        };
+        }, [isDarkMode]);
 
-        // Helper functions for news credibility scoring (définies dans le composant)
-        const getNewsCredibilityScore = (sourceName) => {
+        // Optimisation: useCallback pour getNewsCredibilityScore
+        const getNewsCredibilityScore = useCallback((sourceName) => {
             if (!sourceName) return 50;
 
             const source = sourceName.toLowerCase();
@@ -47,25 +47,26 @@ const StocksNewsTab = () => {
 
             // Low credibility (below 50)
             return 40;
-        };
+        }, []);
 
-        const getCredibilityTier = (score) => {
+        // Optimisation: useCallback pour getCredibilityTier
+        const getCredibilityTier = useCallback((score) => {
             if (score >= 90) return 'premium';
             if (score >= 75) return 'high';
             if (score >= 50) return 'medium';
             return 'low';
-        };
+        }, []);
 
-        // Fonction pour formater les nombres
-        const formatNumber = (num) => {
+        // Optimisation: useCallback pour formatNumber
+        const formatNumber = useCallback((num) => {
             if (!num && num !== 0) return 'N/A';
             if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
             if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
             if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
             return num.toLocaleString('fr-FR');
-        };
+        }, []);
 
-        // Mapping des noms de compagnies pour affichage
+        // Mapping des noms de compagnies pour affichage (constante, pas besoin de useMemo)
         const companyNames = {
             AAPL: 'Apple Inc.',
             TSLA: 'Tesla Inc.',
@@ -205,14 +206,14 @@ const StocksNewsTab = () => {
                         : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
                 }`}>
                     <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        <LucideIcon name="Fire" className="w-6 h-6 text-orange-500" />
+                        <span className="text-2xl">🔥</span>
                         Top Movers du Jour
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Top Gainers */}
                         <div className={`p-3 sm:p-4 rounded-lg ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
                             <h4 className={`text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-3 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
-                                <LucideIcon name="TrendingUp" className="w-5 h-5" />
+                                <span className="text-lg">📈</span>
                                 {renderMarketBadge('bull')}
                                 Top Gainers
                             </h4>
@@ -302,7 +303,7 @@ const StocksNewsTab = () => {
                         {/* Top Losers */}
                         <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-red-500/10 border border-red-500/30' : 'bg-red-50 border border-red-200'}`}>
                             <h4 className={`text-sm font-bold mb-3 flex items-center gap-3 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
-                                <LucideIcon name="TrendingDown" className="w-5 h-5" />
+                                <span className="text-lg">📉</span>
                                 {renderMarketBadge('bear')}
                                 Top Losers
                             </h4>
@@ -400,7 +401,7 @@ const StocksNewsTab = () => {
                         : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
                 }`}>
                     <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        <LucideIcon name="Target" className="w-6 h-6 text-indigo-500" />
+                        <span className="text-2xl">🎯</span>
                         Analyses & Opinions d'Analystes
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -522,7 +523,7 @@ const StocksNewsTab = () => {
 
                                     <div className={`mt-3 pt-3 border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
                                         <div className="flex items-center gap-2">
-                                            <LucideIcon name="ArrowUpRight" className="w-3 h-3 text-gray-400" />
+                                            <span className="text-sm text-gray-400">↗️</span>
                                             <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                 Cliquer pour analyse complète
                                             </span>
@@ -544,7 +545,7 @@ const StocksNewsTab = () => {
                         ) > 0;
                     }).length === 0 && (
                         <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            <LucideIcon name="AlertCircle" className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                            <span className="text-5xl mx-auto mb-3 opacity-50 block">⚠️</span>
                             <p>Aucune recommandation d'analyste disponible pour le moment</p>
                             <p className="text-sm mt-2">Les données seront chargées lors de la prochaine actualisation</p>
                         </div>
@@ -1003,7 +1004,7 @@ const StocksNewsTab = () => {
                                                             <div className={`p-2 rounded-full ${
                                                                 isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'
                                                             }`}>
-                                                                <LucideIcon name="Sparkles" className="w-5 h-5 text-purple-500" />
+                                                                <span className="text-lg text-purple-500">✨</span>
                                                             </div>
 
                                                             {/* Contenu */}
@@ -1033,7 +1034,7 @@ const StocksNewsTab = () => {
                                                                             isDarkMode ? 'text-purple-400' : 'text-purple-600'
                                                                         }`}
                                                                     >
-                                                                        <LucideIcon name="ExternalLink" className="w-3 h-3" />
+                                                                        <span className="text-sm">🔗</span>
                                                                         Lire l'article complet
                                                                     </a>
                                                                 )}
@@ -1061,7 +1062,7 @@ const StocksNewsTab = () => {
                                                                 <div className={`p-3 rounded-full transition-colors duration-300 ${
                                                                             isDarkMode ? 'bg-gray-600/20' : 'bg-gray-200/60'
                                                                 }`}>
-                                                                            <LucideIcon name={newsIconData.icon} className={`w-6 h-6 ${newsIconData.color}`} />
+                                                                            <span className={`text-xl ${newsIconData.color}`}>{newsIconData.icon}</span>
                                                                 </div>
                                                                     );
                                                                 })()}

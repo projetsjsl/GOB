@@ -1,9 +1,9 @@
 // Auto-converted from monolithic dashboard file
 // Component: InvestingCalendarTab
 
+const { useState, useEffect, useRef, useCallback } = React;
 
-
-const InvestingCalendarTab = () => {
+const InvestingCalendarTab = ({ isDarkMode }) => {
     // Refs pour les widgets TradingView
     const tradingViewForexRef = useRef(null);
     const tradingViewEventsRef = useRef(null);
@@ -25,47 +25,48 @@ const InvestingCalendarTab = () => {
     const [showSearchResults, setShowSearchResults] = useState(false);
     const searchInputRef = useRef(null);
 
+    // Optimisation: useCallback pour handleTradingViewMessage
+    const handleTradingViewMessage = useCallback((event) => {
+        // Sécurité: vérifier que le message vient de TradingView
+        if (!event.origin.includes('tradingview.com')) return;
+
+        // Logger tous les messages pour debug
+        console.log('📊 TradingView message:', event.data);
+
+        // Détecter les différents formats de messages possibles
+        try {
+            const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+
+            // Format 1: {name: 'tv-widget-symbol-changed', data: {symbol: 'NASDAQ:AAPL'}}
+            if (data.name === 'tv-widget-symbol-changed' && data.data?.symbol) {
+                console.log('✅ Symbol changed in Advanced Chart:', data.data.symbol);
+                setTimelineSymbol(data.data.symbol);
+            }
+
+            // Format 2: {type: 'symbol-change', symbol: 'NASDAQ:AAPL'}
+            if (data.type === 'symbol-change' && data.symbol) {
+                console.log('✅ Symbol changed in Advanced Chart:', data.symbol);
+                setTimelineSymbol(data.symbol);
+            }
+
+            // Format 3: direct symbol string
+            if (data.symbol && !data.name && !data.type) {
+                console.log('✅ Symbol changed in Advanced Chart:', data.symbol);
+                setTimelineSymbol(data.symbol);
+            }
+        } catch (error) {
+            // Si le parsing échoue, ce n'est pas grave, on ignore
+        }
+    }, []);
+
     // Écouter les changements de symbole depuis l'Advanced Chart (TradingView iframe)
     useEffect(() => {
-        const handleTradingViewMessage = (event) => {
-            // Sécurité: vérifier que le message vient de TradingView
-            if (!event.origin.includes('tradingview.com')) return;
-
-            // Logger tous les messages pour debug
-            console.log('📊 TradingView message:', event.data);
-
-            // Détecter les différents formats de messages possibles
-            try {
-                const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-
-                // Format 1: {name: 'tv-widget-symbol-changed', data: {symbol: 'NASDAQ:AAPL'}}
-                if (data.name === 'tv-widget-symbol-changed' && data.data?.symbol) {
-                    console.log('✅ Symbol changed in Advanced Chart:', data.data.symbol);
-                    setTimelineSymbol(data.data.symbol);
-                }
-
-                // Format 2: {type: 'symbol-change', symbol: 'NASDAQ:AAPL'}
-                if (data.type === 'symbol-change' && data.symbol) {
-                    console.log('✅ Symbol changed in Advanced Chart:', data.symbol);
-                    setTimelineSymbol(data.symbol);
-                }
-
-                // Format 3: direct symbol string
-                if (data.symbol && !data.name && !data.type) {
-                    console.log('✅ Symbol changed in Advanced Chart:', data.symbol);
-                    setTimelineSymbol(data.symbol);
-                }
-            } catch (error) {
-                // Si le parsing échoue, ce n'est pas grave, on ignore
-            }
-        };
-
         window.addEventListener('message', handleTradingViewMessage);
 
         return () => {
             window.removeEventListener('message', handleTradingViewMessage);
         };
-    }, []);
+    }, [handleTradingViewMessage]);
 
     // Charger le script TradingView Forex Heat Map
     useEffect(() => {

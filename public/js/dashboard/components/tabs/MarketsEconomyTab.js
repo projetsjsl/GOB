@@ -1,9 +1,12 @@
 // Auto-converted from monolithic dashboard file
 // Component: MarketsEconomyTab
 
+const { useState, useEffect, useRef, useCallback } = React;
 
-
-const MarketsEconomyTab = () => {
+const MarketsEconomyTab = ({ isDarkMode, newsData = [], loading = false, lastUpdate = null, fetchNews }) => {
+    // S'assurer que newsData est toujours un tableau, même si undefined ou null
+    const safeNewsDataProp = Array.isArray(newsData) ? newsData : [];
+    
     const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
     const [selectedSource, setSelectedSource] = useState('all'); // Filtre source
     const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
@@ -24,10 +27,10 @@ const MarketsEconomyTab = () => {
     React.useEffect(() => {
         // Market Overview Widget
         if (marketOverviewRef.current) {
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
+            const script1 = document.createElement('script');
+            script1.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+            script1.async = true;
+            script1.innerHTML = JSON.stringify({
                 "colorTheme": isDarkMode ? "dark" : "light",
                 "dateRange": "1D",
                 "showChart": true,
@@ -70,15 +73,15 @@ const MarketsEconomyTab = () => {
                     }
                 ]
             });
-            marketOverviewRef.current.appendChild(script);
+            marketOverviewRef.current.appendChild(script1);
         }
 
         // Heatmap Widget
         if (heatmapRef.current) {
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
+            const script2 = document.createElement('script');
+            script2.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+            script2.async = true;
+            script2.innerHTML = JSON.stringify({
                 "exchanges": [],
                 "dataSource": "SPX500",
                 "grouping": "sector",
@@ -94,15 +97,15 @@ const MarketsEconomyTab = () => {
                 "width": "100%",
                 "height": "100%"
             });
-            heatmapRef.current.appendChild(script);
+            heatmapRef.current.appendChild(script2);
         }
 
         // Screener Widget
         if (screenerRef.current) {
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
+            const script3 = document.createElement('script');
+            script3.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js';
+            script3.async = true;
+            script3.innerHTML = JSON.stringify({
                 "width": "100%",
                 "height": "100%",
                 "defaultColumn": "overview",
@@ -113,12 +116,25 @@ const MarketsEconomyTab = () => {
                 "locale": "fr",
                 "isTransparent": false
             });
-            screenerRef.current.appendChild(script);
+            screenerRef.current.appendChild(script3);
         }
+        
+        return () => {
+            // Cleanup: supprimer les widgets lors du démontage
+            if (marketOverviewRef.current) {
+                marketOverviewRef.current.innerHTML = '';
+            }
+            if (heatmapRef.current) {
+                heatmapRef.current.innerHTML = '';
+            }
+            if (screenerRef.current) {
+                screenerRef.current.innerHTML = '';
+            }
+        };
     }, [isDarkMode]);
 
-    // Fonction pour détecter la source avec variations de noms
-    const matchesSource = (articleSource, selectedSource) => {
+    // Optimisation: useCallback pour matchesSource
+    const matchesSource = useCallback((articleSource, selectedSource) => {
         if (!articleSource || !selectedSource) return false;
         const source = articleSource.toLowerCase();
         const selected = selectedSource.toLowerCase();
@@ -144,19 +160,29 @@ const MarketsEconomyTab = () => {
         }
         
         return false;
-    };
+    }, []);
 
     // État pour suivre si les résultats sont exacts ou approximatifs
     const [isApproximateMatch, setIsApproximateMatch] = useState(false);
 
     // Filtrer les nouvelles à l'affichage avec système de fallback intelligent
     React.useEffect(() => {
-        let filtered = newsData;
+        // S'assurer que newsData est toujours un tableau
+        const safeNewsData = Array.isArray(safeNewsDataProp) ? safeNewsDataProp : [];
+        let filtered = safeNewsData;
         let hasExactMatches = true;
 
         // Appliquer le filtre français si activé
         if (localFrenchOnly) {
-            filtered = filtered.filter(article => isFrenchArticle(article));
+            filtered = filtered.filter(article => {
+                if (typeof isFrenchArticle === 'function') {
+                    return isFrenchArticle(article);
+                }
+                // Fallback: détection basique si la fonction n'est pas disponible
+                const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+                const frenchKeywords = ['à', 'de', 'et', 'pour', 'dans', 'avec', 'sur', 'plus', 'après', 'annonce'];
+                return frenchKeywords.filter(keyword => text.includes(keyword)).length >= 3;
+            });
         }
 
         // Appliquer le filtre source avec détection flexible
@@ -167,7 +193,7 @@ const MarketsEconomyTab = () => {
             );
             // Si aucun résultat, essayer un filtrage plus large
             if (filtered.length === 0 && beforeFilter > 0) {
-                filtered = newsData.filter(article => {
+                filtered = safeNewsData.filter(article => {
                     const sourceName = (article.source?.name || '').toLowerCase();
                     const selected = selectedSource.toLowerCase();
                     // Recherche partielle plus large
@@ -198,7 +224,7 @@ const MarketsEconomyTab = () => {
                     'Europe': ['europe', 'eu'],
                     'Asie': ['asia', 'china', 'japan']
                 };
-                filtered = newsData.filter(article => {
+                filtered = safeNewsData.filter(article => {
                     const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
                     return fallbackKeywords[selectedMarket]?.some(keyword => text.includes(keyword));
                 });
@@ -231,7 +257,7 @@ const MarketsEconomyTab = () => {
                     'Crypto': ['crypto', 'bitcoin'],
                     'IA': ['ai', 'artificial intelligence']
                 };
-                filtered = newsData.filter(article => {
+                filtered = safeNewsData.filter(article => {
                     const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
                     return fallbackKeywords[selectedTheme]?.some(keyword => text.includes(keyword));
                 });
@@ -240,14 +266,14 @@ const MarketsEconomyTab = () => {
         }
 
         // Si toujours aucun résultat, afficher toutes les nouvelles avec un message
-        if (filtered.length === 0 && newsData.length > 0) {
-            filtered = newsData.slice(0, 20); // Limiter à 20 pour éviter la surcharge
+        if (filtered.length === 0 && safeNewsData.length > 0) {
+            filtered = safeNewsData.slice(0, 20); // Limiter à 20 pour éviter la surcharge
             hasExactMatches = false;
         }
 
         setIsApproximateMatch(!hasExactMatches);
         setLocalFilteredNews(filtered);
-    }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
+    }, [safeNewsDataProp, localFrenchOnly, selectedSource, selectedMarket, selectedTheme, matchesSource]);
 
     return (
         <div className="space-y-6">
@@ -371,7 +397,7 @@ const MarketsEconomyTab = () => {
                             Articles filtrés
                         </div>
                     </div>
-                    <LucideIcon name="Newspaper" className={`w-12 h-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
+                    <span className={`text-5xl ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>📰</span>
                 </div>
             </div>
 
@@ -505,7 +531,7 @@ const MarketsEconomyTab = () => {
             <div className="space-y-4">
                 {localFilteredNews.length === 0 ? (
                     <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        <LucideIcon name="AlertCircle" className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                        <span className="text-6xl mx-auto mb-4 opacity-50 block">⚠️</span>
                         <p className="text-lg font-semibold mb-2">
                             {localFrenchOnly ? 'Aucun article en français trouvé' : 'Aucune nouvelle disponible'}
                         </p>
@@ -517,8 +543,13 @@ const MarketsEconomyTab = () => {
                     </div>
                 ) : (
                     localFilteredNews.map((article, index) => {
-                        const newsIconData = getNewsIcon(article.title, article.description, article.sentiment);
-                        const credibility = getSourceCredibility(article.source?.name);
+                        // Vérifier que les fonctions utilitaires sont disponibles
+                        const newsIconData = (typeof getNewsIcon === 'function') 
+                            ? getNewsIcon(article.title, article.description, article.sentiment)
+                            : { icon: 'Newspaper', color: 'text-gray-500' };
+                        const credibility = (typeof getSourceCredibility === 'function')
+                            ? getSourceCredibility(article.source?.name)
+                            : 50;
 
                         return (
                             <div
@@ -534,7 +565,7 @@ const MarketsEconomyTab = () => {
                                     <div className={`p-3 rounded-full transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/60'
                                     }`}>
-                                        <LucideIcon name={newsIconData.icon} className={`w-6 h-6 ${newsIconData.color}`} />
+                                        <span className={`text-2xl ${newsIconData.color}`}>{newsIconData.icon}</span>
                                     </div>
 
                                     {/* Contenu */}
@@ -554,10 +585,10 @@ const MarketsEconomyTab = () => {
                                                             : 'text-blue-600 hover:text-blue-700'
                                                     }`}
                                                 >
-                                                    {cleanText(article.title)}
+                                                    {(typeof cleanText === 'function') ? cleanText(article.title) : (article.title || '')}
                                                 </a>
                                             ) : (
-                                                cleanText(article.title)
+                                                (typeof cleanText === 'function') ? cleanText(article.title) : (article.title || '')
                                             )}
                                         </h3>
 
@@ -565,7 +596,7 @@ const MarketsEconomyTab = () => {
                                         <p className={`text-base mb-4 leading-relaxed transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                         }`}>
-                                            {cleanText(article.description)}
+                                            {(typeof cleanText === 'function') ? cleanText(article.description) : (article.description || '')}
                                         </p>
 
                                         {/* Métadonnées */}
@@ -590,16 +621,20 @@ const MarketsEconomyTab = () => {
                                             </span>
 
                                             {/* Badge français */}
-                                            {isFrenchArticle(article) && (
+                                            {((typeof isFrenchArticle === 'function' && isFrenchArticle(article)) || 
+                                              (typeof isFrenchArticle !== 'function' && ((article.title || '') + ' ' + (article.description || '')).toLowerCase().includes('france'))) && (
                                                 <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">
                                                     🇫🇷 FR
                                                 </span>
                                             )}
 
                                             {/* Bouton Résumé avec Emma */}
-                                            {article.url && (
+                                            {article.url && (typeof summarizeWithEmma === 'function' || typeof window.summarizeWithEmma === 'function') && (
                                                 <button
-                                                    onClick={() => summarizeWithEmma(article.url, article.title)}
+                                                    onClick={() => {
+                                                        const fn = typeof summarizeWithEmma === 'function' ? summarizeWithEmma : window.summarizeWithEmma;
+                                                        if (fn) fn(article.url, article.title);
+                                                    }}
                                                     className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
                                                         isDarkMode
                                                             ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white'
@@ -607,7 +642,7 @@ const MarketsEconomyTab = () => {
                                                     }`}
                                                 >
                                                     <span className="flex items-center gap-1">
-                                                        <LucideIcon name="Brain" className="w-3 h-3" />
+                                                        <span className="text-sm">🧠</span>
                                                         Résumé avec Emma
                                                     </span>
                                                 </button>

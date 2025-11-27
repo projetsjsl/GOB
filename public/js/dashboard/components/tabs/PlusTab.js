@@ -3,17 +3,18 @@
  * Settings and logout functionality
  */
 
-
+const { useCallback } = React;
 
 const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
-    const handleLogout = () => {
+    // Optimisation: useCallback pour handleLogout
+    const handleLogout = useCallback(() => {
         // Nettoyer toutes les données de session
         sessionStorage.clear();
         localStorage.clear();
 
         // Rediriger vers la page de login
         window.location.href = '/login.html';
-    };
+    }, []);
 
     return (
         <div className="space-y-6">
@@ -62,3 +63,8 @@ const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
         </div>
     );
 };
+
+// Exposition globale pour Babel standalone
+
+window.PlusTab = PlusTab;
+

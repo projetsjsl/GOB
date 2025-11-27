@@ -1,9 +1,9 @@
 // Auto-converted from monolithic dashboard file
 // Component: EmmaSmsPanel
 
+const { useState, useEffect, useCallback } = React;
 
-
-const EmmaSmsPanel = () => {
+const EmmaSmsPanel = ({ isDarkMode }) => {
             const [loading, setLoading] = useState(true);
             const [envValues, setEnvValues] = useState({});
             const [serverState, setServerState] = useState({ running: false, info: null, logs: [] });
@@ -39,8 +39,52 @@ const EmmaSmsPanel = () => {
             }, []);
 
             useEffect(() => {
-                fetchStatus();
-            }, [fetchStatus]);
+                const abortController = new AbortController();
+                let isMounted = true;
+                
+                const runFetch = async () => {
+                    if (!isMounted) return;
+                    try {
+                        setLoading(true);
+                        const res = await fetch('/api/admin/sms-control', {
+                            signal: abortController.signal
+                        });
+                        if (!isMounted) return;
+                        
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (!isMounted) return;
+                            const env = data.env || {};
+                            if (!env.MODE) env.MODE = 'test';
+                            if (!env.TEST_MODE) env.TEST_MODE = 'true';
+                            if (!env.N8N_WEBHOOK_BASE_URL) env.N8N_WEBHOOK_BASE_URL = 'https://projetsjsl.app.n8n.cloud';
+                            if (!env.EMMA_WEBHOOK_URL) env.EMMA_WEBHOOK_URL = 'https://projetsjsl.app.n8n.cloud/webhook/gob-sms-webhook-test';
+                            if (!env.PUBLIC_URL) env.PUBLIC_URL = 'https://gob-kmay.onrender.com';
+                            setEnvValues(env);
+                            setServerState(data.server || { running: false, info: null, logs: [] });
+                            setWebhookStatus(data.webhookStatus);
+                        } else {
+                            if (!isMounted) return;
+                            setActionMessage({ type: 'error', text: 'Erreur lors du chargement' });
+                        }
+                    } catch (error) {
+                        if (error.name === 'AbortError' || !isMounted) return;
+                        console.error('[Emma SMS] fetchStatus error:', error);
+                        setActionMessage({ type: 'error', text: error.message });
+                    } finally {
+                        if (isMounted) {
+                            setLoading(false);
+                        }
+                    }
+                };
+                
+                runFetch();
+                
+                return () => {
+                    isMounted = false;
+                    abortController.abort();
+                };
+            }, []); // Exécuter seulement au montage, fetchStatus est stable
 
             const handleEnvChange = (key, value) => {
                 setEnvValues((prev) => ({ ...prev, [key]: value }));

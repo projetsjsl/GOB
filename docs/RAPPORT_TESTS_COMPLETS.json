@@ -1,0 +1,40 @@
+{
+  "date": "2025-11-26T23:31:05.088Z",
+  "summary": {
+    "total": 7,
+    "passed": 4,
+    "warnings": 2,
+    "failed": 1,
+    "errors": 0
+  },
+  "results": [
+    {
+      "name": "Validation Architecture",
+      "status": "WARN"
+    },
+    {
+      "name": "Validation Bonnes Pratiques",
+      "status": "PASS"
+    },
+    {
+      "name": "Extraction Fonctionnalités",
+      "status": "PASS"
+    },
+    {
+      "name": "Comparaison Composants",
+      "status": "PASS"
+    },
+    {
+      "name": "Validation Syntaxique",
+      "status": "WARN"
+    },
+    {
+      "name": "Analyse dashboard-main.js",
+      "status": "PASS"
+    },
+    {
+      "name": "Test Authentification",
+      "status": "FAIL"
+    }
+  ]
+}

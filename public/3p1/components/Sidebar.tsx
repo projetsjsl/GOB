@@ -111,7 +111,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
           >
             <ArrowPathIcon className={`w-4 h-4 ${isBulkSyncing ? 'animate-spin' : ''}`} />
             <span className="flex-1 text-left">
-              {isBulkSyncing && bulkSyncProgress
+              {isBulkSyncing && bulkSyncProgress && bulkSyncProgress.total > 0
                 ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}`
                 : 'Sync Tous les Tickers'}
             </span>

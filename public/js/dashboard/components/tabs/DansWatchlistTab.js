@@ -1,10 +1,9 @@
 // Auto-converted from monolithic dashboard file
 // Component: DansWatchlistTab
 
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-
-
-const DansWatchlistTab = () => {
+const DansWatchlistTab = ({ isDarkMode }) => {
     const [watchlistTickers, setWatchlistTickers] = useState([]);
     const [newTicker, setNewTicker] = useState('');
     const [watchlistStockData, setWatchlistStockData] = useState({});
@@ -20,8 +19,8 @@ const DansWatchlistTab = () => {
     });
     const WATCHLIST_FILE = '/dans-watchlist.json'; // servi depuis /public
     
-    // Fonction pour exécuter le screener sur la watchlist
-    const runWatchlistScreener = async () => {
+    // Optimisation: useCallback pour la fonction async runWatchlistScreener
+    const runWatchlistScreener = useCallback(async () => {
         // Convertir les tickers en format attendu par le screener
         const watchlistStocks = watchlistTickers.map(ticker => ({
             symbol: ticker,
@@ -79,10 +78,10 @@ const DansWatchlistTab = () => {
         } finally {
             setLoadingScreener(false);
         }
-    };
+    }, [watchlistTickers, screenerFilters]);
     
-    // Fonctions utilitaires
-    const getMetricColor = (metric, value) => {
+    // Optimisation: useCallback pour les fonctions utilitaires
+    const getMetricColor = useCallback((metric, value) => {
         if (value == null || value === 'N/A') return 'text-gray-400';
         const v = typeof value === 'string' ? parseFloat(value) : value;
         if (isNaN(v)) return 'text-gray-400';
@@ -109,9 +108,9 @@ const DansWatchlistTab = () => {
             default:
                 return 'text-gray-400';
         }
-    };
+    }, []);
     
-    const formatNumber = (num, prefix = '', suffix = '') => {
+    const formatNumber = useCallback((num, prefix = '', suffix = '') => {
         if (!num && num !== 0) return 'N/A';
         const n = parseFloat(num);
         if (isNaN(n)) return 'N/A';
@@ -120,7 +119,7 @@ const DansWatchlistTab = () => {
         if (n >= 1e6) return `${prefix}${(n / 1e6).toFixed(2)}M${suffix}`;
         if (n >= 1e3) return `${prefix}${(n / 1e3).toFixed(2)}K${suffix}`;
         return `${prefix}${n.toFixed(2)}${suffix}`;
-    };
+    }, []);
 
     // État pour éviter le rechargement de la watchlist
     const [watchlistLoaded, setWatchlistLoaded] = useState(false);
@@ -129,10 +128,14 @@ const DansWatchlistTab = () => {
     useEffect(() => {
         if (watchlistLoaded) return; // Éviter les rechargements
         
+        const abortController = new AbortController();
+        
         const loadInitialWatchlist = async () => {
             try {
                 // Essayer de charger depuis Supabase d'abord
-                const res = await fetch('/api/supabase-watchlist');
+                const res = await fetch('/api/supabase-watchlist', {
+                    signal: abortController.signal
+                });
                 if (res.ok) {
                     const json = await res.json();
                     const tickers = Array.isArray(json.tickers) ? json.tickers : [];
@@ -144,6 +147,7 @@ const DansWatchlistTab = () => {
                     return;
                 }
             } catch (e) {
+                if (e.name === 'AbortError') return; // Ignorer les erreurs d'annulation
                 console.log('⚠️ Supabase non disponible, utilisation du localStorage');
             }
             
@@ -159,6 +163,10 @@ const DansWatchlistTab = () => {
         };
         
         loadInitialWatchlist();
+        
+        return () => {
+            abortController.abort();
+        };
     }, []); // Dépendance vide = une seule fois au montage
 
     // Fallback: Individual ticker loading (used when batch fails)
@@ -178,8 +186,8 @@ const DansWatchlistTab = () => {
         }
     };
 
-    // Charger les données pour les tickers de la watchlist (OPTIMIZED WITH BATCHING)
-    const loadWatchlistData = async (tickers, appendMode = false) => {
+    // Optimisation: useCallback pour la fonction async loadWatchlistData
+    const loadWatchlistData = useCallback(async (tickers, appendMode = false) => {
         if (tickers.length === 0) return;
 
         setWatchlistLoading(true);
@@ -243,10 +251,10 @@ const DansWatchlistTab = () => {
             setWatchlistStockData(newData);
         }
         setWatchlistLoading(false);
-    };
+    }, []); // Pas de dépendances car tickers est passé en paramètre
 
-    // Ajouter un ticker à la watchlist
-    const addTickerToWatchlist = async () => {
+    // Optimisation: useCallback pour addTickerToWatchlist
+    const addTickerToWatchlist = useCallback(async () => {
         if (!newTicker.trim()) return;
         
         const ticker = newTicker.trim().toUpperCase();
@@ -282,10 +290,10 @@ const DansWatchlistTab = () => {
         saveWatchlistToSupabaseAuto(ticker, 'add').catch(err => {
             console.error('Erreur sauvegarde Supabase:', err);
         });
-    };
+    }, [newTicker, watchlistTickers, loadWatchlistData]);
 
-    // Supprimer un ticker de la watchlist
-    const removeTickerFromWatchlist = async (ticker) => {
+    // Optimisation: useCallback pour removeTickerFromWatchlist
+    const removeTickerFromWatchlist = useCallback(async (ticker) => {
         // 1. SUPPRESSION IMMÉDIATE : Retirer de la liste TOUT DE SUITE
         const updatedTickers = watchlistTickers.filter(t => t !== ticker);
         setWatchlistTickers(updatedTickers);
@@ -305,13 +313,13 @@ const DansWatchlistTab = () => {
         saveWatchlistToSupabaseAuto(ticker, 'remove').catch(err => {
             console.error('Erreur sauvegarde Supabase:', err);
         });
-    };
+    }, [watchlistTickers]);
 
-    // Actualiser les données de la watchlist (silencieux)
-    const refreshWatchlist = async () => {
+    // Optimisation: useCallback pour refreshWatchlist
+    const refreshWatchlist = useCallback(async () => {
         await loadWatchlistData(watchlistTickers);
         console.log('✅ Watchlist actualisée silencieusement');
-    };
+    }, [watchlistTickers, loadWatchlistData]);
 
     // Timer pour debounce de la sauvegarde Supabase
     let saveSupabaseTimer = null;
@@ -389,13 +397,13 @@ const DansWatchlistTab = () => {
 
     // Effet pour initialiser le TradingView Ticker Tape avec les tickers de la watchlist
     useEffect(() => {
-        if (watchlistTickers.length > 0) {
-            // Supprimer le widget existant s'il existe
-            const existingWidget = document.getElementById('tradingview-ticker-dan-watchlist');
-            if (existingWidget) {
-                existingWidget.innerHTML = '';
-            }
+        const widgetContainer = document.getElementById('tradingview-ticker-dan-watchlist');
+        if (!widgetContainer) return; // Pas de conteneur, pas de widget à créer
 
+        // Nettoyer le widget existant avant de créer un nouveau (évite les doublons)
+        widgetContainer.innerHTML = '';
+
+        if (watchlistTickers.length > 0) {
             // Créer les symboles formatés pour TradingView (EXCHANGE:TICKER)
             // Par défaut, on assume que les tickers US sont sur NASDAQ ou NYSE
             const tvSymbols = watchlistTickers.map(ticker => {
@@ -421,11 +429,16 @@ const DansWatchlistTab = () => {
                 "locale": "fr"
             });
 
-            const widgetContainer = document.getElementById('tradingview-ticker-dan-watchlist');
-            if (widgetContainer) {
-                widgetContainer.appendChild(script);
-            }
+            widgetContainer.appendChild(script);
         }
+        
+        // Cleanup: nettoyer seulement lors du démontage ou changement de dépendances
+        return () => {
+            const widget = document.getElementById('tradingview-ticker-dan-watchlist');
+            if (widget) {
+                widget.innerHTML = '';
+            }
+        };
     }, [watchlistTickers, isDarkMode]);
 
     return (

@@ -1,0 +1,354 @@
+[
+  {
+    "name": "AdminJSLaiTab",
+    "module": {
+      "lines": 1190,
+      "sizeKB": "78.3",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 1189,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "AskEmmaTab",
+    "module": {
+      "lines": 2867,
+      "sizeKB": "166.0",
+      "useState": 16,
+      "useEffect": 7
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 2866,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "DansWatchlistTab",
+    "module": {
+      "lines": 841,
+      "sizeKB": "44.1",
+      "useState": 9,
+      "useEffect": 2
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 840,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "EconomicCalendarTab",
+    "module": {
+      "lines": 831,
+      "sizeKB": "40.3",
+      "useState": 14,
+      "useEffect": 3
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 830,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "EmailBriefingsTab",
+    "module": {
+      "lines": 2915,
+      "sizeKB": "172.3",
+      "useState": 16,
+      "useEffect": 1
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 2914,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "EmmaSmsPanel",
+    "module": {
+      "lines": 400,
+      "sizeKB": "25.3",
+      "useState": 9,
+      "useEffect": 1
+    },
+    "current": {
+      "exists": true,
+      "lines": 349,
+      "sizeKB": "25.6",
+      "useState": 9,
+      "useEffect": 1
+    },
+    "differences": {
+      "linesDiff": 51,
+      "sizeDiff": "-0.3",
+      "useStateDiff": 0,
+      "useEffectDiff": 0
+    }
+  },
+  {
+    "name": "FinanceProTab",
+    "module": {
+      "lines": 272,
+      "sizeKB": "12.0",
+      "useState": 2,
+      "useEffect": 1
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 271,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "IntelliStocksTab",
+    "module": {
+      "lines": 2894,
+      "sizeKB": "208.6",
+      "useState": 12,
+      "useEffect": 6
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 2893,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "InvestingCalendarTab",
+    "module": {
+      "lines": 1376,
+      "sizeKB": "65.2",
+      "useState": 3,
+      "useEffect": 14
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 1375,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "JLabUnifiedTab",
+    "module": {
+      "lines": 67,
+      "sizeKB": "3.4",
+      "useState": 1,
+      "useEffect": 0
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 66,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "MarketsEconomyTab",
+    "module": {
+      "lines": 640,
+      "sizeKB": "33.7",
+      "useState": 6,
+      "useEffect": 2
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 639,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "PlusTab",
+    "module": {
+      "lines": 67,
+      "sizeKB": "2.7",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 66,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "ScrappingSATab",
+    "module": {
+      "lines": 746,
+      "sizeKB": "55.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 745,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "SeekingAlphaTab",
+    "module": {
+      "lines": 582,
+      "sizeKB": "42.7",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 581,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "StocksNewsTab",
+    "module": {
+      "lines": 1329,
+      "sizeKB": "94.3",
+      "useState": 2,
+      "useEffect": 0
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 1328,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  },
+  {
+    "name": "YieldCurveTab",
+    "module": {
+      "lines": 537,
+      "sizeKB": "26.7",
+      "useState": 4,
+      "useEffect": 2
+    },
+    "current": {
+      "exists": true,
+      "lines": 1,
+      "sizeKB": "0.0",
+      "useState": 0,
+      "useEffect": 0
+    },
+    "differences": {
+      "linesDiff": 536,
+      "sizeDiff": null,
+      "useStateDiff": null,
+      "useEffectDiff": null
+    }
+  }
+]

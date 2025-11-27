@@ -1,9 +1,10 @@
 // Auto-converted from monolithic dashboard file
 // Component: AskEmmaTab
 
-
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 const AskEmmaTab = React.memo(({
+                isDarkMode = true,
                 prefillMessage = '',
                 setPrefillMessage = () => {},
                 autoSend = false,
@@ -45,6 +46,10 @@ const AskEmmaTab = React.memo(({
                 const [showScrollToBottom, setShowScrollToBottom] = useState(false); // Bouton scroll vers le bas
                 const [typingMessageId, setTypingMessageId] = useState(null); // ID du message en cours de typing
                 const typingIntervalRef = useRef(null); // Référence pour l'intervalle de typing
+                const [showCommandsHelp, setShowCommandsHelp] = useState(false); // Afficher l'aide des commandes
+                const [showSlashSuggestions, setShowSlashSuggestions] = useState(false); // Afficher les suggestions de slash commands
+                const [slashSuggestions, setSlashSuggestions] = useState([]); // Liste des suggestions de slash commands
+                const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1); // Index de la suggestion sélectionnée
                 const [emmaPrompt, setEmmaPrompt] = useState(`<system_identity>
 Vous êtes Emma — Economic & Market Monitoring Assistant, un assistant IA de niveau expert en analyse financière.
 Version : 2.0 Advanced
