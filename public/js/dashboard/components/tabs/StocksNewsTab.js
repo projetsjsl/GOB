@@ -1282,8 +1282,7 @@ const StocksNewsTab = ({ isDarkMode, tickers = [], stockData = {}, newsData = []
                                                         : 'bg-blue-500 hover:bg-blue-600 text-white'
                                                 }`}
                                             >
-                                                <IconoirIcon name="ExternalLink" className="w-4 h-4 inline mr-1" />
-                                                Lire
+                                                🔗 Lire
                                             </a>
                                             <button
                                                 onClick={(event) => {
@@ -1296,8 +1295,7 @@ const StocksNewsTab = ({ isDarkMode, tickers = [], stockData = {}, newsData = []
                                                         : 'bg-purple-500 hover:bg-purple-600 text-white'
                                                 }`}
                                             >
-                                                <IconoirIcon name="Brain" className="w-4 h-4 inline mr-1" />
-                                                Emma
+                                                🧠 Emma
                                             </button>
                                         </div>
                                     </div>
