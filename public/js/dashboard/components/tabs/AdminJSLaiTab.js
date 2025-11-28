@@ -20,7 +20,8 @@ const AdminJSLaiTab = ({
                 seekingAlphaData = { stocks: [] },
                 seekingAlphaStockData = { stocks: {} },
                 refreshAllStocks,
-                loading = false
+                loading = false,
+                fetchNews
             }) => {
                 // États locaux pour la gestion du cache
                 const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
