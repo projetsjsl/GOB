@@ -7,11 +7,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
-    <!-- Version: 2.1.0 - JLab V2 with Synchronized Widgets - 2025-10-25 -->
+    <!-- Version: 2.2.0 - Modular Components with Tab Fixes - 2025-11-28 -->
     <!-- Favicon JSLAI -->
     <link rel="icon" type="image/png" href="jlab.png">
     <link rel="apple-touch-icon" href="jlab.png">
-    <!-- Cache bust: 2025-10-15 21:00 -->
+    <!-- Cache bust: 2025-11-28 22:50 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
@@ -594,18 +594,24 @@
         
         // Charger tous les scripts séquentiellement
         (async function() {
-            // #region agent log (désactivé en production)
-            // Logging désactivé pour éviter les erreurs CORS en production
-            // #endregion
+            console.log('🚀 [DEBUG] Début du chargement des scripts...');
+            let loadedCount = 0;
+            let errorCount = 0;
             
             for (const src of scriptsToLoad) {
                 try {
+                    console.log(`📦 [DEBUG] Chargement de ${src}...`);
                     await loadAndTranspileScript(src);
+                    loadedCount++;
+                    console.log(`✅ [DEBUG] ${src} chargé avec succès (${loadedCount}/${scriptsToLoad.length})`);
                 } catch (error) {
-                    console.error(`Failed to load ${src}:`, error);
+                    errorCount++;
+                    console.error(`❌ [DEBUG] Failed to load ${src}:`, error);
                     // Continue avec les autres scripts même en cas d'erreur
                 }
             }
+            
+            console.log(`📊 [DEBUG] Chargement terminé: ${loadedCount} réussis, ${errorCount} erreurs`);
             
             // #region agent log (désactivé en production)
             // Logging désactivé pour éviter les erreurs CORS en production
@@ -613,6 +619,14 @@
             
             console.log('✅ [DEBUG] All scripts loaded. BetaCombinedDashboard:', typeof window.BetaCombinedDashboard);
             console.log('✅ [DEBUG] PlusTab:', typeof window.PlusTab);
+            console.log('✅ [DEBUG] MarketsEconomyTab:', typeof window.MarketsEconomyTab);
+            console.log('✅ [DEBUG] JLabUnifiedTab:', typeof window.JLabUnifiedTab);
+            console.log('✅ [DEBUG] AskEmmaTab:', typeof window.AskEmmaTab);
+            console.log('✅ [DEBUG] AdminJSLaiTab:', typeof window.AdminJSLaiTab);
+            console.log('✅ [DEBUG] ScrappingSATab:', typeof window.ScrappingSATab);
+            console.log('✅ [DEBUG] SeekingAlphaTab:', typeof window.SeekingAlphaTab);
+            console.log('✅ [DEBUG] EmailBriefingsTab:', typeof window.EmailBriefingsTab);
+            console.log('✅ [DEBUG] InvestingCalendarTab:', typeof window.InvestingCalendarTab);
             
             // Déclencher l'événement de chargement
             window.dispatchEvent(new Event('modules-loaded'));
