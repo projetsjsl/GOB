@@ -790,11 +790,15 @@ const BetaCombinedDashboard = () => {
                     setTimeout(() => setShowSeekingAlphaIntro(false), 3000);
                     setTabsVisitedThisSession(prev => ({ ...prev, 'seekingalpha': true }));
                 }
-                // Charger les données Seeking Alpha
-                fetchSeekingAlphaData();
-                fetchSeekingAlphaStockData();
+                // Charger les données Seeking Alpha (appelées plus tard dans le code)
+                if (typeof fetchSeekingAlphaData === 'function') {
+                    fetchSeekingAlphaData();
+                }
+                if (typeof fetchSeekingAlphaStockData === 'function') {
+                    fetchSeekingAlphaStockData();
+                }
             }
-        };
+        }, [tabsVisitedThisSession]);
 
         // Fonction pour initialiser l'audio
         const ensureAudioReady = () => {
