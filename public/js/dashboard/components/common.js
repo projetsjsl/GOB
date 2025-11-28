@@ -306,3 +306,6 @@ const Tabs = ({ tabs, activeTab, onTabChange, isDarkMode = true }) => {
         </div>
     );
 };
+
+// Exposer Icon globalement pour que les modules puissent l'utiliser
+window.Icon = Icon;
