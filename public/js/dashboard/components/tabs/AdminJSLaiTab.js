@@ -24,6 +24,7 @@ const AdminJSLaiTab = ({
                 const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
                 const [cacheStatus, setCacheStatus] = useState({});
                 const [showSettings, setShowSettings] = useState(false);
+                const [systemLogs, setSystemLogs] = useState([]);
                 const [cacheSettings, setCacheSettings] = useState(() => {
                     const saved = localStorage.getItem('cacheSettings');
                     return saved ? JSON.parse(saved) : {
