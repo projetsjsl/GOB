@@ -68,32 +68,12 @@ const JLabUnifiedTab = () => {
             {/* Contenu conditionnel */}
             <div className="w-full h-full">
                 {jlabView === 'portfolio' && window.StocksNewsTab && React.createElement(window.StocksNewsTab, { 
-                    tickerSource: 'portfolio', 
-                    isDarkMode,
-                    tickers,
-                    stockData,
-                    newsData,
-                    loading,
-                    lastUpdate,
-                    loadTickersFromSupabase,
-                    fetchNews,
-                    refreshAllStocks,
-                    fetchLatestNewsForTickers
+                    tickerSource: 'portfolio'
                 })}
                 {jlabView === 'watchlist' && window.StocksNewsTab && React.createElement(window.StocksNewsTab, { 
-                    tickerSource: 'watchlist', 
-                    isDarkMode,
-                    tickers,
-                    stockData,
-                    newsData,
-                    loading,
-                    lastUpdate,
-                    loadTickersFromSupabase,
-                    fetchNews,
-                    refreshAllStocks,
-                    fetchLatestNewsForTickers
+                    tickerSource: 'watchlist'
                 })}
-                {jlabView === '3pour1' && window.FinanceProTab && React.createElement(window.FinanceProTab, { isDarkMode })}
+                {jlabView === '3pour1' && window.FinanceProTab && React.createElement(window.FinanceProTab)}
             </div>
         </div>
     );
