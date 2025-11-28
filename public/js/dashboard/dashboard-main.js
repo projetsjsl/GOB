@@ -1337,7 +1337,24 @@ const BetaCombinedDashboard = () => {
         }
     }, [initialLoadComplete, newsData.length]); // Se déclenche après l'initialisation ET quand les news générales sont chargées
 
-    // 7. Rafraîchir les données tickers lors de la navigation si elles sont anciennes
+    // 7. Écouter les événements tab-change depuis l'extérieur (pour navigation programmatique)
+    useEffect(() => {
+        const handleTabChangeEvent = (event) => {
+            const tabId = event.detail?.tabId;
+            if (tabId && typeof handleTabChange === 'function') {
+                console.log(`📋 Événement tab-change reçu: ${tabId}`);
+                handleTabChange(tabId);
+            }
+        };
+
+        window.addEventListener('tab-change', handleTabChangeEvent);
+
+        return () => {
+            window.removeEventListener('tab-change', handleTabChangeEvent);
+        };
+    }, []); // Se déclenche une seule fois au montage
+
+    // 8. Rafraîchir les données tickers lors de la navigation si elles sont anciennes
     // Note: Les news ne sont PAS rafraîchies automatiquement (utilisent le cache configuré)
     useEffect(() => {
         if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminée
