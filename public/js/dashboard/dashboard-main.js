@@ -2134,7 +2134,7 @@ const BetaCombinedDashboard = () => {
                     lastUpdate,
                     fetchNews
                 })}
-                {activeTab === 'intellistocks' && modulesLoaded && window.JLabUnifiedTab && React.createElement(window.JLabUnifiedTab, { 
+                {activeTab === 'intellistocks' && window.JLabUnifiedTab && React.createElement(window.JLabUnifiedTab, { 
                     isDarkMode,
                     tickers,
                     stockData,
@@ -2146,7 +2146,7 @@ const BetaCombinedDashboard = () => {
                     refreshAllStocks,
                     fetchLatestNewsForTickers
                 })}
-                {activeTab === 'ask-emma' && modulesLoaded && window.AskEmmaTab && React.createElement(window.AskEmmaTab, { 
+                {activeTab === 'ask-emma' && window.AskEmmaTab && React.createElement(window.AskEmmaTab, { 
                     isDarkMode,
                     prefillMessage: emmaPrefillMessage,
                     setPrefillMessage: setEmmaPrefillMessage,
@@ -2161,8 +2161,8 @@ const BetaCombinedDashboard = () => {
                     showLengthEditor,
                     setShowLengthEditor
                 })}
-                {activeTab === 'plus' && modulesLoaded && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode, isProfessionalMode })}
-                {activeTab === 'admin-jsla' && modulesLoaded && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
+                {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode, isProfessionalMode })}
+                {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
                     isDarkMode,
                     emmaConnected,
                     setEmmaConnected,
@@ -2180,15 +2180,15 @@ const BetaCombinedDashboard = () => {
                     seekingAlphaStockData,
                     refreshAllStocks
                 })}
-                {activeTab === 'scrapping-sa' && modulesLoaded && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { 
+                {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { 
                     isDarkMode,
                     tickers,
                     stockData,
                     seekingAlphaData,
                     seekingAlphaStockData
                 })}
-                {activeTab === 'email-briefings' && modulesLoaded && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab, { isDarkMode })}
-                {activeTab === 'seeking-alpha' && modulesLoaded && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab, { 
+                {activeTab === 'email-briefings' && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab, { isDarkMode })}
+                {activeTab === 'seeking-alpha' && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab, { 
                     isDarkMode,
                     tickers,
                     stockData,
@@ -2198,7 +2198,7 @@ const BetaCombinedDashboard = () => {
                     fetchNews,
                     loading
                 })}
-                {activeTab === 'investing-calendar' && modulesLoaded && window.InvestingCalendarTab && React.createElement(window.InvestingCalendarTab, { isDarkMode })}
+                {activeTab === 'investing-calendar' && window.InvestingCalendarTab && React.createElement(window.InvestingCalendarTab, { isDarkMode })}
             </main>
 
             {/* Messages */}
