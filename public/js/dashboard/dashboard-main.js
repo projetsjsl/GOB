@@ -2178,7 +2178,8 @@ const BetaCombinedDashboard = () => {
                     lastUpdate,
                     seekingAlphaData,
                     seekingAlphaStockData,
-                    refreshAllStocks
+                    refreshAllStocks,
+                    loading
                 })}
                 {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { 
                     isDarkMode,
