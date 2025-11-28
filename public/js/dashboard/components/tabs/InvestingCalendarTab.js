@@ -3,7 +3,10 @@
 
 const { useState, useEffect, useRef, useCallback } = React;
 
-const InvestingCalendarTab = ({ isDarkMode }) => {
+const InvestingCalendarTab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+    
     // Refs pour les widgets TradingView
     const tradingViewForexRef = useRef(null);
     const tradingViewEventsRef = useRef(null);
