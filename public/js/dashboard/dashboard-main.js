@@ -758,7 +758,7 @@ const BetaCombinedDashboard = () => {
         };
 
         // Fonction pour gérer le changement d'onglet avec animations d'intro
-        const handleTabChange = useCallback((tabId) => {
+        const handleTabChange = React.useCallback((tabId) => {
             console.log(`🔄 Changement d'onglet: ${tabId}`);
             setActiveTab(tabId);
 
