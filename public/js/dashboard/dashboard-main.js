@@ -147,6 +147,10 @@ const BetaCombinedDashboard = () => {
     // État de chargement initial pour éviter les réactualisations
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
     const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+    
+    // États pour forcer le re-render lorsque les modules sont chargés
+    const [modulesLoaded, setModulesLoaded] = useState(false);
+    const [modulesCheckCount, setModulesCheckCount] = useState(0);
 
     // Configuration API
     const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
@@ -1130,6 +1134,65 @@ const BetaCombinedDashboard = () => {
         // ============================================
         // EFFETS GLOBAUX (useEffect hooks)
         // ============================================
+
+    // 0. Écouter l'événement modules-loaded et vérifier périodiquement si les modules sont disponibles
+    useEffect(() => {
+        // Vérifier immédiatement si les modules sont déjà chargés
+        const checkModules = () => {
+            const requiredModules = [
+                'MarketsEconomyTab', 'JLabUnifiedTab', 'AskEmmaTab', 'PlusTab',
+                'AdminJSLaiTab', 'ScrappingSATab', 'SeekingAlphaTab',
+                'EmailBriefingsTab', 'InvestingCalendarTab'
+            ];
+            const allLoaded = requiredModules.every(module => typeof window[module] !== 'undefined');
+            
+            if (allLoaded && !modulesLoaded) {
+                console.log('✅ Tous les modules sont chargés, forcer re-render');
+                setModulesLoaded(true);
+            }
+            
+            return allLoaded;
+        };
+
+        // Vérifier immédiatement
+        if (checkModules()) {
+            return; // Modules déjà chargés
+        }
+
+        // Écouter l'événement modules-loaded
+        const handleModulesLoaded = () => {
+            console.log('📦 Événement modules-loaded reçu');
+            if (checkModules()) {
+                setModulesLoaded(true);
+            }
+        };
+
+        window.addEventListener('modules-loaded', handleModulesLoaded);
+
+        // Vérifier périodiquement (toutes les 500ms, max 20 fois = 10 secondes)
+        let checkCount = 0;
+        const maxChecks = 20;
+        const checkInterval = setInterval(() => {
+            checkCount++;
+            if (checkModules()) {
+                clearInterval(checkInterval);
+                setModulesLoaded(true);
+            } else if (checkCount >= maxChecks) {
+                clearInterval(checkInterval);
+                console.warn('⚠️ Certains modules ne sont pas chargés après 10 secondes');
+                // Forcer quand même le re-render pour afficher ce qui est disponible
+                setModulesLoaded(true);
+            } else {
+                // Forcer un re-render pour vérifier à nouveau
+                setModulesCheckCount(prev => prev + 1);
+            }
+        }, 500);
+
+        return () => {
+            window.removeEventListener('modules-loaded', handleModulesLoaded);
+            clearInterval(checkInterval);
+        };
+    }, []); // Se déclenche une seule fois au montage
 
     // 1. Chargement des informations utilisateur GitHub
     useEffect(() => {
