@@ -2280,4 +2280,4 @@ const BetaCombinedDashboard = () => {
 window.BetaCombinedDashboard = BetaCombinedDashboard;
 console.log('✅ [DEBUG] window.BetaCombinedDashboard défini:', typeof window.BetaCombinedDashboard);
 
-// FORCE REBUILD Fri Nov 28 16:51:52 EST 2025
+// FORCE REBUILD Fri Nov 28 21:59:52 EST 2025 - FORCE DEPLOYMENT
