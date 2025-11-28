@@ -12,7 +12,13 @@ const AdminJSLaiTab = ({
                 showTemperatureEditor,
                 setShowTemperatureEditor,
                 showLengthEditor,
-                setShowLengthEditor
+                setShowLengthEditor,
+                tickers = [],
+                stockData = {},
+                newsData = [],
+                lastUpdate = null,
+                seekingAlphaData = { stocks: [] },
+                seekingAlphaStockData = { stocks: {} }
             }) => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">

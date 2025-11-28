@@ -2036,7 +2036,13 @@ const BetaCombinedDashboard = () => {
                     showTemperatureEditor,
                     setShowTemperatureEditor,
                     showLengthEditor,
-                    setShowLengthEditor
+                    setShowLengthEditor,
+                    tickers,
+                    stockData,
+                    newsData,
+                    lastUpdate,
+                    seekingAlphaData,
+                    seekingAlphaStockData
                 })}
                 {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { isDarkMode })}
                 {activeTab === 'email-briefings' && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab, { isDarkMode })}
