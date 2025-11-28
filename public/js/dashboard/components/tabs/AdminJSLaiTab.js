@@ -25,6 +25,10 @@ const AdminJSLaiTab = ({
                 const [cacheStatus, setCacheStatus] = useState({});
                 const [showSettings, setShowSettings] = useState(false);
                 const [systemLogs, setSystemLogs] = useState([]);
+                const [isProfessionalMode, setIsProfessionalMode] = useState(() => {
+                    const saved = localStorage.getItem('isProfessionalMode');
+                    return saved ? JSON.parse(saved) : false;
+                });
                 const [cacheSettings, setCacheSettings] = useState(() => {
                     const saved = localStorage.getItem('cacheSettings');
                     return saved ? JSON.parse(saved) : {
