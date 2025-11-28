@@ -1194,6 +1194,23 @@ const BetaCombinedDashboard = () => {
         };
     }, []); // Se déclenche une seule fois au montage
 
+    // 0.1. Vérifier les modules à chaque fois que modulesCheckCount change (pour forcer re-render)
+    useEffect(() => {
+        if (modulesLoaded) return; // Déjà chargé, pas besoin de vérifier
+        
+        const requiredModules = [
+            'MarketsEconomyTab', 'JLabUnifiedTab', 'AskEmmaTab', 'PlusTab',
+            'AdminJSLaiTab', 'ScrappingSATab', 'SeekingAlphaTab',
+            'EmailBriefingsTab', 'InvestingCalendarTab'
+        ];
+        const allLoaded = requiredModules.every(module => typeof window[module] !== 'undefined');
+        
+        if (allLoaded) {
+            console.log('✅ Tous les modules sont chargés (vérification via modulesCheckCount), forcer re-render');
+            setModulesLoaded(true);
+        }
+    }, [modulesCheckCount, modulesLoaded]); // Se déclenche à chaque fois que modulesCheckCount change
+
     // 1. Chargement des informations utilisateur GitHub
     useEffect(() => {
         const loadGithubUser = async () => {
