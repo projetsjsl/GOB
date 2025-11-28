@@ -2276,5 +2276,7 @@ const BetaCombinedDashboard = () => {
 
 
 // Exposition globale pour Babel standalone
+// IMPORTANT: Cette ligne doit être présente pour que les composants modulaires fonctionnent
 window.BetaCombinedDashboard = BetaCombinedDashboard;
+console.log('✅ [DEBUG] window.BetaCombinedDashboard défini:', typeof window.BetaCombinedDashboard);
 
