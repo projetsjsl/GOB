@@ -1,7 +1,7 @@
 // Auto-converted from monolithic dashboard file
 // Component: AdminJSLaiTab
 
-
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 const AdminJSLaiTab = ({
                 isDarkMode = true,
@@ -19,7 +19,22 @@ const AdminJSLaiTab = ({
                 lastUpdate = null,
                 seekingAlphaData = { stocks: [] },
                 seekingAlphaStockData = { stocks: {} }
-            }) => (
+            }) => {
+                // États locaux pour la gestion du cache
+                const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
+                const [cacheStatus, setCacheStatus] = useState({});
+                const [cacheSettings, setCacheSettings] = useState(() => {
+                    const saved = localStorage.getItem('cacheSettings');
+                    return saved ? JSON.parse(saved) : {
+                        maxAgeHours: 4,
+                        refreshOnNavigation: false,
+                        refreshIntervalMinutes: 30
+                    };
+                });
+
+                const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
+
+                return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
