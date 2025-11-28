@@ -3,13 +3,13 @@
 
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-const ScrappingSATab = ({ 
-    isDarkMode = true,
-    tickers = [],
-    stockData = {},
-    seekingAlphaData = { stocks: [] },
-    seekingAlphaStockData = { stocks: {} }
-}) => {
+const ScrappingSATab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+    const tickers = window.BetaCombinedDashboard?.tickers ?? [];
+    const stockData = window.BetaCombinedDashboard?.stockData ?? {};
+    const seekingAlphaData = window.BetaCombinedDashboard?.seekingAlphaData ?? { stocks: [] };
+    const seekingAlphaStockData = window.BetaCombinedDashboard?.seekingAlphaStockData ?? { stocks: {} };
     const [selectedStock, setSelectedStock] = useState(null);
     
     return (

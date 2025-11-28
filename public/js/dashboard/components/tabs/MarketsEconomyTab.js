@@ -3,7 +3,13 @@
 
 const { useState, useEffect, useRef, useCallback } = React;
 
-const MarketsEconomyTab = ({ isDarkMode, newsData = [], loading = false, lastUpdate = null, fetchNews }) => {
+const MarketsEconomyTab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+    const newsData = window.BetaCombinedDashboard?.newsData ?? [];
+    const loading = window.BetaCombinedDashboard?.loading ?? false;
+    const lastUpdate = window.BetaCombinedDashboard?.lastUpdate ?? null;
+    const fetchNews = window.BetaCombinedDashboard?.fetchNews;
     // S'assurer que newsData est toujours un tableau, même si undefined ou null
     const safeNewsDataProp = Array.isArray(newsData) ? newsData : [];
     

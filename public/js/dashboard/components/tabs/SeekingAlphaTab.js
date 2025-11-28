@@ -4,16 +4,18 @@
 
 
 
-const SeekingAlphaTab = ({ 
-    isDarkMode,
-    tickers = [],
-    stockData = {},
-    seekingAlphaData = { stocks: [] },
-    seekingAlphaStockData = { stocks: {} },
-    refreshAllStocks,
-    fetchNews,
-    loading = false
-}) => (
+const SeekingAlphaTab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+    const tickers = window.BetaCombinedDashboard?.tickers ?? [];
+    const stockData = window.BetaCombinedDashboard?.stockData ?? {};
+    const seekingAlphaData = window.BetaCombinedDashboard?.seekingAlphaData ?? { stocks: [] };
+    const seekingAlphaStockData = window.BetaCombinedDashboard?.seekingAlphaStockData ?? { stocks: {} };
+    const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
+    const fetchNews = window.BetaCombinedDashboard?.fetchNews;
+    const loading = window.BetaCombinedDashboard?.loading ?? false;
+    
+    return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${

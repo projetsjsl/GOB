@@ -3,7 +3,9 @@
 
 const { useState, useEffect, useCallback, useMemo } = React;
 
-const EmailBriefingsTab = ({ isDarkMode = true }) => {
+const EmailBriefingsTab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
                 const [loading, setLoading] = useState(false);
                 const [currentBriefing, setCurrentBriefing] = useState(null);
                 const [previewHtml, setPreviewHtml] = useState('');

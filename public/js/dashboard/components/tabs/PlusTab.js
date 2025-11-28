@@ -5,7 +5,10 @@
 
 const { useCallback } = React;
 
-const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
+const PlusTab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+    const isProfessionalMode = window.BetaCombinedDashboard?.isProfessionalMode ?? false;
     // Optimisation: useCallback pour handleLogout
     const handleLogout = useCallback(() => {
         // Nettoyer toutes les données de session

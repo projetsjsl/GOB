@@ -2150,13 +2150,7 @@ const BetaCombinedDashboard = () => {
 
             {/* Contenu principal */}
             <main className={`max-w-7xl mx-auto p-6 md:ml-20 pb-24 md:pb-6 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                {activeTab === 'markets-economy' && window.MarketsEconomyTab && React.createElement(window.MarketsEconomyTab, { 
-                    isDarkMode,
-                    newsData: Array.isArray(newsData) ? newsData : [],
-                    loading,
-                    lastUpdate,
-                    fetchNews
-                })}
+                {activeTab === 'markets-economy' && window.MarketsEconomyTab && React.createElement(window.MarketsEconomyTab)}
                 {activeTab === 'intellistocks' && window.JLabUnifiedTab && React.createElement(window.JLabUnifiedTab)}
                 {activeTab === 'ask-emma' && window.AskEmmaTab && React.createElement(window.AskEmmaTab, { 
                     isDarkMode,
@@ -2173,7 +2167,7 @@ const BetaCombinedDashboard = () => {
                     showLengthEditor,
                     setShowLengthEditor
                 })}
-                {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode, isProfessionalMode })}
+                {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab)}
                 {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
                     emmaConnected,
                     setEmmaConnected,
@@ -2184,25 +2178,10 @@ const BetaCombinedDashboard = () => {
                     showLengthEditor,
                     setShowLengthEditor
                 })}
-                {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { 
-                    isDarkMode,
-                    tickers,
-                    stockData,
-                    seekingAlphaData,
-                    seekingAlphaStockData
-                })}
-                {activeTab === 'email-briefings' && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab, { isDarkMode })}
-                {activeTab === 'seeking-alpha' && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab, { 
-                    isDarkMode,
-                    tickers,
-                    stockData,
-                    seekingAlphaData,
-                    seekingAlphaStockData,
-                    refreshAllStocks,
-                    fetchNews,
-                    loading
-                })}
-                {activeTab === 'investing-calendar' && window.InvestingCalendarTab && React.createElement(window.InvestingCalendarTab, { isDarkMode })}
+                {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab)}
+                {activeTab === 'email-briefings' && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab)}
+                {activeTab === 'seeking-alpha' && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab)}
+                {activeTab === 'investing-calendar' && window.InvestingCalendarTab && React.createElement(window.InvestingCalendarTab)}
             </main>
 
             {/* Messages */}
