@@ -1147,21 +1147,64 @@ const BetaCombinedDashboard = () => {
     // 0. Exposer les variables globales pour que les composants enfants y accèdent (comme dans la version monolithique)
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            window.BetaCombinedDashboard = window.BetaCombinedDashboard || {};
-            window.BetaCombinedDashboard.isDarkMode = isDarkMode;
-            window.BetaCombinedDashboard.tickers = tickers;
-            window.BetaCombinedDashboard.stockData = stockData;
-            window.BetaCombinedDashboard.newsData = newsData;
-            window.BetaCombinedDashboard.loading = loading;
-            window.BetaCombinedDashboard.lastUpdate = lastUpdate;
-            window.BetaCombinedDashboard.seekingAlphaData = seekingAlphaData;
-            window.BetaCombinedDashboard.seekingAlphaStockData = seekingAlphaStockData;
-            window.BetaCombinedDashboard.loadTickersFromSupabase = loadTickersFromSupabase;
-            window.BetaCombinedDashboard.fetchNews = fetchNews;
-            window.BetaCombinedDashboard.refreshAllStocks = refreshAllStocks;
-            window.BetaCombinedDashboard.fetchLatestNewsForTickers = fetchLatestNewsForTickers;
+            // Créer un objet pour les données si ce n'est pas déjà fait
+            // Ne pas écraser la fonction composant BetaCombinedDashboard
+            if (!window.BetaCombinedDashboardData) {
+                window.BetaCombinedDashboardData = {};
+            }
+            
+            // Exposer toutes les variables dans l'objet de données
+            const data = window.BetaCombinedDashboardData;
+            data.isDarkMode = isDarkMode;
+            data.tickers = tickers;
+            data.stockData = stockData;
+            data.newsData = newsData;
+            data.loading = loading;
+            data.lastUpdate = lastUpdate;
+            data.seekingAlphaData = seekingAlphaData;
+            data.seekingAlphaStockData = seekingAlphaStockData;
+            data.activeTab = activeTab;
+            data.setActiveTab = setActiveTab;
+            data.loadTickersFromSupabase = loadTickersFromSupabase;
+            data.fetchNews = fetchNews;
+            data.refreshAllStocks = refreshAllStocks;
+            data.fetchLatestNewsForTickers = fetchLatestNewsForTickers;
+            data.isProfessionalMode = isProfessionalMode;
+            data.setScrapingStatus = setScrapingStatus;
+            data.setScrapingProgress = setScrapingProgress;
+            data.setScrapingLogs = setScrapingLogs;
+            data.addLog = addLog;
+            data.showMessage = showMessage;
+            
+            // Exposer aussi directement sur window.BetaCombinedDashboard pour compatibilité avec les composants existants
+            // qui utilisent window.BetaCombinedDashboard.isDarkMode, etc.
+            if (typeof window.BetaCombinedDashboard === 'function') {
+                // Ajouter les propriétés directement à la fonction (possible en JS)
+                Object.defineProperties(window.BetaCombinedDashboard, {
+                    isDarkMode: { value: isDarkMode, writable: true, enumerable: true },
+                    tickers: { value: tickers, writable: true, enumerable: true },
+                    stockData: { value: stockData, writable: true, enumerable: true },
+                    newsData: { value: newsData, writable: true, enumerable: true },
+                    loading: { value: loading, writable: true, enumerable: true },
+                    lastUpdate: { value: lastUpdate, writable: true, enumerable: true },
+                    seekingAlphaData: { value: seekingAlphaData, writable: true, enumerable: true },
+                    seekingAlphaStockData: { value: seekingAlphaStockData, writable: true, enumerable: true },
+                    activeTab: { value: activeTab, writable: true, enumerable: true },
+                    setActiveTab: { value: setActiveTab, writable: true, enumerable: true },
+                    loadTickersFromSupabase: { value: loadTickersFromSupabase, writable: true, enumerable: true },
+                    fetchNews: { value: fetchNews, writable: true, enumerable: true },
+                    refreshAllStocks: { value: refreshAllStocks, writable: true, enumerable: true },
+                    fetchLatestNewsForTickers: { value: fetchLatestNewsForTickers, writable: true, enumerable: true },
+                    isProfessionalMode: { value: isProfessionalMode, writable: true, enumerable: true },
+                    setScrapingStatus: { value: setScrapingStatus, writable: true, enumerable: true },
+                    setScrapingProgress: { value: setScrapingProgress, writable: true, enumerable: true },
+                    setScrapingLogs: { value: setScrapingLogs, writable: true, enumerable: true },
+                    addLog: { value: addLog, writable: true, enumerable: true },
+                    showMessage: { value: showMessage, writable: true, enumerable: true }
+                });
+            }
         }
-    }, [isDarkMode, tickers, stockData, newsData, loading, lastUpdate, seekingAlphaData, seekingAlphaStockData, loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers]);
+    }, [isDarkMode, tickers, stockData, newsData, loading, lastUpdate, seekingAlphaData, seekingAlphaStockData, activeTab, setActiveTab, loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers, isProfessionalMode, setScrapingStatus, setScrapingProgress, setScrapingLogs, addLog, showMessage]);
 
     // 0.1. Écouter l'événement modules-loaded et vérifier périodiquement si les modules sont disponibles
     useEffect(() => {
