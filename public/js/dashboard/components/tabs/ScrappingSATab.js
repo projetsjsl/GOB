@@ -1,9 +1,18 @@
 // Auto-converted from monolithic dashboard file
 // Component: ScrappingSATab
 
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-
-const ScrappingSATab = ({ isDarkMode }) => (
+const ScrappingSATab = ({ 
+    isDarkMode = true,
+    tickers = [],
+    stockData = {},
+    seekingAlphaData = { stocks: [] },
+    seekingAlphaStockData = { stocks: {} }
+}) => {
+    const [selectedStock, setSelectedStock] = useState(null);
+    
+    return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
@@ -742,5 +751,6 @@ const ScrappingSATab = ({ isDarkMode }) => (
                     </div>
                 </div>
             );
+};
 
 window.ScrappingSATab = ScrappingSATab;

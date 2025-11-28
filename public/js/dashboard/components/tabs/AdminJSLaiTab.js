@@ -1205,7 +1205,6 @@ const AdminJSLaiTab = ({
                     </div>
                 </div>
             );
-
-            // Composant onglet Plus
+};
 
 window.AdminJSLaiTab = AdminJSLaiTab;
