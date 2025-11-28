@@ -2157,7 +2157,7 @@ const BetaCombinedDashboard = () => {
                     setShowLengthEditor
                 })}
                 {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode, isProfessionalMode })}
-                {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, { 
+                {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
                     isDarkMode,
                     emmaConnected,
                     setEmmaConnected,
@@ -2172,7 +2172,8 @@ const BetaCombinedDashboard = () => {
                     newsData,
                     lastUpdate,
                     seekingAlphaData,
-                    seekingAlphaStockData
+                    seekingAlphaStockData,
+                    refreshAllStocks
                 })}
                 {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { 
                     isDarkMode,
