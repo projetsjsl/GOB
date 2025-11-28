@@ -1,7 +1,7 @@
 // Main Dashboard Component - Refactored to use modular tab components
 // Compatible with Babel standalone (no ES6 imports, uses window.* globals)
 
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
 
 /**
  * Main Dashboard Component
