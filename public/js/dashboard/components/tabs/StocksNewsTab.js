@@ -1325,3 +1325,6 @@ const StocksNewsTab = ({ isDarkMode, tickers = [], stockData = {}, newsData = []
     );
 };
 
+// Exposition globale pour Babel standalone
+window.StocksNewsTab = StocksNewsTab;
+
