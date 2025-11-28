@@ -34545,6 +34545,17 @@ function App() {
   };
   const [isBulkSyncing, setIsBulkSyncing] = reactExports.useState(false);
   const [bulkSyncProgress, setBulkSyncProgress] = reactExports.useState({ current: 0, total: 0 });
+  const bulkSyncTimeoutRef = reactExports.useRef(null);
+  const progressCounterRef = reactExports.useRef(0);
+  const syncSessionIdRef = reactExports.useRef(0);
+  reactExports.useEffect(() => {
+    return () => {
+      if (bulkSyncTimeoutRef.current) {
+        clearTimeout(bulkSyncTimeoutRef.current);
+        bulkSyncTimeoutRef.current = null;
+      }
+    };
+  }, []);
   const handleBulkSyncAllTickers = async () => {
     if (!confirm(`Synchroniser tous les ${Object.keys(library).length} tickers ?
 
@@ -34552,6 +34563,13 @@ Chaque version sera sauvegardée avant la synchronisation.
 Les données manuelles et hypothèses (orange) seront préservées.`)) {
       return;
     }
+    if (bulkSyncTimeoutRef.current) {
+      clearTimeout(bulkSyncTimeoutRef.current);
+      bulkSyncTimeoutRef.current = null;
+    }
+    syncSessionIdRef.current = (syncSessionIdRef.current || 0) + 1;
+    const currentSessionId = syncSessionIdRef.current;
+    progressCounterRef.current = 0;
     setIsBulkSyncing(true);
     const allTickers = Object.keys(library);
     setBulkSyncProgress({ current: 0, total: allTickers.length });
@@ -34566,6 +34584,7 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
       if (i > 0) {
         await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
       }
+      const batchLibraryUpdates = {};
       const batchResults = await Promise.allSettled(
         batch.map(async (tickerSymbol) => {
           try {
@@ -34574,17 +34593,21 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
               return { type: "skipped", ticker: tickerSymbol };
             }
             console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
-            await saveSnapshot(
-              tickerSymbol,
-              profile.data,
-              profile.assumptions,
-              profile.info,
-              `Avant synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
-              false,
-              // Not current (on va le remplacer)
-              false
-              // Not auto-fetched
-            );
+            try {
+              await saveSnapshot(
+                tickerSymbol,
+                profile.data,
+                profile.assumptions,
+                profile.info,
+                `Avant synchronisation globale - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                false,
+                // Not current (on va le remplacer)
+                false
+                // Not auto-fetched
+              );
+            } catch (snapshotError) {
+              throw new Error(`Échec sauvegarde snapshot pré-sync: ${snapshotError.message || "Erreur inconnue"}`);
+            }
             console.log(`🔄 Synchronisation ${tickerSymbol}...`);
             const result = await fetchCompanyData(tickerSymbol);
             const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
@@ -34611,35 +34634,6 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
               }
             });
             mergedData.sort((a2, b) => a2.year - b.year);
-            setLibrary((prev) => {
-              const updated = {
-                ...prev,
-                [tickerSymbol]: {
-                  ...profile,
-                  data: mergedData,
-                  info: {
-                    ...profile.info,
-                    ...result.info,
-                    // Mettre à jour les infos (nom, secteur, etc.)
-                    // S'assurer que le nom de FMP remplace toujours celui de Supabase
-                    name: result.info.name || profile.info.name
-                  },
-                  assumptions: {
-                    ...profile.assumptions,
-                    // Garder toutes les hypothèses (orange)
-                    currentPrice: result.currentPrice
-                    // Mettre à jour seulement le prix actuel
-                  },
-                  lastModified: Date.now()
-                }
-              };
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-              } catch (e) {
-                console.warn("Failed to save to LocalStorage:", e);
-              }
-              return updated;
-            });
             await saveSnapshot(
               tickerSymbol,
               mergedData,
@@ -34657,11 +34651,28 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
               true
               // Auto-fetched
             );
+            batchLibraryUpdates[tickerSymbol] = {
+              ...profile,
+              data: mergedData,
+              info: {
+                ...profile.info,
+                ...result.info,
+                // Mettre à jour les infos (nom, secteur, etc.)
+                // S'assurer que le nom de FMP remplace toujours celui de Supabase
+                name: result.info.name || profile.info.name
+              },
+              assumptions: {
+                ...profile.assumptions,
+                // Garder toutes les hypothèses (orange)
+                currentPrice: result.currentPrice
+                // Mettre à jour seulement le prix actuel
+              },
+              lastModified: Date.now()
+            };
             console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
             return { type: "success", ticker: tickerSymbol };
           } catch (error) {
             const errorMsg = `${tickerSymbol}: ${error.message || "Erreur inconnue"}`;
-            errors.push(errorMsg);
             console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
             return { type: "error", ticker: tickerSymbol, error: errorMsg };
           }
@@ -34669,34 +34680,63 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
       );
       let batchCompleted = 0;
       batchResults.forEach((result) => {
+        var _a;
         if (result.status === "fulfilled") {
           const data2 = result.value;
+          batchCompleted++;
           if (data2 && data2.type === "success") {
             successCount++;
-            batchCompleted++;
           } else if (data2 && data2.type === "error") {
             errorCount++;
-            batchCompleted++;
+            if (data2.error) {
+              errors.push(data2.error);
+            }
           } else if (data2 && data2.type === "skipped") {
             skippedCount++;
-            batchCompleted++;
           } else {
             console.warn("⚠️ Résultat batch avec type inattendu:", data2);
             errorCount++;
-            batchCompleted++;
+            errors.push(`Type inattendu pour ${(data2 == null ? void 0 : data2.ticker) || "inconnu"}`);
           }
         } else {
-          errorCount++;
           batchCompleted++;
+          errorCount++;
+          const rejectionError = ((_a = result.reason) == null ? void 0 : _a.message) || result.reason || "Erreur inconnue";
+          errors.push(`Promise rejetée: ${rejectionError}`);
         }
       });
-      setBulkSyncProgress((prev) => ({
-        ...prev,
-        current: prev.current + batchCompleted
-      }));
+      if (syncSessionIdRef.current === currentSessionId) {
+        const newCurrent = progressCounterRef.current + batchCompleted;
+        progressCounterRef.current = newCurrent;
+        setBulkSyncProgress((prev) => ({ ...prev, current: newCurrent }));
+      } else {
+        console.warn(`⚠️ Mise à jour de progression ignorée (session ${currentSessionId} vs ${syncSessionIdRef.current})`);
+      }
+      if (Object.keys(batchLibraryUpdates).length > 0) {
+        setLibrary((prev) => {
+          const updated = {
+            ...prev,
+            ...batchLibraryUpdates
+          };
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+          } catch (e) {
+            console.warn("Failed to save to LocalStorage:", e);
+          }
+          return updated;
+        });
+      }
     }
-    setIsBulkSyncing(false);
-    setBulkSyncProgress({ current: 0, total: 0 });
+    const timeoutSessionId = currentSessionId;
+    bulkSyncTimeoutRef.current = setTimeout(() => {
+      if (syncSessionIdRef.current === timeoutSessionId) {
+        setIsBulkSyncing(false);
+        setBulkSyncProgress({ current: 0, total: 0 });
+        bulkSyncTimeoutRef.current = null;
+      } else {
+        console.log(`⏭️ Timeout ignoré (session ${timeoutSessionId} remplacée par ${syncSessionIdRef.current})`);
+      }
+    }, 3e3);
     const message = `✅ Synchronisation terminée
 
 Réussies: ${successCount}

@@ -35,6 +35,11 @@ const AskEmmaTab = React.memo(({
                     }
                 });
                 const [emmaInput, setEmmaInput] = useState('');
+                const [generalInput, setGeneralInput] = useState('');
+                const [stockTitle, setStockTitle] = useState('');
+                const [stockTicker, setStockTicker] = useState('');
+                const [newsQuery, setNewsQuery] = useState('');
+                const [compareTickers, setCompareTickers] = useState('');
                 const [emmaLoading, setEmmaLoading] = useState(false);
                 const chatContainerRef = useRef(null);
                 const [emmaApiKey, setEmmaApiKey] = useState('');
@@ -597,9 +602,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     setEmmaConnected(!!localKey);
                 };
 
-                const sendMessageToEmma = async () => {
-                    console.log('🔍 sendMessageToEmma appelée avec:', emmaInput);
-                    if (!emmaInput.trim()) {
+                const sendMessageToEmma = async (message = null, options = {}, onSuccess = null) => {
+                    // Utiliser le message fourni ou emmaInput par défaut
+                    const messageToSend = message !== null ? message : emmaInput;
+                    
+                    console.log('🔍 sendMessageToEmma appelée avec:', messageToSend);
+                    if (!messageToSend || !messageToSend.trim()) {
                         console.log('❌ Input vide, sortie de la fonction');
                         return;
                     }
@@ -607,7 +615,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     const userMessage = {
                         id: Date.now(),
                         type: 'user',
-                        content: emmaInput,
+                        content: messageToSend,
                         timestamp: new Date().toLocaleTimeString('fr-FR')
                     };
                     
@@ -641,7 +649,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         console.log('✅ Utilisation des données existantes du dashboard');
                         
                         // Utiliser l'API Perplexity avec les données fraîches
-                        const responseData = await generatePerplexityResponse(emmaInput);
+                        // Si promptOverride est fourni, l'utiliser; sinon utiliser le prompt système par défaut
+                        const responseData = await generatePerplexityResponse(messageToSend, options.promptOverride);
                         const response = typeof responseData === 'string' ? responseData : responseData.text;
                         const model = typeof responseData === 'object' ? responseData.model : null;
                         const modelReason = typeof responseData === 'object' ? responseData.modelReason : null;
@@ -787,12 +796,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                         });
                     } finally {
                         setEmmaLoading(false);
-                        // Vider l'input après envoi
-                        setEmmaInput('');
+                        // Ne pas vider l'input automatiquement - le callback onSuccess le fera si fourni
+                        // setEmmaInput(''); // Retiré - géré par callback
                     }
                 };
 
-                const generatePerplexityResponse = async (userMessage) => {
+                const generatePerplexityResponse = async (userMessage, promptOverride = null) => {
                     try {
                         console.log('🔍 Génération de réponse Emma Agent pour:', userMessage);
 
@@ -818,6 +827,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                             },
                             body: JSON.stringify({
                                 message: userMessage,
+                                promptOverride: promptOverride || undefined,  // Utiliser promptOverride si fourni
                                 context: {
                                     output_mode: 'chat',  // ← MODE CHAT pour chatbot web
                                     user_channel: channelSim,  // 'web' ou 'sms' pour adapter le FORMAT
@@ -826,7 +836,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                                     stockData: currentStockData,
                                     newsData: currentNewsData,
                                     apiStatus: currentApiStatus,
-                                    emmaPrompt: emmaPrompt,
+                                    emmaPrompt: promptOverride || emmaPrompt,  // Utiliser promptOverride si fourni, sinon emmaPrompt
                                     temperature: emmaTemperature,
                                     max_tokens: emmaMaxTokens
                                 }
@@ -2321,10 +2331,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     setShowSlashSuggestions(false);
                                                     setSelectedSuggestionIndex(-1);
                                                 } else if (e.key === 'Enter' && !showSlashSuggestions) {
-                                                    sendMessageToEmma();
+                                                    sendMessageToEmma(emmaInput, {}, () => setEmmaInput(''));
                                                 }
                                             } else if (e.key === 'Enter') {
-                                                sendMessageToEmma();
+                                                sendMessageToEmma(emmaInput, {}, () => setEmmaInput(''));
                                             }
                                         }}
                                         onFocus={() => {
@@ -2411,7 +2421,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         console.log('🔘 Bouton Envoyer cliqué !');
                                         console.log('📝 Contenu de emmaInput:', emmaInput);
                                         console.log('📊 État de emmaLoading:', emmaLoading);
-                                        sendMessageToEmma();
+                                        sendMessageToEmma(emmaInput, {}, () => setEmmaInput(''));
                                     }}
                                     disabled={emmaLoading || !emmaInput.trim()}
                                     className={`px-6 py-2 rounded-lg font-medium transition-colors duration-300 ${
