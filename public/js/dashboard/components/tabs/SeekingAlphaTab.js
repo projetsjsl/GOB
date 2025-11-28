@@ -326,7 +326,7 @@ const SeekingAlphaTab = ({ isDarkMode }) => (
                                     Ajoutez des tickers dans l'onglet "Titres & Nouvelles" pour commencer.
                                 </p>
                                 <button
-                                    onClick={() => setActiveTab('stocks-news')}
+                                    onClick={() => window.dispatchEvent(new CustomEvent('tab-change', { detail: { tabId: 'stocks-news' } }))}
                                     className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                 >
                                     Aller à Titres & Nouvelles →
@@ -474,7 +474,7 @@ const SeekingAlphaTab = ({ isDarkMode }) => (
                             <div className="text-center py-8">
                                 <p className="text-gray-400 mb-4">Aucun ticker disponible. Ajoutez des tickers dans l'onglet "Titres & Nouvelles".</p>
                                 <button
-                                    onClick={() => setActiveTab('stocks-news')}
+                                    onClick={() => window.dispatchEvent(new CustomEvent('tab-change', { detail: { tabId: 'stocks-news' } }))}
                                     className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                 >
                                     Aller à Titres & Nouvelles →

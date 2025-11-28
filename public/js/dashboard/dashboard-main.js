@@ -2165,7 +2165,16 @@ const BetaCombinedDashboard = () => {
                     seekingAlphaStockData
                 })}
                 {activeTab === 'email-briefings' && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab, { isDarkMode })}
-                {activeTab === 'seeking-alpha' && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab, { isDarkMode })}
+                {activeTab === 'seeking-alpha' && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab, { 
+                    isDarkMode,
+                    tickers,
+                    stockData,
+                    seekingAlphaData,
+                    seekingAlphaStockData,
+                    refreshAllStocks,
+                    fetchNews,
+                    loading
+                })}
                 {activeTab === 'investing-calendar' && window.InvestingCalendarTab && React.createElement(window.InvestingCalendarTab, { isDarkMode })}
             </main>
 
