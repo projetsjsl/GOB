@@ -3,7 +3,18 @@
 
 const { useState, useEffect, useCallback, useMemo } = React;
 
-const StocksNewsTab = ({ isDarkMode, tickers = [], stockData = {}, newsData = [], loading = false, lastUpdate = null, loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers }) => {
+const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
+        // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+        const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+        const tickers = window.BetaCombinedDashboard?.tickers ?? [];
+        const stockData = window.BetaCombinedDashboard?.stockData ?? {};
+        const newsData = window.BetaCombinedDashboard?.newsData ?? [];
+        const loading = window.BetaCombinedDashboard?.loading ?? false;
+        const lastUpdate = window.BetaCombinedDashboard?.lastUpdate ?? null;
+        const loadTickersFromSupabase = window.BetaCombinedDashboard?.loadTickersFromSupabase;
+        const fetchNews = window.BetaCombinedDashboard?.fetchNews;
+        const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
+        const fetchLatestNewsForTickers = window.BetaCombinedDashboard?.fetchLatestNewsForTickers;
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
 

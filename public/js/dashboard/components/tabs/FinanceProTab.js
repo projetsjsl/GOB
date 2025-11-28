@@ -3,7 +3,9 @@
 
 const { useState, useEffect, useRef } = React;
 
-const FinanceProTab = ({ isDarkMode }) => {
+const FinanceProTab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
     const containerRef = useRef(null);
     const scriptRef = useRef(null);
     const styleRef = useRef(null);

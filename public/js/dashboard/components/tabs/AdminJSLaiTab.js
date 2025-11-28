@@ -4,7 +4,6 @@
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 const AdminJSLaiTab = ({
-                isDarkMode = true,
                 emmaConnected,
                 setEmmaConnected,
                 showPromptEditor,
@@ -12,17 +11,19 @@ const AdminJSLaiTab = ({
                 showTemperatureEditor,
                 setShowTemperatureEditor,
                 showLengthEditor,
-                setShowLengthEditor,
-                tickers = [],
-                stockData = {},
-                newsData = [],
-                lastUpdate = null,
-                seekingAlphaData = { stocks: [] },
-                seekingAlphaStockData = { stocks: {} },
-                refreshAllStocks,
-                loading = false,
-                fetchNews
+                setShowLengthEditor
             }) => {
+                // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+                const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+                const tickers = window.BetaCombinedDashboard?.tickers ?? [];
+                const stockData = window.BetaCombinedDashboard?.stockData ?? {};
+                const newsData = window.BetaCombinedDashboard?.newsData ?? [];
+                const lastUpdate = window.BetaCombinedDashboard?.lastUpdate ?? null;
+                const seekingAlphaData = window.BetaCombinedDashboard?.seekingAlphaData ?? { stocks: [] };
+                const seekingAlphaStockData = window.BetaCombinedDashboard?.seekingAlphaStockData ?? { stocks: {} };
+                const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
+                const loading = window.BetaCombinedDashboard?.loading ?? false;
+                const fetchNews = window.BetaCombinedDashboard?.fetchNews;
                 // États locaux pour la gestion du cache
                 const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
                 const [cacheStatus, setCacheStatus] = useState({});

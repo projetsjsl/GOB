@@ -9,6 +9,10 @@ const { useState, useEffect, useRef, useCallback } = React;
  * Extracted from beta-combined-dashboard.html
  */
 const BetaCombinedDashboard = () => {
+    // Exposer les variables globales pour que les composants enfants y accèdent (comme dans la version monolithique)
+    if (typeof window !== 'undefined') {
+        window.BetaCombinedDashboard = window.BetaCombinedDashboard || {};
+    }
     // ============================================
     // ÉTATS PRINCIPAUX
     // ============================================
@@ -1140,7 +1144,26 @@ const BetaCombinedDashboard = () => {
         // EFFETS GLOBAUX (useEffect hooks)
         // ============================================
 
-    // 0. Écouter l'événement modules-loaded et vérifier périodiquement si les modules sont disponibles
+    // 0. Exposer les variables globales pour que les composants enfants y accèdent (comme dans la version monolithique)
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window.BetaCombinedDashboard = window.BetaCombinedDashboard || {};
+            window.BetaCombinedDashboard.isDarkMode = isDarkMode;
+            window.BetaCombinedDashboard.tickers = tickers;
+            window.BetaCombinedDashboard.stockData = stockData;
+            window.BetaCombinedDashboard.newsData = newsData;
+            window.BetaCombinedDashboard.loading = loading;
+            window.BetaCombinedDashboard.lastUpdate = lastUpdate;
+            window.BetaCombinedDashboard.seekingAlphaData = seekingAlphaData;
+            window.BetaCombinedDashboard.seekingAlphaStockData = seekingAlphaStockData;
+            window.BetaCombinedDashboard.loadTickersFromSupabase = loadTickersFromSupabase;
+            window.BetaCombinedDashboard.fetchNews = fetchNews;
+            window.BetaCombinedDashboard.refreshAllStocks = refreshAllStocks;
+            window.BetaCombinedDashboard.fetchLatestNewsForTickers = fetchLatestNewsForTickers;
+        }
+    }, [isDarkMode, tickers, stockData, newsData, loading, lastUpdate, seekingAlphaData, seekingAlphaStockData, loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers]);
+
+    // 0.1. Écouter l'événement modules-loaded et vérifier périodiquement si les modules sont disponibles
     useEffect(() => {
         // Vérifier immédiatement si les modules sont déjà chargés
         const checkModules = () => {
@@ -2134,18 +2157,7 @@ const BetaCombinedDashboard = () => {
                     lastUpdate,
                     fetchNews
                 })}
-                {activeTab === 'intellistocks' && window.JLabUnifiedTab && React.createElement(window.JLabUnifiedTab, { 
-                    isDarkMode,
-                    tickers,
-                    stockData,
-                    newsData,
-                    loading,
-                    lastUpdate,
-                    loadTickersFromSupabase,
-                    fetchNews,
-                    refreshAllStocks,
-                    fetchLatestNewsForTickers
-                })}
+                {activeTab === 'intellistocks' && window.JLabUnifiedTab && React.createElement(window.JLabUnifiedTab)}
                 {activeTab === 'ask-emma' && window.AskEmmaTab && React.createElement(window.AskEmmaTab, { 
                     isDarkMode,
                     prefillMessage: emmaPrefillMessage,
@@ -2163,7 +2175,6 @@ const BetaCombinedDashboard = () => {
                 })}
                 {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode, isProfessionalMode })}
                 {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
-                    isDarkMode,
                     emmaConnected,
                     setEmmaConnected,
                     showPromptEditor,
@@ -2171,16 +2182,7 @@ const BetaCombinedDashboard = () => {
                     showTemperatureEditor,
                     setShowTemperatureEditor,
                     showLengthEditor,
-                    setShowLengthEditor,
-                    tickers,
-                    stockData,
-                    newsData,
-                    lastUpdate,
-                    seekingAlphaData,
-                    seekingAlphaStockData,
-                    refreshAllStocks,
-                    loading,
-                    fetchNews
+                    setShowLengthEditor
                 })}
                 {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { 
                     isDarkMode,
