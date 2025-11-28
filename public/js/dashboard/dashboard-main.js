@@ -1341,9 +1341,42 @@ const BetaCombinedDashboard = () => {
     useEffect(() => {
         const handleTabChangeEvent = (event) => {
             const tabId = event.detail?.tabId;
-            if (tabId && typeof handleTabChange === 'function') {
+            if (tabId) {
                 console.log(`📋 Événement tab-change reçu: ${tabId}`);
-                handleTabChange(tabId);
+                setActiveTab(tabId);
+                
+                // Afficher intro Emma IA si c'est la première visite de cette page load
+                if (tabId === 'ask-emma' && !tabsVisitedThisSession['emma']) {
+                    setShowEmmaIntro(true);
+                    setTimeout(() => setShowEmmaIntro(false), 3000);
+                    setTabsVisitedThisSession(prev => ({ ...prev, 'emma': true }));
+                }
+
+                // Afficher intro Dan's Watchlist si c'est la première visite de cette page load
+                if (tabId === 'dans-watchlist' && !tabsVisitedThisSession['dan']) {
+                    setShowDanIntro(true);
+                    setTimeout(() => setShowDanIntro(false), 3000);
+                    setTabsVisitedThisSession(prev => ({ ...prev, 'dan': true }));
+                }
+
+                // Afficher intro JLab si c'est la première visite de cette page load
+                if (tabId === 'intellistocks' && !tabsVisitedThisSession['jlab']) {
+                    setShowJLabIntro(true);
+                    setTimeout(() => setShowJLabIntro(false), 3000);
+                    setTabsVisitedThisSession(prev => ({ ...prev, 'jlab': true }));
+                }
+
+                // Afficher intro Seeking Alpha si c'est la première visite de cette page load
+                if (tabId === 'scrapping-sa' || tabId === 'seeking-alpha') {
+                    if (!tabsVisitedThisSession['seekingalpha']) {
+                        setShowSeekingAlphaIntro(true);
+                        setTimeout(() => setShowSeekingAlphaIntro(false), 3000);
+                        setTabsVisitedThisSession(prev => ({ ...prev, 'seekingalpha': true }));
+                    }
+                    // Charger les données Seeking Alpha
+                    fetchSeekingAlphaData();
+                    fetchSeekingAlphaStockData();
+                }
             }
         };
 
@@ -1352,7 +1385,7 @@ const BetaCombinedDashboard = () => {
         return () => {
             window.removeEventListener('tab-change', handleTabChangeEvent);
         };
-    }, []); // Se déclenche une seule fois au montage
+    }, [tabsVisitedThisSession]); // Dépendances pour les intros
 
     // 8. Rafraîchir les données tickers lors de la navigation si elles sont anciennes
     // Note: Les news ne sont PAS rafraîchies automatiquement (utilisent le cache configuré)
