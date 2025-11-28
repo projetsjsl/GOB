@@ -758,7 +758,8 @@ const BetaCombinedDashboard = () => {
         };
 
         // Fonction pour gérer le changement d'onglet avec animations d'intro
-        const handleTabChange = (tabId) => {
+        const handleTabChange = useCallback((tabId) => {
+            console.log(`🔄 Changement d'onglet: ${tabId}`);
             setActiveTab(tabId);
 
             // Afficher intro Emma IA si c'est la première visite de cette page load
@@ -2129,7 +2130,7 @@ const BetaCombinedDashboard = () => {
                     lastUpdate,
                     fetchNews
                 })}
-                {activeTab === 'intellistocks' && window.JLabUnifiedTab && React.createElement(window.JLabUnifiedTab, { 
+                {activeTab === 'intellistocks' && modulesLoaded && window.JLabUnifiedTab && React.createElement(window.JLabUnifiedTab, { 
                     isDarkMode,
                     tickers,
                     stockData,
@@ -2141,7 +2142,7 @@ const BetaCombinedDashboard = () => {
                     refreshAllStocks,
                     fetchLatestNewsForTickers
                 })}
-                {activeTab === 'ask-emma' && window.AskEmmaTab && React.createElement(window.AskEmmaTab, { 
+                {activeTab === 'ask-emma' && modulesLoaded && window.AskEmmaTab && React.createElement(window.AskEmmaTab, { 
                     isDarkMode,
                     prefillMessage: emmaPrefillMessage,
                     setPrefillMessage: setEmmaPrefillMessage,
@@ -2156,8 +2157,8 @@ const BetaCombinedDashboard = () => {
                     showLengthEditor,
                     setShowLengthEditor
                 })}
-                {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode, isProfessionalMode })}
-                {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
+                {activeTab === 'plus' && modulesLoaded && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode, isProfessionalMode })}
+                {activeTab === 'admin-jsla' && modulesLoaded && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
                     isDarkMode,
                     emmaConnected,
                     setEmmaConnected,
@@ -2175,15 +2176,15 @@ const BetaCombinedDashboard = () => {
                     seekingAlphaStockData,
                     refreshAllStocks
                 })}
-                {activeTab === 'scrapping-sa' && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { 
+                {activeTab === 'scrapping-sa' && modulesLoaded && window.ScrappingSATab && React.createElement(window.ScrappingSATab, { 
                     isDarkMode,
                     tickers,
                     stockData,
                     seekingAlphaData,
                     seekingAlphaStockData
                 })}
-                {activeTab === 'email-briefings' && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab, { isDarkMode })}
-                {activeTab === 'seeking-alpha' && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab, { 
+                {activeTab === 'email-briefings' && modulesLoaded && window.EmailBriefingsTab && React.createElement(window.EmailBriefingsTab, { isDarkMode })}
+                {activeTab === 'seeking-alpha' && modulesLoaded && window.SeekingAlphaTab && React.createElement(window.SeekingAlphaTab, { 
                     isDarkMode,
                     tickers,
                     stockData,
@@ -2193,7 +2194,7 @@ const BetaCombinedDashboard = () => {
                     fetchNews,
                     loading
                 })}
-                {activeTab === 'investing-calendar' && window.InvestingCalendarTab && React.createElement(window.InvestingCalendarTab, { isDarkMode })}
+                {activeTab === 'investing-calendar' && modulesLoaded && window.InvestingCalendarTab && React.createElement(window.InvestingCalendarTab, { isDarkMode })}
             </main>
 
             {/* Messages */}
