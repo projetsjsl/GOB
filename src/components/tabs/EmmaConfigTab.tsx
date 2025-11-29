@@ -3,8 +3,7 @@ import type { TabProps } from '../../types';
 
 const EmmaConfigTab: React.FC<TabProps> = ({ isDarkMode = true }) => {
   const links = [
-    { href: '/emma-config.html', label: 'Configurer Emma (classique)' },
-    { href: '/emma-config-enhanced.html', label: 'Configurer Emma (enhanced)' }
+    { href: '/emma-config.html', label: 'Configurer Emma (classique)' }
   ];
 
   return (

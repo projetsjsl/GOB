@@ -24801,18 +24801,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     : 'bg-blue-600 hover:bg-blue-700 text-white'
                                     }`}
                             >
-                                Config classique
-                            </a>
-                            <a
-                                href="/emma-config-enhanced.html"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${isDarkMode
-                                    ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
-                                    : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                                    }`}
-                            >
-                                Config enhanced
+                                Ouvrir emma-config.html
                             </a>
                         </div>
 
