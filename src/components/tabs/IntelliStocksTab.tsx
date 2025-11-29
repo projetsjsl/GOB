@@ -13,7 +13,7 @@ export const IntelliStocksTab: React.FC<TabProps> = (props) => {
         setSelectedStock: setSelectedStockProp,
         LucideIcon: LucideIconProp
     } = props;
-                const apiBase = API_BASE_URL || '';
+                const apiBase = API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
                 const [time, setTime] = useState(new Date());
                 const [internalSelectedStock, setInternalSelectedStock] = useState(selectedStockProp || 'AAPL');
                 const [timeframe, setTimeframe] = useState('1D');

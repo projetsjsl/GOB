@@ -10,7 +10,7 @@ export const AdminJSLaiTab: React.FC<TabProps> = (props) => {
     const noop = () => {};
 
     const isDarkMode = props.isDarkMode ?? true;
-    const API_BASE_URL = props.API_BASE_URL ?? '';
+    const API_BASE_URL = props.API_BASE_URL ?? (typeof window !== 'undefined' ? window.location.origin : '');
 
     const emmaConnected = props.emmaConnected ?? false;
     const setEmmaConnected = props.setEmmaConnected || noop;

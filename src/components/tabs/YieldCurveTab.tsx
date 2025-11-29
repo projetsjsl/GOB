@@ -10,7 +10,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
         isDarkMode = true,
         API_BASE_URL = ''
     } = props;
-    const apiBase = API_BASE_URL;
+    const apiBase = API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
 
                 const [yieldData, setYieldData] = useState(null);
                 const [loading, setLoading] = useState(true);
