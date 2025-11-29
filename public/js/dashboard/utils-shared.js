@@ -71,7 +71,7 @@
             .replace(/Ã¤/g, 'ä')
             .replace(/Ã¶/g, 'ö')
             .replace(/Ã¼/g, 'ü')
-            .replace(/â€™/g, \"'\")
+            .replace(/â€™/g, "'")
             .replace(/â€œ/g, '“')
             .replace(/â€�/g, '”')
             .replace(/â€“/g, '–')

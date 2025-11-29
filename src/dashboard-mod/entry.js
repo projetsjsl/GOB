@@ -1,6 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+// Shim process for JSX runtime if not present
+if (typeof globalThis.process === 'undefined') {
+  globalThis.process = { env: {} };
+} else if (!globalThis.process.env) {
+  globalThis.process.env = {};
+}
+
 import { PlusTab } from './PlusTabMod.jsx';
 import { StocksNewsTabMod } from './StocksNewsTabMod.jsx';
 import { EmailBriefingsTab } from './EmailBriefingsTabMod.jsx';

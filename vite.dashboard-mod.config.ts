@@ -23,6 +23,9 @@ export default defineConfig({
           'react-dom': 'ReactDOM'
         }
       }
+    },
+    define: {
+      'process.env.NODE_ENV': JSON.stringify('production')
     }
   }
 });
