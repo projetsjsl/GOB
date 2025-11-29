@@ -4,7 +4,6 @@
 const { useState, useEffect, useRef, useCallback } = React;
 
 const MarketsEconomyTab = () => {
-    const ExpandableComponent = window.ExpandableComponent;
     // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
     const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
     const newsData = window.BetaCombinedDashboard?.newsData ?? [];
@@ -13,7 +12,7 @@ const MarketsEconomyTab = () => {
     const fetchNews = window.BetaCombinedDashboard?.fetchNews;
     // S'assurer que newsData est toujours un tableau, même si undefined ou null
     const safeNewsDataProp = Array.isArray(newsData) ? newsData : [];
-
+    
     const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
     const [selectedSource, setSelectedSource] = useState('all'); // Filtre source
     const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
@@ -52,30 +51,30 @@ const MarketsEconomyTab = () => {
                     {
                         "title": "Indices",
                         "symbols": [
-                            { "s": "FOREXCOM:SPXUSD", "d": "S&P 500" },
-                            { "s": "FOREXCOM:NSXUSD", "d": "US 100" },
-                            { "s": "FOREXCOM:DJI", "d": "Dow 30" },
-                            { "s": "INDEX:NKY", "d": "Nikkei 225" },
-                            { "s": "INDEX:DEU40", "d": "DAX Index" },
-                            { "s": "FOREXCOM:UKXGBP", "d": "UK 100" }
+                            {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
+                            {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
+                            {"s": "FOREXCOM:DJI", "d": "Dow 30"},
+                            {"s": "INDEX:NKY", "d": "Nikkei 225"},
+                            {"s": "INDEX:DEU40", "d": "DAX Index"},
+                            {"s": "FOREXCOM:UKXGBP", "d": "UK 100"}
                         ]
                     },
                     {
                         "title": "Forex",
                         "symbols": [
-                            { "s": "FX:EURUSD", "d": "EUR/USD" },
-                            { "s": "FX:GBPUSD", "d": "GBP/USD" },
-                            { "s": "FX:USDJPY", "d": "USD/JPY" },
-                            { "s": "FX:USDCAD", "d": "USD/CAD" }
+                            {"s": "FX:EURUSD", "d": "EUR/USD"},
+                            {"s": "FX:GBPUSD", "d": "GBP/USD"},
+                            {"s": "FX:USDJPY", "d": "USD/JPY"},
+                            {"s": "FX:USDCAD", "d": "USD/CAD"}
                         ]
                     },
                     {
                         "title": "Crypto",
                         "symbols": [
-                            { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" },
-                            { "s": "BINANCE:ETHUSDT", "d": "Ethereum" },
-                            { "s": "BINANCE:BNBUSDT", "d": "BNB" },
-                            { "s": "BINANCE:SOLUSDT", "d": "Solana" }
+                            {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
+                            {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
+                            {"s": "BINANCE:BNBUSDT", "d": "BNB"},
+                            {"s": "BINANCE:SOLUSDT", "d": "Solana"}
                         ]
                     }
                 ]
@@ -125,7 +124,7 @@ const MarketsEconomyTab = () => {
             });
             screenerRef.current.appendChild(script3);
         }
-
+        
         return () => {
             // Cleanup: supprimer les widgets lors du démontage
             if (marketOverviewRef.current) {
@@ -145,7 +144,7 @@ const MarketsEconomyTab = () => {
         if (!articleSource || !selectedSource) return false;
         const source = articleSource.toLowerCase();
         const selected = selectedSource.toLowerCase();
-
+        
         // Mapping des variations de noms de sources
         const sourceVariations = {
             'bloomberg': ['bloomberg', 'bloomberg.com', 'bloomberg news'],
@@ -156,16 +155,16 @@ const MarketsEconomyTab = () => {
             'la presse': ['la presse', 'lapresse', 'lapresse.ca', 'presse'],
             'les affaires': ['les affaires', 'lesaffaires', 'lesaffaires.com', 'affaires']
         };
-
+        
         // Vérifier correspondance exacte
         if (source.includes(selected) || selected.includes(source)) return true;
-
+        
         // Vérifier les variations
         const variations = sourceVariations[selected];
         if (variations) {
             return variations.some(variation => source.includes(variation));
         }
-
+        
         return false;
     }, []);
 
@@ -283,31 +282,34 @@ const MarketsEconomyTab = () => {
     }, [safeNewsDataProp, localFrenchOnly, selectedSource, selectedMarket, selectedTheme, matchesSource]);
 
     return (
-        <div className="space-y-6" role="main" aria-label="Marchés et Économie">
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex justify-between items-center">
-                <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                    }`} role="heading" aria-level="2">📰 Marchés & Économie</h2>
+                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>📰 Marchés & Économie</h2>
                 <div className="flex gap-2">
                     {/* Toggle Français */}
                     <button
                         onClick={() => setLocalFrenchOnly(!localFrenchOnly)}
-                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${localFrenchOnly
-                            ? 'bg-blue-600 text-white'
-                            : (isDarkMode
-                                ? 'bg-gray-800 hover:bg-gray-700 text-white'
-                                : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
-                            }`}
+                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                            localFrenchOnly
+                                ? 'bg-blue-600 text-white'
+                                : (isDarkMode
+                                    ? 'bg-gray-800 hover:bg-gray-700 text-white'
+                                    : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
+                        }`}
                     >
                         🇫🇷 Français {localFrenchOnly && '✓'}
                     </button>
                     <button
                         onClick={fetchNews}
                         disabled={loading}
-                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${isDarkMode
-                            ? 'bg-gray-800 hover:bg-gray-700 text-white'
-                            : 'bg-gray-700 hover:bg-gray-600 text-white'
-                            }`}
+                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${
+                            isDarkMode
+                                ? 'bg-gray-800 hover:bg-gray-700 text-white'
+                                : 'bg-gray-700 hover:bg-gray-600 text-white'
+                        }`}
                     >
                         {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
                     </button>
@@ -323,71 +325,75 @@ const MarketsEconomyTab = () => {
             {/* ===== WIDGETS TRADING VIEW VISUELS ===== */}
             <div className="grid grid-cols-1 gap-6 mt-6">
                 {/* Market Overview Widget */}
-                <ExpandableComponent title="Vue d'ensemble des Marchés (Temps Réel)" icon="📊" isDarkMode={isDarkMode}>
-                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
+                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                    isDarkMode
                         ? 'bg-gray-800/50 border-blue-500/30'
                         : 'bg-white border-blue-400/40'
+                }`}>
+                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                            <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                📊 Vue d'ensemble des Marchés (Temps Réel)
-                            </h3>
-                            <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                Indices majeurs, Forex, Crypto - Données en direct
-                            </p>
-                        </div>
-                        <div ref={marketOverviewRef} style={{ height: '400px' }}></div>
+                            📊 Vue d'ensemble des Marchés (Temps Réel)
+                        </h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            Indices majeurs, Forex, Crypto - Données en direct
+                        </p>
                     </div>
-                </ExpandableComponent>
+                    <div ref={marketOverviewRef} style={{height: '400px'}}></div>
+                </div>
 
                 {/* Stock Heatmap Widget */}
-                <ExpandableComponent title="Heatmap Boursière" icon="🔥" isDarkMode={isDarkMode}>
-                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
+                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                    isDarkMode
                         ? 'bg-gray-800/50 border-green-500/30'
                         : 'bg-white border-green-400/40'
+                }`}>
+                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                            <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                🔥 Heatmap Boursière
-                            </h3>
-                            <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                Visualisation des performances par secteur
-                            </p>
-                        </div>
-                        <div ref={heatmapRef} style={{ height: '500px' }}></div>
+                            🔥 Heatmap Boursière
+                        </h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            Visualisation des performances par secteur
+                        </p>
                     </div>
-                </ExpandableComponent>
+                    <div ref={heatmapRef} style={{height: '500px'}}></div>
+                </div>
 
                 {/* Screener Widget - Top Gainers/Losers */}
-                <ExpandableComponent title="Screener - Top Gainers & Losers" icon="🚀" isDarkMode={isDarkMode}>
-                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${isDarkMode
+                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                    isDarkMode
                         ? 'bg-gray-800/50 border-purple-500/30'
                         : 'bg-white border-purple-400/40'
+                }`}>
+                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                            <h3 className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
-                                🚀 Screener - Top Gainers & Losers
-                            </h3>
-                            <p className={`text-sm transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
-                                Actions les plus performantes et en baisse
-                            </p>
-                        </div>
-                        <div ref={screenerRef} style={{ height: '500px' }}></div>
+                            🚀 Screener - Top Gainers & Losers
+                        </h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            Actions les plus performantes et en baisse
+                        </p>
                     </div>
-                </ExpandableComponent>
+                    <div ref={screenerRef} style={{height: '500px'}}></div>
+                </div>
             </div>
 
             {/* Statistiques */}
-            <div className={`p-4 rounded-xl transition-colors duration-300 ${isDarkMode
-                ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
-                : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
-                }`}>
+            <div className={`p-4 rounded-xl transition-colors duration-300 ${
+                isDarkMode
+                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                    : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+            }`}>
                 <div className="flex items-center justify-between">
                     <div>
                         <div className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -402,10 +408,11 @@ const MarketsEconomyTab = () => {
             </div>
 
             {/* Filtres */}
-            <div className={`p-6 rounded-xl transition-colors duration-300 ${isDarkMode
-                ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
-                : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
-                }`}>
+            <div className={`p-6 rounded-xl transition-colors duration-300 ${
+                isDarkMode
+                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                    : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+            }`}>
                 <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     🔍 Filtres
                 </h3>
@@ -418,10 +425,11 @@ const MarketsEconomyTab = () => {
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => setSelectedSource('all')}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedSource === 'all'
-                                ? 'bg-blue-600 text-white'
-                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                }`}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                selectedSource === 'all'
+                                    ? 'bg-blue-600 text-white'
+                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                            }`}
                         >
                             Toutes
                         </button>
@@ -429,10 +437,11 @@ const MarketsEconomyTab = () => {
                             <button
                                 key={source}
                                 onClick={() => setSelectedSource(source)}
-                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedSource === source
-                                    ? 'bg-blue-600 text-white'
-                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                    }`}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                    selectedSource === source
+                                        ? 'bg-blue-600 text-white'
+                                        : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                }`}
                             >
                                 {source}
                             </button>
@@ -448,10 +457,11 @@ const MarketsEconomyTab = () => {
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => setSelectedMarket('all')}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedMarket === 'all'
-                                ? 'bg-green-600 text-white'
-                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                }`}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                selectedMarket === 'all'
+                                    ? 'bg-green-600 text-white'
+                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                            }`}
                         >
                             Tous
                         </button>
@@ -459,10 +469,11 @@ const MarketsEconomyTab = () => {
                             <button
                                 key={market}
                                 onClick={() => setSelectedMarket(market)}
-                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedMarket === market
-                                    ? 'bg-green-600 text-white'
-                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                    }`}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                    selectedMarket === market
+                                        ? 'bg-green-600 text-white'
+                                        : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                }`}
                             >
                                 {market}
                             </button>
@@ -478,10 +489,11 @@ const MarketsEconomyTab = () => {
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => setSelectedTheme('all')}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedTheme === 'all'
-                                ? 'bg-purple-600 text-white'
-                                : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                }`}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                selectedTheme === 'all'
+                                    ? 'bg-purple-600 text-white'
+                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                            }`}
                         >
                             Toutes
                         </button>
@@ -489,10 +501,11 @@ const MarketsEconomyTab = () => {
                             <button
                                 key={theme}
                                 onClick={() => setSelectedTheme(theme)}
-                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedTheme === theme
-                                    ? 'bg-purple-600 text-white'
-                                    : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
-                                    }`}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                                    selectedTheme === theme
+                                        ? 'bg-purple-600 text-white'
+                                        : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                                }`}
                             >
                                 {theme}
                             </button>
@@ -502,10 +515,11 @@ const MarketsEconomyTab = () => {
 
                 {/* Message informatif pour les résultats approximatifs */}
                 {isApproximateMatch && localFilteredNews.length > 0 && (
-                    <div className={`mt-4 p-4 rounded-lg border-2 ${isDarkMode
-                        ? 'bg-yellow-900/20 border-yellow-600/50 text-yellow-200'
-                        : 'bg-yellow-50 border-yellow-300 text-yellow-800'
-                        }`}>
+                    <div className={`mt-4 p-4 rounded-lg border-2 ${
+                        isDarkMode
+                            ? 'bg-yellow-900/20 border-yellow-600/50 text-yellow-200'
+                            : 'bg-yellow-50 border-yellow-300 text-yellow-800'
+                    }`}>
                         <div className="flex items-start gap-3">
                             <span className="text-xl">💡</span>
                             <div>
@@ -536,7 +550,7 @@ const MarketsEconomyTab = () => {
                 ) : (
                     localFilteredNews.map((article, index) => {
                         // Vérifier que les fonctions utilitaires sont disponibles
-                        const newsIconData = (typeof getNewsIcon === 'function')
+                        const newsIconData = (typeof getNewsIcon === 'function') 
                             ? getNewsIcon(article.title, article.description, article.sentiment)
                             : { icon: 'Newspaper', color: 'text-gray-500' };
                         const credibility = (typeof getSourceCredibility === 'function')
@@ -546,32 +560,36 @@ const MarketsEconomyTab = () => {
                         return (
                             <div
                                 key={index}
-                                className={`p-6 rounded-xl transition-all duration-300 hover:scale-[1.01] ${isDarkMode
-                                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 hover:border-gray-600'
-                                    : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200 hover:border-gray-300'
-                                    }`}
+                                className={`p-6 rounded-xl transition-all duration-300 hover:scale-[1.01] ${
+                                    isDarkMode
+                                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 hover:border-gray-600'
+                                        : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200 hover:border-gray-300'
+                                }`}
                             >
                                 <div className="flex items-start gap-4">
                                     {/* Icône */}
-                                    <div className={`p-3 rounded-full transition-colors duration-300 ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/60'
-                                        }`}>
+                                    <div className={`p-3 rounded-full transition-colors duration-300 ${
+                                        isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/60'
+                                    }`}>
                                         <span className={`text-2xl ${newsIconData.color}`}>{newsIconData.icon}</span>
                                     </div>
 
                                     {/* Contenu */}
                                     <div className="flex-1">
                                         {/* Titre */}
-                                        <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>
+                                        <h3 className={`font-bold text-lg mb-2 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>
                                             {article.url ? (
                                                 <a
                                                     href={article.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className={`hover:underline transition-colors duration-300 ${isDarkMode
-                                                        ? 'text-blue-300 hover:text-blue-200'
-                                                        : 'text-blue-600 hover:text-blue-700'
-                                                        }`}
+                                                    className={`hover:underline transition-colors duration-300 ${
+                                                        isDarkMode
+                                                            ? 'text-blue-300 hover:text-blue-200'
+                                                            : 'text-blue-600 hover:text-blue-700'
+                                                    }`}
                                                 >
                                                     {(typeof cleanText === 'function') ? cleanText(article.title) : (article.title || '')}
                                                 </a>
@@ -581,22 +599,24 @@ const MarketsEconomyTab = () => {
                                         </h3>
 
                                         {/* Description */}
-                                        <p className={`text-base mb-4 leading-relaxed transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>
+                                        <p className={`text-base mb-4 leading-relaxed transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>
                                             {(typeof cleanText === 'function') ? cleanText(article.description) : (article.description || '')}
                                         </p>
 
                                         {/* Métadonnées */}
                                         <div className="flex items-center gap-4 flex-wrap">
                                             {/* Source avec badge de crédibilité */}
-                                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors duration-300 ${credibility >= 100
-                                                ? 'bg-purple-500/20 text-purple-500 border border-purple-500/30'
-                                                : credibility >= 85
+                                            <div className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors duration-300 ${
+                                                credibility >= 100
+                                                    ? 'bg-purple-500/20 text-purple-500 border border-purple-500/30'
+                                                    : credibility >= 85
                                                     ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
                                                     : credibility >= 75
-                                                        ? 'bg-green-500/20 text-green-500 border border-green-500/30'
-                                                        : (isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700')
-                                                }`}>
+                                                    ? 'bg-green-500/20 text-green-500 border border-green-500/30'
+                                                    : (isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700')
+                                            }`}>
                                                 {credibility >= 100 && <span className="text-xs">⭐</span>}
                                                 <span className="text-xs font-semibold">{article.source?.name || 'Source inconnue'}</span>
                                             </div>
@@ -607,12 +627,12 @@ const MarketsEconomyTab = () => {
                                             </span>
 
                                             {/* Badge français */}
-                                            {((typeof isFrenchArticle === 'function' && isFrenchArticle(article)) ||
-                                                (typeof isFrenchArticle !== 'function' && ((article.title || '') + ' ' + (article.description || '')).toLowerCase().includes('france'))) && (
-                                                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">
-                                                        🇫🇷 FR
-                                                    </span>
-                                                )}
+                                            {((typeof isFrenchArticle === 'function' && isFrenchArticle(article)) || 
+                                              (typeof isFrenchArticle !== 'function' && ((article.title || '') + ' ' + (article.description || '')).toLowerCase().includes('france'))) && (
+                                                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">
+                                                    🇫🇷 FR
+                                                </span>
+                                            )}
 
                                             {/* Bouton Résumé avec Emma */}
                                             {article.url && (typeof summarizeWithEmma === 'function' || typeof window.summarizeWithEmma === 'function') && (
@@ -621,10 +641,11 @@ const MarketsEconomyTab = () => {
                                                         const fn = typeof summarizeWithEmma === 'function' ? summarizeWithEmma : window.summarizeWithEmma;
                                                         if (fn) fn(article.url, article.title);
                                                     }}
-                                                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${isDarkMode
-                                                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white'
-                                                        : 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white'
-                                                        }`}
+                                                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${
+                                                        isDarkMode
+                                                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white'
+                                                            : 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white'
+                                                    }`}
                                                 >
                                                     <span className="flex items-center gap-1">
                                                         <span className="text-sm">🧠</span>
