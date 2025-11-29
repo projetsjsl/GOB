@@ -8,7 +8,7 @@ if (typeof globalThis.process === 'undefined') {
   globalThis.process.env = {};
 }
 
-import { PlusTab } from './PlusTabMod.jsx';
+import { PlusTab } from './tabs/PlusTab.jsx';
 import { StocksNewsTabMod } from './StocksNewsTabMod.jsx';
 import { EmailBriefingsTab } from './EmailBriefingsTabMod.jsx';
 import { AskEmmaTab } from './AskEmmaTabMod.jsx';
