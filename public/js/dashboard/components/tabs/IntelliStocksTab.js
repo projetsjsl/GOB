@@ -57,10 +57,7 @@ const IntelliStocksTab = () => {
                         MSFT: 384.89, NVDA: 485.32, AMZN: 178.91
                     }[symbol] || 180;
 
-                    const companyNames = {
-                        AAPL: 'Apple Inc.', TSLA: 'Tesla Inc.', GOOGL: 'Alphabet Inc.',
-                        MSFT: 'Microsoft Corp.', NVDA: 'NVIDIA Corp.', AMZN: 'Amazon.com Inc.'
-                    };
+                    const companyNames = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.companyNames) || {};
 
                     return {
                         quote: {
