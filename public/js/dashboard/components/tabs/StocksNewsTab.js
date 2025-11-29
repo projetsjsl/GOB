@@ -20,6 +20,12 @@ const StocksNewsTab = () => {
         const fetchLatestNewsForTickers = window.BetaCombinedDashboard?.fetchLatestNewsForTickers;
         const getCompanyLogo = window.BetaCombinedDashboardData?.getCompanyLogo || window.BetaCombinedDashboard?.getCompanyLogo;
 
+        // Safe async wrappers to avoid runtime errors if globals are missing
+        const safeLoadTickers = typeof loadTickersFromSupabase === 'function' ? loadTickersFromSupabase : async () => {};
+        const safeFetchNews = typeof fetchNews === 'function' ? fetchNews : async () => {};
+        const safeRefreshAllStocks = typeof refreshAllStocks === 'function' ? refreshAllStocks : async () => {};
+        const safeFetchLatestNewsForTickers = typeof fetchLatestNewsForTickers === 'function' ? fetchLatestNewsForTickers : async () => {};
+
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
 
@@ -105,8 +111,8 @@ const StocksNewsTab = () => {
                     </p>
                     <button
                         onClick={async () => {
-                            await loadTickersFromSupabase();
-                            await fetchNews();
+                            await safeLoadTickers();
+                            await safeFetchNews();
                         }}
                         className={`mt-4 px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
                             isDarkMode
@@ -161,9 +167,9 @@ const StocksNewsTab = () => {
                     </div>
                     <button
                         onClick={async () => {
-                            await refreshAllStocks();
-                            await fetchNews();
-                            await fetchLatestNewsForTickers();
+                            await safeRefreshAllStocks();
+                            await safeFetchNews();
+                            await safeFetchLatestNewsForTickers();
                         }}
                         disabled={loading}
                         className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${
