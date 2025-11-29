@@ -4,6 +4,7 @@
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 const YieldCurveTab = ({ isDarkMode }) => {
+    const ExpandableComponent = window.ExpandableComponent;
     const [yieldData, setYieldData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -42,7 +43,7 @@ const YieldCurveTab = ({ isDarkMode }) => {
             )}
         </div>
     ), [darkMode, formatRate]);
-    
+
     console.log('📊 YieldCurveTab monté, isDarkMode:', darkMode);
 
     // Optimisation: useCallback pour la fonction async
@@ -173,7 +174,7 @@ const YieldCurveTab = ({ isDarkMode }) => {
                         padding: 12,
                         displayColors: true,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
                             }
                         }
@@ -207,7 +208,7 @@ const YieldCurveTab = ({ isDarkMode }) => {
                         },
                         ticks: {
                             color: isDarkMode ? '#9ca3af' : '#6b7280',
-                            callback: function(value) {
+                            callback: function (value) {
                                 return value.toFixed(2) + '%';
                             }
                         }
@@ -247,7 +248,7 @@ const YieldCurveTab = ({ isDarkMode }) => {
     // Optimisation: useMemo pour les maturités triées (calcul coûteux)
     const sortedMaturities = useMemo(() => {
         if (!yieldData) return [];
-        
+
         // Créer une liste unique de toutes les maturités
         const maturities = new Set();
         if (yieldData.data.us) {
@@ -266,19 +267,16 @@ const YieldCurveTab = ({ isDarkMode }) => {
     return (
         <div className="space-y-6">
             {/* En-tête avec contrôles */}
-            <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                darkMode ? 'bg-gray-800' : 'bg-white'
-            }`}>
+            <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'
+                }`}>
                 <div className="flex justify-between items-center mb-4">
                     <div>
-                        <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
-                            darkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
+                        <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
                             📈 Courbe des Taux (Yield Curve)
                         </h2>
-                        <p className={`text-sm transition-colors duration-300 ${
-                            darkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
+                        <p className={`text-sm transition-colors duration-300 ${darkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
                             Visualisation des taux obligataires US Treasury et Canada par maturité
                         </p>
                     </div>
@@ -286,11 +284,10 @@ const YieldCurveTab = ({ isDarkMode }) => {
                         <select
                             value={selectedCountry}
                             onChange={(e) => setSelectedCountry(e.target.value)}
-                            className={`px-4 py-2 rounded-lg border transition-colors duration-300 ${
-                                darkMode
+                            className={`px-4 py-2 rounded-lg border transition-colors duration-300 ${darkMode
                                     ? 'bg-gray-700 border-gray-600 text-white'
                                     : 'bg-white border-gray-300 text-gray-900'
-                            }`}
+                                }`}
                         >
                             <option value="both">US + Canada</option>
                             <option value="us">US uniquement</option>
@@ -308,29 +305,25 @@ const YieldCurveTab = ({ isDarkMode }) => {
 
                 {/* Indicateur de récession (spread 10Y-2Y) */}
                 {yieldData?.data?.us?.spread_10y_2y !== undefined && (
-                    <div className={`p-4 rounded-lg border-l-4 ${
-                        yieldData.data.us.inverted
+                    <div className={`p-4 rounded-lg border-l-4 ${yieldData.data.us.inverted
                             ? 'bg-red-50 border-red-500 dark:bg-red-900/20'
                             : 'bg-green-50 border-green-500 dark:bg-green-900/20'
-                    }`}>
+                        }`}>
                         <div className="flex items-center justify-between">
                             <div>
-                                <h3 className={`font-bold ${
-                                    yieldData.data.us.inverted
+                                <h3 className={`font-bold ${yieldData.data.us.inverted
                                         ? 'text-red-800 dark:text-red-300'
                                         : 'text-green-800 dark:text-green-300'
-                                }`}>
+                                    }`}>
                                     {yieldData.data.us.inverted ? '⚠️ Courbe Inversée' : '✅ Courbe Normale'}
                                 </h3>
-                                <p className={`text-sm ${
-                                    darkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
+                                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
                                     Spread 10Y-2Y: <strong>{yieldData.data.us.spread_10y_2y.toFixed(2)}%</strong>
                                 </p>
                             </div>
-                            <div className={`text-xs ${
-                                darkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
+                            <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
                                 {yieldData.data.us.inverted
                                     ? 'Indicateur historique de récession potentielle'
                                     : 'Conditions économiques normales'}
@@ -342,9 +335,8 @@ const YieldCurveTab = ({ isDarkMode }) => {
 
             {/* Graphique de la courbe */}
             {loading && (
-                <div className={`p-12 rounded-lg text-center transition-colors duration-300 ${
-                    darkMode ? 'bg-gray-800' : 'bg-white'
-                }`}>
+                <div className={`p-12 rounded-lg text-center transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'
+                    }`}>
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
                         Chargement des données...
@@ -353,12 +345,10 @@ const YieldCurveTab = ({ isDarkMode }) => {
             )}
 
             {error && (
-                <div className={`p-6 rounded-lg border-l-4 border-red-500 ${
-                    darkMode ? 'bg-red-900/20' : 'bg-red-50'
-                }`}>
-                    <h3 className={`font-bold mb-2 ${
-                        darkMode ? 'text-red-300' : 'text-red-800'
+                <div className={`p-6 rounded-lg border-l-4 border-red-500 ${darkMode ? 'bg-red-900/20' : 'bg-red-50'
                     }`}>
+                    <h3 className={`font-bold mb-2 ${darkMode ? 'text-red-300' : 'text-red-800'
+                        }`}>
                         ❌ Erreur
                     </h3>
                     <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
@@ -371,20 +361,19 @@ const YieldCurveTab = ({ isDarkMode }) => {
                 <>
                     {/* Graphique */}
                     {(yieldData.data?.us?.rates?.length > 0 || yieldData.data?.canada?.rates?.length > 0) ? (
-                        <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                            darkMode ? 'bg-gray-800' : 'bg-white'
-                        }`}>
-                            <div style={{ height: '400px', position: 'relative' }}>
-                                <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                        <ExpandableComponent title="Courbe des Taux" icon="📈" isDarkMode={darkMode}>
+                            <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'
+                                }`}>
+                                <div style={{ height: '400px', position: 'relative' }}>
+                                    <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
+                                </div>
                             </div>
-                        </div>
+                        </ExpandableComponent>
                     ) : (
-                        <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${
-                            darkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'
-                        }`}>
-                            <h3 className={`font-bold mb-2 ${
-                                darkMode ? 'text-yellow-300' : 'text-yellow-800'
+                        <div className={`p-6 rounded-lg border-l-4 border-yellow-500 ${darkMode ? 'bg-yellow-900/20' : 'bg-yellow-50'
                             }`}>
+                            <h3 className={`font-bold mb-2 ${darkMode ? 'text-yellow-300' : 'text-yellow-800'
+                                }`}>
                                 ⚠️ Aucune donnée disponible
                             </h3>
                             <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
@@ -399,44 +388,37 @@ const YieldCurveTab = ({ isDarkMode }) => {
                     </div>
 
                     {/* Tableau des maturités */}
-                    <div className={`p-6 rounded-lg transition-colors duration-300 ${
-                        darkMode ? 'bg-gray-800' : 'bg-white'
-                    }`}>
-                        <h3 className={`text-xl font-bold mb-4 ${
-                            darkMode ? 'text-white' : 'text-gray-900'
+                    <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
+                        <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
                             📊 Tableau des Maturités
                         </h3>
 
                         <div className="overflow-x-auto">
                             <table className="w-full text-xs">
                                 <thead>
-                                    <tr className={`border-b-2 ${
-                                        darkMode ? 'border-gray-700' : 'border-gray-200'
-                                    }`}>
-                                        <th className={`px-3 py-2 text-left font-bold text-xs ${
-                                            darkMode ? 'text-gray-300' : 'text-gray-700'
+                                    <tr className={`border-b-2 ${darkMode ? 'border-gray-700' : 'border-gray-200'
                                         }`}>
+                                        <th className={`px-3 py-2 text-left font-bold text-xs ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                                            }`}>
                                             Maturité
                                         </th>
                                         {yieldData.data.us && (
-                                            <th className={`px-3 py-2 text-right font-bold text-xs ${
-                                                darkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>
+                                            <th className={`px-3 py-2 text-right font-bold text-xs ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>
                                                 🇺🇸 US Treasury (%)
                                             </th>
                                         )}
                                         {yieldData.data.canada && (
-                                            <th className={`px-3 py-2 text-right font-bold text-xs ${
-                                                darkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>
+                                            <th className={`px-3 py-2 text-right font-bold text-xs ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>
                                                 🇨🇦 Canada Bonds (%)
                                             </th>
                                         )}
                                         {yieldData.data.us && yieldData.data.canada && (
-                                            <th className={`px-3 py-2 text-right font-bold text-xs ${
-                                                darkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>
+                                            <th className={`px-3 py-2 text-right font-bold text-xs ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                                                }`}>
                                                 Écart (bps)
                                             </th>
                                         )}
@@ -444,55 +426,49 @@ const YieldCurveTab = ({ isDarkMode }) => {
                                 </thead>
                                 <tbody>
                                     {sortedMaturities.map((maturity, idx) => {
-                                                const usRate = yieldData.data.us?.rates.find(r => r.maturity === maturity);
-                                                const caRate = yieldData.data.canada?.rates.find(r => r.maturity === maturity);
-                                                const spread = usRate && caRate ? ((usRate.rate - caRate.rate) * 100).toFixed(0) : null;
+                                        const usRate = yieldData.data.us?.rates.find(r => r.maturity === maturity);
+                                        const caRate = yieldData.data.canada?.rates.find(r => r.maturity === maturity);
+                                        const spread = usRate && caRate ? ((usRate.rate - caRate.rate) * 100).toFixed(0) : null;
 
-                                                return (
-                                                    <tr key={maturity} className={`border-b ${
-                                                        darkMode ? 'border-gray-700' : 'border-gray-200'
-                                                    } ${idx % 2 === 0 ? (darkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
-                                                        <td className={`px-3 py-2 font-semibold text-xs ${
-                                                            darkMode ? 'text-white' : 'text-gray-900'
+                                        return (
+                                            <tr key={maturity} className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'
+                                                } ${idx % 2 === 0 ? (darkMode ? 'bg-gray-700/30' : 'bg-gray-50') : ''}`}>
+                                                <td className={`px-3 py-2 font-semibold text-xs ${darkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>
+                                                    {maturity}
+                                                </td>
+                                                {yieldData.data.us && (
+                                                    <td className={`px-3 py-2 text-right text-xs ${darkMode ? 'text-blue-400' : 'text-blue-600'
                                                         }`}>
-                                                            {maturity}
-                                                        </td>
-                                                        {yieldData.data.us && (
-                                                            <td className={`px-3 py-2 text-right text-xs ${
-                                                                darkMode ? 'text-blue-400' : 'text-blue-600'
-                                                            }`}>
-                                                                {usRate ? usRate.rate.toFixed(2) : '-'}
-                                                            </td>
-                                                        )}
-                                                        {yieldData.data.canada && (
-                                                            <td className={`px-3 py-2 text-right text-xs ${
-                                                                darkMode ? 'text-red-400' : 'text-red-600'
-                                                            }`}>
-                                                                {caRate ? caRate.rate.toFixed(2) : '-'}
-                                                            </td>
-                                                        )}
-                                                        {yieldData.data.us && yieldData.data.canada && (
-                                                            <td className={`px-3 py-2 text-right font-mono text-xs ${
-                                                                spread > 0
-                                                                    ? (darkMode ? 'text-green-400' : 'text-green-600')
-                                                                    : spread < 0
-                                                                    ? (darkMode ? 'text-red-400' : 'text-red-600')
-                                                                    : (darkMode ? 'text-gray-400' : 'text-gray-600')
-                                                            }`}>
-                                                                {spread !== null ? (spread > 0 ? '+' : '') + spread : '-'}
-                                                            </td>
-                                                        )}
-                                                    </tr>
-                                                );
-                                            })}
+                                                        {usRate ? usRate.rate.toFixed(2) : '-'}
+                                                    </td>
+                                                )}
+                                                {yieldData.data.canada && (
+                                                    <td className={`px-3 py-2 text-right text-xs ${darkMode ? 'text-red-400' : 'text-red-600'
+                                                        }`}>
+                                                        {caRate ? caRate.rate.toFixed(2) : '-'}
+                                                    </td>
+                                                )}
+                                                {yieldData.data.us && yieldData.data.canada && (
+                                                    <td className={`px-3 py-2 text-right font-mono text-xs ${spread > 0
+                                                            ? (darkMode ? 'text-green-400' : 'text-green-600')
+                                                            : spread < 0
+                                                                ? (darkMode ? 'text-red-400' : 'text-red-600')
+                                                                : (darkMode ? 'text-gray-400' : 'text-gray-600')
+                                                        }`}>
+                                                        {spread !== null ? (spread > 0 ? '+' : '') + spread : '-'}
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
 
                         {/* Métadonnées */}
-                        <div className={`mt-4 pt-4 border-t ${
-                            darkMode ? 'border-gray-700' : 'border-gray-200'
-                        }`}>
+                        <div className={`mt-4 pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'
+                            }`}>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                                 {yieldData.data.us && (
                                     <>
@@ -539,17 +515,14 @@ const YieldCurveTab = ({ isDarkMode }) => {
                     </div>
 
                     {/* Note explicative */}
-                    <div className={`p-4 rounded-lg ${
-                        darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
-                    }`}>
-                        <h4 className={`font-bold mb-2 ${
-                            darkMode ? 'text-blue-300' : 'text-blue-800'
+                    <div className={`p-4 rounded-lg ${darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
                         }`}>
+                        <h4 className={`font-bold mb-2 ${darkMode ? 'text-blue-300' : 'text-blue-800'
+                            }`}>
                             💡 À propos de la courbe des taux
                         </h4>
-                        <ul className={`text-sm space-y-1 ${
-                            darkMode ? 'text-gray-300' : 'text-gray-700'
-                        }`}>
+                        <ul className={`text-sm space-y-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                            }`}>
                             <li>• <strong>Courbe normale:</strong> Les taux longs sont supérieurs aux taux courts (économie saine)</li>
                             <li>• <strong>Courbe inversée:</strong> Les taux courts dépassent les taux longs (possibilité de récession)</li>
                             <li>• <strong>Spread 10Y-2Y:</strong> Indicateur clé surveillé par les économistes et investisseurs</li>
