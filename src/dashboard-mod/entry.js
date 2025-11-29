@@ -20,7 +20,7 @@ import { YieldCurveTab } from './tabs/YieldCurveTab.jsx';
 import { ScrappingSATab } from './tabs/ScrappingSATab.jsx';
 import { SeekingAlphaTab } from './tabs/SeekingAlphaTab.jsx';
 import { DansWatchlistTab } from './tabs/DansWatchlistTab.jsx';
-import { AdminJSLaiTab } from './tabs/AdminJSLaiTab.jsx';
+import { AdminJSLaiTab } from '../components/tabs/AdminJSLaiTab.tsx';
 import { EconomicCalendarTab } from './tabs/EconomicCalendarTab.jsx';
 
 // Expose pilot modules on window (no runtime swap yet)
