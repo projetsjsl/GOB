@@ -24791,6 +24791,56 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
                 );
 
+                // Onglet Test Only - plan fonctionnel
+                const TestOnlyTab = () => (
+                    <div className="space-y-6">
+                        <div>
+                            <p className={`text-xs uppercase tracking-wide ${isDarkMode ? 'text-green-300' : 'text-green-700'}`}>Test Only</p>
+                            <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                Plan fonctionnel (fiche titre, screener, portefeuille)
+                            </h2>
+                            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+                                Maquette des sections à livrer inspirées des meilleurs sites finance.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div className={`rounded-xl border p-4 ${isDarkMode ? 'bg-blue-900/40 border-blue-700' : 'bg-blue-50 border-blue-200'}`}>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Fiche titre type Yahoo/MarketWatch</h3>
+                                <ul className={isDarkMode ? 'text-gray-200 text-sm space-y-1' : 'text-gray-800 text-sm space-y-1'}>
+                                    <li>• Résumé compact (prix, % jour, 52w, volume, sector, cap, dividend)</li>
+                                    <li>• Vue valeur (FCF yield, EV/EBIT, ROE/ROIC, marges), Graphique interactif, News ciblées</li>
+                                    <li>• Thèse en 30s + bull/bear case</li>
+                                </ul>
+                            </div>
+                            <div className={`rounded-xl border p-4 ${isDarkMode ? 'bg-emerald-900/40 border-emerald-700' : 'bg-emerald-50 border-emerald-200'}`}>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Screener valeur modernisé</h3>
+                                <ul className={isDarkMode ? 'text-gray-200 text-sm space-y-1' : 'text-gray-800 text-sm space-y-1'}>
+                                    <li>• Filtres pré-emballés (valeur, dividende, qualité, croissance, momentum)</li>
+                                    <li>• Colonnes clés: P/E fwd, EV/EBIT, FCF yield, CROIC, marges, score qualité, décote</li>
+                                    <li>• Heatmap sectorielle simple</li>
+                                </ul>
+                            </div>
+                            <div className={`rounded-xl border p-4 ${isDarkMode ? 'bg-purple-900/40 border-purple-700' : 'bg-purple-50 border-purple-200'}`}>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Dashboard portefeuille (Passiv/Empower)</h3>
+                                <ul className={isDarkMode ? 'text-gray-200 text-sm space-y-1' : 'text-gray-800 text-sm space-y-1'}>
+                                    <li>• Perf globale + risque simple (vol, max drawdown)</li>
+                                    <li>• Allocations par classe/secteur/pays, bouton diagnostic value</li>
+                                    <li>• Contribution perf/risque par titre, alertes concentration/value trap</li>
+                                </ul>
+                            </div>
+                            <div className={`rounded-xl border p-4 ${isDarkMode ? 'bg-amber-900/30 border-amber-700' : 'bg-amber-50 border-amber-200'}`}>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Architecture & UX</h3>
+                                <ul className={isDarkMode ? 'text-gray-200 text-sm space-y-1' : 'text-gray-800 text-sm space-y-1'}>
+                                    <li>• Données: Supabase scrapes + APIs marché, cache Supabase daily</li>
+                                    <li>• Pipelines: Admin JSLai (scrape) → analyse batch (Perplexity) → seeking_alpha_analysis</li>
+                                    <li>• UX: thème sombre propre, sections à ancres, micro-copy “?” pour ratios, zéro pub</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                );
+
                 // Configuration des onglets (après déclaration de TOUS les composants)
                 // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
                 const tabs = [
