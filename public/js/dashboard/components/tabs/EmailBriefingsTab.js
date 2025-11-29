@@ -4,6 +4,17 @@
 
 
 const EmailBriefingsTab = () => {
+                const dashboard = window.BetaCombinedDashboard || {};
+                const isDarkMode = dashboard.isDarkMode ?? true;
+                const tickers = dashboard.tickers ?? [];
+                const stockData = dashboard.stockData ?? {};
+                const newsData = dashboard.newsData ?? [];
+                const loadTickersFromSupabase = dashboard.loadTickersFromSupabase;
+                const fetchNews = dashboard.fetchNews;
+                const refreshAllStocks = dashboard.refreshAllStocks;
+                const fetchLatestNewsForTickers = dashboard.fetchLatestNewsForTickers;
+                const getCompanyLogo = window.BetaCombinedDashboardData?.getCompanyLogo || dashboard.getCompanyLogo;
+
                 const [loading, setLoading] = useState(false);
                 const [currentBriefing, setCurrentBriefing] = useState(null);
                 const [previewHtml, setPreviewHtml] = useState('');

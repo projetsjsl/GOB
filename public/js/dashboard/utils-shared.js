@@ -68,10 +68,10 @@
             .replace(/Ã¶/g, 'ö')
             .replace(/Ã¼/g, 'ü')
             .replace(/â€™/g, \"'\")
-            .replace(/â€œ/g, '\"')
-            .replace(/â€/g, '\"')
-            .replace(/â€\"/g, '–')
-            .replace(/â€\"/g, '—');
+            .replace(/â€œ/g, '“')
+            .replace(/â€�/g, '”')
+            .replace(/â€“/g, '–')
+            .replace(/â€”/g, '—');
     };
 
     const getNewsIcon = (title, description, sentiment) => {
