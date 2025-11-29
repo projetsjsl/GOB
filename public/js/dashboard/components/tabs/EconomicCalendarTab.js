@@ -1,7 +1,7 @@
 // Auto-converted from monolithic dashboard file
 // Component: EconomicCalendarTab
 
-
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 const EconomicCalendarTab = () => {
     // Initialize with fallback data so component is never blank
@@ -58,32 +58,33 @@ const EconomicCalendarTab = () => {
     const [teamTickers, setTeamTickers] = useState([]);
     const [watchlistTickers, setWatchlistTickers] = useState([]);
 
-    // Helper function for fallback data
-    const getFallbackData = () => {
-        return [{
-            date: 'Mon Oct 16',
-            events: [
-                {
-                    time: '12:55 PM',
-                    currency: 'USD',
-                    impact: 2,
-                    event: 'Fed Paulson Speech',
-                    actual: 'N/A',
-                    forecast: 'N/A',
-                    previous: 'N/A'
-                },
-                {
-                    time: '08:30 AM',
-                    currency: 'USD',
-                    impact: 3,
-                    event: 'NY Empire State Manufacturing Index',
-                    actual: '10.70',
-                    forecast: '-1.00',
-                    previous: '-8.70'
-                }
-            ]
-        }];
-    };
+    // Optimisation: useMemo pour les données de fallback (toujours la même valeur)
+    const fallbackData = useMemo(() => [{
+        date: 'Mon Oct 16',
+        events: [
+            {
+                time: '12:55 PM',
+                currency: 'USD',
+                impact: 2,
+                event: 'Fed Paulson Speech',
+                actual: 'N/A',
+                forecast: 'N/A',
+                previous: 'N/A'
+            },
+            {
+                time: '08:30 AM',
+                currency: 'USD',
+                impact: 3,
+                event: 'NY Empire State Manufacturing Index',
+                actual: '10.70',
+                forecast: '-1.00',
+                previous: '-8.70'
+            }
+        ]
+    }], []);
+
+    // Helper function for fallback data (wrapper pour compatibilité)
+    const getFallbackData = () => fallbackData;
 
     // Debug: Log du chargement du composant
     console.log('📅 EconomicCalendarTab chargé');
@@ -92,10 +93,14 @@ const EconomicCalendarTab = () => {
 
     // Load team and watchlist tickers once on mount
     React.useEffect(() => {
+        const abortController = new AbortController();
+        
         const loadTickers = async () => {
             try {
                 // Try to fetch from API first
-                const response = await fetch('/api/tickers-config');
+                const response = await fetch('/api/tickers-config', {
+                    signal: abortController.signal
+                });
                 const data = await response.json();
 
                 if (data.success) {
@@ -103,12 +108,15 @@ const EconomicCalendarTab = () => {
                     console.log(`✅ Team tickers loaded: ${data.team_tickers?.length || 0}`);
                 }
             } catch (error) {
+                if (error.name === 'AbortError') return; // Ignorer les erreurs d'annulation
                 console.error('❌ Error loading team tickers:', error);
             }
 
             try {
                 // Load watchlist from Supabase
-                const response = await fetch('/api/supabase-watchlist');
+                const response = await fetch('/api/supabase-watchlist', {
+                    signal: abortController.signal
+                });
                 const data = await response.json();
 
                 if (data.tickers && Array.isArray(data.tickers)) {
@@ -116,6 +124,7 @@ const EconomicCalendarTab = () => {
                     console.log(`✅ Watchlist tickers loaded: ${data.tickers.length}`);
                 }
             } catch (error) {
+                if (error.name === 'AbortError') return; // Ignorer les erreurs d'annulation
                 console.error('❌ Error loading watchlist tickers:', error);
                 // Fallback to localStorage
                 const savedWatchlist = localStorage.getItem('dans-watchlist');
@@ -128,18 +137,101 @@ const EconomicCalendarTab = () => {
         };
 
         loadTickers();
+        
+        return () => {
+            abortController.abort();
+        };
     }, []);
 
-    // Charger les données au changement d'onglet
+    // Reset ticker filters when switching tabs (séparé pour éviter stale closures)
     React.useEffect(() => {
-        fetchCalendarData();
-        // Reset ticker filters when switching tabs
         setFilterTicker('all');
         setFilterTickerGroup('all');
         // Activer le filtre Large Cap par défaut pour earnings uniquement
         setFilterLargeCapOnly(activeSubTab === 'earnings');
     }, [activeSubTab]);
 
+    // Charger les données au changement d'onglet
+    React.useEffect(() => {
+        const abortController = new AbortController();
+        let isMounted = true;
+        
+        const fetchData = async () => {
+            if (!isMounted) return;
+            
+            setLoading(true);
+            setError(null);
+
+            try {
+                if (activeSubTab === 'earnings') {
+                    const response = await fetch('/api/calendar-earnings', {
+                        signal: abortController.signal
+                    });
+                    const result = await response.json();
+
+                    if (!isMounted) return;
+                    
+                    if (result.success && result.data) {
+                        setCalendarData(result.data);
+                        console.log(`✅ ${result.data.length} earnings calendar days loaded from ${result.source}`);
+                    } else {
+                        setError('Aucune donnée d\'earnings disponible');
+                        setCalendarData(getFallbackData());
+                    }
+                } else if (activeSubTab === 'economic') {
+                    const response = await fetch('/api/calendar-economic', {
+                        signal: abortController.signal
+                    });
+                    const result = await response.json();
+
+                    if (!isMounted) return;
+                    
+                    if (result.success && result.data) {
+                        setCalendarData(result.data);
+                        console.log(`✅ ${result.data.length} economic calendar days loaded from ${result.source}`);
+                    } else {
+                        setError('Aucune donnée économique disponible');
+                        setCalendarData(getFallbackData());
+                    }
+                } else if (activeSubTab === 'dividends') {
+                    const response = await fetch('/api/calendar-dividends', {
+                        signal: abortController.signal
+                    });
+                    const result = await response.json();
+
+                    if (!isMounted) return;
+                    
+                    if (result.success && result.data) {
+                        setCalendarData(result.data);
+                        console.log(`✅ ${result.data.length} dividend events loaded from ${result.source}`);
+                    } else {
+                        setError('Aucune donnée de dividendes disponible');
+                        setCalendarData(getFallbackData());
+                    }
+                } else {
+                    setCalendarData(getFallbackData());
+                }
+            } catch (err) {
+                if (err.name === 'AbortError' || !isMounted) return;
+                console.error('❌ Erreur fetchCalendarData:', err);
+                setError(`Impossible de charger les données: ${err.message}`);
+                setCalendarData(getFallbackData());
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+        
+        fetchData();
+        
+        return () => {
+            isMounted = false;
+            abortController.abort();
+        };
+    }, [activeSubTab]);
+
+    // Fonction pour rafraîchir les données (utilisée par handleRefresh)
     const fetchCalendarData = async () => {
         console.log('🔄 fetchCalendarData appelé pour:', activeSubTab);
         setLoading(true);
@@ -147,46 +239,34 @@ const EconomicCalendarTab = () => {
 
         try {
             if (activeSubTab === 'earnings') {
-                // Connect to dedicated Earnings Calendar API with fallback chain
                 const response = await fetch('/api/calendar-earnings');
                 const result = await response.json();
 
                 if (result.success && result.data) {
                     setCalendarData(result.data);
                     console.log(`✅ ${result.data.length} earnings calendar days loaded from ${result.source}`);
-                    if (result.fallback_tried) {
-                        console.log('⚠️ Fallback sources tried:', result.fallback_tried);
-                    }
                 } else {
                     setError('Aucune donnée d\'earnings disponible');
                     setCalendarData(getFallbackData());
                 }
             } else if (activeSubTab === 'economic') {
-                // Connect to dedicated Economic Calendar API with fallback chain
                 const response = await fetch('/api/calendar-economic');
                 const result = await response.json();
 
                 if (result.success && result.data) {
                     setCalendarData(result.data);
                     console.log(`✅ ${result.data.length} economic calendar days loaded from ${result.source}`);
-                    if (result.fallback_tried) {
-                        console.log('⚠️ Fallback sources tried:', result.fallback_tried);
-                    }
                 } else {
                     setError('Aucune donnée économique disponible');
                     setCalendarData(getFallbackData());
                 }
             } else if (activeSubTab === 'dividends') {
-                // Connect to dedicated Dividends Calendar API
                 const response = await fetch('/api/calendar-dividends');
                 const result = await response.json();
 
                 if (result.success && result.data) {
                     setCalendarData(result.data);
                     console.log(`✅ ${result.data.length} dividend events loaded from ${result.source}`);
-                    if (result.fallback_tried) {
-                        console.log('⚠️ Fallback sources tried:', result.fallback_tried);
-                    }
                 } else {
                     setError('Aucune donnée de dividendes disponible');
                     setCalendarData(getFallbackData());
@@ -250,15 +330,15 @@ const EconomicCalendarTab = () => {
         return flags[currency] || '🌍';
     };
 
-    // Helper: Extract ticker symbol from event name (for earnings/dividends)
-    const extractTicker = (eventName) => {
+    // Optimisation: useCallback pour la fonction utilitaire extractTicker
+    const extractTicker = useCallback((eventName) => {
         // Look for ticker pattern: "AAPL Earnings" or "MSFT Dividend"
         const match = eventName.match(/^([A-Z]{1,5})\s/);
         return match ? match[1] : null;
-    };
+    }, []);
 
-    // Helper: Determine event category for sorting
-    const getEventCategory = (event) => {
+    // Optimisation: useCallback pour la fonction getEventCategory
+    const getEventCategory = useCallback((event) => {
         // Extract ticker if available (for earnings/dividends)
         const ticker = extractTicker(event.event);
         
@@ -279,10 +359,10 @@ const EconomicCalendarTab = () => {
         
         // 4. Autres données
         return 4; // Other
-    };
+    }, [teamTickers, extractTicker]);
 
-    // Helper: Sort events within a day
-    const sortEvents = (events) => {
+    // Optimisation: useCallback pour la fonction de tri sortEvents
+    const sortEvents = useCallback((events) => {
         return [...events].sort((a, b) => {
             // First sort by category (team → Canada → US → other)
             const categoryA = getEventCategory(a);
@@ -296,10 +376,11 @@ const EconomicCalendarTab = () => {
             const timeB = b.time || '';
             return timeA.localeCompare(timeB);
         });
-    };
+    }, [getEventCategory]);
 
-    // Filter calendar data based on user selections (Finviz-style)
-    const filteredCalendarData = (Array.isArray(calendarData) ? calendarData : []).map(day => {
+    // Optimisation: useMemo pour filteredCalendarData (calcul coûteux)
+    const filteredCalendarData = useMemo(() => {
+        return (Array.isArray(calendarData) ? calendarData : []).map(day => {
         const filteredEvents = (Array.isArray(day.events) ? day.events : []).filter(event => {
             // Search query filter
             if (searchQuery && !event.event.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -360,22 +441,23 @@ const EconomicCalendarTab = () => {
         
         return { ...day, events: sortedEvents };
     }).filter(day => day.events.length > 0); // Remove days with no events
+    }, [calendarData, searchQuery, filterImpact, filterCurrency, filterTicker, filterTickerGroup, filterLargeCapOnly, activeSubTab, teamTickers, watchlistTickers, largeCapTickers, extractTicker, sortEvents]);
 
-    // Get unique currencies from data for filter dropdown
-    const availableCurrencies = [...new Set(
+    // Optimisation: useMemo pour availableCurrencies (calcul)
+    const availableCurrencies = useMemo(() => [...new Set(
         (Array.isArray(calendarData) ? calendarData : []).flatMap(day =>
             (Array.isArray(day.events) ? day.events : []).map(e => e.currency || 'USD')
         )
-    )].sort();
+    )].sort(), [calendarData]);
 
-    // Get unique tickers from data for filter dropdown (earnings/dividends only)
-    const availableTickers = (activeSubTab === 'earnings' || activeSubTab === 'dividends')
+    // Optimisation: useMemo pour availableTickers (calcul conditionnel)
+    const availableTickers = useMemo(() => (activeSubTab === 'earnings' || activeSubTab === 'dividends')
         ? [...new Set(
             (Array.isArray(calendarData) ? calendarData : []).flatMap(day =>
                 (Array.isArray(day.events) ? day.events : []).map(e => extractTicker(e.event)).filter(t => t !== null)
             )
         )].sort()
-        : [];
+        : [], [activeSubTab, calendarData, extractTicker]);
 
     return (
         <div className={`${isDarkMode ? 'bg-gray-900 text-gray-200' : 'bg-white text-gray-900'} p-6`}>

@@ -1,9 +1,9 @@
 // Auto-converted from monolithic dashboard file
 // Component: YieldCurveTab
 
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-
-const YieldCurveTab = () => {
+const YieldCurveTab = ({ isDarkMode }) => {
     const [yieldData, setYieldData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -14,8 +14,12 @@ const YieldCurveTab = () => {
     // S'assurer que isDarkMode est accessible (fallback si non défini)
     const darkMode = typeof isDarkMode !== 'undefined' ? isDarkMode : true;
 
-    const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
-    const renderRateTable = (title, dataset, badgeEmoji) => (
+    // Optimisation: useCallback pour les fonctions utilitaires
+    const formatRate = useCallback((value) => {
+        return value === null || value === undefined ? '—' : Number(value).toFixed(2);
+    }, []);
+
+    const renderRateTable = useCallback((title, dataset, badgeEmoji) => (
         <div className={`p-4 rounded-lg border ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
             <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 font-semibold">
@@ -37,12 +41,12 @@ const YieldCurveTab = () => {
                 <p className="text-sm opacity-70">Données non disponibles.</p>
             )}
         </div>
-    );
+    ), [darkMode, formatRate]);
     
     console.log('📊 YieldCurveTab monté, isDarkMode:', darkMode);
 
-    // Récupérer les données de la yield curve
-    const fetchYieldCurve = async () => {
+    // Optimisation: useCallback pour la fonction async
+    const fetchYieldCurve = useCallback(async () => {
         console.log('🔄 fetchYieldCurve appelé pour country:', selectedCountry);
         setLoading(true);
         setError(null);
@@ -64,27 +68,16 @@ const YieldCurveTab = () => {
             setError(err.message);
             setLoading(false);
         }
-    };
+    }, [selectedCountry]);
 
     // Charger les données au montage et quand le pays change
     useEffect(() => {
         fetchYieldCurve();
-    }, [selectedCountry]);
+    }, [fetchYieldCurve]);
 
-    // Créer/mettre à jour le graphique Chart.js
-    useEffect(() => {
-        if (!yieldData || !chartRef.current) return;
-        if (typeof Chart === 'undefined') {
-            console.error('❌ Chart.js n\'est pas chargé');
-            return;
-        }
-
-        // Détruire l'ancien graphique
-        if (chartInstance.current) {
-            chartInstance.current.destroy();
-        }
-
-        const ctx = chartRef.current.getContext('2d');
+    // Optimisation: useMemo pour les datasets du graphique (calcul coûteux)
+    const chartDatasets = useMemo(() => {
+        if (!yieldData) return [];
 
         const datasets = [];
 
@@ -127,6 +120,27 @@ const YieldCurveTab = () => {
                 pointBorderWidth: 2
             });
         }
+
+        return datasets;
+    }, [yieldData]);
+
+    // Créer/mettre à jour le graphique Chart.js
+    useEffect(() => {
+        if (!yieldData || !chartRef.current) return;
+        if (typeof Chart === 'undefined') {
+            console.error('❌ Chart.js n\'est pas chargé');
+            return;
+        }
+
+        // Détruire l'ancien graphique
+        if (chartInstance.current) {
+            chartInstance.current.destroy();
+        }
+
+        const ctx = chartRef.current.getContext('2d');
+
+        // Utiliser les datasets mémorisés
+        const datasets = chartDatasets;
 
         // Ne créer le graphique que s'il y a des données
         if (datasets.length === 0) {
@@ -207,10 +221,10 @@ const YieldCurveTab = () => {
                 chartInstance.current.destroy();
             }
         };
-    }, [yieldData, darkMode]);
+    }, [yieldData, darkMode, chartDatasets]);
 
-    // Fonction pour formater la date
-    const formatDate = (dateStr) => {
+    // Optimisation: useCallback pour la fonction de formatage de date
+    const formatDate = useCallback((dateStr) => {
         if (!dateStr) return 'N/A';
         const date = new Date(dateStr);
         return date.toLocaleDateString('fr-CA', {
@@ -218,7 +232,34 @@ const YieldCurveTab = () => {
             month: 'long',
             day: 'numeric'
         });
-    };
+    }, []);
+
+    // Fonction utilitaire pour convertir une maturité en mois (pour le tri)
+    const maturityToMonths = useCallback((maturity) => {
+        if (!maturity) return 0;
+        const match = maturity.match(/^(\d+)([MY])$/);
+        if (!match) return 0;
+        const value = parseInt(match[1], 10);
+        const unit = match[2];
+        return unit === 'Y' ? value * 12 : value;
+    }, []);
+
+    // Optimisation: useMemo pour les maturités triées (calcul coûteux)
+    const sortedMaturities = useMemo(() => {
+        if (!yieldData) return [];
+        
+        // Créer une liste unique de toutes les maturités
+        const maturities = new Set();
+        if (yieldData.data.us) {
+            yieldData.data.us.rates.forEach(r => maturities.add(r.maturity));
+        }
+        if (yieldData.data.canada) {
+            yieldData.data.canada.rates.forEach(r => maturities.add(r.maturity));
+        }
+
+        return Array.from(maturities)
+            .sort((a, b) => maturityToMonths(a) - maturityToMonths(b));
+    }, [yieldData, maturityToMonths]);
 
     console.log('🎨 YieldCurveTab render - loading:', loading, 'error:', error, 'yieldData:', yieldData, 'darkMode:', darkMode);
 
@@ -402,19 +443,7 @@ const YieldCurveTab = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {(() => {
-                                        // Créer une liste unique de toutes les maturités
-                                        const maturities = new Set();
-                                        if (yieldData.data.us) {
-                                            yieldData.data.us.rates.forEach(r => maturities.add(r.maturity));
-                                        }
-                                        if (yieldData.data.canada) {
-                                            yieldData.data.canada.rates.forEach(r => maturities.add(r.maturity));
-                                        }
-
-                                        return Array.from(maturities)
-                                            .sort((a, b) => maturityToMonths(a) - maturityToMonths(b))
-                                            .map((maturity, idx) => {
+                                    {sortedMaturities.map((maturity, idx) => {
                                                 const usRate = yieldData.data.us?.rates.find(r => r.maturity === maturity);
                                                 const caRate = yieldData.data.canada?.rates.find(r => r.maturity === maturity);
                                                 const spread = usRate && caRate ? ((usRate.rate - caRate.rate) * 100).toFixed(0) : null;
@@ -455,8 +484,7 @@ const YieldCurveTab = () => {
                                                         )}
                                                     </tr>
                                                 );
-                                            });
-                                    })()}
+                                            })}
                                 </tbody>
                             </table>
                         </div>

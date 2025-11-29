@@ -1,9 +1,18 @@
 // Auto-converted from monolithic dashboard file
 // Component: ScrappingSATab
 
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-
-const ScrappingSATab = () => (
+const ScrappingSATab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+    const tickers = window.BetaCombinedDashboard?.tickers ?? [];
+    const stockData = window.BetaCombinedDashboard?.stockData ?? {};
+    const seekingAlphaData = window.BetaCombinedDashboard?.seekingAlphaData ?? { stocks: [] };
+    const seekingAlphaStockData = window.BetaCombinedDashboard?.seekingAlphaStockData ?? { stocks: {} };
+    const [selectedStock, setSelectedStock] = useState(null);
+    
+    return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
@@ -742,5 +751,6 @@ const ScrappingSATab = () => (
                     </div>
                 </div>
             );
+};
 
 window.ScrappingSATab = ScrappingSATab;

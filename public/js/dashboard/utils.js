@@ -36,37 +36,37 @@ const getNewsIcon = (title, description, sentiment) => {
     const categories = {
         earnings: {
             keywords: ['earnings', 'résultats', 'profit', 'bénéfice', 'trimestre', 'quarterly', 'revenue', 'chiffre d\'affaires'],
-            icon: 'DollarSign',
+            icon: '💰',
             color: 'text-green-500'
         },
         merger: {
             keywords: ['merger', 'acquisition', 'fusionner', 'racheter', 'acquérir', 'deal', 'accord'],
-            icon: 'Briefcase',
+            icon: '💼',
             color: 'text-purple-500'
         },
         growth: {
             keywords: ['croissance', 'expansion', 'growth', 'augmente', 'monte', 'hausse', 'rally', 'surge', 'gain'],
-            icon: 'TrendingUp',
+            icon: '📈',
             color: 'text-green-500'
         },
         decline: {
             keywords: ['baisse', 'chute', 'decline', 'drop', 'fall', 'perte', 'loss', 'diminue'],
-            icon: 'TrendingDown',
+            icon: '📉',
             color: 'text-red-500'
         },
         regulation: {
             keywords: ['régulation', 'regulation', 'law', 'loi', 'sec', 'fda', 'gouvernement', 'government'],
-            icon: 'Shield',
+            icon: '🛡️',
             color: 'text-blue-500'
         },
         target: {
             keywords: ['target', 'objectif', 'forecast', 'prévision', 'outlook', 'guidance'],
-            icon: 'Target',
+            icon: '🎯',
             color: 'text-indigo-500'
         },
         market: {
             keywords: ['market', 'marché', 'index', 'indice', 's&p', 'dow', 'nasdaq', 'bourse'],
-            icon: 'BarChart3',
+            icon: '📊',
             color: 'text-blue-500'
         }
     };
@@ -80,14 +80,14 @@ const getNewsIcon = (title, description, sentiment) => {
 
     // Par défaut: icône basée sur le sentiment
     if (sentiment === 'positive' || text.includes('positif') || text.includes('success') || text.includes('succès')) {
-        return { icon: 'TrendingUp', color: 'text-green-500' };
+        return { icon: '📈', color: 'text-green-500' };
     }
     if (sentiment === 'negative' || text.includes('négatif') || text.includes('risk') || text.includes('risque')) {
-        return { icon: 'TrendingDown', color: 'text-red-500' };
+        return { icon: '📉', color: 'text-red-500' };
     }
 
     // Fallback: icône de journal
-    return { icon: 'Newspaper', color: 'text-gray-500' };
+    return { icon: '📰', color: 'text-gray-500' };
 };
 
 // Fonction pour évaluer la crédibilité d'une source de nouvelles

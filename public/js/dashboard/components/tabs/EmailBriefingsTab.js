@@ -1,9 +1,11 @@
 // Auto-converted from monolithic dashboard file
 // Component: EmailBriefingsTab
 
-
+const { useState, useEffect, useCallback, useMemo } = React;
 
 const EmailBriefingsTab = () => {
+    // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+    const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
                 const [loading, setLoading] = useState(false);
                 const [currentBriefing, setCurrentBriefing] = useState(null);
                 const [previewHtml, setPreviewHtml] = useState('');
@@ -33,7 +35,7 @@ const EmailBriefingsTab = () => {
                     analysis: { request: null, response: null, error: null }
                 });
         // NOTE: healthStatus, healthCheckLoading, processLog, showDebug, showFullLog
-        // moved to line ~468 (top of BetaCombinedDashboard for proper scope)
+        // moved to dashboard-main.js for proper scope
 
                 // Tickers de la watchlist (récupérés depuis Supabase)
                 // Utilise l'état global watchlistTickers chargé depuis Supabase
@@ -453,11 +455,11 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
 
                 // NOTE: addLogEntry() moved to line ~2183 (before AdminJSLaiTab for proper scope)
 
-                // Fonction pour nettoyer le log
-                const clearProcessLog = () => {
+                // Optimisation: useCallback pour clearProcessLog
+                const clearProcessLog = useCallback(() => {
                     setProcessLog([]);
                     addLogEntry('SYSTEM', 'Log Initialisé', 'Nouveau processus de génération de briefing démarré', 'info');
-                };
+                }, []);
 
                 // Fonction pour enrichir les données avec les informations de la watchlist
                 const enrichWatchlistData = async (marketData, type) => {
@@ -605,8 +607,8 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                     }
                 };
 
-                // Fonction pour obtenir le calendrier des résultats
-                const getEarningsCalendar = async () => {
+                // Optimisation: useCallback pour getEarningsCalendar
+                const getEarningsCalendar = useCallback(async () => {
                     // Simulation des prochains résultats pour la watchlist
                     const earnings = [
                         { ticker: 'GOOGL', date: '2024-12-15', time: 'after-hours', estimate: 1.45 },
@@ -616,10 +618,10 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         { ticker: 'NKE', date: '2024-12-19', time: 'after-hours', estimate: 0.85 }
                     ];
                     return earnings.filter(e => watchlistTickers.includes(e.ticker));
-                };
+                }, [watchlistTickers]);
 
-                // Fonction pour obtenir le calendrier des dividendes
-                const getDividendsCalendar = async () => {
+                // Optimisation: useCallback pour getDividendsCalendar
+                const getDividendsCalendar = useCallback(async () => {
                     // Simulation des prochains dividendes pour la watchlist
                     const dividends = [
                         { ticker: 'T', date: '2024-12-20', amount: 0.2775, ex_date: '2024-12-19' },
@@ -629,10 +631,10 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         { ticker: 'WFC', date: '2024-12-20', amount: 0.35, ex_date: '2024-12-19' }
                     ];
                     return dividends.filter(d => watchlistTickers.includes(d.ticker));
-                };
+                }, [watchlistTickers]);
 
-                // Fonction pour l'analyse sectorielle
-                const getSectorAnalysis = () => {
+                // Optimisation: useMemo pour getSectorAnalysis (structure constante)
+                const getSectorAnalysis = useMemo(() => {
                     return {
                         technology: { tickers: ['GOOGL', 'CSCO', 'MU'], weight: 0.25, trend: 'bullish' },
                         healthcare: { tickers: ['JNJ', 'MDT', 'PFE', 'UNH'], weight: 0.30, trend: 'neutral' },
@@ -641,10 +643,10 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                         energy: { tickers: ['NTR', 'TRP'], weight: 0.05, trend: 'bearish' },
                         telecom: { tickers: ['T', 'BCE', 'VZ'], weight: 0.05, trend: 'neutral' }
                     };
-                };
+                }, []);
 
-                // Fonction pour les événements économiques
-                const getEconomicEvents = (type) => {
+                // Optimisation: useCallback pour getEconomicEvents
+                const getEconomicEvents = useCallback((type) => {
                     const today = new Date();
                     const tomorrow = new Date(today);
                     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -663,7 +665,7 @@ STYLE : Voix Emma - Analyse institutionnelle niveau expert, 2500-3000 mots, fran
                     };
 
                     return type === 'morning' ? events.today : events.tomorrow;
-                };
+                }, []);
 
                 // Fonction utilitaire pour extraire la valeur numérique d'un change (inline dans les templates)
 
@@ -1945,7 +1947,33 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
                 // Charger l'historique au montage
                 React.useEffect(() => {
-                    loadBriefingHistory();
+                    const abortController = new AbortController();
+                    let isMounted = true;
+                    
+                    const loadHistory = async () => {
+                        try {
+                            const response = await fetch('/api/ai-services?service=supabase-briefings&limit=20', {
+                                signal: abortController.signal
+                            });
+                            const result = await response.json();
+                            
+                            if (!isMounted) return;
+                            
+                            if (result.success) {
+                                setBriefingHistory(result.data);
+                            }
+                        } catch (error) {
+                            if (error.name === 'AbortError' || !isMounted) return;
+                            console.error('Erreur chargement historique:', error);
+                        }
+                    };
+                    
+                    loadHistory();
+                    
+                    return () => {
+                        isMounted = false;
+                        abortController.abort();
+                    };
                 }, []);
 
                 return (

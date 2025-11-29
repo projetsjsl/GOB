@@ -1,10 +1,9 @@
 // Auto-converted from monolithic dashboard file
 // Component: IntelliStocksTab
 
+const { useState, useEffect, useRef, useCallback } = React;
 
-
-
-const IntelliStocksTab = () => {
+const IntelliStocksTab = ({ isDarkMode }) => {
                 const [time, setTime] = useState(new Date());
                 const [selectedStock, setSelectedStock] = useState('AAPL');
                 const [timeframe, setTimeframe] = useState('1D');
@@ -38,8 +37,8 @@ const IntelliStocksTab = () => {
                     localStorage.setItem('jslaiConfig', JSON.stringify(jslaiConfig));
                 }, [jslaiConfig]);
 
-                // Génération de données mock
-                const generateMockData = (symbol) => {
+                // Optimisation: useCallback pour generateMockData
+                const generateMockData = useCallback((symbol) => {
                     const basePrice = {
                         AAPL: 183.45, TSLA: 251.23, GOOGL: 143.12,
                         MSFT: 384.89, NVDA: 485.32, AMZN: 178.91
@@ -128,13 +127,13 @@ const IntelliStocksTab = () => {
                             reasoning: 'Les fondamentaux solides et la croissance continue justifient un sentiment positif'
                         }
                     };
-                };
+                }, []);
 
                 // 🎯 CALCULATED SENTIMENT - No AI, pure data-driven analysis
                 // Replaces Perplexity AI with free calculated metrics
 
-                // 🎯 Calculate sentiment from financial data (NO AI, NO COST)
-                const calculateSentiment = (symbol, stockData) => {
+                // Optimisation: useCallback pour calculateSentiment
+                const calculateSentiment = useCallback((symbol, stockData) => {
                     const { quote, metrics, ratios, profile, news } = stockData;
 
                     console.log(`📊 Calculating sentiment for ${symbol} from financial data...`);
@@ -234,10 +233,10 @@ const IntelliStocksTab = () => {
                             keyPoints
                         }
                     };
-                };
+                }, []);
 
-                // Fonction pour récupérer les données réelles d'un stock
-                const fetchRealStockData = async (symbol, currentTimeframe = '1D') => {
+                // Optimisation: useCallback pour fetchRealStockData
+                const fetchRealStockData = useCallback(async (symbol, currentTimeframe = '1D') => {
                     try {
                         console.log(`🔍 Récupération des données réelles pour ${symbol}...`);
                         
@@ -931,7 +930,7 @@ console.log('✅ Données hybrides récupérées:', {
                         console.error(`Error fetching real data for ${symbol}:`, error);
                         return null;
                     }
-                };
+                }, [jslaiConfig]);
 
                 // Chargement des données
                 useEffect(() => {
@@ -1093,9 +1092,8 @@ console.log('✅ Données hybrides récupérées:', {
                     { symbol: 'INTC', name: 'Intel Corporation' },
                 ];
                 
-                // Fonction pour déterminer la couleur d'un indicateur
-                // Basée sur les standards de l'industrie financière et les meilleures pratiques d'analyse
-                const getMetricColor = (metric, value) => {
+                // Optimisation: useCallback pour getMetricColor
+                const getMetricColor = useCallback((metric, value) => {
                     if (value == null || value === 'N/A') return 'text-gray-400';
                     
                     const v = typeof value === 'string' ? parseFloat(value) : value;
@@ -1220,10 +1218,10 @@ console.log('✅ Données hybrides récupérées:', {
                         default:
                             return 'text-gray-400';
                     }
-                };
-                
-                // Fonction pour exécuter le screener (utilise la liste de stocks fournie)
-                const runScreenerForStocks = async (stocksList) => {
+                }, []);
+
+                // Optimisation: useCallback pour runScreenerForStocks
+                const runScreenerForStocks = useCallback(async (stocksList) => {
                     setLoadingScreener(true);
                     try {
                         const results = [];
@@ -1276,7 +1274,7 @@ console.log('✅ Données hybrides récupérées:', {
                     } finally {
                         setLoadingScreener(false);
                     }
-                };
+                }, [screenerFilters]);
 
                 const currentStock = stocks.find(s => s.symbol === selectedStock);
                 const quote = stockDataIntelli?.quote || {};
@@ -1290,7 +1288,8 @@ console.log('✅ Données hybrides récupérées:', {
                 const historicalRatios = stockDataIntelli?.historicalRatios || [];
                 const movingAverages = stockDataIntelli?.movingAverages || {};
 
-                const formatNumber = (num, prefix = '', suffix = '') => {
+                // Optimisation: useCallback pour formatNumber
+                const formatNumber = useCallback((num, prefix = '', suffix = '') => {
                     if (!num && num !== 0) return 'N/A';
                     const n = parseFloat(num);
                     if (isNaN(n)) return 'N/A';
@@ -1299,15 +1298,16 @@ console.log('✅ Données hybrides récupérées:', {
                     if (n >= 1e6) return `${prefix}${(n / 1e6).toFixed(2)}M${suffix}`;
                     if (n >= 1e3) return `${prefix}${(n / 1e3).toFixed(2)}K${suffix}`;
                     return `${prefix}${n.toFixed(2)}${suffix}`;
-                };
+                }, []);
 
-                const formatTimeAgo = (dateString) => {
+                // Optimisation: useCallback pour formatTimeAgo
+                const formatTimeAgo = useCallback((dateString) => {
                     const date = new Date(dateString);
                     const hours = Math.floor((Date.now() - date.getTime()) / 3600000);
                     if (hours < 1) return 'maintenant';
                     if (hours < 24) return `${hours}h`;
                     return `${Math.floor(hours / 24)}j`;
-                };
+                }, []);
 
                 const technicalIndicators = {
                     RSI: { value: 67.8, signal: 'Achat' },

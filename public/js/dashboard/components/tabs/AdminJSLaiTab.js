@@ -1,7 +1,7 @@
 // Auto-converted from monolithic dashboard file
 // Component: AdminJSLaiTab
 
-
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 const AdminJSLaiTab = ({
                 emmaConnected,
@@ -12,7 +12,39 @@ const AdminJSLaiTab = ({
                 setShowTemperatureEditor,
                 showLengthEditor,
                 setShowLengthEditor
-            }) => (
+            }) => {
+                // Accès aux variables globales depuis le scope parent (comme dans la version monolithique)
+                const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+                const tickers = window.BetaCombinedDashboard?.tickers ?? [];
+                const stockData = window.BetaCombinedDashboard?.stockData ?? {};
+                const newsData = window.BetaCombinedDashboard?.newsData ?? [];
+                const lastUpdate = window.BetaCombinedDashboard?.lastUpdate ?? null;
+                const seekingAlphaData = window.BetaCombinedDashboard?.seekingAlphaData ?? { stocks: [] };
+                const seekingAlphaStockData = window.BetaCombinedDashboard?.seekingAlphaStockData ?? { stocks: {} };
+                const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
+                const loading = window.BetaCombinedDashboard?.loading ?? false;
+                const fetchNews = window.BetaCombinedDashboard?.fetchNews;
+                // États locaux pour la gestion du cache
+                const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
+                const [cacheStatus, setCacheStatus] = useState({});
+                const [showSettings, setShowSettings] = useState(false);
+                const [systemLogs, setSystemLogs] = useState([]);
+                const [isProfessionalMode, setIsProfessionalMode] = useState(() => {
+                    const saved = localStorage.getItem('isProfessionalMode');
+                    return saved ? JSON.parse(saved) : false;
+                });
+                const [cacheSettings, setCacheSettings] = useState(() => {
+                    const saved = localStorage.getItem('cacheSettings');
+                    return saved ? JSON.parse(saved) : {
+                        maxAgeHours: 4,
+                        refreshOnNavigation: false,
+                        refreshIntervalMinutes: 30
+                    };
+                });
+
+                const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
+
+                return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
@@ -20,7 +52,7 @@ const AdminJSLaiTab = ({
                         }`}>⚙️ Admin-JSLAI</h2>
                     </div>
 
-                    <EmmaSmsPanel />
+                    {window.EmmaSmsPanel && React.createElement(window.EmmaSmsPanel, { isDarkMode })}
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
@@ -1183,7 +1215,6 @@ const AdminJSLaiTab = ({
                     </div>
                 </div>
             );
-
-            // Composant onglet Plus
+};
 
 window.AdminJSLaiTab = AdminJSLaiTab;
