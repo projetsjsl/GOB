@@ -40,6 +40,8 @@
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
     <!-- Constantes partagées exposées globalement -->
     <script src="/js/dashboard/constants.js"></script>
+    <!-- Utilitaires partagés exposés globalement -->
+    <script src="/js/dashboard/utils-shared.js"></script>
 
     <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
@@ -6377,7 +6379,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         }
                     };
 
-                    const formatNumber = (num, prefix = '', suffix = '') => {
+                    const formatNumber = (window.DASHBOARD_UTILS && window.DASHBOARD_UTILS.formatNumberCompact) || ((num, prefix = '', suffix = '') => {
                         if (!num && num !== 0) return 'N/A';
                         const n = parseFloat(num);
                         if (isNaN(n)) return 'N/A';
@@ -6386,7 +6388,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         if (n >= 1e6) return `${prefix}${(n / 1e6).toFixed(2)}M${suffix}`;
                         if (n >= 1e3) return `${prefix}${(n / 1e3).toFixed(2)}K${suffix}`;
                         return `${prefix}${n.toFixed(2)}${suffix}`;
-                    };
+                    });
 
                     // État pour éviter le rechargement de la watchlist
                     const [watchlistLoaded, setWatchlistLoaded] = useState(false);
@@ -17291,21 +17293,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         return 40;
                     };
 
-                    const getCredibilityTier = (score) => {
+                    const getCredibilityTier = (window.DASHBOARD_UTILS && window.DASHBOARD_UTILS.getCredibilityTier) || ((score) => {
                         if (score >= 90) return 'premium';
                         if (score >= 75) return 'high';
                         if (score >= 50) return 'medium';
                         return 'low';
-                    };
+                    });
 
                     // Fonction pour formater les nombres
-                    const formatNumber = (num) => {
+                    const formatNumber = (window.DASHBOARD_UTILS && window.DASHBOARD_UTILS.formatNumberLocale) || ((num) => {
                         if (!num && num !== 0) return 'N/A';
                         if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
                         if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
                         if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
                         return num.toLocaleString('fr-FR');
-                    };
+                    });
 
                     // Mapping des noms de compagnies pour affichage
                     const companyNames = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.companyNames) || {};
@@ -20074,7 +20076,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     const historicalRatios = stockDataIntelli?.historicalRatios || [];
                     const movingAverages = stockDataIntelli?.movingAverages || {};
 
-                    const formatNumber = (num, prefix = '', suffix = '') => {
+                    const formatNumber = (window.DASHBOARD_UTILS && window.DASHBOARD_UTILS.formatNumberCompact) || ((num, prefix = '', suffix = '') => {
                         if (!num && num !== 0) return 'N/A';
                         const n = parseFloat(num);
                         if (isNaN(n)) return 'N/A';
@@ -20083,7 +20085,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         if (n >= 1e6) return `${prefix}${(n / 1e6).toFixed(2)}M${suffix}`;
                         if (n >= 1e3) return `${prefix}${(n / 1e3).toFixed(2)}K${suffix}`;
                         return `${prefix}${n.toFixed(2)}${suffix}`;
-                    };
+                    });
 
                     const formatTimeAgo = (dateString) => {
                         const date = new Date(dateString);
