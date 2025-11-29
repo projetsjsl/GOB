@@ -25348,6 +25348,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                             {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                             {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
+                            {activeTab === 'emma-config' && <EmmaConfigTab />}
                         </main>
 
                         {/* Messages */}
