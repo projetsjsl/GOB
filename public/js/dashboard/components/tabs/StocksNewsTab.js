@@ -9,6 +9,8 @@ const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
         const tickers = window.BetaCombinedDashboard?.tickers ?? [];
         const stockData = window.BetaCombinedDashboard?.stockData ?? {};
         const newsData = window.BetaCombinedDashboard?.newsData ?? [];
+        const tickerLatestNews = window.BetaCombinedDashboard?.tickerLatestNews ?? {};
+        const tickerMoveReasons = window.BetaCombinedDashboard?.tickerMoveReasons ?? {};
         const loading = window.BetaCombinedDashboard?.loading ?? false;
         const lastUpdate = window.BetaCombinedDashboard?.lastUpdate ?? null;
         const loadTickersFromSupabase = window.BetaCombinedDashboard?.loadTickersFromSupabase;
@@ -110,6 +112,43 @@ const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
             UNH: 'UnitedHealth Group Inc.',
             PFE: 'Pfizer Inc.',
             MRK: 'Merck & Co. Inc.'
+        };
+
+        // Extrait une raison de mouvement pour un ticker, en priorisant Finviz "Why Is It Moving?"
+        const extractMoveReason = (ticker, changePercent) => {
+            const directionLabel = changePercent > 0 ? 'hausse' : 'baisse';
+
+            // 1) Explication Finviz (AI) si disponible
+            const whyMoving = tickerMoveReasons[ticker];
+            if (whyMoving?.explanation) {
+                const explanation = whyMoving.explanation_enriched || whyMoving.explanation;
+                return explanation.length > 120 ? `${explanation.substring(0, 120)}...` : explanation;
+            }
+
+            // 2) News spécifique la plus récente
+            const latest = tickerLatestNews[ticker];
+            if (latest?.title) {
+                return latest.title.length > 120 ? `${latest.title.substring(0, 120)}...` : latest.title;
+            }
+
+            // 3) Chercher dans les news générales
+            if (newsData && newsData.length > 0) {
+                const tickerLower = ticker.toLowerCase();
+                const tickerBase = tickerLower.split('.')[0];
+                const found = newsData.find(article => {
+                    const title = (article.title || article.headline || '').toLowerCase();
+                    const desc = (article.description || article.summary || '').toLowerCase();
+                    return title.includes(tickerLower) || desc.includes(tickerLower) ||
+                        title.includes(tickerBase) || desc.includes(tickerBase);
+                });
+                if (found) {
+                    const newsTitle = found.title || found.headline || '';
+                    return newsTitle.length > 120 ? `${newsTitle.substring(0, 120)}...` : newsTitle;
+                }
+            }
+
+            // 4) Fallback générique
+            return `Variation en ${directionLabel} de ${Math.abs(changePercent).toFixed(2)}% sans actualité confirmée.`;
         };
 
         return (
