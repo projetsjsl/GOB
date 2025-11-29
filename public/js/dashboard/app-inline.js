@@ -608,13 +608,14 @@
 
                 // Configuration API
                 const API_BASE_URL = (window.location && window.location.origin) ? window.location.origin : '';
+                const globalUtils = (typeof window !== 'undefined' && window.DASHBOARD_UTILS) ? window.DASHBOARD_UTILS : {};
 
                 // Configuration GitHub
                 const GITHUB_REPO = 'projetsjsl/GOB';
                 const GITHUB_BRANCH = 'main';
 
                 // Fonction pour nettoyer l'encodage des caractères
-                const cleanText = (text) => {
+                const cleanText = globalUtils.cleanText || ((text) => {
                     if (!text) return '';
                     return text
                         .replace(/Ã©/g, 'é')
@@ -636,7 +637,7 @@
                         .replace(/â€/g, '"')
                         .replace(/â€"/g, '–')
                         .replace(/â€"/g, '—');
-                };
+                });
 
                 // Fonction pour déterminer l'icône et la couleur d'une nouvelle
                 const getNewsIcon = (title, description, sentiment) => {
@@ -701,7 +702,7 @@
                 };
 
                 // Fonction pour évaluer la crédibilité d'une source de nouvelles
-                const getSourceCredibility = (sourceName) => {
+                const getSourceCredibility = globalUtils.getSourceCredibility || ((sourceName) => {
                     if (!sourceName) return 0;
 
                     const source = sourceName.toLowerCase();
@@ -724,7 +725,7 @@
 
                     // Tier 5: Sources inconnues (50)
                     return 50;
-                };
+                });
 
                 // Fonction pour trier les nouvelles par crédibilité puis par date
                 const sortNewsByCredibility = (newsArray) => {
@@ -745,7 +746,7 @@
                 };
 
                 // Fonction pour détecter si un article est en français
-                const isFrenchArticle = (article) => {
+                const isFrenchArticle = globalUtils.isFrenchArticle || ((article) => {
                     if (!article) return false;
 
                     const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
@@ -769,7 +770,7 @@
 
                     // Si 3+ mots-clés français, considérer comme article français
                     return frenchWordCount >= 3;
-                };
+                });
 
                 // Fonction pour résumer un article avec Emma IA
                 const summarizeWithEmma = (articleUrl, articleTitle) => {
@@ -2145,7 +2146,7 @@
                 };
 
                 // Fonction pour obtenir la couleur des grades Quant
-                const getGradeColor = (grade) => {
+                const getGradeColor = globalUtils.getGradeColor || ((grade) => {
                     if (!grade) return 'bg-gray-100 text-gray-600';
                     // Convertir en chaîne si ce n'est pas déjà le cas
                     const gradeStr = String(grade);
@@ -2157,7 +2158,7 @@
                     if (letter === 'D') return 'bg-green-100 text-green-700';
                     if (letter === 'F') return 'bg-red-100 text-red-700';
                     return 'bg-gray-100 text-gray-600';
-                };
+                });
 
                 // Parser les données brutes de Seeking Alpha
                 const parseSeekingAlphaRawText = (rawText) => {
@@ -3662,6 +3663,37 @@
                 `;
 
                     return script;
+                };
+
+                // Fonction pour lancer une analyse Claude/Perplexity côté serveur (batch API)
+                const analyzeWithClaude = async (ticker = null, parsedData = null) => {
+                    const tickersToProcess = ticker ? [ticker] : tickers;
+                    if (!Array.isArray(tickersToProcess) || tickersToProcess.length === 0) {
+                        addScrapingLog('⚠️ Aucun ticker à analyser', 'warning');
+                        return;
+                    }
+
+                    addScrapingLog(`🤖 Analyse Claude pour ${tickersToProcess.join(', ')}`, 'info');
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/seeking-alpha-batch`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                tickers: tickersToProcess,
+                                force_refresh: !!parsedData
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+
+                        const result = await response.json();
+                        addScrapingLog(`✅ Analyse lancée (batch ${result.batch_id || 'n/a'})`, 'success');
+                    } catch (error) {
+                        addScrapingLog(`❌ Échec analyse Claude: ${error.message}`, 'error');
+                    }
                 };
 
                 // Fonction pour analyser les données avec Gemini et mettre à jour les fichiers
@@ -16600,23 +16632,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }
                     };
 
-                    const renderMarketBadge = (type) => {
-                        const isBull = type === 'bull';
-                        return (
-                            <span
-                                className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${isBull
-                                    ? isDarkMode
-                                        ? 'bg-lime-900/70 border-lime-500/40 text-lime-300'
-                                        : 'bg-lime-100 border-lime-400 text-lime-700'
-                                    : isDarkMode
-                                        ? 'bg-rose-900/70 border-rose-500/40 text-rose-200'
-                                        : 'bg-rose-100 border-rose-300 text-rose-700'
-                                    }`}
-                            >
-                                {isBull ? '🐂' : '🐻'}
-                            </span>
-                        );
-                    };
+                    const renderMarketBadge = globalUtils.renderMarketBadge
+                        ? (type) => globalUtils.renderMarketBadge(type, isDarkMode)
+                        : (type) => {
+                            const isBull = type === 'bull';
+                            return (
+                                <span
+                                    className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${isBull
+                                        ? isDarkMode
+                                            ? 'bg-lime-900/70 border-lime-500/40 text-lime-300'
+                                            : 'bg-lime-100 border-lime-400 text-lime-700'
+                                        : isDarkMode
+                                            ? 'bg-rose-900/70 border-rose-500/40 text-rose-200'
+                                            : 'bg-rose-100 border-rose-300 text-rose-700'
+                                        }`}
+                                >
+                                    {isBull ? '🐂' : '🐻'}
+                                </span>
+                            );
+                        };
 
                     // Helper functions for news credibility scoring (définies dans le composant)
                     const getNewsCredibilityScore = (sourceName) => {
