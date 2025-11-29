@@ -118,6 +118,19 @@
             .replace(/â€”/g, '—');
     };
 
+    const getGradeColor = (grade) => {
+        if (!grade) return 'bg-gray-100 text-gray-600';
+        const gradeStr = String(grade);
+        if (!gradeStr) return 'bg-gray-100 text-gray-600';
+        const letter = gradeStr.charAt(0).toUpperCase();
+        if (letter === 'A') return 'bg-green-100 text-green-700';
+        if (letter === 'B') return 'bg-gray-100 text-gray-700';
+        if (letter === 'C') return 'bg-yellow-100 text-yellow-700';
+        if (letter === 'D') return 'bg-green-100 text-green-700';
+        if (letter === 'F') return 'bg-red-100 text-red-700';
+        return 'bg-gray-100 text-gray-600';
+    };
+
     const getNewsIcon = (title, description, sentiment) => {
         const text = ((title || '') + ' ' + (description || '')).toLowerCase();
         const categories = {
@@ -164,4 +177,5 @@
     window.DASHBOARD_UTILS.cleanText = cleanText;
     window.DASHBOARD_UTILS.getNewsIcon = getNewsIcon;
     window.DASHBOARD_UTILS.isFrenchArticle = isFrenchArticle;
+    window.DASHBOARD_UTILS.getGradeColor = getGradeColor;
 })();

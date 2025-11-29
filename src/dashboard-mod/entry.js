@@ -17,6 +17,7 @@ import { MarketsEconomyTab } from './tabs/MarketsEconomyTab.jsx';
 import { EmailBriefingsTabFull } from './EmailBriefingsTabFull.jsx';
 import { InvestingCalendarTab } from './tabs/InvestingCalendarTab.jsx';
 import { YieldCurveTab } from './tabs/YieldCurveTab.jsx';
+import { ScrappingSATab } from './tabs/ScrappingSATab.jsx';
 
 // Expose pilot modules on window (no runtime swap yet)
 if (typeof window !== 'undefined') {
@@ -29,6 +30,7 @@ if (typeof window !== 'undefined') {
     window.MarketsEconomyTabMod = MarketsEconomyTab;
     window.InvestingCalendarTabMod = InvestingCalendarTab;
     window.YieldCurveTabMod = YieldCurveTab;
+    window.ScrappingSATabMod = ScrappingSATab;
     if (!window.MarketsEconomyTab) {
         window.MarketsEconomyTab = MarketsEconomyTab;
     }
@@ -37,6 +39,9 @@ if (typeof window !== 'undefined') {
     }
     if (!window.YieldCurveTab) {
         window.YieldCurveTab = YieldCurveTab;
+    }
+    if (!window.ScrappingSATab) {
+        window.ScrappingSATab = ScrappingSATab;
     }
     window.React = window.React || React;
     window.ReactDOM = window.ReactDOM || ReactDOM;
