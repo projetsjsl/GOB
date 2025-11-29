@@ -67,7 +67,8 @@ export type TabName =
   | 'economic-calendar'
   | 'investing-calendar'
   | 'yield-curve'
-  | 'markets-economy';
+  | 'markets-economy'
+  | 'ask-emma';
 
 // Props des tabs
 export interface TabProps {
@@ -108,6 +109,8 @@ export interface TabProps {
   setLastUpdate?: (date: Date | null) => void;
   setProcessLog?: (logs: any[]) => void;
   setEmmaConnected?: (value: boolean) => void;
+  setPrefillMessage?: (value: string) => void;
+  setAutoSend?: (value: boolean) => void;
   setShowPromptEditor?: (value: boolean) => void;
   setShowTemperatureEditor?: (value: boolean) => void;
   setShowLengthEditor?: (value: boolean) => void;
@@ -138,6 +141,8 @@ export interface TabProps {
   showPromptEditor?: boolean;
   showTemperatureEditor?: boolean;
   showLengthEditor?: boolean;
+  prefillMessage?: string;
+  autoSend?: boolean;
 
   // Fonctions utilitaires
   fetchStockData?: (ticker: string) => Promise<any>;

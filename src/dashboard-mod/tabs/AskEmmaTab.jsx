@@ -1,13 +1,8 @@
 import React from 'react';
+import AskEmmaTabComponent from '../../components/tabs/AskEmmaTab';
 
-// Modular wrapper: delegate to global AskEmmaTab until fully migrated
-export const AskEmmaTab = () => {
-    if (typeof window !== 'undefined' && window.AskEmmaTab) {
-        return React.createElement(window.AskEmmaTab);
-    }
-    return React.createElement(
-        'div',
-        { className: 'p-4 rounded border bg-yellow-50 border-yellow-200 text-yellow-800' },
-        "AskEmmaTab module indisponible (component global manquant)."
-    );
+export const AskEmmaTab = (props) => {
+    return <AskEmmaTabComponent {...props} />;
 };
+
+export default AskEmmaTab;

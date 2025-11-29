@@ -7,6 +7,8 @@ import DansWatchlistTab from './tabs/DansWatchlistTab';
 import StocksNewsTab from './tabs/StocksNewsTab';
 import IntelliStocksTab from './tabs/IntelliStocksTab';
 import EconomicCalendarTab from './tabs/EconomicCalendarTab';
+import AskEmmaTab from './tabs/AskEmmaTab';
+import EmailBriefingsTab from './tabs/EmailBriefingsTab';
 import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
 
 export const BetaCombinedDashboard: React.FC = () => {
@@ -25,6 +27,16 @@ export const BetaCombinedDashboard: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+    const [teamTickers, setTeamTickers] = useState<string[]>([]);
+    const [watchlistTickers, setWatchlistTickers] = useState<string[]>([]);
+    const [apiStatus, setApiStatus] = useState<Record<string, any>>({});
+    const [processLog, setProcessLog] = useState<any[]>([]);
+    const [emmaConnected, setEmmaConnected] = useState(false);
+    const [prefillMessage, setPrefillMessage] = useState('');
+    const [autoSend, setAutoSend] = useState(false);
+    const [showPromptEditor, setShowPromptEditor] = useState(false);
+    const [showTemperatureEditor, setShowTemperatureEditor] = useState(false);
+    const [showLengthEditor, setShowLengthEditor] = useState(false);
 
     // Configuration API
     const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : '';
@@ -161,6 +173,10 @@ export const BetaCombinedDashboard: React.FC = () => {
 
                 if (tickersFromSupabase.length > 0) {
                     setTickers(tickersFromSupabase);
+                    setWatchlistTickers(tickersFromSupabase);
+                    if (teamTickers.length === 0) {
+                        setTeamTickers(tickersFromSupabase);
+                    }
                     console.log(`✅ ${tickersFromSupabase.length} tickers rechargés`);
                     return tickersFromSupabase;
                 }
@@ -320,7 +336,27 @@ export const BetaCombinedDashboard: React.FC = () => {
         setSeekingAlphaData,
         seekingAlphaStockData,
         setSeekingAlphaStockData,
-        selectedStock
+        selectedStock,
+        teamTickers,
+        setTeamTickers,
+        watchlistTickers,
+        setWatchlistTickers,
+        apiStatus,
+        setApiStatus,
+        processLog,
+        setProcessLog,
+        emmaConnected,
+        setEmmaConnected,
+        prefillMessage,
+        setPrefillMessage,
+        autoSend,
+        setAutoSend,
+        showPromptEditor,
+        setShowPromptEditor,
+        showTemperatureEditor,
+        setShowTemperatureEditor,
+        showLengthEditor,
+        setShowLengthEditor
     };
 
     useEffect(() => {
@@ -341,6 +377,16 @@ export const BetaCombinedDashboard: React.FC = () => {
             selectedStock,
             seekingAlphaData,
             seekingAlphaStockData,
+            teamTickers,
+            watchlistTickers,
+            apiStatus,
+            processLog,
+            prefillMessage,
+            autoSend,
+            showPromptEditor,
+            showTemperatureEditor,
+            showLengthEditor,
+            emmaConnected,
             API_BASE_URL,
             setActiveTab,
             setSelectedStock,
@@ -353,6 +399,16 @@ export const BetaCombinedDashboard: React.FC = () => {
             setSeekingAlphaStockData,
             setLoading,
             setLastUpdate,
+            setTeamTickers,
+            setWatchlistTickers,
+            setApiStatus,
+            setProcessLog,
+            setPrefillMessage,
+            setAutoSend,
+            setShowPromptEditor,
+            setShowTemperatureEditor,
+            setShowLengthEditor,
+            setEmmaConnected,
             fetchNews,
             fetchLatestNewsForTickers,
             loadTickersFromSupabase,
@@ -379,7 +435,17 @@ export const BetaCombinedDashboard: React.FC = () => {
         lastUpdate,
         selectedStock,
         seekingAlphaData,
-        seekingAlphaStockData
+        seekingAlphaStockData,
+        teamTickers,
+        watchlistTickers,
+        apiStatus,
+        processLog,
+        prefillMessage,
+        autoSend,
+        showPromptEditor,
+        showTemperatureEditor,
+        showLengthEditor,
+        emmaConnected
     ]);
 
     const renderActiveTab = () => {
@@ -387,6 +453,8 @@ export const BetaCombinedDashboard: React.FC = () => {
             case 'stocks-news': return <StocksNewsTab {...tabProps} />;
             case 'intellistocks': return <IntelliStocksTab {...tabProps} />;
             case 'admin-jslai': return <AdminJSLaiTab {...tabProps} />;
+            case 'ask-emma': return <AskEmmaTab {...tabProps} />;
+            case 'email-briefings': return <EmailBriefingsTab {...tabProps} />;
             case 'plus': return <PlusTab {...tabProps} />;
             case 'watchlist': return <DansWatchlistTab {...tabProps} />;
             case 'economic-calendar': return <EconomicCalendarTab {...tabProps} />;
@@ -415,8 +483,10 @@ export const BetaCombinedDashboard: React.FC = () => {
                     {[
                         { id: 'stocks-news' as TabName, label: '📊 Stocks & News' },
                         { id: 'intellistocks' as TabName, label: '🧠 IntelliStocks' },
+                        { id: 'email-briefings' as TabName, label: '📧 Briefings' },
                         { id: 'watchlist' as TabName, label: '⭐ Watchlist' },
                         { id: 'economic-calendar' as TabName, label: '📅 Calendar' },
+                        { id: 'ask-emma' as TabName, label: '🤖 Emma IA™' },
                         { id: 'admin-jslai' as TabName, label: '⚙️ Admin' },
                         { id: 'plus' as TabName, label: '➕ Plus' }
                     ].map(tab => (
