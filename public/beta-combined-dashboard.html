@@ -44,6 +44,8 @@
     <script src="/js/dashboard/utils-shared.js"></script>
     <!-- Prompts briefing externalisés -->
     <script src="/js/dashboard/briefing-prompts.js"></script>
+    <!-- Shim process for bundle JSX runtime -->
+    <script>window.process = window.process || { env: {} };</script>
     <!-- Bundle IIFE modulaire (expérimental); fallback legacy inline reste présent -->
     <script src="/js/dashboard/bundle.js"></script>
 

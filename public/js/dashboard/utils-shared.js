@@ -82,7 +82,7 @@
         const text = ((title || '') + ' ' + (description || '')).toLowerCase();
         const categories = {
             earnings: {
-                keywords: ['earnings', 'résultats', 'profit', 'bénéfice', 'trimestre', 'quarterly', 'revenue', \"chiffre d'affaires\"],
+                keywords: ['earnings', 'résultats', 'profit', 'bénéfice', 'trimestre', 'quarterly', 'revenue', "chiffre d'affaires"],
                 icon: 'DollarSign',
                 color: 'text-green-500'
             },
