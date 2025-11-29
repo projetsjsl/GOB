@@ -12,7 +12,7 @@ import { PlusTab } from './tabs/PlusTab.jsx';
 import { StocksNewsTab } from './tabs/StocksNewsTab.jsx';
 import { EmailBriefingsTab } from '../components/tabs/EmailBriefingsTab.tsx';
 import { AskEmmaTab } from './tabs/AskEmmaTab.jsx';
-import { IntelliStocksTab } from './IntelliStocksTabMod.jsx';
+import { IntelliStocksTab } from '../components/tabs/IntelliStocksTab.tsx';
 import { MarketsEconomyTab } from './tabs/MarketsEconomyTab.jsx';
 import { EmailBriefingsTabFull } from './EmailBriefingsTabFull.jsx';
 import { InvestingCalendarTab } from './tabs/InvestingCalendarTab.jsx';
