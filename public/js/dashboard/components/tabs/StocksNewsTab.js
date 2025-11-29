@@ -19,6 +19,8 @@ const StocksNewsTab = () => {
         const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
         const fetchLatestNewsForTickers = window.BetaCombinedDashboard?.fetchLatestNewsForTickers;
         const getCompanyLogo = window.BetaCombinedDashboardData?.getCompanyLogo || window.BetaCombinedDashboard?.getCompanyLogo;
+        const cleanTextUtil = window.DASHBOARD_UTILS?.cleanText || ((text) => text || '');
+        const getNewsIconUtil = window.DASHBOARD_UTILS?.getNewsIcon || (() => ({ icon: 'Info', color: 'text-gray-400' }));
 
         // Safe async wrappers to avoid runtime errors if globals are missing
         const safeLoadTickers = typeof loadTickersFromSupabase === 'function' ? loadTickersFromSupabase : async () => {};
@@ -1048,7 +1050,7 @@ const StocksNewsTab = () => {
                                                         }`}>
                                                             <div className="flex items-start gap-4">
                                                                 {(() => {
-                                                                    const newsIconData = getNewsIcon(news.title, news.description, news.sentiment);
+                                                                    const newsIconData = getNewsIconUtil(news.title, news.description, news.sentiment);
                                                                     return (
                                                                 <div className={`p-3 rounded-full transition-colors duration-300 ${
                                                                             isDarkMode ? 'bg-gray-600/20' : 'bg-gray-200/60'
@@ -1072,16 +1074,16 @@ const StocksNewsTab = () => {
                                                                                         : 'text-blue-600 hover:text-blue-700'
                                                                                 }`}
                                                                             >
-                                                                                {cleanText(news.title)}
+                                                                                {cleanTextUtil(news.title)}
                                                                             </a>
                                                                         ) : (
-                                                                            cleanText(news.title)
+                                                                            cleanTextUtil(news.title)
                                                                         )}
                                                                     </h5>
                                                                     <p className={`text-base mb-4 leading-relaxed transition-colors duration-300 ${
                                                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                                     }`}>
-                                                                        {cleanText(news.description)}
+                                                                        {cleanTextUtil(news.description)}
                                                                     </p>
                                                                     <div className={`flex items-center gap-4 text-sm transition-colors duration-300 ${
                                                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
