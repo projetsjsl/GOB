@@ -10,7 +10,7 @@ if (typeof globalThis.process === 'undefined') {
 
 import { PlusTab } from './tabs/PlusTab.jsx';
 import { StocksNewsTab } from './tabs/StocksNewsTab.jsx';
-import { EmailBriefingsTab } from './EmailBriefingsTabMod.jsx';
+import { EmailBriefingsTab } from '../components/tabs/EmailBriefingsTab.tsx';
 import { AskEmmaTab } from './tabs/AskEmmaTab.jsx';
 import { IntelliStocksTab } from './IntelliStocksTabMod.jsx';
 import { MarketsEconomyTab } from './tabs/MarketsEconomyTab.jsx';
