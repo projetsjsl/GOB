@@ -6,7 +6,11 @@ declare const Recharts: any;
 declare const LightweightCharts: any;
 
 export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
-    const { isDarkMode = true } = props;
+    const {
+        isDarkMode = true,
+        teamTickers: teamTickersProp = [],
+        watchlistTickers: watchlistTickersProp = []
+    } = props;
 
                 // Initialize with fallback data so component is never blank
                 const [activeSubTab, setActiveSubTab] = useState('economic');
@@ -59,8 +63,23 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                 ];
 
                 // Team and Watchlist tickers
-                const [teamTickers, setTeamTickers] = useState([]);
-                const [watchlistTickers, setWatchlistTickers] = useState([]);
+                const [teamTickersState, setTeamTickersState] = useState<string[]>(teamTickersProp);
+                const [watchlistTickersState, setWatchlistTickersState] = useState<string[]>(watchlistTickersProp);
+
+                useEffect(() => {
+                    if (teamTickersProp && teamTickersProp.length > 0) {
+                        setTeamTickersState(teamTickersProp);
+                    }
+                }, [teamTickersProp]);
+
+                useEffect(() => {
+                    if (watchlistTickersProp && watchlistTickersProp.length > 0) {
+                        setWatchlistTickersState(watchlistTickersProp);
+                    }
+                }, [watchlistTickersProp]);
+
+                const teamTickers = teamTickersProp.length > 0 ? teamTickersProp : teamTickersState;
+                const watchlistTickers = watchlistTickersProp.length > 0 ? watchlistTickersProp : watchlistTickersState;
 
                 // Helper function for fallback data
                 const getFallbackData = () => {
@@ -94,45 +113,49 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                 console.log('📊 Données init:', calendarData);
                 console.log('🔧 État du composant:', { activeSubTab, loading, error });
 
-                // Load team and watchlist tickers once on mount
+                // Load team and watchlist tickers once on mount (only when props are empty)
                 React.useEffect(() => {
                     const loadTickers = async () => {
-                        try {
-                            // Try to fetch from API first
-                            const response = await fetch('/api/tickers-config');
-                            const data = await response.json();
+                        if (!teamTickersProp || teamTickersProp.length === 0) {
+                            try {
+                                // Try to fetch from API first
+                                const response = await fetch('/api/tickers-config');
+                                const data = await response.json();
 
-                            if (data.success) {
-                                setTeamTickers(data.team_tickers || []);
-                                console.log(`✅ Team tickers loaded: ${data.team_tickers?.length || 0}`);
+                                if (data.success) {
+                                    setTeamTickersState(data.team_tickers || []);
+                                    console.log(`✅ Team tickers loaded: ${data.team_tickers?.length || 0}`);
+                                }
+                            } catch (error) {
+                                console.error('❌ Error loading team tickers:', error);
                             }
-                        } catch (error) {
-                            console.error('❌ Error loading team tickers:', error);
                         }
 
-                        try {
-                            // Load watchlist from Supabase
-                            const response = await fetch('/api/supabase-watchlist');
-                            const data = await response.json();
+                        if (!watchlistTickersProp || watchlistTickersProp.length === 0) {
+                            try {
+                                // Load watchlist from Supabase
+                                const response = await fetch('/api/supabase-watchlist');
+                                const data = await response.json();
 
-                            if (data.tickers && Array.isArray(data.tickers)) {
-                                setWatchlistTickers(data.tickers);
-                                console.log(`✅ Watchlist tickers loaded: ${data.tickers.length}`);
-                            }
-                        } catch (error) {
-                            console.error('❌ Error loading watchlist tickers:', error);
-                            // Fallback to localStorage
-                            const savedWatchlist = localStorage.getItem('dans-watchlist');
-                            if (savedWatchlist) {
-                                const tickers = JSON.parse(savedWatchlist);
-                                setWatchlistTickers(tickers);
-                                console.log(`📦 Watchlist loaded from localStorage: ${tickers.length}`);
+                                if (data.tickers && Array.isArray(data.tickers)) {
+                                    setWatchlistTickersState(data.tickers);
+                                    console.log(`✅ Watchlist tickers loaded: ${data.tickers.length}`);
+                                }
+                            } catch (error) {
+                                console.error('❌ Error loading watchlist tickers:', error);
+                                // Fallback to localStorage
+                                const savedWatchlist = localStorage.getItem('dans-watchlist');
+                                if (savedWatchlist) {
+                                    const tickers = JSON.parse(savedWatchlist);
+                                    setWatchlistTickersState(tickers);
+                                    console.log(`📦 Watchlist loaded from localStorage: ${tickers.length}`);
+                                }
                             }
                         }
                     };
 
                     loadTickers();
-                }, []);
+                }, [teamTickersProp, watchlistTickersProp]);
 
                 // Charger les données au changement d'onglet
                 React.useEffect(() => {

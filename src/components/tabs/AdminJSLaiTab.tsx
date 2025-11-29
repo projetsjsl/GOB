@@ -7,7 +7,42 @@ declare const Recharts: any;
 declare const LightweightCharts: any;
 
 export const AdminJSLaiTab: React.FC<TabProps> = (props) => {
-    const {             emmaConnected,                 setEmmaConnected,                 showPromptEditor,                 setShowPromptEditor,                 showTemperatureEditor,                 setShowTemperatureEditor,                 showLengthEditor,                 setShowLengthEditor,                 API_BASE_URL = '',                 isDarkMode = true,                 tickers = [],                 stockData = {},                 newsData = [],                 seekingAlphaData = {},                 seekingAlphaStockData = {},                 lastUpdate = null,                 cacheSettings = { maxAgeHours: 4, refreshOnNavigation: true, refreshIntervalMinutes: 10 },                 setCacheSettings = () => {},                 cacheStatus = {},                 setCacheStatus = () => {},                 loadingCacheStatus = false,                 setLoadingCacheStatus = () => {},                 systemLogs = [] } = props;
+    const dashboardState = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
+    const noop = () => {};
+
+    const isDarkMode = props.isDarkMode ?? dashboardState.isDarkMode ?? true;
+    const API_BASE_URL = props.API_BASE_URL ?? dashboardState.API_BASE_URL ?? '';
+
+    const emmaConnected = props.emmaConnected ?? dashboardState.emmaConnected ?? false;
+    const setEmmaConnected = props.setEmmaConnected || dashboardState.setEmmaConnected || noop;
+
+    const showPromptEditor = props.showPromptEditor ?? dashboardState.showPromptEditor ?? false;
+    const setShowPromptEditor = props.setShowPromptEditor || dashboardState.setShowPromptEditor || noop;
+
+    const showTemperatureEditor = props.showTemperatureEditor ?? dashboardState.showTemperatureEditor ?? false;
+    const setShowTemperatureEditor = props.setShowTemperatureEditor || dashboardState.setShowTemperatureEditor || noop;
+
+    const showLengthEditor = props.showLengthEditor ?? dashboardState.showLengthEditor ?? false;
+    const setShowLengthEditor = props.setShowLengthEditor || dashboardState.setShowLengthEditor || noop;
+
+    const tickers = props.tickers && props.tickers.length > 0 ? props.tickers : (dashboardState.tickers || []);
+    const stockData = props.stockData && Object.keys(props.stockData).length > 0 ? props.stockData : (dashboardState.stockData || {});
+    const newsData = props.newsData && props.newsData.length > 0 ? props.newsData : (dashboardState.newsData || []);
+    const seekingAlphaData = props.seekingAlphaData && Object.keys(props.seekingAlphaData).length > 0 ? props.seekingAlphaData : (dashboardState.seekingAlphaData || {});
+    const seekingAlphaStockData = props.seekingAlphaStockData && Object.keys(props.seekingAlphaStockData).length > 0 ? props.seekingAlphaStockData : (dashboardState.seekingAlphaStockData || {});
+
+    const lastUpdate = props.lastUpdate ?? dashboardState.lastUpdate ?? null;
+
+    const cacheSettings = props.cacheSettings ?? dashboardState.cacheSettings ?? { maxAgeHours: 4, refreshOnNavigation: true, refreshIntervalMinutes: 10 };
+    const setCacheSettings = props.setCacheSettings || dashboardState.setCacheSettings || noop;
+
+    const cacheStatus = props.cacheStatus ?? dashboardState.cacheStatus ?? {};
+    const setCacheStatus = props.setCacheStatus || dashboardState.setCacheStatus || noop;
+
+    const loadingCacheStatus = props.loadingCacheStatus ?? dashboardState.loadingCacheStatus ?? false;
+    const setLoadingCacheStatus = props.setLoadingCacheStatus || dashboardState.setLoadingCacheStatus || noop;
+
+    const systemLogs = props.systemLogs ?? dashboardState.systemLogs ?? [];
                 // États pour Température et Longueur (chargés depuis localStorage)
                 const [emmaTemperature, setEmmaTemperature] = useState(() => {
                     const saved = localStorage.getItem('emma-temperature');

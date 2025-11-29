@@ -5,9 +5,27 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            export const DansWatchlistTab: React.FC<TabProps> = (props) => {
-    const { isDarkMode = true, tickers = [], stockData = {}, API_BASE_URL, fetchStockData, showMessage, getCompanyLogo, emmaPopulateWatchlist, initialLoadComplete } = props;
-                const [watchlistTickers, setWatchlistTickers] = useState([]);
+export const DansWatchlistTab: React.FC<TabProps> = (props) => {
+    const {
+        isDarkMode = true,
+        tickers = [],
+        stockData = {},
+        API_BASE_URL,
+        fetchStockData,
+        showMessage,
+        getCompanyLogo,
+        emmaPopulateWatchlist,
+        initialLoadComplete,
+        watchlistTickers: watchlistTickersProp = []
+    } = props;
+                const [watchlistTickersState, setWatchlistTickersState] = useState<string[]>(watchlistTickersProp);
+                const watchlistTickers = watchlistTickersProp.length > 0 ? watchlistTickersProp : watchlistTickersState;
+
+                useEffect(() => {
+                    if (watchlistTickersProp && watchlistTickersProp.length > 0) {
+                        setWatchlistTickersState(watchlistTickersProp);
+                    }
+                }, [watchlistTickersProp]);
                 const [newTicker, setNewTicker] = useState('');
                 const [watchlistStockData, setWatchlistStockData] = useState({});
                 const [watchlistLoading, setWatchlistLoading] = useState(false);
@@ -129,7 +147,7 @@ declare const LightweightCharts: any;
 
                 // Charger la watchlist UNE SEULE FOIS au démarrage
                 useEffect(() => {
-                    if (watchlistLoaded) return; // Éviter les rechargements
+                    if (watchlistLoaded || (watchlistTickersProp && watchlistTickersProp.length > 0)) return; // Éviter les rechargements
                     
                     const loadInitialWatchlist = async () => {
                         try {
@@ -139,7 +157,7 @@ declare const LightweightCharts: any;
                                 const json = await res.json();
                                 const tickers = Array.isArray(json.tickers) ? json.tickers : [];
                                 console.log('✅ Watchlist chargée depuis Supabase:', tickers);
-                                setWatchlistTickers(tickers);
+                                setWatchlistTickersState(tickers);
                                 localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
                                 loadWatchlistData(tickers);
                                 setWatchlistLoaded(true);
@@ -154,14 +172,14 @@ declare const LightweightCharts: any;
                         if (savedWatchlist) {
                             const tickers = JSON.parse(savedWatchlist);
                             console.log('📦 Watchlist chargée depuis localStorage:', tickers);
-                            setWatchlistTickers(tickers);
+                            setWatchlistTickersState(tickers);
                             loadWatchlistData(tickers);
                         }
                         setWatchlistLoaded(true);
                     };
                     
                     loadInitialWatchlist();
-                }, []); // Dépendance vide = une seule fois au montage
+                }, [watchlistLoaded, watchlistTickersProp]); // relaunch only when needed
 
                 // Fallback: Individual ticker loading (used when batch fails)
                 const loadWatchlistDataIndividual = async (tickers, dataObject) => {
@@ -259,7 +277,7 @@ declare const LightweightCharts: any;
                     
                     // 1. AFFICHAGE IMMÉDIAT : Ajouter le ticker à la liste TOUT DE SUITE
                     const updatedTickers = [...watchlistTickers, ticker];
-                    setWatchlistTickers(updatedTickers);
+                    setWatchlistTickersState(updatedTickers);
                     localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
                     setNewTicker('');
                     // Message discret pour l'ajout
@@ -290,7 +308,7 @@ declare const LightweightCharts: any;
                 const removeTickerFromWatchlist = async (ticker) => {
                     // 1. SUPPRESSION IMMÉDIATE : Retirer de la liste TOUT DE SUITE
                     const updatedTickers = watchlistTickers.filter(t => t !== ticker);
-                    setWatchlistTickers(updatedTickers);
+                    setWatchlistTickersState(updatedTickers);
                     localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
                     
                     // 2. Supprimer les données du ticker immédiatement
@@ -379,7 +397,7 @@ declare const LightweightCharts: any;
                         if (!res.ok) throw new Error(`HTTP ${res.status}`);
                         const json = await res.json();
                         const tickers = Array.isArray(json.tickers) ? json.tickers : [];
-                        setWatchlistTickers(tickers);
+                        setWatchlistTickersState(tickers);
                         localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
                         await loadWatchlistData(tickers);
                         console.log('✅ Watchlist chargée depuis Supabase');

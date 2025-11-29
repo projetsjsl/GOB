@@ -81,11 +81,15 @@ export interface TabProps {
   setNewsContext?: (context: NewsContext) => void;
   githubUser?: any;
   finvizNews?: Record<string, any>;
-  tickerLatestNews?: Record<string, NewsArticle>;
+  tickerLatestNews?: Record<string, NewsArticle[]>;
   tickerMoveReasons?: Record<string, string>;
   seekingAlphaData?: Record<string, SeekingAlphaData>;
   seekingAlphaStockData?: Record<string, any>;
   economicCalendarData?: EconomicEvent[];
+  apiStatus?: Record<string, any>;
+  processLog?: any[];
+  watchlistTickers?: string[];
+  teamTickers?: string[];
 
   // Setters
   setTickers?: (tickers: string[]) => void;
@@ -93,6 +97,8 @@ export interface TabProps {
   setWatchlistTickers?: (tickers: string[]) => void;
   setStockData?: (data: Record<string, StockData>) => void;
   setNewsData?: (news: NewsArticle[]) => void;
+  setTickerLatestNews?: (data: Record<string, NewsArticle[]>) => void;
+  setTickerMoveReasons?: (data: Record<string, string>) => void;
   setEconomicCalendarData?: (events: EconomicEvent[]) => void;
   setSeekingAlphaData?: (data: Record<string, SeekingAlphaData>) => void;
   setSeekingAlphaStockData?: (data: Record<string, any>) => void;
@@ -100,6 +106,26 @@ export interface TabProps {
   setActiveTab?: (tab: TabName) => void;
   setLoading?: (loading: boolean) => void;
   setLastUpdate?: (date: Date | null) => void;
+  setProcessLog?: (logs: any[]) => void;
+  setEmmaConnected?: (value: boolean) => void;
+  setShowPromptEditor?: (value: boolean) => void;
+  setShowTemperatureEditor?: (value: boolean) => void;
+  setShowLengthEditor?: (value: boolean) => void;
+  cacheSettings?: {
+    maxAgeHours: number;
+    refreshOnNavigation: boolean;
+    refreshIntervalMinutes: number;
+  };
+  setCacheSettings?: (settings: {
+    maxAgeHours: number;
+    refreshOnNavigation: boolean;
+    refreshIntervalMinutes: number;
+  }) => void;
+  cacheStatus?: Record<string, any>;
+  setCacheStatus?: (status: Record<string, any>) => void;
+  loadingCacheStatus?: boolean;
+  setLoadingCacheStatus?: (value: boolean) => void;
+  systemLogs?: any[];
 
   // État du système
   loading?: boolean;
@@ -108,6 +134,10 @@ export interface TabProps {
   initialLoadComplete?: boolean;
   selectedStock?: string | null;
   API_BASE_URL?: string;
+  emmaConnected?: boolean;
+  showPromptEditor?: boolean;
+  showTemperatureEditor?: boolean;
+  showLengthEditor?: boolean;
 
   // Fonctions utilitaires
   fetchStockData?: (ticker: string) => Promise<any>;
@@ -139,6 +169,10 @@ declare global {
       renderIcon: (emoji: string, size?: number, className?: string) => string;
     };
     __GOB_DASHBOARD_MOUNTED?: boolean;
+    BetaCombinedDashboard?: Record<string, any>;
+    BetaCombinedDashboardData?: Record<string, any>;
+    DASHBOARD_UTILS?: Record<string, any>;
+    DASHBOARD_CONSTANTS?: Record<string, any>;
   }
 }
 

@@ -96,26 +96,32 @@
 
     const cleanText = (text) => {
         if (!text) return '';
-        return text
-            .replace(/Ã©/g, 'é')
-            .replace(/Ã¨/g, 'è')
-            .replace(/Ã /g, 'à')
-            .replace(/Ã§/g, 'ç')
-            .replace(/Ã´/g, 'ô')
-            .replace(/Ã¢/g, 'â')
-            .replace(/Ã®/g, 'î')
-            .replace(/Ã¯/g, 'ï')
-            .replace(/Ã¹/g, 'ù')
-            .replace(/Ã»/g, 'û')
-            .replace(/Ã«/g, 'ë')
-            .replace(/Ã¤/g, 'ä')
-            .replace(/Ã¶/g, 'ö')
-            .replace(/Ã¼/g, 'ü')
-            .replace(/â€™/g, "'")
-            .replace(/â€œ/g, '“')
-            .replace(/â€�/g, '”')
-            .replace(/â€“/g, '–')
-            .replace(/â€”/g, '—');
+
+        const replacements = [
+            { pattern: /â€”/g, value: '—' },
+            { pattern: /â€“/g, value: '–' },
+            { pattern: /â€¢/g, value: '•' },
+            { pattern: /â€™/g, value: "'" },
+            { pattern: /â€˜/g, value: '‘' },
+            { pattern: /â€œ/g, value: '“' },
+            { pattern: /â€�/g, value: '”' },
+            { pattern: /Ã©/g, value: 'é' },
+            { pattern: /Ã¨/g, value: 'è' },
+            { pattern: /Ã /g, value: 'à' },
+            { pattern: /Ã§/g, value: 'ç' },
+            { pattern: /Ã´/g, value: 'ô' },
+            { pattern: /Ã¢/g, value: 'â' },
+            { pattern: /Ã®/g, value: 'î' },
+            { pattern: /Ã¯/g, value: 'ï' },
+            { pattern: /Ã¹/g, value: 'ù' },
+            { pattern: /Ã»/g, value: 'û' },
+            { pattern: /Ã«/g, value: 'ë' },
+            { pattern: /Ã¤/g, value: 'ä' },
+            { pattern: /Ã¶/g, value: 'ö' },
+            { pattern: /Ã¼/g, value: 'ü' }
+        ];
+
+        return replacements.reduce((result, { pattern, value }) => result.replace(pattern, value), text);
     };
 
     const getGradeColor = (grade) => {

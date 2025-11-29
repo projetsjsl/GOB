@@ -18,6 +18,8 @@ const StocksNewsTab = () => {
         const fetchNews = window.BetaCombinedDashboard?.fetchNews;
         const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
         const fetchLatestNewsForTickers = window.BetaCombinedDashboard?.fetchLatestNewsForTickers;
+        const setActiveTab = window.BetaCombinedDashboard?.setActiveTab;
+        const setSelectedStock = window.BetaCombinedDashboard?.setSelectedStock;
         const getCompanyLogo = window.BetaCombinedDashboardData?.getCompanyLogo || window.BetaCombinedDashboard?.getCompanyLogo;
         const cleanTextUtil = window.DASHBOARD_UTILS?.cleanText || ((text) => text || '');
         const getNewsIconUtil = window.DASHBOARD_UTILS?.getNewsIcon || (() => ({ icon: 'Info', color: 'text-gray-400' }));
@@ -27,6 +29,8 @@ const StocksNewsTab = () => {
         const safeFetchNews = typeof fetchNews === 'function' ? fetchNews : async () => {};
         const safeRefreshAllStocks = typeof refreshAllStocks === 'function' ? refreshAllStocks : async () => {};
         const safeFetchLatestNewsForTickers = typeof fetchLatestNewsForTickers === 'function' ? fetchLatestNewsForTickers : async () => {};
+        const safeSetActiveTab = typeof setActiveTab === 'function' ? setActiveTab : () => {};
+        const safeSetSelectedStock = typeof setSelectedStock === 'function' ? setSelectedStock : () => {};
 
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
@@ -227,8 +231,8 @@ const StocksNewsTab = () => {
                                                 isDarkMode ? 'hover:bg-green-500/20' : 'hover:bg-green-100'
                                             }`}
                                             onClick={() => {
-                                                setSelectedStock(item.ticker);
-                                                setActiveTab('intellistocks');
+                                                safeSetSelectedStock(item.ticker);
+                                                safeSetActiveTab('intellistocks');
                                             }}
                                         >
                                             <div className="flex-1 min-w-0 pr-2">
@@ -317,8 +321,8 @@ const StocksNewsTab = () => {
                                                 isDarkMode ? 'hover:bg-red-500/20' : 'hover:bg-red-100'
                                             }`}
                                             onClick={() => {
-                                                setSelectedStock(item.ticker);
-                                                setActiveTab('intellistocks');
+                                                safeSetSelectedStock(item.ticker);
+                                                safeSetActiveTab('intellistocks');
                                             }}
                                         >
                                             <div className="flex-1 min-w-0 pr-2">
@@ -450,8 +454,8 @@ const StocksNewsTab = () => {
                                             : 'bg-white hover:bg-gray-50 border border-gray-200'
                                     }`}
                                     onClick={() => {
-                                        setSelectedStock(item.ticker);
-                                        setActiveTab('intellistocks');
+                                        safeSetSelectedStock(item.ticker);
+                                        safeSetActiveTab('intellistocks');
                                     }}
                                 >
                                     <div className="flex items-center justify-between mb-3">
@@ -588,8 +592,8 @@ const StocksNewsTab = () => {
                                                 : 'bg-white hover:bg-gray-50 border border-gray-200'
                                         }`}
                                         onClick={() => {
-                                            setSelectedStock(ticker);
-                                            setActiveTab('intellistocks');
+                                            safeSetSelectedStock(ticker);
+                                            safeSetActiveTab('intellistocks');
                                         }}
                                     >
                                         <div className="flex items-center gap-4 flex-1">
@@ -700,8 +704,8 @@ const StocksNewsTab = () => {
                                                 : 'bg-gradient-to-br from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 border border-gray-200 shadow-lg'
                                         }`}
                                         onClick={() => {
-                                            setSelectedStock(ticker);
-                                            setActiveTab('intellistocks');
+                                            safeSetSelectedStock(ticker);
+                                            safeSetActiveTab('intellistocks');
                                         }}
                                     >
                                         <div className="flex items-start justify-between mb-4">
@@ -944,7 +948,7 @@ const StocksNewsTab = () => {
                                                 }`}>{dividendYield}</td>
                                                 <td className={`py-2 px-3 text-sm transition-colors duration-300 ${
                                                     isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                }`}>{cleanText(sector)}</td>
+                                                }`}>{cleanTextUtil(sector)}</td>
                                                 <td className="py-4 px-3">
                                                     <span className={`px-4 py-2 rounded-full text-sm font-bold transition-colors duration-300 ${
                                                         rating === 'Achat' ? 'bg-green-500 text-white' :
@@ -970,8 +974,8 @@ const StocksNewsTab = () => {
                                                 <td className="py-4 px-3">
                                                     <button
                                                         onClick={() => {
-                                                            setSelectedStock(ticker);
-                                                            setActiveTab('intellistocks');
+                                                            safeSetSelectedStock(ticker);
+                                                            safeSetActiveTab('intellistocks');
                                                         }}
                                                         className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 hover:scale-[1.02] shadow ${
                                                             isDarkMode
@@ -1301,7 +1305,7 @@ const StocksNewsTab = () => {
                         {newsData.length > 12 && (
                             <div className="text-center mt-6">
                                 <button
-                                    onClick={() => setActiveTab('markets-economy')}
+                                    onClick={() => safeSetActiveTab('markets-economy')}
                                     className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                                         isDarkMode
                                             ? 'bg-purple-600 hover:bg-purple-500 text-white'

@@ -5,8 +5,35 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            export const StocksNewsTab: React.FC<TabProps> = (props) => {
-    const { isDarkMode = true, tickers = [], stockData = {}, newsData = [], loading = false, lastUpdate, setSelectedStock, setActiveTab, fetchNews, refreshAllStocks, loadTickersFromSupabase, fetchLatestNewsForTickers, LucideIcon, getCompanyLogo } = props;
+export const StocksNewsTab: React.FC<TabProps> = (props) => {
+    const {
+        isDarkMode = true,
+        tickers = [],
+        stockData = {},
+        newsData = [],
+        tickerLatestNews = {},
+        tickerMoveReasons = {},
+        finvizNews = {},
+        loading = false,
+        lastUpdate,
+        setSelectedStock,
+        setActiveTab,
+        fetchNews,
+        refreshAllStocks,
+        loadTickersFromSupabase,
+        fetchLatestNewsForTickers,
+        LucideIcon: LucideIconProp,
+        getCompanyLogo: getCompanyLogoProp
+    } = props;
+
+    const safeLoadTickers = loadTickersFromSupabase ?? (async () => []);
+    const safeFetchNews = fetchNews ?? (async () => []);
+    const safeRefreshAllStocks = refreshAllStocks ?? (async () => {});
+    const safeFetchLatestNewsForTickers = fetchLatestNewsForTickers ?? (async () => {});
+    const safeSetSelectedStock = setSelectedStock ?? (() => {});
+    const safeSetActiveTab = setActiveTab ?? (() => {});
+    const LucideIcon = LucideIconProp || (({ name, className = '' }) => <span className={className}>{name}</span>);
+    const getCompanyLogo = getCompanyLogoProp || ((ticker: string) => `https://financialmodelingprep.com/image-stock/${ticker}.png`);
                 const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
                 const [expandedStock, setExpandedStock] = useState(null);
 
@@ -101,6 +128,84 @@ declare const LightweightCharts: any;
                     MRK: 'Merck & Co. Inc.'
                 };
 
+                const cleanText = (value: string = '') => {
+                    return value
+                        .replace(/Ã©/g, 'é')
+                        .replace(/Ã¨/g, 'è')
+                        .replace(/Ã /g, 'à')
+                        .replace(/Ã§/g, 'ç')
+                        .replace(/Ã´/g, 'ô')
+                        .replace(/Ã¢/g, 'â')
+                        .replace(/Ã®/g, 'î')
+                        .replace(/Ã¯/g, 'ï')
+                        .replace(/Ã¹/g, 'ù')
+                        .replace(/Ã»/g, 'û')
+                        .replace(/Ã«/g, 'ë')
+                        .replace(/Ã¤/g, 'ä')
+                        .replace(/Ã¶/g, 'ö')
+                        .replace(/Ã¼/g, 'ü')
+                        .replace(/â€™/g, "'")
+                        .replace(/â€œ/g, '“')
+                        .replace(/â€�/g, '”')
+                        .replace(/â€“/g, '–')
+                        .replace(/â€”/g, '—');
+                };
+
+                const getTickerArticles = (ticker: string) => {
+                    const entry = tickerLatestNews[ticker];
+                    if (!entry) return [];
+                    if (Array.isArray(entry)) {
+                        return entry;
+                    }
+                    return [entry];
+                };
+
+                const getTickerHeadline = (ticker: string) => {
+                    const [article] = getTickerArticles(ticker);
+                    return article || null;
+                };
+
+                const truncateHeadline = (text: string, maxLength: number) => {
+                    if (!text) return '';
+                    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+                };
+
+                const resolveTickerReason = (ticker: string) => {
+                    const reasonEntry = tickerMoveReasons[ticker];
+                    if (!reasonEntry) return '';
+                    if (typeof reasonEntry === 'string') return reasonEntry;
+                    return reasonEntry.reason || reasonEntry.text || reasonEntry.message || '';
+                };
+
+                const extractMoveReason = (ticker: string, changeValue?: number) => {
+                    const explicitReason = resolveTickerReason(ticker);
+                    if (explicitReason) {
+                        return explicitReason;
+                    }
+                    const finvizHeadline = finvizNews?.[ticker]?.headline;
+                    if (finvizHeadline) {
+                        return finvizHeadline;
+                    }
+                    const article = getTickerArticles(ticker)[0];
+                    if (article?.title) {
+                        return article.title;
+                    }
+                    if (typeof changeValue === 'number' && Math.abs(changeValue) >= 1) {
+                        return `${changeValue > 0 ? 'Hausse' : 'Baisse'} notable (${changeValue.toFixed(2)}%)`;
+                    }
+                    return '';
+                };
+
+                const sortNewsByCredibility = (articles = []) => {
+                    return [...articles]
+                        .filter(article => article && (article.title || article.description))
+                        .sort((a, b) => {
+                            const aScore = getNewsCredibilityScore(a?.source?.name || '');
+                            const bScore = getNewsCredibilityScore(b?.source?.name || '');
+                            return bScore - aScore;
+                        });
+                };
+
                 return (
                 <div className="space-y-6">
                     {/* Message d'état si pas de données */}
@@ -121,8 +226,8 @@ declare const LightweightCharts: any;
                             </p>
                             <button
                                 onClick={async () => {
-                                    await loadTickersFromSupabase();
-                                    await fetchNews();
+                                    await safeLoadTickers();
+                                    await safeFetchNews();
                                 }}
                                 className={`mt-4 px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
                                     isDarkMode
@@ -177,9 +282,9 @@ declare const LightweightCharts: any;
                             </div>
                             <button
                                 onClick={async () => {
-                                    await refreshAllStocks();
-                                    await fetchNews();
-                                    await fetchLatestNewsForTickers();
+                                    await safeRefreshAllStocks();
+                                    await safeFetchNews();
+                                    await safeFetchLatestNewsForTickers();
                                 }}
                                 disabled={loading}
                                 className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${
@@ -235,8 +340,8 @@ declare const LightweightCharts: any;
                                                         isDarkMode ? 'hover:bg-green-500/20' : 'hover:bg-green-100'
                                                     }`}
                                                     onClick={() => {
-                                                        setSelectedStock(item.ticker);
-                                                        setActiveTab('intellistocks');
+                                                        safeSetSelectedStock(item.ticker);
+                                                        safeSetActiveTab('intellistocks');
                                                     }}
                                                 >
                                                     <div className="flex-1 min-w-0 pr-2">
@@ -325,8 +430,8 @@ declare const LightweightCharts: any;
                                                         isDarkMode ? 'hover:bg-red-500/20' : 'hover:bg-red-100'
                                                     }`}
                                                     onClick={() => {
-                                                        setSelectedStock(item.ticker);
-                                                        setActiveTab('intellistocks');
+                                                        safeSetSelectedStock(item.ticker);
+                                                        safeSetActiveTab('intellistocks');
                                                     }}
                                                 >
                                                     <div className="flex-1 min-w-0 pr-2">
@@ -458,8 +563,8 @@ declare const LightweightCharts: any;
                                                     : 'bg-white hover:bg-gray-50 border border-gray-200'
                                             }`}
                                             onClick={() => {
-                                                setSelectedStock(item.ticker);
-                                                setActiveTab('intellistocks');
+                                                safeSetSelectedStock(item.ticker);
+                                                safeSetActiveTab('intellistocks');
                                             }}
                                         >
                                             <div className="flex items-center justify-between mb-3">
@@ -596,8 +701,8 @@ declare const LightweightCharts: any;
                                                         : 'bg-white hover:bg-gray-50 border border-gray-200'
                                                 }`}
                                                 onClick={() => {
-                                                    setSelectedStock(ticker);
-                                                    setActiveTab('intellistocks');
+                                                    safeSetSelectedStock(ticker);
+                                                    safeSetActiveTab('intellistocks');
                                                 }}
                                             >
                                                 <div className="flex items-center gap-4 flex-1">
@@ -635,9 +740,9 @@ declare const LightweightCharts: any;
                                                                         </span>
                                                                     )}
                                                                 </div>
-                                                            ) : tickerLatestNews[ticker] ? (
+                                                            ) : getTickerHeadline(ticker) ? (
                                                                 <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                                    📰 <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
+                                                                    📰 <span className="italic">{truncateHeadline(getTickerHeadline(ticker)?.title || '', 70)}</span>
                                                                 </div>
                                                             ) : (
                                                                 <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
@@ -708,8 +813,8 @@ declare const LightweightCharts: any;
                                                         : 'bg-gradient-to-br from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 border border-gray-200 shadow-lg'
                                                 }`}
                                                 onClick={() => {
-                                                    setSelectedStock(ticker);
-                                                    setActiveTab('intellistocks');
+                                                    safeSetSelectedStock(ticker);
+                                                    safeSetActiveTab('intellistocks');
                                                 }}
                                             >
                                                 <div className="flex items-start justify-between mb-4">
@@ -748,11 +853,11 @@ declare const LightweightCharts: any;
                                                                             </span>
                                                                         )}
                                                                     </div>
-                                                                ) : tickerLatestNews[ticker] ? (
-                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                                        📰 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
-                                                                    </div>
-                                                                ) : (
+                                                        ) : getTickerHeadline(ticker) ? (
+                                                            <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                                📰 <span className="italic">{truncateHeadline(getTickerHeadline(ticker)?.title || '', 60)}</span>
+                                                            </div>
+                                                        ) : (
                                                                     <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
                                                                         Chargement des explications...
                                                                     </div>
@@ -978,8 +1083,8 @@ declare const LightweightCharts: any;
                                                         <td className="py-4 px-3">
                                                             <button
                                                                 onClick={() => {
-                                                                    setSelectedStock(ticker);
-                                                                    setActiveTab('intellistocks');
+                                                                    safeSetSelectedStock(ticker);
+                                                                    safeSetActiveTab('intellistocks');
                                                                 }}
                                                                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 hover:scale-[1.02] shadow ${
                                                                     isDarkMode
@@ -1309,7 +1414,7 @@ declare const LightweightCharts: any;
                                 {newsData.length > 12 && (
                                     <div className="text-center mt-6">
                                         <button
-                                            onClick={() => setActiveTab('markets-economy')}
+                                            onClick={() => safeSetActiveTab('markets-economy')}
                                             className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                                                 isDarkMode
                                                     ? 'bg-purple-600 hover:bg-purple-500 text-white'

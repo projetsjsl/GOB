@@ -5,8 +5,68 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            export const EmailBriefingsTab: React.FC<TabProps> = (props) => {
+export const EmailBriefingsTab: React.FC<TabProps> = (props) => {
     const { isDarkMode = true } = props;
+    const dashboardState = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
+    const noop = () => {};
+
+    const resolvedWatchlistTickers = props.watchlistTickers && props.watchlistTickers.length > 0
+        ? props.watchlistTickers
+        : (dashboardState.watchlistTickers || []);
+    const resolvedTeamTickers = props.teamTickers && props.teamTickers.length > 0
+        ? props.teamTickers
+        : (dashboardState.teamTickers || []);
+    const resolvedStockData = props.stockData && Object.keys(props.stockData).length > 0
+        ? props.stockData
+        : (dashboardState.stockData || {});
+    const resolvedNewsData = props.newsData && props.newsData.length > 0
+        ? props.newsData
+        : (dashboardState.newsData || []);
+    const resolvedApiStatus = props.apiStatus && Object.keys(props.apiStatus).length > 0
+        ? props.apiStatus
+        : (dashboardState.apiStatus || {});
+
+    const [localProcessLog, setLocalProcessLog] = useState<any[]>(() => {
+        if (Array.isArray(props.processLog) && props.processLog.length > 0) {
+            return props.processLog;
+        }
+        if (Array.isArray(dashboardState.processLog) && dashboardState.processLog.length > 0) {
+            return dashboardState.processLog;
+        }
+        return [];
+    });
+    const processLog = (Array.isArray(props.processLog) && props.processLog.length > 0)
+        ? props.processLog
+        : localProcessLog;
+    const setProcessLog = props.setProcessLog && props.setProcessLog !== noop
+        ? props.setProcessLog
+        : (dashboardState.setProcessLog || setLocalProcessLog);
+
+    const emmaConnected = typeof props.emmaConnected === 'boolean'
+        ? props.emmaConnected
+        : (typeof dashboardState.emmaConnected === 'boolean' ? dashboardState.emmaConnected : false);
+    const setEmmaConnected = props.setEmmaConnected || dashboardState.setEmmaConnected || noop;
+
+    const showPromptEditor = typeof props.showPromptEditor === 'boolean'
+        ? props.showPromptEditor
+        : (typeof dashboardState.showPromptEditor === 'boolean' ? dashboardState.showPromptEditor : false);
+    const setShowPromptEditor = props.setShowPromptEditor || dashboardState.setShowPromptEditor || noop;
+
+    const showTemperatureEditor = typeof props.showTemperatureEditor === 'boolean'
+        ? props.showTemperatureEditor
+        : (typeof dashboardState.showTemperatureEditor === 'boolean' ? dashboardState.showTemperatureEditor : false);
+    const setShowTemperatureEditor = props.setShowTemperatureEditor || dashboardState.setShowTemperatureEditor || noop;
+
+    const showLengthEditor = typeof props.showLengthEditor === 'boolean'
+        ? props.showLengthEditor
+        : (typeof dashboardState.showLengthEditor === 'boolean' ? dashboardState.showLengthEditor : false);
+    const setShowLengthEditor = props.setShowLengthEditor || dashboardState.setShowLengthEditor || noop;
+
+    const watchlistTickers = resolvedWatchlistTickers;
+    const teamTickers = resolvedTeamTickers;
+    const stockData = resolvedStockData;
+    const newsData = resolvedNewsData;
+    const apiStatus = resolvedApiStatus;
                 const [loading, setLoading] = useState(false);
                 const [currentBriefing, setCurrentBriefing] = useState(null);
                 const [previewHtml, setPreviewHtml] = useState('');

@@ -7,7 +7,7 @@ import DansWatchlistTab from './tabs/DansWatchlistTab';
 import StocksNewsTab from './tabs/StocksNewsTab';
 import IntelliStocksTab from './tabs/IntelliStocksTab';
 import EconomicCalendarTab from './tabs/EconomicCalendarTab';
-import type { TabName, StockData, NewsArticle } from '../types';
+import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
 
 export const BetaCombinedDashboard: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TabName>('stocks-news');
@@ -17,6 +17,11 @@ export const BetaCombinedDashboard: React.FC = () => {
     const [tickers, setTickers] = useState<string[]>([]); // Vide au départ, chargé depuis Supabase
     const [stockData, setStockData] = useState<Record<string, StockData>>({});
     const [newsData, setNewsData] = useState<NewsArticle[]>([]);
+    const [tickerLatestNews, setTickerLatestNews] = useState<Record<string, NewsArticle[]>>({});
+    const [tickerMoveReasons, setTickerMoveReasons] = useState<Record<string, string>>({});
+    const [selectedStock, setSelectedStock] = useState<string | null>(null);
+    const [seekingAlphaData, setSeekingAlphaData] = useState<Record<string, SeekingAlphaData>>({});
+    const [seekingAlphaStockData, setSeekingAlphaStockData] = useState<Record<string, any>>({});
     const [loading, setLoading] = useState(false);
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
@@ -79,6 +84,12 @@ export const BetaCombinedDashboard: React.FC = () => {
         }
     };
 
+    const extractMoveReason = (articles: NewsArticle[]) => {
+        if (!articles || articles.length === 0) return '';
+        const primary = articles[0];
+        return primary?.title || primary?.text || primary?.url || '';
+    };
+
     // Fonction: charger les news spécifiques pour chaque ticker
     const fetchLatestNewsForTickers = async () => {
         if (tickers.length === 0) {
@@ -88,28 +99,50 @@ export const BetaCombinedDashboard: React.FC = () => {
 
         try {
             console.log(`📰 Chargement des news pour ${tickers.length} tickers...`);
-            const newsPromises = tickers.slice(0, 10).map(async (ticker) => {
+            const scopedTickers = tickers.slice(0, 10);
+            const newsPromises = scopedTickers.map(async (ticker) => {
                 try {
                     const response = await fetch(`${API_BASE_URL}/api/news?ticker=${ticker}&limit=5`);
                     const data = await response.json();
-                    return data.success ? data.articles : [];
+                    const articles = data.success ? data.articles : [];
+                    return { ticker, articles };
                 } catch (error) {
                     console.error(`❌ Erreur news ${ticker}:`, error);
-                    return [];
+                    return { ticker, articles: [] };
                 }
             });
 
             const results = await Promise.all(newsPromises);
-            const tickerNews = results.flat();
+            const tickerNewsList: NewsArticle[] = [];
+            const latestNewsByTicker: Record<string, NewsArticle[]> = {};
+            const moveReasons: Record<string, string> = {};
 
-            if (tickerNews.length > 0) {
+            results.forEach(({ ticker, articles }) => {
+                if (articles && articles.length > 0) {
+                    latestNewsByTicker[ticker] = articles;
+                    tickerNewsList.push(...articles);
+                    const reason = extractMoveReason(articles);
+                    if (reason) {
+                        moveReasons[ticker] = reason;
+                    }
+                }
+            });
+
+            if (Object.keys(latestNewsByTicker).length > 0) {
+                setTickerLatestNews(prev => ({ ...prev, ...latestNewsByTicker }));
+            }
+            if (Object.keys(moveReasons).length > 0) {
+                setTickerMoveReasons(prev => ({ ...prev, ...moveReasons }));
+            }
+
+            if (tickerNewsList.length > 0) {
                 // Merge avec les news générales et dédupliquer par URL
-                const allNews = [...newsData, ...tickerNews];
+                const allNews = [...newsData, ...tickerNewsList];
                 const uniqueNews = Array.from(
                     new Map(allNews.map(article => [article.url, article])).values()
                 );
                 setNewsData(uniqueNews);
-                console.log(`✅ ${tickerNews.length} news spécifiques aux tickers chargées`);
+                console.log(`✅ ${tickerNewsList.length} news spécifiques aux tickers chargées`);
             }
         } catch (error) {
             console.error('❌ Erreur chargement news tickers:', error);
@@ -263,6 +296,10 @@ export const BetaCombinedDashboard: React.FC = () => {
         setStockData,
         newsData,
         setNewsData,
+        tickerLatestNews,
+        setTickerLatestNews,
+        tickerMoveReasons,
+        setTickerMoveReasons,
         loading,
         setLoading,
         lastUpdate,
@@ -285,6 +322,65 @@ export const BetaCombinedDashboard: React.FC = () => {
         setSeekingAlphaStockData,
         selectedStock
     };
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        window.BetaCombinedDashboard = {
+            ...(window.BetaCombinedDashboard || {}),
+            isDarkMode,
+            tickers,
+            stockData,
+            newsData,
+            tickerLatestNews,
+            tickerMoveReasons,
+            loading,
+            lastUpdate,
+            selectedStock,
+            seekingAlphaData,
+            seekingAlphaStockData,
+            API_BASE_URL,
+            setActiveTab,
+            setSelectedStock,
+            setTickers,
+            setStockData,
+            setNewsData,
+            setTickerLatestNews,
+            setTickerMoveReasons,
+            setSeekingAlphaData,
+            setSeekingAlphaStockData,
+            setLoading,
+            setLastUpdate,
+            fetchNews,
+            fetchLatestNewsForTickers,
+            loadTickersFromSupabase,
+            refreshAllStocks,
+            fetchStockData,
+            showMessage,
+            getCompanyLogo,
+            emmaPopulateWatchlist
+        };
+
+        window.BetaCombinedDashboardData = {
+            ...(window.BetaCombinedDashboardData || {}),
+            getCompanyLogo,
+            emmaPopulateWatchlist
+        };
+    }, [
+        isDarkMode,
+        tickers,
+        stockData,
+        newsData,
+        tickerLatestNews,
+        tickerMoveReasons,
+        loading,
+        lastUpdate,
+        selectedStock,
+        seekingAlphaData,
+        seekingAlphaStockData
+    ]);
 
     const renderActiveTab = () => {
         switch (activeTab) {
