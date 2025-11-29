@@ -6786,7 +6786,10 @@ STRUCTURE JSON OBLIGATOIRE:
                                                             const peRatio = claudeData?.metrics?.peRatio || parsedData?.peRatio || 'N/A';
                                                             const dividendYield = claudeData?.metrics?.dividendYield || parsedData?.dividendYield || 'N/A';
                                                             const sector = claudeData?.metrics?.sector || parsedData?.sector || 'N/A';
-                                                            const quantRating = parsedData?.quantRating || claudeData?.quantRating || 'N/A';
+                                                            let quantRating = parsedData?.quantRating || claudeData?.quantRating || 'N/A';
+                                                            if (quantRating && typeof quantRating === 'object') {
+                                                                quantRating = quantRating.overall || quantRating.rating || 'N/A';
+                                                            }
                                                             const rating = claudeData?.finalConclusion?.rating || 'Hold';
 
                                                             const changeColor = (change.includes('+') || change.includes('green')) ? 'text-green-400' : 'text-red-400';
