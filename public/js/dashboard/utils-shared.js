@@ -50,8 +50,8 @@
                 isBull ? '🐂' : '🐻'
             );
         }
-        // Fallback plain object if React is not available
-        return { className: classes, content: isBull ? '🐂' : '🐻' };
+        // Fallback string if React is not available
+        return isBull ? '🐂' : '🐻';
     };
 
     const cleanText = (text) => {
