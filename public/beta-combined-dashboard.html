@@ -527,6 +527,14 @@
     
     <script>
         
+        const DASHBOARD_MODULES_VERSION = '2025-11-29T04:26:00Z';
+        let resolveModulesReady;
+        let rejectModulesReady;
+        window.dashboardModulesReady = new Promise((resolve, reject) => {
+            resolveModulesReady = resolve;
+            rejectModulesReady = reject;
+        });
+
         // Liste des scripts à charger dans l'ordre
         const scriptsToLoad = [
             '/js/dashboard/utils.js',
@@ -551,6 +559,31 @@
             '/js/dashboard/components/tabs/JLabUnifiedTab.js',
             '/js/dashboard/dashboard-main.js'
         ];
+
+        // Composants attendus en globals pour compatibilité monolithique et tests
+        const expectedGlobals = [
+            'BetaCombinedDashboard',
+            'PlusTab',
+            'YieldCurveTab',
+            'MarketsEconomyTab',
+            'EconomicCalendarTab',
+            'InvestingCalendarTab',
+            'EmmaSmsPanel',
+            'AdminJSLaiTab',
+            'AskEmmaTab',
+            'DansWatchlistTab',
+            'StocksNewsTab',
+            'IntelliStocksTab',
+            'EmailBriefingsTab',
+            'ScrappingSATab',
+            'SeekingAlphaTab',
+            'FinanceProTab',
+            'JLabUnifiedTab'
+        ];
+        window.expectedDashboardGlobals = expectedGlobals;
+        window.dashboardModulesVersion = DASHBOARD_MODULES_VERSION;
+
+        const globalEval = (0, eval);
         
         // Fonction pour charger et transpiler un script
         async function loadAndTranspileScript(src) {
@@ -569,7 +602,9 @@
                 // Transpiler avec Babel
                 if (typeof Babel !== 'undefined') {
                     const transpiled = Babel.transform(code, {
-                        presets: ['react', 'env']
+                        presets: ['react', 'env'],
+                        sourceType: 'script',
+                        filename: src
                     }).code;
                     
                     // #region agent log (désactivé en production)
@@ -577,7 +612,7 @@
                     // #endregion
                     
                     // Exécuter le code transpilé
-                    eval(transpiled);
+                    globalEval(`${transpiled}\n//# sourceURL=${src}`);
                 } else {
                     throw new Error('Babel is not available');
                 }
@@ -597,8 +632,13 @@
             console.log('🚀 [DEBUG] Début du chargement des scripts...');
             let loadedCount = 0;
             let errorCount = 0;
+            const versionedScripts = scriptsToLoad.map((src) => 
+                src.includes('?')
+                    ? `${src}&v=${DASHBOARD_MODULES_VERSION}`
+                    : `${src}?v=${DASHBOARD_MODULES_VERSION}`
+            );
             
-            for (const src of scriptsToLoad) {
+            for (const src of versionedScripts) {
                 try {
                     console.log(`📦 [DEBUG] Chargement de ${src}...`);
                     await loadAndTranspileScript(src);
@@ -612,6 +652,24 @@
             }
             
             console.log(`📊 [DEBUG] Chargement terminé: ${loadedCount} réussis, ${errorCount} erreurs`);
+            const missingGlobals = expectedGlobals.filter(name => typeof window[name] === 'undefined');
+            if (missingGlobals.length) {
+                console.error('❌ [DEBUG] Composants manquants dans window:', missingGlobals);
+            } else {
+                console.log('✅ [DEBUG] Tous les composants attendus sont disponibles dans window');
+            }
+            const status = {
+                version: DASHBOARD_MODULES_VERSION,
+                loadedCount,
+                errorCount,
+                missingGlobals
+            };
+            window.dashboardModulesStatus = status;
+            if (missingGlobals.length || errorCount > 0) {
+                rejectModulesReady?.(new Error(`Modules incomplets (erreurs: ${errorCount}, manquants: ${missingGlobals.join(', ') || 'aucun'})`));
+            } else {
+                resolveModulesReady?.(status);
+            }
             
             // #region agent log (désactivé en production)
             // Logging désactivé pour éviter les erreurs CORS en production
