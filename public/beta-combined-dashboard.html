@@ -38,6 +38,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
+    <!-- Constantes partagées exposées globalement -->
+    <script src="/js/dashboard/constants.js"></script>
 
     <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
@@ -17306,38 +17308,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     };
 
                     // Mapping des noms de compagnies pour affichage
-                    const companyNames = {
-                        AAPL: 'Apple Inc.',
-                        TSLA: 'Tesla Inc.',
-                        GOOGL: 'Alphabet Inc.',
-                        GOOG: 'Alphabet Inc.',
-                        MSFT: 'Microsoft Corporation',
-                        NVDA: 'NVIDIA Corporation',
-                        AMZN: 'Amazon.com Inc.',
-                        META: 'Meta Platforms Inc.',
-                        NFLX: 'Netflix Inc.',
-                        AMD: 'Advanced Micro Devices Inc.',
-                        INTC: 'Intel Corporation',
-                        CRM: 'Salesforce Inc.',
-                        ORCL: 'Oracle Corporation',
-                        CSCO: 'Cisco Systems Inc.',
-                        ADBE: 'Adobe Inc.',
-                        PYPL: 'PayPal Holdings Inc.',
-                        DIS: 'The Walt Disney Company',
-                        BA: 'The Boeing Company',
-                        GE: 'General Electric Company',
-                        JPM: 'JPMorgan Chase & Co.',
-                        BAC: 'Bank of America Corporation',
-                        WMT: 'Walmart Inc.',
-                        HD: 'The Home Depot Inc.',
-                        PG: 'Procter & Gamble Company',
-                        JNJ: 'Johnson & Johnson',
-                        V: 'Visa Inc.',
-                        MA: 'Mastercard Incorporated',
-                        UNH: 'UnitedHealth Group Inc.',
-                        PFE: 'Pfizer Inc.',
-                        MRK: 'Merck & Co. Inc.'
-                    };
+                    const companyNames = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.companyNames) || {};
 
                     // Fonction helper pour obtenir les 5 dernières nouvelles d'un ticker
                     const getTickerNews = (ticker, limit = 5) => {
@@ -18858,7 +18829,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             MSFT: 384.89, NVDA: 485.32, AMZN: 178.91
                         }[symbol] || 180;
 
-                        const companyNames = {
+                        const companyNames = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.companyNames) || {
                             AAPL: 'Apple Inc.', TSLA: 'Tesla Inc.', GOOGL: 'Alphabet Inc.',
                             MSFT: 'Microsoft Corp.', NVDA: 'NVIDIA Corp.', AMZN: 'Amazon.com Inc.'
                         };
