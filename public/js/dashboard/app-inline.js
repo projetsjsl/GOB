@@ -13665,10 +13665,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`);
                     useEffect(() => {
                         if (typeof window.supabase !== 'undefined') {
                             try {
-                                // URL Supabase (déduite de la clé fournie)
-                                const supabaseUrl = 'https://boyuxgdpbkpknplxbxp.supabase.co';
-                                // Clé par défaut (peut être surchargée via localStorage)
-                                const defaultSupabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
+                                // URL/clé Supabase (surchargées via localStorage ou variables globales)
+                                const supabaseUrl = window.SUPABASE_URL || 'https://boyuxgdplbpkknplxbxp.supabase.co';
+                                const defaultSupabaseKey = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJveXV4Z2RwbGJwa2tucGx4YnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzMzU5MTQsImV4cCI6MjA3NTkxMTkxNH0.-M-QdpBFlDtg1CeA00VepQCNzGzvU-tISyVA0yCLBdw';
                                 const supabaseKey = localStorage.getItem('SUPABASE_ANON_KEY') || defaultSupabaseKey;
                                 
                                 const client = window.supabase.createClient(supabaseUrl, supabaseKey);
