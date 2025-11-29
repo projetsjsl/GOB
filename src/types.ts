@@ -69,7 +69,8 @@ export type TabName =
   | 'yield-curve'
   | 'markets-economy'
   | 'ask-emma'
-  | 'emma-config';
+  | 'emma-config'
+  | 'testonly';
 
 // Props des tabs
 export interface TabProps {

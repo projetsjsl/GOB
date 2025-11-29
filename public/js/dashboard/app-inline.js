@@ -3286,7 +3286,8 @@
                         'investing-calendar': 'iconoir-calendar', // Calendrier pour Investing Calendar
                         'yield-curve': 'iconoir-graph-up', // Graphique pour Yield Curve
                         'markets-economy': 'iconoir-globe', // ✅ Icône valide
-                        'emma-config': 'iconoir-settings' // Page de configuration Emma
+                        'emma-config': 'iconoir-settings', // Page de configuration Emma
+                        'testonly': 'iconoir-lab' // Section test/plan
                     };
                     // Retourner l'icône avec fallback
                     return iconMap[tabId] || 'iconoir-graph-up';
@@ -24804,7 +24805,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     { id: 'seeking-alpha', label: 'Stocks News', component: SeekingAlphaTab },
                     { id: 'email-briefings', label: 'Emma En Direct', component: EmailBriefingsTab },
                     { id: 'investing-calendar', label: 'TESTS JS', component: InvestingCalendarTab },
-                    { id: 'emma-config', label: 'Emma Config', component: EmmaConfigTab }
+                    { id: 'emma-config', label: 'Emma Config', component: EmmaConfigTab },
+                    { id: 'testonly', label: 'Test Only', component: TestOnlyTab }
                 ];
 
                 return (
@@ -25326,6 +25328,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                             {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
                             {activeTab === 'emma-config' && <EmmaConfigTab />}
+                            {activeTab === 'testonly' && <TestOnlyTab />}
                         </main>
 
                         {/* Messages */}

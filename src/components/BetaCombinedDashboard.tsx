@@ -10,6 +10,7 @@ import EconomicCalendarTab from './tabs/EconomicCalendarTab';
 import EmmaConfigTab from './tabs/EmmaConfigTab';
 import AskEmmaTab from './tabs/AskEmmaTab';
 import EmailBriefingsTab from './tabs/EmailBriefingsTab';
+import TestOnlyTab from './tabs/TestOnlyTab';
 import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
 
 export const BetaCombinedDashboard: React.FC = () => {
@@ -456,6 +457,7 @@ export const BetaCombinedDashboard: React.FC = () => {
             case 'admin-jslai': return <AdminJSLaiTab {...tabProps} />;
             case 'ask-emma': return <AskEmmaTab {...tabProps} />;
             case 'emma-config': return <EmmaConfigTab {...tabProps} />;
+            case 'testonly': return <TestOnlyTab {...tabProps} />;
             case 'email-briefings': return <EmailBriefingsTab {...tabProps} />;
             case 'plus': return <PlusTab {...tabProps} />;
             case 'watchlist': return <DansWatchlistTab {...tabProps} />;
@@ -490,6 +492,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                         { id: 'economic-calendar' as TabName, label: '📅 Calendar' },
                         { id: 'ask-emma' as TabName, label: '🤖 Emma IA™' },
                         { id: 'emma-config' as TabName, label: '🛠️ Emma Config' },
+                        { id: 'testonly' as TabName, label: '🧪 Test Only' },
                         { id: 'admin-jslai' as TabName, label: '⚙️ Admin' },
                         { id: 'plus' as TabName, label: '➕ Plus' }
                     ].map(tab => (
