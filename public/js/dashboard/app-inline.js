@@ -7162,65 +7162,6 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <Icon emoji="📈" size={24} className="mr-2 inline-block" />
                                 Analyses Seeking Alpha
                             </h2>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={refreshAllStocks}
-                                    disabled={loading}
-                                    className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
-                                >
-                                    {loading ? 'Actualisation...' : 'Actualiser Stocks'}
-                                </button>
-                                <button
-                                    onClick={fetchNews}
-                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                                >
-                                    Actualiser News
-                                </button>
-                                <button
-                                    onClick={runSeekingAlphaScraper}
-                                    disabled={scrapingStatus === 'running'}
-                                    className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
-                                >
-                                    {scrapingStatus === 'running' ? 'Scraping...' : '🚀 Lancer le Scraper'}
-                                </button>
-                                <button
-                                    onClick={() => openSeekingAlpha('AAPL')}
-                                    className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
-                                >
-                                    🌐 Ouvrir Seeking Alpha
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        const script = generateScrapingScript('CVS');
-                                        navigator.clipboard.writeText(script).then(() => {
-                                            addScrapingLog('📋 Script de scraping copié dans le presse-papiers', 'success');
-                                            addScrapingLog('💡 Collez-le dans la console F12 de Seeking Alpha', 'info');
-                                        });
-                                    }}
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
-                                >
-                                    📋 Script F12
-                                </button>
-                                <button
-                                    onClick={async () => {
-                                        addScrapingLog('🤖 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
-                                        try {
-                                            for (const ticker of tickers) {
-                                                const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
-                                                if (seekingAlphaItem?.parsedData) {
-                                                    await analyzeWithClaude(ticker, seekingAlphaItem.parsedData);
-                                                }
-                                            }
-                                            addScrapingLog('✅ Analyse Perplexity terminée pour tous les titres', 'success');
-                                        } catch (error) {
-                                            addScrapingLog(`❌ Erreur analyse Perplexity: ${error.message}`, 'error');
-                                        }
-                                    }}
-                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-                                >
-                                    🤖 Analyser avec Claude
-                                </button>
-                            </div>
                         </div>
 
                         {/* Fiche détaillée du titre sélectionné */}
