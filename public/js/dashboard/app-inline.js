@@ -1,3 +1,11 @@
+/**
+ * SAFETY NOTE FOR EDITORS:
+ * - This file is huge and parsed by Babel Standalone in the browser; a single unclosed template string/backtick will break production.
+ * - Avoid JSX template literals for className/style when not necessary; prefer plain strings.
+ * - Do not interpolate backticks inside backticks; use simple quotes in alt/src/className.
+ * - After edits, run a quick parse check locally (e.g. with @babel/parser or another linter) before deploying.
+ * Keeping this block at the top as a reminder to reduce future syntax regressions.
+ */
         if (window.__GOB_DASHBOARD_MOUNTED) {
             console.warn('⚠️ Beta Dashboard déjà initialisé, exécution ignorée.');
         } else {
