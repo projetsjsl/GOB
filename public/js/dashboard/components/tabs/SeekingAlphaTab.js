@@ -16,11 +16,11 @@ const SeekingAlphaTab = () => {
     const loading = window.BetaCombinedDashboard?.loading ?? false;
     
     return (
-                <div className="space-y-6">
+                <div className="space-y-6" role="main" aria-label="Analyses Seeking Alpha">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
+                        }`} role="heading" aria-level="2">
                         <Icon emoji="📈" size={24} className="mr-2 inline-block" />
                         Analyses Seeking Alpha
                     </h2>
@@ -589,5 +589,6 @@ const SeekingAlphaTab = () => {
                     )}
                 </div>
             );
+};
 
 window.SeekingAlphaTab = SeekingAlphaTab;

@@ -15,6 +15,7 @@ const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
         const fetchNews = window.BetaCombinedDashboard?.fetchNews;
         const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
         const fetchLatestNewsForTickers = window.BetaCombinedDashboard?.fetchLatestNewsForTickers;
+        const getCompanyLogo = window.BetaCombinedDashboardData?.getCompanyLogo || window.BetaCombinedDashboard?.getCompanyLogo;
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
 
@@ -112,7 +113,7 @@ const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
         };
 
         return (
-        <div className="space-y-6">
+        <div className="space-y-6" role="main" aria-label="Titres et nouvelles">
             {/* Message d'état si pas de données */}
             {tickers.length === 0 && (
                 <div className={`p-6 rounded-xl border-2 transition-colors duration-300 ${
@@ -148,7 +149,7 @@ const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
             <div className="flex justify-between items-center">
                 <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>📊 Titres & nouvelles</h2>
+                }`} role="heading" aria-level="2">📊 Titres & nouvelles</h2>
                 <div className="flex gap-2">
                     {/* Toggle Vue */}
                     <div className={`flex gap-1 p-1 rounded-lg transition-colors duration-300 ${
@@ -257,7 +258,7 @@ const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
                                                         {idx + 1}
                                                     </div>
                                                     <img
-                                                        src={getCompanyLogo(item.ticker)}
+                                                        src={getCompanyLogo ? getCompanyLogo(item.ticker) : `https://logo.clearbit.com/${item.ticker.toLowerCase()}.com`}
                                                         alt={item.ticker}
                                                         className="w-6 h-6 rounded flex-shrink-0"
                                                         onError={(e) => e.target.style.display = 'none'}
@@ -347,7 +348,7 @@ const StocksNewsTab = ({ tickerSource = 'portfolio' }) => {
                                                         {idx + 1}
                                                     </div>
                                                     <img
-                                                        src={getCompanyLogo(item.ticker)}
+                                                        src={getCompanyLogo ? getCompanyLogo(item.ticker) : `https://logo.clearbit.com/${item.ticker.toLowerCase()}.com`}
                                                         alt={item.ticker}
                                                         className="w-6 h-6 rounded flex-shrink-0"
                                                         onError={(e) => e.target.style.display = 'none'}
