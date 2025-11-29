@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "node build.js",
     "build:vite": "vite build",
+    "build:dashboard-mod": "vite build --config vite.dashboard-mod.config.ts",
     "preview": "vite preview",
     "build:legacy": "node build.js",
     "start": "node test-sms-server.js",

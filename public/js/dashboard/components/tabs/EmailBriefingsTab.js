@@ -50,8 +50,9 @@ const EmailBriefingsTab = () => {
                 // ✅ 4 modèles de backup + cache intelligent + monitoring en temps réel
                 // ============================================================================
                 
-                // Prompts Emma En Direct - désormais externalisés dans DASHBOARD_CONSTANTS.briefingPrompts
-                const prompts = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.briefingPrompts) || {}
+                // Prompts Emma En Direct - externalisés dans DASHBOARD_CONSTANTS.briefingPrompts
+                const prompts = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.briefingPrompts) || {};
+                const hasPrompt = (type) => !!(prompts && prompts[type] && (prompts[type]?.perplexity || "") && (prompts[type]?.openai || ""));
 
 
                 // NOTE: addLogEntry() moved to line ~2183 (before AdminJSLaiTab for proper scope)
@@ -401,12 +402,12 @@ const EmailBriefingsTab = () => {
                         
                         addLogEntry('NEWS', 'Début recherche actualités', { 
                             source: 'perplexity',
-                            promptLength: prompts[type].perplexity.length
+                            promptLength: (prompts[type]?.perplexity || "").length
                         }, 'info');
                         
                         const newsRequest = {
                             service: 'perplexity',
-                            prompt: prompts[type].perplexity,
+                            prompt: (prompts[type]?.perplexity || ""),
                             recency: 'day',
                             section: 'news'
                         };
@@ -464,14 +465,14 @@ const EmailBriefingsTab = () => {
                         
                         addLogEntry('ANALYSIS', 'Début génération analyse IA', { 
                             source: 'perplexity',
-                            promptLength: prompts[type].perplexity.length,
+                            promptLength: (prompts[type]?.perplexity || "").length,
                             marketDataSize: JSON.stringify(enrichedMarketData).length,
                             newsSize: (newsResult.content || '').length
                         }, 'info');
                         
                         const analysisRequest = {
                             service: 'perplexity',
-                            prompt: prompts[type].perplexity,
+                            prompt: (prompts[type]?.perplexity || ""),
                             marketData: enrichedMarketData,
                             news: newsResult.content || 'Aucune actualité disponible',
                             section: 'analysis'
