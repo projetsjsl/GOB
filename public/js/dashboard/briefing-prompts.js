@@ -192,4 +192,37 @@ Contenu attendu
 
 STYLE : Voix Emma - Niveau expert institutionnel, 2000-2500 mots, français, avec chiffres précis, références sectorielles détaillées, et recommandations tactiques approfondies`
     };
+
+    // Noon / Midday briefing prompt (condensed to avoid missing keys)
+    window.DASHBOARD_CONSTANTS.briefingPrompts.noon = {
+        perplexity: `⏱️ Noon Market Briefing — Mise à jour Intraday
+Résumé intraday (4 dernières heures) : breaking news corporate (earnings, guidance, M&A), activités options, volumes anormaux, sentiment retail/institutionnel.
+Macro EU/US du matin (retail sales, PPI, sentiment) vs consensus et impacts.
+Analyse sectorielle (tech, santé, finance, énergie…) avec drivers et implications tactiques.
+Analyse technique intraday (supports/résistances, RSI/MACD, VIX, corrélations) + niveaux clés pour l'après-midi.
+Calendrier après-midi (discours Fed, prints macro, résultats after-market) et recommandations tactiques (entry/stops/hedges).
+Sources : Bloomberg, Reuters, CNBC, banques centrales, Investing, CBOE.`,
+        openai: `⏱️ Noon Market Briefing — Mise à jour Intraday
+Couverture des 4 dernières heures : breaking news corporate (earnings, guidance, M&A), options flow, volumes anormaux.
+Macro du matin vs consensus, effets marchés, rotations sectorielles.
+Technique intraday (S/R, RSI/MACD, VIX, corrélations) et niveaux à surveiller.
+Calendrier après-midi (Fed, prints macro, earnings), risques/opportunités et tactiques (entry/stops/hedges).
+Sources : Bloomberg, Reuters, CNBC, CBOE, Investing.`
+    };
+
+    // Evening / Close briefing prompt (condensed)
+    window.DASHBOARD_CONSTANTS.briefingPrompts.evening = {
+        perplexity: `🌙 Evening Market Briefing — Clôture
+Synthèse de la séance clôturée : indices (S&P/NASDAQ/DOW/TSX), secteurs gagnants/perdants, top movers avec explications (volumes, sentiment).
+Breaking news after-market (earnings, guidance, M&A), options/dark pool si pertinents.
+Analyse technique et sentiment (S/R, patterns, RSI/MACD, VIX, put/call), niveaux clés pour demain.
+Agenda macro/earnings du lendemain, risques/opportunités tactiques par secteur/watchlist.
+Sources : Bloomberg, Reuters, CNBC, CBOE, Investing.`,
+        openai: `🌙 Evening Market Briefing — Clôture
+Résumé de la séance : indices, secteurs, top movers, drivers macro/micro.
+News after-market (earnings, guidance, M&A), réactions cours/volumes.
+Technique/sentiment : S/R, RSI/MACD, VIX, put/call, niveaux pour demain.
+Agenda macro/earnings à venir, risques/opportunités et positionnement suggéré.
+Sources : Bloomberg, Reuters, CNBC, CBOE, Investing.`
+    };
 })();
