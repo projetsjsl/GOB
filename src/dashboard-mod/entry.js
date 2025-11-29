@@ -21,6 +21,7 @@ import { ScrappingSATab } from './tabs/ScrappingSATab.jsx';
 import { SeekingAlphaTab } from './tabs/SeekingAlphaTab.jsx';
 import { DansWatchlistTab } from './tabs/DansWatchlistTab.jsx';
 import { AdminJSLaiTab } from './tabs/AdminJSLaiTab.jsx';
+import { EconomicCalendarTab } from './tabs/EconomicCalendarTab.jsx';
 
 // Expose pilot modules on window (no runtime swap yet)
 if (typeof window !== 'undefined') {
@@ -37,6 +38,7 @@ if (typeof window !== 'undefined') {
     window.SeekingAlphaTabMod = SeekingAlphaTab;
     window.DansWatchlistTabMod = DansWatchlistTab;
     window.AdminJSLaiTabMod = AdminJSLaiTab;
+    window.EconomicCalendarTabMod = EconomicCalendarTab;
     if (!window.MarketsEconomyTab) {
         window.MarketsEconomyTab = MarketsEconomyTab;
     }
@@ -57,6 +59,9 @@ if (typeof window !== 'undefined') {
     }
     if (!window.AdminJSLaiTab) {
         window.AdminJSLaiTab = AdminJSLaiTab;
+    }
+    if (!window.EconomicCalendarTab) {
+        window.EconomicCalendarTab = EconomicCalendarTab;
     }
     window.React = window.React || React;
     window.ReactDOM = window.ReactDOM || ReactDOM;
