@@ -896,7 +896,7 @@
                     }
 
                     // Afficher intro Seeking Alpha si c'est la première visite de cette page load
-                    if (tabId === 'scrapping-sa' || tabId === 'seeking-alpha') {
+                    if (tabId === 'seeking-alpha') {
                         if (!tabsVisitedThisSession['seekingalpha']) {
                             setShowSeekingAlphaIntro(true);
                             setTimeout(() => setShowSeekingAlphaIntro(false), 3000);
@@ -3280,7 +3280,6 @@
                         'plus': 'iconoir-menu', // Menu pour Plus
                         'admin-jsla': 'iconoir-settings', // ✅ Icône valide
                         'dans-watchlist': 'iconoir-star', // ✅ Icône valide
-                        'scrapping-sa': 'iconoir-search', // ✅ Icône valide
                         'seeking-alpha': 'iconoir-graph-up', // ✅ Icône valide
                         'email-briefings': 'iconoir-antenna-signal', // ✅ Icône valide
                         'economic-calendar': 'iconoir-calendar', // ✅ Icône valide
@@ -24763,7 +24762,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     // { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab }, // Supprimé - fonctionnalités disponibles dans JLab → Dan's watchlist
                     { id: 'plus', label: 'Plus', component: PlusTab },
                     { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
-                    { id: 'scrapping-sa', label: 'Seeking Alpha', component: ScrappingSATab },
                     { id: 'seeking-alpha', label: 'Stocks News', component: SeekingAlphaTab },
                     { id: 'email-briefings', label: 'Emma En Direct', component: EmailBriefingsTab },
                     { id: 'investing-calendar', label: 'TESTS JS', component: InvestingCalendarTab },
@@ -24829,7 +24827,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         )}
 
                         {/* Intro Seeking Alpha - première visite de session */}
-                        {showSeekingAlphaIntro && activeTab === 'scrapping-sa' && (
+                        {showSeekingAlphaIntro && activeTab === 'seeking-alpha' && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
                                 <div className="text-center">
                                     <div className="mb-6">
@@ -25284,7 +25282,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 setShowLengthEditor={setShowLengthEditor}
                             />}
                             {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
-                            {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                             {activeTab === 'email-briefings' && <EmailBriefingsTab />}
                             {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                             {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
