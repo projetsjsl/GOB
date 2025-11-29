@@ -20,6 +20,7 @@ import { YieldCurveTab } from './tabs/YieldCurveTab.jsx';
 import { ScrappingSATab } from './tabs/ScrappingSATab.jsx';
 import { SeekingAlphaTab } from './tabs/SeekingAlphaTab.jsx';
 import { DansWatchlistTab } from './tabs/DansWatchlistTab.jsx';
+import { AdminJSLaiTab } from './tabs/AdminJSLaiTab.jsx';
 
 // Expose pilot modules on window (no runtime swap yet)
 if (typeof window !== 'undefined') {
@@ -35,6 +36,7 @@ if (typeof window !== 'undefined') {
     window.ScrappingSATabMod = ScrappingSATab;
     window.SeekingAlphaTabMod = SeekingAlphaTab;
     window.DansWatchlistTabMod = DansWatchlistTab;
+    window.AdminJSLaiTabMod = AdminJSLaiTab;
     if (!window.MarketsEconomyTab) {
         window.MarketsEconomyTab = MarketsEconomyTab;
     }
@@ -52,6 +54,9 @@ if (typeof window !== 'undefined') {
     }
     if (!window.DansWatchlistTab) {
         window.DansWatchlistTab = DansWatchlistTab;
+    }
+    if (!window.AdminJSLaiTab) {
+        window.AdminJSLaiTab = AdminJSLaiTab;
     }
     window.React = window.React || React;
     window.ReactDOM = window.ReactDOM || ReactDOM;
