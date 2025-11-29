@@ -9,9 +9,9 @@ if (typeof globalThis.process === 'undefined') {
 }
 
 import { PlusTab } from './tabs/PlusTab.jsx';
-import { StocksNewsTabMod } from './StocksNewsTabMod.jsx';
+import { StocksNewsTab } from './tabs/StocksNewsTab.jsx';
 import { EmailBriefingsTab } from './EmailBriefingsTabMod.jsx';
-import { AskEmmaTab } from './AskEmmaTabMod.jsx';
+import { AskEmmaTab } from './tabs/AskEmmaTab.jsx';
 import { IntelliStocksTab } from './IntelliStocksTabMod.jsx';
 import { MarketsEconomyTab } from './MarketsEconomyTabMod.jsx';
 import { EmailBriefingsTabFull } from './EmailBriefingsTabFull.jsx';
@@ -19,7 +19,7 @@ import { EmailBriefingsTabFull } from './EmailBriefingsTabFull.jsx';
 // Expose pilot modules on window (no runtime swap yet)
 if (typeof window !== 'undefined') {
     window.PlusTabMod = PlusTab;
-    window.StocksNewsTabMod = StocksNewsTabMod;
+    window.StocksNewsTabMod = StocksNewsTab;
     window.EmailBriefingsTabMod = EmailBriefingsTab;
     window.EmailBriefingsTabFull = EmailBriefingsTabFull;
     window.AskEmmaTabMod = AskEmmaTab;
