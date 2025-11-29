@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import BetaCombinedDashboard from '../components/BetaCombinedDashboard.tsx';
 
 // Shim process for JSX runtime if not present
 if (typeof globalThis.process === 'undefined') {
@@ -65,4 +66,12 @@ if (typeof window !== 'undefined') {
     }
     window.React = window.React || React;
     window.ReactDOM = window.ReactDOM || ReactDOM;
+    window.BetaCombinedDashboardComponent = BetaCombinedDashboard;
+
+    // Monter automatiquement si un root est présent
+    const rootEl = document.getElementById('root');
+    if (rootEl && !window.__GOB_DASHBOARD_MOUNTED) {
+        ReactDOM.render(React.createElement(BetaCombinedDashboard), rootEl);
+        window.__GOB_DASHBOARD_MOUNTED = true;
+    }
 }
