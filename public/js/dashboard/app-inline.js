@@ -896,7 +896,7 @@
                     }
 
                     // Afficher intro Seeking Alpha si c'est la première visite de cette page load
-                    if (tabId === 'seeking-alpha') {
+                    if (tabId === 'scrapping-sa' || tabId === 'seeking-alpha') {
                         if (!tabsVisitedThisSession['seekingalpha']) {
                             setShowSeekingAlphaIntro(true);
                             setTimeout(() => setShowSeekingAlphaIntro(false), 3000);
@@ -3280,14 +3280,14 @@
                         'plus': 'iconoir-menu', // Menu pour Plus
                         'admin-jsla': 'iconoir-settings', // ✅ Icône valide
                         'dans-watchlist': 'iconoir-star', // ✅ Icône valide
+                        'scrapping-sa': 'iconoir-search', // ✅ Icône valide
                         'seeking-alpha': 'iconoir-graph-up', // ✅ Icône valide
                         'email-briefings': 'iconoir-antenna-signal', // ✅ Icône valide
                         'economic-calendar': 'iconoir-calendar', // ✅ Icône valide
                         'investing-calendar': 'iconoir-calendar', // Calendrier pour Investing Calendar
                         'yield-curve': 'iconoir-graph-up', // Graphique pour Yield Curve
                         'markets-economy': 'iconoir-globe', // ✅ Icône valide
-                        'emma-config': 'iconoir-settings', // Page de configuration Emma
-                        'testonly': 'iconoir-lab' // Section test/plan
+                        'emma-config': 'iconoir-settings' // Page de configuration Emma
                     };
                     // Retourner l'icône avec fallback
                     return iconMap[tabId] || 'iconoir-graph-up';
@@ -4503,136 +4503,97 @@ STRUCTURE JSON OBLIGATOIRE:
                     setShowTemperatureEditor,
                     showLengthEditor,
                     setShowLengthEditor
-                }) => {
-                    const sectionLinks = [
-                        { id: 'admin-sms', label: 'SMS/Emma' },
-                        { id: 'admin-debug', label: 'Debug données' },
-                        { id: 'admin-cache', label: 'Cache Supabase' },
-                        { id: 'admin-stocks', label: 'Stocks & News' },
-                        { id: 'admin-scraping', label: 'Scraping SA' },
-                        { id: 'admin-health', label: 'Diagnostics' },
-                        { id: 'admin-logs', label: 'Logs' }
-                    ];
+                }) => (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>⚙️ Admin-JSLAI</h2>
+                        </div>
 
-                    const scrollToSection = (id) => {
-                        const el = document.getElementById(id);
-                        if (el) {
-                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    };
+                        <EmmaSmsPanel />
 
-                    return (
-                        <div className="space-y-6">
-                            <div className="flex justify-between items-center">
-                                <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>⚙️ Admin-JSLAI</h2>
+                        {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
+                        <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                            }`}>
+                            <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <Icon emoji="🔍" size={20} />
+                                Debug des Données
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                                    <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
+                                        <Icon emoji="📊" size={18} />
+                                        Stock Data
+                                    </div>
+                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                        Tickers: {tickers.length} ({tickers.join(', ')})
+                                    </div>
+                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                        Données chargées: {Object.keys(stockData).length}
+                                    </div>
+                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                        Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
+                                    </div>
+                                </div>
+                                <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                                    <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
+                                        <Icon emoji="📰" size={18} />
+                                        News Data
+                                    </div>
+                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                        Articles: {newsData.length}
+                                    </div>
+                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                        Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
+                                    </div>
+                                </div>
+                                <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                                    <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
+                                        <Icon emoji="🎯" size={18} />
+                                        Seeking Alpha
+                                    </div>
+                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                        Stocks: {seekingAlphaData.stocks?.length || 0}
+                                    </div>
+                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                        Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
+                                    </div>
+                                </div>
                             </div>
+                        </div>
 
-                            <div className="flex flex-wrap gap-2">
-                                {sectionLinks.map(link => (
-                                    <button
-                                        key={link.id}
-                                        onClick={() => scrollToSection(link.id)}
-                                        className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${isDarkMode
-                                            ? 'bg-gray-800 hover:bg-gray-700 text-gray-200'
-                                            : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-                                            }`}
-                                    >
-                                        {link.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div id="admin-sms">
-                                <EmmaSmsPanel />
-                            </div>
-
-                            {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
-                            <div
-                                id="admin-debug"
-                                className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
-                                    }`}>
-                                <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    <Icon emoji="🔍" size={20} />
-                                    Debug des Données
+                        {/* 📦 Gestion du Cache Supabase */}
+                        <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
+                            }`}>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                                    <Icon emoji="📦" size={20} />
+                                    Gestion du Cache Supabase
                                 </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                    <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                        <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
-                                            <Icon emoji="📊" size={18} />
-                                            Stock Data
-                                        </div>
-                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                            Tickers: {tickers.length} ({tickers.join(', ')})
-                                        </div>
-                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                            Données chargées: {Object.keys(stockData).length}
-                                        </div>
-                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                            Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
-                                        </div>
-                                    </div>
-                                    <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                        <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
-                                            <Icon emoji="📰" size={18} />
-                                            News Data
-                                        </div>
-                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                            Articles: {newsData.length}
-                                        </div>
-                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                            Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
-                                        </div>
-                                    </div>
-                                    <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                        <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
-                                            <Icon emoji="🎯" size={18} />
-                                            Seeking Alpha
-                                        </div>
-                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                            Stocks: {seekingAlphaData.stocks?.length || 0}
-                                        </div>
-                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                            Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* 📦 Gestion du Cache Supabase */}
-                            <div
-                                id="admin-cache"
-                                className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
-                                    }`}>
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                                        <Icon emoji="📦" size={20} />
-                                        Gestion du Cache Supabase
-                                    </h3>
-                                    <button
-                                        onClick={async () => {
-                                            setLoadingCacheStatus(true);
-                                            try {
-                                                const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache?type=status&maxAgeHours=${cacheSettings.maxAgeHours || 4}`);
-                                                if (response.ok) {
-                                                    const data = await response.json();
-                                                    setCacheStatus(data.status || {});
-                                                }
-                                            } catch (error) {
-                                                console.error('Erreur récupération statut cache:', error);
-                                            } finally {
-                                                setLoadingCacheStatus(false);
+                                <button
+                                    onClick={async () => {
+                                        setLoadingCacheStatus(true);
+                                        try {
+                                            const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache?type=status&maxAgeHours=${cacheSettings.maxAgeHours || 4}`);
+                                            if (response.ok) {
+                                                const data = await response.json();
+                                                setCacheStatus(data.status || {});
                                             }
-                                        }}
-                                        disabled={loadingCacheStatus}
-                                        className={`px-3 py-1 text-xs rounded transition-colors ${loadingCacheStatus
-                                            ? 'bg-gray-500 text-white cursor-not-allowed'
-                                            : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                            }`}
-                                    >
-                                        {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
-                                    </button>
-                                </div>
+                                        } catch (error) {
+                                            console.error('Erreur récupération statut cache:', error);
+                                        } finally {
+                                            setLoadingCacheStatus(false);
+                                        }
+                                    }}
+                                    disabled={loadingCacheStatus}
+                                    className={`px-3 py-1 text-xs rounded transition-colors ${loadingCacheStatus
+                                        ? 'bg-gray-500 text-white cursor-not-allowed'
+                                        : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                        }`}
+                                >
+                                    {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
+                                </button>
+                            </div>
 
                             {/* Paramètres du Cache */}
                             <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -4784,7 +4745,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
 
                         {/* 📋 Logs Système - Nouveau */}
-                        <div id="admin-logs" className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                             }`}>
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -5023,7 +4984,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
 
                         {/* Section Administration des Stocks */}
-                        <div id="admin-stocks" className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
                             ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                             }`}>
@@ -5051,7 +5012,7 @@ STRUCTURE JSON OBLIGATOIRE:
 
                         {/* Section Scraping Seeking Alpha */}
                         {/* WORKFLOW EN 3 ÉTAPES CLAIRES */}
-                        <div id="admin-scraping" className="space-y-4">
+                        <div className="space-y-4">
                             {/* ÉTAPE 1: SCRAPING BATCH */}
                             <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${isDarkMode
                                 ? 'bg-gradient-to-r from-gray-900/40 to-gray-800/40 border-gray-500/50'
@@ -5250,7 +5211,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         )}
 
                         {/* Section État des Connexions & Diagnostic des APIs - FUSIONNÉE */}
-                        <div id="admin-health" className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
+                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
                             ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                             }`}>
@@ -7201,6 +7162,65 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <Icon emoji="📈" size={24} className="mr-2 inline-block" />
                                 Analyses Seeking Alpha
                             </h2>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={refreshAllStocks}
+                                    disabled={loading}
+                                    className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {loading ? 'Actualisation...' : 'Actualiser Stocks'}
+                                </button>
+                                <button
+                                    onClick={fetchNews}
+                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                >
+                                    Actualiser News
+                                </button>
+                                <button
+                                    onClick={runSeekingAlphaScraper}
+                                    disabled={scrapingStatus === 'running'}
+                                    className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {scrapingStatus === 'running' ? 'Scraping...' : '🚀 Lancer le Scraper'}
+                                </button>
+                                <button
+                                    onClick={() => openSeekingAlpha('AAPL')}
+                                    className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
+                                >
+                                    🌐 Ouvrir Seeking Alpha
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const script = generateScrapingScript('CVS');
+                                        navigator.clipboard.writeText(script).then(() => {
+                                            addScrapingLog('📋 Script de scraping copié dans le presse-papiers', 'success');
+                                            addScrapingLog('💡 Collez-le dans la console F12 de Seeking Alpha', 'info');
+                                        });
+                                    }}
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                                >
+                                    📋 Script F12
+                                </button>
+                                <button
+                                    onClick={async () => {
+                                        addScrapingLog('🤖 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
+                                        try {
+                                            for (const ticker of tickers) {
+                                                const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
+                                                if (seekingAlphaItem?.parsedData) {
+                                                    await analyzeWithClaude(ticker, seekingAlphaItem.parsedData);
+                                                }
+                                            }
+                                            addScrapingLog('✅ Analyse Perplexity terminée pour tous les titres', 'success');
+                                        } catch (error) {
+                                            addScrapingLog(`❌ Erreur analyse Perplexity: ${error.message}`, 'error');
+                                        }
+                                    }}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                                >
+                                    🤖 Analyser avec Claude
+                                </button>
+                            </div>
                         </div>
 
                         {/* Fiche détaillée du titre sélectionné */}
@@ -24791,56 +24811,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
                 );
 
-                // Onglet Test Only - plan fonctionnel
-                const TestOnlyTab = () => (
-                    <div className="space-y-6">
-                        <div>
-                            <p className={`text-xs uppercase tracking-wide ${isDarkMode ? 'text-green-300' : 'text-green-700'}`}>Test Only</p>
-                            <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                Plan fonctionnel (fiche titre, screener, portefeuille)
-                            </h2>
-                            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
-                                Maquette des sections à livrer inspirées des meilleurs sites finance.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <div className={`rounded-xl border p-4 ${isDarkMode ? 'bg-blue-900/40 border-blue-700' : 'bg-blue-50 border-blue-200'}`}>
-                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Fiche titre type Yahoo/MarketWatch</h3>
-                                <ul className={isDarkMode ? 'text-gray-200 text-sm space-y-1' : 'text-gray-800 text-sm space-y-1'}>
-                                    <li>• Résumé compact (prix, % jour, 52w, volume, sector, cap, dividend)</li>
-                                    <li>• Vue valeur (FCF yield, EV/EBIT, ROE/ROIC, marges), Graphique interactif, News ciblées</li>
-                                    <li>• Thèse en 30s + bull/bear case</li>
-                                </ul>
-                            </div>
-                            <div className={`rounded-xl border p-4 ${isDarkMode ? 'bg-emerald-900/40 border-emerald-700' : 'bg-emerald-50 border-emerald-200'}`}>
-                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Screener valeur modernisé</h3>
-                                <ul className={isDarkMode ? 'text-gray-200 text-sm space-y-1' : 'text-gray-800 text-sm space-y-1'}>
-                                    <li>• Filtres pré-emballés (valeur, dividende, qualité, croissance, momentum)</li>
-                                    <li>• Colonnes clés: P/E fwd, EV/EBIT, FCF yield, CROIC, marges, score qualité, décote</li>
-                                    <li>• Heatmap sectorielle simple</li>
-                                </ul>
-                            </div>
-                            <div className={`rounded-xl border p-4 ${isDarkMode ? 'bg-purple-900/40 border-purple-700' : 'bg-purple-50 border-purple-200'}`}>
-                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Dashboard portefeuille (Passiv/Empower)</h3>
-                                <ul className={isDarkMode ? 'text-gray-200 text-sm space-y-1' : 'text-gray-800 text-sm space-y-1'}>
-                                    <li>• Perf globale + risque simple (vol, max drawdown)</li>
-                                    <li>• Allocations par classe/secteur/pays, bouton diagnostic value</li>
-                                    <li>• Contribution perf/risque par titre, alertes concentration/value trap</li>
-                                </ul>
-                            </div>
-                            <div className={`rounded-xl border p-4 ${isDarkMode ? 'bg-amber-900/30 border-amber-700' : 'bg-amber-50 border-amber-200'}`}>
-                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Architecture & UX</h3>
-                                <ul className={isDarkMode ? 'text-gray-200 text-sm space-y-1' : 'text-gray-800 text-sm space-y-1'}>
-                                    <li>• Données: Supabase scrapes + APIs marché, cache Supabase daily</li>
-                                    <li>• Pipelines: Admin JSLai (scrape) → analyse batch (Perplexity) → seeking_alpha_analysis</li>
-                                    <li>• UX: thème sombre propre, sections à ancres, micro-copy “?” pour ratios, zéro pub</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                );
-
                 // Configuration des onglets (après déclaration de TOUS les composants)
                 // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
                 const tabs = [
@@ -24852,11 +24822,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     // { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab }, // Supprimé - fonctionnalités disponibles dans JLab → Dan's watchlist
                     { id: 'plus', label: 'Plus', component: PlusTab },
                     { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
+                    { id: 'scrapping-sa', label: 'Seeking Alpha', component: ScrappingSATab },
                     { id: 'seeking-alpha', label: 'Stocks News', component: SeekingAlphaTab },
                     { id: 'email-briefings', label: 'Emma En Direct', component: EmailBriefingsTab },
                     { id: 'investing-calendar', label: 'TESTS JS', component: InvestingCalendarTab },
-                    { id: 'emma-config', label: 'Emma Config', component: EmmaConfigTab },
-                    { id: 'testonly', label: 'Test Only', component: TestOnlyTab }
+                    { id: 'emma-config', label: 'Emma Config', component: EmmaConfigTab }
                 ];
 
                 return (
@@ -24918,7 +24888,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         )}
 
                         {/* Intro Seeking Alpha - première visite de session */}
-                        {showSeekingAlphaIntro && activeTab === 'seeking-alpha' && (
+                        {showSeekingAlphaIntro && activeTab === 'scrapping-sa' && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black emma-intro-overlay">
                                 <div className="text-center">
                                     <div className="mb-6">
@@ -25373,12 +25343,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 setShowLengthEditor={setShowLengthEditor}
                             />}
                             {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
+                            {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                             {activeTab === 'email-briefings' && <EmailBriefingsTab />}
                             {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                             {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                             {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
-                            {activeTab === 'emma-config' && <EmmaConfigTab />}
-                            {activeTab === 'testonly' && <TestOnlyTab />}
                         </main>
 
                         {/* Messages */}
