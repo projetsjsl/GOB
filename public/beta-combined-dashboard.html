@@ -658,7 +658,8 @@
 <body class="min-h-screen">
     <div id="root"></div>
 
-    <script src="/js/dashboard/bundle.js"></script>
+    <!-- Inline (legacy) bundle to preserve existing design -->
+    <script type="text/babel" data-presets="react" src="/js/dashboard/app-inline.js"></script>
 </body>
 
 </html>
