@@ -4502,97 +4502,136 @@ STRUCTURE JSON OBLIGATOIRE:
                     setShowTemperatureEditor,
                     showLengthEditor,
                     setShowLengthEditor
-                }) => (
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-center">
-                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>⚙️ Admin-JSLAI</h2>
-                        </div>
+                }) => {
+                    const sectionLinks = [
+                        { id: 'admin-sms', label: 'SMS/Emma' },
+                        { id: 'admin-debug', label: 'Debug données' },
+                        { id: 'admin-cache', label: 'Cache Supabase' },
+                        { id: 'admin-stocks', label: 'Stocks & News' },
+                        { id: 'admin-scraping', label: 'Scraping SA' },
+                        { id: 'admin-health', label: 'Diagnostics' },
+                        { id: 'admin-logs', label: 'Logs' }
+                    ];
 
-                        <EmmaSmsPanel />
+                    const scrollToSection = (id) => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    };
 
-                        {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
-                        <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
-                            }`}>
-                            <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                <Icon emoji="🔍" size={20} />
-                                Debug des Données
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                    <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
-                                        <Icon emoji="📊" size={18} />
-                                        Stock Data
-                                    </div>
-                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                        Tickers: {tickers.length} ({tickers.join(', ')})
-                                    </div>
-                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                        Données chargées: {Object.keys(stockData).length}
-                                    </div>
-                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                        Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
-                                    </div>
-                                </div>
-                                <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                    <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
-                                        <Icon emoji="📰" size={18} />
-                                        News Data
-                                    </div>
-                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                        Articles: {newsData.length}
-                                    </div>
-                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                        Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
-                                    </div>
-                                </div>
-                                <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
-                                    <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
-                                        <Icon emoji="🎯" size={18} />
-                                        Seeking Alpha
-                                    </div>
-                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                        Stocks: {seekingAlphaData.stocks?.length || 0}
-                                    </div>
-                                    <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                        Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
-                                    </div>
-                                </div>
+                    return (
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center">
+                                <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
+                                    }`}>⚙️ Admin-JSLAI</h2>
                             </div>
-                        </div>
 
-                        {/* 📦 Gestion du Cache Supabase */}
-                        <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
-                            }`}>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                                    <Icon emoji="📦" size={20} />
-                                    Gestion du Cache Supabase
+                            <div className="flex flex-wrap gap-2">
+                                {sectionLinks.map(link => (
+                                    <button
+                                        key={link.id}
+                                        onClick={() => scrollToSection(link.id)}
+                                        className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${isDarkMode
+                                            ? 'bg-gray-800 hover:bg-gray-700 text-gray-200'
+                                            : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                                            }`}
+                                    >
+                                        {link.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div id="admin-sms">
+                                <EmmaSmsPanel />
+                            </div>
+
+                            {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
+                            <div
+                                id="admin-debug"
+                                className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                                    }`}>
+                                <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    <Icon emoji="🔍" size={20} />
+                                    Debug des Données
                                 </h3>
-                                <button
-                                    onClick={async () => {
-                                        setLoadingCacheStatus(true);
-                                        try {
-                                            const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache?type=status&maxAgeHours=${cacheSettings.maxAgeHours || 4}`);
-                                            if (response.ok) {
-                                                const data = await response.json();
-                                                setCacheStatus(data.status || {});
-                                            }
-                                        } catch (error) {
-                                            console.error('Erreur récupération statut cache:', error);
-                                        } finally {
-                                            setLoadingCacheStatus(false);
-                                        }
-                                    }}
-                                    disabled={loadingCacheStatus}
-                                    className={`px-3 py-1 text-xs rounded transition-colors ${loadingCacheStatus
-                                        ? 'bg-gray-500 text-white cursor-not-allowed'
-                                        : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                        }`}
-                                >
-                                    {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
-                                </button>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                    <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                                        <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
+                                            <Icon emoji="📊" size={18} />
+                                            Stock Data
+                                        </div>
+                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                            Tickers: {tickers.length} ({tickers.join(', ')})
+                                        </div>
+                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                            Données chargées: {Object.keys(stockData).length}
+                                        </div>
+                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                            Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
+                                        </div>
+                                    </div>
+                                    <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                                        <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
+                                            <Icon emoji="📰" size={18} />
+                                            News Data
+                                        </div>
+                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                            Articles: {newsData.length}
+                                        </div>
+                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                            Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
+                                        </div>
+                                    </div>
+                                    <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                                        <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
+                                            <Icon emoji="🎯" size={18} />
+                                            Seeking Alpha
+                                        </div>
+                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                            Stocks: {seekingAlphaData.stocks?.length || 0}
+                                        </div>
+                                        <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                            Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            {/* 📦 Gestion du Cache Supabase */}
+                            <div
+                                id="admin-cache"
+                                className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
+                                    }`}>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                                        <Icon emoji="📦" size={20} />
+                                        Gestion du Cache Supabase
+                                    </h3>
+                                    <button
+                                        onClick={async () => {
+                                            setLoadingCacheStatus(true);
+                                            try {
+                                                const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache?type=status&maxAgeHours=${cacheSettings.maxAgeHours || 4}`);
+                                                if (response.ok) {
+                                                    const data = await response.json();
+                                                    setCacheStatus(data.status || {});
+                                                }
+                                            } catch (error) {
+                                                console.error('Erreur récupération statut cache:', error);
+                                            } finally {
+                                                setLoadingCacheStatus(false);
+                                            }
+                                        }}
+                                        disabled={loadingCacheStatus}
+                                        className={`px-3 py-1 text-xs rounded transition-colors ${loadingCacheStatus
+                                            ? 'bg-gray-500 text-white cursor-not-allowed'
+                                            : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                            }`}
+                                    >
+                                        {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
+                                    </button>
+                                </div>
 
                             {/* Paramètres du Cache */}
                             <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -4744,7 +4783,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
 
                         {/* 📋 Logs Système - Nouveau */}
-                        <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        <div id="admin-logs" className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                             }`}>
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -4983,7 +5022,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         </div>
 
                         {/* Section Administration des Stocks */}
-                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
+                        <div id="admin-stocks" className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
                             ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                             }`}>
@@ -5011,7 +5050,7 @@ STRUCTURE JSON OBLIGATOIRE:
 
                         {/* Section Scraping Seeking Alpha */}
                         {/* WORKFLOW EN 3 ÉTAPES CLAIRES */}
-                        <div className="space-y-4">
+                        <div id="admin-scraping" className="space-y-4">
                             {/* ÉTAPE 1: SCRAPING BATCH */}
                             <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${isDarkMode
                                 ? 'bg-gradient-to-r from-gray-900/40 to-gray-800/40 border-gray-500/50'
@@ -5210,7 +5249,7 @@ STRUCTURE JSON OBLIGATOIRE:
                         )}
 
                         {/* Section État des Connexions & Diagnostic des APIs - FUSIONNÉE */}
-                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
+                        <div id="admin-health" className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${isDarkMode
                             ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                             }`}>
