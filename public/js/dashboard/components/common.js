@@ -310,46 +310,62 @@ const Tabs = ({ tabs, activeTab, onTabChange, isDarkMode = true }) => {
 /**
  * Section wrapper (simple card)
  */
-const SectionCard = ({ title, children, isDarkMode = true, className = '' }) => (
-    <div className={`rounded-xl border shadow-sm transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} ${className}`}>
-        {title && (
-            <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-gray-800 text-white' : 'border-gray-200 text-gray-900'}`}>
-                <h3 className="text-lg font-semibold">{title}</h3>
-            </div>
-        )}
-        <div className="p-4">
-            {children}
-        </div>
-    </div>
-);
+const SectionCard = ({ title, children, isDarkMode = true, className = '' }) => {
+    const cls = `rounded-xl border shadow-sm transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} ${className}`;
+    const header = title
+        ? React.createElement(
+            'div',
+            { className: `px-4 py-3 border-b ${isDarkMode ? 'border-gray-800 text-white' : 'border-gray-200 text-gray-900'}` },
+            React.createElement('h3', { className: 'text-lg font-semibold' }, title)
+        )
+        : null;
+    return React.createElement(
+        'div',
+        { className: cls },
+        header,
+        React.createElement('div', { className: 'p-4' }, children)
+    );
+};
 
 /**
  * Metric tile (value + label + optional delta)
  */
-const MetricTile = ({ label, value, delta, isDarkMode = true }) => (
-    <div className={`p-4 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-        <div className="text-sm opacity-70 mb-1">{label}</div>
-        <div className="text-2xl font-bold">{value}</div>
-        {delta !== undefined && (
-            <div className={`text-sm font-semibold ${delta >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {delta >= 0 ? '+' : ''}{delta}
-            </div>
-        )}
-    </div>
-);
+const MetricTile = ({ label, value, delta, isDarkMode = true }) => {
+    const cls = `p-4 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`;
+    const deltaNode = delta !== undefined
+        ? React.createElement(
+            'div',
+            { className: `text-sm font-semibold ${delta >= 0 ? 'text-green-500' : 'text-red-500'}` },
+            `${delta >= 0 ? '+' : ''}${delta}`
+        )
+        : null;
+    return React.createElement(
+        'div',
+        { className: cls },
+        React.createElement('div', { className: 'text-sm opacity-70 mb-1' }, label),
+        React.createElement('div', { className: 'text-2xl font-bold' }, value),
+        deltaNode
+    );
+};
 
 /**
  * News row (title + source + time)
  */
-const NewsRow = ({ title, source, timeAgo, isDarkMode = true }) => (
-    <div className={`flex flex-col gap-1 py-2 border-b last:border-b-0 ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
-        <div className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{title}</div>
-        <div className="text-xs opacity-70 flex gap-2">
-            {source && <span>{source}</span>}
-            {timeAgo && <span>· {timeAgo}</span>}
-        </div>
-    </div>
-);
+const NewsRow = ({ title, source, timeAgo, isDarkMode = true }) => {
+    const cls = `flex flex-col gap-1 py-2 border-b last:border-b-0 ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`;
+    const meta = React.createElement(
+        'div',
+        { className: 'text-xs opacity-70 flex gap-2' },
+        source ? React.createElement('span', null, source) : null,
+        timeAgo ? React.createElement('span', null, `· ${timeAgo}`) : null
+    );
+    return React.createElement(
+        'div',
+        { className: cls },
+        React.createElement('div', { className: `text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}` }, title),
+        meta
+    );
+};
 
 // Exposer Icon et composants globaux
 window.Icon = Icon;

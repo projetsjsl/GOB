@@ -43,11 +43,15 @@
             : (isDarkMode
                 ? 'bg-rose-900/70 border-rose-500/40 text-rose-200'
                 : 'bg-rose-100 border-rose-300 text-rose-700');
-        return (
-            <span className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${classes}`}>
-                {isBull ? '🐂' : '🐻'}
-            </span>
-        );
+        if (typeof React !== 'undefined' && React.createElement) {
+            return React.createElement(
+                'span',
+                { className: `w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${classes}` },
+                isBull ? '🐂' : '🐻'
+            );
+        }
+        // Fallback plain object if React is not available
+        return { className: classes, content: isBull ? '🐂' : '🐻' };
     };
 
     const cleanText = (text) => {
