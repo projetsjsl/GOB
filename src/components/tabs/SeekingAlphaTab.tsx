@@ -1,11 +1,93 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { TabProps } from '../../types';
-
-declare const Chart: any;
-declare const Recharts: any;
-declare const LightweightCharts: any;
+import Icon from '../shared/Icon';
 
 export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
+    const isDarkMode = props.isDarkMode ?? true;
+    const tickers = Array.isArray(props.tickers) ? props.tickers : [];
+    const stockData = props.stockData && Object.keys(props.stockData).length > 0 ? props.stockData : {};
+    const seekingAlphaData = props.seekingAlphaData && Object.keys(props.seekingAlphaData).length > 0
+        ? props.seekingAlphaData
+        : {};
+    const seekingAlphaStockData = props.seekingAlphaStockData && Object.keys(props.seekingAlphaStockData).length > 0
+        ? props.seekingAlphaStockData
+        : {};
+
+    const isSelectionControlled = typeof props.selectedStock !== 'undefined';
+    const [internalSelectedStock, setInternalSelectedStock] = useState<string | null>(props.selectedStock ?? null);
+
+    const loading = props.loading ?? false;
+    const refreshAllStocksFn = props.refreshAllStocks || (async () => {});
+    const fetchNewsFn = props.fetchNews || (async () => {});
+    const runSeekingAlphaScraperFn = props.runSeekingAlphaScraper || (async () => {});
+    const scrapingStatus = props.scrapingStatus ?? 'idle';
+    const openSeekingAlphaFn = props.openSeekingAlpha || ((ticker: string) => {
+        if (typeof window !== 'undefined') {
+            window.open(`https://seekingalpha.com/symbol/${ticker}`, '_blank', 'noopener,noreferrer');
+        }
+    });
+    const generateScrapingScriptFn = props.generateScrapingScript || ((ticker: string) => `// Scrape ${ticker}`);
+    const addScrapingLogFn =
+        props.addScrapingLog ||
+        ((message: string, level: string = 'info') => {
+            console.log(`[${level}] ${message}`);
+        });
+    const analyzeWithClaudeFn = props.analyzeWithClaude || (async () => {});
+
+    const LucideIcon =
+        props.LucideIcon ||
+        (({ name, className = '' }: { name: string; className?: string }) => <span className={className}>{name}</span>);
+    const [seekingAlphaViewMode, setSeekingAlphaViewMode] = useState<'list' | 'cards'>('cards');
+
+    useEffect(() => {
+        if (isSelectionControlled) {
+            setInternalSelectedStock(props.selectedStock ?? null);
+        }
+    }, [isSelectionControlled, props.selectedStock]);
+
+    const selectedStock = isSelectionControlled ? (props.selectedStock ?? null) : internalSelectedStock;
+
+    const handleSelectStock = (ticker: string | null) => {
+        if (!isSelectionControlled) {
+            setInternalSelectedStock(ticker);
+        }
+        props.setSelectedStock?.(ticker);
+    };
+
+    const cleanText = (value: string | null | undefined) => {
+        if (!value) return '';
+        return value
+            .replace(/Ã©/g, 'é')
+            .replace(/Ã¨/g, 'è')
+            .replace(/Ã /g, 'à')
+            .replace(/Ã§/g, 'ç')
+            .replace(/Ã´/g, 'ô')
+            .replace(/Ã¢/g, 'â')
+            .replace(/Ã®/g, 'î')
+            .replace(/Ã¯/g, 'ï')
+            .replace(/Ã¹/g, 'ù')
+            .replace(/Ã»/g, 'û')
+            .replace(/Ã«/g, 'ë')
+            .replace(/Ã¤/g, 'ä')
+            .replace(/Ã¶/g, 'ö')
+            .replace(/Ã¼/g, 'ü')
+            .replace(/â€™/g, "'")
+            .replace(/â€œ/g, '“')
+            .replace(/â€�/g, '”')
+            .replace(/â€“/g, '–')
+            .replace(/â€”/g, '—');
+    };
+
+    const getGradeColor = (grade?: string | number) => {
+        if (!grade) return 'bg-gray-100 text-gray-600';
+        const value = String(grade).toUpperCase();
+        if (value.startsWith('A')) return 'bg-green-100 text-green-700';
+        if (value.startsWith('B')) return 'bg-blue-100 text-blue-700';
+        if (value.startsWith('C')) return 'bg-yellow-100 text-yellow-700';
+        if (value.startsWith('D')) return 'bg-orange-100 text-orange-700';
+        return 'bg-red-100 text-red-700';
+    };
+
     return (
         <div className="space-y-6">
                     <div className="flex justify-between items-center">
@@ -17,38 +99,44 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                     </h2>
                         <div className="flex gap-2">
                             <button
-                                onClick={refreshAllStocks}
+                                onClick={refreshAllStocksFn}
                                 disabled={loading}
                                 className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 transition-colors"
                             >
                                 {loading ? 'Actualisation...' : 'Actualiser Stocks'}
                             </button>
                             <button
-                                onClick={fetchNews}
+                                onClick={fetchNewsFn}
                                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                             >
                                 Actualiser News
                             </button>
                             <button
-                                onClick={runSeekingAlphaScraper}
+                                onClick={runSeekingAlphaScraperFn}
                                 disabled={scrapingStatus === 'running'}
                                 className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
                             >
                                 {scrapingStatus === 'running' ? 'Scraping...' : '🚀 Lancer le Scraper'}
                             </button>
                             <button
-                                onClick={() => openSeekingAlpha('AAPL')}
+                                onClick={() => openSeekingAlphaFn('AAPL')}
                                 className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
                             >
                                 🌐 Ouvrir Seeking Alpha
                             </button>
                             <button
                                 onClick={() => {
-                                    const script = generateScrapingScript('CVS');
-                                    navigator.clipboard.writeText(script).then(() => {
-                                        addScrapingLog('📋 Script de scraping copié dans le presse-papiers', 'success');
-                                        addScrapingLog('💡 Collez-le dans la console F12 de Seeking Alpha', 'info');
-                                    });
+                                    const script = generateScrapingScriptFn('CVS');
+                                    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                                        navigator.clipboard.writeText(script).then(() => {
+                                            addScrapingLogFn('📋 Script de scraping copié dans le presse-papiers', 'success');
+                                            addScrapingLogFn('💡 Collez-le dans la console F12 de Seeking Alpha', 'info');
+                                        }).catch(() => {
+                                            addScrapingLogFn('❌ Impossible de copier le script automatiquement', 'error');
+                                        });
+                                    } else {
+                                        addScrapingLogFn('⚠️ Clipboard API indisponible', 'warning');
+                                    }
                                 }}
                                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                             >
@@ -56,17 +144,17 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                             </button>
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🤖 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
+                                    addScrapingLogFn('🤖 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
                                     try {
                                         for (const ticker of tickers) {
                                             const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
                                             if (seekingAlphaItem?.parsedData) {
-                                                await analyzeWithClaude(ticker, seekingAlphaItem.parsedData);
+                                                await analyzeWithClaudeFn(ticker, seekingAlphaItem.parsedData);
                                             }
                                         }
-                                        addScrapingLog('✅ Analyse Perplexity terminée pour tous les titres', 'success');
-                                    } catch (error) {
-                                        addScrapingLog(`❌ Erreur analyse Perplexity: ${error.message}`, 'error');
+                                        addScrapingLogFn('✅ Analyse Perplexity terminée pour tous les titres', 'success');
+                                    } catch (error: any) {
+                                        addScrapingLogFn(`❌ Erreur analyse Perplexity: ${error?.message || error}`, 'error');
                                     }
                                 }}
                                 className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
@@ -82,7 +170,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                             <div className="flex justify-between items-start mb-4">
                                 <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
                                 <button
-                                    onClick={() => setSelectedStock(null)}
+                                    onClick={() => handleSelectStock(null)}
                                     className="text-blue-400 hover:text-blue-300"
                                 >
                                     ✕ Fermer
@@ -108,7 +196,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                         </p>
                                                     </div>
                                                     <button
-                                                        onClick={() => setSelectedStock(null)}
+                                                        onClick={() => handleSelectStock(null)}
                                                         className="text-white hover:text-gray-200 text-xl"
                                                     >
                                                         ✕
@@ -361,7 +449,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                     🔍 Peers
                                                 </button>
                                                 <button
-                                                    onClick={() => setSelectedStock(stock.ticker)}
+                                                    onClick={() => handleSelectStock(stock.ticker)}
                                                     className="text-blue-400 hover:text-blue-300 text-sm"
                                                 >
                                                     Voir détail
@@ -444,7 +532,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                 {tickers.map((ticker) => (
                                     <button
                                         key={ticker}
-                                        onClick={() => setSelectedStock(ticker)}
+                                        onClick={() => handleSelectStock(ticker)}
                                         className={`p-3 rounded-lg border transition-all hover:scale-105 ${
                                             isDarkMode
                                                 ? 'bg-gray-700/50 border-gray-600 hover:border-green-500 text-white'
@@ -514,7 +602,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                         🔍 Peers
                                                     </button>
                                                     <button
-                                                        onClick={() => setSelectedStock(ticker)}
+                                                        onClick={() => handleSelectStock(ticker)}
                                                         className="text-blue-600 hover:text-blue-700 text-sm"
                                                     >
                                                         Voir détail

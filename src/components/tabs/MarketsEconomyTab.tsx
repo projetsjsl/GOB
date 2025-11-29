@@ -6,6 +6,16 @@ declare const Recharts: any;
 declare const LightweightCharts: any;
 
 export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
+    const {
+        isDarkMode = true,
+        newsData: newsDataProp = [],
+        LucideIcon: LucideIconProp
+    } = props;
+
+    const newsData = newsDataProp;
+    const LucideIcon = LucideIconProp || (({ name, className = '' }) => (
+        <span className={className}>{name}</span>
+    ));
     const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
     const [selectedSource, setSelectedSource] = useState('all'); // Filtre source
     const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché

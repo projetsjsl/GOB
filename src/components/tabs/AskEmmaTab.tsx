@@ -34,43 +34,32 @@ export const AskEmmaTab = React.memo((props: AskEmmaTabProps) => {
         showLengthEditor,
         setShowLengthEditor
     } = props;
-                const dashboardState = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
-                const isDarkMode = typeof props.isDarkMode === 'boolean'
-                    ? props.isDarkMode
-                    : (typeof dashboardState.isDarkMode === 'boolean' ? dashboardState.isDarkMode : true);
-                const tickers = props.tickers && props.tickers.length > 0
-                    ? props.tickers
-                    : (dashboardState.tickers || []);
+                const isDarkMode = props.isDarkMode ?? true;
+                const tickers = Array.isArray(props.tickers) ? props.tickers : [];
                 const stockData = props.stockData && Object.keys(props.stockData).length > 0
                     ? props.stockData
-                    : (dashboardState.stockData || {});
+                    : {};
                 const newsData = props.newsData && props.newsData.length > 0
                     ? props.newsData
-                    : (dashboardState.newsData || []);
+                    : [];
                 const apiStatus = props.apiStatus && Object.keys(props.apiStatus).length > 0
                     ? props.apiStatus
-                    : (dashboardState.apiStatus || {});
-                const teamTickers = props.teamTickers && props.teamTickers.length > 0
+                    : {};
+                const teamTickers = Array.isArray(props.teamTickers)
                     ? props.teamTickers
-                    : (dashboardState.teamTickers || []);
-                const watchlistTickers = props.watchlistTickers && props.watchlistTickers.length > 0
+                    : [];
+                const watchlistTickers = Array.isArray(props.watchlistTickers)
                     ? props.watchlistTickers
-                    : (dashboardState.watchlistTickers || []);
+                    : [];
                 const loadTickersFromSupabase = props.loadTickersFromSupabase
-                    || dashboardState.loadTickersFromSupabase
                     || (async () => []);
                 const fetchNews = props.fetchNews
-                    || dashboardState.fetchNews
                     || (async () => []);
                 const refreshAllStocks = props.refreshAllStocks
-                    || dashboardState.refreshAllStocks
                     || (async () => {});
                 const fetchLatestNewsForTickers = props.fetchLatestNewsForTickers
-                    || dashboardState.fetchLatestNewsForTickers
                     || (async () => {});
                 const getCompanyLogo = props.getCompanyLogo
-                    || window.BetaCombinedDashboardData?.getCompanyLogo
-                    || dashboardState.getCompanyLogo
                     || ((ticker: string) => `https://financialmodelingprep.com/image-stock/${ticker}.png`);
                 // État pour l'animation de chargement de l'historique
                 const [historyLoading, setHistoryLoading] = useState(true);

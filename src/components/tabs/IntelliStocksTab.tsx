@@ -5,10 +5,17 @@ declare const Chart: any;
 declare const Recharts: any;
 declare const LightweightCharts: any;
 
-            export const IntelliStocksTab: React.FC<TabProps> = (props) => {
-    const { isDarkMode = true } = props;
+export const IntelliStocksTab: React.FC<TabProps> = (props) => {
+    const {
+        isDarkMode = true,
+        API_BASE_URL = '',
+        selectedStock: selectedStockProp,
+        setSelectedStock: setSelectedStockProp,
+        LucideIcon: LucideIconProp
+    } = props;
+                const apiBase = API_BASE_URL || '';
                 const [time, setTime] = useState(new Date());
-                const [selectedStock, setSelectedStock] = useState('AAPL');
+                const [internalSelectedStock, setInternalSelectedStock] = useState(selectedStockProp || 'AAPL');
                 const [timeframe, setTimeframe] = useState('1D');
                 const [menuOpen, setMenuOpen] = useState(false);
                 const [stockDataIntelli, setStockDataIntelli] = useState(null);
@@ -20,6 +27,20 @@ declare const LightweightCharts: any;
                 const [violations, setViolations] = useState([]);
                 // Screener visibility
                 const [showScreener, setShowScreener] = useState(false);
+
+                useEffect(() => {
+                    if (selectedStockProp && selectedStockProp !== internalSelectedStock) {
+                        setInternalSelectedStock(selectedStockProp);
+                    }
+                }, [selectedStockProp]);
+
+                const selectedStock = selectedStockProp ?? internalSelectedStock;
+                const handleSelectStock = useCallback((symbol: string) => {
+                    if (!selectedStockProp) {
+                        setInternalSelectedStock(symbol);
+                    }
+                    setSelectedStockProp?.(symbol);
+                }, [selectedStockProp, setSelectedStockProp]);
                 
                 // 🎯 Configuration du Score JSLAI™ (pondérations)
                 const [jslaiConfig, setJslaiConfig] = useState(() => {
@@ -1234,9 +1255,9 @@ console.log('✅ Données hybrides récupérées:', {
                         for (const stock of stocksList) {
                             try {
                                 const [quoteRes, profileRes, ratiosRes] = await Promise.allSettled([
-                                    fetch(`/api/marketdata?endpoint=quote&symbol=${stock.symbol}&source=auto`),
-                                    fetch(`/api/fmp?endpoint=profile&symbol=${stock.symbol}`),
-                                    fetch(`/api/fmp?endpoint=ratios&symbol=${stock.symbol}`)
+                                    fetch(`${apiBase}/api/marketdata?endpoint=quote&symbol=${stock.symbol}&source=auto`),
+                                    fetch(`${apiBase}/api/fmp?endpoint=profile&symbol=${stock.symbol}`),
+                                    fetch(`${apiBase}/api/fmp?endpoint=ratios&symbol=${stock.symbol}`)
                                 ]);
                                 
                                 const quote = quoteRes.status === 'fulfilled' && quoteRes.value.ok 
@@ -1369,7 +1390,9 @@ console.log('✅ Données hybrides récupérées:', {
                 };
 
                 // Référence locale pour utiliser le composant global
-                const LucideIcon = window.LucideIcon;
+                const LucideIcon = LucideIconProp || (({ name, className = '' }) => (
+                    <span className={className}>{name}</span>
+                ));
 
                 return (
                     <div className={`min-h-screen p-2 transition-colors duration-300 ${
@@ -1543,7 +1566,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                             <td className="text-center p-2">
                                                                 <button
                                                                     onClick={() => {
-                                                                        setSelectedStock(stock.symbol);
+                                                                        handleSelectStock(stock.symbol);
                                                                         setShowScreener(false);
                                                                     }}
                                                                     className="px-2 py-1 bg-gray-800 text-white rounded text-[9px] hover:bg-gray-700 transition-colors"
@@ -1703,7 +1726,7 @@ console.log('✅ Données hybrides récupérées:', {
                                                     <button
                                                         key={stock.symbol}
                                                         onClick={() => {
-                                                            setSelectedStock(stock.symbol);
+                                                            handleSelectStock(stock.symbol);
                                                             setMenuOpen(false);
                                                         }}
                                                         className={`w-full p-2 flex items-center justify-between transition-all text-xs ${

@@ -6,7 +6,11 @@ declare const Recharts: any;
 declare const LightweightCharts: any;
 
 export const YieldCurveTab: React.FC<TabProps> = (props) => {
-    const { isDarkMode = true } = props;
+    const {
+        isDarkMode = true,
+        API_BASE_URL = ''
+    } = props;
+    const apiBase = API_BASE_URL;
 
                 const [yieldData, setYieldData] = useState(null);
                 const [loading, setLoading] = useState(true);
@@ -15,8 +19,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                 const chartRef = useRef(null);
                 const chartInstance = useRef(null);
 
-                // S'assurer que isDarkMode est accessible (fallback si non défini)
-                const darkMode = typeof isDarkMode !== 'undefined' ? isDarkMode : true;
+                const darkMode = isDarkMode;
 
                 const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
                 const renderRateTable = (title, dataset, badgeEmoji) => (
@@ -52,7 +55,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                     setError(null);
 
                     try {
-                        const response = await fetch(`/api/yield-curve?country=${selectedCountry}`);
+                        const response = await fetch(`${apiBase}/api/yield-curve?country=${selectedCountry}`);
                         console.log('📡 Réponse API yield-curve:', response.status, response.ok);
 
                         if (!response.ok) {

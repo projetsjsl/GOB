@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { TabProps } from '../../types';
 
 declare const Chart: any;
@@ -6,7 +6,16 @@ declare const Recharts: any;
 declare const LightweightCharts: any;
 
 export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
-    const { isDarkMode = true } = props;
+    const {
+        isDarkMode = true,
+        watchlistTickers: watchlistTickersProp = [],
+        teamTickers: teamTickersProp = [],
+        stockData: stockDataProp = {}
+    } = props;
+
+    const watchlistTickers = Array.isArray(watchlistTickersProp) ? watchlistTickersProp : [];
+    const teamTickers = Array.isArray(teamTickersProp) ? teamTickersProp : [];
+    const stockData = Object.keys(stockDataProp).length > 0 ? stockDataProp : {};
 
                 // Refs pour les widgets TradingView
                 const tradingViewForexRef = useRef(null);
@@ -28,6 +37,67 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                 const [searchQuery, setSearchQuery] = useState('');
                 const [showSearchResults, setShowSearchResults] = useState(false);
                 const searchInputRef = useRef(null);
+
+                const resolveSymbolForTicker = (ticker: string) => {
+                    const info = stockData?.[ticker];
+                    if (info?.symbol && typeof info.symbol === 'string') {
+                        if (info.symbol.includes(':')) return info.symbol;
+                        if (info.exchange) {
+                            return `${info.exchange}:${info.symbol}`;
+                        }
+                        return `NASDAQ:${info.symbol}`;
+                    }
+                    if (info?.exchange && info?.ticker) {
+                        return `${info.exchange}:${info.ticker}`;
+                    }
+                    return ticker.includes(':') ? ticker : `NASDAQ:${ticker}`;
+                };
+
+                const baseSearchSymbols = useMemo(() => ([
+                    { symbol: 'FOREXCOM:SPXUSD', name: 'SPY - S&P 500', category: '📈 Indices' },
+                    { symbol: 'FOREXCOM:NSXUSD', name: 'QQQ - Nasdaq 100', category: '📈 Indices' },
+                    { symbol: 'FOREXCOM:DJI', name: 'DJI - Dow Jones', category: '📈 Indices' },
+                    { symbol: 'NASDAQ:AAPL', name: 'AAPL - Apple', category: '🍎 Tech' },
+                    { symbol: 'NASDAQ:MSFT', name: 'MSFT - Microsoft', category: '🍎 Tech' },
+                    { symbol: 'NASDAQ:GOOGL', name: 'GOOGL - Google', category: '🍎 Tech' },
+                    { symbol: 'NASDAQ:AMZN', name: 'AMZN - Amazon', category: '🍎 Tech' },
+                    { symbol: 'NASDAQ:NVDA', name: 'NVDA - NVIDIA', category: '🍎 Tech' },
+                    { symbol: 'NASDAQ:TSLA', name: 'TSLA - Tesla', category: '🍎 Tech' },
+                    { symbol: 'NASDAQ:META', name: 'META - Meta', category: '🍎 Tech' },
+                    { symbol: 'BITSTAMP:BTCUSD', name: 'BTC - Bitcoin', category: '₿ Crypto' },
+                    { symbol: 'BITSTAMP:ETHUSD', name: 'ETH - Ethereum', category: '₿ Crypto' },
+                    { symbol: 'NYSE:JPM', name: 'JPM - JPMorgan', category: '🏦 Finance' },
+                    { symbol: 'NYSE:BAC', name: 'BAC - Bank of America', category: '🏦 Finance' },
+                    { symbol: 'NYSE:GS', name: 'GS - Goldman Sachs', category: '🏦 Finance' }
+                ]), []);
+
+                const watchlistSearchSymbols = useMemo(() => {
+                    return (watchlistTickers || []).map((ticker) => ({
+                        symbol: resolveSymbolForTicker(ticker),
+                        name: `${ticker} - Watchlist`,
+                        category: '⭐ Watchlist'
+                    }));
+                }, [watchlistTickers, stockData]);
+
+                const teamSearchSymbols = useMemo(() => {
+                    return (teamTickers || []).map((ticker) => ({
+                        symbol: resolveSymbolForTicker(ticker),
+                        name: `${ticker} - Team`,
+                        category: '👥 Team'
+                    }));
+                }, [teamTickers, stockData]);
+
+                const availableSearchSymbols = useMemo(() => {
+                    const merged = [...baseSearchSymbols, ...watchlistSearchSymbols, ...teamSearchSymbols];
+                    const seen = new Set();
+                    return merged.filter(item => {
+                        if (seen.has(item.symbol)) {
+                            return false;
+                        }
+                        seen.add(item.symbol);
+                        return true;
+                    });
+                }, [baseSearchSymbols, watchlistSearchSymbols, teamSearchSymbols]);
 
                 // Écouter les changements de symbole depuis l'Advanced Chart (TradingView iframe)
                 useEffect(() => {
@@ -1161,25 +1231,7 @@ export const InvestingCalendarTab: React.FC<TabProps> = (props) => {
                                                     : 'bg-white border-gray-300'
                                             }`}>
                                                 {(() => {
-                                                    const symbols = [
-                                                        { symbol: 'FOREXCOM:SPXUSD', name: 'SPY - S&P 500', category: '📈 Indices' },
-                                                        { symbol: 'FOREXCOM:NSXUSD', name: 'QQQ - Nasdaq 100', category: '📈 Indices' },
-                                                        { symbol: 'FOREXCOM:DJI', name: 'DJI - Dow Jones', category: '📈 Indices' },
-                                                        { symbol: 'NASDAQ:AAPL', name: 'AAPL - Apple', category: '🍎 Tech' },
-                                                        { symbol: 'NASDAQ:MSFT', name: 'MSFT - Microsoft', category: '🍎 Tech' },
-                                                        { symbol: 'NASDAQ:GOOGL', name: 'GOOGL - Google', category: '🍎 Tech' },
-                                                        { symbol: 'NASDAQ:AMZN', name: 'AMZN - Amazon', category: '🍎 Tech' },
-                                                        { symbol: 'NASDAQ:NVDA', name: 'NVDA - NVIDIA', category: '🍎 Tech' },
-                                                        { symbol: 'NASDAQ:TSLA', name: 'TSLA - Tesla', category: '🍎 Tech' },
-                                                        { symbol: 'NASDAQ:META', name: 'META - Meta', category: '🍎 Tech' },
-                                                        { symbol: 'BITSTAMP:BTCUSD', name: 'BTC - Bitcoin', category: '₿ Crypto' },
-                                                        { symbol: 'BITSTAMP:ETHUSD', name: 'ETH - Ethereum', category: '₿ Crypto' },
-                                                        { symbol: 'NYSE:JPM', name: 'JPM - JPMorgan', category: '🏦 Finance' },
-                                                        { symbol: 'NYSE:BAC', name: 'BAC - Bank of America', category: '🏦 Finance' },
-                                                        { symbol: 'NYSE:GS', name: 'GS - Goldman Sachs', category: '🏦 Finance' }
-                                                    ];
-
-                                                    const filtered = symbols.filter(s =>
+                                                    const filtered = availableSearchSymbols.filter(s =>
                                                         s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                                                         s.symbol.toLowerCase().includes(searchQuery.toLowerCase())
                                                     );

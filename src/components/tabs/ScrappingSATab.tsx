@@ -1,12 +1,77 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { TabProps } from '../../types';
-
-declare const Chart: any;
-declare const Recharts: any;
-declare const LightweightCharts: any;
+import Icon from '../shared/Icon';
 
 export const ScrappingSATab: React.FC<TabProps> = (props) => {
-    const isDarkMode = props.isDarkMode || false;
+    const isDarkMode = props.isDarkMode ?? true;
+    const tickers = Array.isArray(props.tickers) ? props.tickers : [];
+    const stockData = props.stockData && Object.keys(props.stockData).length > 0 ? props.stockData : {};
+    const seekingAlphaData = props.seekingAlphaData && Object.keys(props.seekingAlphaData).length > 0
+        ? props.seekingAlphaData
+        : {};
+    const seekingAlphaStockData = props.seekingAlphaStockData && Object.keys(props.seekingAlphaStockData).length > 0
+        ? props.seekingAlphaStockData
+        : {};
+
+    const LucideIcon =
+        props.LucideIcon ||
+        (({ name, className = '' }) => <span className={className}>{name}</span>);
+
+    const seekingAlphaStocks = (seekingAlphaData?.stocks as any[]) || [];
+    const seekingAlphaStockMap = (seekingAlphaStockData?.stocks as Record<string, any>) || {};
+
+    const isSelectionControlled = typeof props.selectedStock !== 'undefined';
+    const [internalSelectedStock, setInternalSelectedStock] = useState<string | null>(props.selectedStock ?? null);
+    const [seekingAlphaViewMode, setSeekingAlphaViewMode] = useState<'list' | 'cards'>('cards');
+
+    useEffect(() => {
+        if (isSelectionControlled) {
+            setInternalSelectedStock(props.selectedStock ?? null);
+        }
+    }, [isSelectionControlled, props.selectedStock]);
+
+    const selectedStock = isSelectionControlled ? (props.selectedStock ?? null) : internalSelectedStock;
+
+    const handleSelectStock = (ticker: string | null) => {
+        if (!isSelectionControlled) {
+            setInternalSelectedStock(ticker);
+        }
+        props.setSelectedStock?.(ticker);
+    };
+
+    const cleanText = (value: string | null | undefined) => {
+        if (!value) return '';
+        return value
+            .replace(/Ã©/g, 'é')
+            .replace(/Ã¨/g, 'è')
+            .replace(/Ã /g, 'à')
+            .replace(/Ã§/g, 'ç')
+            .replace(/Ã´/g, 'ô')
+            .replace(/Ã¢/g, 'â')
+            .replace(/Ã®/g, 'î')
+            .replace(/Ã¯/g, 'ï')
+            .replace(/Ã¹/g, 'ù')
+            .replace(/Ã»/g, 'û')
+            .replace(/Ã«/g, 'ë')
+            .replace(/Ã¤/g, 'ä')
+            .replace(/Ã¶/g, 'ö')
+            .replace(/Ã¼/g, 'ü')
+            .replace(/â€™/g, "'")
+            .replace(/â€œ/g, '“')
+            .replace(/â€�/g, '”')
+            .replace(/â€“/g, '–')
+            .replace(/â€”/g, '—');
+    };
+
+    const getGradeColor = (grade?: string | number) => {
+        if (!grade) return 'bg-gray-100 text-gray-600';
+        const value = String(grade).toUpperCase();
+        if (value.startsWith('A')) return 'bg-green-100 text-green-700';
+        if (value.startsWith('B')) return 'bg-blue-100 text-blue-700';
+        if (value.startsWith('C')) return 'bg-yellow-100 text-yellow-700';
+        if (value.startsWith('D')) return 'bg-orange-100 text-orange-700';
+        return 'bg-red-100 text-red-700';
+    };
 
     return (
                 <div className="space-y-6">
@@ -30,7 +95,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                             <div className="flex justify-between items-start mb-4">
                                 <h3 className="text-2xl font-bold text-white">{selectedStock}</h3>
                                 <button
-                                    onClick={() => setSelectedStock(null)}
+                                    onClick={() => handleSelectStock(null)}
                                     className="text-blue-400 hover:text-blue-300"
                                 >
                                     ✕ Fermer
@@ -39,8 +104,8 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                             
                             {/* Fiche détaillée comme dans les images */}
                             {(() => {
-                                const claudeData = seekingAlphaStockData.stocks?.[selectedStock];
-                                const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === selectedStock);
+                                const claudeData = seekingAlphaStockMap?.[selectedStock];
+                                const seekingAlphaItem = seekingAlphaStocks?.find(s => s.ticker === selectedStock);
                                 const parsedData = seekingAlphaItem?.parsedData;
                                 
                                 if (claudeData || parsedData) {
@@ -56,7 +121,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                         </p>
                                                     </div>
                                                     <button
-                                                        onClick={() => setSelectedStock(null)}
+                                                        onClick={() => handleSelectStock(null)}
                                                         className="text-white hover:text-gray-200 text-xl"
                                                     >
                                                         ✕
@@ -240,7 +305,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                             
                             {/* Analyse Seeking Alpha */}
                             {(() => {
-                                const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === selectedStock);
+                                const seekingAlphaItem = seekingAlphaStocks?.find(s => s.ticker === selectedStock);
                                 const parsedData = seekingAlphaItem?.parsedData;
                                 
                                 if (parsedData?.analysis) {
@@ -294,7 +359,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                     )}
 
                     {/* Liste des tickers disponibles si aucune donnée Seeking Alpha */}
-                    {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length > 0 && (
+                    {!selectedStock && (!seekingAlphaStocks || seekingAlphaStocks.length === 0) && tickers.length > 0 && (
                         <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
                         }`}>
@@ -308,7 +373,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                 {tickers.map((ticker) => (
                                     <button
                                         key={ticker}
-                                        onClick={() => setSelectedStock(ticker)}
+                                        onClick={() => handleSelectStock(ticker)}
                                         className={`p-3 rounded-lg border transition-all hover:scale-105 ${
                                             isDarkMode
                                                 ? 'bg-gray-700/50 border-gray-600 hover:border-green-500 text-white'
@@ -331,7 +396,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                     )}
 
                     {/* Cartes d'analyse comme dans les images */}
-                    {!selectedStock && seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
+                    {!selectedStock && seekingAlphaStocks && seekingAlphaStocks.length > 0 && (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
                             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -385,11 +450,11 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                            {seekingAlphaData.stocks
+                            {seekingAlphaStocks
                                 .slice()
                                 .sort((a, b) => a.ticker.localeCompare(b.ticker))
                                 .map((stock, index) => {
-                                const claudeData = seekingAlphaStockData.stocks?.[stock.ticker];
+                                const claudeData = seekingAlphaStockMap?.[stock.ticker];
                                 const parsedData = stock.parsedData;
                                                     
                                                     // Priorité: Claude > Parsed
@@ -405,7 +470,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                 
                                 return (
                                                         <tr key={index} className="border-b border-gray-700 hover:bg-gray-800 cursor-pointer"
-                                                            onClick={() => setSelectedStock(stock.ticker)}>
+                                                            onClick={() => handleSelectStock(stock.ticker)}>
                                                             <td className="py-3">
                                                                 <div className="flex items-center gap-2">
                                                                     <img 
@@ -445,7 +510,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                                     <button
                                                                         onClick={(e) => {
                                                                             e.stopPropagation();
-                                                                            setSelectedStock(stock.ticker);
+                                                                            handleSelectStock(stock.ticker);
                                                                         }}
                                                                         className="px-2 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold transition-colors flex items-center gap-1"
                                                                     >
@@ -490,16 +555,16 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                             {/* Vue en cartes pour Seeking Alpha */}
                             {seekingAlphaViewMode === 'cards' && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {seekingAlphaData.stocks
+                                    {seekingAlphaStocks
                                         .slice()
                                         .sort((a, b) => a.ticker.localeCompare(b.ticker))
                                         .map((stock, index) => {
-                                        const claudeData = seekingAlphaStockData.stocks?.[stock.ticker];
+                                        const claudeData = seekingAlphaStockMap?.[stock.ticker];
                                         const parsedData = stock.parsedData;
                                         
                                         return (
                                             <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-blue-300/40 transition-all cursor-pointer"
-                                                 onClick={() => setSelectedStock(stock.ticker)}>
+                                                 onClick={() => handleSelectStock(stock.ticker)}>
                                                 
                                         {/* Header avec ticker et rating */}
                                         <div className="flex justify-between items-start mb-6">
