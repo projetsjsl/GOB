@@ -1159,6 +1159,8 @@ const BetaCombinedDashboard = () => {
             data.tickers = tickers;
             data.stockData = stockData;
             data.newsData = newsData;
+            data.tickerLatestNews = tickerLatestNews;
+            data.tickerMoveReasons = tickerMoveReasons;
             data.loading = loading;
             data.lastUpdate = lastUpdate;
             data.seekingAlphaData = seekingAlphaData;
@@ -1185,6 +1187,8 @@ const BetaCombinedDashboard = () => {
                     tickers: { value: tickers, writable: true, enumerable: true },
                     stockData: { value: stockData, writable: true, enumerable: true },
                     newsData: { value: newsData, writable: true, enumerable: true },
+                    tickerLatestNews: { value: tickerLatestNews, writable: true, enumerable: true },
+                    tickerMoveReasons: { value: tickerMoveReasons, writable: true, enumerable: true },
                     loading: { value: loading, writable: true, enumerable: true },
                     lastUpdate: { value: lastUpdate, writable: true, enumerable: true },
                     seekingAlphaData: { value: seekingAlphaData, writable: true, enumerable: true },
@@ -1204,7 +1208,7 @@ const BetaCombinedDashboard = () => {
                 });
             }
         }
-    }, [isDarkMode, tickers, stockData, newsData, loading, lastUpdate, seekingAlphaData, seekingAlphaStockData, activeTab, setActiveTab, loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers, isProfessionalMode, setScrapingStatus, setScrapingProgress, setScrapingLogs, addLog, showMessage]);
+    }, [isDarkMode, tickers, stockData, newsData, tickerLatestNews, tickerMoveReasons, loading, lastUpdate, seekingAlphaData, seekingAlphaStockData, activeTab, setActiveTab, loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers, isProfessionalMode, setScrapingStatus, setScrapingProgress, setScrapingLogs, addLog, showMessage]);
 
     // 0.1. Écouter l'événement modules-loaded et vérifier périodiquement si les modules sont disponibles
     useEffect(() => {
