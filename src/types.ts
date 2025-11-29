@@ -68,7 +68,8 @@ export type TabName =
   | 'investing-calendar'
   | 'yield-curve'
   | 'markets-economy'
-  | 'ask-emma';
+  | 'ask-emma'
+  | 'emma-config';
 
 // Props des tabs
 export interface TabProps {

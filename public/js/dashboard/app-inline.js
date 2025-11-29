@@ -3286,7 +3286,8 @@
                         'economic-calendar': 'iconoir-calendar', // ✅ Icône valide
                         'investing-calendar': 'iconoir-calendar', // Calendrier pour Investing Calendar
                         'yield-curve': 'iconoir-graph-up', // Graphique pour Yield Curve
-                        'markets-economy': 'iconoir-globe' // ✅ Icône valide
+                        'markets-economy': 'iconoir-globe', // ✅ Icône valide
+                        'emma-config': 'iconoir-settings' // Page de configuration Emma
                     };
                     // Retourner l'icône avec fallback
                     return iconMap[tabId] || 'iconoir-graph-up';
@@ -24772,6 +24773,55 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     );
                 };
 
+                // Onglet de configuration Emma (ouvre les pages de config en nouvel onglet)
+                const EmmaConfigTab = () => (
+                    <div className={`p-6 rounded-lg border transition-colors duration-300 ${isDarkMode
+                        ? 'bg-gray-900 border-gray-700 text-white'
+                        : 'bg-white border-gray-200 text-gray-900'
+                        }`}>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-2xl font-bold">🛠️ Emma Config</h2>
+                            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                Prompts & paramètres d'Emma IA
+                            </span>
+                        </div>
+
+                        <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Ouvrez la page de configuration pour gérer les prompts, paramètres et sauvegardes d'Emma.
+                            Les pages s'ouvrent dans un nouvel onglet.
+                        </p>
+
+                        <div className="flex flex-wrap gap-3">
+                            <a
+                                href="/emma-config.html"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${isDarkMode
+                                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    }`}
+                            >
+                                Config classique
+                            </a>
+                            <a
+                                href="/emma-config-enhanced.html"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${isDarkMode
+                                    ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                                    : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                                    }`}
+                            >
+                                Config enhanced
+                            </a>
+                        </div>
+
+                        <div className={`mt-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Astuce : gardez cet onglet ouvert pendant que vous ajustez vos prompts dans la page config pour tester en direct.
+                        </div>
+                    </div>
+                );
+
                 // Configuration des onglets (après déclaration de TOUS les composants)
                 // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
                 const tabs = [
@@ -24786,7 +24836,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     { id: 'scrapping-sa', label: 'Seeking Alpha', component: ScrappingSATab },
                     { id: 'seeking-alpha', label: 'Stocks News', component: SeekingAlphaTab },
                     { id: 'email-briefings', label: 'Emma En Direct', component: EmailBriefingsTab },
-                    { id: 'investing-calendar', label: 'TESTS JS', component: InvestingCalendarTab }
+                    { id: 'investing-calendar', label: 'TESTS JS', component: InvestingCalendarTab },
+                    { id: 'emma-config', label: 'Emma Config', component: EmmaConfigTab }
                 ];
 
                 return (

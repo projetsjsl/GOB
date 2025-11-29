@@ -7,6 +7,7 @@ import DansWatchlistTab from './tabs/DansWatchlistTab';
 import StocksNewsTab from './tabs/StocksNewsTab';
 import IntelliStocksTab from './tabs/IntelliStocksTab';
 import EconomicCalendarTab from './tabs/EconomicCalendarTab';
+import EmmaConfigTab from './tabs/EmmaConfigTab';
 import AskEmmaTab from './tabs/AskEmmaTab';
 import EmailBriefingsTab from './tabs/EmailBriefingsTab';
 import type { TabName, StockData, NewsArticle, SeekingAlphaData } from '../types';
@@ -454,6 +455,7 @@ export const BetaCombinedDashboard: React.FC = () => {
             case 'intellistocks': return <IntelliStocksTab {...tabProps} />;
             case 'admin-jslai': return <AdminJSLaiTab {...tabProps} />;
             case 'ask-emma': return <AskEmmaTab {...tabProps} />;
+            case 'emma-config': return <EmmaConfigTab {...tabProps} />;
             case 'email-briefings': return <EmailBriefingsTab {...tabProps} />;
             case 'plus': return <PlusTab {...tabProps} />;
             case 'watchlist': return <DansWatchlistTab {...tabProps} />;
@@ -487,6 +489,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                         { id: 'watchlist' as TabName, label: '⭐ Watchlist' },
                         { id: 'economic-calendar' as TabName, label: '📅 Calendar' },
                         { id: 'ask-emma' as TabName, label: '🤖 Emma IA™' },
+                        { id: 'emma-config' as TabName, label: '🛠️ Emma Config' },
                         { id: 'admin-jslai' as TabName, label: '⚙️ Admin' },
                         { id: 'plus' as TabName, label: '➕ Plus' }
                     ].map(tab => (
