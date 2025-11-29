@@ -2835,17 +2835,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>💡 Suggestions rapides</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {[
-                                    "Analyse complète de Microsoft",
-                                    "Comparer Tesla vs Nvidia",
-                                    "Résultats récents d'Apple",
-                                    "Actualités IA récentes",
-                                    "Vue globale des marchés",
-                                    "Valorisation Amazon (DCF)",
-                                    "Explique-moi le Score JSLAI™",
-                                    "Analyse des dividendes BCE",
-                                    "Comment utiliser l'onglet JLab ?"
-                                ].map((suggestion, index) => (
+                                {(window.DASHBOARD_CONSTANTS?.askEmmaSuggestions || []).map((suggestion, index) => (
                                     <button
                                         key={index}
                                         onClick={() => setEmmaInput(suggestion)}

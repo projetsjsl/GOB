@@ -35,4 +35,17 @@
 
     window.DASHBOARD_CONSTANTS = window.DASHBOARD_CONSTANTS || {};
     window.DASHBOARD_CONSTANTS.companyNames = companyNames;
+
+    // Suggestions rapides pour AskEmma
+    window.DASHBOARD_CONSTANTS.askEmmaSuggestions = [
+        "Analyse complète de Microsoft",
+        "Comparer Tesla vs Nvidia",
+        "Résultats récents d'Apple",
+        "Actualités IA récentes",
+        "Vue globale des marchés",
+        "Valorisation Amazon (DCF)",
+        "Explique-moi le Score JSLAI™",
+        "Analyse des dividendes BCE",
+        "Comment utiliser l'onglet JLab ?"
+    ];
 })();
