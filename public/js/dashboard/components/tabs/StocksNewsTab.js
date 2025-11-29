@@ -23,24 +23,26 @@ const StocksNewsTab = () => {
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
 
-        const renderMarketBadge = (type) => {
-            const isBull = type === 'bull';
-            return (
-                <span
-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${
-                        isBull
-                            ? isDarkMode
-                                ? 'bg-lime-900/70 border-lime-500/40 text-lime-300'
-                                : 'bg-lime-100 border-lime-400 text-lime-700'
-                            : isDarkMode
-                                ? 'bg-rose-900/70 border-rose-500/40 text-rose-200'
-                                : 'bg-rose-100 border-rose-300 text-rose-700'
-                    }`}
-                >
-                    {isBull ? '🐂' : '🐻'}
-                </span>
-            );
-        };
+        const renderMarketBadge = window.DASHBOARD_UTILS?.renderMarketBadge
+            ? (type) => window.DASHBOARD_UTILS.renderMarketBadge(type, isDarkMode)
+            : (type) => {
+                const isBull = type === 'bull';
+                return (
+                    <span
+                        className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${
+                            isBull
+                                ? isDarkMode
+                                    ? 'bg-lime-900/70 border-lime-500/40 text-lime-300'
+                                    : 'bg-lime-100 border-lime-400 text-lime-700'
+                                : isDarkMode
+                                    ? 'bg-rose-900/70 border-rose-500/40 text-rose-200'
+                                    : 'bg-rose-100 border-rose-300 text-rose-700'
+                        }`}
+                    >
+                        {isBull ? '🐂' : '🐻'}
+                    </span>
+                );
+            };
 
         // Helper functions for news credibility scoring (définies dans le composant)
         const getNewsCredibilityScore = (sourceName) => {
@@ -81,38 +83,7 @@ const StocksNewsTab = () => {
         };
 
         // Mapping des noms de compagnies pour affichage
-        const companyNames = {
-            AAPL: 'Apple Inc.',
-            TSLA: 'Tesla Inc.',
-            GOOGL: 'Alphabet Inc.',
-            GOOG: 'Alphabet Inc.',
-            MSFT: 'Microsoft Corporation',
-            NVDA: 'NVIDIA Corporation',
-            AMZN: 'Amazon.com Inc.',
-            META: 'Meta Platforms Inc.',
-            NFLX: 'Netflix Inc.',
-            AMD: 'Advanced Micro Devices Inc.',
-            INTC: 'Intel Corporation',
-            CRM: 'Salesforce Inc.',
-            ORCL: 'Oracle Corporation',
-            CSCO: 'Cisco Systems Inc.',
-            ADBE: 'Adobe Inc.',
-            PYPL: 'PayPal Holdings Inc.',
-            DIS: 'The Walt Disney Company',
-            BA: 'The Boeing Company',
-            GE: 'General Electric Company',
-            JPM: 'JPMorgan Chase & Co.',
-            BAC: 'Bank of America Corporation',
-            WMT: 'Walmart Inc.',
-            HD: 'The Home Depot Inc.',
-            PG: 'Procter & Gamble Company',
-            JNJ: 'Johnson & Johnson',
-            V: 'Visa Inc.',
-            MA: 'Mastercard Incorporated',
-            UNH: 'UnitedHealth Group Inc.',
-            PFE: 'Pfizer Inc.',
-            MRK: 'Merck & Co. Inc.'
-        };
+        const companyNames = (window.DASHBOARD_CONSTANTS && window.DASHBOARD_CONSTANTS.companyNames) || {};
 
         return (
         <div className="space-y-6">
