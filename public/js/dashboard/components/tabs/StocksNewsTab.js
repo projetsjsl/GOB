@@ -5,6 +5,21 @@
 
 
 const StocksNewsTab = () => {
+        // Récupère les données/handlers depuis la surface globale du dashboard
+        const isDarkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
+        const tickers = window.BetaCombinedDashboard?.tickers ?? [];
+        const stockData = window.BetaCombinedDashboard?.stockData ?? {};
+        const newsData = window.BetaCombinedDashboard?.newsData ?? [];
+        const tickerLatestNews = window.BetaCombinedDashboard?.tickerLatestNews ?? {};
+        const tickerMoveReasons = window.BetaCombinedDashboard?.tickerMoveReasons ?? {};
+        const loading = window.BetaCombinedDashboard?.loading ?? false;
+        const lastUpdate = window.BetaCombinedDashboard?.lastUpdate ?? null;
+        const loadTickersFromSupabase = window.BetaCombinedDashboard?.loadTickersFromSupabase;
+        const fetchNews = window.BetaCombinedDashboard?.fetchNews;
+        const refreshAllStocks = window.BetaCombinedDashboard?.refreshAllStocks;
+        const fetchLatestNewsForTickers = window.BetaCombinedDashboard?.fetchLatestNewsForTickers;
+        const getCompanyLogo = window.BetaCombinedDashboardData?.getCompanyLogo || window.BetaCombinedDashboard?.getCompanyLogo;
+
         const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
 
