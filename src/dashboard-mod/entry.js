@@ -13,7 +13,7 @@ import { StocksNewsTab } from './tabs/StocksNewsTab.jsx';
 import { EmailBriefingsTab } from './EmailBriefingsTabMod.jsx';
 import { AskEmmaTab } from './tabs/AskEmmaTab.jsx';
 import { IntelliStocksTab } from './IntelliStocksTabMod.jsx';
-import { MarketsEconomyTab } from './MarketsEconomyTabMod.jsx';
+import { MarketsEconomyTab } from './tabs/MarketsEconomyTab.jsx';
 import { EmailBriefingsTabFull } from './EmailBriefingsTabFull.jsx';
 
 // Expose pilot modules on window (no runtime swap yet)
@@ -25,6 +25,9 @@ if (typeof window !== 'undefined') {
     window.AskEmmaTabMod = AskEmmaTab;
     window.IntelliStocksTabMod = IntelliStocksTab;
     window.MarketsEconomyTabMod = MarketsEconomyTab;
+    if (!window.MarketsEconomyTab) {
+        window.MarketsEconomyTab = MarketsEconomyTab;
+    }
     window.React = window.React || React;
     window.ReactDOM = window.ReactDOM || ReactDOM;
 }

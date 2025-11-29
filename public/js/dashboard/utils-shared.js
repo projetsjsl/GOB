@@ -26,6 +26,46 @@
         return 'low';
     };
 
+    const getSourceCredibility = (sourceName = '') => {
+        const source = (sourceName || '').toLowerCase();
+        if (!source) return 50;
+
+        const tiers = [
+            { score: 100, keywords: ['bloomberg', 'reuters', 'wall street journal', 'wsj', 'financial times', 'ft'] },
+            { score: 90, keywords: ['cnbc', 'marketwatch', 'barrons', 'seeking alpha', 'yahoo finance', 'morningstar', 'the economist'] },
+            { score: 80, keywords: ['forbes', 'benzinga', 'investorplace', 'zacks', 'motley fool', 'nasdaq', 'business insider'] },
+            { score: 70, keywords: ['investing.com', 'fxstreet', 'dailyfx', 'capital.com', 'markets insider'] },
+        ];
+
+        for (const tier of tiers) {
+            if (tier.keywords.some(keyword => source.includes(keyword))) {
+                return tier.score;
+            }
+        }
+
+        return 50;
+    };
+
+    const isFrenchArticle = (article) => {
+        if (!article) return false;
+        const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+        const sourceName = (article.source?.name || '').toLowerCase();
+
+        const frenchSources = ['la presse', 'les affaires', 'radio-canada', 'ici', 'le devoir', 'le journal', 'reuters fr', 'bloomberg fr'];
+        if (frenchSources.some(source => sourceName.includes(source))) {
+            return true;
+        }
+
+        const frenchKeywords = [
+            'à', 'de', 'et', 'pour', 'dans', 'avec', 'sur', 'plus', 'après', 'annonce',
+            'hausse', 'baisse', 'résultats', 'bourse', 'marché', 'économie', 'entreprise',
+            'société', 'actionnaire', 'bénéfice', 'chiffre', 'trimestre', 'milliards', 'millions'
+        ];
+
+        const frenchWordCount = frenchKeywords.filter(keyword => text.includes(keyword)).length;
+        return frenchWordCount >= 3;
+    };
+
     const formatTimeAgo = (dateString) => {
         const date = new Date(dateString);
         const hours = Math.floor((Date.now() - date.getTime()) / 3600000);
@@ -118,8 +158,10 @@
     window.DASHBOARD_UTILS.formatNumberCompact = formatNumberCompact;
     window.DASHBOARD_UTILS.formatNumberLocale = formatNumberLocale;
     window.DASHBOARD_UTILS.getCredibilityTier = getCredibilityTier;
+    window.DASHBOARD_UTILS.getSourceCredibility = getSourceCredibility;
     window.DASHBOARD_UTILS.formatTimeAgo = formatTimeAgo;
     window.DASHBOARD_UTILS.renderMarketBadge = renderMarketBadge;
     window.DASHBOARD_UTILS.cleanText = cleanText;
     window.DASHBOARD_UTILS.getNewsIcon = getNewsIcon;
+    window.DASHBOARD_UTILS.isFrenchArticle = isFrenchArticle;
 })();
