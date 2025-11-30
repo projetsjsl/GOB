@@ -51,6 +51,11 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
     const [tavusStatus, setTavusStatus] = useState('disconnected'); // disconnected, connecting, connected
     const [showSettings, setShowSettings] = useState(false);
 
+    // Voice Configuration
+    const [language, setLanguage] = useState('fr-CA'); // 'fr-CA' or 'en-CA'
+    const [useAccent, setUseAccent] = useState(true); // Quebecois accent for French
+    const [isTtsEnabled, setIsTtsEnabled] = useState(true); // Text-to-Speech enabled/disabled
+
     // Refs
     const chatContainerRef = useRef(null);
     const recognitionRef = useRef(null);
@@ -66,7 +71,7 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
             const recognition = new webkitSpeechRecognition();
             recognition.continuous = false;
             recognition.interimResults = false;
-            recognition.lang = 'fr-FR';
+            recognition.lang = language === 'fr-CA' ? 'fr-FR' : 'en-US';
 
             recognition.onstart = () => {
                 setIsRecording(true);
@@ -87,7 +92,7 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
         } else {
             console.warn('Speech recognition not supported in this browser.');
         }
-    }, []);
+    }, [language]);
 
     // Auto-scroll to bottom of chat
     useEffect(() => {
@@ -171,9 +176,11 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
     };
 
     const speakWithBrowser = (text) => {
+        if (!isTtsEnabled) return; // Don't speak if TTS is disabled
+
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'fr-FR';
+            utterance.lang = language === 'fr-CA' ? 'fr-FR' : 'en-US';
             window.speechSynthesis.speak(utterance);
         }
     };
@@ -324,19 +331,55 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
                     <div className={`p-4 border-b ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                         <h4 className={`text-sm font-bold mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Configuration</h4>
                         <div className="space-y-3">
+                            {/* Language Selector */}
                             <div>
-                                <label className={`block text-xs mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Modèle IA</label>
-                                <select className={`w-full text-sm rounded-md p-2 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}>
-                                    <option>Gemini 2.0 Flash</option>
-                                    <option>Gemini Pro Vision</option>
-                                </select>
+                                <label className={`block text-xs mb-1 font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Langue</label>
+                                <div className="flex bg-gray-900 rounded-lg p-1 border border-gray-700">
+                                    <button
+                                        onClick={() => setLanguage('fr-CA')}
+                                        className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'fr-CA' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                                    >
+                                        Français (CA)
+                                    </button>
+                                    <button
+                                        onClick={() => setLanguage('en-CA')}
+                                        className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'en-CA' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                                    >
+                                        English (CA)
+                                    </button>
+                                </div>
                             </div>
+
+                            {/* Accent Toggle (Only for French) */}
+                            {language === 'fr-CA' && (
+                                <div>
+                                    <label className={`block text-xs mb-1 font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Accent</label>
+                                    <button
+                                        onClick={() => setUseAccent(!useAccent)}
+                                        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all ${useAccent ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-600'}`}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <span className={`w-2 h-2 rounded-full ${useAccent ? 'bg-emerald-500' : 'bg-gray-600'}`}></span>
+                                            Accent Québécois
+                                        </span>
+                                        <span>{useAccent ? 'Activé' : 'Désactivé'}</span>
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* TTS Toggle */}
                             <div>
-                                <label className={`block text-xs mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Voix</label>
-                                <select className={`w-full text-sm rounded-md p-2 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}>
-                                    <option>Français (Femme)</option>
-                                    <option>Français (Homme)</option>
-                                </select>
+                                <label className={`block text-xs mb-1 font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Synthèse Vocale (TTS)</label>
+                                <button
+                                    onClick={() => setIsTtsEnabled(!isTtsEnabled)}
+                                    className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all ${isTtsEnabled ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-600'}`}
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <span className={`w-2 h-2 rounded-full ${isTtsEnabled ? 'bg-emerald-500' : 'bg-gray-600'}`}></span>
+                                        Réponses Vocales
+                                    </span>
+                                    <span>{isTtsEnabled ? 'Activée' : 'Désactivée'}</span>
+                                </button>
                             </div>
                         </div>
                     </div>
