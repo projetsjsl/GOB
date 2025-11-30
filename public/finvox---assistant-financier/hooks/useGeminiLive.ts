@@ -8,69 +8,77 @@ const INPUT_SAMPLE_RATE = 16000;
 const OUTPUT_SAMPLE_RATE = 24000;
 const BUFFER_SIZE = 4096;
 
-// --- Tool Definitions ---
+// --- Dynamic Tool Definitions ---
 
-const stockPriceTool: FunctionDeclaration = {
+const getStockPriceTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
   name: "getStockPrice",
-  description: "Outil essentiel pour obtenir le prix actuel, la variation et la performance d'une action. À utiliser dès que l'utilisateur mentionne une entreprise, demande 'comment ça va' pour une action, ou demande des 'résultats' ou chiffres récents.",
+  description: lang === 'fr-CA'
+    ? "Outil essentiel pour obtenir le prix actuel, la variation et la performance d'une action. À utiliser dès que l'utilisateur mentionne une entreprise, demande 'comment ça va' pour une action, ou demande des 'résultats' ou chiffres récents."
+    : "Essential tool to get current price, change, and performance of a stock. Use immediately when user mentions a company, asks 'how is it doing', or asks for 'results' or recent numbers.",
   parameters: {
     type: Type.OBJECT,
     properties: {
       symbol: {
         type: Type.STRING,
-        description: "Le symbole du ticker (ex: AAPL, NVDA, CAC40, BTC).",
+        description: lang === 'fr-CA' ? "Le symbole du ticker (ex: AAPL, NVDA, CAC40, BTC)." : "The ticker symbol (e.g. AAPL, NVDA, CAC40, BTC).",
       },
     },
     required: ["symbol"],
   },
-};
+});
 
-const marketNewsTool: FunctionDeclaration = {
+const getMarketNewsTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
   name: "getMarketNews",
-  description: "Obtenir les grands titres de l'actualité financière récente. Utile pour expliquer pourquoi une action monte ou descend.",
+  description: lang === 'fr-CA'
+    ? "Obtenir les grands titres de l'actualité financière récente. Utile pour expliquer pourquoi une action monte ou descend."
+    : "Get recent financial news headlines. Useful to explain why a stock is moving up or down.",
   parameters: {
     type: Type.OBJECT,
     properties: {
       category: {
         type: Type.STRING,
-        description: "La catégorie (ex: Tech, Marchés, Crypto, Général).",
+        description: lang === 'fr-CA' ? "La catégorie (ex: Tech, Marchés, Crypto, Général)." : "The category (e.g. Tech, Markets, Crypto, General).",
       },
     },
     required: ["category"],
   },
-};
+});
 
-const stockHistoryTool: FunctionDeclaration = {
+const getStockHistoryTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
   name: "getStockHistory",
-  description: "Obtenir l'historique des prix pour afficher un graphique. A utiliser quand l'utilisateur demande de voir l'évolution, la courbe ou l'historique sur une période.",
+  description: lang === 'fr-CA'
+    ? "Obtenir l'historique des prix pour afficher un graphique. A utiliser quand l'utilisateur demande de voir l'évolution, la courbe ou l'historique sur une période."
+    : "Get price history to display a chart. Use when user asks to see the trend, the curve, or history over a period.",
   parameters: {
     type: Type.OBJECT,
     properties: {
       symbol: {
         type: Type.STRING,
-        description: "Le symbole du ticker (ex: AAPL).",
+        description: lang === 'fr-CA' ? "Le symbole du ticker (ex: AAPL)." : "The ticker symbol (e.g. AAPL).",
       },
       period: {
         type: Type.STRING,
-        description: "La période (ex: 1M, 6M, 1Y). Par défaut 1M.",
+        description: lang === 'fr-CA' ? "La période (ex: 1M, 6M, 1Y). Par défaut 1M." : "The period (e.g. 1M, 6M, 1Y). Default 1M.",
       },
     },
     required: ["symbol"],
   },
-};
+});
 
-const analyzeStockTool: FunctionDeclaration = {
+const getAnalyzeStockTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
   name: "analyzeStock",
-  description: "Effectuer une analyse approfondie, stratégique et raisonnée (Thinking Mode) d'une action ou d'un marché. À utiliser quand l'utilisateur demande une 'analyse profonde', 'pourquoi ça monte vraiment', 'fais une recherche approfondie', ou des prédictions complexes nécessitant du raisonnement.",
+  description: lang === 'fr-CA'
+    ? "Effectuer une analyse approfondie, stratégique et raisonnée (Thinking Mode) d'une action ou d'un marché. À utiliser quand l'utilisateur demande une 'analyse profonde', 'pourquoi ça monte vraiment', 'fais une recherche approfondie', ou des prédictions complexes nécessitant du raisonnement."
+    : "Perform a deep, strategic, and reasoned analysis (Thinking Mode) of a stock or market. Use when user asks for 'deep analysis', 'why is it really moving', 'do thorough research', or complex predictions requiring reasoning.",
   parameters: {
     type: Type.OBJECT,
     properties: {
-      symbol: { type: Type.STRING, description: "Symbole de l'action ou sujet principal." },
-      question: { type: Type.STRING, description: "La question spécifique ou le contexte complet de l'analyse." }
+      symbol: { type: Type.STRING, description: lang === 'fr-CA' ? "Symbole de l'action ou sujet principal." : "Stock symbol or main subject." },
+      question: { type: Type.STRING, description: lang === 'fr-CA' ? "La question spécifique ou le contexte complet de l'analyse." : "The specific question or full context of the analysis." }
     },
     required: ["symbol", "question"]
   }
-};
+});
 
 // --- Advanced Caching Strategy ---
 
@@ -170,15 +178,15 @@ const fetchStockPrice = (symbol: string) => {
   return result;
 };
 
-const fetchMarketNews = (category: string) => {
-  const key = category.toLowerCase();
+const fetchMarketNews = (category: string, lang: 'fr-CA' | 'en-CA') => {
+  const key = category.toLowerCase() + '_' + lang;
 
   const cached = newsCache.get(key);
   if (cached) {
     return cached;
   }
 
-  const newsItems = [
+  const newsItemsFr = [
     { title: "La Fed signale une possible baisse des taux le mois prochain.", source: "Bloomberg" },
     { title: "Le secteur technologique bondit après des résultats trimestriels records.", source: "Reuters" },
     { title: "Le Bitcoin atteint un nouveau seuil de résistance.", source: "CoinDesk" },
@@ -186,7 +194,16 @@ const fetchMarketNews = (category: string) => {
     { title: "Nouvelles régulations annoncées pour les marchés des dérivés.", source: "Financial Times" }
   ];
 
-  const selected = newsItems.sort(() => 0.5 - Math.random()).slice(0, 3);
+  const newsItemsEn = [
+    { title: "Fed signals potential rate cut next month.", source: "Bloomberg" },
+    { title: "Tech sector jumps after record quarterly results.", source: "Reuters" },
+    { title: "Bitcoin hits a new resistance level.", source: "CoinDesk" },
+    { title: "Eurozone inflation slows faster than expected.", source: "The Economist" },
+    { title: "New regulations announced for derivatives markets.", source: "Financial Times" }
+  ];
+
+  const items = lang === 'fr-CA' ? newsItemsFr : newsItemsEn;
+  const selected = items.sort(() => 0.5 - Math.random()).slice(0, 3);
   const baseTime = new Date();
 
   const result = {
@@ -202,7 +219,7 @@ const fetchMarketNews = (category: string) => {
   return result;
 };
 
-const fetchStockHistory = (symbol: string, period: string = '1M'): StockChartData => {
+const fetchStockHistory = (symbol: string, period: string = '1M', lang: 'fr-CA' | 'en-CA'): StockChartData => {
   const key = symbol.toUpperCase();
   const days = period === '1M' ? 30 : period === '1W' ? 7 : 30;
 
@@ -218,7 +235,7 @@ const fetchStockHistory = (symbol: string, period: string = '1M'): StockChartDat
     const change = (Math.random() - 0.48) * (basePrice * 0.05);
     currentPrice += change;
     dataPoints.push({
-      date: date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+      date: date.toLocaleDateString(lang === 'fr-CA' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short' }),
       price: currentPrice
     });
   }
@@ -239,9 +256,10 @@ const fetchStockHistory = (symbol: string, period: string = '1M'): StockChartDat
 };
 
 // --- Deep Analysis Implementation with Fallback ---
-const performDeepAnalysis = async (symbol: string, question: string): Promise<string> => {
+const performDeepAnalysis = async (symbol: string, question: string, lang: 'fr-CA' | 'en-CA'): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
-  const prompt = `You are a senior financial analyst. Provide a comprehensive, reasoned financial analysis for: ${symbol}. 
+
+  const promptFr = `You are a senior financial analyst. Provide a comprehensive, reasoned financial analysis for: ${symbol}. 
   Context/Question: ${question}.
   
   Structure your response with clear Markdown headers.
@@ -252,6 +270,19 @@ const performDeepAnalysis = async (symbol: string, question: string): Promise<st
   
   Be insightful, professional, and respond in French.`;
 
+  const promptEn = `You are a senior financial analyst. Provide a comprehensive, reasoned financial analysis for: ${symbol}. 
+  Context/Question: ${question}.
+  
+  Structure your response with clear Markdown headers.
+  1. Market Context
+  2. Key Drivers
+  3. Risks & Opportunities
+  4. Strategic Verdict
+  
+  Be insightful, professional, and respond in English.`;
+
+  const prompt = lang === 'fr-CA' ? promptFr : promptEn;
+
   try {
     // Attempt 1: Gemini 3 Pro (Thinking Mode)
     const response = await ai.models.generateContent({
@@ -261,7 +292,7 @@ const performDeepAnalysis = async (symbol: string, question: string): Promise<st
         thinkingConfig: { thinkingBudget: 32768 }, // Max thinking budget
       }
     });
-    return response.text || "Analyse terminée.";
+    return response.text || (lang === 'fr-CA' ? "Analyse terminée." : "Analysis complete.");
   } catch (error) {
     console.warn("Deep analysis (Pro) failed, falling back to Flash...", error);
     try {
@@ -271,10 +302,15 @@ const performDeepAnalysis = async (symbol: string, question: string): Promise<st
         contents: prompt,
         // No thinking config for Flash standard
       });
-      return (response.text || "Analyse terminée.") + "\n\n*(Note: Généré avec le modèle de secours Gemini 2.5 Flash)*";
+      const note = lang === 'fr-CA'
+        ? "\n\n*(Note: Généré avec le modèle de secours Gemini 2.5 Flash)*"
+        : "\n\n*(Note: Generated with fallback model Gemini 2.5 Flash)*";
+      return (response.text || (lang === 'fr-CA' ? "Analyse terminée." : "Analysis complete.")) + note;
     } catch (fallbackError) {
       console.error("Deep analysis fallback failed", fallbackError);
-      return "Désolé, l'analyse approfondie a échoué. Veuillez réessayer plus tard.";
+      return lang === 'fr-CA'
+        ? "Désolé, l'analyse approfondie a échoué. Veuillez réessayer plus tard."
+        : "Sorry, deep analysis failed. Please try again later.";
     }
   }
 };
@@ -375,7 +411,14 @@ export const useGeminiLive = () => {
           } : undefined,
           systemInstruction: getSystemInstruction(),
           tools: [
-            { functionDeclarations: [stockPriceTool, marketNewsTool, stockHistoryTool, analyzeStockTool] },
+            {
+              functionDeclarations: [
+                getStockPriceTool(language),
+                getMarketNewsTool(language),
+                getStockHistoryTool(language),
+                getAnalyzeStockTool(language)
+              ]
+            },
             { googleSearch: {} }
           ],
           inputAudioTranscription: {},
@@ -468,13 +511,16 @@ export const useGeminiLive = () => {
         let responseResult;
 
         if (fc.name === 'getStockPrice') {
-          result = fetchStockPrice(fc.args.symbol);
+          const args = fc.args as any;
+          result = fetchStockPrice(args.symbol);
           responseResult = result;
         } else if (fc.name === 'getMarketNews') {
-          result = fetchMarketNews(fc.args.category);
+          const args = fc.args as any;
+          result = fetchMarketNews(args.category, language);
           responseResult = result;
         } else if (fc.name === 'getStockHistory') {
-          const history = fetchStockHistory(fc.args.symbol, fc.args.period);
+          const args = fc.args as any;
+          const history = fetchStockHistory(args.symbol, args.period, language);
           setChartData(history);
           setAnalysisResult(null); // Clear analysis if showing chart
           responseResult = {
@@ -482,9 +528,10 @@ export const useGeminiLive = () => {
             status: "Chart displayed"
           };
         } else if (fc.name === 'analyzeStock') {
+          const args = fc.args as any;
           // Trigger background deep analysis
           setAnalysisResult({
-            symbol: fc.args.symbol,
+            symbol: args.symbol,
             content: '',
             isLoading: true,
             timestamp: new Date()
@@ -492,9 +539,9 @@ export const useGeminiLive = () => {
           setChartData(null); // Clear chart if showing analysis
 
           // Non-blocking async call
-          performDeepAnalysis(fc.args.symbol, fc.args.question).then(content => {
+          performDeepAnalysis(args.symbol, args.question, language).then(content => {
             setAnalysisResult({
-              symbol: fc.args.symbol,
+              symbol: args.symbol,
               content: content,
               isLoading: false,
               timestamp: new Date()
