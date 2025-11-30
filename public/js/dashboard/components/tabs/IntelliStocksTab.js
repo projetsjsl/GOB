@@ -2402,6 +2402,36 @@ const IntelliStocksTab = () => {
                             </div>
                         </div>
 
+                        {/* Analyse Approfondie - Clickable Card */}
+                        <div
+                            onClick={() => setShowAnalysisModal(true)}
+                            className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl ${isDarkMode
+                                    ? 'bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-700/50 hover:border-blue-500'
+                                    : 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 hover:border-blue-500'
+                                }`}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-500/10'
+                                        }`}>
+                                        <LucideIcon name="TrendingUp" className="w-6 h-6 text-blue-500" />
+                                    </div>
+                                    <div>
+                                        <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            📊 Analyse Approfondie
+                                        </h3>
+                                        <p className="text-xs text-gray-400">
+                                            Valorisation DCF, États Financiers, Insights IA
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className={`px-4 py-2 rounded-lg font-semibold text-sm ${isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                                    }`}>
+                                    Ouvrir →
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Ratios Historiques */}
                         <div className={`border rounded-lg p-2 transition-colors duration-300 ${isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
                             }`}>
