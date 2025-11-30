@@ -1,0 +1,7 @@
+{
+  "name": "FinVox - Assistant Financier",
+  "description": "A real-time voice-enabled financial portfolio assistant powered by Gemini Live API.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

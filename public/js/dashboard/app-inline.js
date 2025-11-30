@@ -24817,13 +24817,23 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             </div>
         );
 
+        // Placeholder for SettingsTab if not defined elsewhere
+        const SettingsTab = window.SettingsTab || (() => (
+            <div className="p-6 text-center">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Paramètres</h2>
+                <p className="text-gray-600 dark:text-gray-400">Configuration de l'application (Bientôt disponible)</p>
+            </div>
+        ));
+
         // Configuration des onglets (après déclaration de TOUS les composants)
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
         const tabs = [
             { id: 'markets-economy', label: 'Marchés & Économie', component: MarketsEconomyTab },
             { id: 'intellistocks', label: 'JLab™', component: JLabUnifiedTab },
             { id: 'ask-emma', label: 'Emma IA™', component: AskEmmaTab },
-            { id: 'voice-assistant', label: 'Assistant Vocal', component: VoiceAssistantTab },
+            { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
+            { id: 'finvox', label: 'FinVox (Live)', icon: 'iconoir-voice-circle', component: FinVoxTab },
+            { id: 'settings', label: 'Paramètres', icon: 'iconoir-settings', component: SettingsTab }, // Intégré dans Marchés & Économie
             // { id: 'yield-curve', label: '📈 Yield Curve', component: YieldCurveTab }, // Intégré dans Marchés & Économie
             // { id: 'economic-calendar', label: 'Calendrier Économique', component: EconomicCalendarTab }, // Intégré dans Marchés & Économie
             // { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab }, // Supprimé - fonctionnalités disponibles dans JLab → Dan's watchlist
