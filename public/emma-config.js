@@ -14,6 +14,7 @@ export const emmaConfig = {
 
   // Configuration Gemini
   gemini: {
+    apiKey: 'YOUR_GEMINI_API_KEY', // Placeholder
     model: 'gemini-2.0-flash-exp',
     temperature: 0.7,
     topK: 40,
@@ -24,6 +25,18 @@ export const emmaConfig = {
       hateSpeech: 'BLOCK_MEDIUM_AND_ABOVE',
       sexuallyExplicit: 'BLOCK_MEDIUM_AND_ABOVE',
       dangerousContent: 'BLOCK_MEDIUM_AND_ABOVE'
+    }
+  },
+
+  // Configuration Tavus (Video Avatar)
+  tavus: {
+    apiKey: 'YOUR_TAVUS_API_KEY', // Placeholder
+    replicaId: 'default_replica_id', // Placeholder
+    personaId: 'default_persona_id', // Placeholder
+    conversationId: null, // Will be set dynamically
+    options: {
+      enableVideo: true,
+      enableAudio: true
     }
   },
 

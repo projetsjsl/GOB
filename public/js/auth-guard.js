@@ -3,7 +3,7 @@
  * Vérifie l'authentification avant d'accéder au dashboard
  */
 
-(function() {
+(function () {
   'use strict';
 
   // Configuration
