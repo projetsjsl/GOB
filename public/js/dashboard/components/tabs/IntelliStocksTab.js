@@ -1385,13 +1385,16 @@ const IntelliStocksTab = () => {
         <div className={`min-h-screen p-2 transition-colors duration-300 ${isDarkMode ? 'bg-neutral-950 text-gray-100' : 'bg-gray-50 text-gray-900'
             }`}>
             {/* Stock Analysis Modal */}
-            {showAnalysisModal && window.StockAnalysisModal && (
-                <window.StockAnalysisModal
-                    symbol={selectedStock}
-                    currentPrice={stockDataIntelli?.quote?.price || 0}
-                    onClose={() => setShowAnalysisModal(false)}
-                />
-            )}
+            {showAnalysisModal && (() => {
+                const StockAnalysisModal = window.StockAnalysisModal;
+                return StockAnalysisModal ? (
+                    <StockAnalysisModal
+                        symbol={selectedStock}
+                        currentPrice={stockDataIntelli?.quote?.price || 0}
+                        onClose={() => setShowAnalysisModal(false)}
+                    />
+                ) : null;
+            })()}
 
             {/* Screener */}
             {showScreener && (
