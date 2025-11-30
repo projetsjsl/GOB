@@ -88,7 +88,7 @@ class SmartCache<T> {
   get(key: string): T | null {
     const entry = this.cache.get(key);
     if (!entry) return null;
-    
+
     // Lazy eviction on access
     if (Date.now() - entry.timestamp > this.ttl) {
       this.cache.delete(key);
@@ -130,7 +130,7 @@ const MOCK_STOCKS: Record<string, { price: number; currency: string; change: num
 
 const fetchStockPrice = (symbol: string) => {
   const key = symbol.toUpperCase();
-  
+
   const cached = stockCache.get(key);
   if (cached) {
     return cached;
@@ -188,7 +188,7 @@ const fetchMarketNews = (category: string) => {
 
   const selected = newsItems.sort(() => 0.5 - Math.random()).slice(0, 3);
   const baseTime = new Date();
-  
+
   const result = {
     category,
     headlines: selected.map((item, index) => ({
@@ -205,13 +205,13 @@ const fetchMarketNews = (category: string) => {
 const fetchStockHistory = (symbol: string, period: string = '1M'): StockChartData => {
   const key = symbol.toUpperCase();
   const days = period === '1M' ? 30 : period === '1W' ? 7 : 30;
-  
+
   const basePrice = MOCK_STOCKS[key]?.price || 150;
   const dataPoints = [];
-  let currentPrice = basePrice * 0.9; 
+  let currentPrice = basePrice * 0.9;
 
   const now = new Date();
-  
+
   for (let i = days; i >= 0; i--) {
     const date = new Date(now);
     date.setDate(now.getDate() - i);
@@ -282,10 +282,15 @@ const performDeepAnalysis = async (symbol: string, question: string): Promise<st
 export const useGeminiLive = () => {
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const [logs, setLogs] = useState<LogMessage[]>([]);
-  const [volume, setVolume] = useState<number>(0); 
+  const [volume, setVolume] = useState<number>(0);
   const [chartData, setChartData] = useState<StockChartData | null>(null);
-  const [voiceName, setVoiceName] = useState<string>('Aoede'); 
+  const [voiceName, setVoiceName] = useState<string>('Aoede');
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+
+  // Configuration States
+  const [language, setLanguage] = useState<'fr-CA' | 'en-CA'>('fr-CA');
+  const [useAccent, setUseAccent] = useState<boolean>(true);
+  const [isTtsEnabled, setIsTtsEnabled] = useState<boolean>(true);
 
   const inputAudioContextRef = useRef<AudioContext | null>(null);
   const outputAudioContextRef = useRef<AudioContext | null>(null);
@@ -293,16 +298,29 @@ export const useGeminiLive = () => {
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioStreamRef = useRef<MediaStream | null>(null);
-  
+
   const nextStartTimeRef = useRef<number>(0);
   const sessionPromiseRef = useRef<Promise<any> | null>(null);
   const activeSourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
-  
+
   const currentInputTranscription = useRef('');
   const currentOutputTranscription = useRef('');
 
-  const SYSTEM_INSTRUCTION = `You are "FinVox", a friendly and knowledgeable financial assistant. You speak with a natural French Canadian (Québécois) accent.
+  const getSystemInstruction = () => {
+    let instruction = `You are "FinVox", a friendly and knowledgeable financial assistant. `;
 
+    if (language === 'fr-CA') {
+      instruction += `You speak French. `;
+      if (useAccent) {
+        instruction += `You MUST speak with a natural French Canadian (Québécois) accent. Use local expressions when appropriate but remain professional. `;
+      } else {
+        instruction += `You speak standard international French. `;
+      }
+    } else {
+      instruction += `You speak English (Canadian). `;
+    }
+
+    instruction += `
   IMPORTANT: You HAVE access to real-time market data using your tools. NEVER state that you cannot access stock prices, news, or results.
   
   Usage of Tools:
@@ -315,7 +333,9 @@ export const useGeminiLive = () => {
   Behavior Guidelines:
   - If a user asks for "results" (e.g., "résultats de Nvidia"), assume they want the current stock price and recent movement.
   - Be natural and conversational.
-  - If the user speaks English, reply in English, but default to French.`;
+  `;
+    return instruction;
+  };
 
   const addLog = (role: 'user' | 'assistant' | 'system', text: string, citations?: string[]) => {
     setLogs(prev => [...prev, { role, text, timestamp: new Date(), citations }]);
@@ -324,10 +344,10 @@ export const useGeminiLive = () => {
   const connect = useCallback(async () => {
     try {
       setConnectionState(ConnectionState.CONNECTING);
-      
+
       inputAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: INPUT_SAMPLE_RATE });
       outputAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: OUTPUT_SAMPLE_RATE });
-      
+
       nextStartTimeRef.current = 0;
 
       analyserRef.current = inputAudioContextRef.current.createAnalyser();
@@ -344,14 +364,16 @@ export const useGeminiLive = () => {
 
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
+      const responseModalities = isTtsEnabled ? [Modality.AUDIO] : [Modality.TEXT];
+
       const sessionPromise = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-09-2025',
         config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
+          responseModalities: responseModalities,
+          speechConfig: isTtsEnabled ? {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } },
-          },
-          systemInstruction: SYSTEM_INSTRUCTION,
+          } : undefined,
+          systemInstruction: getSystemInstruction(),
           tools: [
             { functionDeclarations: [stockPriceTool, marketNewsTool, stockHistoryTool, analyzeStockTool] },
             { googleSearch: {} }
@@ -390,7 +412,7 @@ export const useGeminiLive = () => {
       setConnectionState(ConnectionState.ERROR);
       addLog('system', `Failed to initiate connection: ${err instanceof Error ? err.message : String(err)}`);
     }
-  }, [voiceName]);
+  }, [voiceName, language, useAccent, isTtsEnabled]);
 
   const setupAudioInput = (stream: MediaStream, sessionPromise: Promise<any>) => {
     if (!inputAudioContextRef.current || !analyserRef.current) return;
@@ -405,7 +427,7 @@ export const useGeminiLive = () => {
 
     processor.onaudioprocess = (e) => {
       const inputData = e.inputBuffer.getChannelData(0);
-      
+
       const dataArray = new Uint8Array(analyserRef.current!.frequencyBinCount);
       analyserRef.current!.getByteFrequencyData(dataArray);
       let sum = 0;
@@ -415,16 +437,16 @@ export const useGeminiLive = () => {
       const avg = sum / dataArray.length;
       const vol = avg / 255;
 
-      const isAiSpeaking = outputAudioContextRef.current && 
-                           outputAudioContextRef.current.currentTime < nextStartTimeRef.current;
+      const isAiSpeaking = outputAudioContextRef.current &&
+        outputAudioContextRef.current.currentTime < nextStartTimeRef.current;
 
       if (isAiSpeaking) {
         setVolume(0);
-        return; 
+        return;
       }
 
       setVolume(vol);
-      
+
       const pcmBlob = createBlob(inputData);
       sessionPromise.then((session) => {
         session.sendRealtimeInput({ media: pcmBlob });
@@ -441,7 +463,7 @@ export const useGeminiLive = () => {
     if (message.toolCall) {
       for (const fc of message.toolCall.functionCalls) {
         addLog('system', `Using tool: ${fc.name}`);
-        
+
         let result;
         let responseResult;
 
@@ -460,26 +482,26 @@ export const useGeminiLive = () => {
             status: "Chart displayed"
           };
         } else if (fc.name === 'analyzeStock') {
-            // Trigger background deep analysis
-            setAnalysisResult({ 
-                symbol: fc.args.symbol, 
-                content: '', 
-                isLoading: true,
-                timestamp: new Date()
-            });
-            setChartData(null); // Clear chart if showing analysis
+          // Trigger background deep analysis
+          setAnalysisResult({
+            symbol: fc.args.symbol,
+            content: '',
+            isLoading: true,
+            timestamp: new Date()
+          });
+          setChartData(null); // Clear chart if showing analysis
 
-            // Non-blocking async call
-            performDeepAnalysis(fc.args.symbol, fc.args.question).then(content => {
-                setAnalysisResult({
-                    symbol: fc.args.symbol,
-                    content: content,
-                    isLoading: false,
-                    timestamp: new Date()
-                });
+          // Non-blocking async call
+          performDeepAnalysis(fc.args.symbol, fc.args.question).then(content => {
+            setAnalysisResult({
+              symbol: fc.args.symbol,
+              content: content,
+              isLoading: false,
+              timestamp: new Date()
             });
+          });
 
-            responseResult = { status: "Analysis started. Inform the user to check their screen." };
+          responseResult = { status: "Analysis started. Inform the user to check their screen." };
         } else {
           result = { error: `Function ${fc.name} not found` };
           responseResult = result;
@@ -508,72 +530,72 @@ export const useGeminiLive = () => {
 
     let citations: string[] | undefined;
     if (serverContent?.groundingMetadata?.groundingChunks) {
-        citations = serverContent.groundingMetadata.groundingChunks
-            .map((chunk: any) => chunk.web?.uri)
-            .filter((uri: string) => !!uri);
+      citations = serverContent.groundingMetadata.groundingChunks
+        .map((chunk: any) => chunk.web?.uri)
+        .filter((uri: string) => !!uri);
     }
 
     if (serverContent?.turnComplete) {
-        if (currentInputTranscription.current.trim()) {
-            addLog('user', currentInputTranscription.current);
-            currentInputTranscription.current = '';
-        }
-        if (currentOutputTranscription.current.trim()) {
-            addLog('assistant', currentOutputTranscription.current, citations);
-            currentOutputTranscription.current = '';
-        }
+      if (currentInputTranscription.current.trim()) {
+        addLog('user', currentInputTranscription.current);
+        currentInputTranscription.current = '';
+      }
+      if (currentOutputTranscription.current.trim()) {
+        addLog('assistant', currentOutputTranscription.current, citations);
+        currentOutputTranscription.current = '';
+      }
     }
 
     const base64Audio = serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-    if (base64Audio && outputAudioContextRef.current) {
-        const ctx = outputAudioContextRef.current;
-        nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
-        
-        const audioBuffer = await decodeAudioData(
-            decode(base64Audio),
-            ctx,
-            OUTPUT_SAMPLE_RATE,
-            1
-        );
-        
-        const source = ctx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(ctx.destination);
-        source.addEventListener('ended', () => {
-            activeSourcesRef.current.delete(source);
-        });
-        
-        source.start(nextStartTimeRef.current);
-        nextStartTimeRef.current += audioBuffer.duration;
-        activeSourcesRef.current.add(source);
+    if (base64Audio && outputAudioContextRef.current && isTtsEnabled) {
+      const ctx = outputAudioContextRef.current;
+      nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
+
+      const audioBuffer = await decodeAudioData(
+        decode(base64Audio),
+        ctx,
+        OUTPUT_SAMPLE_RATE,
+        1
+      );
+
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ctx.destination);
+      source.addEventListener('ended', () => {
+        activeSourcesRef.current.delete(source);
+      });
+
+      source.start(nextStartTimeRef.current);
+      nextStartTimeRef.current += audioBuffer.duration;
+      activeSourcesRef.current.add(source);
     }
 
     if (serverContent?.interrupted) {
-        activeSourcesRef.current.forEach(src => {
-            try { src.stop(); } catch(e) {} 
-        });
-        activeSourcesRef.current.clear();
-        nextStartTimeRef.current = 0;
-        addLog('system', '[Interrupted]');
+      activeSourcesRef.current.forEach(src => {
+        try { src.stop(); } catch (e) { }
+      });
+      activeSourcesRef.current.clear();
+      nextStartTimeRef.current = 0;
+      addLog('system', '[Interrupted]');
     }
   };
 
   const sendTextMessage = useCallback((text: string) => {
     if (connectionState === ConnectionState.CONNECTED && sessionPromiseRef.current) {
-        addLog('user', text); 
-        sessionPromiseRef.current.then(session => {
-            session.send({ parts: [{ text }], turnComplete: true });
-        });
+      addLog('user', text);
+      sessionPromiseRef.current.then(session => {
+        session.send({ parts: [{ text }], turnComplete: true });
+      });
     }
   }, [connectionState]);
 
   const cleanup = () => {
     audioStreamRef.current?.getTracks().forEach(track => track.stop());
-    
+
     inputSourceRef.current?.disconnect();
     processorRef.current?.disconnect();
     analyserRef.current?.disconnect();
-    
+
     inputAudioContextRef.current?.close();
     outputAudioContextRef.current?.close();
 
@@ -588,11 +610,11 @@ export const useGeminiLive = () => {
 
   const disconnect = useCallback(() => {
     if (sessionPromiseRef.current) {
-        sessionPromiseRef.current.then(session => {
-            if (session && typeof session.close === 'function') {
-                session.close();
-            }
-        }).catch(e => console.warn("Error closing session", e));
+      sessionPromiseRef.current.then(session => {
+        if (session && typeof session.close === 'function') {
+          session.close();
+        }
+      }).catch(e => console.warn("Error closing session", e));
     }
     cleanup();
     setConnectionState(ConnectionState.DISCONNECTED);
@@ -616,6 +638,13 @@ export const useGeminiLive = () => {
     setVoiceName,
     sendTextMessage,
     analysisResult,
-    setAnalysisResult
+    setAnalysisResult,
+    // Configuration
+    language,
+    setLanguage,
+    useAccent,
+    setUseAccent,
+    isTtsEnabled,
+    setIsTtsEnabled
   };
 };
