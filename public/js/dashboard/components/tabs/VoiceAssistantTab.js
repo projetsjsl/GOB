@@ -1,5 +1,41 @@
-// Component: VoiceAssistantTab
-// Integration with Google Gemini and Tavus
+/**
+ * Component: VoiceAssistantTab
+ * Integration with Google Gemini and Tavus
+ * 
+ * IMPORTANT - React Hooks in Standalone Components:
+ * ================================================
+ * This component is loaded via <script type="text/babel"> tag (not bundled).
+ * When using React hooks in standalone components like this, you MUST destructure
+ * them from the global React object at the top of the file:
+ * 
+ *   const { useState, useEffect, useRef } = React;
+ * 
+ * Without this line, hooks like useState, useEffect, etc. will be undefined,
+ * causing the component to fail silently and render a blank page.
+ * 
+ * This is different from bundled React apps where hooks are imported via:
+ *   import { useState } from 'react';
+ * 
+ * TAVUS API INTEGRATION NOTES:
+ * ============================
+ * Tavus API requires:
+ * 1. Authentication: Use 'x-api-key' header with your API key
+ * 2. Create Conversation endpoint: POST https://tavusapi.com/v2/conversations
+ * 3. Required parameters:
+ *    - replica_id: Your trained replica ID (from Tavus dashboard)
+ *    - persona_id: Defines behavior/capabilities of the replica
+ *    - conversation_name: Optional name for the conversation
+ * 4. Response includes:
+ *    - conversation_url: Direct link to join or embed the video call
+ *    - conversation_id: Unique identifier for tracking
+ * 5. Optional features:
+ *    - custom_greeting: Initial message from replica
+ *    - callback_url: Webhook for conversation status updates
+ *    - memory_stores: For conversation context persistence
+ *    - document_ids: Knowledge base access during conversation
+ * 
+ * API Documentation: https://docs.tavus.io/api-reference/authentication
+ */
 
 const { useState, useEffect, useRef } = React;
 
@@ -142,16 +178,70 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
     };
 
     const speakWithTavus = (text) => {
-        // Placeholder for Tavus TTS/Video sync
+        // TODO: Implement Tavus conversation message sending
+        // This would require the Tavus conversation API to send messages
         console.log('Sending text to Tavus:', text);
     };
 
-    const connectTavus = () => {
+    /**
+     * Connect to Tavus and create a conversation
+     * Uses the Tavus API v2 to create a real-time video conversation
+     */
+    const connectTavus = async () => {
+        const tavusConfig = config.tavus || {};
+        const apiKey = tavusConfig.apiKey;
+
+        if (!apiKey || apiKey === 'YOUR_TAVUS_API_KEY') {
+            alert('Veuillez configurer votre clé API Tavus dans emma-config.js');
+            return;
+        }
+
         setTavusStatus('connecting');
-        // Simulate connection
-        setTimeout(() => {
+
+        try {
+            // Create a conversation using Tavus API
+            const response = await fetch('https://tavusapi.com/v2/conversations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': apiKey
+                },
+                body: JSON.stringify({
+                    replica_id: tavusConfig.replicaId || 'r9d30b0e55ac',
+                    persona_id: tavusConfig.personaId || 'pe13ed370726',
+                    conversation_name: `Session ${new Date().toLocaleString('fr-FR')}`,
+                    custom_greeting: tavusConfig.customGreeting || 'Bonjour ! Je suis votre assistant virtuel. Comment puis-je vous aider ?',
+                    properties: tavusConfig.options || {}
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Tavus API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Store conversation details
+            window.tavusConversation = {
+                id: data.conversation_id,
+                url: data.conversation_url,
+                status: data.status
+            };
+
+            console.log('Tavus conversation created:', data);
+
+            // TODO: Embed the conversation_url in an iframe or open in new window
+            // For now, we'll just log it and mark as connected
             setTavusStatus('connected');
-        }, 2000);
+
+            // Optional: Open conversation in iframe
+            // You can create an iframe element and set src to data.conversation_url
+
+        } catch (error) {
+            console.error('Error connecting to Tavus:', error);
+            setTavusStatus('disconnected');
+            alert('Erreur lors de la connexion à Tavus. Vérifiez votre configuration.');
+        }
     };
 
     return (
