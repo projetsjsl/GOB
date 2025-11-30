@@ -54,6 +54,7 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
     // Refs
     const chatContainerRef = useRef(null);
     const recognitionRef = useRef(null);
+    const tavusVideoRef = useRef(null);
 
     // Access global config
     const config = window.emmaConfig || {};
@@ -230,12 +231,19 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
 
             console.log('Tavus conversation created:', data);
 
-            // TODO: Embed the conversation_url in an iframe or open in new window
-            // For now, we'll just log it and mark as connected
-            setTavusStatus('connected');
+            // Embed the conversation in an iframe
+            if (tavusVideoRef.current && data.conversation_url) {
+                tavusVideoRef.current.innerHTML = `
+                    <iframe 
+                        src="${data.conversation_url}" 
+                        allow="camera; microphone; autoplay; display-capture; fullscreen"
+                        style="width: 100%; height: 100%; border: none; border-radius: 0;"
+                        class="tavus-video-iframe"
+                    ></iframe>
+                `;
+            }
 
-            // Optional: Open conversation in iframe
-            // You can create an iframe element and set src to data.conversation_url
+            setTavusStatus('connected');
 
         } catch (error) {
             console.error('Error connecting to Tavus:', error);
@@ -250,22 +258,8 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
             <div className={`lg:col-span-2 flex flex-col rounded-2xl overflow-hidden shadow-2xl ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                 <div className="flex-1 relative bg-black flex items-center justify-center">
                     {tavusStatus === 'connected' ? (
-                        <div className="text-center">
-                            <div className="w-full h-full absolute inset-0 bg-gradient-to-b from-transparent to-black/50 z-10"></div>
-                            {/* Placeholder for Tavus Video Stream */}
-                            <img
-                                src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=2550&auto=format&fit=crop"
-                                alt="AI Avatar"
-                                className="w-full h-full object-cover opacity-80"
-                            />
-                            <div className="absolute bottom-10 left-0 right-0 z-20 text-white">
-                                <div className="animate-pulse flex justify-center gap-1 mb-2">
-                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                    <div className="w-2 h-2 bg-blue-500 rounded-full animation-delay-200"></div>
-                                    <div className="w-2 h-2 bg-blue-500 rounded-full animation-delay-400"></div>
-                                </div>
-                                <p className="font-medium text-lg text-blue-200">L'assistant parle...</p>
-                            </div>
+                        <div ref={tavusVideoRef} className="w-full h-full">
+                            {/* Tavus Video Stream will be embedded here via iframe */}
                         </div>
                     ) : (
                         <div className="text-center p-10">
