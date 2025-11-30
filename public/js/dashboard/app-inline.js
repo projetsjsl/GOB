@@ -24780,42 +24780,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         };
 
         // Onglet de configuration Emma (ouvre les pages de config en nouvel onglet)
-        const EmmaConfigTab = () => (
-            <div className={`p-6 rounded-lg border transition-colors duration-300 ${isDarkMode
-                ? 'bg-gray-900 border-gray-700 text-white'
-                : 'bg-white border-gray-200 text-gray-900'
-                }`}>
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold">🛠️ Emma Config</h2>
-                    <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Prompts & paramètres d'Emma IA
-                    </span>
+        const EmmaConfigTab = () => {
+            return (
+                <div className="w-full h-[calc(100vh-140px)] rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-gray-900">
+                    <iframe
+                        src="/emma-config.html"
+                        className="w-full h-full border-0"
+                        title="Emma Configuration"
+                    />
                 </div>
-
-                <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Ouvrez la page de configuration pour gérer les prompts, paramètres et sauvegardes d'Emma.
-                    Les pages s'ouvrent dans un nouvel onglet.
-                </p>
-
-                <div className="flex flex-wrap gap-3">
-                    <a
-                        href="/emma-config.html"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`px-4 py-2 rounded-lg font-semibold transition-colors ${isDarkMode
-                            ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
-                            }`}
-                    >
-                        Ouvrir emma-config.html
-                    </a>
-                </div>
-
-                <div className={`mt-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Astuce : gardez cet onglet ouvert pendant que vous ajustez vos prompts dans la page config pour tester en direct.
-                </div>
-            </div>
-        );
+            );
+        };
 
         // Placeholder for SettingsTab if not defined elsewhere
         const SettingsTab = window.SettingsTab || (() => (
@@ -24828,22 +24803,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Configuration des onglets (après déclaration de TOUS les composants)
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
         const tabs = [
-            { id: 'markets-economy', label: 'Marchés & Économie', component: MarketsEconomyTab },
-            { id: 'intellistocks', label: 'JLab™', component: JLabUnifiedTab },
-            { id: 'ask-emma', label: 'Emma IA™', component: AskEmmaTab },
+            { id: 'markets-economy', label: 'Marchés & Économie', icon: 'iconoir-globe', component: MarketsEconomyTab },
+            { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
+            { id: 'ask-emma', label: 'Emma IA™', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox (Live)', icon: 'iconoir-voice-circle', component: FinVoxTab },
-            { id: 'settings', label: 'Paramètres', icon: 'iconoir-settings', component: SettingsTab }, // Intégré dans Marchés & Économie
-            // { id: 'yield-curve', label: '📈 Yield Curve', component: YieldCurveTab }, // Intégré dans Marchés & Économie
-            // { id: 'economic-calendar', label: 'Calendrier Économique', component: EconomicCalendarTab }, // Intégré dans Marchés & Économie
-            // { id: 'dans-watchlist', label: 'Dan\'s Watchlist', component: DansWatchlistTab }, // Supprimé - fonctionnalités disponibles dans JLab → Dan's watchlist
-            { id: 'plus', label: 'Plus', component: PlusTab },
-            { id: 'admin-jsla', label: 'Admin JSLAI', component: AdminJSLaiTab },
-            { id: 'scrapping-sa', label: 'Seeking Alpha', component: ScrappingSATab },
-            { id: 'seeking-alpha', label: 'Stocks News', component: SeekingAlphaTab },
-            { id: 'email-briefings', label: 'Emma En Direct', component: EmailBriefingsTab },
-            { id: 'investing-calendar', label: 'TESTS JS', component: InvestingCalendarTab },
-            { id: 'emma-config', label: 'Emma Config', component: EmmaConfigTab }
+            { id: 'settings', label: 'Paramètres', icon: 'iconoir-settings', component: SettingsTab },
+            { id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: PlusTab },
+            { id: 'admin-jsla', label: 'Admin JSLAI', icon: 'iconoir-settings', component: AdminJSLaiTab },
+            { id: 'scrapping-sa', label: 'Seeking Alpha', icon: 'iconoir-search', component: ScrappingSATab },
+            { id: 'seeking-alpha', label: 'Stocks News', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
+            { id: 'email-briefings', label: 'Emma En Direct', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
+            { id: 'investing-calendar', label: 'TESTS JS', icon: 'iconoir-calendar', component: InvestingCalendarTab },
+            { id: 'emma-config', label: 'Emma Config', icon: 'iconoir-settings', component: EmmaConfigTab }
         ];
 
         return (
@@ -25032,9 +25004,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
 
                     {/* Navigation Items */}
-                    <nav className="flex-1 overflow-y-auto py-4">
+                    <nav className="flex-1 overflow-y-auto py-4" style={{ maxHeight: 'none' }}>
                         {tabs.map(tab => {
-                            const iconClass = getTabIcon(tab.id);
+                            const iconClass = tab.icon || getTabIcon(tab.id);
                             const isActive = activeTab === tab.id;
                             return (
                                 <button
@@ -25330,7 +25302,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                 {/* Contenu principal */}
                 <main className={`max-w-7xl mx-auto p-6 md:ml-20 pb-24 md:pb-6 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                    }`}>
+                    }`} style={{ minHeight: '500px', backgroundColor: isDarkMode ? '#000' : '#fff' }}>
+                    {console.log('🎯 Active Tab:', activeTab, 'Loading Screen:', showLoadingScreen)}
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
                     {activeTab === 'intellistocks' && <JLabUnifiedTab />}
@@ -25348,7 +25321,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         showLengthEditor={showLengthEditor}
                         setShowLengthEditor={setShowLengthEditor}
                     />}
-                    {activeTab === 'voice-assistant' && <VoiceAssistantTab isDarkMode={isDarkMode} />}
+                    {activeTab === 'assistant-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} />}
                     {activeTab === 'plus' && <PlusTab />}
                     {activeTab === 'admin-jsla' && <AdminJSLaiTab
                         emmaConnected={emmaConnected}
@@ -25366,6 +25339,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'seeking-alpha' && <SeekingAlphaTab />}
                     {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                     {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
+                    {activeTab === 'finvox' && <FinVoxTab />}
+                    {activeTab === 'settings' && <SettingsTab />}
+                    {activeTab === 'emma-config' && <EmmaConfigTab />}
                 </main>
 
                 {/* Messages */}

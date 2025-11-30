@@ -85,7 +85,7 @@ const FinVoxTab = ({ isDarkMode }) => {
                 Ideally, FinVox should mount to a unique ID like 'finvox-root'.
                 For now, let's assume we can provide a container.
             */}
-            <div id="root" className="w-full h-full overflow-auto">
+            <div id="finvox-root" className="w-full h-full overflow-auto">
                 {/* FinVox app will mount here */}
             </div>
         </div>

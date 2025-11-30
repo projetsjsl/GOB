@@ -14,7 +14,7 @@ export const emmaConfig = {
 
   // Configuration Gemini
   gemini: {
-    apiKey: 'YOUR_GEMINI_API_KEY', // Placeholder
+    apiKey: 'AIzaSyCQxlKZCgsjAytjEYz2EyKYhacPSJdGaVY', // Configured from .env.local
     model: 'gemini-2.0-flash-exp',
     temperature: 0.7,
     topK: 40,
