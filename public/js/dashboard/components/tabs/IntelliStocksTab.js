@@ -1,6 +1,9 @@
 // Auto-converted from monolithic dashboard file
 // Component: IntelliStocksTab
 
+const { useState, useEffect } = React;
+const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = Recharts;
+
 
 
 
