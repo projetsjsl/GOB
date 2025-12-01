@@ -6,6 +6,11 @@ const { useState, useEffect } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = window.Recharts || {};
 
 const AdvancedAnalysisTab = () => {
+    // Watchlist Tickers (loaded from Supabase)
+    const [watchlistTickers, setWatchlistTickers] = useState([]);
+    const [watchlistLoaded, setWatchlistLoaded] = useState(false);
+
+    // Selected stock and data
     const [selectedStock, setSelectedStock] = useState('AAPL');
     const [stockData, setStockData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -16,39 +21,105 @@ const AdvancedAnalysisTab = () => {
     const [showAdvancedScreener, setShowAdvancedScreener] = useState(false);
     const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
-    // Load initial data
+    // Load watchlist from Supabase on mount
     useEffect(() => {
-        fetchData(selectedStock);
+        if (watchlistLoaded) return;
+
+        const loadWatchlistFromSupabase = async () => {
+            try {
+                console.log('📥 Loading watchlist from Supabase...');
+                const res = await fetch('/api/supabase-watchlist');
+                if (res.ok) {
+                    const json = await res.json();
+                    const tickers = Array.isArray(json.tickers) ? json.tickers : [];
+                    console.log('✅ Watchlist loaded from Supabase:', tickers);
+                    setWatchlistTickers(tickers);
+
+                    // Set first ticker as selected if available
+                    if (tickers.length > 0 && !selectedStock) {
+                        setSelectedStock(tickers[0]);
+                    }
+
+                    setWatchlistLoaded(true);
+                    return;
+                }
+            } catch (e) {
+                console.log('⚠️ Supabase not available, using default tickers');
+            }
+
+            // Fallback to default tickers if Supabase fails
+            const defaultTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META'];
+            setWatchlistTickers(defaultTickers);
+            setSelectedStock(defaultTickers[0]);
+            setWatchlistLoaded(true);
+        };
+
+        loadWatchlistFromSupabase();
+    }, []);
+
+    // Load stock data when selected stock changes
+    useEffect(() => {
+        if (selectedStock) {
+            fetchData(selectedStock);
+        }
     }, [selectedStock]);
 
     const fetchData = async (symbol) => {
         setLoading(true);
         try {
-            // Use global fetchHybridData if available, otherwise fallback
-            if (window.fetchHybridData) {
-                const [quote, metrics, ratios] = await Promise.all([
-                    window.fetchHybridData(symbol, 'quote'),
-                    window.fetchHybridData(symbol, 'metrics'),
-                    window.fetchHybridData(symbol, 'ratios')
-                ]);
+            // Use the same API pattern as DansWatchlistTab - batch or individual
+            const API_BASE_URL = window.location.origin || '';
 
-                setStockData({
-                    quote: quote?.data || {},
-                    metrics: metrics?.data || {},
-                    ratios: ratios?.data || {},
-                    symbol: symbol
-                });
-            } else {
-                // Fallback mock data if API is not ready
-                console.warn('fetchHybridData not found, using mock data');
-                setStockData({
-                    quote: { price: 150, change: 1.5, changesPercentage: 1.0 },
-                    metrics: { peRatioTTM: 25 },
-                    symbol: symbol
-                });
-            }
+            // Fetch quote and fundamentals using marketdata API
+            const [quoteRes, fundamentalsRes] = await Promise.allSettled([
+                fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
+                fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${symbol}&source=auto`)
+            ]);
+
+            const quoteData = quoteRes.status === 'fulfilled' && quoteRes.value.ok
+                ? await quoteRes.value.json() : null;
+            const fundamentalsData = fundamentalsRes.status === 'fulfilled' && fundamentalsRes.value.ok
+                ? await fundamentalsRes.value.json() : null;
+
+            console.log('✅ Data loaded for', symbol, { quoteData, fundamentalsData });
+
+            setStockData({
+                symbol: symbol,
+                // Quote data (Finnhub format)
+                price: quoteData?.c || fundamentalsData?.quote?.price || 0,
+                change: quoteData?.d || fundamentalsData?.quote?.change || 0,
+                changePercent: quoteData?.dp || fundamentalsData?.quote?.changesPercentage || 0,
+                high: quoteData?.h || 0,
+                low: quoteData?.l || 0,
+                open: quoteData?.o || 0,
+                previousClose: quoteData?.pc || 0,
+
+                // Fundamentals
+                profile: fundamentalsData?.profile || null,
+                ratios: fundamentalsData?.ratios || null,
+                metrics: fundamentalsData?.metrics || null,
+
+                // For modals
+                quote: {
+                    price: quoteData?.c || fundamentalsData?.quote?.price || 0,
+                    change: quoteData?.d || fundamentalsData?.quote?.change || 0,
+                    changesPercentage: quoteData?.dp || fundamentalsData?.quote?.changesPercentage || 0
+                },
+
+                source: quoteData?.source || 'api',
+                timestamp: new Date().toISOString()
+            });
+
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('❌ Error fetching data for', symbol, error);
+            // Set empty data on error
+            setStockData({
+                symbol: symbol,
+                price: 0,
+                change: 0,
+                changePercent: 0,
+                quote: { price: 0, change: 0, changesPercentage: 0 }
+            });
         } finally {
             setLoading(false);
         }
@@ -70,24 +141,36 @@ const AdvancedAnalysisTab = () => {
                     </p>
                 </div>
 
-                {/* Stock Selector */}
+                {/* Stock Selector Dropdown */}
                 <div className="flex items-center gap-4">
-                    <div className="bg-gray-800 rounded-lg p-2 flex items-center gap-2 border border-gray-700">
-                        <span className="text-gray-400 text-sm">Titre:</span>
-                        <input
-                            type="text"
+                    <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+                        <select
                             value={selectedStock}
-                            onChange={(e) => setSelectedStock(e.target.value.toUpperCase())}
-                            className="bg-transparent text-white font-bold w-16 outline-none"
-                        />
+                            onChange={(e) => setSelectedStock(e.target.value)}
+                            className="bg-gray-800 text-white font-bold px-4 py-2 outline-none cursor-pointer hover:bg-gray-700 transition-colors"
+                            disabled={loading}
+                        >
+                            {watchlistTickers.length > 0 ? (
+                                watchlistTickers.map(ticker => (
+                                    <option key={ticker} value={ticker}>{ticker}</option>
+                                ))
+                            ) : (
+                                <option value="AAPL">AAPL</option>
+                            )}
+                        </select>
                     </div>
-                    {stockData && (
+
+                    {loading ? (
+                        <div className="text-gray-400 text-sm">⏳ Chargement...</div>
+                    ) : stockData ? (
                         <div className="text-right">
-                            <div className="text-xl font-bold">${stockData.quote.price?.toFixed(2)}</div>
-                            <div className={`text-sm ${stockData.quote.changesPercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                {stockData.quote.changesPercentage >= 0 ? '+' : ''}{stockData.quote.changesPercentage?.toFixed(2)}%
+                            <div className="text-xl font-bold">${stockData.price?.toFixed(2) || '0.00'}</div>
+                            <div className={`text-sm ${stockData.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                {stockData.changePercent >= 0 ? '+' : ''}{stockData.changePercent?.toFixed(2) || '0.00'}%
                             </div>
                         </div>
+                    ) : (
+                        <div className="text-gray-500 text-sm">Sélectionnez un titre</div>
                     )}
                 </div>
             </div>
@@ -166,18 +249,20 @@ const AdvancedAnalysisTab = () => {
                     onClick={async () => {
                         if (stockData && window.PDFExporter) {
                             await window.PDFExporter.generateAnalysisReport(selectedStock, {
-                                currentPrice: stockData.quote?.price || 0,
-                                fairValue: stockData.metrics?.dcf || 0,
-                                upside: 0, // To calculate
-                                recommendation: 'BUY', // Mock
+                                currentPrice: stockData.price || 0,
+                                fairValue: stockData.metrics?.dcf || stockData.metrics?.enterpriseValue || 0,
+                                upside: stockData.metrics?.dcf ? ((stockData.metrics.dcf - stockData.price) / stockData.price * 100) : 0,
+                                recommendation: 'BUY', // Could be calculated based on upside
                                 metrics: stockData.metrics || {},
+                                ratios: stockData.ratios || {},
+                                profile: stockData.profile || {},
                                 aiInsights: {
                                     strengths: ['Strong Revenue Growth', 'High ROE'],
                                     weaknesses: ['High Valuation']
                                 }
                             });
                         } else {
-                            alert('Données non disponibles pour l\'export');
+                            alert('Données non disponibles pour l\'export. Veuillez d\'abord charger les données du titre.');
                         }
                     }}
                     className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-700/30 rounded-xl p-6 cursor-pointer hover:border-cyan-500 transition-all hover:shadow-lg hover:shadow-cyan-500/10 group"
@@ -196,7 +281,7 @@ const AdvancedAnalysisTab = () => {
             {/* Modals Rendering */}
             {showPeerComparison && window.PeerComparisonModal && (
                 <window.PeerComparisonModal
-                    symbols={[selectedStock, 'MSFT', 'GOOGL', 'AMZN', 'NVDA']}
+                    symbols={[selectedStock, ...watchlistTickers.filter(t => t !== selectedStock).slice(0, 4)]}
                     onClose={() => setShowPeerComparison(false)}
                 />
             )}
@@ -204,11 +289,11 @@ const AdvancedAnalysisTab = () => {
             {showScenarioAnalysis && window.ScenarioAnalysisModal && (
                 <window.ScenarioAnalysisModal
                     symbol={selectedStock}
-                    currentPrice={stockData?.quote?.price || 0}
+                    currentPrice={stockData?.price || 0}
                     baselineData={{
-                        latestFCF: 10000000000, // Mock or fetch
-                        netDebt: 5000000000,
-                        sharesOutstanding: 1000000000,
+                        latestFCF: stockData?.metrics?.fcf || 10000000000,
+                        netDebt: stockData?.metrics?.netDebt || 5000000000,
+                        sharesOutstanding: stockData?.metrics?.sharesOutstanding || stockData?.profile?.sharesOutstanding || 1000000000,
                         avgGrowth: 15
                     }}
                     onClose={() => setShowScenarioAnalysis(false)}
@@ -228,7 +313,7 @@ const AdvancedAnalysisTab = () => {
             {showAnalysisModal && window.StockAnalysisModal && (
                 <window.StockAnalysisModal
                     symbol={selectedStock}
-                    currentPrice={stockData?.quote?.price || 0}
+                    currentPrice={stockData?.price || 0}
                     onClose={() => setShowAnalysisModal(false)}
                 />
             )}
