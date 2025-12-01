@@ -18188,7 +18188,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {jlabView === 'watchlist' && <StocksNewsTab tickerSource="watchlist" />}
                         {jlabView === '3pour1' && <FinanceProTab />}
                         {jlabView === 'advanced' && (
-                            window.IntelliStocksTab ? <window.IntelliStocksTab /> : <div className="text-white">Chargement de la nouvelle version...</div>
+                            window.AdvancedAnalysisTab ? <window.AdvancedAnalysisTab /> : <div className="text-white p-4">Chargement de l'analyse avancée...</div>
                         )}
                     </div>
                 </div>
