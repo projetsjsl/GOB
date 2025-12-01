@@ -18119,16 +18119,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // ============================================
         // Composant JLab unifié avec navigation interne
         const JLabUnifiedTab = () => {
-            const [jlabView, setJlabView] = useState('portfolio'); // 'portfolio', 'watchlist', ou '3pour1'
+            const [jlabView, setJlabView] = useState('portfolio'); // 'portfolio', 'watchlist', '3pour1', 'advanced'
 
             return (
                 <div className="w-full h-full">
                     {/* Navigation interne JLab */}
                     <div className={`mb-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 overflow-x-auto pb-1">
                             <button
                                 onClick={() => setJlabView('portfolio')}
-                                className={`px-6 py-3 font-semibold transition-all duration-200 ${jlabView === 'portfolio'
+                                className={`px-6 py-3 font-semibold transition-all duration-200 whitespace-nowrap ${jlabView === 'portfolio'
                                     ? isDarkMode
                                         ? 'bg-green-600 text-white border-b-2 border-green-400'
                                         : 'bg-green-100 text-green-800 border-b-2 border-green-600'
@@ -18141,7 +18141,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </button>
                             <button
                                 onClick={() => setJlabView('watchlist')}
-                                className={`px-6 py-3 font-semibold transition-all duration-200 ${jlabView === 'watchlist'
+                                className={`px-6 py-3 font-semibold transition-all duration-200 whitespace-nowrap ${jlabView === 'watchlist'
                                     ? isDarkMode
                                         ? 'bg-green-600 text-white border-b-2 border-green-400'
                                         : 'bg-green-100 text-green-800 border-b-2 border-green-600'
@@ -18154,7 +18154,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </button>
                             <button
                                 onClick={() => setJlabView('3pour1')}
-                                className={`px-6 py-3 font-semibold transition-all duration-200 ${jlabView === '3pour1'
+                                className={`px-6 py-3 font-semibold transition-all duration-200 whitespace-nowrap ${jlabView === '3pour1'
                                     ? isDarkMode
                                         ? 'bg-green-600 text-white border-b-2 border-green-400'
                                         : 'bg-green-100 text-green-800 border-b-2 border-green-600'
@@ -18165,6 +18165,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             >
                                 3pour1
                             </button>
+                            <button
+                                onClick={() => setJlabView('advanced')}
+                                className={`px-6 py-3 font-semibold transition-all duration-200 whitespace-nowrap flex items-center gap-2 ${jlabView === 'advanced'
+                                    ? isDarkMode
+                                        ? 'bg-blue-600 text-white border-b-2 border-blue-400'
+                                        : 'bg-blue-100 text-blue-800 border-b-2 border-blue-600'
+                                    : isDarkMode
+                                        ? 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                    }`}
+                            >
+                                <LucideIcon name="Sparkles" className="w-4 h-4" />
+                                Analyse Pro 🚀
+                            </button>
                         </div>
                     </div>
 
@@ -18173,6 +18187,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {jlabView === 'portfolio' && <StocksNewsTab tickerSource="portfolio" />}
                         {jlabView === 'watchlist' && <StocksNewsTab tickerSource="watchlist" />}
                         {jlabView === '3pour1' && <FinanceProTab />}
+                        {jlabView === 'advanced' && <IntelliStocksTab />}
                     </div>
                 </div>
             );
