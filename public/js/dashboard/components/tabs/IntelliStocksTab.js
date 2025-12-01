@@ -32,6 +32,10 @@ const IntelliStocksTab = () => {
     const [showScreener, setShowScreener] = useState(false);
     // Stock Analysis Modal
     const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+    // Advanced Modals
+    const [showPeerComparison, setShowPeerComparison] = useState(false);
+    const [showScenarioAnalysis, setShowScenarioAnalysis] = useState(false);
+    const [showAdvancedScreener, setShowAdvancedScreener] = useState(false);
 
     // 🎯 Configuration du Score JSLAI™ (pondérations)
     const [jslaiConfig, setJslaiConfig] = useState(() => {
@@ -1396,6 +1400,53 @@ const IntelliStocksTab = () => {
                 ) : null;
             })()}
 
+            {/* Peer Comparison Modal */}
+            {showPeerComparison && (() => {
+                const PeerComparisonModal = window.PeerComparisonModal;
+                return PeerComparisonModal ? (
+                    <PeerComparisonModal
+                        symbols={[selectedStock, 'MSFT', 'GOOGL', 'AMZN']} // Exemple de pairs, idéalement dynamique
+                        onClose={() => setShowPeerComparison(false)}
+                    />
+                ) : null;
+            })()}
+
+            {/* Scenario Analysis Modal */}
+            {showScenarioAnalysis && (() => {
+                const ScenarioAnalysisModal = window.ScenarioAnalysisModal;
+                // Utiliser les données chargées ou des valeurs par défaut sûres
+                const baselineData = stockDataIntelli ? {
+                    latestFCF: stockDataIntelli.dcfValue * 1000000000 * 0.05, // Estimation approximative si pas de données brutes
+                    netDebt: 0,
+                    sharesOutstanding: 1000000000,
+                    avgGrowth: 10
+                } : null;
+
+                return ScenarioAnalysisModal ? (
+                    <ScenarioAnalysisModal
+                        symbol={selectedStock}
+                        currentPrice={stockDataIntelli?.quote?.price || 0}
+                        baselineData={baselineData}
+                        onClose={() => setShowScenarioAnalysis(false)}
+                    />
+                ) : null;
+            })()}
+
+            {/* Advanced Screener Modal */}
+            {showAdvancedScreener && (() => {
+                const AdvancedScreenerModal = window.AdvancedScreenerModal;
+                return AdvancedScreenerModal ? (
+                    <AdvancedScreenerModal
+                        onClose={() => setShowAdvancedScreener(false)}
+                        onSelectStock={(symbol) => {
+                            setSelectedStock(symbol);
+                            setShowAdvancedScreener(false);
+                            // Déclencher le chargement des données pour le nouveau symbole
+                        }}
+                    />
+                ) : null;
+            })()}
+
             {/* Screener */}
             {showScreener && (
                 <div className={`mb-2 border rounded-lg p-3 transition-colors duration-300 ${isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
@@ -2406,8 +2457,8 @@ const IntelliStocksTab = () => {
                         <div
                             onClick={() => setShowAnalysisModal(true)}
                             className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl ${isDarkMode
-                                    ? 'bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-700/50 hover:border-blue-500'
-                                    : 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 hover:border-blue-500'
+                                ? 'bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-blue-700/50 hover:border-blue-500'
+                                : 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 hover:border-blue-500'
                                 }`}
                         >
                             <div className="flex items-center justify-between">
@@ -2428,6 +2479,115 @@ const IntelliStocksTab = () => {
                                 <div className={`px-4 py-2 rounded-lg font-semibold text-sm ${isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
                                     }`}>
                                     Ouvrir →
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Advanced Analysis Tools Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Peer Comparison */}
+                            <div
+                                onClick={() => setShowPeerComparison(true)}
+                                className={`border rounded-lg p-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg ${isDarkMode
+                                    ? 'bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-700/50 hover:border-emerald-500'
+                                    : 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-300 hover:border-emerald-500'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-emerald-500/20' : 'bg-emerald-500/10'
+                                        }`}>
+                                        <i className="iconoir-stats-report text-emerald-500 text-xl"></i>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            Comparaison Multi-Titres
+                                        </h4>
+                                        <p className="text-xs text-gray-400">Comparez côte à côte</p>
+                                    </div>
+                                    <i className="iconoir-nav-arrow-right text-emerald-500"></i>
+                                </div>
+                            </div>
+
+                            {/* Scenario Analysis */}
+                            <div
+                                onClick={() => setShowScenarioAnalysis(true)}
+                                className={`border rounded-lg p-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg ${isDarkMode
+                                    ? 'bg-gradient-to-br from-purple-900/20 to-pink-900/20 border-purple-700/50 hover:border-purple-500'
+                                    : 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-300 hover:border-purple-500'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-500/10'
+                                        }`}>
+                                        <i className="iconoir-graph-up text-purple-500 text-xl"></i>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            Analyse de Scénarios
+                                        </h4>
+                                        <p className="text-xs text-gray-400">Simulation What-If</p>
+                                    </div>
+                                    <i className="iconoir-nav-arrow-right text-purple-500"></i>
+                                </div>
+                            </div>
+
+                            {/* Advanced Screener */}
+                            <div
+                                onClick={() => setShowAdvancedScreener(true)}
+                                className={`border rounded-lg p-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg ${isDarkMode
+                                    ? 'bg-gradient-to-br from-orange-900/20 to-red-900/20 border-orange-700/50 hover:border-orange-500'
+                                    : 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-300 hover:border-orange-500'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-orange-500/20' : 'bg-orange-500/10'
+                                        }`}>
+                                        <i className="iconoir-filter text-orange-500 text-xl"></i>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            Screener Avancé
+                                        </h4>
+                                        <p className="text-xs text-gray-400">Filtres personnalisés</p>
+                                    </div>
+                                    <i className="iconoir-nav-arrow-right text-orange-500"></i>
+                                </div>
+                            </div>
+
+                            {/* PDF Export */}
+                            <div
+                                onClick={async () => {
+                                    if (stockDataIntelli) {
+                                        await window.PDFExporter.generateAnalysisReport(selectedStock, {
+                                            currentPrice: stockDataIntelli.quote?.price || 0,
+                                            fairValue: stockDataIntelli.fairValue || 0,
+                                            upside: stockDataIntelli.upside || 0,
+                                            recommendation: stockDataIntelli.recommendation || 'N/A',
+                                            dcfValue: stockDataIntelli.dcfValue || 0,
+                                            peValue: stockDataIntelli.peValue || 0,
+                                            pbValue: stockDataIntelli.pbValue || 0,
+                                            metrics: stockDataIntelli.metrics || {},
+                                            aiInsights: stockDataIntelli.aiInsights || {}
+                                        });
+                                    }
+                                }}
+                                className={`border rounded-lg p-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg ${isDarkMode
+                                    ? 'bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border-cyan-700/50 hover:border-cyan-500'
+                                    : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-300 hover:border-cyan-500'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-cyan-500/20' : 'bg-cyan-500/10'
+                                        }`}>
+                                        <i className="iconoir-download text-cyan-500 text-xl"></i>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                            Export PDF
+                                        </h4>
+                                        <p className="text-xs text-gray-400">Rapport professionnel</p>
+                                    </div>
+                                    <i className="iconoir-nav-arrow-right text-cyan-500"></i>
                                 </div>
                             </div>
                         </div>
