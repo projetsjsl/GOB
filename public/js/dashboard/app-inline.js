@@ -18187,13 +18187,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {jlabView === 'portfolio' && <StocksNewsTab tickerSource="portfolio" />}
                         {jlabView === 'watchlist' && <StocksNewsTab tickerSource="watchlist" />}
                         {jlabView === '3pour1' && <FinanceProTab />}
-                        {jlabView === 'advanced' && <IntelliStocksTab />}
+                        {jlabView === 'advanced' && (
+                            window.IntelliStocksTab ? <window.IntelliStocksTab /> : <div className="text-white">Chargement de la nouvelle version...</div>
+                        )}
                     </div>
                 </div>
             );
         };
 
-        const IntelliStocksTab = () => {
+        const LegacyIntelliStocksTab = () => {
             const [time, setTime] = useState(new Date());
             const [selectedStock, setSelectedStock] = useState('AAPL');
             const [timeframe, setTimeframe] = useState('1D');
