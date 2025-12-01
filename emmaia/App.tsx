@@ -1,0 +1,324 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useGeminiLive } from './services/geminiLive';
+import { analyzePersonality } from './services/analysisService';
+import { IntegrationService } from './services/integrationService';
+import { ConfigService } from './services/configService';
+import { AvatarView } from './components/AvatarView';
+import { ControlBar } from './components/ControlBar';
+import { ChatInterface } from './components/ChatInterface';
+import { AdminPanel } from './components/AdminPanel';
+import { ContextPanel } from './components/ContextPanel';
+import { StatusBadge } from './components/StatusBadge';
+import { QuickActions } from './components/QuickActions';
+import { EmailInputModal } from './components/EmailInputModal';
+import { SessionStats } from './components/SessionStats';
+import { SmartSuggestions } from './components/SmartSuggestions';
+import { ModeSelector } from './components/ModeSelector';
+import { TextChatMode } from './components/TextChatMode';
+import { TavusService } from './services/tavusService';
+import { TavusMode } from './components/TavusMode';
+import { WriterMode } from './components/WriterMode';
+import { ResearcherMode } from './components/ResearcherMode';
+import { NotificationCenter } from './components/NotificationCenter';
+import { CeoMode } from './components/CeoMode';
+import { CriticMode } from './components/CriticMode';
+import { TechnicalMode } from './components/TechnicalMode';
+import { DeveloperGuide } from './components/DeveloperGuide';
+import { EcosystemMap } from './components/EcosystemMap';
+// FIX: Using relative import instead of alias to prevent module resolution errors
+import { AvatarGalleryModal } from './components/AvatarGalleryModal';
+import { PersonaSelector } from './components/PersonaSelector';
+
+import { AlertCircle } from 'lucide-react';
+import { AvatarConfig, PersonalityAnalysis, ConnectionState, ContextItem, SpeakerStats, QuickAction, AppMode, SmartSuggestion, ModeConfigMap } from './types';
+import { HEYGEN_AVATAR_ID, AKOOL_AVATAR_ID, DEFAULT_SYSTEM_INSTRUCTION, MODEL_FLASH, VOICE_NAME, DEFAULT_INTEGRATION_CONFIG, PANEL_SYSTEM_INSTRUCTION, DEFAULT_QUICK_ACTIONS, DEFAULT_TAVUS_REPLICA_ID, DEFAULT_TAVUS_PERSONA_NAME, DEFAULT_TAVUS_CONTEXT, CEO_SYSTEM_INSTRUCTION_TEMPLATE, PROFESSION_PRESETS } from './constants';
+
+const App: React.FC = () => {
+  const [appMode, setAppMode] = useState<AppMode | null>(null);
+
+  // Gemini Hook
+  const gemini = useGeminiLive();
+  
+  // Configuration & State
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [showDevGuide, setShowDevGuide] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
+  
+  // Config Service
+  const [configs, setConfigs] = useState<ModeConfigMap | null>(null);
+
+  // Default to the first preset for the vocal mode if not set
+  const [activePresetId, setActivePresetId] = useState('finance');
+
+  const [avatarConfig, setAvatarConfig] = useState<AvatarConfig>({
+    systemInstruction: DEFAULT_SYSTEM_INSTRUCTION,
+    llmModel: MODEL_FLASH,
+    llmTemperature: 0.6,
+    geminiVoice: VOICE_NAME,
+    chatMode: 'solo',
+    heygenToken: '',
+    heygenAvatarId: HEYGEN_AVATAR_ID,
+    heygenQuality: 'medium',
+    heygenEmotion: 'Friendly',
+    heygenRemoveBackground: false,
+    akoolToken: '',
+    akoolAvatarId: AKOOL_AVATAR_ID,
+    akoolRegion: 'us-west',
+    akoolFaceEnhance: true,
+    activeProvider: 'both',
+    muteGeminiAudio: false,
+    integrationConfig: DEFAULT_INTEGRATION_CONFIG
+  });
+
+  const [quickActions, setQuickActions] = useState<QuickAction[]>(DEFAULT_QUICK_ACTIONS);
+  const tavusServiceRef = useRef<TavusService | null>(null);
+  const sessionStartTimeRef = useRef<Date | null>(null);
+
+  const [showContext, setShowContext] = useState(false);
+  const [personalityData, setPersonalityData] = useState<PersonalityAnalysis | null>(null);
+  const [contextItems, setContextItems] = useState<ContextItem[]>([]);
+  const [suggestions, setSuggestions] = useState<SmartSuggestion[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  const [speakerStats, setSpeakerStats] = useState<SpeakerStats>({ userTime: 0, aiTime: {}, lastActive: null });
+  const statsIntervalRef = useRef<number | null>(null);
+
+  const [ceoPrompt, setCeoPrompt] = useState<string | null>(null);
+  const [customImages, setCustomImages] = useState<Record<string, string>>({});
+
+  // Load configs on mount
+  useEffect(() => {
+     const svc = new ConfigService(DEFAULT_INTEGRATION_CONFIG);
+     svc.loadAllConfigs().then(loaded => setConfigs(loaded));
+  }, []);
+
+  const handleModeSelect = (mode: AppMode) => {
+      setAppMode(mode);
+  };
+
+  const handleBackToMenu = () => {
+      if (gemini.connectionState === ConnectionState.CONNECTED) gemini.disconnect();
+      if (tavusServiceRef.current) tavusServiceRef.current.endConversation();
+      setAppMode(null);
+  };
+
+  const handleConnect = () => {
+    // Tavus Logic moved to TavusMode component mostly, but if we need to trigger it from here:
+    if (appMode === 'tavus-video') return; 
+
+    let finalConfig = { ...avatarConfig };
+    
+    // Apply granular configs if available
+    if (configs) {
+        if (appMode === 'ceo-mode' && configs['ceo']) {
+             finalConfig.systemInstruction = configs['ceo'].systemPrompt;
+             finalConfig.geminiVoice = configs['ceo'].voiceName;
+        } else if (appMode === 'critic-mode' && configs['critic']) {
+             finalConfig.systemInstruction = configs['critic'].systemPrompt;
+             finalConfig.geminiVoice = configs['critic'].voiceName;
+        } else if (appMode === 'technical-analyst' && configs['geek']) {
+             finalConfig.systemInstruction = configs['geek'].systemPrompt;
+        }
+    }
+
+    // Apply Active Preset for Vocal Mode if generic
+    if (appMode === 'avatar-hybrid') {
+        const preset = PROFESSION_PRESETS.find(p => p.id === activePresetId);
+        if (preset) {
+            finalConfig.systemInstruction = preset.systemPrompt;
+            finalConfig.geminiVoice = preset.voiceName;
+            finalConfig.heygenAvatarId = preset.avatarId;
+        }
+    }
+
+    if (avatarConfig.chatMode === 'panel') finalConfig.systemInstruction = PANEL_SYSTEM_INSTRUCTION;
+    if (appMode === 'ceo-mode' && ceoPrompt) finalConfig.systemInstruction = ceoPrompt; // Override with user input if present
+
+    gemini.connect(finalConfig);
+    setPersonalityData(null);
+    setContextItems([]);
+    setSuggestions([]);
+    setSpeakerStats({ userTime: 0, aiTime: {}, lastActive: null });
+  };
+
+  const handleDisconnect = () => {
+      gemini.disconnect();
+  };
+
+  const handleLivePersonaChange = (id: string) => {
+      setActivePresetId(id);
+      // If connected, we must reconnect to change the voice/system prompt in Gemini Live
+      if (gemini.connectionState === ConnectionState.CONNECTED) {
+          gemini.disconnect();
+          // Small timeout to allow disconnect to process
+          setTimeout(() => {
+              // Re-trigger connect will pick up the new activePresetId
+              const connectBtn = document.getElementById('connect-btn-trigger');
+              if (connectBtn) connectBtn.click(); // Hacky but effective for self-triggering logic without duping code
+              // Ideally, call handleConnect() but need to ensure state is clean
+          }, 500);
+      }
+  };
+
+  // Re-trigger effect for manual persona switch if disconnected
+  useEffect(() => {
+      if (gemini.connectionState === ConnectionState.DISCONNECTED && appMode === 'avatar-hybrid') {
+          // Ready to connect with new persona
+      }
+  }, [activePresetId]);
+
+  useEffect(() => {
+    if (gemini.connectionState === ConnectionState.CONNECTED) {
+        sessionStartTimeRef.current = new Date();
+        statsIntervalRef.current = window.setInterval(() => {
+            const isUserSpeaking = gemini.userVolume > 10;
+            const isAiSpeaking = gemini.assistantVolume > 10;
+            setSpeakerStats(prev => {
+                const newStats = { ...prev };
+                if (isUserSpeaking) { newStats.userTime += 1; newStats.lastActive = 'User'; }
+                if (isAiSpeaking) {
+                    const lastMsg = gemini.messages.slice().reverse().find(m => m.role === 'assistant')?.text || '';
+                    let speaker = 'Emma IA'; 
+                    if (lastMsg.includes('[Marc]:')) speaker = 'Marc';
+                    if (lastMsg.includes('[Sarah]:')) speaker = 'Sarah';
+                    newStats.aiTime[speaker] = (newStats.aiTime[speaker] || 0) + 1;
+                    newStats.lastActive = speaker;
+                }
+                return newStats;
+            });
+        }, 1000);
+    } else {
+        if (statsIntervalRef.current) clearInterval(statsIntervalRef.current);
+    }
+    return () => { if (statsIntervalRef.current) clearInterval(statsIntervalRef.current); };
+  }, [gemini.connectionState, gemini.userVolume, gemini.assistantVolume]);
+
+  useEffect(() => {
+    if (gemini.connectionState !== ConnectionState.CONNECTED) return;
+    const lastMsg = gemini.messages[gemini.messages.length - 1];
+    if (lastMsg && lastMsg.role === 'assistant') {
+        const jsonMatch = lastMsg.text.match(/###VISUAL_JSON_START###([\s\S]*?)###VISUAL_JSON_END###/);
+        if (jsonMatch && jsonMatch[1]) {
+            try {
+                const data = JSON.parse(jsonMatch[1]);
+                if (data.title) {
+                    const newItem: ContextItem = {
+                        id: Date.now().toString(),
+                        type: data.type,
+                        title: data.title,
+                        topic: data.topic || "Général",
+                        content: data.data?.summary || data.content || JSON.stringify(data.data),
+                        url: data.url,
+                        timestamp: new Date(),
+                        metadata: { ...data, verificationStatus: data.verificationStatus }
+                    };
+                    setContextItems(prev => [newItem, ...prev]);
+                    setShowContext(true);
+                }
+                if (data.suggestions && Array.isArray(data.suggestions)) {
+                    setSuggestions(data.suggestions.map((s: any, i: number) => ({
+                        id: Date.now() + i + '_sugg',
+                        type: s.category === 'News' ? 'news' : 'question',
+                        text: s.text,
+                        category: s.category || 'Général'
+                    })).slice(0, 3));
+                }
+            } catch (e) { console.error(e); }
+        }
+    }
+  }, [gemini.messages, gemini.connectionState]);
+
+  // Global Animated Background
+  const Background = () => (
+      <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 animated-bg opacity-40"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_rgba(59,130,246,0.15),transparent_50%)]"></div>
+          <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom,_rgba(168,85,247,0.15),transparent_50%)]"></div>
+      </div>
+  );
+
+  // Mode Rendering Logic
+  const renderMode = () => {
+    if (!appMode) return <ModeSelector onSelect={handleModeSelect} onOpenDevGuide={() => setShowDevGuide(true)} onOpenGallery={() => setShowGallery(true)} customImages={customImages} />;
+    
+    const openGallery = () => setShowGallery(true);
+
+    if (appMode === 'text-chat') return <TextChatMode onBack={handleBackToMenu} avatarImage={customImages['finance']} onOpenGallery={openGallery} />;
+    if (appMode === 'letter-writer') return <WriterMode onBack={handleBackToMenu} avatarImage={customImages['writer']} onOpenGallery={openGallery} />;
+    if (appMode === 'researcher') return <><NotificationCenter /><ResearcherMode onBack={handleBackToMenu} avatarImage={customImages['researcher']} onOpenGallery={openGallery} /></>;
+    if (appMode === 'ceo-mode') return <CeoMode onBack={handleBackToMenu} onInjectPrompt={setCeoPrompt} avatarImage={customImages['ceo']} onOpenGallery={openGallery} />;
+    if (appMode === 'critic-mode') return <CriticMode onBack={handleBackToMenu} avatarImage={customImages['critic']} onOpenGallery={openGallery} />;
+    if (appMode === 'technical-analyst') return <TechnicalMode onBack={handleBackToMenu} avatarImage={customImages['geek']} onOpenGallery={openGallery} />;
+    if (appMode === 'tavus-video') return <TavusMode onBack={handleBackToMenu} config={configs ? configs['tavus'] : undefined} avatarImage={customImages['tavus']} onOpenGallery={openGallery} />;
+
+    // Avatar/Hybrid Mode
+    return (
+        <div className="min-h-screen flex flex-col md:flex-row relative">
+            <main className="flex-1 flex flex-col relative h-[60vh] md:h-screen transition-all duration-300">
+                <div className="absolute top-0 left-0 right-0 p-6 z-20 flex justify-between items-start pointer-events-none">
+                    <div className="pointer-events-auto flex items-center gap-4">
+                        <button onClick={handleBackToMenu} className="text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg border border-white/10 backdrop-blur transition-colors">← Menu</button>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 pointer-events-auto">
+                        <StatusBadge state={gemini.connectionState} temperature={avatarConfig.llmTemperature} latencyMs={24} isSpeaking={gemini.volume > 10} />
+                        {gemini.connectionState === ConnectionState.CONNECTED && <SessionStats startTime={sessionStartTimeRef.current} stats={speakerStats} />}
+                    </div>
+                </div>
+
+                {gemini.error && (
+                    <div className="absolute top-24 left-1/2 -translate-x-1/2 z-50 bg-red-500/90 border border-red-400 text-white px-6 py-3 rounded-full flex items-center gap-2 backdrop-blur-md shadow-xl animate-bounce">
+                        <AlertCircle className="w-5 h-5" /> <span className="text-sm font-medium">{gemini.error}</span>
+                    </div>
+                )}
+
+                <div className="flex-1 flex items-center justify-center pt-20 md:pt-0">
+                    <AvatarView state={gemini.connectionState} volume={gemini.assistantVolume} config={avatarConfig} lastMessage={gemini.messages.slice().reverse().find(m => m.role === 'assistant')?.text || ""} />
+                </div>
+
+                <div className="relative z-30 pb-4 md:pb-8 flex flex-col items-center gap-4">
+                    {/* Persona Selector Overlay for Live Mode */}
+                    {gemini.connectionState !== ConnectionState.CONNECTED && (
+                         <div className="mb-2 animate-in slide-in-from-bottom-4 fade-in">
+                             <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center mb-2">Choisir l'Expert Vocal</div>
+                             <PersonaSelector activeId={activePresetId} onSelect={setActivePresetId} className="bg-slate-900/60 p-2 rounded-2xl backdrop-blur-md border border-white/10" />
+                         </div>
+                    )}
+                    
+                    {gemini.connectionState === ConnectionState.CONNECTED && suggestions.length > 0 && (
+                        <SmartSuggestions suggestions={suggestions} onSelect={(s) => { gemini.sendText(s.text); setSuggestions(prev => prev.filter(p => p.id !== s.id)); }} />
+                    )}
+                    <QuickActions actions={quickActions} onAction={(cmd) => cmd === 'OPEN_EMAIL_MODAL' ? setShowEmailModal(true) : gemini.sendText(`[ACTION]: ${cmd}`)} onUpdateActions={setQuickActions} />
+                    <ControlBar state={gemini.connectionState} onConnect={handleConnect} onDisconnect={handleDisconnect} onEmail={() => setShowEmailModal(true)} onOpenAdmin={() => setShowAdmin(true)} onToggleInsights={() => setShowContext(!showContext)} showInsights={showContext} />
+                    
+                    {/* Hidden trigger for reconnection logic */}
+                    <button id="connect-btn-trigger" className="hidden" onClick={handleConnect}></button>
+                </div>
+            </main>
+
+            <aside className="hidden md:flex flex-row h-screen z-20">
+                <div className="w-80 border-l border-white/5 bg-slate-950/80 backdrop-blur-xl flex flex-col h-full shadow-2xl">
+                    <div className="flex-1 overflow-hidden p-4"><ChatInterface messages={gemini.messages} /></div>
+                </div>
+                {showContext && <ContextPanel personalityData={personalityData} contextItems={contextItems} isLoading={isAnalyzing} />}
+            </aside>
+        </div>
+    );
+  };
+
+  return (
+    <>
+      <Background />
+      {showAdmin && <AdminPanel config={avatarConfig} onSave={setAvatarConfig} onClose={() => setShowAdmin(false)} />}
+      {showDevGuide && <DeveloperGuide onClose={() => setShowDevGuide(false)} />}
+      {showMap && <EcosystemMap onClose={() => setShowMap(false)} />}
+      {showGallery && <AvatarGalleryModal onClose={() => setShowGallery(false)} onSelect={(section, url) => setCustomImages({...customImages, [section]: url})} />}
+      {showEmailModal && <EmailInputModal onClose={() => setShowEmailModal(false)} onProcess={(text) => { setShowEmailModal(false); gemini.sendText(`[ANALYSE CE COURRIEL]: ${text}`); }} />}
+
+      {renderMode()}
+    </>
+  );
+};
+
+export default App;

@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Emma IA - Assistante Québec",
+  "description": "Une assistante virtuelle intelligente utilisant Gemini Live pour une communication bidirectionnelle fluide en français québécois.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

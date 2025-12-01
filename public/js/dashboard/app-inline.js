@@ -24825,6 +24825,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'ask-emma', label: 'Emma IA™', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox (Live)', icon: 'iconoir-voice-circle', component: FinVoxTab },
+            { id: 'emmaia', label: 'EmmAIA (Gemini)', icon: 'iconoir-brain', component: EmmAIATab },
             { id: 'settings', label: 'Paramètres', icon: 'iconoir-settings', component: SettingsTab },
             { id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: PlusTab },
             { id: 'admin-jsla', label: 'Admin JSLAI', icon: 'iconoir-settings', component: AdminJSLaiTab },
@@ -25357,6 +25358,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'economic-calendar' && <EconomicCalendarTab />}
                     {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
                     {activeTab === 'finvox' && <FinVoxTab />}
+                    {activeTab === 'emmaia' && <EmmAIATab isDarkMode={isDarkMode} />}
                     {activeTab === 'settings' && <SettingsTab />}
                     {activeTab === 'emma-config' && <EmmaConfigTab />}
                 </main>
