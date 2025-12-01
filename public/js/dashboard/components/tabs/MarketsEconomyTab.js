@@ -253,9 +253,9 @@ const MarketsEconomyTab = () => {
         <div className="space-y-6">
             {/* Header */}
             <div className="flex justify-between items-center">
-                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                <h2 className={`text-2xl font-bold transition-colors duration-300 flex items-center gap-2 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>📰 Marchés & Économie</h2>
+                }`}><Icon name="newspaper" className="w-6 h-6" /> Marchés & Économie</h2>
                 <div className="flex gap-2">
                     {/* Toggle Français */}
                     <button
@@ -268,7 +268,7 @@ const MarketsEconomyTab = () => {
                                     : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
                         }`}
                     >
-                        🇫🇷 Français {localFrenchOnly && '✓'}
+                        <Icon name="globe" className="w-4 h-4 mr-1 inline" /> Français {localFrenchOnly && <Icon name="check" className="w-3 h-3 inline ml-1" />}
                     </button>
                     <button
                         onClick={fetchNews}
@@ -279,7 +279,7 @@ const MarketsEconomyTab = () => {
                                 : 'bg-gray-700 hover:bg-gray-600 text-white'
                         }`}
                     >
-                        {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                        {loading ? <><Icon name="hourglass" className="w-4 h-4 mr-1 inline" /> Actualisation...</> : <><Icon name="refresh" className="w-4 h-4 mr-1 inline" /> Actualiser</>}
                     </button>
                 </div>
             </div>
@@ -299,10 +299,10 @@ const MarketsEconomyTab = () => {
                         : 'bg-white border-blue-400/40'
                 }`}>
                     <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                        <h3 className={`text-lg font-bold transition-colors duration-300 flex items-center gap-2 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            📊 Vue d'ensemble des Marchés (Temps Réel)
+                            <Icon name="stats-report" className="w-5 h-5" /> Vue d'ensemble des Marchés (Temps Réel)
                         </h3>
                         <p className={`text-sm transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -320,10 +320,10 @@ const MarketsEconomyTab = () => {
                         : 'bg-white border-green-400/40'
                 }`}>
                     <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                        <h3 className={`text-lg font-bold transition-colors duration-300 flex items-center gap-2 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            🔥 Heatmap Boursière
+                            <Icon name="fire" className="w-5 h-5" /> Heatmap Boursière
                         </h3>
                         <p className={`text-sm transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -341,10 +341,10 @@ const MarketsEconomyTab = () => {
                         : 'bg-white border-purple-400/40'
                 }`}>
                     <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                        <h3 className={`text-lg font-bold transition-colors duration-300 flex items-center gap-2 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            🚀 Screener - Top Gainers & Losers
+                            <Icon name="rocket" className="w-5 h-5" /> Screener - Top Gainers & Losers
                         </h3>
                         <p className={`text-sm transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -381,14 +381,14 @@ const MarketsEconomyTab = () => {
                     ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
                     : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
             }`}>
-                <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    🔍 Filtres
+                <h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <Icon name="search" className="w-5 h-5" /> Filtres
                 </h3>
 
                 {/* Filtre Source */}
                 <div className="mb-4">
-                    <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        📰 Source
+                    <label className={`text-sm font-semibold mb-2 block flex items-center gap-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Icon name="newspaper" className="w-4 h-4" /> Source
                     </label>
                     <div className="flex flex-wrap gap-2">
                         <button
@@ -419,8 +419,8 @@ const MarketsEconomyTab = () => {
 
                 {/* Filtre Marché */}
                 <div className="mb-4">
-                    <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        🌍 Marché
+                    <label className={`text-sm font-semibold mb-2 block flex items-center gap-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Icon name="globe" className="w-4 h-4" /> Marché
                     </label>
                     <div className="flex flex-wrap gap-2">
                         <button
@@ -451,8 +451,8 @@ const MarketsEconomyTab = () => {
 
                 {/* Filtre Thème */}
                 <div>
-                    <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        🏷️ Thématique
+                    <label className={`text-sm font-semibold mb-2 block flex items-center gap-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Icon name="tag" className="w-4 h-4" /> Thématique
                     </label>
                     <div className="flex flex-wrap gap-2">
                         <button
@@ -489,7 +489,7 @@ const MarketsEconomyTab = () => {
                             : 'bg-yellow-50 border-yellow-300 text-yellow-800'
                     }`}>
                         <div className="flex items-start gap-3">
-                            <span className="text-xl">💡</span>
+                            <Icon name="light-bulb" className="w-6 h-6" />
                             <div>
                                 <p className="font-semibold mb-1">Résultats similaires affichés</p>
                                 <p className="text-sm">
@@ -580,7 +580,7 @@ const MarketsEconomyTab = () => {
                                                     ? 'bg-green-500/20 text-green-500 border border-green-500/30'
                                                     : (isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700')
                                             }`}>
-                                                {credibility >= 100 && <span className="text-xs">⭐</span>}
+                                                {credibility >= 100 && <Icon name="star" className="w-3 h-3" />}
                                                 <span className="text-xs font-semibold">{article.source?.name || 'Source inconnue'}</span>
                                             </div>
 
@@ -591,8 +591,8 @@ const MarketsEconomyTab = () => {
 
                                             {/* Badge français */}
                                             {isFrenchArticle(article) && (
-                                                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">
-                                                    🇫🇷 FR
+                                                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30 flex items-center gap-1">
+                                                    <Icon name="globe" className="w-3 h-3" /> FR
                                                 </span>
                                             )}
 

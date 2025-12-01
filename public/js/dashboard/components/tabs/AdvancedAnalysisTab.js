@@ -257,7 +257,7 @@ const AdvancedAnalysisTab = () => {
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-                        Analyse Financière Pro 🚀
+                        <Icon name="stats-report" className="w-8 h-8 inline mr-2 text-blue-400" /> Analyse Financière Pro
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">
                         Outils avancés pour l'investisseur intelligent
@@ -284,7 +284,7 @@ const AdvancedAnalysisTab = () => {
                     </div>
 
                     {loading ? (
-                        <div className="text-gray-400 text-sm">⏳ Chargement...</div>
+                        <div className="text-gray-400 text-sm"><Icon name="refresh" className="w-4 h-4 inline animate-spin" /> Chargement...</div>
                     ) : stockData ? (
                         <div className="text-right">
                             <div className="text-xl font-bold">${stockData.price?.toFixed(2) || '0.00'}</div>
@@ -309,7 +309,7 @@ const AdvancedAnalysisTab = () => {
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-4">
                             <div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <i className="iconoir-stats-report text-blue-400 text-3xl"></i>
+                                <Icon name="stats-report" className="text-blue-400 w-8 h-8" />
                             </div>
                             <div>
                                 <h3 className="text-xl font-bold text-white mb-1">Analyse Approfondie Complète</h3>
@@ -320,7 +320,7 @@ const AdvancedAnalysisTab = () => {
                             </div>
                         </div>
                         <div className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2">
-                            Ouvrir <i className="iconoir-arrow-right"></i>
+                            Ouvrir <Icon name="arrow-right" className="w-5 h-5" />
                         </div>
                     </div>
                 </div>
@@ -331,7 +331,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border border-emerald-700/30 rounded-xl p-6 cursor-pointer hover:border-emerald-500 transition-all hover:shadow-lg hover:shadow-emerald-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-group text-emerald-400 text-2xl"></i>
+                        <Icon name="group" className="text-emerald-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">Comparaison Pairs</h3>
                     <p className="text-gray-400 text-sm">
@@ -345,7 +345,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-700/30 rounded-xl p-6 cursor-pointer hover:border-purple-500 transition-all hover:shadow-lg hover:shadow-purple-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-graph-up text-purple-400 text-2xl"></i>
+                        <Icon name="graph-up" className="text-purple-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">Simulateur de Scénarios</h3>
                     <p className="text-gray-400 text-sm">
@@ -359,7 +359,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-orange-900/20 to-red-900/20 border border-orange-700/30 rounded-xl p-6 cursor-pointer hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-filter text-orange-400 text-2xl"></i>
+                        <Icon name="filter" className="text-orange-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">Screener Avancé</h3>
                     <p className="text-gray-400 text-sm">
@@ -373,7 +373,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-violet-900/20 to-fuchsia-900/20 border border-violet-700/30 rounded-xl p-6 cursor-pointer hover:border-violet-500 transition-all hover:shadow-lg hover:shadow-violet-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-brain text-violet-400 text-2xl"></i>
+                        <Icon name="brain" className="text-violet-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">AI Stock Analysis</h3>
                     <p className="text-gray-400 text-sm">
@@ -387,7 +387,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 border border-amber-700/30 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all hover:shadow-lg hover:shadow-amber-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-newspaper text-amber-400 text-2xl"></i>
+                        <Icon name="newspaper" className="text-amber-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">News & Sentiment</h3>
                     <p className="text-gray-400 text-sm">
@@ -401,7 +401,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-lime-900/20 to-green-900/20 border border-lime-700/30 rounded-xl p-6 cursor-pointer hover:border-lime-500 transition-all hover:shadow-lg hover:shadow-lime-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-lime-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-community text-lime-400 text-2xl"></i>
+                        <Icon name="community" className="text-lime-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">Analyst Consensus</h3>
                     <p className="text-gray-400 text-sm">
@@ -415,7 +415,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-rose-900/20 to-pink-900/20 border border-rose-700/30 rounded-xl p-6 cursor-pointer hover:border-rose-500 transition-all hover:shadow-lg hover:shadow-rose-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-rose-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-calendar text-rose-400 text-2xl"></i>
+                        <Icon name="calendar" className="text-rose-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">Earnings Calendar</h3>
                     <p className="text-gray-400 text-sm">
@@ -429,7 +429,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-sky-900/20 to-indigo-900/20 border border-sky-700/30 rounded-xl p-6 cursor-pointer hover:border-sky-500 transition-all hover:shadow-lg hover:shadow-sky-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-sky-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-globe text-sky-400 text-2xl"></i>
+                        <Icon name="globe" className="text-sky-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">Economic Events</h3>
                     <p className="text-gray-400 text-sm">
@@ -443,7 +443,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-teal-900/20 to-cyan-900/20 border border-teal-700/30 rounded-xl p-6 cursor-pointer hover:border-teal-500 transition-all hover:shadow-lg hover:shadow-teal-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-teal-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-search text-teal-400 text-2xl"></i>
+                        <Icon name="search" className="text-teal-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">Watchlist Screener</h3>
                     <p className="text-gray-400 text-sm">
@@ -475,7 +475,7 @@ const AdvancedAnalysisTab = () => {
                     className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-700/30 rounded-xl p-6 cursor-pointer hover:border-cyan-500 transition-all hover:shadow-lg hover:shadow-cyan-500/10 group"
                 >
                     <div className="w-12 h-12 rounded-lg bg-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i className="iconoir-page text-cyan-400 text-2xl"></i>
+                        <Icon name="page" className="text-cyan-400 w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-2">Export Rapport PDF</h3>
                     <p className="text-gray-400 text-sm">

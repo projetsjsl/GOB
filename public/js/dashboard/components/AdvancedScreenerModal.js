@@ -167,7 +167,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                     <div>
                         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                             <span className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                                <i className="iconoir-filter text-emerald-400 text-xl"></i>
+                                <Icon name="filter" className="w-5 h-5 text-emerald-400" />
                             </span>
                             Screener Avancé
                         </h2>
@@ -179,7 +179,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                         onClick={onClose}
                         className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors"
                     >
-                        <i className="iconoir-xmark text-gray-400 text-xl"></i>
+                        <Icon name="xmark" className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
 
@@ -300,9 +300,9 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                             <button
                                 onClick={runScreen}
                                 disabled={loading}
-                                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50"
+                                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                {loading ? 'Analyse en cours...' : '🔍 Lancer le Screening'}
+                                {loading ? 'Analyse en cours...' : <><Icon name="search" className="w-5 h-5" /> Lancer le Screening</>}
                             </button>
                         </div>
 
@@ -334,9 +334,9 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                                 />
                                 <button
                                     onClick={savePreset}
-                                    className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg text-sm transition-colors"
+                                    className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
                                 >
-                                    💾 Sauvegarder
+                                    <Icon name="floppy-disk" className="w-4 h-4" /> Sauvegarder
                                 </button>
                             </div>
 
@@ -354,9 +354,9 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                                             </button>
                                             <button
                                                 onClick={() => deletePreset(idx)}
-                                                className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 rounded transition-colors"
+                                                className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 rounded transition-colors flex items-center justify-center"
                                             >
-                                                🗑️
+                                                <Icon name="trash" className="w-4 h-4" />
                                             </button>
                                         </div>
                                     ))}
@@ -374,7 +374,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
 
                             {results.length === 0 ? (
                                 <div className="text-center py-12 text-gray-400">
-                                    <i className="iconoir-search text-6xl mb-4 block"></i>
+                                    <Icon name="search" className="w-16 h-16 mx-auto mb-4 text-gray-600" />
                                     <p>Aucun résultat. Lancez un screening pour voir les titres correspondants.</p>
                                 </div>
                             ) : (

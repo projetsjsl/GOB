@@ -1732,7 +1732,7 @@ const IntelliStocksTab = () => {
                                 : 'bg-purple-600 hover:bg-purple-700 border-purple-600 text-white'
                                 } disabled:opacity-50`}
                         >
-                            <span>🤖</span>
+                            <Icon name="bot" className="w-4 h-4" />
                             <span className="text-xs font-semibold">Emma Populate</span>
                         </button>
 
@@ -2043,8 +2043,9 @@ const IntelliStocksTab = () => {
                                         }
                                     }} width="100%" height="140"></canvas>
                                 ) : (
-                                    <div className="text-center text-gray-500 text-xs py-8">
-                                        📈 Chargement des données du graphique...
+                                    <div className="text-center text-gray-500 text-xs py-8 flex items-center justify-center gap-2">
+                                        <Icon name="chart" className="w-4 h-4" />
+                                        Chargement des données du graphique...
                                     </div>
                                 )}
                             </div>
@@ -2150,8 +2151,9 @@ const IntelliStocksTab = () => {
                                             }
                                         }} width="100%" height="80"></canvas>
                                     ) : (
-                                        <div className="text-center text-gray-500 text-xs py-4">
-                                            📊 Chargement du volume...
+                                        <div className="text-center text-gray-500 text-xs py-4 flex items-center justify-center gap-2">
+                                            <Icon name="stats-report" className="w-4 h-4" />
+                                            Chargement du volume...
                                         </div>
                                     )}
                                 </div>
@@ -2258,8 +2260,8 @@ const IntelliStocksTab = () => {
                                     movingAverages.interpretation?.trend?.includes('Baissier') ? 'text-red-500' :
                                         'text-gray-400'
                                     }`}>
-                                    {movingAverages.interpretation?.trend === 'Haussier fort' && '📈 '}
-                                    {movingAverages.interpretation?.trend === 'Baissier fort' && '📉 '}
+                                    {movingAverages.interpretation?.trend === 'Haussier fort' && <Icon name="trending-up" className="w-3 h-3 mr-1" />}
+                                    {movingAverages.interpretation?.trend === 'Baissier fort' && <Icon name="trending-down" className="w-3 h-3 mr-1" />}
                                     {movingAverages.interpretation?.trend || 'Calcul en cours...'}
                                 </div>
                             </div>
@@ -2289,14 +2291,14 @@ const IntelliStocksTab = () => {
                                     </div>
                                     <div className="text-[7px] text-gray-500 mt-1 italic">
                                         {Math.abs(movingAverages.sma20?.diff || 0) < 2
-                                            ? '💡 Proche de la moyenne - Zone de consolidation'
+                                            ? <span className="flex items-center gap-1"><Icon name="light-bulb" className="w-3 h-3" /> Proche de la moyenne - Zone de consolidation</span>
                                             : movingAverages.sma20?.diff > 5
-                                                ? '🚀 Fort au-dessus - Momentum haussier'
+                                                ? <span className="flex items-center gap-1"><Icon name="rocket" className="w-3 h-3" /> Fort au-dessus - Momentum haussier</span>
                                                 : movingAverages.sma20?.diff < -5
-                                                    ? '⚠️ Fort en-dessous - Pression baissière'
+                                                    ? <span className="flex items-center gap-1"><Icon name="warning-triangle" className="w-3 h-3" /> Fort en-dessous - Pression baissière</span>
                                                     : movingAverages.sma20?.diff > 0
-                                                        ? '✅ Au-dessus - Signal positif'
-                                                        : '⚠️ En-dessous - Signal négatif'}
+                                                        ? <span className="flex items-center gap-1"><Icon name="check-circle" className="w-3 h-3" /> Au-dessus - Signal positif</span>
+                                                        : <span className="flex items-center gap-1"><Icon name="warning-triangle" className="w-3 h-3" /> En-dessous - Signal négatif</span>}
                                     </div>
                                 </div>
 
@@ -2324,12 +2326,12 @@ const IntelliStocksTab = () => {
                                     </div>
                                     <div className="text-[7px] text-gray-500 mt-1 italic">
                                         {movingAverages.sma50?.diff > 0 && movingAverages.sma20?.diff > 0
-                                            ? '📊 Tendance moyen terme positive'
+                                            ? <span className="flex items-center gap-1"><Icon name="stats-report" className="w-3 h-3" /> Tendance moyen terme positive</span>
                                             : movingAverages.sma50?.diff < 0 && movingAverages.sma20?.diff < 0
-                                                ? '📉 Tendance moyen terme négative'
+                                                ? <span className="flex items-center gap-1"><Icon name="trending-down" className="w-3 h-3" /> Tendance moyen terme négative</span>
                                                 : movingAverages.sma50?.diff > 0
-                                                    ? '⚡ Support potentiel - Test en cours'
-                                                    : '⚠️ Résistance - Vigilance recommandée'}
+                                                    ? <span className="flex items-center gap-1"><Icon name="flash" className="w-3 h-3" /> Support potentiel - Test en cours</span>
+                                                    : <span className="flex items-center gap-1"><Icon name="warning-triangle" className="w-3 h-3" /> Résistance - Vigilance recommandée</span>}
                                     </div>
                                 </div>
 
@@ -2357,12 +2359,12 @@ const IntelliStocksTab = () => {
                                     </div>
                                     <div className="text-[7px] text-gray-500 mt-1 italic">
                                         {movingAverages.sma200?.diff > 10
-                                            ? '🎯 Bull Market confirmé - Tendance long terme haussière'
+                                            ? <span className="flex items-center gap-1"><Icon name="target" className="w-3 h-3" /> Bull Market confirmé - Tendance long terme haussière</span>
                                             : movingAverages.sma200?.diff > 0
-                                                ? '✅ Au-dessus SMA200 - Marché haussier'
+                                                ? <span className="flex items-center gap-1"><Icon name="check-circle" className="w-3 h-3" /> Au-dessus SMA200 - Marché haussier</span>
                                                 : movingAverages.sma200?.diff < -10
-                                                    ? '🐻 Bear Market - Tendance long terme baissière'
-                                                    : '⚠️ En-dessous SMA200 - Marché baissier'}
+                                                    ? <span className="flex items-center gap-1"><Icon name="bear" className="w-3 h-3" /> Bear Market - Tendance long terme baissière</span>
+                                                    : <span className="flex items-center gap-1"><Icon name="warning-triangle" className="w-3 h-3" /> En-dessous SMA200 - Marché baissier</span>}
                                     </div>
                                 </div>
                             </div>
@@ -2376,17 +2378,17 @@ const IntelliStocksTab = () => {
                                         : (isDarkMode ? 'bg-yellow-900/20 border-yellow-800 text-yellow-300' : 'bg-yellow-50 border-yellow-200 text-yellow-700')
                                     }`}>
                                     <div className="font-semibold mb-1 flex items-center gap-2">
-                                        <Icon emoji="📊" size={16} />
+                                        <Icon name="stats-report" size={16} />
                                         Analyse des Croisements
                                     </div>
                                     {movingAverages.sma20.value > movingAverages.sma50.value && movingAverages.sma50.value > movingAverages.sma200.value ? (
-                                        <div>✅ Configuration idéale : SMA20 &gt; SMA50 &gt; SMA200. Tendance haussière confirmée sur tous les horizons temporels.</div>
+                                        <div className="flex items-start gap-1"><Icon name="check-circle" className="w-3 h-3 mt-0.5 flex-shrink-0" /> <span>Configuration idéale : SMA20 &gt; SMA50 &gt; SMA200. Tendance haussière confirmée sur tous les horizons temporels.</span></div>
                                     ) : movingAverages.sma20.value < movingAverages.sma50.value && movingAverages.sma50.value < movingAverages.sma200.value ? (
-                                        <div>⚠️ Configuration baissière : SMA20 &lt; SMA50 &lt; SMA200. Pression vendeuse sur tous les horizons. Prudence recommandée.</div>
+                                        <div className="flex items-start gap-1"><Icon name="warning-triangle" className="w-3 h-3 mt-0.5 flex-shrink-0" /> <span>Configuration baissière : SMA20 &lt; SMA50 &lt; SMA200. Pression vendeuse sur tous les horizons. Prudence recommandée.</span></div>
                                     ) : movingAverages.sma20.value > movingAverages.sma50.value ? (
-                                        <div>⚡ Croisement récent possible : SMA20 au-dessus de SMA50. Signal de retournement haussier à confirmer.</div>
+                                        <div className="flex items-start gap-1"><Icon name="flash" className="w-3 h-3 mt-0.5 flex-shrink-0" /> <span>Croisement récent possible : SMA20 au-dessus de SMA50. Signal de retournement haussier à confirmer.</span></div>
                                     ) : (
-                                        <div>📉 Moyennes désalignées : Configuration mixte. Attendre confirmation de tendance avant prise de position.</div>
+                                        <div className="flex items-start gap-1"><Icon name="trending-down" className="w-3 h-3 mt-0.5 flex-shrink-0" /> <span>Moyennes désalignées : Configuration mixte. Attendre confirmation de tendance avant prise de position.</span></div>
                                     )}
                                 </div>
                             )}
@@ -2868,7 +2870,7 @@ const IntelliStocksTab = () => {
                                 </div>
                             ) : (
                                 <div className="text-center text-gray-500 text-xs py-4">
-                                    <div className="mb-2"><Icon emoji="📊" size={24} /></div>
+                                    <div className="mb-2 flex justify-center"><Icon name="stats-report" size={24} /></div>
                                     <div>Chargement des ratios historiques...</div>
                                 </div>
                             )}
@@ -2884,13 +2886,13 @@ const IntelliStocksTab = () => {
                                 </h3>
                                 <div className="space-y-2">
                                     <div>
-                                        <div className="text-[9px] text-gray-500 mb-1 font-semibold">🚀 Catalyseurs</div>
+                                        <div className="text-[9px] text-gray-500 mb-1 font-semibold flex items-center gap-1"><Icon name="rocket" className="w-3 h-3" /> Catalyseurs</div>
                                         {insights.catalysts.map((cat, i) => (
                                             <div key={i} className="text-[8px] text-emerald-400 mb-0.5">• {cat}</div>
                                         ))}
                                     </div>
                                     <div>
-                                        <div className="text-[9px] text-gray-500 mb-1 font-semibold">⚠️ Risques</div>
+                                        <div className="text-[9px] text-gray-500 mb-1 font-semibold flex items-center gap-1"><Icon name="warning-triangle" className="w-3 h-3" /> Risques</div>
                                         {insights.risks.map((risk, i) => (
                                             <div key={i} className="text-[8px] text-green-400 mb-0.5">• {risk}</div>
                                         ))}
@@ -2901,8 +2903,8 @@ const IntelliStocksTab = () => {
                                             <span className={`ml-1 font-bold ${insights.consensus === 'bullish' ? 'text-emerald-500' :
                                                 insights.consensus === 'bearish' ? 'text-red-500' : 'text-gray-400'
                                                 }`}>
-                                                {insights.consensus === 'bullish' ? '📈 Bullish' :
-                                                    insights.consensus === 'bearish' ? '📉 Bearish' : '➖ Neutre'}
+                                                {insights.consensus === 'bullish' ? <span className="flex items-center gap-1"><Icon name="trending-up" className="w-3 h-3" /> Bullish</span> :
+                                                    insights.consensus === 'bearish' ? <span className="flex items-center gap-1"><Icon name="trending-down" className="w-3 h-3" /> Bearish</span> : <span className="flex items-center gap-1"><Icon name="minus" className="w-3 h-3" /> Neutre</span>}
                                             </span>
                                         </div>
                                         <div className="text-[8px] text-gray-400">{insights.reasoning}</div>
@@ -3000,7 +3002,7 @@ const IntelliStocksTab = () => {
                                         : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                                         }`}>
                                         <div className="flex items-start justify-between mb-0.5">
-                                            <div className="text-[7px] px-1 py-0.5 rounded bg-emerald-900 text-emerald-500">📈</div>
+                                            <div className="text-[7px] px-1 py-0.5 rounded bg-emerald-900 text-emerald-500 flex items-center justify-center"><Icon name="trending-up" className="w-2 h-2" /></div>
                                             <span className="text-[7px] text-gray-600">{formatTimeAgo(item.publishedDate)}</span>
                                         </div>
                                         <div className={`font-semibold text-[8px] mb-0.5 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -3021,7 +3023,10 @@ const IntelliStocksTab = () => {
                         <LucideIcon name="AlertCircle" className="w-3 h-3 text-gray-500" />
                         <div className="flex-1">
                             <div className="font-semibold text-[9px] text-gray-400">
-                                ✅ Dashboard Hybride Fonctionnel
+                                <div className="flex items-center gap-1">
+                                    <Icon name="check-circle" className="w-3 h-3 text-emerald-500" />
+                                    Dashboard Hybride Fonctionnel
+                                </div>
                             </div>
                             <div className="text-[7px] text-gray-600">
                                 Mode Démo • FMP (données précises) + Perplexity (intelligence IA)

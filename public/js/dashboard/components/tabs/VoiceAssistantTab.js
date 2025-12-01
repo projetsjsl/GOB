@@ -271,7 +271,7 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
                     ) : (
                         <div className="text-center p-10">
                             <div className="w-32 h-32 mx-auto bg-gray-700 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
-                                <i className="iconoir-user text-6xl text-gray-400"></i>
+                                <Icon name="user" className="w-16 h-16 text-gray-400" />
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-2">Assistant Virtuel</h3>
                             <p className="text-gray-400 mb-8 max-w-md mx-auto">Connectez-vous pour interagir avec votre assistant vidéo alimenté par Tavus et Gemini.</p>
@@ -282,12 +282,12 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
                             >
                                 {tavusStatus === 'connecting' ? (
                                     <>
-                                        <i className="iconoir-system-restart animate-spin"></i>
+                                        <Icon name="system-restart" className="w-5 h-5 animate-spin" />
                                         Connexion...
                                     </>
                                 ) : (
                                     <>
-                                        <i className="iconoir-play-circle"></i>
+                                        <Icon name="play-circle" className="w-5 h-5" />
                                         Démarrer la session
                                     </>
                                 )}
@@ -311,7 +311,7 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
                 <div className={`p-4 border-b flex justify-between items-center ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
-                            <i className="iconoir-sparkles text-xl"></i>
+                            <Icon name="sparkles" className="w-5 h-5" />
                         </div>
                         <div>
                             <h3 className={`font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>JSL Assistant</h3>
@@ -322,7 +322,7 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
                         onClick={() => setShowSettings(!showSettings)}
                         className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-200 text-gray-600'}`}
                     >
-                        <i className="iconoir-settings text-xl"></i>
+                        <Icon name="settings" className="w-5 h-5" />
                     </button>
                 </div>
 
@@ -423,7 +423,7 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
                                 : (darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300')
                                 }`}
                         >
-                            <i className={isRecording ? "iconoir-mic-speaking" : "iconoir-microphone"}></i>
+                            <Icon name={isRecording ? "mic-speaking" : "microphone"} className="w-6 h-6" />
                         </button>
                         <input
                             type="text"
@@ -441,7 +441,7 @@ const VoiceAssistantTab = ({ isDarkMode }) => {
                             disabled={!input.trim() || isLoading}
                             className={`p-3 rounded-full bg-blue-600 text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20`}
                         >
-                            <i className="iconoir-send-diagonal"></i>
+                            <Icon name="send-diagonal" className="w-5 h-5" />
                         </button>
                     </div>
                     <p className={`text-center text-[10px] mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>

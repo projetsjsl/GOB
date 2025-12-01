@@ -606,10 +606,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-100 to-purple-100'
             }`}>
                 <div className="mb-2">
-                    <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        🧪 TESTS JS - Widgets Financiers
+                        <Icon name="beaker" className="w-8 h-8" /> TESTS JS - Widgets Financiers
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-blue-200' : 'text-blue-800'
@@ -626,10 +626,10 @@ const InvestingCalendarTab = () => {
                 <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${
                     isDarkMode ? 'border-blue-500' : 'border-blue-600'
                 }`}>
-                    <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${
+                    <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-blue-400' : 'text-blue-600'
                     }`}>
-                        📅 Calendriers & Événements Économiques
+                        <Icon name="calendar" className="w-6 h-6" /> Calendriers & Événements Économiques
                     </h3>
                 </div>
             </div>
@@ -639,10 +639,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        📊 Calendrier Économique
+                        <Icon name="stats-report" className="w-6 h-6" /> Calendrier Économique
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -681,10 +681,10 @@ const InvestingCalendarTab = () => {
                 <div className={`flex items-center gap-3 mb-4 pb-2 border-b-2 ${
                     isDarkMode ? 'border-green-500' : 'border-green-600'
                 }`}>
-                    <h3 className={`text-xl font-bold transition-colors duration-300 ${
+                    <h3 className={`text-xl font-bold transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-green-400' : 'text-green-600'
                     }`}>
-                        💱 Marchés Forex
+                        <Icon name="currency-exchange" className="w-6 h-6" /> Marchés Forex
                     </h3>
                 </div>
             </div>
@@ -694,10 +694,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        💱 Forex Heat Map
+                        <Icon name="currency-exchange" className="w-6 h-6" /> Forex Heat Map
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -718,10 +718,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        📅 Economic Calendar Events
+                        <Icon name="calendar" className="w-6 h-6" /> Economic Calendar Events
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -742,10 +742,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        💱 Forex Cross Rates
+                        <Icon name="currency-exchange" className="w-6 h-6" /> Forex Cross Rates
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -768,10 +768,10 @@ const InvestingCalendarTab = () => {
                 <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${
                     isDarkMode ? 'border-purple-500' : 'border-purple-600'
                 }`}>
-                    <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${
+                    <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-purple-400' : 'text-purple-600'
                     }`}>
-                        📊 Marchés Boursiers - Vues Globales
+                        <Icon name="stats-report" className="w-6 h-6" /> Marchés Boursiers - Vues Globales
                     </h3>
                 </div>
             </div>
@@ -781,10 +781,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        🇺🇸 Stock Heatmap All USA
+                        <Icon name="globe" className="w-6 h-6" /> Stock Heatmap All USA
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -819,10 +819,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        🇨🇦 Stock Heatmap TSX
+                        <Icon name="globe" className="w-6 h-6" /> Stock Heatmap TSX
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -857,10 +857,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        📊 Market Quotes - Indices, Futures, Bonds, Forex
+                        <Icon name="stats-report" className="w-6 h-6" /> Market Quotes - Indices, Futures, Bonds, Forex
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -897,10 +897,10 @@ const InvestingCalendarTab = () => {
                 <div className={`flex items-center gap-2 md:gap-3 mb-2 md:mb-4 pb-2 border-b-2 ${
                     isDarkMode ? 'border-orange-500' : 'border-orange-600'
                 }`}>
-                    <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 ${
+                    <h3 className={`text-base md:text-lg lg:text-xl font-bold transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-orange-400' : 'text-orange-600'
                     }`}>
-                        📈 Outils d'Analyse Fondamentale
+                        <Icon name="trending-up" className="w-6 h-6" /> Outils d'Analyse Fondamentale
                     </h3>
                 </div>
             </div>
@@ -910,20 +910,20 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        📊 FastGraphs - Analyse Fondamentale
+                        <Icon name="stats-report" className="w-6 h-6" /> FastGraphs - Analyse Fondamentale
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
                     }`}>
                         Outil d'analyse fondamentale pour investisseurs à long terme. Visualisez la valeur intrinsèque, les bénéfices, revenus, dividendes et ratios de valorisation.
                     </p>
-                    <p className={`text-xs mt-2 transition-colors duration-300 ${
+                    <p className={`text-xs mt-2 transition-colors duration-300 flex items-center gap-1 ${
                         isDarkMode ? 'text-orange-300' : 'text-orange-600'
                     }`}>
-                        💡 <a 
+                        <Icon name="light-bulb" className="w-4 h-4" /> <a 
                             href="https://fastgraphs.com/blog/if-you-are-a-long-term-investor-you-need-to-watch-this-introducing-fast-graphs/" 
                             target="_blank" 
                             rel="noopener noreferrer"
@@ -1019,7 +1019,7 @@ const InvestingCalendarTab = () => {
                         >
                             <div className="text-center p-6">
                                 <div className={`text-4xl mb-4 ${isDarkMode ? 'text-orange-400' : 'text-orange-500'}`}>
-                                    🔒
+                                    <Icon name="lock" className="w-12 h-12 mx-auto" />
                                 </div>
                                 <p className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                     Authentification requise
@@ -1054,25 +1054,25 @@ const InvestingCalendarTab = () => {
                                 href="https://www.fastgraphs.com/secure/fg.php?ticker=AAPL"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`px-6 py-3 rounded-lg font-semibold text-sm md:text-base transition-all duration-300 ${
+                                className={`px-6 py-3 rounded-lg font-semibold text-sm md:text-base transition-all duration-300 flex items-center gap-2 ${
                                     isDarkMode
                                         ? 'bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-500/20'
                                         : 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30'
                                 } focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50`}
                             >
-                                📈 Ouvrir FastGraphs (AAPL)
+                                <Icon name="trending-up" className="w-5 h-5" /> Ouvrir FastGraphs (AAPL)
                             </a>
                             <a
                                 href="https://www.fastgraphs.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`px-6 py-3 rounded-lg font-semibold text-sm md:text-base transition-all duration-300 border-2 ${
+                                className={`px-6 py-3 rounded-lg font-semibold text-sm md:text-base transition-all duration-300 border-2 flex items-center gap-2 ${
                                     isDarkMode
                                         ? 'bg-transparent border-orange-500 hover:bg-orange-500/20 text-orange-400'
                                         : 'bg-transparent border-orange-500 hover:bg-orange-500/10 text-orange-600'
                                 } focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50`}
                             >
-                                🌐 Visiter FastGraphs.com
+                                <Icon name="globe" className="w-5 h-5" /> Visiter FastGraphs.com
                             </a>
                         </div>
                     </div>
@@ -1111,10 +1111,10 @@ const InvestingCalendarTab = () => {
                 }`}>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-0 mb-3 md:mb-4">
                         <div className="flex-1">
-                            <h2 className={`text-lg md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                            <h2 className={`text-lg md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                                 isDarkMode ? 'text-red-400' : 'text-red-600'
                             }`}>
-                                📊 Analyse Complète - {timelineSymbol.split(':')[1] || timelineSymbol}
+                                <Icon name="stats-report" className="w-8 h-8" /> Analyse Complète - {timelineSymbol.split(':')[1] || timelineSymbol}
                             </h2>
                             <p className={`text-xs md:text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1158,21 +1158,21 @@ const InvestingCalendarTab = () => {
                                 }`}>
                                     {(() => {
                                         const symbols = [
-                                            { symbol: 'FOREXCOM:SPXUSD', name: 'SPY - S&P 500', category: '📈 Indices' },
-                                            { symbol: 'FOREXCOM:NSXUSD', name: 'QQQ - Nasdaq 100', category: '📈 Indices' },
-                                            { symbol: 'FOREXCOM:DJI', name: 'DJI - Dow Jones', category: '📈 Indices' },
-                                            { symbol: 'NASDAQ:AAPL', name: 'AAPL - Apple', category: '🍎 Tech' },
-                                            { symbol: 'NASDAQ:MSFT', name: 'MSFT - Microsoft', category: '🍎 Tech' },
-                                            { symbol: 'NASDAQ:GOOGL', name: 'GOOGL - Google', category: '🍎 Tech' },
-                                            { symbol: 'NASDAQ:AMZN', name: 'AMZN - Amazon', category: '🍎 Tech' },
-                                            { symbol: 'NASDAQ:NVDA', name: 'NVDA - NVIDIA', category: '🍎 Tech' },
-                                            { symbol: 'NASDAQ:TSLA', name: 'TSLA - Tesla', category: '🍎 Tech' },
-                                            { symbol: 'NASDAQ:META', name: 'META - Meta', category: '🍎 Tech' },
-                                            { symbol: 'BITSTAMP:BTCUSD', name: 'BTC - Bitcoin', category: '₿ Crypto' },
-                                            { symbol: 'BITSTAMP:ETHUSD', name: 'ETH - Ethereum', category: '₿ Crypto' },
-                                            { symbol: 'NYSE:JPM', name: 'JPM - JPMorgan', category: '🏦 Finance' },
-                                            { symbol: 'NYSE:BAC', name: 'BAC - Bank of America', category: '🏦 Finance' },
-                                            { symbol: 'NYSE:GS', name: 'GS - Goldman Sachs', category: '🏦 Finance' }
+                                            { symbol: 'FOREXCOM:SPXUSD', name: 'SPY - S&P 500', category: 'Indices' },
+                                            { symbol: 'FOREXCOM:NSXUSD', name: 'QQQ - Nasdaq 100', category: 'Indices' },
+                                            { symbol: 'FOREXCOM:DJI', name: 'DJI - Dow Jones', category: 'Indices' },
+                                            { symbol: 'NASDAQ:AAPL', name: 'AAPL - Apple', category: 'Tech' },
+                                            { symbol: 'NASDAQ:MSFT', name: 'MSFT - Microsoft', category: 'Tech' },
+                                            { symbol: 'NASDAQ:GOOGL', name: 'GOOGL - Google', category: 'Tech' },
+                                            { symbol: 'NASDAQ:AMZN', name: 'AMZN - Amazon', category: 'Tech' },
+                                            { symbol: 'NASDAQ:NVDA', name: 'NVDA - NVIDIA', category: 'Tech' },
+                                            { symbol: 'NASDAQ:TSLA', name: 'TSLA - Tesla', category: 'Tech' },
+                                            { symbol: 'NASDAQ:META', name: 'META - Meta', category: 'Tech' },
+                                            { symbol: 'BITSTAMP:BTCUSD', name: 'BTC - Bitcoin', category: 'Crypto' },
+                                            { symbol: 'BITSTAMP:ETHUSD', name: 'ETH - Ethereum', category: 'Crypto' },
+                                            { symbol: 'NYSE:JPM', name: 'JPM - JPMorgan', category: 'Finance' },
+                                            { symbol: 'NYSE:BAC', name: 'BAC - Bank of America', category: 'Finance' },
+                                            { symbol: 'NYSE:GS', name: 'GS - Goldman Sachs', category: 'Finance' }
                                         ];
 
                                         const filtered = symbols.filter(s =>
@@ -1241,10 +1241,10 @@ const InvestingCalendarTab = () => {
                         <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                             isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                         }`}>
-                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
+                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 flex items-center gap-2 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                📊 Symbol Info
+                                <Icon name="stats-report" className="w-4 h-4" /> Symbol Info
                             </h3>
                             <div className="h-[300px] md:h-[380px]">
                                 <div className="tradingview-widget-container h-full" ref={tradingViewSymbolInfoRef}></div>
@@ -1255,10 +1255,10 @@ const InvestingCalendarTab = () => {
                         <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                             isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                         }`}>
-                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
+                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 flex items-center gap-2 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                📊 {timelineSymbol.split(':')[1]} - Graphique Avancé
+                                <Icon name="stats-report" className="w-4 h-4" /> {timelineSymbol.split(':')[1]} - Graphique Avancé
                             </h3>
                             <p className={`text-xs mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1274,10 +1274,10 @@ const InvestingCalendarTab = () => {
                         <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                         }`}>
-                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
+                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 flex items-center gap-2 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                🏢 Profil de l'Entreprise
+                                <Icon name="building" className="w-4 h-4" /> Profil de l'Entreprise
                             </h3>
                             <div className="h-[300px] md:h-[400px]">
                                 <div className="tradingview-widget-container h-full" ref={tradingViewSymbolProfileRef}></div>
@@ -1288,10 +1288,10 @@ const InvestingCalendarTab = () => {
                         <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                         }`}>
-                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
+                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 flex items-center gap-2 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                📰 Timeline - Fil d'Actualité
+                                <Icon name="newspaper" className="w-4 h-4" /> Timeline - Fil d'Actualité
                             </h3>
                             <div className="h-[300px] md:h-[400px]">
                                 <div className="tradingview-widget-container h-full" ref={tradingViewTimelineRef}></div>
@@ -1302,10 +1302,10 @@ const InvestingCalendarTab = () => {
                         <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                             isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                         }`}>
-                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
+                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 flex items-center gap-2 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                💰 États Financiers
+                                <Icon name="circle-dollar" className="w-4 h-4" /> États Financiers
                             </h3>
                             <div className="h-[350px] md:h-[450px]">
                                 <div className="tradingview-widget-container h-full" ref={tradingViewFinancialsRef}></div>
@@ -1316,10 +1316,10 @@ const InvestingCalendarTab = () => {
                         <div className={`rounded-lg p-2 md:p-3 transition-colors duration-300 lg:col-span-2 ${
                             isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50'
                         }`}>
-                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 ${
+                            <h3 className={`text-sm md:text-base font-bold mb-1 transition-colors duration-300 flex items-center gap-2 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                📈 Analyse Technique
+                                <Icon name="trending-up" className="w-4 h-4" /> Analyse Technique
                             </h3>
                             <div className="h-[300px] md:h-[400px]">
                                 <div className="tradingview-widget-container h-full" ref={tradingViewTechnicalAnalysisRef}></div>
@@ -1335,10 +1335,10 @@ const InvestingCalendarTab = () => {
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-3 md:mb-6">
-                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 ${
+                    <h2 className={`text-lg md:text-xl lg:text-2xl font-bold mb-1 md:mb-2 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        🔍 Screener de Titres
+                        <Icon name="search" className="w-6 h-6" /> Screener de Titres
                     </h2>
                     <p className={`text-xs md:text-sm transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'

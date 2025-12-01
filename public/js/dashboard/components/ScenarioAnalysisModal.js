@@ -133,7 +133,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                     <div>
                         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                             <span className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                                <i className="iconoir-graph-up text-purple-400 text-xl"></i>
+                                <Icon name="graph-up" className="w-5 h-5 text-purple-400" />
                             </span>
                             Analyse de Scénarios - {symbol}
                         </h2>
@@ -145,7 +145,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                         onClick={onClose}
                         className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors"
                     >
-                        <i className="iconoir-xmark text-gray-400 text-xl"></i>
+                        <Icon name="xmark" className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
 

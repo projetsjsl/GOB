@@ -233,7 +233,7 @@ const YieldCurveTab = () => {
                         <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            📈 Courbe des Taux (Yield Curve)
+                            <Icon name="trending-up" className="w-6 h-6 inline mr-2" /> Courbe des Taux (Yield Curve)
                         </h2>
                         <p className={`text-sm transition-colors duration-300 ${
                             darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -260,7 +260,7 @@ const YieldCurveTab = () => {
                             disabled={loading}
                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
                         >
-                            {loading ? '🔄 Chargement...' : '🔄 Actualiser'}
+                            {loading ? <><Icon name="refresh" className="w-4 h-4 inline mr-2 animate-spin" /> Chargement...</> : <><Icon name="refresh" className="w-4 h-4 inline mr-2" /> Actualiser</>}
                         </button>
                     </div>
                 </div>
@@ -279,7 +279,7 @@ const YieldCurveTab = () => {
                                         ? 'text-red-800 dark:text-red-300'
                                         : 'text-green-800 dark:text-green-300'
                                 }`}>
-                                    {yieldData.data.us.inverted ? '⚠️ Courbe Inversée' : '✅ Courbe Normale'}
+                                    {yieldData.data.us.inverted ? <><Icon name="warning-triangle" className="w-5 h-5 inline mr-2" /> Courbe Inversée</> : <><Icon name="check-circle" className="w-5 h-5 inline mr-2" /> Courbe Normale</>}
                                 </h3>
                                 <p className={`text-sm ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -318,7 +318,7 @@ const YieldCurveTab = () => {
                     <h3 className={`font-bold mb-2 ${
                         darkMode ? 'text-red-300' : 'text-red-800'
                     }`}>
-                        ❌ Erreur
+                        <Icon name="xmark" className="w-5 h-5 inline mr-2" /> Erreur
                     </h3>
                     <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
                         {error}
@@ -344,7 +344,7 @@ const YieldCurveTab = () => {
                             <h3 className={`font-bold mb-2 ${
                                 darkMode ? 'text-yellow-300' : 'text-yellow-800'
                             }`}>
-                                ⚠️ Aucune donnée disponible
+                                <Icon name="warning-triangle" className="w-5 h-5 inline mr-2" /> Aucune donnée disponible
                             </h3>
                             <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
                                 Les données de yield curve ne sont pas disponibles. Vérifiez que la clé API FRED_API_KEY est configurée dans les variables d'environnement Vercel.
@@ -353,8 +353,8 @@ const YieldCurveTab = () => {
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                        {yieldData.data.us && renderRateTable('US Treasury', yieldData.data.us, '🇺🇸')}
-                        {yieldData.data.canada && renderRateTable('Obligations Canada', yieldData.data.canada, '🇨🇦')}
+                        {yieldData.data.us && renderRateTable('US Treasury', yieldData.data.us, <Icon name="globe" className="w-5 h-5 inline mr-2" />)}
+                        {yieldData.data.canada && renderRateTable('Obligations Canada', yieldData.data.canada, <Icon name="globe" className="w-5 h-5 inline mr-2" />)}
                     </div>
 
                     {/* Tableau des maturités */}
@@ -364,7 +364,7 @@ const YieldCurveTab = () => {
                         <h3 className={`text-xl font-bold mb-4 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            📊 Tableau des Maturités
+                            <Icon name="table" className="w-5 h-5 inline mr-2" /> Tableau des Maturités
                         </h3>
 
                         <div className="overflow-x-auto">
@@ -382,14 +382,14 @@ const YieldCurveTab = () => {
                                             <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                 darkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>
-                                                🇺🇸 US Treasury (%)
+                                                <Icon name="globe" className="w-4 h-4 inline mr-1" /> US Treasury (%)
                                             </th>
                                         )}
                                         {yieldData.data.canada && (
                                             <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                 darkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>
-                                                🇨🇦 Canada Bonds (%)
+                                                <Icon name="globe" className="w-4 h-4 inline mr-1" /> Canada Bonds (%)
                                             </th>
                                         )}
                                         {yieldData.data.us && yieldData.data.canada && (
@@ -517,7 +517,7 @@ const YieldCurveTab = () => {
                         <h4 className={`font-bold mb-2 ${
                             darkMode ? 'text-blue-300' : 'text-blue-800'
                         }`}>
-                            💡 À propos de la courbe des taux
+                            <Icon name="light-bulb" className="w-4 h-4 inline mr-2" /> À propos de la courbe des taux
                         </h4>
                         <ul className={`text-sm space-y-1 ${
                             darkMode ? 'text-gray-300' : 'text-gray-700'

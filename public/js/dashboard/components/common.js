@@ -8,23 +8,30 @@
 // and attached to window object. They should remain there for now due to dependencies.
 
 /**
- * Icon Component - Wrapper for Iconoir icons
- * This is a placeholder - the actual implementation is in window.IconoirIcon
+ * Icon Component - Professional icon system with IconSystem prioritized
  * @param {string} name - Icon name
  * @param {string} className - CSS classes
  * @param {number} size - Icon size
- * @param {string} emoji - Emoji fallback
+ * @param {string} emoji - Emoji fallback (deprecated - use IconSystem)
  */
-const Icon = ({ name, className = "w-4 h-4", size, emoji }) => {
+const Icon = ({ name, className = "w-4 h-4", size, emoji, color, direction }) => {
+    // Priority 1: Use professional IconSystem if available
+    if (window.IconSystem && window.IconSystem[name]) {
+        return window.IconSystem[name]({ className, color, direction });
+    }
+
+    // Priority 2: Use Iconoir icons
     if (window.IconoirIcon) {
         return window.IconoirIcon({ name, className });
     }
 
-    // Fallback to emoji if Icon system not available
+    // Priority 3 (deprecated): Fallback to emoji only if no other option
     if (emoji) {
+        console.warn(`⚠️ Emoji fallback used for "${name}". Consider using IconSystem instead.`);
         return <span className="inline-block">{emoji}</span>;
     }
 
+    // Priority 4: Default Iconoir class
     return <i className={`iconoir-${name} ${className}`}></i>;
 };
 

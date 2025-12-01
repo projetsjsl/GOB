@@ -144,7 +144,7 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                     <div>
                         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                             <span className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                                <i className="iconoir-stats-report text-blue-400 text-xl"></i>
+                                <Icon name="stats-report" className="w-5 h-5 text-blue-400" />
                             </span>
                             Comparaison Multi-Titres
                         </h2>
@@ -156,7 +156,7 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                         onClick={onClose}
                         className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors"
                     >
-                        <i className="iconoir-xmark text-gray-400 text-xl"></i>
+                        <Icon name="xmark" className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
 

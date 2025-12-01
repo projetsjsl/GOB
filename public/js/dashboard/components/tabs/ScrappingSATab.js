@@ -8,7 +8,7 @@ const ScrappingSATab = () => (
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Scrapping SA</h2>
+                        }`}><Icon name="tools" className="w-6 h-6 inline mr-2" /> Scrapping SA</h2>
                         <div className="flex gap-2">
                             <span className={`text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -164,7 +164,7 @@ const ScrappingSATab = () => (
                                                 {claudeData?.strengths && (
                                                     <div className="bg-green-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-green-800 mb-4 flex items-center">
-                                                            <span className="mr-2">✅</span>
+                                                            <Icon name="check-circle" className="w-4 h-4 inline mr-2" />
                                                             Points Positifs
                                                         </h4>
                                                         <div className="space-y-3">
@@ -181,13 +181,13 @@ const ScrappingSATab = () => (
                                                 {claudeData?.concerns && (
                                                     <div className="bg-red-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-red-800 mb-4 flex items-center">
-                                                            <span className="mr-2">⚠️</span>
+                                                            <Icon name="warning-triangle" className="w-4 h-4 inline mr-2" />
                                                             Préoccupations
                                                         </h4>
                                                         <div className="space-y-3">
                                                             {claudeData.concerns.map((concern, index) => (
                                                                 <div key={index} className="text-red-700 flex items-start">
-                                                                    <span className="mr-2">⚠️</span>
+                                                                    <Icon name="warning-triangle" className="w-4 h-4 inline mr-2" />
                                                                     <span>{cleanText(concern)}</span>
                                                                 </div>
                                                             ))}
@@ -242,7 +242,7 @@ const ScrappingSATab = () => (
                                     return (
                                         <div className="mb-4">
                                             <h4 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                                                <Icon emoji="📈" size={20} />
+                                                <Icon name="trending-up" className="w-5 h-5" />
                                                 Analyse Seeking Alpha
                                             </h4>
                                             <div className="text-gray-200 text-sm leading-relaxed">
@@ -266,7 +266,7 @@ const ScrappingSATab = () => (
                             {stockData[selectedStock] && (
                                 <div className="mb-4">
                                     <h4 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                                        <Icon emoji="📊" size={20} />
+                                        <Icon name="stats-report" className="w-5 h-5" />
                                         Données Temps Réel
                                     </h4>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
@@ -294,7 +294,7 @@ const ScrappingSATab = () => (
                             isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                📊 Tickers disponibles ({tickers.length})
+                                <Icon name="stats-report" className="w-5 h-5 inline mr-2" /> Tickers disponibles ({tickers.length})
                             </h3>
                             <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 Cliquez sur un ticker pour voir ses détails ou lancez le scraper pour collecter les données Seeking Alpha.
@@ -330,7 +330,7 @@ const ScrappingSATab = () => (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
                             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                                <Icon emoji="📈" size={20} />
+                                <Icon name="trending-up" className="w-5 h-5" />
                                 Analyses Complètes
                             </h3>
                                 <div className="flex bg-gray-700 rounded-lg p-1">
@@ -342,7 +342,7 @@ const ScrappingSATab = () => (
                                                 : 'text-gray-300 hover:text-white'
                                         }`}
                                     >
-                                        📋 Liste
+                                        <Icon name="list" className="w-4 h-4 inline mr-1" /> Liste
                                     </button>
                                     <button
                                         onClick={() => setSeekingAlphaViewMode('cards')}
@@ -352,7 +352,7 @@ const ScrappingSATab = () => (
                                                 : 'text-gray-300 hover:text-white'
                                         }`}
                                     >
-                                        🎴 Cartes
+                                        <Icon name="view-grid" className="w-4 h-4 inline mr-1" /> Cartes
                                     </button>
                                 </div>
                             </div>
@@ -361,7 +361,7 @@ const ScrappingSATab = () => (
                             {seekingAlphaViewMode === 'list' && (
                                 <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
                                     <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                        <Icon emoji="📋" size={20} />
+                                        <Icon name="list" className="w-5 h-5" />
                                         Vue Liste - Analyses
                                     </h4>
                                     <div className="overflow-x-auto">
@@ -585,7 +585,7 @@ const ScrappingSATab = () => (
                                                     onClick={(e) => e.stopPropagation()}
                                                     className="block w-full px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors text-center"
                                                 >
-                                                    📰 Lire sur Seeking Alpha →
+                                                    <Icon name="newspaper" className="w-4 h-4 inline mr-1" /> Lire sur Seeking Alpha →
                                                 </a>
                                             </div>
                                         )}
@@ -593,7 +593,7 @@ const ScrappingSATab = () => (
                                         {/* Call to action */}
                                         <div className="text-center">
                                             <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
-                                                <span>👆</span>
+                                                <Icon name="hand-card" className="w-4 h-4 inline mr-1" />
                                                 <span>Cliquez pour le rapport détaillé</span>
                                             </div>
                                         </div>
@@ -613,7 +613,7 @@ const ScrappingSATab = () => (
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Outils de Scraping</h3>
+                        }`}><Icon name="tools" className="w-5 h-5 inline mr-2" /> Outils de Scraping</h3>
                         
                         {/* Statut du scraping */}
                         <div className="mb-4">
@@ -627,10 +627,10 @@ const ScrappingSATab = () => (
                                     scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
                                     'bg-red-500 text-white'
                                 }`}>
-                                    {scrapingStatus === 'idle' ? '⏸️ En attente' :
-                                     scrapingStatus === 'running' ? '🔄 En cours' :
-                                     scrapingStatus === 'completed' ? '✅ Terminé' :
-                                     '❌ Erreur'}
+                                    {scrapingStatus === 'idle' ? <><Icon name="pause" className="w-4 h-4 inline mr-1" /> En attente</> :
+                                     scrapingStatus === 'running' ? <><Icon name="refresh" className="w-4 h-4 inline mr-1 animate-spin" /> En cours</> :
+                                     scrapingStatus === 'completed' ? <><Icon name="check" className="w-4 h-4 inline mr-1" /> Terminé</> :
+                                     <><Icon name="xmark" className="w-4 h-4 inline mr-1" /> Erreur</>}
                                 </span>
                         </div>
 
@@ -659,7 +659,7 @@ const ScrappingSATab = () => (
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📖 Instructions de Scraping</h4>
+                            }`}><Icon name="book" className="w-4 h-4 inline mr-2" /> Instructions de Scraping</h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-blue-200' : 'text-blue-800'
                             }`}>
@@ -678,7 +678,7 @@ const ScrappingSATab = () => (
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🔧 Résolution des Popups Bloqués</h4>
+                            }`}><Icon name="tools" className="w-4 h-4 inline mr-2" /> Résolution des Popups Bloqués</h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-yellow-200' : 'text-yellow-800'
                             }`}>
@@ -698,7 +698,7 @@ const ScrappingSATab = () => (
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="🤖" size={18} className="mr-2 inline-block" />
+                            <Icon name="bot" className="w-4 h-4 inline mr-2" />
                             Configuration des API
                         </h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
@@ -719,7 +719,7 @@ const ScrappingSATab = () => (
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📋 Logs de Scraping</h4>
+                            }`}><Icon name="list" className="w-4 h-4 inline mr-2" /> Logs de Scraping</h4>
                             {scrapingLogs.length === 0 ? (
                                 <div className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-500'

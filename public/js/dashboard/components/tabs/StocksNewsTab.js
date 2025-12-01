@@ -51,7 +51,7 @@ const StocksNewsTab = () => {
                                     : 'bg-rose-100 border-rose-300 text-rose-700'
                         }`}
                     >
-                        {isBull ? '🐂' : '🐻'}
+                        {isBull ? <Icon name="bull" className="w-5 h-5" /> : <Icon name="bear" className="w-5 h-5" />}
                     </span>
                 );
             };
@@ -107,7 +107,7 @@ const StocksNewsTab = () => {
                         : 'bg-yellow-50 border-yellow-200'
                 }`}>
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl">⏳</span>
+                        <Icon name="hourglass" className="w-8 h-8" />
                         <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                             Chargement des données...
                         </h3>
@@ -120,21 +120,21 @@ const StocksNewsTab = () => {
                             await safeLoadTickers();
                             await safeFetchNews();
                         }}
-                        className={`mt-4 px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                        className={`mt-4 px-4 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2 ${
                             isDarkMode
                                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                 : 'bg-blue-500 hover:bg-blue-600 text-white'
                         }`}
                     >
-                        🔄 Forcer le chargement
+                        <Icon name="refresh" className="w-4 h-4" /> Forcer le chargement
                     </button>
                 </div>
             )}
 
             <div className="flex justify-between items-center">
-                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                <h2 className={`text-2xl font-bold transition-colors duration-300 flex items-center gap-2 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>📊 Titres & nouvelles</h2>
+                }`}><Icon name="stats-report" className="w-6 h-6" /> Titres & nouvelles</h2>
                 <div className="flex gap-2">
                     {/* Toggle Vue */}
                     <div className={`flex gap-1 p-1 rounded-lg transition-colors duration-300 ${
@@ -148,7 +148,7 @@ const StocksNewsTab = () => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            📋 Liste
+                            <Icon name="list" className="w-4 h-4 mr-1 inline" /> Liste
                         </button>
                         <button
                             onClick={() => setStocksViewMode('cards')}
@@ -158,7 +158,7 @@ const StocksNewsTab = () => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            🎴 Cartes
+                            <Icon name="view-grid" className="w-4 h-4 mr-1 inline" /> Cartes
                         </button>
                         <button
                             onClick={() => setStocksViewMode('table')}
@@ -168,7 +168,7 @@ const StocksNewsTab = () => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            📊 Tableau
+                            <Icon name="table" className="w-4 h-4 mr-1 inline" /> Tableau
                         </button>
                     </div>
                     <button
@@ -184,7 +184,7 @@ const StocksNewsTab = () => {
                                 : 'bg-gray-700 hover:bg-gray-600 text-white'
                         }`}
                     >
-                        {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                        {loading ? <><Icon name="hourglass" className="w-4 h-4 mr-1 inline" /> Actualisation...</> : <><Icon name="refresh" className="w-4 h-4 mr-1 inline" /> Actualiser</>}
                     </button>
                 </div>
             </div>
@@ -560,9 +560,9 @@ const StocksNewsTab = () => {
                             ? 'bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-blue-500/30 shadow-blue-500/10'
                             : 'bg-gradient-to-br from-white/95 to-gray-50/95 border-blue-400/40 shadow-blue-400/10'
                     }`}>
-                        <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
+                        <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 flex items-center gap-2 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📊 Titres - Vue Liste</h2>
+                        }`}><Icon name="list" className="w-6 h-6" /> Titres - Vue Liste</h2>
 
                         {tickers.length === 0 ? (
                             <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -626,14 +626,14 @@ const StocksNewsTab = () => {
                                                                 </span>
                                                             ) : (
                                                                 <span className="inline-flex items-start gap-1.5">
-                                                                    <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                    <Icon name="newspaper" className="w-4 h-4 text-blue-400 flex-shrink-0" />
                                                                     <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
                                                                 </span>
                                                             )}
                                                         </div>
                                                     ) : tickerLatestNews[ticker] ? (
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                            📰 <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
+                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} flex items-center gap-1`}>
+                                                            <Icon name="newspaper" className="w-3 h-3" /> <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
                                                         </div>
                                                     ) : (
                                                         <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
@@ -669,9 +669,9 @@ const StocksNewsTab = () => {
                             ? 'bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-blue-500/30 shadow-blue-500/10'
                             : 'bg-gradient-to-br from-white/95 to-gray-50/95 border-blue-400/40 shadow-blue-400/10'
                     }`}>
-                        <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
+                        <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 flex items-center gap-2 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🎴 Titres - Vue Cartes</h2>
+                        }`}><Icon name="view-grid" className="w-6 h-6" /> Titres - Vue Cartes</h2>
 
                         {tickers.length === 0 ? (
                             <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -739,14 +739,14 @@ const StocksNewsTab = () => {
                                                                     </span>
                                                                 ) : (
                                                                     <span className="inline-flex items-start gap-1.5">
-                                                                        <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                        <Icon name="newspaper" className="w-4 h-4 text-blue-400 flex-shrink-0" />
                                                                         <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
                                                                     </span>
                                                                 )}
                                                             </div>
                                                         ) : tickerLatestNews[ticker] ? (
-                                                            <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                                📰 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
+                                                            <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'} flex items-center gap-1`}>
+                                                                <Icon name="newspaper" className="w-3 h-3" /> <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
                                                             </div>
                                                         ) : (
                                                             <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
@@ -762,7 +762,7 @@ const StocksNewsTab = () => {
                                                     ? 'bg-green-500/20 text-green-500 border border-green-500/30'
                                                     : 'bg-red-500/20 text-red-500 border border-red-500/30'
                                             }`}>
-                                                {isPositive ? '▲' : '▼'}
+                                            {isPositive ? <Icon name="arrow-up" className="w-3 h-3" /> : <Icon name="arrow-down" className="w-3 h-3" />}
                                             </div>
                                         </div>
 
@@ -810,14 +810,14 @@ const StocksNewsTab = () => {
                         <h2 className={`text-2xl font-bold mb-3 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            📊 Données Financières & Actualités
+                            <Icon name="stats-report" className="w-6 h-6 mr-2 inline" /> Données Financières & Actualités
                         </h2>
                         <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${
                             isDarkMode 
                                 ? 'bg-gray-600/20 text-gray-300 border border-gray-500/30' 
                                 : 'bg-gray-700/80 text-gray-200 border border-gray-600/50'
                         }`}>
-                            <span className="mr-2">🔗</span>
+                            <span className="mr-2"><Icon name="link" className="w-4 h-4 inline" /></span>
                             Source: Finnhub API
                         </div>
                         <p className={`text-sm mt-3 transition-colors duration-300 ${
@@ -834,31 +834,31 @@ const StocksNewsTab = () => {
                                 }`}>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📈 Ticker</th>
+                                    }`}><Icon name="trending-up" className="w-4 h-4 inline mr-1" /> Ticker</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>💰 Prix</th>
+                                    }`}><Icon name="circle-dollar" className="w-4 h-4 inline mr-1" /> Prix</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📊 Change</th>
+                                    }`}><Icon name="stats-report" className="w-4 h-4 inline mr-1" /> Change</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📈 P/E</th>
+                                    }`}><Icon name="trending-up" className="w-4 h-4 inline mr-1" /> P/E</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>💎 Dividende</th>
+                                    }`}><Icon name="diamond" className="w-4 h-4 inline mr-1" /> Dividende</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>🏢 Secteur</th>
+                                    }`}><Icon name="building" className="w-4 h-4 inline mr-1" /> Secteur</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>⭐ Rating</th>
+                                    }`}><Icon name="star" className="w-4 h-4 inline mr-1" /> Rating</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>😊 Sentiment</th>
+                                    }`}><Icon name="emoji-smile" className="w-4 h-4 inline mr-1" /> Sentiment</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>⚡ Actions</th>
+                                    }`}><Icon name="flash" className="w-4 h-4 inline mr-1" /> Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -965,8 +965,8 @@ const StocksNewsTab = () => {
                                                         'bg-gray-100 text-gray-800'
                                                     }`}>
                                                         <span className="text-lg">
-                                                            {sentiment.sentiment === 'Positif' ? '😊' : 
-                                                             sentiment.sentiment === 'Négatif' ? '😟' : '😐'}
+                                                            {sentiment.sentiment === 'Positif' ? <Icon name="emoji-smile" className="w-5 h-5" /> : 
+                                                             sentiment.sentiment === 'Négatif' ? <Icon name="emoji-sad" className="w-5 h-5" /> : <Icon name="emoji-neutral" className="w-5 h-5" />}
                                                         </span>
                                                         <span className="font-semibold">{sentiment.sentiment}</span>
                                                     </div>
@@ -983,7 +983,7 @@ const StocksNewsTab = () => {
                                                                 : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white shadow-blue-400/25'
                                                         }`}
                                                     >
-                                                        📊 Voir dans JLab
+                                                        <Icon name="stats-report" className="w-3 h-3 inline mr-1" /> Voir dans JLab
                                                     </button>
                                                 </td>
                                             </tr>
@@ -1100,7 +1100,7 @@ const StocksNewsTab = () => {
                                                                         <div className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors duration-300 ${
                                                                             isDarkMode ? 'bg-gray-800' : 'bg-gray-200'
                                                                         }`}>
-                                                                            <span>🕒</span>
+                                                                            <Icon name="clock" className="w-4 h-4" />
                                                                             <span>
                                                                                 {news.publishedAt ? 
                                                                                     new Date(news.publishedAt).toLocaleString('fr-FR') : 
@@ -1119,7 +1119,7 @@ const StocksNewsTab = () => {
                                                                                         : 'bg-gray-700 hover:bg-gray-600 text-white shadow-lg shadow-gray-400/25'
                                                                                 }`}
                                                                             >
-                                                                                📖 Lire l'article
+                                                                                <Icon name="book" className="w-4 h-4 inline mr-1" /> Lire l'article
                                                                             </a>
                                                                         )}
                                                                     </div>
@@ -1143,7 +1143,7 @@ const StocksNewsTab = () => {
                         <div className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
                             isDarkMode ? 'text-blue-300' : 'text-blue-700'
                         }`}>
-                            📜 Section Principale - Données Financières
+                            <Icon name="page" className="w-5 h-5 inline mr-2" /> Section Principale - Données Financières
                         </div>
                         <div className={`text-sm transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
@@ -1164,7 +1164,7 @@ const StocksNewsTab = () => {
             {tickers.length === 0 && (
                 <div className="bg-yellow-900/20 backdrop-blur-sm rounded-lg p-6 border border-yellow-300/20">
                     <div className="flex items-center gap-3">
-                        <span className="text-yellow-400 text-2xl">⚠️</span>
+                        <Icon name="warning-triangle" className="w-6 h-6 text-yellow-400" />
                         <div>
                             <h3 className="text-yellow-200 font-semibold">Aucun ticker configuré</h3>
                             <p className="text-yellow-300/80 text-sm mt-1">
@@ -1187,7 +1187,7 @@ const StocksNewsTab = () => {
                             <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                📰 Actualités du Marché
+                                <Icon name="newspaper" className="w-6 h-6 mr-2 inline" /> Actualités du Marché
                             </h2>
                             <div className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${
                                 isDarkMode

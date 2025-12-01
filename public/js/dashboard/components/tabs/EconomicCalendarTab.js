@@ -247,7 +247,7 @@ const EconomicCalendarTab = () => {
             'CNY': '🇨🇳',
             'NZD': '🇳🇿'
         };
-        return flags[currency] || '🌍';
+        return flags[currency] || <Icon name="globe" className="w-4 h-4 inline" />;
     };
 
     // Helper: Extract ticker symbol from event name (for earnings/dividends)
@@ -383,7 +383,7 @@ const EconomicCalendarTab = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className="text-2xl">📅</div>
+                        <div className="text-2xl"><Icon name="calendar" className="w-8 h-8" /></div>
                         <h2 className="text-2xl font-bold">Calendrier financier</h2>
                     </div>
                     <button
@@ -396,7 +396,7 @@ const EconomicCalendarTab = () => {
                         }`}
                     >
                         <div className={`w-4 h-4 ${loading || isRefreshing ? 'animate-spin' : ''}`}>
-                            🔄
+                            <Icon name="refresh" className="w-4 h-4" />
                         </div>
                         Actualiser
                     </button>
@@ -411,17 +411,20 @@ const EconomicCalendarTab = () => {
                     }`}>
                         {/* Search Box */}
                         <div className="col-span-1 md:col-span-2">
-                            <input
-                                type="text"
-                                placeholder="🔍 Rechercher un événement..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className={`w-full px-3 py-2 rounded-md text-sm ${
+                            <div className="relative">
+                                <Icon name="search" className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Rechercher un événement..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className={`w-full pl-9 pr-3 py-2 rounded-md text-sm ${
                                     isDarkMode
                                         ? 'bg-gray-700 text-white border-gray-600'
                                         : 'bg-white text-gray-900 border-gray-300'
                                 } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
                             />
+                            </div>
                         </div>
 
                         {/* Ticker Group Filter - Only for Earnings/Dividends */}
@@ -538,8 +541,8 @@ const EconomicCalendarTab = () => {
                         <div className="flex flex-wrap gap-2 mt-3">
                             <span className="text-xs text-gray-400">Filtres actifs :</span>
                             {activeSubTab === 'earnings' && filterLargeCapOnly && (
-                                <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
-                                    📊 Grandes capitalisations
+                                <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
+                                    <Icon name="stats-report" className="w-3 h-3" /> Grandes capitalisations
                                 </span>
                             )}
                             {searchQuery && (
@@ -549,9 +552,9 @@ const EconomicCalendarTab = () => {
                             )}
                             {filterTickerGroup !== 'all' && (
                                 <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-cyan-900 text-cyan-200' : 'bg-cyan-100 text-cyan-800'}`}>
-                                    {filterTickerGroup === 'team' ? '👥 Tickers équipe' :
-                                     filterTickerGroup === 'watchlist' ? '⭐ Tickers liste de suivi' :
-                                     '🎯 Équipe + Liste de suivi'}
+                                    {filterTickerGroup === 'team' ? <><Icon name="group" className="w-3 h-3 inline mr-1" /> Tickers équipe</> :
+                                     filterTickerGroup === 'watchlist' ? <><Icon name="star" className="w-3 h-3 inline mr-1" /> Tickers liste de suivi</> :
+                                     <><Icon name="target" className="w-3 h-3 inline mr-1" /> Équipe + Liste de suivi</>}
                                 </span>
                             )}
                             {filterTicker !== 'all' && (
@@ -588,8 +591,8 @@ const EconomicCalendarTab = () => {
 
                 {/* Message d'erreur */}
                 {error && (
-                    <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4 text-sm">
-                        ⚠️ {error}
+                    <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4 text-sm flex items-center gap-2">
+                        <Icon name="warning-triangle" className="w-5 h-5" /> {error}
                     </div>
                 )}
 
@@ -630,7 +633,7 @@ const EconomicCalendarTab = () => {
                 {/* Contenu */}
                 {loading ? (
                     <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-8 text-center`}>
-                        <div className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3">🔄</div>
+                        <div className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3"><Icon name="refresh" className="w-8 h-8" /></div>
                         <p className="text-gray-400 text-sm">Loading data...</p>
                     </div>
                 ) : filteredCalendarData.length === 0 ? (

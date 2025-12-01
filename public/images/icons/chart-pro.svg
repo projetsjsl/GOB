@@ -1,0 +1,32 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Professional Chart Icon -->
+  <path d="M12 52 L12 32 L18 32 L18 52 L12 52 Z" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  <path d="M24 52 L24 22 L30 22 L30 52 L24 52 Z" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  <path d="M36 52 L36 12 L42 12 L42 52 L36 52 Z" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  <path d="M48 52 L48 26 L54 26 L54 52 L48 52 Z" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  <!-- Base line -->
+  <line x1="8" y1="56" x2="58" y2="56" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round"/>
+</svg>
