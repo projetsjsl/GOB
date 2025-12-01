@@ -21,6 +21,14 @@ const AdvancedAnalysisTab = () => {
     const [showAdvancedScreener, setShowAdvancedScreener] = useState(false);
     const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
+    // New Modal States for enhanced features
+    const [showAIAnalysisModal, setShowAIAnalysisModal] = useState(false);
+    const [showNewsModal, setShowNewsModal] = useState(false);
+    const [showAnalystModal, setShowAnalystModal] = useState(false);
+    const [showEarningsModal, setShowEarningsModal] = useState(false);
+    const [showEconomicModal, setShowEconomicModal] = useState(false);
+    const [showWatchlistScreenerModal, setShowWatchlistScreenerModal] = useState(false);
+
     // Load watchlist from Supabase on mount
     useEffect(() => {
         if (watchlistLoaded) return;
@@ -244,7 +252,91 @@ const AdvancedAnalysisTab = () => {
                     </p>
                 </div>
 
-                {/* 5. Export PDF */}
+                {/* 5. AI Stock Analysis */}
+                <div
+                    onClick={() => setShowAIAnalysisModal(true)}
+                    className="bg-gradient-to-br from-violet-900/20 to-fuchsia-900/20 border border-violet-700/30 rounded-xl p-6 cursor-pointer hover:border-violet-500 transition-all hover:shadow-lg hover:shadow-violet-500/10 group"
+                >
+                    <div className="w-12 h-12 rounded-lg bg-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i className="iconoir-brain text-violet-400 text-2xl"></i>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">AI Stock Analysis</h3>
+                    <p className="text-gray-400 text-sm">
+                        Analyse pilotée par IA : thèse d'investissement, risques, valorisation et recommandation.
+                    </p>
+                </div>
+
+                {/* 6. News & Sentiment */}
+                <div
+                    onClick={() => setShowNewsModal(true)}
+                    className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 border border-amber-700/30 rounded-xl p-6 cursor-pointer hover:border-amber-500 transition-all hover:shadow-lg hover:shadow-amber-500/10 group"
+                >
+                    <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i className="iconoir-newspaper text-amber-400 text-2xl"></i>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">News & Sentiment</h3>
+                    <p className="text-gray-400 text-sm">
+                        Actualités en temps réel avec analyse de sentiment IA et impact sur le cours.
+                    </p>
+                </div>
+
+                {/* 7. Analyst Consensus */}
+                <div
+                    onClick={() => setShowAnalystModal(true)}
+                    className="bg-gradient-to-br from-lime-900/20 to-green-900/20 border border-lime-700/30 rounded-xl p-6 cursor-pointer hover:border-lime-500 transition-all hover:shadow-lg hover:shadow-lime-500/10 group"
+                >
+                    <div className="w-12 h-12 rounded-lg bg-lime-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i className="iconoir-community text-lime-400 text-2xl"></i>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">Analyst Consensus</h3>
+                    <p className="text-gray-400 text-sm">
+                        Consensus des analystes : EPS, revenus, recommandations Buy/Hold/Sell.
+                    </p>
+                </div>
+
+                {/* 8. Earnings Calendar */}
+                <div
+                    onClick={() => setShowEarningsModal(true)}
+                    className="bg-gradient-to-br from-rose-900/20 to-pink-900/20 border border-rose-700/30 rounded-xl p-6 cursor-pointer hover:border-rose-500 transition-all hover:shadow-lg hover:shadow-rose-500/10 group"
+                >
+                    <div className="w-12 h-12 rounded-lg bg-rose-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i className="iconoir-calendar text-rose-400 text-2xl"></i>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">Earnings Calendar</h3>
+                    <p className="text-gray-400 text-sm">
+                        Prochaine date d'earnings, estimations et historique des surprises.
+                    </p>
+                </div>
+
+                {/* 9. Economic Events */}
+                <div
+                    onClick={() => setShowEconomicModal(true)}
+                    className="bg-gradient-to-br from-sky-900/20 to-indigo-900/20 border border-sky-700/30 rounded-xl p-6 cursor-pointer hover:border-sky-500 transition-all hover:shadow-lg hover:shadow-sky-500/10 group"
+                >
+                    <div className="w-12 h-12 rounded-lg bg-sky-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i className="iconoir-globe text-sky-400 text-2xl"></i>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">Economic Events</h3>
+                    <p className="text-gray-400 text-sm">
+                        Calendrier économique (7j) avec analyse d'impact sur vos titres.
+                    </p>
+                </div>
+
+                {/* 10. Watchlist Screener */}
+                <div
+                    onClick={() => setShowWatchlistScreenerModal(true)}
+                    className="bg-gradient-to-br from-teal-900/20 to-cyan-900/20 border border-teal-700/30 rounded-xl p-6 cursor-pointer hover:border-teal-500 transition-all hover:shadow-lg hover:shadow-teal-500/10 group"
+                >
+                    <div className="w-12 h-12 rounded-lg bg-teal-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i className="iconoir-search text-teal-400 text-2xl"></i>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">Watchlist Screener</h3>
+                    <p className="text-gray-400 text-sm">
+                        Classement IA de votre watchlist avec scores de buy et opportunités.
+                    </p>
+                </div>
+
+                {/* 11. Export PDF */}
                 <div
                     onClick={async () => {
                         if (stockData && window.PDFExporter) {
@@ -315,6 +407,59 @@ const AdvancedAnalysisTab = () => {
                     symbol={selectedStock}
                     currentPrice={stockData?.price || 0}
                     onClose={() => setShowAnalysisModal(false)}
+                />
+            )}
+
+            {/* New Enhanced Modals */}
+            {showAIAnalysisModal && window.AIStockAnalysisModal && (
+                <window.AIStockAnalysisModal
+                    symbol={selectedStock}
+                    stockData={stockData}
+                    onClose={() => setShowAIAnalysisModal(false)}
+                />
+            )}
+
+            {showNewsModal && window.NewsAndSentimentModal && (
+                <window.NewsAndSentimentModal
+                    symbol={selectedStock}
+                    stockData={stockData}
+                    onClose={() => setShowNewsModal(false)}
+                />
+            )}
+
+            {showAnalystModal && window.AnalystConsensusModal && (
+                <window.AnalystConsensusModal
+                    symbol={selectedStock}
+                    stockData={stockData}
+                    onClose={() => setShowAnalystModal(false)}
+                />
+            )}
+
+            {showEarningsModal && window.EarningsCalendarModal && (
+                <window.EarningsCalendarModal
+                    symbol={selectedStock}
+                    stockData={stockData}
+                    onClose={() => setShowEarningsModal(false)}
+                />
+            )}
+
+            {showEconomicModal && window.EconomicEventsModal && (
+                <window.EconomicEventsModal
+                    symbol={selectedStock}
+                    stockData={stockData}
+                    watchlist={watchlistTickers}
+                    onClose={() => setShowEconomicModal(false)}
+                />
+            )}
+
+            {showWatchlistScreenerModal && window.WatchlistScreenerModal && (
+                <window.WatchlistScreenerModal
+                    watchlist={watchlistTickers}
+                    onClose={() => setShowWatchlistScreenerModal(false)}
+                    onSelectStock={(symbol) => {
+                        setSelectedStock(symbol);
+                        setShowWatchlistScreenerModal(false);
+                    }}
                 />
             )}
 
