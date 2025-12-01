@@ -29,7 +29,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     }
 
     // Version simplifiée de l'API hybride qui fonctionne sans Supabase
-    const fetchHybridData = async (symbol, dataType) => {
+    const fetchHybridData = window.fetchHybridData = async (symbol, dataType) => {
         try {
             console.log(`🔄 Récupération ${dataType} pour ${symbol}`);
 
@@ -1866,7 +1866,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         };
 
         // Fonction Emma Populate pour JLab (IntelliStocks)
-        const emmaPopulateJLab = async () => {
+        const emmaPopulateJLab = window.emmaPopulateJLab = async () => {
             console.log('🤖 Emma Populate JLab (IntelliStocks)...');
             setLoading(true);
 
