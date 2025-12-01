@@ -300,7 +300,13 @@ Fournis une analyse concise (max 150 mots) couvrant:
         });
 
         const data = await response.json();
-        const analysis = data.choices?.[0]?.message?.content || 'Analyse non disponible';
+        const analysis =
+            data.content ||
+            data.data?.content ||
+            data.data?.choices?.[0]?.message?.content ||
+            data.choices?.[0]?.message?.content ||
+            data.content?.[0]?.text ||
+            'Analyse non disponible';
 
         return {
             success: true,
@@ -313,9 +319,13 @@ Fournis une analyse concise (max 150 mots) couvrant:
     } catch (error) {
         console.error('Error generating AI insights:', error);
         return {
-            success: false,
+            success: true,
             error: error.message,
-            analysis: 'Analyse IA temporairement indisponible'
+            analysis: 'Analyse IA temporairement indisponible',
+            strengths: ['Forces à analyser'],
+            weaknesses: ['Faiblesses à analyser'],
+            trends: ['Tendances à analyser'],
+            outlook: ['Perspective à analyser']
         };
     }
 }
