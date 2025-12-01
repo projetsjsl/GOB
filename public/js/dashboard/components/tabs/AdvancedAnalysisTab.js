@@ -6,7 +6,7 @@ const { useState, useEffect } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = window.Recharts || {};
 
 const AdvancedAnalysisTab = () => {
-    // Watchlist Tickers (loaded from Supabase)
+    // Watchlist / Team tickers (loaded from Supabase)
     const [watchlistTickers, setWatchlistTickers] = useState([]);
     const [watchlistLoaded, setWatchlistLoaded] = useState(false);
 
@@ -58,11 +58,16 @@ const AdvancedAnalysisTab = () => {
                     const json = await res.json();
                     const tickers = Array.isArray(json.tickers) ? json.tickers : [];
                     console.log('✅ Watchlist loaded from Supabase:', tickers);
-                    setWatchlistTickers(tickers);
+
+                    const merged = Array.isArray(json.teamTickers) && json.teamTickers.length > 0
+                        ? Array.from(new Set([...tickers, ...json.teamTickers]))
+                        : tickers;
+
+                    setWatchlistTickers(merged);
 
                     // Set first ticker as selected if available
-                    if (tickers.length > 0 && !selectedStock) {
-                        setSelectedStock(tickers[0]);
+                    if (merged.length > 0 && !selectedStock) {
+                        setSelectedStock(merged[0]);
                     }
 
                     setWatchlistLoaded(true);
