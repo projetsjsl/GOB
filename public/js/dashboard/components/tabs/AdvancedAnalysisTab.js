@@ -29,6 +29,23 @@ const AdvancedAnalysisTab = () => {
     const [showEconomicModal, setShowEconomicModal] = useState(false);
     const [showWatchlistScreenerModal, setShowWatchlistScreenerModal] = useState(false);
 
+    // NEW: Enhanced Data States (Restoring missing state)
+    const [aiAnalysis, setAIAnalysis] = useState(null);
+    const [newsData, setNewsData] = useState([]);
+    const [earningsData, setEarningsData] = useState(null);
+    const [analystData, setAnalystData] = useState(null);
+    const [loadingAI, setLoadingAI] = useState(false);
+    const [loadingNews, setLoadingNews] = useState(false);
+
+    // Caching System
+    const cacheRef = React.useRef(new Map());
+    const CACHE_TTL = {
+        quote: 5 * 60 * 1000,
+        fundamentals: 60 * 60 * 1000,
+        news: 10 * 60 * 1000,
+        ai: 30 * 60 * 1000
+    };
+
     // Load watchlist from Supabase on mount
     useEffect(() => {
         if (watchlistLoaded) return;
@@ -72,28 +89,57 @@ const AdvancedAnalysisTab = () => {
         }
     }, [selectedStock]);
 
+    // Cache helper functions
+    const getFromCache = (key, ttl) => {
+        const cached = cacheRef.current.get(key);
+        if (cached && (Date.now() - cached.timestamp) < ttl) {
+            console.log(`📦 Cache hit: ${key}`);
+            return cached.data;
+        }
+        return null;
+    };
+
+    const setCache = (key, data, ttl) => {
+        cacheRef.current.set(key, { data, timestamp: Date.now() });
+    };
+
+    // Comprehensive data fetching
     const fetchData = async (symbol) => {
         setLoading(true);
+        const API_BASE_URL = window.location.origin || '';
+        
         try {
-            // Use the same API pattern as DansWatchlistTab - batch or individual
-            const API_BASE_URL = window.location.origin || '';
+            // Check cache first
+            const cacheKey = `comprehensive_${symbol}`;
+            const cached = getFromCache(cacheKey, CACHE_TTL.quote);
+            if (cached) {
+                setStockData(cached.stockData);
+                setNewsData(cached.newsData || []);
+                setEarningsData(cached.earningsData);
+                setAnalystData(cached.analystData);
+                setLoading(false);
+                return;
+            }
 
-            // Fetch quote and fundamentals using marketdata API
-            const [quoteRes, fundamentalsRes] = await Promise.allSettled([
+            // Fetch comprehensive data in parallel
+            const [quoteRes, fundamentalsRes, newsRes, earningsRes, analystRes] = await Promise.allSettled([
                 fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`),
-                fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${symbol}&source=auto`)
+                fetch(`${API_BASE_URL}/api/marketdata?endpoint=fundamentals&symbol=${symbol}&source=auto`),
+                fetch(`${API_BASE_URL}/api/fmp?endpoint=ticker-news&symbol=${symbol}`),
+                fetch(`${API_BASE_URL}/api/fmp?endpoint=earnings-calendar&symbol=${symbol}`),
+                fetch(`${API_BASE_URL}/api/marketdata?endpoint=analyst&symbol=${symbol}`)
             ]);
 
-            const quoteData = quoteRes.status === 'fulfilled' && quoteRes.value.ok
-                ? await quoteRes.value.json() : null;
-            const fundamentalsData = fundamentalsRes.status === 'fulfilled' && fundamentalsRes.value.ok
-                ? await fundamentalsRes.value.json() : null;
+            const quoteData = quoteRes.status === 'fulfilled' && quoteRes.value.ok ? await quoteRes.value.json() : null;
+            const fundamentalsData = fundamentalsRes.status === 'fulfilled' && fundamentalsRes.value.ok ? await fundamentalsRes.value.json() : null;
+            const newsResponse = newsRes.status === 'fulfilled' && newsRes.value.ok ? await newsRes.value.json() : null;
+            const earningsResponse = earningsRes.status === 'fulfilled' && earningsRes.value.ok ? await earningsRes.value.json() : null;
+            const analystResponse = analystRes.status === 'fulfilled' && analystRes.value.ok ? await analystRes.value.json() : null;
 
-            console.log('✅ Data loaded for', symbol, { quoteData, fundamentalsData });
+            console.log('✅ Comprehensive data loaded for', symbol);
 
-            setStockData({
+            const newStockData = {
                 symbol: symbol,
-                // Quote data (Finnhub format)
                 price: quoteData?.c || fundamentalsData?.quote?.price || 0,
                 change: quoteData?.d || fundamentalsData?.quote?.change || 0,
                 changePercent: quoteData?.dp || fundamentalsData?.quote?.changesPercentage || 0,
@@ -101,26 +147,37 @@ const AdvancedAnalysisTab = () => {
                 low: quoteData?.l || 0,
                 open: quoteData?.o || 0,
                 previousClose: quoteData?.pc || 0,
-
-                // Fundamentals
                 profile: fundamentalsData?.profile || null,
                 ratios: fundamentalsData?.ratios || null,
                 metrics: fundamentalsData?.metrics || null,
-
-                // For modals
                 quote: {
                     price: quoteData?.c || fundamentalsData?.quote?.price || 0,
                     change: quoteData?.d || fundamentalsData?.quote?.change || 0,
                     changesPercentage: quoteData?.dp || fundamentalsData?.quote?.changesPercentage || 0
                 },
-
                 source: quoteData?.source || 'api',
                 timestamp: new Date().toISOString()
-            });
+            };
+
+            const newNewsData = newsResponse?.data || newsResponse?.news || [];
+            const newEarningsData = earningsResponse?.data || earningsResponse;
+            const newAnalystData = analystResponse?.data || analystResponse;
+
+            setStockData(newStockData);
+            setNewsData(newNewsData.slice(0, 10)); // Top 10 news
+            setEarningsData(newEarningsData);
+            setAnalystData(newAnalystData);
+
+            // Cache the results
+            setCache(cacheKey, {
+                stockData: newStockData,
+                newsData: newNewsData.slice(0, 10),
+                earningsData: newEarningsData,
+                analystData: newAnalystData
+            }, CACHE_TTL.quote);
 
         } catch (error) {
             console.error('❌ Error fetching data for', symbol, error);
-            // Set empty data on error
             setStockData({
                 symbol: symbol,
                 price: 0,
@@ -130,6 +187,59 @@ const AdvancedAnalysisTab = () => {
             });
         } finally {
             setLoading(false);
+        }
+    };
+
+    // AI Analysis function
+    const fetchAIAnalysis = async (symbol) => {
+        const API_BASE_URL = window.location.origin || '';
+        const cacheKey = `ai_${symbol}`;
+        
+        // Check cache
+        const cached = getFromCache(cacheKey, CACHE_TTL.ai);
+        if (cached) {
+            setAIAnalysis(cached);
+            return;
+        }
+
+        setLoadingAI(true);
+        try {
+            const prompt = `Analyze ${symbol} stock. Provide:
+            1. Investment Thesis (2-3 sentences)
+            2. Key Risks (3 bullet points)
+            3. Price Target Range (low-high)
+            4. Recommendation (Buy/Hold/Sell)
+            
+            Stock Data: Price $${stockData?.price || 'N/A'}, P/E ${stockData?.ratios?.peRatioTTM || 'N/A'}, 
+            Sector: ${stockData?.profile?.sector || 'N/A'}
+            
+            Format as JSON: {thesis, risks:[], targetLow, targetHigh, recommendation, confidence}`;
+
+            const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    service: 'perplexity',
+                    prompt,
+                    section: 'analysis',
+                    recency: 'day'
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const analysis = {
+                    content: data.content,
+                    model: data.model,
+                    timestamp: new Date().toISOString()
+                };
+                setAIAnalysis(analysis);
+                setCache(cacheKey, analysis, CACHE_TTL.ai);
+            }
+        } catch (error) {
+            console.error('❌ AI Analysis error:', error);
+        } finally {
+            setLoadingAI(false);
         }
     };
 
@@ -415,6 +525,7 @@ const AdvancedAnalysisTab = () => {
                 <window.AIStockAnalysisModal
                     symbol={selectedStock}
                     stockData={stockData}
+                    aiAnalysis={aiAnalysis}
                     onClose={() => setShowAIAnalysisModal(false)}
                 />
             )}
@@ -423,6 +534,7 @@ const AdvancedAnalysisTab = () => {
                 <window.NewsAndSentimentModal
                     symbol={selectedStock}
                     stockData={stockData}
+                    newsData={newsData}
                     onClose={() => setShowNewsModal(false)}
                 />
             )}
@@ -431,6 +543,7 @@ const AdvancedAnalysisTab = () => {
                 <window.AnalystConsensusModal
                     symbol={selectedStock}
                     stockData={stockData}
+                    analystData={analystData}
                     onClose={() => setShowAnalystModal(false)}
                 />
             )}
@@ -439,6 +552,7 @@ const AdvancedAnalysisTab = () => {
                 <window.EarningsCalendarModal
                     symbol={selectedStock}
                     stockData={stockData}
+                    earningsData={earningsData}
                     onClose={() => setShowEarningsModal(false)}
                 />
             )}

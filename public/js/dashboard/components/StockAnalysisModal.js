@@ -133,7 +133,7 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
 
 // Valuation Tab Component
 const ValuationTab = ({ data }) => {
-    const { valuation, dcf, currentPrice } = data;
+    const { valuation, dcf, currentPrice, cashFlow = [], incomeStatement = [] } = data;
 
     if (!valuation) {
         return <div className="text-gray-400 text-center py-12">Données de valorisation non disponibles</div>;
@@ -142,6 +142,36 @@ const ValuationTab = ({ data }) => {
     const fairValue = valuation.fairValue || 0;
     const marginOfSafety = valuation.marginOfSafety || 0;
     const upside = ((fairValue - currentPrice) / currentPrice) * 100;
+
+    const formatBillions = (value) => {
+        if (!value && value !== 0) return 'N/A';
+        return `${(value / 1e9).toFixed(2)}B`;
+    };
+
+    const buildSparklinePath = (values, width = 220, height = 80) => {
+        if (!values || values.length === 0) return '';
+        const max = Math.max(...values, 0);
+        const min = Math.min(...values, 0);
+        const range = max - min || 1;
+        const step = width / Math.max(values.length - 1, 1);
+        return values
+            .map((v, i) => {
+                const x = i * step;
+                const y = height - ((v - min) / range) * height;
+                return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+            })
+            .join(' ');
+    };
+
+    const fcfSeries = Array.isArray(cashFlow)
+        ? cashFlow.slice(0, 6).reverse().map(item => item.freeCashFlow || 0)
+        : [];
+    const revenueSeries = Array.isArray(incomeStatement)
+        ? incomeStatement.slice(0, 6).reverse().map(item => item.revenue || 0)
+        : [];
+
+    const fcfPath = buildSparklinePath(fcfSeries);
+    const revenuePath = buildSparklinePath(revenueSeries);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -242,6 +272,72 @@ const ValuationTab = ({ data }) => {
                             </div>
                         </div>
                     )}
+                </div>
+            </div>
+
+            {/* Historical Trends */}
+            <div className="lg:col-span-2 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i className="iconoir-chart-line text-emerald-400"></i>
+                    Tendances Financières (5-6 périodes)
+                </h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-800">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-gray-400 text-sm">Free Cash Flow</span>
+                            <span className="text-white font-mono text-sm">
+                                {fcfSeries.length ? formatBillions(fcfSeries[fcfSeries.length - 1]) : 'N/A'}
+                            </span>
+                        </div>
+                        <div className="h-28 relative">
+                            {fcfSeries.length === 0 ? (
+                                <div className="text-gray-500 text-sm">Données FCF indisponibles</div>
+                            ) : (
+                                <svg viewBox="0 0 220 80" className="w-full h-full">
+                                    <defs>
+                                        <linearGradient id="fcfGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#34d399" stopOpacity="0.8" />
+                                            <stop offset="100%" stopColor="#34d399" stopOpacity="0.1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path
+                                        d={`${fcfPath} L220,80 L0,80 Z`}
+                                        fill="url(#fcfGradient)"
+                                        opacity="0.35"
+                                    />
+                                    <path d={fcfPath} stroke="#34d399" strokeWidth="3" fill="none" />
+                                </svg>
+                            )}
+                        </div>
+                    </div>
+                    <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-800">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-gray-400 text-sm">Chiffre d'affaires</span>
+                            <span className="text-white font-mono text-sm">
+                                {revenueSeries.length ? formatBillions(revenueSeries[revenueSeries.length - 1]) : 'N/A'}
+                            </span>
+                        </div>
+                        <div className="h-28 relative">
+                            {revenueSeries.length === 0 ? (
+                                <div className="text-gray-500 text-sm">Données revenus indisponibles</div>
+                            ) : (
+                                <svg viewBox="0 0 220 80" className="w-full h-full">
+                                    <defs>
+                                        <linearGradient id="revGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.8" />
+                                            <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path
+                                        d={`${revenuePath} L220,80 L0,80 Z`}
+                                        fill="url(#revGradient)"
+                                        opacity="0.35"
+                                    />
+                                    <path d={revenuePath} stroke="#60a5fa" strokeWidth="3" fill="none" />
+                                </svg>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 

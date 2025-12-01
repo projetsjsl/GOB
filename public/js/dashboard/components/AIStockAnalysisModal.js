@@ -25,7 +25,10 @@ const AIStockAnalysisModal = ({ symbol, stockData, onClose }) => {
             // Build comprehensive analysis prompt
             const fundamentals = stockData?.ratios || stockData?.metrics || {};
             const profile = stockData?.profile || {};
-            const price = stockData?.price || 0;
+            const price = typeof stockData?.price === 'number' && !Number.isNaN(stockData?.price) ? stockData.price : 0;
+            const marketCapText = profile.marketCap
+                ? `$${(profile.marketCap / 1_000_000_000).toFixed(2)}B`
+                : 'N/A';
 
             const analysisPrompt = `Analyze ${symbol} stock comprehensively as an investment opportunity.
 
@@ -33,7 +36,7 @@ Current Price: $${price}
 Company: ${profile.companyName || symbol}
 Sector: ${profile.sector || 'N/A'}
 Industry: ${profile.industry || 'N/A'}
-Market Cap: $${(profile.marketCap / 1000000000).toFixed(2)}B
+Market Cap: ${marketCapText}
 
 Provide a detailed analysis in the following structure:
 
@@ -89,19 +92,23 @@ Use the latest market data and news. Be objective and data-driven. Format with m
             const data = await response.json();
 
             // Extract analysis text
-            let analysisText = '';
-            if (selectedModel === 'perplexity' && data.success && data.data?.choices?.[0]?.message?.content) {
-                analysisText = data.data.choices[0].message.content;
-            } else if (selectedModel === 'openai' && data.choices?.[0]?.message?.content) {
-                analysisText = data.choices[0].message.content;
-            } else {
+            const analysisText =
+                data.content ||
+                data.data?.content ||
+                data.data?.choices?.[0]?.message?.content ||
+                data.choices?.[0]?.message?.content ||
+                '';
+
+            if (!analysisText) {
                 throw new Error('Invalid AI response format');
             }
+
+            const modelUsed = data.model || data.data?.model || selectedModel;
 
             // Parse the analysis (simple parsing - can be enhanced)
             setAnalysisData({
                 fullText: analysisText,
-                model: data.model || selectedModel,
+                model: modelUsed,
                 timestamp: new Date().toISOString()
             });
 

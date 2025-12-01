@@ -18,7 +18,8 @@ export default async function handler(req, res) {
 
   try {
     const apiKey = process.env.FMP_API_KEY;
-    const { endpoint, symbols, limit, ticker, symbol } = req.query;
+    const { endpoint, symbols, limit, ticker, symbol, period } = req.query;
+    const symbolParam = symbol || ticker;
 
     // Health check if no endpoint specified
     if (!endpoint) {
@@ -38,6 +39,11 @@ export default async function handler(req, res) {
     }
 
     let fmpUrl;
+    const v3Base = 'https://financialmodelingprep.com/api/v3';
+    const v4Base = 'https://financialmodelingprep.com/api/v4';
+    const stableBase = 'https://financialmodelingprep.com/stable';
+    const fallbackPeriod = period || 'annual';
+    const fallbackLimit = limit || 5;
 
     // Route based on endpoint type (Updated to /stable/ endpoints - Aug 2025)
     switch (endpoint) {
@@ -56,35 +62,73 @@ export default async function handler(req, res) {
 
       case 'quote':
         const quoteSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/stable/quote?symbol=${quoteSymbol}&apikey=${apiKey}`;
+        fmpUrl = `${stableBase}/quote?symbol=${quoteSymbol}&apikey=${apiKey}`;
         break;
 
       case 'profile':
         const profileSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/stable/profile?symbol=${profileSymbol}&apikey=${apiKey}`;
+        fmpUrl = `${stableBase}/profile?symbol=${profileSymbol}&apikey=${apiKey}`;
         break;
 
       case 'fundamentals':
         const fundSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/stable/profile?symbol=${fundSymbol}&apikey=${apiKey}`;
+        fmpUrl = `${stableBase}/profile?symbol=${fundSymbol}&apikey=${apiKey}`;
         break;
 
       case 'ratios':
         // Financial ratios (P/E, P/B, ROE, ROA, debt ratios, etc.)
         const ratiosSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/stable/ratios?symbol=${ratiosSymbol}&apikey=${apiKey}`;
+        fmpUrl = `${v3Base}/ratios/${ratiosSymbol}?period=${fallbackPeriod}&limit=${fallbackLimit}&apikey=${apiKey}`;
+        break;
+
+      case 'income-statement':
+        fmpUrl = `${v3Base}/income-statement/${symbolParam || 'AAPL'}?period=${fallbackPeriod}&limit=${fallbackLimit}&apikey=${apiKey}`;
+        break;
+
+      case 'balance-sheet-statement':
+        fmpUrl = `${v3Base}/balance-sheet-statement/${symbolParam || 'AAPL'}?period=${fallbackPeriod}&limit=${fallbackLimit}&apikey=${apiKey}`;
+        break;
+
+      case 'cash-flow-statement':
+        fmpUrl = `${v3Base}/cash-flow-statement/${symbolParam || 'AAPL'}?period=${fallbackPeriod}&limit=${fallbackLimit}&apikey=${apiKey}`;
         break;
 
       case 'key-metrics':
         // Key financial metrics (revenue, net income, P/E, market cap, etc.)
         const metricsSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/stable/key-metrics?symbol=${metricsSymbol}&apikey=${apiKey}`;
+        fmpUrl = `${v3Base}/key-metrics/${metricsSymbol}?period=${fallbackPeriod}&limit=${fallbackLimit}&apikey=${apiKey}`;
         break;
 
       case 'ratings':
         // Company ratings snapshot
         const ratingsSymbol = symbol || ticker || 'AAPL';
-        fmpUrl = `https://financialmodelingprep.com/stable/ratings-snapshot?symbol=${ratingsSymbol}&apikey=${apiKey}`;
+        fmpUrl = `${stableBase}/ratings-snapshot?symbol=${ratingsSymbol}&apikey=${apiKey}`;
+        break;
+
+      case 'discounted-cash-flow':
+      case 'dcf':
+        fmpUrl = `${v3Base}/discounted-cash-flow/${symbolParam || 'AAPL'}?apikey=${apiKey}`;
+        break;
+
+      case 'stock_peers':
+        fmpUrl = `${v4Base}/stock_peers?symbol=${symbolParam || 'AAPL'}&apikey=${apiKey}`;
+        break;
+
+      case 'financial-growth':
+        fmpUrl = `${v3Base}/financial-growth/${symbolParam || 'AAPL'}?limit=${fallbackLimit}&apikey=${apiKey}`;
+        break;
+
+      case 'financial-ratios':
+        fmpUrl = `${v3Base}/financial-ratios/${symbolParam || 'AAPL'}?period=${fallbackPeriod}&limit=${fallbackLimit}&apikey=${apiKey}`;
+        break;
+
+      case 'enterprise-value':
+        fmpUrl = `${v3Base}/enterprise-values/${symbolParam || 'AAPL'}?period=${fallbackPeriod}&limit=${fallbackLimit}&apikey=${apiKey}`;
+        break;
+
+      case 'analyst':
+      case 'analyst-estimates':
+        fmpUrl = `${v3Base}/analyst-estimates/${symbolParam || 'AAPL'}?limit=${fallbackLimit || 8}&apikey=${apiKey}`;
         break;
 
       case 'earnings-calendar':
@@ -103,6 +147,10 @@ export default async function handler(req, res) {
           fmpUrl = `https://financialmodelingprep.com/stable/earnings-calendar?apikey=${apiKey}`;
         }
         break;
+      case 'calendar-earnings':
+        // Alias used elsewhere in the app
+        fmpUrl = `${v3Base}/earning-calendar?symbol=${symbolParam || ''}&limit=${fallbackLimit || 50}&apikey=${apiKey}`;
+        break;
 
       case 'economic-calendar':
         // Economic data releases (GDP, CPI, unemployment, etc.)
@@ -118,10 +166,22 @@ export default async function handler(req, res) {
         break;
 
       default:
-        return res.status(400).json({
-          error: 'Invalid endpoint',
-          supported: ['news', 'ticker-news', 'quote', 'profile', 'fundamentals', 'ratios', 'key-metrics', 'ratings', 'earnings-calendar', 'economic-calendar']
-        });
+        // Generic fallback for other endpoints (keeps query params)
+        const params = new URLSearchParams(req.query);
+        params.delete('endpoint');
+        if (symbolParam) {
+          params.delete('symbol');
+          params.delete('ticker');
+        }
+        params.set('apikey', apiKey);
+
+        // If symbols is provided, keep it in query string rather than path
+        const basePath = symbols
+          ? `${v3Base}/${endpoint}`
+          : `${v3Base}/${endpoint}${symbolParam ? `/${symbolParam}` : ''}`;
+
+        const queryString = params.toString();
+        fmpUrl = `${basePath}?${queryString}`;
     }
 
     console.log(`🔗 FMP API call: ${endpoint} - ${fmpUrl.split('?')[0]}`);

@@ -104,17 +104,22 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
             const screenResults = await Promise.all(
                 stocksToScreen.map(async (symbol) => {
                     try {
-                        const [metrics, ratios, quote] = await Promise.all([
+                        const [metricsRes, ratiosRes, quoteRes] = await Promise.all([
                             window.StockAnalysisAPI.fetchKeyMetrics(symbol, 1),
                             window.StockAnalysisAPI.fetchFinancialRatios(symbol, 1),
-                            fetch(`https://financialmodelingprep.com/api/v3/quote/${symbol}?apikey=${window.emmaConfig.fmpApiKey}`)
+                            fetch(`${window.location.origin}/api/fmp?endpoint=quote&symbol=${symbol}`)
                                 .then(r => r.json())
                         ]);
 
+                        const metrics = Array.isArray(metricsRes?.data) ? metricsRes.data : (Array.isArray(metricsRes) ? metricsRes : []);
+                        const ratios = Array.isArray(ratiosRes?.data) ? ratiosRes.data : (Array.isArray(ratiosRes) ? ratiosRes : []);
+                        const quoteArray = Array.isArray(quoteRes?.data) ? quoteRes.data : (Array.isArray(quoteRes) ? quoteRes : []);
+                        const quote = quoteArray[0] || {};
+
                         const data = {
                             symbol,
-                            name: quote[0]?.name || symbol,
-                            price: quote[0]?.price || 0,
+                            name: quote.name || quote.companyName || symbol,
+                            price: quote.price || quote.c || 0,
                             marketCap: metrics[0]?.marketCap || 0,
                             peRatio: metrics[0]?.peRatio || 0,
                             priceToBook: metrics[0]?.priceToBookRatio || 0,
@@ -122,7 +127,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                             debtToEquity: ratios[0]?.debtEquityRatio || 0,
                             dividendYield: (metrics[0]?.dividendYieldTTM || 0) * 100,
                             revenueGrowth: (metrics[0]?.revenueGrowth || 0) * 100,
-                            sector: quote[0]?.sector || 'Unknown'
+                            sector: quote.sector || 'Unknown'
                         };
 
                         // Apply filters
