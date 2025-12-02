@@ -4,6 +4,7 @@
 
 const { useState, useEffect } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area } = window.Recharts || {};
+const Icon = window.Icon;
 
 const AdvancedAnalysisTab = () => {
     // Watchlist / Team tickers (loaded from Supabase)

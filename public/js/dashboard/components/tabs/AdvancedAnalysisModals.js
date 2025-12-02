@@ -3,6 +3,7 @@
 
 const { useState, useEffect, useMemo } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area, PieChart, Pie, Cell } = window.Recharts || {};
+const Icon = window.Icon;
 
 // --- Base Modal Component ---
 const BaseModal = ({ title, onClose, children, maxWidth = "max-w-4xl" }) => {
