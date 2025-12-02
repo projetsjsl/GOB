@@ -24104,16 +24104,30 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Configuration des onglets (après déclaration de TOUS les composants)
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
         // Configuration des onglets (sans "Plus" dans la liste principale - il sera ajouté dynamiquement)
+        // Fonction helper pour obtenir le composant AdminJSLaiTab de manière sécurisée
+        const getAdminJSLaiTabComponent = () => {
+            return typeof window !== 'undefined' && window.AdminJSLaiTab 
+                ? window.AdminJSLaiTab 
+                : (() => <div className="p-4 text-center">Chargement de l'onglet Admin...</div>);
+        };
+
+        // Fonction helper pour obtenir le composant GroupChatTab de manière sécurisée
+        const getGroupChatTabComponent = () => {
+            return typeof window !== 'undefined' && window.GroupChatTab 
+                ? window.GroupChatTab 
+                : (() => <div className="p-4 text-center">Chargement de l'onglet RobotWeb...</div>);
+        };
+
         const allTabs = [
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
             { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
-            { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: window.GroupChatTab || (() => <div>Chargement...</div>) },
+            { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: getGroupChatTabComponent() },
             { id: 'ask-emma', label: 'Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
             { id: 'emmaia', label: 'EmmAIA', icon: 'iconoir-brain', component: EmmAIATab },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
-            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: window.AdminJSLaiTab || (() => <div>Chargement...</div>) },
+            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: getAdminJSLaiTabComponent() },
             { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
             { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
