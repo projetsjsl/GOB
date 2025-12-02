@@ -53,7 +53,7 @@ const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
                                     : 'bg-red-500 hover:bg-red-600 text-white'
                             } shadow-lg hover:shadow-xl transform hover:scale-105`}
                         >
-                            <Icon emoji="🚪" name="LogOut" size={20} className="mr-2 inline-block" />
+                            {typeof Icon !== 'undefined' ? <Icon emoji="🚪" name="LogOut" size={20} className="mr-2 inline-block" /> : '🚪'}
                             Se déconnecter
                         </button>
                     </div>
