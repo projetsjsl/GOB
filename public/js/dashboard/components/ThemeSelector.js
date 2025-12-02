@@ -158,7 +158,7 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
             >
-                {/* Shine effect au hover avec animation */}
+                {/* Shine effect au hover avec animation multi-layer */}
                 <div 
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden"
                     style={{
@@ -168,80 +168,145 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                     <div 
                         className="absolute inset-0"
                         style={{
-                            background: `linear-gradient(135deg, transparent 0%, ${colors.primary || 'rgba(255,255,255,0.1)'} 50%, transparent 100%)`,
+                            background: `linear-gradient(135deg, transparent 0%, ${colors.primary || 'rgba(255,255,255,0.15)'} 50%, transparent 100%)`,
                             transform: 'translateX(-100%) translateY(-100%)',
-                            animation: 'shimmer 2s ease-in-out infinite'
+                            animation: 'shimmer 2.5s ease-in-out infinite'
+                        }}
+                    ></div>
+                    <div 
+                        className="absolute inset-0"
+                        style={{
+                            background: `linear-gradient(45deg, transparent 0%, ${colors.accent || colors.primary || 'rgba(255,255,255,0.05)'} 50%, transparent 100%)`,
+                            transform: 'translateX(100%) translateY(100%)',
+                            animation: 'shimmer 3s ease-in-out infinite 0.5s'
                         }}
                     ></div>
                 </div>
                 
-                {/* Glow effect au hover */}
+                {/* Glow effect au hover avec multiple layers */}
                 <div 
-                    className="absolute -inset-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-xl"
+                    className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none blur-2xl"
                     style={{
-                        background: `radial-gradient(circle, ${colors.primary || colors.accent || '#3b82f6'}40 0%, transparent 70%)`,
+                        background: `radial-gradient(circle at 30% 30%, ${colors.primary || colors.accent || '#3b82f6'}50 0%, transparent 60%)`,
                     }}
                 ></div>
-                {/* Badge "Sélectionné" avec animation */}
+                <div 
+                    className="absolute -inset-1 opacity-0 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none blur-lg"
+                    style={{
+                        background: `radial-gradient(circle at 70% 70%, ${colors.accent || colors.primary || '#8b5cf6'}40 0%, transparent 50%)`,
+                    }}
+                ></div>
+                
+                {/* Particle effect subtle */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
+                    {[...Array(3)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute w-1 h-1 rounded-full"
+                            style={{
+                                backgroundColor: colors.primary || colors.accent || '#3b82f6',
+                                left: `${20 + i * 30}%`,
+                                top: `${30 + i * 20}%`,
+                                animation: `float ${2 + i * 0.5}s ease-in-out infinite ${i * 0.3}s`,
+                                boxShadow: `0 0 8px ${colors.primary || colors.accent || '#3b82f6'}`
+                            }}
+                        ></div>
+                    ))}
+                </div>
+                {/* Badge "Sélectionné" avec animation premium */}
                 {isSelected && (
                     <>
+                        {/* Multiple rings pour effet de propagation */}
+                        {[0, 1, 2].map((ring) => (
+                            <div 
+                                key={ring}
+                                className="absolute top-3 right-3 z-0 rounded-full"
+                                style={{ 
+                                    width: `${28 + ring * 8}px`,
+                                    height: `${28 + ring * 8}px`,
+                                    marginTop: `${-ring * 4}px`,
+                                    marginRight: `${-ring * 4}px`,
+                                    border: `2px solid ${colors.primary || colors.accent || '#3b82f6'}`,
+                                    animation: `pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite ${ring * 0.3}s`,
+                                    opacity: 0.6 - (ring * 0.2)
+                                }}
+                            ></div>
+                        ))}
+                        
+                        {/* Badge principal avec gradient */}
                         <div 
-                            className="absolute top-3 right-3 z-10 w-7 h-7 rounded-full flex items-center justify-center shadow-xl"
+                            className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-2xl relative overflow-hidden"
                             style={{ 
-                                backgroundColor: colors.primary || colors.accent || '#3b82f6',
-                                boxShadow: `0 0 20px ${colors.primary || colors.accent || '#3b82f6'}60, 0 4px 12px rgba(0,0,0,0.3)`,
-                                animation: 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                                background: `linear-gradient(135deg, ${colors.primary || colors.accent || '#3b82f6'} 0%, ${colors.accent || colors.primary || '#8b5cf6'} 100%)`,
+                                boxShadow: `0 0 24px ${colors.primary || colors.accent || '#3b82f6'}80, 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)`,
+                                animation: 'glow-pulse 2s ease-in-out infinite'
                             }}
                         >
-                            <svg className="w-4 h-4 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {/* Shine overlay */}
+                            <div className="absolute inset-0 opacity-50" style={{
+                                background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)'
+                            }}></div>
+                            <svg className="w-5 h-5 text-white drop-shadow-lg relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        {/* Ring animé */}
-                        <div 
-                            className="absolute top-3 right-3 z-0 w-7 h-7 rounded-full"
-                            style={{ 
-                                border: `2px solid ${colors.primary || colors.accent || '#3b82f6'}`,
-                                animation: 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                                opacity: 0.6
-                            }}
-                        ></div>
                     </>
                 )}
 
                 {/* Header de l'aperçu avec gradient premium */}
                 <div
-                    className="p-5 relative overflow-hidden"
+                    className="p-6 relative overflow-hidden group/header"
                     style={{
                         background: colors.styles?.headerBg || `linear-gradient(135deg, ${colors.surface || colors.background} 0%, ${colors.surfaceLight || colors.surface || colors.background} 100%)`,
                         borderBottom: `1px solid ${colors.border || 'rgba(255,255,255,0.1)'}`
                     }}
                 >
-                    {/* Pattern overlay */}
-                    <div className="absolute inset-0 opacity-[0.03]" style={{
+                    {/* Pattern overlay animé */}
+                    <div className="absolute inset-0 opacity-[0.04] group-hover/header:opacity-[0.06] transition-opacity duration-500" style={{
                         backgroundImage: `radial-gradient(circle at 2px 2px, ${colors.text || previewText} 1px, transparent 0)`,
-                        backgroundSize: '24px 24px'
+                        backgroundSize: '24px 24px',
+                        backgroundPosition: '0 0',
+                        animation: 'float 20s ease-in-out infinite'
                     }}></div>
                     
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 opacity-60" style={{
-                        background: `linear-gradient(135deg, ${colors.primary || 'transparent'}15 0%, transparent 50%, ${colors.accent || 'transparent'}10 100%)`
+                    {/* Gradient overlay multi-layer */}
+                    <div className="absolute inset-0 opacity-70 group-hover/header:opacity-90 transition-opacity duration-500" style={{
+                        background: `linear-gradient(135deg, ${colors.primary || 'transparent'}20 0%, transparent 40%, ${colors.accent || 'transparent'}15 60%, transparent 100%)`
+                    }}></div>
+                    <div className="absolute inset-0 opacity-30" style={{
+                        background: `radial-gradient(circle at 20% 50%, ${colors.primary || 'transparent'}15 0%, transparent 50%)`
+                    }}></div>
+                    
+                    {/* Animated gradient line */}
+                    <div className="absolute bottom-0 left-0 right-0 h-px opacity-50" style={{
+                        background: `linear-gradient(90deg, transparent 0%, ${colors.primary || colors.accent || '#3b82f6'}50 50%, transparent 100%)`,
+                        animation: 'glow-pulse 3s ease-in-out infinite'
                     }}></div>
                     
                     <div className="flex items-center justify-between relative z-10">
                         <div className="flex items-center gap-4">
                             <div 
-                                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-lg relative overflow-hidden group/icon transition-transform duration-300 group-hover:scale-110"
+                                className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-2xl relative overflow-hidden group/icon transition-all duration-500 group-hover:scale-110 group-hover:rotate-3"
                                 style={{ 
-                                    background: `linear-gradient(135deg, ${colors.primary || colors.accent || '#3b82f6'} 0%, ${colors.accent || colors.primary || '#8b5cf6'} 100%)`,
+                                    background: `linear-gradient(135deg, ${colors.primary || colors.accent || '#3b82f6'} 0%, ${colors.accent || colors.primary || '#8b5cf6'} 50%, ${colors.primary || colors.accent || '#3b82f6'} 100%)`,
+                                    backgroundSize: '200% 200%',
                                     color: '#ffffff',
-                                    boxShadow: `0 4px 16px ${colors.primary || colors.accent || '#3b82f6'}40`
+                                    boxShadow: `0 6px 24px ${colors.primary || colors.accent || '#3b82f6'}50, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                                    animation: 'glow-pulse 3s ease-in-out infinite'
                                 }}
                             >
-                                <div className="absolute inset-0 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-300" style={{
-                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%)'
+                                {/* Animated gradient */}
+                                <div className="absolute inset-0 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-500" style={{
+                                    background: `linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)`,
+                                    animation: 'shimmer 2s ease-in-out infinite'
                                 }}></div>
-                                <span className="relative z-10 drop-shadow-md">{getThemeIcon(theme.id)}</span>
+                                
+                                {/* Glow effect */}
+                                <div className="absolute -inset-2 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-500 blur-xl" style={{
+                                    background: `radial-gradient(circle, ${colors.primary || colors.accent || '#3b82f6'}60 0%, transparent 70%)`
+                                }}></div>
+                                
+                                <span className="relative z-10 drop-shadow-lg filter brightness-110">{getThemeIcon(theme.id)}</span>
                             </div>
                             <div>
                                 <div className="font-bold text-lg tracking-tight" style={{ color: colors.text || previewText }}>
@@ -279,18 +344,30 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                             ].map((item, idx) => (
                                 <div key={idx} className="group/color">
                                     <div
-                                        className="h-12 rounded-xl shadow-lg transition-all duration-300 group-hover/color:scale-110 group-hover/color:shadow-xl relative overflow-hidden"
+                                        className="h-14 rounded-2xl shadow-xl transition-all duration-500 group-hover/color:scale-110 group-hover/color:shadow-2xl relative overflow-hidden"
                                         style={{ 
-                                            backgroundColor: item.color,
-                                            boxShadow: `0 4px 12px ${item.color}30`
+                                            background: `linear-gradient(135deg, ${item.color} 0%, ${item.color}dd 100%)`,
+                                            boxShadow: `0 6px 20px ${item.color}40, inset 0 1px 0 rgba(255,255,255,0.1)`
                                         }}
                                         title={item.label}
                                     >
-                                        <div className="absolute inset-0 opacity-0 group-hover/color:opacity-100 transition-opacity duration-300" style={{
-                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%)'
+                                        {/* Shine effect */}
+                                        <div className="absolute inset-0 opacity-0 group-hover/color:opacity-100 transition-opacity duration-500" style={{
+                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)',
+                                            animation: 'shimmer 2s ease-in-out infinite'
+                                        }}></div>
+                                        
+                                        {/* Glow on hover */}
+                                        <div className="absolute -inset-1 opacity-0 group-hover/color:opacity-100 transition-opacity duration-500 blur-lg" style={{
+                                            background: `radial-gradient(circle, ${item.color}60 0%, transparent 70%)`
+                                        }}></div>
+                                        
+                                        {/* Inner highlight */}
+                                        <div className="absolute top-0 left-0 right-0 h-1/2 opacity-30" style={{
+                                            background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)'
                                         }}></div>
                                     </div>
-                                    <div className="text-[10px] font-medium text-center mt-2 opacity-70 tracking-wide" style={{ color: colors.textSecondary || colors.text }}>
+                                    <div className="text-[10px] font-bold text-center mt-2.5 opacity-80 tracking-wider uppercase" style={{ color: colors.textSecondary || colors.text }}>
                                         {item.label}
                                     </div>
                                 </div>
@@ -307,18 +384,31 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                             <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${colors.border || 'rgba(255,255,255,0.1)'} 0%, transparent 100%)` }}></div>
                         </div>
                         <div
-                            className="p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 group-hover:shadow-xl relative overflow-hidden"
+                            className="p-5 rounded-2xl border backdrop-blur-sm transition-all duration-500 group-hover:shadow-2xl relative overflow-hidden group/card"
                             style={{
-                                background: `linear-gradient(135deg, ${colors.surface || colors.background} 0%, ${colors.surfaceLight || colors.surface || colors.background} 100%)`,
+                                background: `linear-gradient(135deg, ${colors.surface || colors.background} 0%, ${colors.surfaceLight || colors.surface || colors.background} 50%, ${colors.surface || colors.background} 100%)`,
+                                backgroundSize: '200% 200%',
                                 borderColor: colors.border || 'rgba(255,255,255,0.1)',
                                 color: colors.text || previewText,
-                                boxShadow: `0 4px 16px ${colors.primary || 'rgba(0,0,0,0.1)'}20, inset 0 1px 0 rgba(255,255,255,0.05)`
+                                boxShadow: `0 6px 24px ${colors.primary || 'rgba(0,0,0,0.1)'}30, inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.05)`
                             }}
                         >
-                            {/* Subtle pattern */}
-                            <div className="absolute inset-0 opacity-[0.02]" style={{
+                            {/* Animated gradient background */}
+                            <div className="absolute inset-0 opacity-0 group-hover/card:opacity-100 transition-opacity duration-700" style={{
+                                background: `linear-gradient(135deg, ${colors.primary || 'transparent'}08 0%, transparent 50%, ${colors.accent || 'transparent'}05 100%)`,
+                                animation: 'glow-pulse 4s ease-in-out infinite'
+                            }}></div>
+                            
+                            {/* Subtle pattern animé */}
+                            <div className="absolute inset-0 opacity-[0.03] group-hover/card:opacity-[0.05] transition-opacity duration-500" style={{
                                 backgroundImage: `radial-gradient(circle at 1px 1px, ${colors.text || previewText} 1px, transparent 0)`,
-                                backgroundSize: '16px 16px'
+                                backgroundSize: '16px 16px',
+                                animation: 'float 15s ease-in-out infinite'
+                            }}></div>
+                            
+                            {/* Top highlight */}
+                            <div className="absolute top-0 left-0 right-0 h-1/3 opacity-20" style={{
+                                background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
                             }}></div>
                             
                             <div className="relative z-10">
@@ -468,29 +558,48 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                 >
                     <div
                         ref={modalRef}
-                        className={`relative w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-3xl shadow-2xl transform transition-all duration-500 ${
+                        className={`relative w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-3xl shadow-2xl transform transition-all duration-700 group/modal ${
                             isDarkMode 
-                                ? 'bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-gray-700/30' 
-                                : 'bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200/30'
+                                ? 'bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-gray-700/20' 
+                                : 'bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200/20'
                         }`}
                         style={{
                             boxShadow: `
-                                0 25px 80px rgba(0, 0, 0, 0.6),
-                                0 0 0 1px rgba(255, 255, 255, 0.05),
-                                inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                                0 30px 100px rgba(0, 0, 0, 0.7),
+                                0 0 0 1px rgba(255, 255, 255, 0.08),
+                                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                                inset 0 -2px 4px rgba(0, 0, 0, 0.1)
                             `,
-                            backdropFilter: 'blur(20px)',
-                            WebkitBackdropFilter: 'blur(20px)'
+                            backdropFilter: 'blur(24px) saturate(180%)',
+                            WebkitBackdropFilter: 'blur(24px) saturate(180%)'
                         }}
                     >
-                        {/* Animated border glow */}
+                        {/* Animated border glow multi-layer */}
                         <div 
-                            className="absolute -inset-0.5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-xl"
+                            className="absolute -inset-1 rounded-3xl opacity-0 group-hover/modal:opacity-100 transition-opacity duration-700 pointer-events-none blur-2xl"
                             style={{
-                                background: `linear-gradient(135deg, ${isDarkMode ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.2)'} 0%, transparent 50%)`,
+                                background: `radial-gradient(circle at 30% 30%, ${isDarkMode ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)'} 0%, transparent 60%)`,
+                                zIndex: -1,
+                                animation: 'glow-pulse 3s ease-in-out infinite'
+                            }}
+                        ></div>
+                        <div 
+                            className="absolute -inset-0.5 rounded-3xl opacity-0 group-hover/modal:opacity-60 transition-opacity duration-500 pointer-events-none blur-lg"
+                            style={{
+                                background: `radial-gradient(circle at 70% 70%, ${isDarkMode ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)'} 0%, transparent 50%)`,
                                 zIndex: -1
                             }}
                         ></div>
+                        
+                        {/* Corner accents */}
+                        <div className="absolute top-0 left-0 w-32 h-32 opacity-10 pointer-events-none" style={{
+                            background: `radial-gradient(circle, ${colors.primary || '#3b82f6'} 0%, transparent 70%)`,
+                            filter: 'blur(20px)'
+                        }}></div>
+                        <div className="absolute bottom-0 right-0 w-32 h-32 opacity-10 pointer-events-none" style={{
+                            background: `radial-gradient(circle, ${colors.accent || '#8b5cf6'} 0%, transparent 70%)`,
+                            filter: 'blur(20px)'
+                        }}></div>
                         {/* Header de la modal avec gradient premium */}
                         <div className={`sticky top-0 z-20 p-7 border-b backdrop-blur-xl relative overflow-hidden ${
                             isDarkMode 
