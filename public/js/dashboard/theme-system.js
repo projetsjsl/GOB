@@ -404,8 +404,21 @@ const allThemes = {
 
 // Fonction pour appliquer un thème
 function applyTheme(themeId) {
+    // Validation du themeId
+    if (!themeId || typeof themeId !== 'string') {
+        console.warn('Theme ID invalide, utilisation du thème par défaut');
+        themeId = 'darkmode';
+    }
+    
     // Utiliser allThemes pour inclure les thèmes par défaut
     const theme = allThemes[themeId] || allThemes.darkmode || defaultThemes.darkmode;
+    
+    // Validation du thème
+    if (!theme || !theme.colors || !theme.styles || !theme.fonts) {
+        console.error('Thème invalide:', themeId, 'Utilisation du thème par défaut');
+        return applyTheme('darkmode');
+    }
+    
     const root = document.documentElement;
     
     // Appliquer les variables CSS
@@ -454,7 +467,11 @@ function applyTheme(themeId) {
     document.body.classList.add(`theme-${themeId}`);
     
     // Sauvegarder dans localStorage
-    localStorage.setItem('gob-dashboard-theme', themeId);
+    try {
+        localStorage.setItem('gob-dashboard-theme', themeId);
+    } catch (error) {
+        console.warn('Impossible de sauvegarder le thème dans localStorage:', error);
+    }
     
     // Déclencher un événement personnalisé
     window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId } }));
@@ -464,10 +481,14 @@ function applyTheme(themeId) {
 
 // Fonction pour obtenir le thème actuel
 function getCurrentTheme() {
-    const saved = localStorage.getItem('gob-dashboard-theme');
-    // Vérifier dans tous les thèmes (par défaut + personnalisés)
-    if (saved && allThemes[saved]) {
-        return saved;
+    try {
+        const saved = localStorage.getItem('gob-dashboard-theme');
+        // Vérifier dans tous les thèmes (par défaut + personnalisés)
+        if (saved && typeof saved === 'string' && allThemes[saved]) {
+            return saved;
+        }
+    } catch (error) {
+        console.warn('Erreur lors de la lecture du localStorage:', error);
     }
     // Par défaut: darkmode
     return 'darkmode';

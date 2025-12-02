@@ -80,17 +80,28 @@ const ThemeSelector = ({ isDarkMode = true }) => {
     };
 
     const themes = getThemes();
-    const defaultThemesList = themes.filter(t => t.isDefault);
-    const customThemesList = themes.filter(t => !t.isDefault);
+    const defaultThemesList = themes.filter(t => t && t.isDefault === true);
+    const customThemesList = themes.filter(t => t && t.isDefault !== true);
 
     const handleThemeChange = (themeId) => {
-        if (window.GOBThemes) {
-            window.GOBThemes.applyTheme(themeId);
-            setCurrentTheme(themeId);
-            setIsOpen(false);
-            
-            // Déclencher un événement personnalisé pour notifier les autres composants
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId } }));
+        if (!themeId || typeof themeId !== 'string') {
+            console.warn('Theme ID invalide:', themeId);
+            return;
+        }
+        
+        if (window.GOBThemes && window.GOBThemes.applyTheme) {
+            try {
+                window.GOBThemes.applyTheme(themeId);
+                setCurrentTheme(themeId);
+                setIsOpen(false);
+                
+                // Déclencher un événement personnalisé pour notifier les autres composants
+                window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId } }));
+            } catch (error) {
+                console.error('Erreur lors du changement de thème:', error);
+            }
+        } else {
+            console.warn('GOBThemes n\'est pas disponible');
         }
     };
 
@@ -127,7 +138,7 @@ const ThemeSelector = ({ isDarkMode = true }) => {
     
     const isDarkLightTheme = currentTheme === 'darkmode' || currentTheme === 'light';
 
-    const currentThemeData = themes.find(t => t.id === currentTheme) || themes[0];
+    const currentThemeData = themes.find(t => t && t.id === currentTheme) || themes[0] || null;
 
     // Fonction pour générer un aperçu de couleurs du thème
     const renderThemePreview = (theme) => {

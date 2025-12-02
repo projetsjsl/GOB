@@ -489,6 +489,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             
             // Écouter les changements de thème
             const handleThemeChange = (event) => {
+                if (!event || !event.detail || !event.detail.themeId) {
+                    console.warn('Événement themeChanged invalide:', event);
+                    return;
+                }
+                
                 const themeId = event.detail.themeId;
                 console.log('Thème changé:', themeId);
                 
@@ -502,7 +507,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // Sauvegarder dans localStorage pour compatibilité
                 try {
                     localStorage.setItem('theme', isLight ? 'light' : 'dark');
-                } catch (_) {}
+                } catch (error) {
+                    console.warn('Impossible de sauvegarder le thème dans localStorage:', error);
+                }
             };
             
             window.addEventListener('themeChanged', handleThemeChange);
