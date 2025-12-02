@@ -177,7 +177,8 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
                 borderColor: isDarkMode ? 'rgba(75, 85, 99, 0.3)' : 'rgba(209, 213, 219, 0.5)',
                 height: '40px',
-                zIndex: 100
+                zIndex: 10,
+                position: 'relative'
             }}
         >
             {/* Left icon + Type selector */}
@@ -215,13 +216,14 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 {/* Type selector dropdown */}
                 {showTypeSelector && (
                     <div
-                        className="absolute left-0 top-full mt-1 rounded-lg shadow-xl border overflow-hidden z-30"
+                        className="absolute left-0 top-full mt-1 rounded-lg shadow-xl border overflow-hidden"
                         style={{
                             backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
                             borderColor: isDarkMode ? 'rgba(75, 85, 99, 0.5)' : 'rgba(209, 213, 219, 0.5)',
                             minWidth: '150px',
                             maxHeight: '300px',
-                            overflowY: 'auto'
+                            overflowY: 'auto',
+                            zIndex: 50
                         }}
                     >
                         {newsTypes.map(type => (
