@@ -48,4 +48,45 @@
         "Analyse des dividendes BCE",
         "Comment utiliser l'onglet JLab ?"
     ];
+
+    // Professional Color Palette (Emma IA Style)
+    window.DASHBOARD_CONSTANTS.professionalColors = {
+        // Neutrals - Dark theme base
+        background: {
+            primary: '#0f172a',      // slate-950
+            secondary: '#1e293b',    // slate-900
+            tertiary: '#334155',     // slate-700
+        },
+        
+        // Accent colors - Financial context
+        accent: {
+            bullish: '#10b981',      // green-500 (subtle, not bright)
+            bearish: '#ef4444',      // red-500
+            neutral: '#3b82f6',      // blue-500
+            warning: '#f59e0b',      // amber-500
+        },
+        
+        // Glass effects
+        glass: {
+            light: 'rgba(255, 255, 255, 0.05)',
+            border: 'rgba(255, 255, 255, 0.1)',
+        },
+        
+        // Typography
+        text: {
+            primary: '#f8fafc',      // slate-50
+            secondary: '#cbd5e1',    // slate-300
+            muted: '#64748b',        // slate-500
+        }
+    };
+
+    // Professional icon paths (replacing emojis)
+    window.DASHBOARD_CONSTANTS.professionalIcons = {
+        bull: '/images/icons/bull-pro.svg',
+        bear: '/images/icons/bear-pro.svg',
+        chart: '/images/icons/chart-pro.svg',
+        news: '/images/icons/news-pro.svg',
+        analytics: '/images/icons/analytics-pro.svg',
+    };
+
 })();

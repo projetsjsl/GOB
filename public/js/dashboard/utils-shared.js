@@ -76,20 +76,44 @@
 
     const renderMarketBadge = (type, isDarkMode = true) => {
         const isBull = type === 'bull';
+        
+        // Professional styling with glassmorphism
         const classes = isBull
             ? (isDarkMode
-                ? 'bg-lime-900/70 border-lime-500/40 text-lime-300'
-                : 'bg-lime-100 border-lime-400 text-lime-700')
+                ? 'bg-emerald-900/20 border-emerald-500/30 text-emerald-300'
+                : 'bg-emerald-100 border-emerald-400 text-emerald-700')
             : (isDarkMode
-                ? 'bg-rose-900/70 border-rose-500/40 text-rose-200'
+                ? 'bg-rose-900/20 border-rose-500/30 text-rose-200'
                 : 'bg-rose-100 border-rose-300 text-rose-700');
+        
         if (typeof React !== 'undefined' && React.createElement) {
+            // Use professional IconSystem if available
+            if (window.IconSystem) {
+                const IconComponent = isBull ? window.IconSystem.bull : window.IconSystem.bear;
+                const iconColor = isBull ? '#10b981' : '#ef4444';
+                
+                return React.createElement(
+                    'div',
+                    { 
+                        className: `w-10 h-10 rounded-full flex items-center justify-center shadow-lg border backdrop-blur-sm ${classes}`,
+                        style: { 
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)'
+                        }
+                    },
+                    React.createElement(IconComponent, { className: 'w-6 h-6', color: iconColor })
+                );
+            }
+            
+            // Fallback to emoji (deprecated)
+            console.warn('⚠️ IconSystem not available, using emoji fallback for market badge');
             return React.createElement(
                 'span',
                 { className: `w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${classes}` },
                 isBull ? '🐂' : '🐻'
-            );
+           );
         }
+        
         // Fallback string if React is not available
         return isBull ? '🐂' : '🐻';
     };
