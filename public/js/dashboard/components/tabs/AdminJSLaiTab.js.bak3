@@ -425,7 +425,7 @@ const AdminJSLaiTab = ({
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
-                                        {typeof Icon !== 'undefined' ? <Icon emoji={typeof isProfessionalMode !== 'undefined' && isProfessionalMode ? "💼" : "🎉"} size={18} /> : (typeof isProfessionalMode !== 'undefined' && isProfessionalMode ? '💼' : '🎉')}
+                                        <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
                                         <span className="font-semibold">
                                             {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
                                         </span>
@@ -537,7 +537,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={20} className="mr-2 inline-block" /> : '📊'}
+                        <Icon emoji="📊" size={20} className="mr-2 inline-block" />
                         Gestion des Stocks
                     </h3>
                         <div className="flex flex-wrap gap-2">
@@ -570,7 +570,7 @@ const AdminJSLaiTab = ({
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     darkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={20} className="mr-2 inline-block" /> : '📊'}
+                                <Icon emoji="📊" size={20} className="mr-2 inline-block" />
                                 ÉTAPE 1: SCRAPING BATCH (25 tickers)
                             </h3>
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold ${
@@ -649,7 +649,7 @@ const AdminJSLaiTab = ({
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 darkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            {typeof Icon !== 'undefined' ? <Icon emoji="🤖" size={20} className="mr-2 inline-block" /> : '🤖'}
+                            <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
                             ÉTAPE 2: ANALYSE BATCH PERPLEXITY
                         </h3>
 
@@ -718,7 +718,7 @@ const AdminJSLaiTab = ({
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 darkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={20} className="mr-2 inline-block" /> : '📊'}
+                            <Icon emoji="📊" size={20} className="mr-2 inline-block" />
                             ÉTAPE 3: RÉSULTATS & AFFICHAGE
                         </h3>
 
@@ -956,7 +956,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        {typeof Icon !== 'undefined' ? <Icon emoji="🤖" size={20} className="mr-2 inline-block" /> : '🤖'}
+                        <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
                         Monitoring Emma AI
                     </h3>
                         <div className="space-y-4">
@@ -1074,7 +1074,7 @@ const AdminJSLaiTab = ({
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                         darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                    {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={18} className="mr-2 inline-block" /> : '📊'}
+                                    <Icon emoji="📊" size={18} className="mr-2 inline-block" />
                                     Outils Financiers
                                 </h4>
                                     <div className="space-y-1 text-sm">
@@ -1160,7 +1160,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        {typeof Icon !== 'undefined' ? <Icon emoji="⚙️" size={20} className="mr-2 inline-block" /> : '⚙️'}
+                        <Icon emoji="⚙️" size={20} className="mr-2 inline-block" />
                         Configuration
                     </h3>
                         <div className="space-y-4">

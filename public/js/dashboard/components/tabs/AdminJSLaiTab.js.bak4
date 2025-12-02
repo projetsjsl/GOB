@@ -425,7 +425,7 @@ const AdminJSLaiTab = ({
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
-                                        {typeof Icon !== 'undefined' ? <Icon emoji={typeof isProfessionalMode !== 'undefined' && isProfessionalMode ? "💼" : "🎉"} size={18} /> : (typeof isProfessionalMode !== 'undefined' && isProfessionalMode ? '💼' : '🎉')}
+                                        <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
                                         <span className="font-semibold">
                                             {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
                                         </span>
