@@ -12,10 +12,10 @@ const AdminJSLaiTab = ({
                 setShowTemperatureEditor,
                 showLengthEditor,
                 setShowLengthEditor,
-                darkMode = true
+                isDarkMode = true
             }) => {
-                // Vérifier que darkMode est défini
-                const darkMode = darkMode !== undefined ? darkMode : true;
+                // Vérifier que isDarkMode est défini et créer une variable locale darkMode
+                const darkMode = isDarkMode !== undefined ? isDarkMode : true;
                 
                 return (
                 <div className="space-y-6">

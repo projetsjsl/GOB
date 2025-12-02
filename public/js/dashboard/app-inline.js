@@ -4790,19 +4790,16 @@ STRUCTURE JSON OBLIGATOIRE:
 
         // ============================================================================
         // COMPOSANT ADMIN-JSLAI
+        // NOTE: Le composant AdminJSLaiTab est maintenant défini dans un fichier séparé:
+        // public/js/dashboard/components/tabs/AdminJSLaiTab.js
+        // Il est chargé via <script> dans beta-combined-dashboard.html
+        // L'ancienne définition a été supprimée pour éviter les conflits.
+        // Utiliser window.AdminJSLaiTab à la place (voir ligne ~26487 pour le rendu)
         // ============================================================================
-        const AdminJSLaiTab = ({
-            emmaConnected,
-            setEmmaConnected,
-            showPromptEditor,
-            setShowPromptEditor,
-            showTemperatureEditor,
-            setShowTemperatureEditor,
-            showLengthEditor,
-            setShowLengthEditor
-        }) => (
-            <div className="space-y-6">
-                <div className="flex justify-between items-center">
+        // (Ancienne définition JSX supprimée - voir AdminJSLaiTab.js pour la nouvelle version)
+        // Le code JSX suivant a été supprimé pour éviter les conflits avec window.AdminJSLaiTab
+        const _removedAdminJSLaiTabJSX = null; // Placeholder pour éviter les erreurs de syntaxe
+        // ============================================================================
                     <h2 className={`text-2xl font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>⚙️ Admin-JSLAI</h2>
                 </div>
