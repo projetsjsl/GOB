@@ -25587,8 +25587,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         : '0.02em',
                                                     color: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                         ? '#ffcc00'
-                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '#1a1a1a'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '#ffffff'
                                                         : '#ffffff',
                                                     textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                         ? '0 1px 3px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 212, 255, 0.2)'
@@ -25682,8 +25684,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         : '"Inter", "Arial", sans-serif',
                                                     color: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                         ? '#888888'
-                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '#666666'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '#e5e7eb'
                                                         : '#9ca3af',
                                                     textShadow: currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
                                                         ? '0 1px 1px rgba(255, 255, 255, 0.5)'
