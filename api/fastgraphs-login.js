@@ -133,28 +133,80 @@ export default async function handler(req, res) {
     console.log('Initialisation de Stagehand...');
     const stagehandConfig = getStagehandConfig();
     
+    // Validation des clés API avant initialisation
+    if (!stagehandConfig.apiKey || !stagehandConfig.projectId) {
+      return res.status(503).json({
+        success: false,
+        error: 'Configuration Browserbase incomplète',
+        details: 'BROWSERBASE_API_KEY ou BROWSERBASE_PROJECT_ID manquant',
+        hint: 'Vérifiez que les variables d\'environnement sont définies dans Vercel',
+        type: 'ConfigurationError',
+        timestamp: new Date().toISOString(),
+        debugInfo: debugMode ? {
+          hasApiKey: !!stagehandConfig.apiKey,
+          hasProjectId: !!stagehandConfig.projectId,
+          apiKeyLength: stagehandConfig.apiKey?.length || 0,
+          projectIdLength: stagehandConfig.projectId?.length || 0,
+          apiKeyPrefix: stagehandConfig.apiKey ? stagehandConfig.apiKey.substring(0, 8) + '...' : 'N/A',
+          projectIdPrefix: stagehandConfig.projectId ? stagehandConfig.projectId.substring(0, 8) + '...' : 'N/A'
+        } : undefined
+      });
+    }
+    
+    if (!stagehandConfig.modelClientOptions?.apiKey) {
+      console.warn('GEMINI_API_KEY non définie - Stagehand pourrait échouer');
+      return res.status(503).json({
+        success: false,
+        error: 'Clé API Gemini manquante',
+        details: 'GEMINI_API_KEY ou GOOGLE_API_KEY est requis pour Stagehand',
+        hint: 'Configurez GEMINI_API_KEY dans Vercel Environment Variables',
+        type: 'ConfigurationError',
+        timestamp: new Date().toISOString(),
+        debugInfo: debugMode ? {
+          hasGeminiKey: false,
+          hasGoogleKey: !!process.env.GOOGLE_API_KEY,
+          envKeys: Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('GOOGLE'))
+        } : undefined
+      });
+    }
+    
     if (debugMode) {
       console.log('Configuration Stagehand:', {
         env: stagehandConfig.env,
         hasApiKey: !!stagehandConfig.apiKey,
         hasProjectId: !!stagehandConfig.projectId,
         modelName: stagehandConfig.modelName,
-        hasGeminiKey: !!stagehandConfig.modelClientOptions?.apiKey
+        hasGeminiKey: !!stagehandConfig.modelClientOptions?.apiKey,
+        apiKeyPrefix: stagehandConfig.apiKey ? stagehandConfig.apiKey.substring(0, 8) + '...' : 'N/A',
+        projectIdPrefix: stagehandConfig.projectId ? stagehandConfig.projectId.substring(0, 8) + '...' : 'N/A',
+        geminiKeyPrefix: stagehandConfig.modelClientOptions?.apiKey ? stagehandConfig.modelClientOptions.apiKey.substring(0, 8) + '...' : 'N/A'
       });
     }
     
     try {
       stagehand = new Stagehand(stagehandConfig);
+      console.log('Stagehand instance créée, initialisation en cours...');
       await stagehand.init();
       console.log('Stagehand initialisé avec succès.');
     } catch (initError) {
       console.error('Erreur lors de l\'initialisation de Stagehand:', initError);
+      console.error('Type d\'erreur:', initError.name);
+      console.error('Message:', initError.message);
+      
+      // Messages d'erreur spécifiques selon le type
+      let hint = 'Vérifiez vos clés API Browserbase et Gemini. Ajoutez ?debug=true pour plus de détails.';
+      if (initError.message?.includes('Unauthorized') || initError.name === 'StagehandAPIUnauthorizedError') {
+        hint = 'La clé API Browserbase n\'est pas valide ou n\'est pas autorisée. Vérifiez: 1) La clé est correcte dans Vercel, 2) La clé est whitelistée pour Stagehand, 3) Le projet Browserbase est correct.';
+      } else if (initError.message?.includes('API key')) {
+        hint = 'Problème avec la clé API. Vérifiez que GEMINI_API_KEY est valide et a les permissions nécessaires.';
+      }
+      
       return res.status(503).json({
         success: false,
         error: 'Erreur lors de l\'initialisation de Stagehand',
         details: initError.message || 'Impossible d\'initialiser Stagehand',
-        hint: 'Vérifiez vos clés API Browserbase et Gemini. Ajoutez ?debug=true pour plus de détails.',
-        type: 'InitializationError',
+        hint: hint,
+        type: initError.name || 'InitializationError',
         timestamp: new Date().toISOString(),
         debugInfo: debugMode ? {
           errorMessage: initError.message,
@@ -163,7 +215,12 @@ export default async function handler(req, res) {
           stagehandConfig: {
             env: stagehandConfig.env,
             hasApiKey: !!stagehandConfig.apiKey,
-            hasProjectId: !!stagehandConfig.projectId
+            hasProjectId: !!stagehandConfig.projectId,
+            modelName: stagehandConfig.modelName,
+            hasGeminiKey: !!stagehandConfig.modelClientOptions?.apiKey,
+            apiKeyPrefix: stagehandConfig.apiKey ? stagehandConfig.apiKey.substring(0, 8) + '...' : 'N/A',
+            projectIdPrefix: stagehandConfig.projectId ? stagehandConfig.projectId.substring(0, 8) + '...' : 'N/A',
+            geminiKeyPrefix: stagehandConfig.modelClientOptions?.apiKey ? stagehandConfig.modelClientOptions.apiKey.substring(0, 8) + '...' : 'N/A'
           }
         } : undefined
       });
