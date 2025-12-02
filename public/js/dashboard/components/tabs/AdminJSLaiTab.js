@@ -18,7 +18,7 @@ const AdminJSLaiTab = ({
                 const darkMode = isDarkMode !== undefined ? isDarkMode : true;
                 
                 // États pour la gestion des indices TradingView
-                const [adminSelectedIndices, setAdminSelectedIndices] = React.useState(() => {
+                const [adminSelectedIndices, setAdminSelectedIndices] = (typeof React !== 'undefined' && React.useState) ? React.useState(() => {
                     try {
                         const saved = localStorage.getItem('tradingview-selected-indices');
                         if (saved) {
