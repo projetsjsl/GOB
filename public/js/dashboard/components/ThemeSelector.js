@@ -158,13 +158,28 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
             >
-                {/* Shine effect au hover */}
+                {/* Shine effect au hover avec animation */}
                 <div 
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden"
                     style={{
-                        background: `linear-gradient(135deg, transparent 0%, ${colors.primary || 'rgba(255,255,255,0.05)'} 50%, transparent 100%)`,
-                        transform: 'translateX(-100%) translateY(-100%)',
-                        animation: 'shimmer 1.5s ease-in-out'
+                        background: `linear-gradient(135deg, transparent 30%, ${colors.primary || 'rgba(255,255,255,0.08)'} 50%, transparent 70%)`,
+                    }}
+                >
+                    <div 
+                        className="absolute inset-0"
+                        style={{
+                            background: `linear-gradient(135deg, transparent 0%, ${colors.primary || 'rgba(255,255,255,0.1)'} 50%, transparent 100%)`,
+                            transform: 'translateX(-100%) translateY(-100%)',
+                            animation: 'shimmer 2s ease-in-out infinite'
+                        }}
+                    ></div>
+                </div>
+                
+                {/* Glow effect au hover */}
+                <div 
+                    className="absolute -inset-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-xl"
+                    style={{
+                        background: `radial-gradient(circle, ${colors.primary || colors.accent || '#3b82f6'}40 0%, transparent 70%)`,
                     }}
                 ></div>
                 {/* Badge "Sélectionné" avec animation */}
@@ -338,25 +353,38 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                     </div>
 
                     {/* Badge de type avec icône premium */}
-                    <div className="flex items-center justify-between pt-4 mt-4 border-t" style={{ borderColor: colors.border || 'rgba(255,255,255,0.1)' }}>
+                    <div className="flex items-center justify-between pt-5 mt-5 border-t relative" style={{ borderColor: colors.border || 'rgba(255,255,255,0.1)' }}>
+                        {/* Gradient line */}
+                        <div className="absolute top-0 left-0 right-0 h-px opacity-50" style={{
+                            background: `linear-gradient(90deg, transparent 0%, ${colors.primary || colors.accent || '#3b82f6'}50 50%, transparent 100%)`
+                        }}></div>
+                        
                         <span
-                            className="text-xs px-3.5 py-2 rounded-full font-semibold flex items-center gap-2 transition-all duration-300 hover:scale-105"
+                            className="text-xs px-4 py-2.5 rounded-full font-bold flex items-center gap-2.5 transition-all duration-300 hover:scale-110 relative overflow-hidden group/badge"
                             style={{
                                 background: isLightTheme 
-                                    ? `linear-gradient(135deg, ${colors.primary || '#3b82f6'}20 0%, ${colors.accent || colors.primary || '#8b5cf6'}15 100%)` 
-                                    : `linear-gradient(135deg, ${colors.primary || '#3b82f6'}30 0%, ${colors.accent || colors.primary || '#8b5cf6'}25 100%)`,
+                                    ? `linear-gradient(135deg, ${colors.primary || '#3b82f6'}25 0%, ${colors.accent || colors.primary || '#8b5cf6'}20 100%)` 
+                                    : `linear-gradient(135deg, ${colors.primary || '#3b82f6'}35 0%, ${colors.accent || colors.primary || '#8b5cf6'}30 100%)`,
                                 color: colors.primary || colors.accent || previewText,
-                                border: `1.5px solid ${colors.primary || colors.accent || '#3b82f6'}50`,
-                                boxShadow: `0 2px 8px ${colors.primary || colors.accent || '#3b82f6'}20`
+                                border: `1.5px solid ${colors.primary || colors.accent || '#3b82f6'}60`,
+                                boxShadow: `0 3px 12px ${colors.primary || colors.accent || '#3b82f6'}30`
                             }}
                         >
-                            <span className="text-sm">{isLightTheme ? '☀️' : '🌙'}</span>
-                            <span className="tracking-wide">{isLightTheme ? 'Light' : 'Dark'}</span>
+                            <div className="absolute inset-0 opacity-0 group-hover/badge:opacity-100 transition-opacity duration-300" style={{
+                                background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%)'
+                            }}></div>
+                            <span className="relative z-10 text-sm transition-transform duration-300 group-hover/badge:rotate-12">
+                                {isLightTheme ? '☀️' : '🌙'}
+                            </span>
+                            <span className="relative z-10 tracking-wider uppercase text-[10px]">{isLightTheme ? 'Light' : 'Dark'}</span>
                         </span>
                         {!theme.isDefault && (
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: colors.primary || colors.accent || '#3b82f6' }}></div>
-                                <span className="text-xs font-medium opacity-60 tracking-wide" style={{ color: colors.textSecondary || colors.text }}>
+                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
+                                backgroundColor: `${colors.primary || colors.accent || '#3b82f6'}15`,
+                                border: `1px solid ${colors.primary || colors.accent || '#3b82f6'}30`
+                            }}>
+                                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: colors.primary || colors.accent || '#3b82f6' }}></div>
+                                <span className="text-xs font-bold opacity-70 tracking-wider uppercase" style={{ color: colors.primary || colors.accent || colors.text }}>
                                     Custom
                                 </span>
                             </div>
@@ -381,57 +409,88 @@ const ThemeSelector = ({ isDarkMode = true }) => {
             {isDarkLightTheme && (
                 <button
                     onClick={handleToggleDarkLight}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg ${
+                    className={`relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl overflow-hidden group/toggle ${
                         isDarkMode
-                            ? 'bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white border border-gray-600/50'
-                            : 'bg-gradient-to-r from-gray-100 to-white hover:from-gray-200 hover:to-gray-100 text-gray-900 border border-gray-300/50'
+                            ? 'bg-gradient-to-r from-gray-800 via-gray-750 to-gray-700 hover:from-gray-700 hover:via-gray-650 hover:to-gray-600 text-white border border-gray-600/40'
+                            : 'bg-gradient-to-r from-gray-100 via-white to-gray-50 hover:from-gray-200 hover:via-gray-100 hover:to-gray-50 text-gray-900 border border-gray-300/40'
                     }`}
                     title={currentTheme === 'darkmode' ? 'Passer en mode clair' : 'Passer en mode sombre'}
                 >
-                    <span className="text-xl transition-transform duration-300 hover:rotate-12">
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 opacity-0 group-hover/toggle:opacity-100 transition-opacity duration-500" style={{
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)'
+                    }}></div>
+                    <span className="relative z-10 text-xl transition-all duration-300 group-hover/toggle:rotate-12 group-hover/toggle:scale-110">
                         {currentTheme === 'darkmode' ? '🌙' : '☀️'}
                     </span>
-                    <span className="hidden sm:inline font-medium">{currentTheme === 'darkmode' ? 'Dark' : 'Light'}</span>
+                    <span className="relative z-10 hidden sm:inline font-bold tracking-tight">{currentTheme === 'darkmode' ? 'Dark' : 'Light'}</span>
                 </button>
             )}
             
             {/* Bouton pour ouvrir la modal */}
             <button
                 onClick={() => setIsOpen(true)}
-                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg group ${
+                className={`relative flex items-center gap-3 px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl overflow-hidden group/theme ${
                     isDarkMode
-                        ? 'bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white border border-gray-600/50'
-                        : 'bg-gradient-to-r from-gray-100 to-white hover:from-gray-200 hover:to-gray-100 text-gray-900 border border-gray-300/50'
+                        ? 'bg-gradient-to-r from-gray-800 via-gray-750 to-gray-700 hover:from-gray-700 hover:via-gray-650 hover:to-gray-600 text-white border border-gray-600/40'
+                        : 'bg-gradient-to-r from-gray-100 via-white to-gray-50 hover:from-gray-200 hover:via-gray-100 hover:to-gray-50 text-gray-900 border border-gray-300/40'
                 }`}
                 title="Changer le thème"
             >
-                <span className="text-xl transition-transform duration-300 group-hover:rotate-12">
+                {/* Shine effect */}
+                <div className="absolute inset-0 opacity-0 group-hover/theme:opacity-100 transition-opacity duration-500" style={{
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)'
+                }}></div>
+                
+                {/* Glow effect */}
+                <div className="absolute -inset-1 opacity-0 group-hover/theme:opacity-100 transition-opacity duration-500 blur-md pointer-events-none" style={{
+                    background: `radial-gradient(circle, ${isDarkMode ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)'} 0%, transparent 70%)`
+                }}></div>
+                
+                <span className="relative z-10 text-xl transition-all duration-300 group-hover/theme:rotate-12 group-hover/theme:scale-110">
                     {currentThemeData ? getThemeIcon(currentThemeData.id) : '🎨'}
                 </span>
-                <span className="hidden sm:inline font-medium">{currentThemeData?.name || 'Thème'}</span>
-                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <span className="relative z-10 hidden sm:inline font-bold tracking-tight">{currentThemeData?.name || 'Thème'}</span>
+                <svg className="relative z-10 w-4 h-4 transition-all duration-300 group-hover/theme:translate-y-1 group-hover/theme:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
 
             {/* Modal de sélection de thème */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn"
-                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn"
+                    style={{ 
+                        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                        backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
+                    }}
                     onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
                 >
                     <div
                         ref={modalRef}
-                        className={`relative w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-3xl shadow-2xl transform transition-all duration-300 ${
+                        className={`relative w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-3xl shadow-2xl transform transition-all duration-500 ${
                             isDarkMode 
-                                ? 'bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-gray-700/50' 
-                                : 'bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200/50'
+                                ? 'bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-gray-700/30' 
+                                : 'bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200/30'
                         }`}
                         style={{
-                            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                            boxShadow: `
+                                0 25px 80px rgba(0, 0, 0, 0.6),
+                                0 0 0 1px rgba(255, 255, 255, 0.05),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                            `,
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)'
                         }}
                     >
+                        {/* Animated border glow */}
+                        <div 
+                            className="absolute -inset-0.5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-xl"
+                            style={{
+                                background: `linear-gradient(135deg, ${isDarkMode ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.2)'} 0%, transparent 50%)`,
+                                zIndex: -1
+                            }}
+                        ></div>
                         {/* Header de la modal avec gradient premium */}
                         <div className={`sticky top-0 z-20 p-7 border-b backdrop-blur-xl relative overflow-hidden ${
                             isDarkMode 
@@ -487,26 +546,56 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                         </div>
 
                         {/* Grille des thèmes avec scroll personnalisé */}
-                        <div className="p-8 overflow-y-auto max-h-[calc(92vh-180px)] custom-scrollbar">
+                        <div className="p-8 overflow-y-auto max-h-[calc(92vh-180px)] custom-scrollbar relative">
+                            {/* Gradient fade en haut et bas pour indiquer le scroll */}
+                            <div className={`sticky top-0 left-0 right-0 h-8 pointer-events-none z-10 ${
+                                isDarkMode 
+                                    ? 'bg-gradient-to-b from-gray-900 via-gray-900/80 to-transparent' 
+                                    : 'bg-gradient-to-b from-white via-white/80 to-transparent'
+                            }`}></div>
+                            <div className={`sticky bottom-0 left-0 right-0 h-8 pointer-events-none z-10 ${
+                                isDarkMode 
+                                    ? 'bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent' 
+                                    : 'bg-gradient-to-t from-white via-white/80 to-transparent'
+                            }`}></div>
                             {/* Thèmes par défaut */}
                             {defaultThemesList.length > 0 && (
-                                <div className="mb-8">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className={`w-1.5 h-8 rounded-full shadow-lg ${isDarkMode ? 'bg-gradient-to-b from-blue-500 to-blue-600' : 'bg-gradient-to-b from-blue-600 to-blue-700'}`}></div>
-                                        <h3 className={`text-xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <div className="mb-10">
+                                    <div className="flex items-center gap-4 mb-7 relative">
+                                        <div className={`w-2 h-10 rounded-full shadow-xl relative overflow-hidden ${
+                                            isDarkMode ? 'bg-gradient-to-b from-blue-500 via-blue-500 to-blue-600' : 'bg-gradient-to-b from-blue-600 via-blue-600 to-blue-700'
+                                        }`}>
+                                            <div className="absolute inset-0 opacity-50" style={{
+                                                background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%)'
+                                            }}></div>
+                                        </div>
+                                        <h3 className={`text-2xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             Thèmes par défaut
                                         </h3>
-                                        <div className={`flex-1 h-px ${isDarkMode ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-transparent' : 'bg-gradient-to-r from-gray-200 via-gray-300 to-transparent'}`}></div>
-                                        <span className={`text-xs px-3.5 py-1.5 rounded-full font-bold shadow-md ${
+                                        <div className={`flex-1 h-px relative ${
                                             isDarkMode 
-                                                ? 'bg-gradient-to-br from-gray-800 to-gray-700 text-gray-200 border border-gray-700/50' 
-                                                : 'bg-gradient-to-br from-gray-100 to-white text-gray-700 border border-gray-200/50'
+                                                ? 'bg-gradient-to-r from-gray-700 via-gray-600/50 to-transparent' 
+                                                : 'bg-gradient-to-r from-gray-200 via-gray-300/50 to-transparent'
                                         }`}>
-                                            {defaultThemesList.length}
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 animate-pulse"></div>
+                                        </div>
+                                        <span className={`text-xs px-4 py-2 rounded-full font-extrabold shadow-lg relative overflow-hidden ${
+                                            isDarkMode 
+                                                ? 'bg-gradient-to-br from-gray-800 via-gray-750 to-gray-700 text-gray-200 border border-gray-700/50' 
+                                                : 'bg-gradient-to-br from-gray-100 via-white to-gray-50 text-gray-700 border border-gray-200/50'
+                                        }`}>
+                                            <div className="absolute inset-0 opacity-20" style={{
+                                                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
+                                            }}></div>
+                                            <span className="relative z-10">{defaultThemesList.length}</span>
                                         </span>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                                        {defaultThemesList.map(theme => renderThemePreview(theme))}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {defaultThemesList.map((theme, idx) => (
+                                            <div key={theme.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-fadeIn">
+                                                {renderThemePreview(theme)}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             )}
@@ -514,22 +603,41 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                             {/* Thèmes personnalisés */}
                             {customThemesList.length > 0 && (
                                 <div>
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className={`w-1.5 h-8 rounded-full shadow-lg ${isDarkMode ? 'bg-gradient-to-b from-purple-500 to-purple-600' : 'bg-gradient-to-b from-purple-600 to-purple-700'}`}></div>
-                                        <h3 className={`text-xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    <div className="flex items-center gap-4 mb-7 relative">
+                                        <div className={`w-2 h-10 rounded-full shadow-xl relative overflow-hidden ${
+                                            isDarkMode ? 'bg-gradient-to-b from-purple-500 via-purple-500 to-purple-600' : 'bg-gradient-to-b from-purple-600 via-purple-600 to-purple-700'
+                                        }`}>
+                                            <div className="absolute inset-0 opacity-50" style={{
+                                                background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%)'
+                                            }}></div>
+                                        </div>
+                                        <h3 className={`text-2xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             Thèmes personnalisés
                                         </h3>
-                                        <div className={`flex-1 h-px ${isDarkMode ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-transparent' : 'bg-gradient-to-r from-gray-200 via-gray-300 to-transparent'}`}></div>
-                                        <span className={`text-xs px-3.5 py-1.5 rounded-full font-bold shadow-md ${
+                                        <div className={`flex-1 h-px relative ${
                                             isDarkMode 
-                                                ? 'bg-gradient-to-br from-gray-800 to-gray-700 text-gray-200 border border-gray-700/50' 
-                                                : 'bg-gradient-to-br from-gray-100 to-white text-gray-700 border border-gray-200/50'
+                                                ? 'bg-gradient-to-r from-gray-700 via-gray-600/50 to-transparent' 
+                                                : 'bg-gradient-to-r from-gray-200 via-gray-300/50 to-transparent'
                                         }`}>
-                                            {customThemesList.length}
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 animate-pulse"></div>
+                                        </div>
+                                        <span className={`text-xs px-4 py-2 rounded-full font-extrabold shadow-lg relative overflow-hidden ${
+                                            isDarkMode 
+                                                ? 'bg-gradient-to-br from-gray-800 via-gray-750 to-gray-700 text-gray-200 border border-gray-700/50' 
+                                                : 'bg-gradient-to-br from-gray-100 via-white to-gray-50 text-gray-700 border border-gray-200/50'
+                                        }`}>
+                                            <div className="absolute inset-0 opacity-20" style={{
+                                                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
+                                            }}></div>
+                                            <span className="relative z-10">{customThemesList.length}</span>
                                         </span>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                        {customThemesList.map(theme => renderThemePreview(theme))}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {customThemesList.map((theme, idx) => (
+                                            <div key={theme.id} style={{ animationDelay: `${(defaultThemesList.length + idx) * 50}ms` }} className="animate-fadeIn">
+                                                {renderThemePreview(theme)}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             )}
@@ -543,17 +651,29 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                             )}
                         </div>
 
-                        {/* Footer avec info et gradient */}
-                        <div className={`p-5 border-t backdrop-blur-xl ${
+                        {/* Footer avec info et gradient premium */}
+                        <div className={`p-6 border-t backdrop-blur-xl relative overflow-hidden ${
                             isDarkMode 
-                                ? 'bg-gradient-to-r from-gray-900/95 to-gray-800/95 border-gray-700/50' 
-                                : 'bg-gradient-to-r from-white/95 to-gray-50/95 border-gray-200/50'
+                                ? 'bg-gradient-to-r from-gray-900/98 via-gray-800/95 to-gray-900/98 border-gray-700/30' 
+                                : 'bg-gradient-to-r from-white/98 via-gray-50/95 to-white/98 border-gray-200/30'
                         }`}>
-                            <div className="flex items-center justify-center gap-2">
-                                <svg className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {/* Pattern subtil */}
+                            <div className={`absolute inset-0 opacity-[0.015] ${
+                                isDarkMode ? 'bg-white' : 'bg-black'
+                            }`} style={{
+                                backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
+                                backgroundSize: '20px 20px'
+                            }}></div>
+                            
+                            <div className="flex items-center justify-center gap-3 relative z-10">
+                                <div className={`p-2 rounded-lg ${
+                                    isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/50'
+                                }`}>
+                                    <svg className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <p className={`text-sm font-semibold tracking-wide ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                     Le thème sélectionné est sauvegardé automatiquement
                                 </p>
                             </div>
