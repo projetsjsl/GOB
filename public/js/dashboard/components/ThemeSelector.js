@@ -591,14 +591,16 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                             }}
                         ></div>
                         
-                        {/* Corner accents */}
-                        <div className="absolute top-0 left-0 w-32 h-32 opacity-10 pointer-events-none" style={{
-                            background: `radial-gradient(circle, ${colors.primary || '#3b82f6'} 0%, transparent 70%)`,
-                            filter: 'blur(20px)'
+                        {/* Corner accents avec animation */}
+                        <div className="absolute top-0 left-0 w-40 h-40 opacity-0 group-hover/modal:opacity-20 transition-opacity duration-1000 pointer-events-none" style={{
+                            background: `radial-gradient(circle, ${isDarkMode ? 'rgba(59, 130, 246, 0.6)' : 'rgba(59, 130, 246, 0.4)'} 0%, transparent 70%)`,
+                            filter: 'blur(30px)',
+                            animation: 'glow-pulse 4s ease-in-out infinite'
                         }}></div>
-                        <div className="absolute bottom-0 right-0 w-32 h-32 opacity-10 pointer-events-none" style={{
-                            background: `radial-gradient(circle, ${colors.accent || '#8b5cf6'} 0%, transparent 70%)`,
-                            filter: 'blur(20px)'
+                        <div className="absolute bottom-0 right-0 w-40 h-40 opacity-0 group-hover/modal:opacity-20 transition-opacity duration-1000 pointer-events-none" style={{
+                            background: `radial-gradient(circle, ${isDarkMode ? 'rgba(139, 92, 246, 0.6)' : 'rgba(139, 92, 246, 0.4)'} 0%, transparent 70%)`,
+                            filter: 'blur(30px)',
+                            animation: 'glow-pulse 4s ease-in-out infinite 1s'
                         }}></div>
                         {/* Header de la modal avec gradient premium */}
                         <div className={`sticky top-0 z-20 p-7 border-b backdrop-blur-xl relative overflow-hidden ${
