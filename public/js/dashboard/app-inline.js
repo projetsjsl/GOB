@@ -25084,22 +25084,117 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
         // Configuration des onglets (après déclaration de TOUS les composants)
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
-        const tabs = [
-            { id: 'markets-economy', label: 'Marchés & Économie', icon: 'iconoir-globe', component: MarketsEconomyTab },
+        // Configuration des onglets (sans "Plus" dans la liste principale - il sera ajouté dynamiquement)
+        const allTabs = [
+            { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
             { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
-            { id: 'ask-emma', label: 'Emma IA™', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
-            { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
-            { id: 'finvox', label: 'FinVox (Live)', icon: 'iconoir-voice-circle', component: FinVoxTab },
-            { id: 'emmaia', label: 'EmmAIA (Gemini)', icon: 'iconoir-brain', component: EmmAIATab },
+            { id: 'ask-emma', label: 'Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
+            { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
+            { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
+            { id: 'emmaia', label: 'EmmAIA', icon: 'iconoir-brain', component: EmmAIATab },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
-            { id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: PlusTab },
-            { id: 'admin-jsla', label: 'Admin JSLAI', icon: 'iconoir-settings', component: AdminJSLaiTab },
-            { id: 'scrapping-sa', label: 'Seeking Alpha', icon: 'iconoir-search', component: ScrappingSATab },
-            { id: 'seeking-alpha', label: 'Stocks News', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
-            { id: 'email-briefings', label: 'Emma En Direct', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
-            { id: 'investing-calendar', label: 'TESTS JS', icon: 'iconoir-calendar', component: InvestingCalendarTab },
-            { id: 'emma-config', label: 'Emma Config', icon: 'iconoir-settings', component: EmmaConfigTab }
+            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: AdminJSLaiTab },
+            { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
+            { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
+            { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
+            { id: 'investing-calendar', label: 'TESTS', icon: 'iconoir-calendar', component: InvestingCalendarTab },
+            { id: 'emma-config', label: 'Emma', icon: 'iconoir-settings', component: EmmaConfigTab }
         ];
+
+        // État pour gérer les onglets visibles et ceux dans "Plus"
+        const [visibleTabs, setVisibleTabs] = useState(allTabs);
+        const [hiddenTabs, setHiddenTabs] = useState([]);
+        const [showPlusMenu, setShowPlusMenu] = useState(false);
+        const navRef = useRef(null);
+        const tabRefs = useRef({});
+
+        // Fonction pour calculer quels onglets peuvent s'afficher
+        const calculateVisibleTabs = useCallback(() => {
+            if (!navRef.current) return;
+
+            const navWidth = navRef.current.offsetWidth;
+            const plusButtonWidth = 80; // Largeur approximative du bouton "Plus"
+            const padding = 16; // Padding horizontal
+            const gap = 4; // Gap entre les onglets
+            const availableWidth = navWidth - padding * 2 - plusButtonWidth - gap;
+
+            let currentWidth = 0;
+            const visible = [];
+            const hidden = [];
+
+            for (const tab of allTabs) {
+                // Estimer la largeur de l'onglet (min-width: 70px + padding)
+                const estimatedWidth = 70 + (tab.label.length * 4); // Approximation
+                
+                if (currentWidth + estimatedWidth <= availableWidth) {
+                    visible.push(tab);
+                    currentWidth += estimatedWidth + gap;
+                } else {
+                    hidden.push(tab);
+                }
+            }
+
+            // Toujours afficher au moins quelques onglets principaux
+            if (visible.length < 3 && allTabs.length > 3) {
+                const mainTabs = allTabs.slice(0, 3);
+                const restTabs = allTabs.slice(3);
+                setVisibleTabs(mainTabs);
+                setHiddenTabs(restTabs);
+            } else {
+                setVisibleTabs(visible);
+                setHiddenTabs(hidden);
+            }
+        }, []);
+
+        // Recalculer lors du redimensionnement
+        useEffect(() => {
+            calculateVisibleTabs();
+            
+            const handleResize = () => {
+                calculateVisibleTabs();
+            };
+
+            window.addEventListener('resize', handleResize);
+            // Recalculer après un court délai pour s'assurer que le DOM est rendu
+            const timeout = setTimeout(calculateVisibleTabs, 100);
+
+            return () => {
+                window.removeEventListener('resize', handleResize);
+                clearTimeout(timeout);
+            };
+        }, [calculateVisibleTabs]);
+
+        // Recalculer quand activeTab change (pour s'assurer que l'onglet actif est visible)
+        useEffect(() => {
+            const activeTabIndex = allTabs.findIndex(t => t.id === activeTab);
+            if (activeTabIndex >= 0 && hiddenTabs.some(t => t.id === activeTab)) {
+                // Si l'onglet actif est caché, le rendre visible
+                calculateVisibleTabs();
+            }
+        }, [activeTab, calculateVisibleTabs, hiddenTabs]);
+
+        // Fermer le menu "Plus" quand on clique en dehors
+        useEffect(() => {
+            const handleClickOutside = (event) => {
+                if (showPlusMenu && navRef.current && !navRef.current.contains(event.target)) {
+                    setShowPlusMenu(false);
+                }
+            };
+
+            if (showPlusMenu) {
+                document.addEventListener('mousedown', handleClickOutside);
+            }
+
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }, [showPlusMenu]);
+
+        // Construire la liste finale des onglets à afficher
+        const tabs = [...visibleTabs];
+        if (hiddenTabs.length > 0) {
+            tabs.push({ id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: PlusTab, hiddenTabs: hiddenTabs });
+        }
 
         return (
             <div className={`min-h-screen transition-colors duration-300 ${isDarkMode
@@ -25919,22 +26014,108 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 </div>
 
                 {/* Bottom Navigation Bar - Tous les écrans */}
-                <nav className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl ${isDarkMode
-                    ? 'bg-black/95 border-t border-green-500/20'
-                    : 'bg-white/95 border-t-2 border-gray-200'
-                    } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <nav 
+                    ref={navRef}
+                    className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl ${isDarkMode
+                        ? 'bg-black/95 border-t border-green-500/20'
+                        : 'bg-white/95 border-t-2 border-gray-200'
+                        } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                >
                     <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
                         {(window.RolesPermissions && window.userPermissions 
                             ? window.RolesPermissions.filterTabsByPermissions(tabs)
                             : tabs
                         ).map(tab => {
+                            // Gérer le menu "Plus" spécialement
+                            if (tab.id === 'plus' && tab.hiddenTabs) {
+                                return (
+                                    <div key="plus-menu" className="relative flex-shrink-0">
+                                        <button
+                                            onMouseDown={withRipple}
+                                            onClick={() => setShowPlusMenu(!showPlusMenu)}
+                                            className={`flex flex-col items-center justify-center py-2.5 px-3 min-w-[70px] btn-ripple relative transition-all duration-300 group rounded-lg ${
+                                                showPlusMenu
+                                                    ? (isDarkMode
+                                                        ? 'text-green-400 bg-gradient-to-b from-green-500/20 to-green-600/10'
+                                                        : 'text-green-600 bg-gradient-to-b from-green-50 to-green-100/50')
+                                                    : (isDarkMode
+                                                        ? 'text-gray-400 hover:text-green-300 hover:bg-gray-800/50'
+                                                        : 'text-gray-600 hover:text-green-700 hover:bg-gray-100')
+                                            }`}
+                                            title="Plus d'options"
+                                        >
+                                            <i className={`iconoir-menu text-xl relative z-10 transition-all duration-300`}></i>
+                                            <span className={`text-[10px] font-semibold text-center leading-tight transition-all duration-300 whitespace-nowrap`}>
+                                                Plus
+                                            </span>
+                                            {showPlusMenu && (
+                                                <span className={`absolute top-1 right-1 w-2 h-2 rounded-full transition-all duration-300 ${isDarkMode
+                                                    ? 'bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.8)]'
+                                                    : 'bg-green-600 shadow-[0_0_4px_rgba(22,163,74,0.6)]'
+                                                    } animate-pulse`}></span>
+                                            )}
+                                        </button>
+
+                                        {/* Dropdown menu pour les onglets cachés */}
+                                        {showPlusMenu && (
+                                            <div 
+                                                className={`absolute bottom-full left-0 mb-2 rounded-lg shadow-2xl border overflow-hidden z-50 min-w-[200px] max-h-[400px] overflow-y-auto ${
+                                                    isDarkMode
+                                                        ? 'bg-gray-900 border-gray-700'
+                                                        : 'bg-white border-gray-200'
+                                                }`}
+                                                style={{ maxHeight: '60vh' }}
+                                            >
+                                                {tab.hiddenTabs.map(hiddenTab => {
+                                                    const iconClass = hiddenTab.icon || getTabIcon(hiddenTab.id);
+                                                    const isActive = activeTab === hiddenTab.id;
+                                                    return (
+                                                        <button
+                                                            key={hiddenTab.id}
+                                                            onClick={() => {
+                                                                handleTabChange(hiddenTab.id);
+                                                                setShowPlusMenu(false);
+                                                            }}
+                                                            className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors ${
+                                                                isActive
+                                                                    ? (isDarkMode
+                                                                        ? 'bg-green-500/20 text-green-400'
+                                                                        : 'bg-green-50 text-green-600')
+                                                                    : (isDarkMode
+                                                                        ? 'text-gray-300 hover:bg-gray-800'
+                                                                        : 'text-gray-700 hover:bg-gray-100')
+                                                            }`}
+                                                        >
+                                                            {iconClass ? (
+                                                                <i className={`${iconClass} text-lg`}></i>
+                                                            ) : (
+                                                                <span className="text-lg">📊</span>
+                                                            )}
+                                                            <span className="font-medium">{hiddenTab.label}</span>
+                                                            {isActive && (
+                                                                <span className={`ml-auto w-2 h-2 rounded-full ${isDarkMode ? 'bg-green-400' : 'bg-green-600'}`}></span>
+                                                            )}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+                            
+                            // Rendu normal pour les autres onglets
                             const iconClass = tab.icon || getTabIcon(tab.id);
                             const isActive = activeTab === tab.id;
                             return (
                                 <button
                                     key={tab.id}
+                                    ref={el => { if (el) tabRefs.current[tab.id] = el; }}
                                     onMouseDown={withRipple}
-                                    onClick={() => handleTabChange(tab.id)}
+                                    onClick={() => {
+                                        handleTabChange(tab.id);
+                                        setShowPlusMenu(false);
+                                    }}
                                     className={`flex-shrink-0 flex flex-col items-center justify-center py-2.5 px-3 min-w-[70px] btn-ripple relative transition-all duration-300 group rounded-lg ${isActive
                                         ? (isDarkMode
                                             ? 'text-green-400 bg-gradient-to-b from-green-500/20 to-green-600/10'
