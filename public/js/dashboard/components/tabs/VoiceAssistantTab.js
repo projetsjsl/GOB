@@ -38,6 +38,7 @@
  */
 
 const { useState, useEffect, useRef } = React;
+const Icon = window.Icon;
 
 const VoiceAssistantTab = ({ isDarkMode }) => {
     // Use prop if passed, otherwise check global or default to true
