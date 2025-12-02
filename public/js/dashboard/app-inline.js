@@ -25924,7 +25924,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     : 'bg-white/95 border-t-2 border-gray-200'
                     } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                     <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
-                        {tabs.map(tab => {
+                        {(window.RolesPermissions && window.userPermissions 
+                            ? window.RolesPermissions.filterTabsByPermissions(tabs)
+                            : tabs
+                        ).map(tab => {
                             const iconClass = tab.icon || getTabIcon(tab.id);
                             const isActive = activeTab === tab.id;
                             return (
