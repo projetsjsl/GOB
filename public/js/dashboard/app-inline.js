@@ -6,10 +6,14 @@
  * - After edits, run a quick parse check locally (e.g. with @babel/parser or another linter) before deploying.
  * Keeping this block at the top as a reminder to reduce future syntax regressions.
  */
+// Log immédiat pour confirmer que le script se charge
+console.log('🚀 app-inline.js: Script en cours de chargement...');
+
 if (window.__GOB_DASHBOARD_MOUNTED) {
     console.warn('⚠️ Beta Dashboard déjà initialisé, exécution ignorée.');
 } else {
     window.__GOB_DASHBOARD_MOUNTED = true;
+    console.log('✅ app-inline.js: Initialisation du dashboard...');
 
     // Vérification que Babel fonctionne
     console.log('🔧 Babel chargé:', typeof Babel !== 'undefined');
@@ -26802,6 +26806,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
     // Fonction fallback SUPPRIMÉE - Plus de contenu demo
 
+    // Exposer BetaCombinedDashboard globalement pour le montage
+    window.BetaCombinedDashboard = BetaCombinedDashboard;
+
     // Montage de l'application React avec gestion d'erreurs robuste
     const mountApp = () => {
         try {
@@ -26830,30 +26837,45 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             }
             
             // Attendre que BetaCombinedDashboard soit défini (Babel peut prendre du temps)
+            // Note: BetaCombinedDashboard est défini dans la portée du bloc if, donc accessible ici
             let attempts = 0;
-            const maxAttempts = 100; // 10 secondes max (100 * 100ms)
+            const maxAttempts = 150; // 15 secondes max (150 * 100ms) - Babel peut être lent sur gros fichiers
             const checkAndMount = () => {
                 attempts++;
-                if (typeof BetaCombinedDashboard !== 'undefined') {
+                // Vérifier dans la portée locale d'abord, puis globale
+                const DashboardComponent = typeof BetaCombinedDashboard !== 'undefined' ? BetaCombinedDashboard : 
+                                         (typeof window.BetaCombinedDashboard !== 'undefined' ? window.BetaCombinedDashboard : undefined);
+                
+                if (DashboardComponent) {
                     console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
                     try {
                         // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
-                        ReactDOM.render(<BetaCombinedDashboard />, rootElement);
+                        ReactDOM.render(<DashboardComponent />, rootElement);
                         console.log('✅ Application React montée avec succès !');
                     } catch (renderError) {
                         console.error('❌ Erreur lors du ReactDOM.render:', renderError);
+                        console.error('Stack:', renderError.stack);
                         throw renderError;
                     }
                 } else if (attempts < maxAttempts) {
-                    if (attempts % 10 === 0) {
+                    if (attempts % 10 === 0 || attempts === 1) {
                         console.log(`⏳ Attente de BetaCombinedDashboard... (${attempts}/${maxAttempts})`);
+                        console.log('🔍 Vérification portée:', {
+                            local: typeof BetaCombinedDashboard !== 'undefined',
+                            global: typeof window.BetaCombinedDashboard !== 'undefined',
+                            React: typeof React !== 'undefined',
+                            ReactDOM: typeof ReactDOM !== 'undefined'
+                        });
                     }
                     setTimeout(checkAndMount, 100);
                 } else {
-                    throw new Error('BetaCombinedDashboard n\'est pas défini après 10 secondes. Le script Babel ne s\'est peut-être pas chargé correctement.');
+                    const errorMsg = 'BetaCombinedDashboard n\'est pas défini après 15 secondes. Le script Babel ne s\'est peut-être pas chargé correctement.';
+                    console.error('❌', errorMsg);
+                    throw new Error(errorMsg);
                 }
             };
             
+            // Démarrer la vérification immédiatement
             checkAndMount();
             
         } catch (error) {
