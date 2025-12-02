@@ -24104,32 +24104,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Configuration des onglets (après déclaration de TOUS les composants)
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
         // Configuration des onglets (sans "Plus" dans la liste principale - il sera ajouté dynamiquement)
-        // Fonction helper pour obtenir le composant AdminJSLaiTab de manière sécurisée (vérification dynamique)
-        const getAdminJSLaiTabComponent = () => {
-            if (typeof window !== 'undefined' && window.AdminJSLaiTab) {
-                return window.AdminJSLaiTab;
-            }
-            return () => <div className="p-4 text-center text-gray-500">Chargement de l'onglet Admin...</div>;
-        };
-
-        // Fonction helper pour obtenir le composant GroupChatTab de manière sécurisée (vérification dynamique)
-        const getGroupChatTabComponent = () => {
-            if (typeof window !== 'undefined' && window.GroupChatTab) {
-                return window.GroupChatTab;
-            }
-            return () => <div className="p-4 text-center text-gray-500">Chargement de l'onglet RobotWeb...</div>;
-        };
+        // Composant de fallback pour AdminJSLaiTab
+        const AdminJSLaiTabFallback = () => <div className="p-4 text-center text-gray-500">Chargement de l'onglet Admin...</div>;
+        
+        // Composant de fallback pour GroupChatTab
+        const GroupChatTabFallback = () => <div className="p-4 text-center text-gray-500">Chargement de l'onglet RobotWeb...</div>;
 
         const allTabs = [
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
             { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
-            { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', getComponent: getGroupChatTabComponent },
+            { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: (typeof window !== 'undefined' && window.GroupChatTab) ? window.GroupChatTab : GroupChatTabFallback },
             { id: 'ask-emma', label: 'Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
             { id: 'emmaia', label: 'EmmAIA', icon: 'iconoir-brain', component: EmmAIATab },
             { id: 'fastgraphs', label: 'FastGraphs', icon: 'iconoir-graph-up', component: FastGraphsTab },
-            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', getComponent: getAdminJSLaiTabComponent },
+            { id: 'admin-jsla', label: 'Admin', icon: 'iconoir-settings', component: (typeof window !== 'undefined' && window.AdminJSLaiTab) ? window.AdminJSLaiTab : AdminJSLaiTabFallback },
             { id: 'scrapping-sa', label: 'Seeking', icon: 'iconoir-search', component: ScrappingSATab },
             { id: 'seeking-alpha', label: 'Stocks', icon: 'iconoir-graph-up', component: SeekingAlphaTab },
             { id: 'email-briefings', label: 'Emma', icon: 'iconoir-antenna-signal', component: EmailBriefingsTab },
