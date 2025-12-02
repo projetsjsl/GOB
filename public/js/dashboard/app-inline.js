@@ -25398,12 +25398,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         </>
                     )}
 
-                    <div className="px-6 py-5 relative z-10">
+                    <div className="px-6 py-3 relative z-10">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-8">
+                            <div className="flex items-center space-x-6">
                                 {/* CEO Premium: Logo ultra-personnalisé selon le thème */}
                                 <div 
-                                    className="relative p-3.5 rounded-xl shadow-2xl group/logo transition-all duration-500 hover:scale-105"
+                                    className="relative p-2.5 rounded-xl shadow-2xl group/logo transition-all duration-500 hover:scale-105"
                                     style={{
                                         background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                             ? `
@@ -25554,188 +25554,166 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <img
                                         src="/logojslaidark.jpg"
                                         alt="JSL AI Logo"
-                                        className="w-20 h-20 object-contain relative z-10 drop-shadow-2xl filter brightness-110"
+                                        className="w-14 h-14 object-contain relative z-10 drop-shadow-2xl filter brightness-110"
                                     />
                                 </div>
 
                                 <div 
-                                    className="border-l pl-7 relative"
-                                    style={{
-                                        borderColor: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                            ? 'rgba(0, 212, 255, 0.5)'
-                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                            ? 'rgba(255, 204, 0, 0.5)'
-                                            : currentThemeId === 'seeking-alpha'
-                                            ? 'rgba(255, 107, 53, 0.4)'
-                                            : currentThemeId === 'desjardins'
-                                            ? 'rgba(0, 166, 81, 0.4)'
-                                            : `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
-                                        borderWidth: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '3px' : '2px'
-                                    }}
+                                    className="pl-5 relative"
                                 >
-                                    {/* Animated border glow personnalisé */}
-                                    <div 
-                                        className="absolute left-0 top-0 bottom-0"
-                                        style={{
-                                            width: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '3px' : '2px',
-                                            opacity: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' ? 0.7 : 0.5,
-                                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                ? 'linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.8) 50%, transparent 100%)'
-                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                ? 'linear-gradient(180deg, transparent 0%, rgba(255, 204, 0, 0.8) 50%, transparent 100%)'
-                                                : currentThemeId === 'seeking-alpha'
-                                                ? 'linear-gradient(180deg, transparent 0%, rgba(255, 107, 53, 0.7) 50%, transparent 100%)'
-                                                : currentThemeId === 'desjardins'
-                                                ? 'linear-gradient(180deg, transparent 0%, rgba(0, 166, 81, 0.7) 50%, transparent 100%)'
-                                                : `linear-gradient(180deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.6) 50%, transparent 100%)`,
-                                            animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                ? 'glow-pulse 2.5s ease-in-out infinite'
-                                                : 'glow-pulse 3s ease-in-out infinite',
-                                            boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                ? '0 0 12px rgba(0, 212, 255, 0.4)'
-                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                ? '0 0 12px rgba(255, 204, 0, 0.4)'
-                                                : 'none'
-                                        }}
-                                    ></div>
-                                    
-                                    <div className="flex items-center gap-4 relative z-10">
+                                    <div className="flex items-center gap-3 relative z-10">
                                         <div>
                                             <h1 
-                                                className="text-5xl font-black tracking-tighter relative"
+                                                className="text-2xl font-bold tracking-tight relative"
                                                 style={{ 
                                                     fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                        ? 'var(--theme-font-mono, "Courier New", monospace)'
+                                                        ? '"Courier New", "Courier", monospace'
                                                         : currentThemeId === 'bloomberg-nostalgie'
-                                                        ? 'var(--theme-font-primary, "Courier New", monospace)'
+                                                        ? '"Georgia", "Times New Roman", serif'
                                                         : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                        ? 'var(--theme-font-primary, Roboto, sans-serif)'
-                                                        : "'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', var(--theme-font-primary, Inter), sans-serif",
-                                                    fontWeight: 900, 
+                                                        ? '"Roboto", "Helvetica Neue", sans-serif'
+                                                        : currentThemeId === 'seeking-alpha'
+                                                        ? '"Open Sans", "Arial", sans-serif'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '"Montserrat", "Arial", sans-serif'
+                                                        : currentThemeId === 'ia'
+                                                        ? '"Inter", "SF Pro Display", sans-serif'
+                                                        : '"Inter", "Arial", sans-serif',
+                                                    fontWeight: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 700 : 700, 
                                                     letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' 
-                                                        ? '0.1em' 
+                                                        ? '0.05em' 
                                                         : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                        ? '-0.02em'
-                                                        : '-0.03em',
-                                                    color: 'var(--theme-text, #ffffff)',
+                                                        ? '0.01em'
+                                                        : '0.02em',
+                                                    color: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                        ? '#ffcc00'
+                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        ? '#1a1a1a'
+                                                        : '#ffffff',
                                                     textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                        ? `
-                                                            0 2px 8px rgba(0, 0, 0, 0.4),
-                                                            0 0 25px rgba(0, 212, 255, 0.3),
-                                                            0 0 50px rgba(0, 212, 255, 0.2)
-                                                        `
+                                                        ? '0 1px 3px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 212, 255, 0.2)'
                                                         : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                        ? `
-                                                            0 2px 8px rgba(0, 0, 0, 0.5),
-                                                            0 0 20px rgba(255, 204, 0, 0.3)
-                                                        `
-                                                        : `
-                                                            0 2px 8px rgba(0, 0, 0, 0.3),
-                                                            0 0 20px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)
-                                                        `
+                                                        ? '0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 204, 0, 0.3)'
+                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        ? '0 1px 2px rgba(255, 255, 255, 0.8)'
+                                                        : '0 1px 3px rgba(0, 0, 0, 0.5)'
                                                 }}
                                             >
                                                 TERMINAL FINANCIER
                                                 <br />
                                                 <span 
-                                                    className="text-4xl relative inline-block"
+                                                    className="text-xl relative inline-block ml-1"
                                                     style={{ 
-                                                        color: 'var(--theme-primary, #4ade80)', 
-                                                        fontWeight: 900,
-                                                        fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                            ? 'var(--theme-font-mono, "Courier New", monospace)'
-                                                            : 'inherit',
-                                                        textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                            ? `
-                                                                0 2px 12px rgba(0, 212, 255, 0.5),
-                                                                0 0 35px rgba(0, 212, 255, 0.4),
-                                                                0 0 60px rgba(0, 212, 255, 0.3)
-                                                            `
+                                                        color: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? '#00d4ff'
                                                             : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                            ? `
-                                                                0 2px 12px rgba(255, 204, 0, 0.5),
-                                                                0 0 30px rgba(255, 204, 0, 0.4)
-                                                            `
-                                                            : `
-                                                                0 2px 12px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4),
-                                                                0 0 30px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)
-                                                            `,
-                                                        filter: 'brightness(1.15)',
-                                                        animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' ? 'glow-pulse 3s ease-in-out infinite' : 'none'
+                                                            ? '#00ff00'
+                                                            : currentThemeId === 'seeking-alpha'
+                                                            ? '#ff6b35'
+                                                            : currentThemeId === 'desjardins'
+                                                            ? '#00a651'
+                                                            : currentThemeId === 'bloomberg-nostalgie'
+                                                            ? '#8b5cf6'
+                                                            : currentThemeId === 'ia'
+                                                            ? '#a78bfa'
+                                                            : '#10b981', 
+                                                        fontWeight: 700,
+                                                        fontFamily: 'inherit',
+                                                        textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? '0 1px 4px rgba(0, 212, 255, 0.4), 0 0 12px rgba(0, 212, 255, 0.3)'
+                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? '0 1px 4px rgba(0, 255, 0, 0.5), 0 0 12px rgba(0, 255, 0, 0.4)'
+                                                            : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                            ? '0 1px 2px rgba(0, 0, 0, 0.3)'
+                                                            : '0 1px 4px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)',
+                                                        filter: 'brightness(1.1)'
                                                     }}
                                                 >
                                                     Emma IA
                                                 </span>
                                                 <span 
-                                                    className="ml-4 text-xs font-bold px-3 py-1.5 rounded-lg relative inline-block"
+                                                    className="ml-2 text-[10px] font-semibold px-2 py-0.5 rounded relative inline-block"
                                                     style={{
                                                         background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                            ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(0, 168, 204, 0.2) 100%)'
+                                                            ? 'rgba(0, 212, 255, 0.2)'
                                                             : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                            ? 'linear-gradient(135deg, rgba(255, 204, 0, 0.3) 0%, rgba(255, 204, 0, 0.2) 100%)'
+                                                            ? 'rgba(255, 204, 0, 0.2)'
                                                             : currentThemeId === 'seeking-alpha'
-                                                            ? 'linear-gradient(135deg, rgba(255, 107, 53, 0.3) 0%, rgba(255, 107, 53, 0.2) 100%)'
+                                                            ? 'rgba(255, 107, 53, 0.2)'
                                                             : currentThemeId === 'desjardins'
-                                                            ? 'linear-gradient(135deg, rgba(0, 166, 81, 0.3) 0%, rgba(0, 103, 71, 0.2) 100%)'
-                                                            : `linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.25) 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 100%)`,
-                                                        color: 'var(--theme-primary, #4ade80)',
+                                                            ? 'rgba(0, 166, 81, 0.2)'
+                                                            : `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)`,
+                                                        color: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? '#00d4ff'
+                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? '#ffcc00'
+                                                            : currentThemeId === 'seeking-alpha'
+                                                            ? '#ff6b35'
+                                                            : currentThemeId === 'desjardins'
+                                                            ? '#00a651'
+                                                            : 'var(--theme-primary, #10b981)',
                                                         border: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                            ? '1px solid rgba(0, 212, 255, 0.5)'
+                                                            ? '1px solid rgba(0, 212, 255, 0.4)'
                                                             : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                            ? '1px solid rgba(255, 204, 0, 0.5)'
+                                                            ? '1px solid rgba(255, 204, 0, 0.4)'
                                                             : currentThemeId === 'seeking-alpha'
-                                                            ? '1px solid rgba(255, 107, 53, 0.4)'
+                                                            ? '1px solid rgba(255, 107, 53, 0.3)'
                                                             : currentThemeId === 'desjardins'
-                                                            ? '1px solid rgba(0, 166, 81, 0.4)'
-                                                            : `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
-                                                        boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                            ? `
-                                                                0 4px 12px rgba(0, 212, 255, 0.3),
-                                                                inset 0 1px 0 rgba(0, 212, 255, 0.3),
-                                                                0 0 20px rgba(0, 212, 255, 0.2)
-                                                            `
-                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                            ? `
-                                                                0 4px 12px rgba(255, 204, 0, 0.3),
-                                                                inset 0 1px 0 rgba(255, 204, 0, 0.3),
-                                                                0 0 20px rgba(255, 204, 0, 0.2)
-                                                            `
-                                                            : `
-                                                                0 4px 12px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2),
-                                                                inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                                                            `,
+                                                            ? '1px solid rgba(0, 166, 81, 0.3)'
+                                                            : `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`,
                                                         textTransform: 'uppercase',
-                                                        letterSpacing: '0.1em',
-                                                        animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                            ? 'glow-pulse 2s ease-in-out infinite'
-                                                            : 'glow-pulse 2.5s ease-in-out infinite'
+                                                        letterSpacing: '0.08em'
                                                     }}
                                                 >
                                                     BÊTA
                                                 </span>
                                             </h1>
                                             <p 
-                                                className="text-sm font-semibold tracking-wider mt-2 relative"
+                                                className="text-xs font-medium tracking-wide mt-1 relative"
                                                 style={{
                                                     fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                        ? 'var(--theme-font-mono, "Courier New", monospace)'
-                                                        : 'var(--theme-font-primary, Inter, sans-serif)',
-                                                    color: 'var(--theme-text-secondary, #9ca3af)',
-                                                    textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                        ? '0 1px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 212, 255, 0.1)'
-                                                        : '0 1px 4px rgba(0, 0, 0, 0.2)',
-                                                    letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.05em' : '0.02em'
+                                                        ? '"Courier New", "Courier", monospace'
+                                                        : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                        ? '"Roboto", "Helvetica Neue", sans-serif'
+                                                        : currentThemeId === 'seeking-alpha'
+                                                        ? '"Open Sans", "Arial", sans-serif'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '"Montserrat", "Arial", sans-serif'
+                                                        : '"Inter", "Arial", sans-serif',
+                                                    color: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                        ? '#888888'
+                                                        : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        ? '#666666'
+                                                        : '#9ca3af',
+                                                    textShadow: currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                        ? '0 1px 1px rgba(255, 255, 255, 0.5)'
+                                                        : '0 1px 2px rgba(0, 0, 0, 0.3)',
+                                                    letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.03em' : '0.01em'
                                                 }}
                                             >
                                                 Propulsé par <span 
                                                     style={{ 
-                                                        color: 'var(--theme-primary, #4ade80)', 
-                                                        fontWeight: 'bold',
-                                                        textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                            ? `0 0 12px rgba(0, 212, 255, 0.5), 0 0 24px rgba(0, 212, 255, 0.3)`
+                                                        color: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? '#00d4ff'
                                                             : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                            ? `0 0 10px rgba(255, 204, 0, 0.4)`
-                                                            : `0 0 10px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`
+                                                            ? '#00ff00'
+                                                            : currentThemeId === 'seeking-alpha'
+                                                            ? '#ff6b35'
+                                                            : currentThemeId === 'desjardins'
+                                                            ? '#00a651'
+                                                            : currentThemeId === 'bloomberg-nostalgie'
+                                                            ? '#8b5cf6'
+                                                            : currentThemeId === 'ia'
+                                                            ? '#a78bfa'
+                                                            : '#10b981', 
+                                                        fontWeight: '600',
+                                                        textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? `0 0 6px rgba(0, 212, 255, 0.4)`
+                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? `0 0 6px rgba(0, 255, 0, 0.4)`
+                                                            : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                            ? `0 1px 2px rgba(0, 0, 0, 0.2)`
+                                                            : `0 0 6px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`
                                                     }}
                                                 >
                                                     JSL AI
@@ -25749,7 +25727,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             <div className="flex items-center gap-3">
                                 {/* CEO Premium: Live indicator ultra-personnalisé selon le thème */}
                                 <div 
-                                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl relative group/live transition-all duration-500 hover:scale-105"
+                                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg relative group/live transition-all duration-500 hover:scale-105"
                                     style={{
                                         background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                             ? `
@@ -25807,7 +25785,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     
                                     <div className="relative z-10">
                                         <div 
-                                            className="w-2.5 h-2.5 rounded-full animate-pulse relative"
+                                            className="w-2 h-2 rounded-full animate-pulse relative"
                                             style={{ 
                                                 backgroundColor: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                     ? '#00ff88'
@@ -25815,47 +25793,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     ? '#00ff00'
                                                     : 'var(--theme-success, #10b981)',
                                                 boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                    ? `0 0 12px #00ff88, 0 0 24px rgba(0, 255, 136, 0.5), 0 0 40px rgba(0, 255, 136, 0.3)`
+                                                    ? `0 0 6px #00ff88, 0 0 12px rgba(0, 255, 136, 0.4)`
                                                     : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                    ? `0 0 12px #00ff00, 0 0 24px rgba(0, 255, 0, 0.5), 0 0 40px rgba(0, 255, 0, 0.3)`
-                                                    : `0 0 12px var(--theme-success, #10b981), 0 0 24px rgba(var(--theme-success-rgb, 16, 185, 129), 0.4)`
+                                                    ? `0 0 6px #00ff00, 0 0 12px rgba(0, 255, 0, 0.4)`
+                                                    : `0 0 6px var(--theme-success, #10b981), 0 0 12px rgba(var(--theme-success-rgb, 16, 185, 129), 0.3)`
                                             }}
                                         ></div>
                                         <div 
-                                            className="absolute inset-0 w-2.5 h-2.5 rounded-full animate-ping opacity-75"
+                                            className="absolute inset-0 w-2 h-2 rounded-full animate-ping opacity-75"
                                             style={{ 
                                                 backgroundColor: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                     ? '#00ff88'
                                                     : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                     ? '#00ff00'
-                                                    : 'var(--theme-success, #10b981)',
-                                                boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                    ? `0 0 12px #00ff88`
-                                                    : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                    ? `0 0 12px #00ff00`
-                                                    : `0 0 12px var(--theme-success, #10b981)`
+                                                    : 'var(--theme-success, #10b981)'
                                             }}
                                         ></div>
-                                        {/* Triple ring pulse */}
-                                        {[0, 1, 2].map((ring) => (
-                                            <div
-                                                key={ring}
-                                                className="absolute inset-0 w-2.5 h-2.5 rounded-full"
-                                                style={{
-                                                    border: `1px solid ${currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                        ? '#00ff88'
-                                                        : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                        ? '#00ff00'
-                                                        : 'var(--theme-success, #10b981)'}`,
-                                                    animation: `pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite ${ring * 0.3}s`,
-                                                    opacity: 0.6 - (ring * 0.2),
-                                                    transform: `scale(${1 + ring * 0.5})`
-                                                }}
-                                            ></div>
-                                        ))}
                                     </div>
                                     <span 
-                                        className="text-xs font-black tracking-widest relative z-10 uppercase"
+                                        className="text-[10px] font-bold tracking-wide relative z-10 uppercase"
                                         style={{ 
                                             color: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                 ? '#00ff88'
@@ -25863,14 +25819,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 ? '#00ff00'
                                                 : 'var(--theme-success, #10b981)',
                                             fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                ? 'var(--theme-font-mono, "Courier New", monospace)'
-                                                : 'var(--theme-font-primary, Inter, sans-serif)',
+                                                ? '"Courier New", "Courier", monospace'
+                                                : '"Inter", "Arial", sans-serif',
                                             textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                ? `0 0 10px rgba(0, 255, 136, 0.6), 0 0 20px rgba(0, 255, 136, 0.4)`
+                                                ? `0 0 4px rgba(0, 255, 136, 0.5)`
                                                 : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                ? `0 0 10px rgba(0, 255, 0, 0.6), 0 0 20px rgba(0, 255, 0, 0.4)`
-                                                : `0 0 8px rgba(var(--theme-success-rgb, 16, 185, 129), 0.5)`,
-                                            letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.2em' : '0.15em'
+                                                ? `0 0 4px rgba(0, 255, 0, 0.5)`
+                                                : `0 0 4px rgba(var(--theme-success-rgb, 16, 185, 129), 0.4)`,
+                                            letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.1em' : '0.08em'
                                         }}
                                     >
                                         LIVE
