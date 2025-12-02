@@ -22,7 +22,7 @@ const AIStockAnalysisModal = ({ symbol, stockData, onClose }) => {
         try {
             const API_BASE_URL = window.location.origin || '';
 
-            // Build comprehensive analysis prompt
+            // Build comprehensive analysis prompt for Emma Agent
             const fundamentals = stockData?.ratios || stockData?.metrics || {};
             const profile = stockData?.profile || {};
             const price = typeof stockData?.price === 'number' && !Number.isNaN(stockData?.price) ? stockData.price : 0;
@@ -30,7 +30,8 @@ const AIStockAnalysisModal = ({ symbol, stockData, onClose }) => {
                 ? `$${(profile.marketCap / 1_000_000_000).toFixed(2)}B`
                 : 'N/A';
 
-            const analysisPrompt = `Analyze ${symbol} stock comprehensively as an investment opportunity.
+            // Use Emma Agent for real-time analysis with Perplexity
+            const analysisMessage = `Analyze ${symbol} stock comprehensively as an investment opportunity.
 
 Current Price: $${price}
 Company: ${profile.companyName || symbol}
@@ -71,51 +72,113 @@ Provide a detailed analysis in the following structure:
 
 Use the latest market data and news. Be objective and data-driven. Format with markdown.`;
 
-            // Call AI service
-            const response = await fetch(`${API_BASE_URL}/api/ai-services`, {
+            // Call Emma Agent API for real-time analysis
+            const response = await fetch(`${API_BASE_URL}/api/emma-agent`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    service: selectedModel === 'perplexity' ? 'perplexity' : 'openai',
-                    prompt: analysisPrompt,
-                    section: 'analysis',
-                    recency: 'day',
-                    model: selectedModel === 'perplexity' ? 'sonar-reasoning-pro' : 'gpt-4o',
-                    max_tokens: 2000
+                    message: analysisMessage,
+                    context: {
+                        output_mode: 'chat',
+                        user_channel: 'web',
+                        tickers: [symbol],
+                        news_requested: true,
+                        stockData: stockData,
+                        recency: 'day',
+                        model_preference: selectedModel === 'perplexity' ? 'perplexity' : 'openai',
+                        temperature: 0.7,
+                        max_tokens: 2000
+                    }
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`AI service error: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`Emma Agent error: ${response.status} - ${errorData.error || response.statusText}`);
             }
 
             const data = await response.json();
 
-            // Extract analysis text
-            const analysisText =
-                data.content ||
-                data.data?.content ||
-                data.data?.choices?.[0]?.message?.content ||
-                data.choices?.[0]?.message?.content ||
-                '';
+            // Extract analysis text from Emma Agent response
+            let analysisText = '';
+            let modelUsed = selectedModel;
 
-            if (!analysisText) {
-                throw new Error('Invalid AI response format');
+            // Handle different response formats from Emma Agent
+            if (data.response) {
+                analysisText = data.response;
+            } else if (data.content) {
+                analysisText = data.content;
+            } else if (data.message) {
+                analysisText = data.message;
+            } else if (data.data?.response) {
+                analysisText = data.data.response;
+            } else if (data.data?.content) {
+                analysisText = data.data.content;
+            } else if (typeof data === 'string') {
+                analysisText = data;
             }
 
-            const modelUsed = data.model || data.data?.model || selectedModel;
+            // Extract model information
+            if (data.model) {
+                modelUsed = data.model;
+            } else if (data.data?.model) {
+                modelUsed = data.data.model;
+            } else if (data.source) {
+                modelUsed = data.source;
+            }
 
-            // Parse the analysis (simple parsing - can be enhanced)
+            if (!analysisText || analysisText.trim().length === 0) {
+                throw new Error('Empty response from Emma Agent');
+            }
+
+            // Parse the analysis
             setAnalysisData({
                 fullText: analysisText,
                 model: modelUsed,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                sources: data.sources || [],
+                tools_used: data.tools_used || []
             });
 
         } catch (err) {
             console.error('AI Analysis Error:', err);
-            setError(err.message || 'Failed to fetch AI analysis');
-            // Set fallback data
+            setError(err.message || 'Failed to fetch AI analysis from Emma Agent');
+            
+            // Try fallback to ai-services if emma-agent fails
+            try {
+                console.log('Trying fallback to ai-services...');
+                const fallbackResponse = await fetch(`${window.location.origin || ''}/api/ai-services`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        service: selectedModel === 'perplexity' ? 'perplexity' : 'openai',
+                        prompt: `Analyze ${symbol} stock comprehensively as an investment opportunity. Provide detailed analysis with investment thesis, strengths, risks, valuation, outlook, and recommendation. Use latest market data. Format with markdown.`,
+                        section: 'analysis',
+                        recency: 'day',
+                        model: selectedModel === 'perplexity' ? 'sonar-reasoning-pro' : 'gpt-4o',
+                        max_tokens: 2000
+                    })
+                });
+
+                if (fallbackResponse.ok) {
+                    const fallbackData = await fallbackResponse.json();
+                    const fallbackText = fallbackData.content || fallbackData.data?.content || '';
+                    
+                    if (fallbackText) {
+                        setAnalysisData({
+                            fullText: fallbackText,
+                            model: fallbackData.model || selectedModel,
+                            timestamp: new Date().toISOString()
+                        });
+                        setError(null);
+                        return;
+                    }
+                }
+            } catch (fallbackErr) {
+                console.error('Fallback also failed:', fallbackErr);
+            }
+
+            // Set error data
             setAnalysisData({
                 fullText: `## AI Analysis Error\n\nUnable to generate analysis for ${symbol}. Please try again later.\n\nError: ${err.message}`,
                 model: 'error',
@@ -155,7 +218,7 @@ Use the latest market data and news. Be objective and data-driven. Format with m
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white">AI Stock Analysis</h2>
-                            <p className="text-gray-400 text-sm">{symbol} • Powered by {selectedModel === 'perplexity' ? 'Perplexity AI' : 'OpenAI GPT-4o'}</p>
+                            <p className="text-gray-400 text-sm">{symbol} • Powered by Emma IA via {selectedModel === 'perplexity' ? 'Perplexity AI (Real-time)' : 'OpenAI GPT-4o'}</p>
                         </div>
                     </div>
                     <button
@@ -225,7 +288,17 @@ Use the latest market data and news. Be objective and data-driven. Format with m
                                 }}
                             />
                             <div className="mt-8 pt-4 border-t border-gray-700 text-xs text-gray-500">
-                                Generated by {analysisData.model} on {new Date(analysisData.timestamp).toLocaleString()}
+                                <div>Generated by Emma IA via {analysisData.model} on {new Date(analysisData.timestamp).toLocaleString()}</div>
+                                {analysisData.tools_used && analysisData.tools_used.length > 0 && (
+                                    <div className="mt-2 text-gray-600">
+                                        Data sources: {analysisData.tools_used.join(', ')}
+                                    </div>
+                                )}
+                                {analysisData.sources && analysisData.sources.length > 0 && (
+                                    <div className="mt-2 text-gray-600">
+                                        Sources: {analysisData.sources.length} reference(s)
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ) : null}

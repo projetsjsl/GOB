@@ -9,6 +9,7 @@ const MarketsEconomyTab = () => {
     const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
     const [selectedTheme, setSelectedTheme] = useState('all'); // Filtre thème
     const [localFilteredNews, setLocalFilteredNews] = useState([]);
+    const [activeView, setActiveView] = useState('overview'); // 'overview' ou 'screener'
 
     // Refs pour les widgets TradingView
     const marketOverviewRef = useRef(null);
@@ -252,34 +253,68 @@ const MarketsEconomyTab = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex justify-between items-center">
-                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
-                    isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>📰 Marchés & Économie</h2>
-                <div className="flex gap-2">
-                    {/* Toggle Français */}
-                    <button
-                        onClick={() => setLocalFrenchOnly(!localFrenchOnly)}
-                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
-                            localFrenchOnly
-                                ? 'bg-blue-600 text-white'
-                                : (isDarkMode
+            <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                    <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                    }`}>📰 Marchés & Économie</h2>
+                    <div className="flex gap-2">
+                        {/* Toggle Français */}
+                        <button
+                            onClick={() => setLocalFrenchOnly(!localFrenchOnly)}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                                localFrenchOnly
+                                    ? 'bg-blue-600 text-white'
+                                    : (isDarkMode
+                                        ? 'bg-gray-800 hover:bg-gray-700 text-white'
+                                        : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
+                            }`}
+                        >
+                            🇫🇷 Français {localFrenchOnly && '✓'}
+                        </button>
+                        <button
+                            onClick={fetchNews}
+                            disabled={loading}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${
+                                isDarkMode
                                     ? 'bg-gray-800 hover:bg-gray-700 text-white'
-                                    : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
+                                    : 'bg-gray-700 hover:bg-gray-600 text-white'
+                            }`}
+                        >
+                            {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Navigation entre les vues */}
+                <div className={`flex gap-2 p-1 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                    <button
+                        onClick={() => setActiveView('overview')}
+                        className={`flex-1 px-4 py-2 rounded-md font-semibold transition-all duration-300 ${
+                            activeView === 'overview'
+                                ? isDarkMode
+                                    ? 'bg-blue-600 text-white shadow-lg'
+                                    : 'bg-blue-500 text-white shadow-md'
+                                : isDarkMode
+                                    ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                         }`}
                     >
-                        🇫🇷 Français {localFrenchOnly && '✓'}
+                        📊 Vue d'ensemble
                     </button>
                     <button
-                        onClick={fetchNews}
-                        disabled={loading}
-                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${
-                            isDarkMode
-                                ? 'bg-gray-800 hover:bg-gray-700 text-white'
-                                : 'bg-gray-700 hover:bg-gray-600 text-white'
+                        onClick={() => setActiveView('screener')}
+                        className={`flex-1 px-4 py-2 rounded-md font-semibold transition-all duration-300 ${
+                            activeView === 'screener'
+                                ? isDarkMode
+                                    ? 'bg-purple-600 text-white shadow-lg'
+                                    : 'bg-purple-500 text-white shadow-md'
+                                : isDarkMode
+                                    ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                         }`}
                     >
-                        {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                        🚀 Screener - Top Gainers & Losers
                     </button>
                 </div>
             </div>
@@ -291,70 +326,74 @@ const MarketsEconomyTab = () => {
             )}
 
             {/* ===== WIDGETS TRADING VIEW VISUELS ===== */}
-            <div className="grid grid-cols-1 gap-6 mt-6">
-                {/* Market Overview Widget */}
-                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                    isDarkMode
-                        ? 'bg-gray-800/50 border-blue-500/30'
-                        : 'bg-white border-blue-400/40'
-                }`}>
-                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
-                            📊 Vue d'ensemble des Marchés (Temps Réel)
-                        </h3>
-                        <p className={`text-sm transition-colors duration-300 ${
-                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
-                            Indices majeurs, Forex, Crypto - Données en direct
-                        </p>
+            {activeView === 'overview' ? (
+                <div className="grid grid-cols-1 gap-6 mt-6">
+                    {/* Market Overview Widget */}
+                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                        isDarkMode
+                            ? 'bg-gray-800/50 border-blue-500/30'
+                            : 'bg-white border-blue-400/40'
+                    }`}>
+                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
+                                📊 Vue d'ensemble des Marchés (Temps Réel)
+                            </h3>
+                            <p className={`text-sm transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                Indices majeurs, Forex, Crypto - Données en direct
+                            </p>
+                        </div>
+                        <div ref={marketOverviewRef} style={{height: '400px'}}></div>
                     </div>
-                    <div ref={marketOverviewRef} style={{height: '400px'}}></div>
-                </div>
 
-                {/* Stock Heatmap Widget */}
-                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                    isDarkMode
-                        ? 'bg-gray-800/50 border-green-500/30'
-                        : 'bg-white border-green-400/40'
-                }`}>
-                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
-                            🔥 Heatmap Boursière
-                        </h3>
-                        <p className={`text-sm transition-colors duration-300 ${
-                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
-                            Visualisation des performances par secteur
-                        </p>
+                    {/* Stock Heatmap Widget */}
+                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                        isDarkMode
+                            ? 'bg-gray-800/50 border-green-500/30'
+                            : 'bg-white border-green-400/40'
+                    }`}>
+                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
+                                🔥 Heatmap Boursière
+                            </h3>
+                            <p className={`text-sm transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                Visualisation des performances par secteur
+                            </p>
+                        </div>
+                        <div ref={heatmapRef} style={{height: '500px'}}></div>
                     </div>
-                    <div ref={heatmapRef} style={{height: '500px'}}></div>
                 </div>
-
-                {/* Screener Widget - Top Gainers/Losers */}
-                <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
-                    isDarkMode
-                        ? 'bg-gray-800/50 border-purple-500/30'
-                        : 'bg-white border-purple-400/40'
-                }`}>
-                    <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                        <h3 className={`text-lg font-bold transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
-                            🚀 Screener - Top Gainers & Losers
-                        </h3>
-                        <p className={`text-sm transition-colors duration-300 ${
-                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
-                            Actions les plus performantes et en baisse
-                        </p>
+            ) : (
+                <div className="mt-6">
+                    {/* Screener Widget - Top Gainers/Losers - Vue dédiée */}
+                    <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
+                        isDarkMode
+                            ? 'bg-gray-800/50 border-purple-500/30'
+                            : 'bg-white border-purple-400/40'
+                    }`}>
+                        <div className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                            <h3 className={`text-lg font-bold transition-colors duration-300 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
+                                🚀 Screener - Top Gainers & Losers
+                            </h3>
+                            <p className={`text-sm transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                                Actions les plus performantes et en baisse
+                            </p>
+                        </div>
+                        <div ref={screenerRef} style={{height: '700px'}}></div>
                     </div>
-                    <div ref={screenerRef} style={{height: '500px'}}></div>
                 </div>
-            </div>
+            )}
 
             {/* Statistiques */}
             <div className={`p-4 rounded-xl transition-colors duration-300 ${

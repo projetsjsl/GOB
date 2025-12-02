@@ -22,21 +22,118 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
         try {
             const API_BASE_URL = window.location.origin || '';
 
-            const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=earnings&symbol=${symbol}`);
+            // Try FMP first (primary source)
+            let earningsData = null;
+            let source = 'fmp';
 
-            if (!response.ok) {
-                throw new Error(`Earnings API error: ${response.status}`);
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=earnings&symbol=${symbol}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Normalize FMP data structure
+                    if (data && (data.historical || data.upcoming || data.consensus)) {
+                        earningsData = {
+                            symbol: data.symbol || symbol.toUpperCase(),
+                            consensus: {
+                                nextEarningsDate: data.consensus?.nextEarningsDate || 
+                                               data.upcoming?.[0]?.date || null,
+                                estimatedEPS: data.consensus?.estimatedEPS || 
+                                            data.upcoming?.[0]?.eps || 
+                                            data.upcoming?.[0]?.epsEstimated || null,
+                                estimatedRevenue: data.consensus?.estimatedRevenue || 
+                                                 data.upcoming?.[0]?.revenue || null
+                            },
+                            upcoming: (data.upcoming || []).map(item => ({
+                                date: item.date || item.earningDate,
+                                fiscalDateEnding: item.fiscalDateEnding || item.fiscalQuarter || null,
+                                eps: item.eps || item.epsEstimated || null,
+                                epsEstimated: item.epsEstimated || item.eps || null,
+                                revenue: item.revenue || item.revenueEstimated || null,
+                                revenueEstimated: item.revenueEstimated || item.revenue || null,
+                                time: item.time || 'N/A'
+                            })),
+                            historical: (data.historical || []).map(item => ({
+                                date: item.date || item.earningDate || item.reportDate,
+                                fiscalDateEnding: item.fiscalDateEnding || item.fiscalQuarter || null,
+                                eps: item.eps || item.actualEPS || null,
+                                epsEstimated: item.epsEstimated || item.estimatedEPS || null,
+                                revenue: item.revenue || item.actualRevenue || null,
+                                revenueEstimated: item.revenueEstimated || item.estimatedRevenue || null,
+                                surprise: item.surprise || null,
+                                surprisePercent: item.surprisePercent || null
+                            })).sort((a, b) => {
+                                // Sort by date descending (most recent first)
+                                return new Date(b.date) - new Date(a.date);
+                            }).slice(0, 8)
+                        };
+                        source = 'fmp';
+                    }
+                }
+            } catch (fmpError) {
+                console.warn('FMP earnings fetch failed:', fmpError);
             }
 
-            const data = await response.json();
-            setEarningsData(data);
+            // Fallback: Try FMP direct API endpoint if marketdata endpoint failed
+            if (!earningsData || (!earningsData.historical?.length && !earningsData.upcoming?.length)) {
+                try {
+                    const fmpRes = await fetch(`${API_BASE_URL}/api/fmp?endpoint=earnings-calendar&symbol=${symbol}`);
+                    
+                    if (fmpRes.ok) {
+                        const fmpData = await fmpRes.json();
+                        
+                        if (Array.isArray(fmpData) && fmpData.length > 0) {
+                            const upcoming = fmpData.filter(e => {
+                                const date = e.date || e.earningDate;
+                                return date && new Date(date) >= new Date();
+                            });
+                            const nextEarnings = upcoming.length > 0 ? upcoming[0] : null;
+
+                            earningsData = {
+                                symbol: symbol.toUpperCase(),
+                                consensus: {
+                                    nextEarningsDate: nextEarnings?.date || nextEarnings?.earningDate || null,
+                                    estimatedEPS: nextEarnings?.eps || nextEarnings?.epsEstimated || null,
+                                    estimatedRevenue: nextEarnings?.revenue || nextEarnings?.revenueEstimated || null
+                                },
+                                upcoming: upcoming.slice(0, 3).map(item => ({
+                                    date: item.date || item.earningDate,
+                                    fiscalDateEnding: item.fiscalDateEnding || null,
+                                    eps: item.eps || item.epsEstimated || null,
+                                    epsEstimated: item.epsEstimated || item.eps || null,
+                                    revenue: item.revenue || item.revenueEstimated || null,
+                                    time: item.time || 'N/A'
+                                })),
+                                historical: []
+                            };
+                            source = 'fmp-direct';
+                        }
+                    }
+                } catch (fmpDirectError) {
+                    console.warn('FMP direct API fallback failed:', fmpDirectError);
+                }
+            }
+
+            // Set data or fallback
+            if (earningsData) {
+                setEarningsData(earningsData);
+            } else {
+                setEarningsData({
+                    symbol: symbol.toUpperCase(),
+                    consensus: { nextEarningsDate: null, estimatedEPS: null, estimatedRevenue: null },
+                    upcoming: [],
+                    historical: []
+                });
+                setError('Aucune donnée d\'earnings disponible pour ce symbole');
+            }
 
         } catch (err) {
             console.error('Earnings data error:', err);
             setError(err.message || 'Failed to fetch earnings data');
             setEarningsData({
-                symbol,
-                consensus: { nextEarningsDate: null },
+                symbol: symbol.toUpperCase(),
+                consensus: { nextEarningsDate: null, estimatedEPS: null, estimatedRevenue: null },
                 upcoming: [],
                 historical: []
             });
@@ -136,23 +233,30 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
                             )}
 
                             {/* Upcoming Earnings */}
-                            {earningsData.upcoming && earningsData.upcoming.length > 0 && (
+                            {earningsData.upcoming && earningsData.upcoming.length > 0 ? (
                                 <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
                                     <h3 className="text-lg font-bold text-white mb-4">Upcoming Reports</h3>
                                     <div className="space-y-3">
                                         {earningsData.upcoming.slice(0, 3).map((earning, index) => (
-                                            <div key={index} className="flex justify-between items-center p-3 bg-gray-900/50 rounded-lg">
+                                            <div key={index} className="flex justify-between items-center p-3 bg-gray-900/50 rounded-lg hover:bg-gray-900/70 transition-colors">
                                                 <div>
                                                     <div className="text-white font-semibold">{formatDate(earning.date)}</div>
-                                                    <div className="text-gray-400 text-sm">{earning.fiscalDateEnding || 'FY'}</div>
+                                                    <div className="text-gray-400 text-sm">
+                                                        {earning.fiscalDateEnding || earning.fiscalQuarter || 'FY'}
+                                                        {earning.time && earning.time !== 'N/A' && (
+                                                            <span className="ml-2 text-xs">({earning.time})</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    {earning.eps && (
-                                                        <div className="text-white font-semibold">${earning.eps.toFixed(2)} EPS</div>
+                                                    {(earning.eps || earning.epsEstimated) && (
+                                                        <div className="text-white font-semibold">
+                                                            ${(earning.eps || earning.epsEstimated).toFixed(2)} EPS Est.
+                                                        </div>
                                                     )}
-                                                    {earning.revenue && (
+                                                    {(earning.revenue || earning.revenueEstimated) && (
                                                         <div className="text-gray-400 text-sm">
-                                                            ${(earning.revenue / 1000000000).toFixed(2)}B Revenue
+                                                            ${((earning.revenue || earning.revenueEstimated) / 1000000000).toFixed(2)}B Rev. Est.
                                                         </div>
                                                     )}
                                                 </div>
@@ -160,10 +264,17 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
                                         ))}
                                     </div>
                                 </div>
+                            ) : (
+                                <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+                                    <h3 className="text-lg font-bold text-white mb-4">Upcoming Reports</h3>
+                                    <p className="text-gray-400 text-center py-4">
+                                        Aucune date d'earnings à venir disponible
+                                    </p>
+                                </div>
                             )}
 
                             {/* Historical Earnings */}
-                            {earningsData.historical && earningsData.historical.length > 0 && (
+                            {earningsData.historical && earningsData.historical.length > 0 ? (
                                 <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
                                     <h3 className="text-lg font-bold text-white mb-4">Historical Earnings (Last 8 Quarters)</h3>
                                     <div className="overflow-x-auto">
@@ -178,24 +289,35 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
                                             </thead>
                                             <tbody>
                                                 {earningsData.historical.slice(0, 8).map((earning, index) => {
-                                                    const surprise = earning.eps && earning.epsEstimated
-                                                        ? ((earning.eps - earning.epsEstimated) / earning.epsEstimated * 100)
-                                                        : 0;
-                                                    const isPositiveSurprise = surprise > 0;
+                                                    const eps = earning.eps || earning.actualEPS;
+                                                    const epsEstimated = earning.epsEstimated || earning.estimatedEPS;
+                                                    const surprise = earning.surprisePercent || 
+                                                                    (eps && epsEstimated 
+                                                                        ? ((eps - epsEstimated) / Math.abs(epsEstimated)) * 100 
+                                                                        : null);
+                                                    const isPositiveSurprise = surprise !== null && surprise > 0;
 
                                                     return (
-                                                        <tr key={index} className="border-b border-gray-700/50">
-                                                            <td className="py-3 text-gray-300">{formatDate(earning.date)}</td>
+                                                        <tr key={index} className="border-b border-gray-700/50 hover:bg-gray-700/30 transition-colors">
+                                                            <td className="py-3 text-gray-300">
+                                                                {formatDate(earning.date)}
+                                                                {earning.fiscalDateEnding && (
+                                                                    <div className="text-xs text-gray-500">{earning.fiscalDateEnding}</div>
+                                                                )}
+                                                            </td>
                                                             <td className="py-3 text-right text-white font-semibold">
-                                                                ${earning.eps?.toFixed(2) || 'N/A'}
+                                                                {eps !== null && eps !== undefined ? `$${eps.toFixed(2)}` : 'N/A'}
                                                             </td>
                                                             <td className="py-3 text-right text-gray-400">
-                                                                ${earning.epsEstimated?.toFixed(2) || 'N/A'}
+                                                                {epsEstimated !== null && epsEstimated !== undefined ? `$${epsEstimated.toFixed(2)}` : 'N/A'}
                                                             </td>
                                                             <td className={`py-3 text-right font-bold ${
-                                                                isPositiveSurprise ? 'text-green-400' : surprise < 0 ? 'text-red-400' : 'text-gray-400'
+                                                                isPositiveSurprise ? 'text-green-400' : 
+                                                                surprise !== null && surprise < 0 ? 'text-red-400' : 'text-gray-400'
                                                             }`}>
-                                                                {surprise !== 0 ? `${surprise > 0 ? '+' : ''}${surprise.toFixed(1)}%` : 'N/A'}
+                                                                {surprise !== null && surprise !== undefined 
+                                                                    ? `${surprise > 0 ? '+' : ''}${surprise.toFixed(1)}%` 
+                                                                    : 'N/A'}
                                                             </td>
                                                         </tr>
                                                     );
@@ -203,6 +325,13 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
                                             </tbody>
                                         </table>
                                     </div>
+                                </div>
+                            ) : (
+                                <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+                                    <h3 className="text-lg font-bold text-white mb-4">Historical Earnings</h3>
+                                    <p className="text-gray-400 text-center py-4">
+                                        Aucune donnée historique disponible pour ce symbole
+                                    </p>
                                 </div>
                             )}
                         </div>

@@ -1,21 +1,29 @@
 // Auto-converted from monolithic dashboard file
 // Component: ScrappingSATab
 
+const ScrappingSATab = () => {
+    // État pour gérer le modal expandable
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalUrl, setModalUrl] = useState('');
 
+    // Fonction pour ouvrir le modal avec une URL
+    const openModal = (url) => {
+        setModalUrl(url);
+        setIsModalOpen(true);
+    };
 
-const ScrappingSATab = () => (
+    // Fonction pour fermer le modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setModalUrl('');
+    };
+
+    return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>🔧 Scrapping SA</h2>
-                        <div className="flex gap-2">
-                            <span className={`text-sm transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                Outils d'administration déplacés vers l'onglet Admin-JSLAI
-                            </span>
-                        </div>
                     </div>
 
 
@@ -216,14 +224,12 @@ const ScrappingSATab = () => (
                                                 {/* Lien vers Seeking Alpha */}
                                                 {seekingAlphaItem?.url && (
                                                     <div className="text-center pt-4 border-t">
-                                                        <a
-                                                            href={seekingAlphaItem.url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
+                                                        <button
+                                                            onClick={() => openModal(seekingAlphaItem.url)}
                                                             className="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                                         >
                                                             Lire l'analyse complète sur Seeking Alpha →
-                                                        </a>
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
@@ -248,14 +254,12 @@ const ScrappingSATab = () => (
                                             <div className="text-gray-200 text-sm leading-relaxed">
                                                 {parsedData.analysis}
                                             </div>
-                                            <a
-                                                href={seekingAlphaItem.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline"
+                                            <button
+                                                onClick={() => openModal(seekingAlphaItem.url)}
+                                                className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline cursor-pointer"
                                             >
                                                 Lire l'analyse complète sur Seeking Alpha →
-                                            </a>
+                                            </button>
                                         </div>
                                     );
                                 }
@@ -448,16 +452,16 @@ const ScrappingSATab = () => (
                                                                         Fiche
                                                                     </button>
                                                                     {stock.url && (
-                                                                        <a
-                                                                            href={stock.url}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                openModal(stock.url);
+                                                                            }}
                                                                             className="px-2 py-1 bg-green-600 hover:bg-green-500 text-white rounded text-xs font-semibold transition-colors flex items-center gap-1"
                                                                         >
                                                                             <LucideIcon name="ExternalLink" className="w-3 h-3" />
                                                                             Article SA
-                                                                        </a>
+                                                                        </button>
                                                                     )}
                                                                     {parsedData?.peers && (
                                                                         <button
@@ -578,15 +582,15 @@ const ScrappingSATab = () => (
                                         {/* Lien vers Seeking Alpha */}
                                         {stock.url && (
                                             <div className="mb-4">
-                                                <a
-                                                    href={stock.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    onClick={(e) => e.stopPropagation()}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        openModal(stock.url);
+                                                    }}
                                                     className="block w-full px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors text-center"
                                                 >
                                                     📰 Lire sur Seeking Alpha →
-                                                </a>
+                                                </button>
                                             </div>
                                         )}
 
@@ -604,143 +608,55 @@ const ScrappingSATab = () => (
                     )}
                         </div>
                     )}
+                </div>
 
-                    {/* Section Scraping */}
-                    <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode 
-                            ? 'bg-gray-900 border-gray-700' 
-                            : 'bg-gray-50 border-gray-200'
-                    }`}>
-                        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Outils de Scraping</h3>
-                        
-                        {/* Statut du scraping */}
-                        <div className="mb-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className={`font-medium transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>Statut:</span>
-                                <span className={`px-3 py-1 rounded text-sm font-bold ${
-                                    scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
-                                    scrapingStatus === 'running' ? 'bg-gray-700 text-white' :
-                                    scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
-                                    'bg-red-500 text-white'
-                                }`}>
-                                    {scrapingStatus === 'idle' ? '⏸️ En attente' :
-                                     scrapingStatus === 'running' ? '🔄 En cours' :
-                                     scrapingStatus === 'completed' ? '✅ Terminé' :
-                                     '❌ Erreur'}
-                                </span>
-                        </div>
-
-                            {/* Barre de progression */}
-                            {scrapingStatus === 'running' && (
-                                <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
-                                    <div
-                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                        style={{ width: `${scrapingProgress}%` }}
-                                    ></div>
+                {/* Modal expandable pour Seeking Alpha */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={closeModal}>
+                        <div className="relative w-full h-full max-w-7xl max-h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+                            {/* Header du modal */}
+                            <div className="flex items-center justify-between p-4 bg-gray-800 border-b border-gray-700">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                    <span className="ml-4 text-white font-semibold text-sm">Seeking Alpha</span>
                                 </div>
-                            )}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => window.open(modalUrl, '_blank', 'noopener,noreferrer')}
+                                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold transition-colors"
+                                        title="Ouvrir dans un nouvel onglet"
+                                    >
+                                        Ouvrir dans un nouvel onglet
+                                    </button>
+                                    <button
+                                        onClick={closeModal}
+                                        className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                                        title="Fermer"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                             
-                            <div className={`text-sm transition-colors duration-300 ${
-                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                            }`}>
-                                Progression: {scrapingProgress}%
+                            {/* Contenu iframe */}
+                            <div className="flex-1 relative overflow-hidden">
+                                <iframe
+                                    src={modalUrl}
+                                    className="w-full h-full border-0"
+                                    title="Seeking Alpha Article"
+                                    allow="fullscreen"
+                                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                                ></iframe>
                             </div>
-                        </div>
-
-                        {/* Instructions de scraping */}
-                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
-                            isDarkMode
-                                ? 'bg-gray-900/30'
-                                : 'bg-blue-50'
-                        }`}>
-                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📖 Instructions de Scraping</h4>
-                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-blue-200' : 'text-blue-800'
-                            }`}>
-                                <div>• <strong>Méthode 1:</strong> Cliquez sur "🚀 Lancer le Scraper" pour ouvrir les pages</div>
-                                <div>• <strong>Méthode 2:</strong> Cliquez sur "📋 Script F12" pour copier un script</div>
-                                <div>• <strong>Étapes:</strong> Ouvrez F12 → Console → Collez le script → Entrée</div>
-                                <div>• <strong>Résultat:</strong> Les données seront affichées et copiées automatiquement</div>
-                            </div>
-                        </div>
-
-                        {/* Aide pour les popups bloqués */}
-                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
-                            isDarkMode 
-                                ? 'bg-yellow-900/30' 
-                                : 'bg-yellow-100/80'
-                        }`}>
-                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🔧 Résolution des Popups Bloqués</h4>
-                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-yellow-200' : 'text-yellow-800'
-                            }`}>
-                                <div>• <strong>Chrome/Edge:</strong> Cliquez sur l'icône popup dans la barre d'adresse → "Toujours autoriser"</div>
-                                <div>• <strong>Firefox:</strong> Cliquez sur l'icône bouclier → "Désactiver la protection"</div>
-                                <div>• <strong>Safari:</strong> Safari → Préférences → Sites web → Pop-ups → Autoriser</div>
-                                <div>• <strong>Alternative:</strong> Utilisez le bouton "🌐 Ouvrir Seeking Alpha" ou le script F12</div>
-                            </div>
-                        </div>
-
-                        {/* Configuration des API */}
-                        <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
-                            isDarkMode 
-                                ? 'bg-green-900/30' 
-                                : 'bg-green-100/80'
-                        }`}>
-                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                            <Icon emoji="🤖" size={18} className="mr-2 inline-block" />
-                            Configuration des API
-                        </h4>
-                            <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-green-200' : 'text-green-800'
-                            }`}>
-                                <div>• <strong>Claude API:</strong> Configurez ANTHROPIC_API_KEY pour l'analyse automatique</div>
-                                <div>• <strong>GitHub API:</strong> Configurez GITHUB_TOKEN pour la mise à jour des fichiers</div>
-                                <div>• <strong>Fonctionnalité:</strong> Scraping → Analyse Perplexity → Mise à jour JSON automatique</div>
-                                <div>• <strong>Bouton:</strong> "🤖 Analyser avec Claude" pour traiter les données existantes</div>
-                            </div>
-                        </div>
-
-                        {/* Logs de scraping */}
-                        <div className={`rounded-lg p-4 max-h-64 overflow-y-auto transition-colors duration-300 ${
-                            isDarkMode 
-                                ? 'bg-black/50' 
-                                : 'bg-gray-100'
-                        }`}>
-                            <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📋 Logs de Scraping</h4>
-                            {scrapingLogs.length === 0 ? (
-                                <div className={`text-sm transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                }`}>Aucun log pour le moment...</div>
-                            ) : (
-                                <div className="space-y-1">
-                                    {scrapingLogs.map((log, index) => (
-                                        <div key={index} className={`text-xs p-2 rounded ${
-                                            log.type === 'error' ? 'bg-red-900/50 text-red-300' :
-                                            log.type === 'success' ? 'bg-green-900/50 text-green-300' :
-                                            log.type === 'warning' ? 'bg-yellow-900/50 text-yellow-300' :
-                                            'bg-gray-900/50 text-gray-300'
-                                        }`}>
-                                            <span className="text-gray-400">[{log.timestamp}]</span> {log.message}
-                                    </div>
-                                    ))}
-                                </div>
-                            )}
                         </div>
                     </div>
-                </div>
-            );
+                )}
+            </div>
+    );
+};
 
 window.ScrappingSATab = ScrappingSATab;

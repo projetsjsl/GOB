@@ -395,20 +395,41 @@ const fetchAnalystFromFMP = async (symbol) => {
 
     const data = await response.json();
 
-    // Calculer le consensus
-    if (data && data.length > 0) {
+    // Normalize and calculate consensus
+    if (data && Array.isArray(data) && data.length > 0) {
       const latest = data[0];
+
+      // Normalize estimates array
+      const normalizedEstimates = data
+        .filter(item => item.date || item.calendarYear || item.fiscalDateEnding) // Only include items with dates
+        .map(item => ({
+          date: item.date || item.calendarYear || item.fiscalDateEnding,
+          calendarYear: item.calendarYear || null,
+          fiscalDateEnding: item.fiscalDateEnding || null,
+          estimatedEpsAvg: item.estimatedEpsAvg || item.estimatedEPS || null,
+          estimatedEpsHigh: item.estimatedEpsHigh || null,
+          estimatedEpsLow: item.estimatedEpsLow || null,
+          estimatedRevenueAvg: item.estimatedRevenueAvg || item.estimatedRevenue || null,
+          numberAnalystEstimatedRevenue: item.numberAnalystEstimatedRevenue || item.numberAnalysts || 0
+        }))
+        .sort((a, b) => {
+          // Sort by date descending (most recent first)
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateB - dateA;
+        })
+        .slice(0, 8); // Last 8 quarters
 
       return {
         symbol: symbol.toUpperCase(),
         consensus: {
-          estimatedRevenue: latest.estimatedRevenueAvg || null,
-          estimatedEPS: latest.estimatedEpsAvg || null,
+          estimatedRevenue: latest.estimatedRevenueAvg || latest.estimatedRevenue || null,
+          estimatedEPS: latest.estimatedEpsAvg || latest.estimatedEPS || null,
           estimatedEPSHigh: latest.estimatedEpsHigh || null,
           estimatedEPSLow: latest.estimatedEpsLow || null,
-          numberAnalysts: latest.numberAnalystEstimatedRevenue || 0
+          numberAnalysts: latest.numberAnalystEstimatedRevenue || latest.numberAnalysts || 0
         },
-        estimates: data.slice(0, 4), // 4 derniers trimestres
+        estimates: normalizedEstimates,
         source: 'fmp',
         timestamp: new Date().toISOString()
       };
@@ -416,7 +437,13 @@ const fetchAnalystFromFMP = async (symbol) => {
 
     return {
       symbol: symbol.toUpperCase(),
-      consensus: null,
+      consensus: {
+        estimatedRevenue: null,
+        estimatedEPS: null,
+        estimatedEPSHigh: null,
+        estimatedEPSLow: null,
+        numberAnalysts: 0
+      },
       estimates: [],
       source: 'fmp',
       timestamp: new Date().toISOString()
@@ -446,19 +473,59 @@ const fetchEarningsFromFMP = async (symbol) => {
     const historical = historicalRes.status === 'fulfilled' && historicalRes.value.ok
       ? await historicalRes.value.json() : [];
 
+    // Normalize calendar data
+    const calendarArray = Array.isArray(calendar) ? calendar : [];
+    
     // Trouver la prochaine date d'earnings
-    const upcoming = calendar.filter(e => new Date(e.date) >= new Date());
+    const now = new Date();
+    const upcoming = calendarArray.filter(e => {
+      const date = e.date || e.earningDate;
+      return date && new Date(date) >= now;
+    }).sort((a, b) => {
+      const dateA = new Date(a.date || a.earningDate);
+      const dateB = new Date(b.date || b.earningDate);
+      return dateA - dateB;
+    });
+    
     const nextEarnings = upcoming.length > 0 ? upcoming[0] : null;
+
+    // Normalize historical data
+    const historicalArray = Array.isArray(historical) ? historical : [];
+    const normalizedHistorical = historicalArray
+      .map(item => ({
+        date: item.date || item.earningDate || item.reportDate,
+        fiscalDateEnding: item.fiscalDateEnding || item.fiscalQuarter || null,
+        eps: item.eps || item.actualEPS || (typeof item.eps === 'number' ? item.eps : null),
+        epsEstimated: item.epsEstimated || item.estimatedEPS || (typeof item.epsEstimated === 'number' ? item.epsEstimated : null),
+        revenue: item.revenue || item.actualRevenue || (typeof item.revenue === 'number' ? item.revenue : null),
+        revenueEstimated: item.revenueEstimated || item.estimatedRevenue || (typeof item.revenueEstimated === 'number' ? item.revenueEstimated : null),
+        surprise: item.surprise || null,
+        surprisePercent: item.surprisePercent || null
+      }))
+      .filter(item => item.date) // Only include items with valid dates
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by date descending
+      .slice(0, 8); // Last 8 quarters
+
+    // Normalize upcoming data
+    const normalizedUpcoming = upcoming.slice(0, 3).map(item => ({
+      date: item.date || item.earningDate,
+      fiscalDateEnding: item.fiscalDateEnding || item.fiscalQuarter || null,
+      eps: item.eps || item.epsEstimated || null,
+      epsEstimated: item.epsEstimated || item.eps || null,
+      revenue: item.revenue || item.revenueEstimated || null,
+      revenueEstimated: item.revenueEstimated || item.revenue || null,
+      time: item.time || 'N/A'
+    }));
 
     return {
       symbol: symbol.toUpperCase(),
       consensus: {
-        nextEarningsDate: nextEarnings?.date || null,
-        estimatedEPS: nextEarnings?.eps || null,
-        estimatedRevenue: nextEarnings?.revenue || null
+        nextEarningsDate: nextEarnings?.date || nextEarnings?.earningDate || null,
+        estimatedEPS: nextEarnings?.eps || nextEarnings?.epsEstimated || null,
+        estimatedRevenue: nextEarnings?.revenue || nextEarnings?.revenueEstimated || null
       },
-      upcoming: upcoming.slice(0, 3),
-      historical: historical.slice(0, 8), // 8 derniers résultats
+      upcoming: normalizedUpcoming,
+      historical: normalizedHistorical,
       source: 'fmp',
       timestamp: new Date().toISOString()
     };

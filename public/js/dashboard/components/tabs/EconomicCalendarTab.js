@@ -42,6 +42,16 @@ const EconomicCalendarTab = () => {
     const [dateRange, setDateRange] = useState('week'); // today, week, month
     const [filterLargeCapOnly, setFilterLargeCapOnly] = useState(true); // Par défaut activé pour earnings
     
+    // Contrôle du nombre d'éléments affichés par section
+    const [itemsPerSection, setItemsPerSection] = useState({
+        economic: 25,
+        earnings: 25,
+        dividends: 25
+    });
+    
+    // Options pour le nombre d'éléments à afficher
+    const itemsPerPageOptions = [10, 25, 50, 100, 200, 500];
+    
     // Liste des tickers Large Cap (S&P 500 principaux)
     const largeCapTickers = [
         'AAPL', 'MSFT', 'GOOGL', 'GOOG', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'UNH',
@@ -652,67 +662,151 @@ const EconomicCalendarTab = () => {
                         )}
                     </div>
                 ) : (
-                    <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg overflow-hidden shadow-lg`}>
-                        {filteredCalendarData.map((day, dayIndex) => (
-                            <div key={dayIndex} className="border-b border-gray-700 last:border-b-0">
-                                {/* Day Header */}
-                                <div className={`${isDarkMode ? 'bg-gray-750' : 'bg-gray-200'} px-4 py-2 font-semibold text-sm`}>
-                                    {day.date}
-                                </div>
+                    <div>
+                        {/* Contrôle du nombre d'éléments à afficher */}
+                        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-4 mb-4 flex items-center justify-between flex-wrap gap-3`}>
+                            <div className="flex items-center gap-3">
+                                <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    Afficher :
+                                </span>
+                                <select
+                                    value={itemsPerSection[activeSubTab]}
+                                    onChange={(e) => {
+                                        const newValue = parseInt(e.target.value, 10);
+                                        setItemsPerSection(prev => ({
+                                            ...prev,
+                                            [activeSubTab]: newValue
+                                        }));
+                                    }}
+                                    className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-all ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 text-white border-gray-600 hover:bg-gray-600'
+                                            : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'
+                                    } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                >
+                                    {itemsPerPageOptions.map(option => (
+                                        <option key={option} value={option}>
+                                            {option === 500 ? 'Tous' : option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    éléments par section
+                                </span>
+                            </div>
+                            <div className={`text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Total filtré : {filteredCalendarData.reduce((acc, day) => acc + day.events.length, 0)} événements
+                            </div>
+                        </div>
 
-                                {/* Column Headers - Finviz Style */}
-                                {dayIndex === 0 && (
-                                    <div className={`grid grid-cols-[80px_1fr_80px_60px_90px_90px_90px] gap-3 px-4 py-3 ${
-                                        isDarkMode ? 'bg-gray-900' : 'bg-gray-300'
-                                    } text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} border-b-2 ${
-                                        isDarkMode ? 'border-gray-600' : 'border-gray-400'
-                                    }`}>
-                                        <div>TIME</div>
-                                        <div>EVENT</div>
-                                        <div>IMPACT</div>
-                                        <div>FOR</div>
-                                        <div className="text-center">ACTUAL</div>
-                                        <div className="text-center">FORECAST</div>
-                                        <div className="text-center">PREVIOUS</div>
-                                    </div>
-                                )}
+                        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg overflow-hidden shadow-lg`}>
+                            {(() => {
+                                // Limiter le nombre d'événements affichés
+                                let eventCount = 0;
+                                const maxEvents = itemsPerSection[activeSubTab];
+                                const limitedData = [];
+                                
+                                for (const day of filteredCalendarData) {
+                                    if (eventCount >= maxEvents) break;
+                                    
+                                    const remaining = maxEvents - eventCount;
+                                    const limitedEvents = day.events.slice(0, remaining);
+                                    eventCount += limitedEvents.length;
+                                    
+                                    if (limitedEvents.length > 0) {
+                                        limitedData.push({ ...day, events: limitedEvents });
+                                    }
+                                    
+                                    if (eventCount >= maxEvents) break;
+                                }
+                                
+                                return limitedData.map((day, dayIndex) => (
+                                    <div key={dayIndex} className="border-b border-gray-700 last:border-b-0">
+                                        {/* Day Header */}
+                                        <div className={`${isDarkMode ? 'bg-gray-750' : 'bg-gray-200'} px-4 py-2 font-semibold text-sm`}>
+                                            {day.date}
+                                        </div>
 
-                                {/* Events - Finviz Style */}
-                                {day.events.map((event, eventIndex) => (
-                                    <div
-                                        key={eventIndex}
-                                        className={`grid grid-cols-[80px_1fr_80px_60px_90px_90px_90px] gap-3 px-4 py-3 ${
-                                            isDarkMode ? 'hover:bg-gray-750' : 'hover:bg-gray-200'
-                                        } transition-colors border-b ${
-                                            isDarkMode ? 'border-gray-700' : 'border-gray-300'
-                                        } last:border-b-0 items-center text-sm`}
-                                    >
-                                        <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} font-mono text-xs`}>
-                                            {event.time}
-                                        </div>
-                                        <div className="font-medium flex items-center gap-2" title={event.event}>
-                                            <span className="text-lg">{getCurrencyFlag(event.currency)}</span>
-                                            <span className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} truncate`}>
-                                                {event.event}
-                                            </span>
-                                        </div>
-                                        <div className="flex gap-1">{getImpactBars(event.impact)}</div>
-                                        <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} font-semibold text-xs`}>
-                                            {event.currency}
-                                        </div>
-                                        <div className={`text-center font-bold ${getValueColor(event.actual, event.forecast)}`}>
-                                            {event.actual}
-                                        </div>
-                                        <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                            {event.forecast}
-                                        </div>
-                                        <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                            {event.previous}
-                                        </div>
+                                        {/* Column Headers - Finviz Style */}
+                                        {dayIndex === 0 && (
+                                            <div className={`grid grid-cols-[80px_1fr_80px_60px_90px_90px_90px] gap-3 px-4 py-3 ${
+                                                isDarkMode ? 'bg-gray-900' : 'bg-gray-300'
+                                            } text-xs font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} border-b-2 ${
+                                                isDarkMode ? 'border-gray-600' : 'border-gray-400'
+                                            }`}>
+                                                <div>TIME</div>
+                                                <div>EVENT</div>
+                                                <div>IMPACT</div>
+                                                <div>FOR</div>
+                                                <div className="text-center">ACTUAL</div>
+                                                <div className="text-center">FORECAST</div>
+                                                <div className="text-center">PREVIOUS</div>
+                                            </div>
+                                        )}
+
+                                        {/* Events - Finviz Style */}
+                                        {day.events.map((event, eventIndex) => (
+                                            <div
+                                                key={eventIndex}
+                                                className={`grid grid-cols-[80px_1fr_80px_60px_90px_90px_90px] gap-3 px-4 py-3 ${
+                                                    isDarkMode ? 'hover:bg-gray-750' : 'hover:bg-gray-200'
+                                                } transition-colors border-b ${
+                                                    isDarkMode ? 'border-gray-700' : 'border-gray-300'
+                                                } last:border-b-0 items-center text-sm`}
+                                            >
+                                                <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} font-mono text-xs`}>
+                                                    {event.time}
+                                                </div>
+                                                <div className="font-medium flex items-center gap-2" title={event.event}>
+                                                    <span className="text-lg">{getCurrencyFlag(event.currency)}</span>
+                                                    <span className={`${isDarkMode ? 'text-gray-200' : 'text-gray-800'} truncate`}>
+                                                        {event.event}
+                                                    </span>
+                                                </div>
+                                                <div className="flex gap-1">{getImpactBars(event.impact)}</div>
+                                                <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} font-semibold text-xs`}>
+                                                    {event.currency}
+                                                </div>
+                                                <div className={`text-center font-bold ${getValueColor(event.actual, event.forecast)}`}>
+                                                    {event.actual}
+                                                </div>
+                                                <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    {event.forecast}
+                                                </div>
+                                                <div className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                    {event.previous}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ))}
-                            </div>
-                        ))}
+                            })()}
+                            
+                            {/* Message si des événements sont masqués */}
+                            {filteredCalendarData.reduce((acc, day) => acc + day.events.length, 0) > itemsPerSection[activeSubTab] && (
+                                <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'} px-4 py-3 text-center border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        {filteredCalendarData.reduce((acc, day) => acc + day.events.length, 0) - itemsPerSection[activeSubTab]} événement(s) supplémentaire(s) masqué(s).
+                                        <button
+                                            onClick={() => {
+                                                const nextOption = itemsPerPageOptions.find(opt => opt > itemsPerSection[activeSubTab]) || 500;
+                                                setItemsPerSection(prev => ({
+                                                    ...prev,
+                                                    [activeSubTab]: nextOption
+                                                }));
+                                            }}
+                                            className={`ml-2 px-3 py-1 rounded-md text-sm font-semibold transition-all ${
+                                                isDarkMode
+                                                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                            }`}
+                                        >
+                                            Afficher plus
+                                        </button>
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 

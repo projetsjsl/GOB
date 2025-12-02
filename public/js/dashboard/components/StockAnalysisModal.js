@@ -598,6 +598,107 @@ const MetricsTab = ({ data }) => {
 const InsightsTab = ({ data }) => {
     const { aiInsights } = data;
 
+    // Markdown formatter function
+    const formatMarkdown = (text) => {
+        if (!text) return '';
+        
+        // Split into lines for better processing
+        const lines = text.split('\n');
+        let html = '';
+        let inList = false;
+        let listType = null; // 'ul' or 'ol'
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Headers
+            if (line.startsWith('#### ')) {
+                if (inList) {
+                    html += listType === 'ul' ? '</ul>' : '</ol>';
+                    inList = false;
+                }
+                html += `<h4 class="text-base font-bold text-white mt-4 mb-2">${line.substring(5)}</h4>`;
+            } else if (line.startsWith('### ')) {
+                if (inList) {
+                    html += listType === 'ul' ? '</ul>' : '</ol>';
+                    inList = false;
+                }
+                html += `<h3 class="text-lg font-bold text-white mt-5 mb-3">${line.substring(4)}</h3>`;
+            } else if (line.startsWith('## ')) {
+                if (inList) {
+                    html += listType === 'ul' ? '</ul>' : '</ol>';
+                    inList = false;
+                }
+                html += `<h2 class="text-xl font-bold text-white mt-6 mb-4">${line.substring(3)}</h2>`;
+            } else if (line.startsWith('# ')) {
+                if (inList) {
+                    html += listType === 'ul' ? '</ul>' : '</ol>';
+                    inList = false;
+                }
+                html += `<h1 class="text-2xl font-bold text-white mt-8 mb-5">${line.substring(2)}</h1>`;
+            }
+            // Numbered list
+            else if (/^\d+\.\s+/.test(line)) {
+                const currentListType = 'ol';
+                if (!inList || listType !== currentListType) {
+                    if (inList) {
+                        html += listType === 'ul' ? '</ul>' : '</ol>';
+                    }
+                    html += '<ol class="list-decimal ml-6 space-y-2 my-3">';
+                    inList = true;
+                    listType = currentListType;
+                }
+                const content = line.replace(/^\d+\.\s+/, '');
+                html += `<li class="text-gray-300">${formatInlineMarkdown(content)}</li>`;
+            }
+            // Bullet list
+            else if (/^[-*]\s+/.test(line)) {
+                const currentListType = 'ul';
+                if (!inList || listType !== currentListType) {
+                    if (inList) {
+                        html += listType === 'ul' ? '</ul>' : '</ol>';
+                    }
+                    html += '<ul class="list-disc ml-6 space-y-2 my-3">';
+                    inList = true;
+                    listType = currentListType;
+                }
+                const content = line.replace(/^[-*]\s+/, '');
+                html += `<li class="text-gray-300">${formatInlineMarkdown(content)}</li>`;
+            }
+            // Empty line
+            else if (line === '') {
+                if (inList) {
+                    html += listType === 'ul' ? '</ul>' : '</ol>';
+                    inList = false;
+                }
+                html += '<br />';
+            }
+            // Regular paragraph
+            else {
+                if (inList) {
+                    html += listType === 'ul' ? '</ul>' : '</ol>';
+                    inList = false;
+                }
+                html += `<p class="text-gray-300 leading-relaxed mb-3">${formatInlineMarkdown(line)}</p>`;
+            }
+        }
+        
+        // Close any open list
+        if (inList) {
+            html += listType === 'ul' ? '</ul>' : '</ol>';
+        }
+        
+        return html;
+    };
+    
+    // Format inline markdown (bold, italic, code)
+    const formatInlineMarkdown = (text) => {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em class="text-gray-300 italic">$1</em>')
+            .replace(/`([^`]+)`/g, '<code class="bg-gray-800 text-blue-400 px-2 py-1 rounded text-sm font-mono">$1</code>');
+    };
+
     if (!aiInsights || !aiInsights.success) {
         return (
             <div className="text-center py-12">
@@ -617,9 +718,44 @@ const InsightsTab = ({ data }) => {
                     <i className="iconoir-brain text-purple-400"></i>
                     Analyse Gemini AI
                 </h3>
-                <p className="text-gray-300 leading-relaxed whitespace-pre-line">
-                    {aiInsights.analysis}
-                </p>
+                <div 
+                    className="prose prose-invert max-w-none text-gray-300 leading-relaxed analysis-content"
+                    style={{
+                        lineHeight: '1.7'
+                    }}
+                    dangerouslySetInnerHTML={{
+                        __html: formatMarkdown(aiInsights.analysis)
+                    }}
+                />
+                <style>{`
+                    .analysis-content h1,
+                    .analysis-content h2,
+                    .analysis-content h3,
+                    .analysis-content h4 {
+                        scroll-margin-top: 1rem;
+                    }
+                    .analysis-content ul,
+                    .analysis-content ol {
+                        margin-top: 0.75rem;
+                        margin-bottom: 0.75rem;
+                    }
+                    .analysis-content li {
+                        margin-top: 0.5rem;
+                        margin-bottom: 0.5rem;
+                    }
+                    .analysis-content code {
+                        display: inline-block;
+                        padding: 0.125rem 0.375rem;
+                        margin: 0 0.125rem;
+                    }
+                    .analysis-content p {
+                        margin-bottom: 0.75rem;
+                    }
+                    .analysis-content strong {
+                        color: #ffffff;
+                        font-weight: 600;
+                    }
+                `}</style>
             </div>
 
             {/* Strengths & Weaknesses */}

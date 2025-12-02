@@ -21,6 +21,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
 
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [savedPresets, setSavedPresets] = useState([]);
     const [presetName, setPresetName] = useState('');
 
@@ -97,59 +98,165 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
 
     const runScreen = async () => {
         setLoading(true);
+        setResults([]);
+        
         try {
-            // Get list of stocks to screen (you would typically have a predefined list)
-            const stocksToScreen = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'JPM', 'V', 'WMT'];
+            const API_BASE_URL = window.location.origin || '';
+            let stocksToScreen = [];
 
-            const screenResults = await Promise.all(
-                stocksToScreen.map(async (symbol) => {
-                    try {
-                        const [metricsRes, ratiosRes, quoteRes] = await Promise.all([
-                            window.StockAnalysisAPI.fetchKeyMetrics(symbol, 1),
-                            window.StockAnalysisAPI.fetchFinancialRatios(symbol, 1),
-                            fetch(`${window.location.origin}/api/fmp?endpoint=quote&symbol=${symbol}`)
-                                .then(r => r.json())
-                        ]);
+            // Step 1: Get list of stocks from FMP stock screener based on filters
+            try {
+                // Build FMP screener URL with basic filters
+                const screenerParams = {
+                    endpoint: 'stock-screener',
+                    marketCapMoreThan: Math.floor(filters.marketCapMin).toString(),
+                    limit: '100' // Get up to 100 stocks to screen
+                };
 
-                        const metrics = Array.isArray(metricsRes?.data) ? metricsRes.data : (Array.isArray(metricsRes) ? metricsRes : []);
-                        const ratios = Array.isArray(ratiosRes?.data) ? ratiosRes.data : (Array.isArray(ratiosRes) ? ratiosRes : []);
-                        const quoteArray = Array.isArray(quoteRes?.data) ? quoteRes.data : (Array.isArray(quoteRes) ? quoteRes : []);
-                        const quote = quoteArray[0] || {};
+                // Add market cap max if specified
+                if (filters.marketCapMax < 1000000000000) {
+                    screenerParams.marketCapLowerThan = Math.floor(filters.marketCapMax).toString();
+                }
 
-                        const data = {
-                            symbol,
-                            name: quote.name || quote.companyName || symbol,
-                            price: quote.price || quote.c || 0,
-                            marketCap: metrics[0]?.marketCap || 0,
-                            peRatio: metrics[0]?.peRatio || 0,
-                            priceToBook: metrics[0]?.priceToBookRatio || 0,
-                            roe: (ratios[0]?.returnOnEquityTTM || 0) * 100,
-                            debtToEquity: ratios[0]?.debtEquityRatio || 0,
-                            dividendYield: (metrics[0]?.dividendYieldTTM || 0) * 100,
-                            revenueGrowth: (metrics[0]?.revenueGrowth || 0) * 100,
-                            sector: quote.sector || 'Unknown'
-                        };
+                // Add sector filter if specified
+                if (filters.sector !== 'all') {
+                    screenerParams.sector = filters.sector;
+                }
 
-                        // Apply filters
-                        if (data.marketCap < filters.marketCapMin || data.marketCap > filters.marketCapMax) return null;
-                        if (data.peRatio < filters.peRatioMin || data.peRatio > filters.peRatioMax) return null;
-                        if (data.roe < filters.roeMin) return null;
-                        if (data.dividendYield < filters.dividendYieldMin) return null;
-                        if (data.debtToEquity > filters.debtToEquityMax) return null;
-                        if (data.revenueGrowth < filters.revenueGrowthMin) return null;
-                        if (filters.sector !== 'all' && data.sector !== filters.sector) return null;
+                const queryString = new URLSearchParams(screenerParams).toString();
+                const screenerUrl = `${API_BASE_URL}/api/fmp?${queryString}`;
+                const screenerRes = await fetch(screenerUrl);
 
-                        return data;
-                    } catch (error) {
-                        console.error(`Error screening ${symbol}:`, error);
-                        return null;
+                if (screenerRes.ok) {
+                    const screenerData = await screenerRes.json();
+                    const stocks = Array.isArray(screenerData?.data) ? screenerData.data : 
+                                  Array.isArray(screenerData) ? screenerData : [];
+                    
+                    // Extract symbols from screener results
+                    stocksToScreen = stocks.slice(0, 50).map(s => s.symbol || s.ticker).filter(Boolean);
+                    console.log(`📊 FMP Screener: ${stocksToScreen.length} stocks found`);
+                }
+            } catch (screenerError) {
+                console.warn('FMP screener failed, using default list:', screenerError);
+            }
+
+            // Fallback: Use a comprehensive list of major stocks if screener fails
+            if (stocksToScreen.length === 0) {
+                stocksToScreen = [
+                    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'JPM', 'V', 'WMT',
+                    'JNJ', 'PG', 'UNH', 'HD', 'MA', 'DIS', 'BAC', 'XOM', 'CVX', 'ABBV',
+                    'PFE', 'KO', 'PEP', 'TMO', 'COST', 'AVGO', 'MRK', 'ABT', 'ACN', 'CSCO',
+                    'ADBE', 'NFLX', 'CMCSA', 'TXN', 'NKE', 'PM', 'LIN', 'QCOM', 'INTU', 'HON',
+                    'AMGN', 'RTX', 'LOW', 'UPS', 'SBUX', 'DE', 'CAT', 'GS', 'MS', 'BLK'
+                ];
+            }
+
+            // Step 2: Fetch data for all stocks using batch API
+            console.log(`🔍 Screening ${stocksToScreen.length} stocks...`);
+            
+            // Split into batches of 10 to avoid API limits
+            const BATCH_SIZE = 10;
+            const batches = [];
+            for (let i = 0; i < stocksToScreen.length; i += BATCH_SIZE) {
+                batches.push(stocksToScreen.slice(i, i + BATCH_SIZE));
+            }
+
+            const allResults = [];
+            
+            for (const batch of batches) {
+                try {
+                    // Fetch batch data from marketdata API
+                    const batchRes = await fetch(
+                        `${API_BASE_URL}/api/marketdata/batch?symbols=${batch.join(',')}&endpoints=quote,profile,ratios`
+                    );
+
+                    if (batchRes.ok) {
+                        const batchData = await batchRes.json();
+                        const quoteData = batchData?.data?.quote || {};
+                        const profileData = batchData?.data?.profile || {};
+                        const ratiosData = batchData?.data?.ratios || {};
+
+                        // Process each stock in the batch
+                        for (const symbol of batch) {
+                            try {
+                                const quote = quoteData[symbol] || {};
+                                const profile = profileData[symbol] || {};
+                                const ratios = ratiosData[symbol] || {};
+
+                                // Extract metrics
+                                const marketCap = quote.marketCap || 
+                                                profile.mktCap || 
+                                                (ratios.marketCapTTM || ratios.marketCap) || 0;
+                                
+                                const peRatio = ratios.priceEarningsRatioTTM || 
+                                               ratios.peRatioTTM || 
+                                               ratios.peRatio || 0;
+                                
+                                const roe = (ratios.returnOnEquityTTM || ratios.roe || 0) * 100;
+                                const debtToEquity = ratios.debtEquityRatio || 
+                                                   ratios.debtToEquity || 
+                                                   ratios.debtEquity || 0;
+                                
+                                const dividendYield = (ratios.dividendYieldTTM || 
+                                                      ratios.dividendYield || 0) * 100;
+                                
+                                const revenueGrowth = (ratios.revenueGrowthTTM || 
+                                                      ratios.revenueGrowth || 0) * 100;
+
+                                const data = {
+                                    symbol: symbol.toUpperCase(),
+                                    name: profile.companyName || 
+                                         quote.name || 
+                                         quote.companyName || 
+                                         symbol,
+                                    price: quote.price || quote.c || 0,
+                                    change: quote.changesPercentage || 
+                                           (quote.dp ? parseFloat(quote.dp) : 0) || 0,
+                                    marketCap: marketCap,
+                                    peRatio: peRatio,
+                                    priceToBook: ratios.priceToBookRatioTTM || 
+                                               ratios.priceToBookRatio || 0,
+                                    roe: roe,
+                                    debtToEquity: debtToEquity,
+                                    dividendYield: dividendYield,
+                                    revenueGrowth: revenueGrowth,
+                                    sector: profile.sector || quote.sector || 'Unknown'
+                                };
+
+                                // Apply filters
+                                if (data.marketCap < filters.marketCapMin || data.marketCap > filters.marketCapMax) continue;
+                                if (data.peRatio < filters.peRatioMin || data.peRatio > filters.peRatioMax) continue;
+                                if (data.roe < filters.roeMin) continue;
+                                if (data.dividendYield < filters.dividendYieldMin) continue;
+                                if (data.debtToEquity > filters.debtToEquityMax) continue;
+                                if (data.revenueGrowth < filters.revenueGrowthMin) continue;
+                                if (filters.sector !== 'all' && data.sector !== filters.sector) continue;
+
+                                allResults.push(data);
+                            } catch (stockError) {
+                                console.error(`Error processing ${symbol}:`, stockError);
+                            }
+                        }
                     }
-                })
-            );
+                } catch (batchError) {
+                    console.error('Batch fetch error:', batchError);
+                }
 
-            setResults(screenResults.filter(r => r !== null));
+                // Small delay between batches to respect rate limits
+                if (batches.indexOf(batch) < batches.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+
+            // Sort results by market cap (largest first)
+            allResults.sort((a, b) => b.marketCap - a.marketCap);
+            
+            setResults(allResults);
+            console.log(`✅ Screening complete: ${allResults.length} stocks match criteria`);
+            
         } catch (error) {
             console.error('Screening error:', error);
+            setError('Erreur lors du screening. Veuillez réessayer.');
         } finally {
             setLoading(false);
         }
@@ -372,10 +479,22 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                                 Résultats ({results.length} titres)
                             </h3>
 
-                            {results.length === 0 ? (
+                            {loading ? (
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                    <p className="text-gray-400">Analyse en cours...</p>
+                                    <p className="text-gray-500 text-sm mt-2">Récupération des données depuis FMP</p>
+                                </div>
+                            ) : error ? (
+                                <div className="text-center py-12 text-red-400">
+                                    <i className="iconoir-warning-triangle text-6xl mb-4 block"></i>
+                                    <p>{error}</p>
+                                </div>
+                            ) : results.length === 0 ? (
                                 <div className="text-center py-12 text-gray-400">
                                     <i className="iconoir-search text-6xl mb-4 block"></i>
                                     <p>Aucun résultat. Lancez un screening pour voir les titres correspondants.</p>
+                                    <p className="text-sm text-gray-500 mt-2">Essayez d'ajuster vos filtres pour obtenir plus de résultats.</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3 max-h-[600px] overflow-y-auto">
@@ -391,7 +510,12 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                                                     <div className="text-gray-400 text-sm">{stock.name}</div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-white font-mono text-lg">${stock.price.toFixed(2)}</div>
+                                                    <div className="text-white font-mono text-lg">
+                                                        ${stock.price > 0 ? stock.price.toFixed(2) : 'N/A'}
+                                                    </div>
+                                                    <div className={`text-xs font-medium ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                        {stock.change !== 0 ? (stock.change >= 0 ? '+' : '') + stock.change.toFixed(2) + '%' : '0.00%'}
+                                                    </div>
                                                     <div className="text-gray-400 text-xs">{stock.sector}</div>
                                                 </div>
                                             </div>

@@ -208,12 +208,56 @@ const StocksNewsTab = () => {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Top Gainers */}
-                        <div className={`p-3 sm:p-4 rounded-lg ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
-                            <h4 className={`text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-3 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
-                                <LucideIcon name="TrendingUp" className="w-5 h-5" />
-                                {renderMarketBadge('bull')}
-                                Top Gainers
-                            </h4>
+                        <div className={`p-3 sm:p-4 rounded-lg relative overflow-hidden ${isDarkMode ? 'bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent border border-green-500/30' : 'bg-gradient-to-br from-green-50 via-green-100/50 to-transparent border border-green-200'}`}>
+                            {/* Bull Image Background - More Visible */}
+                            <div className="absolute top-0 right-0 w-40 h-40 opacity-20 pointer-events-none transform rotate-12">
+                                <svg viewBox="0 0 200 200" className="w-full h-full">
+                                    {/* Bull Head */}
+                                    <ellipse cx="100" cy="80" rx="50" ry="40" fill={isDarkMode ? '#10b981' : '#059669'} />
+                                    {/* Bull Horns */}
+                                    <path d="M60 60 Q50 40, 40 50 Q50 60, 60 70 Z" fill={isDarkMode ? '#10b981' : '#059669'} />
+                                    <path d="M140 60 Q150 40, 160 50 Q150 60, 140 70 Z" fill={isDarkMode ? '#10b981' : '#059669'} />
+                                    {/* Bull Eyes */}
+                                    <circle cx="85" cy="75" r="5" fill="#1f2937" />
+                                    <circle cx="115" cy="75" r="5" fill="#1f2937" />
+                                    {/* Bull Nose */}
+                                    <ellipse cx="100" cy="90" rx="8" ry="6" fill="#1f2937" />
+                                    {/* Bull Body */}
+                                    <ellipse cx="100" cy="140" rx="45" ry="50" fill={isDarkMode ? '#10b981' : '#059669'} />
+                                </svg>
+                            </div>
+                            
+                            {/* Decorative gradient overlay */}
+                            <div className={`absolute inset-0 bg-gradient-to-l from-transparent via-transparent ${isDarkMode ? 'to-green-500/5' : 'to-green-100/30'} pointer-events-none`}></div>
+                            
+                            {/* Pattern overlay for texture */}
+                            <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
+                                backgroundImage: `radial-gradient(circle at 2px 2px, ${isDarkMode ? '#10b981' : '#059669'} 1px, transparent 0)`,
+                                backgroundSize: '20px 20px'
+                            }}></div>
+                            
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h4 className={`text-base sm:text-sm font-bold flex items-center gap-3 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
+                                        <div className="relative">
+                                            <LucideIcon name="TrendingUp" className="w-5 h-5" />
+                                        </div>
+                                        {renderMarketBadge('bull')}
+                                        <span>Top Gainers</span>
+                                    </h4>
+                                    {/* Bull Illustration */}
+                                    <div className="flex-shrink-0 relative">
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg ${
+                                            isDarkMode ? 'bg-green-500/30 border-2 border-green-500/50' : 'bg-green-200 border-2 border-green-300'
+                                        }`}>
+                                            🐂
+                                        </div>
+                                        {/* Glow effect */}
+                                        <div className={`absolute inset-0 rounded-full blur-md opacity-30 ${
+                                            isDarkMode ? 'bg-green-500' : 'bg-green-400'
+                                        }`}></div>
+                                    </div>
+                                </div>
                             <div className="space-y-2.5 sm:space-y-2">
                                 {tickers
                                     .map(ticker => ({
@@ -295,15 +339,65 @@ const StocksNewsTab = () => {
                                         </div>
                                     ))}
                             </div>
+                            </div>
                         </div>
 
                         {/* Top Losers */}
-                        <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-red-500/10 border border-red-500/30' : 'bg-red-50 border border-red-200'}`}>
-                            <h4 className={`text-sm font-bold mb-3 flex items-center gap-3 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
-                                <LucideIcon name="TrendingDown" className="w-5 h-5" />
-                                {renderMarketBadge('bear')}
-                                Top Losers
-                            </h4>
+                        <div className={`p-4 rounded-lg relative overflow-hidden ${isDarkMode ? 'bg-gradient-to-br from-red-500/10 via-red-500/5 to-transparent border border-red-500/30' : 'bg-gradient-to-br from-red-50 via-red-100/50 to-transparent border border-red-200'}`}>
+                            {/* Bear Image Background - More Visible */}
+                            <div className="absolute top-0 right-0 w-40 h-40 opacity-20 pointer-events-none transform -rotate-12">
+                                <svg viewBox="0 0 200 200" className="w-full h-full">
+                                    {/* Bear Head */}
+                                    <circle cx="100" cy="90" r="45" fill={isDarkMode ? '#ef4444' : '#dc2626'} />
+                                    {/* Bear Ears */}
+                                    <circle cx="70" cy="60" r="18" fill={isDarkMode ? '#ef4444' : '#dc2626'} />
+                                    <circle cx="130" cy="60" r="18" fill={isDarkMode ? '#ef4444' : '#dc2626'} />
+                                    <circle cx="70" cy="60" r="10" fill="#1f2937" />
+                                    <circle cx="130" cy="60" r="10" fill="#1f2937" />
+                                    {/* Bear Eyes */}
+                                    <circle cx="85" cy="85" r="6" fill="#1f2937" />
+                                    <circle cx="115" cy="85" r="6" fill="#1f2937" />
+                                    {/* Bear Nose */}
+                                    <ellipse cx="100" cy="100" rx="6" ry="8" fill="#1f2937" />
+                                    {/* Bear Mouth */}
+                                    <path d="M100 108 Q95 115, 90 110 Q95 105, 100 108" stroke="#1f2937" strokeWidth="2" fill="none" />
+                                    <path d="M100 108 Q105 115, 110 110 Q105 105, 100 108" stroke="#1f2937" strokeWidth="2" fill="none" />
+                                    {/* Bear Body */}
+                                    <ellipse cx="100" cy="150" rx="50" ry="55" fill={isDarkMode ? '#ef4444' : '#dc2626'} />
+                                </svg>
+                            </div>
+                            
+                            {/* Decorative gradient overlay */}
+                            <div className={`absolute inset-0 bg-gradient-to-l from-transparent via-transparent ${isDarkMode ? 'to-red-500/5' : 'to-red-100/30'} pointer-events-none`}></div>
+                            
+                            {/* Pattern overlay for texture */}
+                            <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
+                                backgroundImage: `radial-gradient(circle at 2px 2px, ${isDarkMode ? '#ef4444' : '#dc2626'} 1px, transparent 0)`,
+                                backgroundSize: '20px 20px'
+                            }}></div>
+                            
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h4 className={`text-sm font-bold flex items-center gap-3 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
+                                        <div className="relative">
+                                            <LucideIcon name="TrendingDown" className="w-5 h-5" />
+                                        </div>
+                                        {renderMarketBadge('bear')}
+                                        <span>Top Losers</span>
+                                    </h4>
+                                    {/* Bear Illustration */}
+                                    <div className="flex-shrink-0 relative">
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg ${
+                                            isDarkMode ? 'bg-red-500/30 border-2 border-red-500/50' : 'bg-red-200 border-2 border-red-300'
+                                        }`}>
+                                            🐻
+                                        </div>
+                                        {/* Glow effect */}
+                                        <div className={`absolute inset-0 rounded-full blur-md opacity-30 ${
+                                            isDarkMode ? 'bg-red-500' : 'bg-red-400'
+                                        }`}></div>
+                                    </div>
+                                </div>
                             <div className="space-y-2">
                                 {tickers
                                     .map(ticker => ({
@@ -384,6 +478,7 @@ const StocksNewsTab = () => {
                                             </div>
                                         </div>
                                     ))}
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -1178,144 +1273,216 @@ const StocksNewsTab = () => {
             {/* ===== SECTION ACTUALITÉS SÉPARÉE ===== */}
             {newsData.length > 0 && (
                 <div className="mt-12">
-                    <div className={`backdrop-blur-sm rounded-2xl p-8 border-2 shadow-2xl transition-colors duration-300 ${
+                    <div className={`backdrop-blur-md rounded-3xl p-8 md:p-10 border-2 shadow-2xl transition-all duration-300 relative overflow-hidden ${
                         isDarkMode
-                            ? 'bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-purple-500/30 shadow-purple-500/10'
-                            : 'bg-gradient-to-br from-white/95 to-gray-50/95 border-purple-400/40 shadow-purple-400/10'
+                            ? 'bg-gradient-to-br from-gray-800/95 via-gray-800/90 to-gray-900/95 border-purple-500/40 shadow-purple-500/20'
+                            : 'bg-gradient-to-br from-white/98 via-white/95 to-gray-50/98 border-purple-400/50 shadow-purple-400/20'
                     }`}>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>
-                                📰 Actualités du Marché
-                            </h2>
-                            <div className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${
-                                isDarkMode
-                                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                    : 'bg-purple-100 text-purple-700 border border-purple-300'
-                            }`}>
-                                {newsData.length} articles
+                        {/* Pattern de fond décoratif */}
+                        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
+                            backgroundImage: `radial-gradient(circle at 2px 2px, ${isDarkMode ? '#a855f7' : '#9333ea'} 1px, transparent 0)`,
+                            backgroundSize: '40px 40px'
+                        }}></div>
+                        
+                        {/* Gradient overlay */}
+                        <div className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-20 pointer-events-none ${
+                            isDarkMode ? 'bg-purple-500' : 'bg-purple-300'
+                        }`} style={{
+                            transform: 'translate(30%, -30%)'
+                        }}></div>
+                        
+                        <div className="relative z-10">
+                            {/* Header amélioré */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+                                <div className="flex items-center gap-4">
+                                    <div className={`p-3 rounded-2xl ${
+                                        isDarkMode 
+                                            ? 'bg-gradient-to-br from-purple-600/30 to-purple-500/20 border border-purple-500/30' 
+                                            : 'bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200'
+                                    }`}>
+                                        <span className="text-3xl">📰</span>
+                                    </div>
+                                    <div>
+                                        <h2 className={`text-3xl md:text-4xl font-black transition-colors duration-300 mb-1 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`} style={{
+                                            fontFamily: "'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif",
+                                            fontWeight: 900,
+                                            letterSpacing: '-0.02em'
+                                        }}>
+                                            Actualités du Marché
+                                        </h2>
+                                        <p className={`text-sm transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        }`}>
+                                            Dernières nouvelles financières en temps réel
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-lg ${
+                                        isDarkMode
+                                            ? 'bg-gradient-to-r from-purple-600/40 to-purple-500/30 text-purple-200 border-2 border-purple-500/50 shadow-purple-500/20'
+                                            : 'bg-gradient-to-r from-purple-100 to-purple-50 text-purple-700 border-2 border-purple-300 shadow-purple-200/50'
+                                    }`}>
+                                        <span className="text-lg mr-2">📊</span>
+                                        {newsData.length} articles
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {newsData.slice(0, 12).map((article, index) => {
-                                const credibilityScore = getNewsCredibilityScore(article.source?.name || '');
-                                const credibilityTier = getCredibilityTier(credibilityScore);
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {newsData.slice(0, 12).map((article, index) => {
+                                    const credibilityScore = getNewsCredibilityScore(article.source?.name || '');
+                                    const credibilityTier = getCredibilityTier(credibilityScore);
 
-                                return (
-                                    <div
-                                        key={index}
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={() => {
-                                            if (article.url) {
-                                                window.open(article.url, '_blank', 'noopener,noreferrer');
-                                            }
-                                        }}
-                                        onKeyDown={(event) => {
-                                            if ((event.key === 'Enter' || event.key === ' ') && article.url) {
-                                                event.preventDefault();
-                                                window.open(article.url, '_blank', 'noopener,noreferrer');
-                                            }
-                                        }}
-                                        className={`p-6 rounded-xl cursor-pointer transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                                    return (
+                                        <div
+                                            key={index}
+                                            role="button"
+                                            tabIndex={0}
+                                            onClick={() => {
+                                                if (article.url) {
+                                                    window.open(article.url, '_blank', 'noopener,noreferrer');
+                                                }
+                                            }}
+                                            onKeyDown={(event) => {
+                                                if ((event.key === 'Enter' || event.key === ' ') && article.url) {
+                                                    event.preventDefault();
+                                                    window.open(article.url, '_blank', 'noopener,noreferrer');
+                                                }
+                                            }}
+                                            className={`group relative p-6 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 overflow-hidden ${
+                                                isDarkMode
+                                                    ? 'bg-gradient-to-br from-gray-700/60 via-gray-800/60 to-gray-900/60 hover:from-gray-700/80 hover:via-gray-800/80 hover:to-gray-900/80 border border-gray-600/50 hover:border-purple-500/50 shadow-xl'
+                                                    : 'bg-gradient-to-br from-white via-gray-50/50 to-white hover:from-gray-50 hover:via-white hover:to-gray-50 border border-gray-200/80 hover:border-purple-300/80 shadow-xl hover:shadow-2xl'
+                                            }`}
+                                            style={{
+                                                animation: `fadeInUp 0.5s ease-out ${index * 0.05}s both`
+                                            }}
+                                        >
+                                            {/* Effet de brillance au hover */}
+                                            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-gradient-to-r from-transparent via-purple-500/10 to-transparent' 
+                                                    : 'bg-gradient-to-r from-transparent via-purple-200/20 to-transparent'
+                                            }`} style={{
+                                                transform: 'translateX(-100%)',
+                                                animation: 'shimmer 2s infinite'
+                                            }}></div>
+                                            
+                                            {/* Indicateur de crédibilité coloré à gauche */}
+                                            <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl ${
+                                                credibilityTier === 'premium'
+                                                    ? 'bg-gradient-to-b from-yellow-400 to-yellow-600'
+                                                    : credibilityTier === 'high'
+                                                    ? 'bg-gradient-to-b from-green-400 to-green-600'
+                                                    : credibilityTier === 'medium'
+                                                    ? 'bg-gradient-to-b from-blue-400 to-blue-600'
+                                                    : credibilityTier === 'low'
+                                                    ? 'bg-gradient-to-b from-gray-400 to-gray-600'
+                                                    : 'bg-gradient-to-b from-red-400 to-red-600'
+                                            }`}></div>
+                                            <div className="relative z-10">
+                                                {/* Source et crédibilité */}
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <div className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${
+                                                        credibilityTier === 'premium'
+                                                            ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 shadow-lg shadow-yellow-500/20'
+                                                            : credibilityTier === 'high'
+                                                            ? 'bg-green-500/20 text-green-400 border border-green-500/40 shadow-lg shadow-green-500/20'
+                                                            : credibilityTier === 'medium'
+                                                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40 shadow-lg shadow-blue-500/20'
+                                                            : credibilityTier === 'low'
+                                                            ? 'bg-gray-500/20 text-gray-400 border border-gray-500/40'
+                                                            : 'bg-red-500/20 text-red-400 border border-red-500/40'
+                                                    }`}>
+                                                        {article.source?.name || 'Source inconnue'}
+                                                    </div>
+                                                    <div className={`text-xs font-medium px-2 py-1 rounded-md ${
+                                                        isDarkMode 
+                                                            ? 'bg-gray-700/50 text-gray-300' 
+                                                            : 'bg-gray-100 text-gray-600'
+                                                    }`}>
+                                                        {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </div>
+                                                </div>
+
+                                                {/* Titre */}
+                                                <h3 className={`font-bold text-lg md:text-xl mb-3 line-clamp-2 transition-colors duration-300 leading-tight group-hover:text-purple-400 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}>
+                                                    {article.title}
+                                                </h3>
+
+                                                {/* Description */}
+                                                {article.description && (
+                                                    <p className={`text-sm mb-5 line-clamp-3 transition-colors duration-300 leading-relaxed ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                    }`}>
+                                                        {article.description}
+                                                    </p>
+                                                )}
+
+                                                {/* Actions */}
+                                                <div className="flex gap-2 mt-5">
+                                                    <a
+                                                        href={article.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className={`flex-1 px-4 py-2.5 rounded-xl text-center text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl ${
+                                                            isDarkMode
+                                                                ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white'
+                                                                : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
+                                                        }`}
+                                                    >
+                                                        <IconoirIcon name="ExternalLink" className="w-4 h-4 inline mr-1.5" />
+                                                        Lire
+                                                    </a>
+                                                    <button
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            summarizeWithEmma(article.url, article.title);
+                                                        }}
+                                                        className={`flex-1 px-4 py-2.5 rounded-xl text-center text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl ${
+                                                            isDarkMode
+                                                                ? 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white'
+                                                                : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
+                                                        }`}
+                                                    >
+                                                        <IconoirIcon name="Brain" className="w-4 h-4 inline mr-1.5" />
+                                                        Emma
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {newsData.length > 12 && (
+                                <div className="text-center mt-8">
+                                    <button
+                                        onClick={() => safeSetActiveTab('markets-economy')}
+                                        className={`px-8 py-4 rounded-xl font-bold text-base transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${
                                             isDarkMode
-                                                ? 'bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:from-gray-700/70 hover:to-gray-800/70 border border-gray-600'
-                                                : 'bg-gradient-to-br from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 border border-gray-200 shadow-lg'
+                                                ? 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white border-2 border-purple-400/50'
+                                                : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-2 border-purple-300/50'
                                         }`}
                                     >
-                                        {/* Source et crédibilité */}
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                                credibilityTier === 'premium'
-                                                    ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30'
-                                                    : credibilityTier === 'high'
-                                                    ? 'bg-green-500/20 text-green-500 border border-green-500/30'
-                                                    : credibilityTier === 'medium'
-                                                    ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
-                                                    : credibilityTier === 'low'
-                                                    ? 'bg-gray-500/20 text-gray-500 border border-gray-500/30'
-                                                    : 'bg-red-500/20 text-red-500 border border-red-500/30'
-                                            }`}>
-                                                {article.source?.name || 'Source inconnue'}
-                                            </div>
-                                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
-                                                })}
-                                            </div>
-                                        </div>
-
-                                        {/* Titre */}
-                                        <h3 className={`font-bold text-lg mb-3 line-clamp-2 transition-colors duration-300 ${
-                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>
-                                            {article.title}
-                                        </h3>
-
-                                        {/* Description */}
-                                        {article.description && (
-                                            <p className={`text-sm mb-4 line-clamp-3 transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>
-                                                {article.description}
-                                            </p>
-                                        )}
-
-                                        {/* Actions */}
-                                        <div className="flex gap-2 mt-4">
-                                            <a
-                                                href={article.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                onClick={(e) => e.stopPropagation()}
-                                                className={`flex-1 px-3 py-2 rounded-lg text-center text-sm font-semibold transition-all ${
-                                                    isDarkMode
-                                                        ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                                }`}
-                                            >
-                                                <IconoirIcon name="ExternalLink" className="w-4 h-4 inline mr-1" />
-                                                Lire
-                                            </a>
-                                            <button
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-                                                    summarizeWithEmma(article.url, article.title);
-                                                }}
-                                                className={`flex-1 px-3 py-2 rounded-lg text-center text-sm font-semibold transition-all ${
-                                                    isDarkMode
-                                                        ? 'bg-purple-600 hover:bg-purple-500 text-white'
-                                                        : 'bg-purple-500 hover:bg-purple-600 text-white'
-                                                }`}
-                                            >
-                                                <IconoirIcon name="Brain" className="w-4 h-4 inline mr-1" />
-                                                Emma
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                        <span className="mr-2">📰</span>
+                                        Voir toutes les actualités ({newsData.length})
+                                        <span className="ml-2">→</span>
+                                    </button>
+                                </div>
+                            )}
                         </div>
-
-                        {newsData.length > 12 && (
-                            <div className="text-center mt-6">
-                                <button
-                                    onClick={() => safeSetActiveTab('markets-economy')}
-                                    className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                                        isDarkMode
-                                            ? 'bg-purple-600 hover:bg-purple-500 text-white'
-                                            : 'bg-purple-500 hover:bg-purple-600 text-white'
-                                    }`}
-                                >
-                                    Voir toutes les actualités ({newsData.length}) →
-                                </button>
-                            </div>
-                        )}
                     </div>
                 </div>
             )}

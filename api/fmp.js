@@ -131,6 +131,32 @@ export default async function handler(req, res) {
         fmpUrl = `${v3Base}/analyst-estimates/${symbolParam || 'AAPL'}?limit=${fallbackLimit || 8}&apikey=${apiKey}`;
         break;
 
+      case 'stock-screener':
+        // Stock screener with filters
+        const marketCapMoreThan = req.query.marketCapMoreThan || '0';
+        const marketCapLowerThan = req.query.marketCapLowerThan || '';
+        const sector = req.query.sector || '';
+        const limit = req.query.limit || '100';
+        
+        let screenerParams = new URLSearchParams({
+          marketCapMoreThan,
+          limit,
+          apikey: apiKey
+        });
+        
+        if (marketCapLowerThan) {
+          screenerParams.append('marketCapLowerThan', marketCapLowerThan);
+        }
+        if (sector) {
+          screenerParams.append('sector', sector);
+        }
+        if (req.query.exchange) {
+          screenerParams.append('exchange', req.query.exchange);
+        }
+        
+        fmpUrl = `${v3Base}/stock-screener?${screenerParams.toString()}`;
+        break;
+
       case 'earnings-calendar':
         // Upcoming and past earnings announcements
         // Optional: from/to date range, or specific symbol

@@ -598,6 +598,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const tickerTapeRef = useRef(null);
         const stocksLoadingRef = useRef(false); // Pour éviter les chargements multiples
         const batchLoadedRef = useRef(false); // Pour suivre si le batch a déjà chargé les données
+        
+        // États pour le composant expandable du ticker tape
+        const [tickerExpandableOpen, setTickerExpandableOpen] = useState(false);
+        const [tickerExpandableUrl, setTickerExpandableUrl] = useState('');
+        const [tickerExpandableTitle, setTickerExpandableTitle] = useState('');
 
         // États pour Emma (partagés entre AskEmmaTab et AdminJSLaiTab)
         const [emmaConnected, setEmmaConnected] = useState(false);
@@ -3441,10 +3446,145 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             container.appendChild(script);
 
+            // Intercepter les clics et navigations depuis le ticker tape
+            const setupTickerInterception = () => {
+                // Attendre que l'iframe soit créé
+                const checkForIframe = setInterval(() => {
+                    const widgetContainer = container.querySelector('.tradingview-widget-container__widget');
+                    const iframe = widgetContainer?.querySelector('iframe');
+                    
+                    if (iframe && widgetContainer) {
+                        clearInterval(checkForIframe);
+                        
+                        // Intercepter les messages postMessage de TradingView
+                        const messageHandler = (event) => {
+                            // TradingView peut envoyer des messages avec des URLs
+                            if (event.data && typeof event.data === 'object') {
+                                if (event.data.url || event.data.href || event.data.symbol) {
+                                    const url = event.data.url || event.data.href;
+                                    const symbol = event.data.symbol;
+                                    const title = event.data.title || symbol || 'TradingView';
+                                    
+                                    if (url) {
+                                        setTickerExpandableUrl(url);
+                                        setTickerExpandableTitle(title);
+                                        setTickerExpandableOpen(true);
+                                    } else if (symbol) {
+                                        // Construire l'URL TradingView pour le symbole
+                                        const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(symbol)}`;
+                                        setTickerExpandableUrl(tradingViewUrl);
+                                        setTickerExpandableTitle(symbol);
+                                        setTickerExpandableOpen(true);
+                                    }
+                                }
+                            }
+                        };
+                        
+                        window.addEventListener('message', messageHandler);
+                        
+                        // Intercepter les clics sur le conteneur du widget
+                        const clickHandler = (e) => {
+                            // Vérifier si le clic est sur un élément cliquable du ticker
+                            const clickableElement = e.target.closest('a, button, [role="button"], [onclick]');
+                            
+                            if (clickableElement || e.target.closest('.tradingview-widget-container__widget')) {
+                                // Empêcher la navigation par défaut
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                // Essayer d'extraire l'URL ou le symbole
+                                const href = clickableElement?.href || clickableElement?.getAttribute('href');
+                                const symbol = clickableElement?.getAttribute('data-symbol') || 
+                                             clickableElement?.textContent?.trim();
+                                
+                                if (href && href.includes('tradingview.com')) {
+                                    setTickerExpandableUrl(href);
+                                    setTickerExpandableTitle(symbol || 'TradingView Chart');
+                                    setTickerExpandableOpen(true);
+                                } else if (symbol) {
+                                    const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(symbol)}`;
+                                    setTickerExpandableUrl(tradingViewUrl);
+                                    setTickerExpandableTitle(symbol);
+                                    setTickerExpandableOpen(true);
+                                } else {
+                                    // Utiliser l'URL de base de l'iframe comme fallback
+                                    setTickerExpandableUrl(iframe.src);
+                                    setTickerExpandableTitle('TradingView Chart');
+                                    setTickerExpandableOpen(true);
+                                }
+                            }
+                        };
+                        
+                        // Ajouter un overlay transparent pour capturer les clics
+                        const overlay = document.createElement('div');
+                        overlay.style.cssText = `
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            z-index: 1;
+                            pointer-events: auto;
+                            cursor: pointer;
+                            background: transparent;
+                        `;
+                        overlay.addEventListener('click', clickHandler, true);
+                        
+                        // Positionner le conteneur en relative si nécessaire
+                        if (getComputedStyle(widgetContainer).position === 'static') {
+                            widgetContainer.style.position = 'relative';
+                        }
+                        
+                        widgetContainer.appendChild(overlay);
+                        
+                        // Nettoyer au démontage
+                        return () => {
+                            window.removeEventListener('message', messageHandler);
+                            overlay.removeEventListener('click', clickHandler, true);
+                            overlay.remove();
+                        };
+                    }
+                }, 100);
+                
+                // Timeout de sécurité
+                setTimeout(() => clearInterval(checkForIframe), 10000);
+            };
+            
+            setupTickerInterception();
+            
+            // Intercepter les navigations depuis l'iframe en écoutant les changements d'URL
+            const originalPushState = history.pushState;
+            const originalReplaceState = history.replaceState;
+            
+            history.pushState = function(...args) {
+                const url = args[2];
+                if (url && typeof url === 'string' && url.includes('tradingview.com')) {
+                    setTickerExpandableUrl(url);
+                    setTickerExpandableTitle('TradingView');
+                    setTickerExpandableOpen(true);
+                    return;
+                }
+                return originalPushState.apply(history, args);
+            };
+            
+            history.replaceState = function(...args) {
+                const url = args[2];
+                if (url && typeof url === 'string' && url.includes('tradingview.com')) {
+                    setTickerExpandableUrl(url);
+                    setTickerExpandableTitle('TradingView');
+                    setTickerExpandableOpen(true);
+                    return;
+                }
+                return originalReplaceState.apply(history, args);
+            };
+
             return () => {
                 if (container) {
                     container.innerHTML = '';
+                    container.removeEventListener('click', handleTickerClick, true);
                 }
+                history.pushState = originalPushState;
+                history.replaceState = originalReplaceState;
             };
         }, [isDarkMode]);
 
@@ -18128,56 +18268,107 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         <div className="flex gap-2 overflow-x-auto pb-1">
                             <button
                                 onClick={() => setJlabView('portfolio')}
-                                className={`px-6 py-3 font-semibold transition-all duration-200 whitespace-nowrap ${jlabView === 'portfolio'
+                                className={`px-6 py-3 font-semibold transition-all duration-300 whitespace-nowrap relative overflow-hidden rounded-t-lg group ${jlabView === 'portfolio'
                                     ? isDarkMode
-                                        ? 'bg-green-600 text-white border-b-2 border-green-400'
-                                        : 'bg-green-100 text-green-800 border-b-2 border-green-600'
+                                        ? 'text-white border-b-2 border-green-400 shadow-lg shadow-green-500/20'
+                                        : 'text-green-900 border-b-2 border-green-600 shadow-md'
                                     : isDarkMode
-                                        ? 'text-gray-400 hover:text-white hover:bg-gray-800'
-                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                        ? 'text-gray-400 hover:text-white'
+                                        : 'text-gray-600 hover:text-gray-900'
                                     }`}
+                                style={jlabView === 'portfolio' ? {
+                                    background: isDarkMode 
+                                        ? 'linear-gradient(135deg, rgba(22, 163, 74, 0.9) 0%, rgba(16, 185, 129, 0.8) 100%), url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+                                        : 'linear-gradient(135deg, rgba(220, 252, 231, 0.95) 0%, rgba(187, 247, 208, 0.9) 100%)'
+                                } : {
+                                    background: isDarkMode
+                                        ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%)'
+                                        : 'linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(243, 244, 246, 0.95) 100%)'
+                                }}
                             >
-                                Titres en portefeuille
+                                <span className="relative z-10">Titres en portefeuille</span>
+                                {jlabView === 'portfolio' && (
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                                )}
                             </button>
                             <button
                                 onClick={() => setJlabView('watchlist')}
-                                className={`px-6 py-3 font-semibold transition-all duration-200 whitespace-nowrap ${jlabView === 'watchlist'
+                                className={`px-6 py-3 font-semibold transition-all duration-300 whitespace-nowrap relative overflow-hidden rounded-t-lg group ${jlabView === 'watchlist'
                                     ? isDarkMode
-                                        ? 'bg-green-600 text-white border-b-2 border-green-400'
-                                        : 'bg-green-100 text-green-800 border-b-2 border-green-600'
+                                        ? 'text-white border-b-2 border-blue-400 shadow-lg shadow-blue-500/20'
+                                        : 'text-blue-900 border-b-2 border-blue-600 shadow-md'
                                     : isDarkMode
-                                        ? 'text-gray-400 hover:text-white hover:bg-gray-800'
-                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                        ? 'text-gray-400 hover:text-white'
+                                        : 'text-gray-600 hover:text-gray-900'
                                     }`}
+                                style={jlabView === 'watchlist' ? {
+                                    background: isDarkMode 
+                                        ? 'linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(59, 130, 246, 0.8) 100%), url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+                                        : 'linear-gradient(135deg, rgba(219, 234, 254, 0.95) 0%, rgba(191, 219, 254, 0.9) 100%)'
+                                } : {
+                                    background: isDarkMode
+                                        ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%)'
+                                        : 'linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(243, 244, 246, 0.95) 100%)'
+                                }}
                             >
-                                Dan's watchlist
+                                <span className="relative z-10">Dan's watchlist</span>
+                                {jlabView === 'watchlist' && (
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                                )}
                             </button>
                             <button
                                 onClick={() => setJlabView('3pour1')}
-                                className={`px-6 py-3 font-semibold transition-all duration-200 whitespace-nowrap ${jlabView === '3pour1'
+                                className={`px-6 py-3 font-semibold transition-all duration-300 whitespace-nowrap relative overflow-hidden rounded-t-lg group ${jlabView === '3pour1'
                                     ? isDarkMode
-                                        ? 'bg-green-600 text-white border-b-2 border-green-400'
-                                        : 'bg-green-100 text-green-800 border-b-2 border-green-600'
+                                        ? 'text-white border-b-2 border-purple-400 shadow-lg shadow-purple-500/20'
+                                        : 'text-purple-900 border-b-2 border-purple-600 shadow-md'
                                     : isDarkMode
-                                        ? 'text-gray-400 hover:text-white hover:bg-gray-800'
-                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                        ? 'text-gray-400 hover:text-white'
+                                        : 'text-gray-600 hover:text-gray-900'
                                     }`}
+                                style={jlabView === '3pour1' ? {
+                                    background: isDarkMode 
+                                        ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.9) 0%, rgba(168, 85, 247, 0.8) 100%), url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+                                        : 'linear-gradient(135deg, rgba(243, 232, 255, 0.95) 0%, rgba(233, 213, 255, 0.9) 100%)'
+                                } : {
+                                    background: isDarkMode
+                                        ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%)'
+                                        : 'linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(243, 244, 246, 0.95) 100%)'
+                                }}
                             >
-                                3pour1
+                                <span className="relative z-10">3pour1</span>
+                                {jlabView === '3pour1' && (
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                                )}
                             </button>
                             <button
                                 onClick={() => setJlabView('advanced')}
-                                className={`px-6 py-3 font-semibold transition-all duration-200 whitespace-nowrap flex items-center gap-2 ${jlabView === 'advanced'
+                                className={`px-6 py-3 font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-2 relative overflow-hidden rounded-t-lg group ${jlabView === 'advanced'
                                     ? isDarkMode
-                                        ? 'bg-blue-600 text-white border-b-2 border-blue-400'
-                                        : 'bg-blue-100 text-blue-800 border-b-2 border-blue-600'
+                                        ? 'text-white border-b-2 border-cyan-400 shadow-lg shadow-cyan-500/20'
+                                        : 'text-cyan-900 border-b-2 border-cyan-600 shadow-md'
                                     : isDarkMode
-                                        ? 'text-gray-400 hover:text-white hover:bg-gray-800'
-                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                        ? 'text-gray-400 hover:text-white'
+                                        : 'text-gray-600 hover:text-gray-900'
                                     }`}
+                                style={jlabView === 'advanced' ? {
+                                    background: isDarkMode 
+                                        ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.9) 0%, rgba(34, 211, 238, 0.8) 100%), url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+                                        : 'linear-gradient(135deg, rgba(207, 250, 254, 0.95) 0%, rgba(165, 243, 252, 0.9) 100%)'
+                                } : {
+                                    background: isDarkMode
+                                        ? 'linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%)'
+                                        : 'linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(243, 244, 246, 0.95) 100%)'
+                                }}
                             >
-                                <LucideIcon name="Sparkles" className="w-4 h-4" />
-                                Analyse Pro 🚀
+                                <LucideIcon name="Sparkles" className="w-4 h-4 relative z-10" />
+                                <span className="relative z-10">Analyse Pro</span>
+                                {jlabView === 'advanced' && (
+                                    <>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 via-transparent to-transparent"></div>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -24809,13 +25000,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             );
         };
 
-        // Placeholder for SettingsTab if not defined elsewhere
-        const SettingsTab = window.SettingsTab || (() => (
-            <div className="p-6 text-center">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Paramètres</h2>
-                <p className="text-gray-600 dark:text-gray-400">Configuration de l'application (Bientôt disponible)</p>
-            </div>
-        ));
 
         // Configuration des onglets (après déclaration de TOUS les composants)
         // Note: Les icônes Iconoir sont générées automatiquement via getTabIconClass()
@@ -24826,7 +25010,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             { id: 'assistant-vocal', label: 'Assistant Vocal', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox (Live)', icon: 'iconoir-voice-circle', component: FinVoxTab },
             { id: 'emmaia', label: 'EmmAIA (Gemini)', icon: 'iconoir-brain', component: EmmAIATab },
-            { id: 'settings', label: 'Paramètres', icon: 'iconoir-settings', component: SettingsTab },
             { id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: PlusTab },
             { id: 'admin-jsla', label: 'Admin JSLAI', icon: 'iconoir-settings', component: AdminJSLaiTab },
             { id: 'scrapping-sa', label: 'Seeking Alpha', icon: 'iconoir-search', component: ScrappingSATab },
@@ -24911,7 +25094,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
                 )}
                 {/* Header - Bloomberg Style - Always Dark */}
-                <header className="relative overflow-hidden bg-gradient-to-r from-black via-gray-900 to-black border-b border-green-500/20 md:ml-20">
+                <header className="relative overflow-hidden bg-gradient-to-r from-black via-gray-900 to-black border-b border-green-500/20">
                     {/* Bloomberg-style animated background pattern */}
                     <div className="absolute inset-0 opacity-5">
                         <div className="absolute inset-0" style={{
@@ -24920,7 +25103,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }}></div>
                     </div>
 
-                    <div className="max-w-7xl mx-auto px-6 py-4 relative z-10">
+                    <div className="px-6 py-4 relative z-10">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-6">
                                 {/* Logo avec effet Bloomberg */}
@@ -24933,7 +25116,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     />
                                 </div>
 
-                                <div className="border-l border-green-500/30 pl-6 flex-1">
+                                <div className="border-l border-green-500/30 pl-6">
                                     <div className="flex items-center gap-4">
                                         <div>
                                             <h1 className="text-4xl font-black tracking-tight text-white" style={{ fontFamily: "'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif", fontWeight: 900, letterSpacing: '-0.02em' }}>
@@ -24950,7 +25133,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 ml-auto">
+                            <div className="flex items-center gap-3">
                                 {/* Live indicator */}
                                 <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'
                                     }`}>
@@ -25002,27 +25185,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 </header>
 
                 {/* TradingView Ticker Tape Widget - Bandeau de cotations */}
-                <div className="tradingview-widget-container md:ml-20" ref={tickerTapeRef}>
+                <div className="tradingview-widget-container" ref={tickerTapeRef}>
                     <div className="tradingview-widget-container__widget"></div>
                 </div>
 
-                {/* Desktop Sidebar Navigation */}
-                <aside className={`hidden md:flex fixed left-0 top-0 h-full w-20 flex-col backdrop-blur-sm transition-all duration-300 z-40 ${isDarkMode
-                    ? 'bg-black/95 border-r border-green-500/10'
-                    : 'bg-white/95 border-r-2 border-gray-200'
+                {/* Bottom Navigation Bar - Tous les écrans */}
+                <nav className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl ${isDarkMode
+                    ? 'bg-black/95 border-t border-green-500/20'
+                    : 'bg-white/95 border-t-2 border-gray-200'
                     } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                    {/* Logo section */}
-                    <div className={`flex items-center justify-center h-20 border-b ${isDarkMode ? 'border-green-500/10' : 'border-gray-200'
-                        }`}>
-                        <img
-                            src="/logojslaidark.jpg"
-                            alt="JSL AI"
-                            className="w-12 h-12 object-contain"
-                        />
-                    </div>
-
-                    {/* Navigation Items */}
-                    <nav className="flex-1 overflow-y-auto py-4" style={{ maxHeight: 'none' }}>
+                    <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
                         {tabs.map(tab => {
                             const iconClass = tab.icon || getTabIcon(tab.id);
                             const isActive = activeTab === tab.id;
@@ -25031,108 +25203,22 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     key={tab.id}
                                     onMouseDown={withRipple}
                                     onClick={() => handleTabChange(tab.id)}
-                                    className={`w-full flex flex-col items-center justify-center py-4 px-2 btn-ripple relative transition-all duration-300 group ${isActive
+                                    className={`flex-shrink-0 flex flex-col items-center justify-center py-2.5 px-3 min-w-[70px] btn-ripple relative transition-all duration-300 group rounded-lg ${isActive
                                         ? (isDarkMode
-                                            ? 'text-green-400 bg-gradient-to-r from-gray-900/50 to-transparent'
-                                            : 'text-green-600 bg-gradient-to-r from-green-50 to-transparent')
+                                            ? 'text-green-400 bg-gradient-to-b from-green-500/20 to-green-600/10'
+                                            : 'text-green-600 bg-gradient-to-b from-green-50 to-green-100/50')
                                         : (isDarkMode
-                                            ? 'text-gray-400 hover:text-green-300 hover:bg-gray-900/30'
-                                            : 'text-gray-600 hover:text-green-700 hover:bg-gray-50')
+                                            ? 'text-gray-400 hover:text-green-300 hover:bg-gray-800/50'
+                                            : 'text-gray-600 hover:text-green-700 hover:bg-gray-100')
                                         }`}
                                     title={tab.label}
                                 >
-                                    {/* Active indicator - left bar with glow */}
-                                    {isActive && (
-                                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 rounded-r transition-all duration-300 ${isDarkMode
-                                            ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]'
-                                            : 'bg-green-600 shadow-[0_0_8px_rgba(22,163,74,0.4)]'
-                                            }`}></div>
-                                    )}
-
-                                    {/* Icon Container with enhanced styling */}
-                                    <div className={`relative mb-2 transition-all duration-300 ${isActive
-                                        ? 'scale-110'
-                                        : 'scale-100 group-hover:scale-105'
-                                        }`}>
-                                        {/* Glow effect for active icon */}
-                                        {isActive && (
-                                            <div className={`absolute inset-0 rounded-full blur-md opacity-50 transition-all duration-300 ${isDarkMode ? 'bg-green-500' : 'bg-green-400'
-                                                }`} style={{
-                                                    transform: 'scale(1.5)',
-                                                    filter: 'blur(8px)'
-                                                }}></div>
-                                        )}
-
-                                        {/* Icon with enhanced styling */}
-                                        {iconClass ? (
-                                            <i className={`${iconClass} text-2xl relative z-10 transition-all duration-300 ${isActive
-                                                ? (isDarkMode
-                                                    ? 'drop-shadow-[0_0_6px_rgba(34,197,94,0.8)]'
-                                                    : 'drop-shadow-[0_0_4px_rgba(22,163,74,0.6)]')
-                                                : 'drop-shadow-none'
-                                                }`} style={{
-                                                    display: 'inline-block',
-                                                    filter: isActive
-                                                        ? (isDarkMode
-                                                            ? 'drop-shadow(0 0 6px rgba(34,197,94,0.8))'
-                                                            : 'drop-shadow(0 0 4px rgba(22,163,74,0.6))')
-                                                        : 'none'
-                                                }}></i>
-                                        ) : (
-                                            <span className="text-2xl">📊</span>
-                                        )}
-                                    </div>
-
-                                    {/* Label (shown on hover) */}
-                                    <span className={`text-xs font-semibold text-center leading-tight transition-all duration-300 ${isActive
-                                        ? 'opacity-100'
-                                        : 'opacity-0 group-hover:opacity-100'
-                                        }`}>
-                                        {tab.label.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim()}
-                                    </span>
-
-                                    {/* Active dot indicator with pulse */}
-                                    {isActive && (
-                                        <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full transition-all duration-300 ${isDarkMode
-                                            ? 'bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.8)]'
-                                            : 'bg-green-600 shadow-[0_0_4px_rgba(22,163,74,0.6)]'
-                                            } animate-pulse`}></span>
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </nav>
-                </aside>
-
-                {/* Mobile Bottom Navigation Bar */}
-                <nav className={`md:hidden fixed bottom-0 left-0 right-0 backdrop-blur-sm transition-all duration-300 z-40 ${isDarkMode
-                    ? 'bg-black/95 border-t border-green-500/10'
-                    : 'bg-white/95 border-t-2 border-gray-200'
-                    } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                    <div className="flex items-center justify-around px-2 pb-safe">
-                        {tabs.slice(0, 5).map(tab => {
-                            const iconClass = getTabIcon(tab.id);
-                            const isActive = activeTab === tab.id;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onMouseDown={withRipple}
-                                    onClick={() => handleTabChange(tab.id)}
-                                    className={`flex-1 flex flex-col items-center justify-center py-3 px-1 btn-ripple relative transition-all duration-300 group ${isActive
-                                        ? (isDarkMode
-                                            ? 'text-green-400'
-                                            : 'text-green-600')
-                                        : (isDarkMode
-                                            ? 'text-gray-400'
-                                            : 'text-gray-600')
-                                        }`}
-                                >
                                     {/* Active indicator - top bar with glow */}
                                     {isActive && (
-                                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-16 h-1 rounded-b transition-all duration-300 ${isDarkMode
+                                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-b transition-all duration-300 ${isDarkMode
                                             ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]'
                                             : 'bg-green-600 shadow-[0_0_6px_rgba(22,163,74,0.4)]'
-                                            } animate-slide-down`}></div>
+                                            }`}></div>
                                     )}
 
                                     {/* Icon Container with enhanced styling */}
@@ -25151,147 +25237,36 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                                         {/* Icon with enhanced styling */}
                                         {iconClass ? (
-                                            <i className={`${iconClass} text-2xl relative z-10 transition-all duration-300 ${isActive
+                                            <i className={`${iconClass} text-xl relative z-10 transition-all duration-300 ${isActive
                                                 ? (isDarkMode
                                                     ? 'drop-shadow-[0_0_8px_rgba(34,197,94,0.9)]'
                                                     : 'drop-shadow-[0_0_6px_rgba(22,163,74,0.7)]')
                                                 : 'drop-shadow-none'
                                                 }`} style={{ display: 'inline-block' }}></i>
                                         ) : (
-                                            <span className="text-2xl">📊</span>
+                                            <span className="text-xl">📊</span>
                                         )}
                                     </div>
 
                                     {/* Label */}
-                                    <span className={`text-xs font-semibold text-center leading-tight transition-all duration-300 ${isActive ? 'font-bold' : ''
+                                    <span className={`text-[10px] font-semibold text-center leading-tight transition-all duration-300 whitespace-nowrap ${isActive ? 'font-bold' : ''
                                         }`}>
                                         {tab.label.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim().split(' ')[0]}
                                     </span>
+
+                                    {/* Active dot indicator with pulse */}
+                                    {isActive && (
+                                        <span className={`absolute top-1 right-1 w-2 h-2 rounded-full transition-all duration-300 ${isDarkMode
+                                            ? 'bg-green-400 shadow-[0_0_6px_rgba(34,197,94,0.8)]'
+                                            : 'bg-green-600 shadow-[0_0_4px_rgba(22,163,74,0.6)]'
+                                            } animate-pulse`}></span>
+                                    )}
                                 </button>
                             );
                         })}
-
-                        {/* Menu button for additional tabs */}
-                        <button
-                            onClick={() => {
-                                const moreTabs = tabs.slice(5);
-                                if (moreTabs.length > 0) {
-                                    setShowMoreTabsOverlay(!showMoreTabsOverlay);
-                                }
-                            }}
-                            className={`flex-1 flex flex-col items-center justify-center py-3 px-1 btn-ripple relative transition-all duration-200 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                } ${showMoreTabsOverlay ? 'bg-opacity-10 bg-blue-500' : ''}`}
-                        >
-                            <i className="iconoir-menu text-2xl mb-1"></i>
-                            <span className="text-xs font-medium">Plus</span>
-                        </button>
                     </div>
                 </nav>
 
-                {/* Overlay pour les onglets supplémentaires */}
-                {showMoreTabsOverlay && (
-                    <>
-                        {/* Backdrop */}
-                        <div
-                            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
-                            onClick={() => setShowMoreTabsOverlay(false)}
-                        ></div>
-
-                        {/* Overlay Panel */}
-                        <div className={`fixed bottom-0 left-0 right-0 z-50 transform transition-transform duration-300 ease-out ${showMoreTabsOverlay ? 'translate-y-0' : 'translate-y-full'
-                            }`}>
-                            <div className={`rounded-t-2xl shadow-2xl max-h-[75vh] overflow-y-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-                                }`}>
-                                {/* Header */}
-                                <div className={`sticky top-0 px-6 py-4 border-b ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                                    }`}>
-                                    <div className="flex items-center justify-between">
-                                        <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>
-                                            <Icon emoji="📱" size={20} />
-                                            Autres onglets
-                                        </h3>
-                                        <button
-                                            onClick={() => setShowMoreTabsOverlay(false)}
-                                            className={`p-2 rounded-full transition-colors ${isDarkMode
-                                                ? 'hover:bg-gray-700 text-gray-400'
-                                                : 'hover:bg-gray-100 text-gray-600'
-                                                }`}
-                                        >
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Tabs List */}
-                                <div className="p-4">
-                                    {tabs.slice(5).map((tab) => {
-                                        const iconClass = getTabIcon(tab.id);
-                                        const isActive = activeTab === tab.id;
-
-                                        return (
-                                            <button
-                                                key={tab.id}
-                                                onClick={() => {
-                                                    handleTabChange(tab.id);
-                                                    setShowMoreTabsOverlay(false);
-                                                }}
-                                                className={`w-full flex items-center gap-4 p-4 rounded-xl mb-2 transition-all duration-300 group ${isActive
-                                                    ? isDarkMode
-                                                        ? 'bg-gradient-to-r from-green-900/40 to-green-800/20 border-2 border-green-500 shadow-lg shadow-green-500/20'
-                                                        : 'bg-gradient-to-r from-green-50 to-green-100/50 border-2 border-green-500 shadow-lg shadow-green-500/10'
-                                                    : isDarkMode
-                                                        ? 'bg-gray-700/50 hover:bg-gray-600/70 border-2 border-transparent hover:border-gray-600'
-                                                        : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent hover:border-gray-300'
-                                                    }`}
-                                            >
-                                                <div className={`relative flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-300 ${isActive
-                                                    ? (isDarkMode
-                                                        ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/40'
-                                                        : 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30')
-                                                    : (isDarkMode
-                                                        ? 'bg-gray-600/50 text-gray-300 group-hover:bg-gray-500/70'
-                                                        : 'bg-gray-200 text-gray-600 group-hover:bg-gray-300')
-                                                    }`}>
-                                                    {/* Glow effect for active icon */}
-                                                    {isActive && (
-                                                        <div className={`absolute inset-0 rounded-xl blur-lg opacity-50 transition-all duration-300 ${isDarkMode ? 'bg-green-500' : 'bg-green-400'
-                                                            }`} style={{
-                                                                transform: 'scale(1.3)',
-                                                                filter: 'blur(12px)'
-                                                            }}></div>
-                                                    )}
-
-                                                    {/* Icon with enhanced styling */}
-                                                    <i className={`${iconClass} text-2xl relative z-10 transition-all duration-300 ${isActive
-                                                        ? (isDarkMode
-                                                            ? 'drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]'
-                                                            : 'drop-shadow-[0_0_6px_rgba(255,255,255,0.4)]')
-                                                        : 'drop-shadow-none'
-                                                        } ${isActive ? 'scale-110' : 'scale-100 group-hover:scale-105'}`}></i>
-                                                </div>
-                                                <div className="flex-1 text-left">
-                                                    <div className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'
-                                                        }`}>
-                                                        {tab.label}
-                                                    </div>
-                                                </div>
-                                                {isActive && (
-                                                    <div className="flex items-center justify-center">
-                                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                                    </div>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-
-                                </div>
-                            </div>
-                        </div>
-                    </>
-                )}
 
                 {/* Audio UI feedback (désactivé par défaut jusqu'au premier geste utilisateur) */}
                 <audio ref={tabSoundRef} preload="auto" className="hidden">
@@ -25319,7 +25294,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 )}
 
                 {/* Contenu principal */}
-                <main className={`max-w-7xl mx-auto p-6 md:ml-20 pb-24 md:pb-6 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                <main className={`max-w-7xl mx-auto p-6 pb-24 transition-opacity duration-500 ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
                     }`} style={{ minHeight: '500px', backgroundColor: isDarkMode ? '#000' : '#fff' }}>
                     {console.log('🎯 Active Tab:', activeTab, 'Loading Screen:', showLoadingScreen)}
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
@@ -25359,7 +25334,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'investing-calendar' && <InvestingCalendarTab />}
                     {activeTab === 'finvox' && <FinVoxTab />}
                     {activeTab === 'emmaia' && <EmmAIATab isDarkMode={isDarkMode} />}
-                    {activeTab === 'settings' && <SettingsTab />}
                     {activeTab === 'emma-config' && <EmmaConfigTab />}
                 </main>
 
@@ -25612,6 +25586,49 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 ×
                             </button>
                         </button>
+                    </div>
+                )}
+
+                {/* Composant Expandable pour TradingView Ticker Tape */}
+                {tickerExpandableOpen && (
+                    <div 
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+                        onClick={() => setTickerExpandableOpen(false)}
+                    >
+                        <div 
+                            className={`relative w-full h-full max-w-7xl max-h-[90vh] m-4 rounded-xl shadow-2xl overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header */}
+                            <div className={`flex items-center justify-between p-4 border-b ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    {tickerExpandableTitle || 'TradingView Chart'}
+                                </h3>
+                                <button
+                                    onClick={() => setTickerExpandableOpen(false)}
+                                    className={`p-2 rounded-lg transition-colors ${isDarkMode 
+                                        ? 'hover:bg-gray-700 text-gray-400 hover:text-white' 
+                                        : 'hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+                                    }`}
+                                    aria-label="Fermer"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            {/* Iframe Content */}
+                            <div className="relative w-full h-[calc(90vh-80px)]">
+                                <iframe
+                                    src={tickerExpandableUrl}
+                                    className="w-full h-full border-0"
+                                    allow="fullscreen"
+                                    allowTransparency="true"
+                                    title={tickerExpandableTitle || 'TradingView Chart'}
+                                />
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
