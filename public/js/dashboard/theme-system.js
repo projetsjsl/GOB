@@ -382,9 +382,9 @@ const customThemes = {
             warning: '#ff9800', // Orange (#FF9800) - alertes
         },
         fonts: {
-            primary: '"Avenir Next", "Avenir", "Frutiger", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            secondary: '"Inter", "Roboto", system-ui, sans-serif',
-            mono: '"SF Mono", "Consolas", "Monaco", "Courier New", monospace'
+            primary: '"Arial", "Helvetica Neue", "Helvetica", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Arial", "Helvetica Neue", "Helvetica", system-ui, sans-serif',
+            mono: '"Consolas", "Monaco", "Menlo", "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #006747 0%, #00a651 100%)', // Dégradé vert Desjardins

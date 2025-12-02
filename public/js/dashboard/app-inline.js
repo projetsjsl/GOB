@@ -25567,18 +25567,18 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 className="text-2xl font-bold tracking-tight relative"
                                                 style={{ 
                                                     fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                        ? '"Courier New", "Courier", monospace'
+                                                        ? '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", monospace'
                                                         : currentThemeId === 'bloomberg-nostalgie'
-                                                        ? '"Georgia", "Times New Roman", serif'
+                                                        ? '"Georgia", "Times New Roman", "Palatino", serif'
                                                         : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                        ? '"Roboto", "Helvetica Neue", sans-serif'
+                                                        ? '"Roboto", "Helvetica Neue", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
                                                         : currentThemeId === 'seeking-alpha'
-                                                        ? '"Open Sans", "Arial", sans-serif'
+                                                        ? '"Roboto", "Helvetica Neue", "Arial", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
                                                         : currentThemeId === 'desjardins'
-                                                        ? '"Montserrat", "Arial", sans-serif'
+                                                        ? '"Arial", "Helvetica Neue", "Helvetica", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
                                                         : currentThemeId === 'ia'
-                                                        ? '"Inter", "SF Pro Display", sans-serif'
-                                                        : '"Inter", "Arial", sans-serif',
+                                                        ? '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif'
+                                                        : '"Inter", "Roboto", -apple-system, BlinkMacSystemFont, sans-serif',
                                                     fontWeight: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 700 : 700, 
                                                     letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' 
                                                         ? '0.05em' 
@@ -25819,13 +25819,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 ? '#00ff00'
                                                 : 'var(--theme-success, #10b981)',
                                                     fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                        ? '"Consolas", "Monaco", "Menlo", "Courier New", "Courier", monospace'
+                                                        ? '"Courier New", "Courier", "Consolas", "Monaco", "Menlo", monospace'
                                                         : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                                        ? '"Montserrat", "Roboto", sans-serif'
+                                                        ? '"Roboto", "Helvetica Neue", "Arial", sans-serif'
                                                         : currentThemeId === 'seeking-alpha'
-                                                        ? '"Source Sans Pro", "Open Sans", sans-serif'
+                                                        ? '"Roboto", "Helvetica Neue", "Arial", sans-serif'
                                                         : currentThemeId === 'desjardins'
-                                                        ? '"Avenir Next", "Inter", sans-serif'
+                                                        ? '"Arial", "Helvetica Neue", "Helvetica", sans-serif'
                                                         : '"Inter", "Roboto", sans-serif',
                                             textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                 ? `0 0 4px rgba(0, 255, 136, 0.5)`
