@@ -8,6 +8,7 @@
  * 4. Soumet le formulaire
  * 
  * Utilise Stagehand avec Browserbase pour l'automatisation du navigateur
+ * Fallback vers API REST Browserbase directe si Stagehand n'est pas disponible
  * Basé sur le workflow initial fourni par Browserbase
  */
 
@@ -25,6 +26,232 @@ const getStagehandConfig = () => {
     },
   };
 };
+
+// Fonction de fallback: Créer une session Browserbase via API REST directe
+async function createBrowserbaseSessionDirect(req, res, options) {
+  const { email, password, hasCredentials, debugMode, browserbaseApiKey, browserbaseProjectId, stagehandError } = options;
+  
+  try {
+    const browserbaseApiUrl = process.env.BROWSERBASE_API_URL || 'https://www.browserbase.com/v1';
+    
+    console.log('Création d\'une session Browserbase via API REST...');
+    
+    // Créer une session Browserbase
+    const sessionResponse = await fetch(`${browserbaseApiUrl}/sessions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${browserbaseApiKey}`,
+        'Content-Type': 'application/json',
+        'x-browserbase-project-id': browserbaseProjectId
+      },
+      body: JSON.stringify({
+        url: 'https://www.fastgraphs.com/',
+        options: {
+          headless: false,
+          keepAlive: true
+        }
+      }),
+      signal: AbortSignal.timeout(30000)
+    });
+    
+    if (!sessionResponse.ok) {
+      const errorText = await sessionResponse.text();
+      console.error('Erreur création session Browserbase:', sessionResponse.status, errorText);
+      
+      return res.status(sessionResponse.status >= 500 ? 502 : sessionResponse.status).json({
+        success: false,
+        error: 'Erreur lors de la création de la session Browserbase',
+        details: errorText || 'Erreur inconnue',
+        hint: 'Vérifiez vos clés API Browserbase. Ajoutez ?debug=true pour plus de détails.',
+        type: 'BrowserbaseAPIError',
+        timestamp: new Date().toISOString(),
+        debugInfo: debugMode ? {
+          status: sessionResponse.status,
+          errorText,
+          apiUrl: `${browserbaseApiUrl}/sessions`
+        } : undefined
+      });
+    }
+    
+    const sessionData = await sessionResponse.json();
+    const sessionId = sessionData.id || sessionData.sessionId;
+    const sessionUrl = sessionData.url || 
+                      sessionData.viewerUrl || 
+                      sessionData.viewer_url ||
+                      `https://www.browserbase.com/sessions/${sessionId}`;
+    
+    console.log('Session Browserbase créée:', sessionId);
+    
+    // Script d'automatisation JavaScript pour injection côté client
+    const emailSafe = hasCredentials ? JSON.stringify(email) : 'null';
+    const passwordSafe = hasCredentials ? JSON.stringify(password) : 'null';
+    
+    const automationScript = `
+      (async () => {
+        try {
+          const email = ${emailSafe};
+          const password = ${passwordSafe};
+          const hasCredentials = ${hasCredentials ? 'true' : 'false'};
+          
+          await new Promise(resolve => {
+            if (document.readyState === 'complete') {
+              resolve();
+            } else {
+              window.addEventListener('load', resolve);
+            }
+          });
+          
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          const results = { steps: [] };
+          
+          // Chercher et cliquer sur le bouton "Log In"
+          let loginButton = Array.from(document.querySelectorAll('button, a, input[type="button"], input[type="submit"]'))
+            .find(btn => {
+              const text = (btn.textContent || '').toLowerCase();
+              return text.includes('log in') || text.includes('login') || text.includes('se connecter');
+            });
+          
+          if (!loginButton) {
+            loginButton = document.querySelector('[id*="login"], [class*="login"], [id*="signin"], [class*="signin"]');
+          }
+          
+          if (!loginButton) {
+            loginButton = document.querySelector('a[href*="login"], a[href*="signin"]');
+          }
+          
+          if (loginButton) {
+            loginButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            await new Promise(resolve => setTimeout(resolve, 500));
+            loginButton.click();
+            results.steps.push({ step: 'click_login', success: true });
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          } else {
+            results.steps.push({ step: 'click_login', success: false, message: 'Bouton non trouvé' });
+            return { success: false, results };
+          }
+          
+          // Si identifiants fournis, remplir le formulaire
+          if (hasCredentials && email && password) {
+            let emailField = document.querySelector('input[type="email"], input[name*="email"], input[name*="username"], input[id*="email"], input[id*="username"]');
+            if (!emailField) {
+              emailField = Array.from(document.querySelectorAll('input')).find(input => 
+                (input.placeholder || '').toLowerCase().includes('email') ||
+                (input.placeholder || '').toLowerCase().includes('username')
+              );
+            }
+            
+            let passwordField = document.querySelector('input[type="password"]');
+            
+            if (emailField && passwordField) {
+              emailField.focus();
+              emailField.value = email;
+              emailField.dispatchEvent(new Event('input', { bubbles: true }));
+              emailField.dispatchEvent(new Event('change', { bubbles: true }));
+              
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              passwordField.focus();
+              passwordField.value = password;
+              passwordField.dispatchEvent(new Event('input', { bubbles: true }));
+              passwordField.dispatchEvent(new Event('change', { bubbles: true }));
+              
+              results.steps.push({ step: 'fill_credentials', success: true });
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              let submitButton = document.querySelector('button[type="submit"], input[type="submit"], button:not([type])');
+              if (!submitButton) {
+                submitButton = Array.from(document.querySelectorAll('button')).find(btn => {
+                  const text = (btn.textContent || '').toLowerCase();
+                  return text.includes('log in') || text.includes('sign in') || text.includes('connexion') || text.includes('submit');
+                });
+              }
+              
+              if (submitButton) {
+                submitButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                await new Promise(resolve => setTimeout(resolve, 500));
+                submitButton.click();
+                results.steps.push({ step: 'submit_form', success: true });
+                await new Promise(resolve => setTimeout(resolve, 2000));
+              } else {
+                results.steps.push({ step: 'submit_form', success: false, message: 'Bouton submit non trouvé' });
+              }
+            } else {
+              results.steps.push({ step: 'fill_credentials', success: false, message: 'Champs email/password non trouvés' });
+            }
+          }
+          
+          return { success: true, results };
+        } catch (error) {
+          console.error('Erreur automatisation:', error);
+          return { success: false, error: error.message };
+        }
+      })();
+    `;
+    
+    const automationSteps = [
+      { step: 'session_created', success: true, message: 'Session Browserbase créée via API REST' },
+      { step: 'automation_script', success: true, message: 'Script d\'automatisation disponible' }
+    ];
+    
+    return res.status(200).json({
+      success: true,
+      message: hasCredentials 
+        ? 'Session créée - Automatisation disponible (API REST)' 
+        : 'Session Browserbase créée - Bouton "Log In" à cliquer manuellement',
+      session: {
+        id: sessionId,
+        url: sessionUrl,
+        status: sessionData.status || 'active',
+        createdAt: sessionData.createdAt || new Date().toISOString()
+      },
+      automation: {
+        steps: automationSteps,
+        script: automationScript,
+        fullyAutomated: false,
+        method: 'api_rest',
+        message: hasCredentials 
+          ? 'Script d\'automatisation disponible - Exécutez-le dans la console de la session' 
+          : 'Ouvrez la session et cliquez manuellement sur "Log In"'
+      },
+      workflow: {
+        url: 'https://www.fastgraphs.com/',
+        action: 'click the Log In button' + (hasCredentials ? ' and login with credentials' : ''),
+        status: 'session_created',
+        automationLevel: hasCredentials ? 'script_available' : 'manual',
+        method: 'api_rest_fallback'
+      },
+      fallback: {
+        reason: 'Stagehand non autorisé - Utilisation API REST Browserbase',
+        stagehandError: stagehandError?.message || 'Unauthorized',
+        note: 'Pour une automatisation complète serveur, whitelistez votre clé API Browserbase pour Stagehand'
+      },
+      debugInfo: debugMode ? {
+        method: 'api_rest_fallback',
+        sessionId,
+        apiUrl: `${browserbaseApiUrl}/sessions`,
+        hasCredentials,
+        stagehandError: stagehandError?.message
+      } : undefined
+    });
+    
+  } catch (error) {
+    console.error('Erreur création session Browserbase directe:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Erreur lors de la création de la session Browserbase',
+      details: error.message || 'Erreur inconnue',
+      hint: 'Vérifiez vos clés API Browserbase. Ajoutez ?debug=true pour plus de détails.',
+      type: 'BrowserbaseError',
+      timestamp: new Date().toISOString(),
+      debugInfo: debugMode ? {
+        errorMessage: error.message,
+        errorStack: error.stack,
+        errorName: error.name
+      } : undefined
+    });
+  }
+}
 
 export default async function handler(req, res) {
   // CORS headers
@@ -183,6 +410,9 @@ export default async function handler(req, res) {
       });
     }
     
+    let useStagehand = true;
+    let stagehandError = null;
+    
     try {
       stagehand = new Stagehand(stagehandConfig);
       console.log('Stagehand instance créée, initialisation en cours...');
@@ -193,46 +423,56 @@ export default async function handler(req, res) {
       console.error('Type d\'erreur:', initError.name);
       console.error('Message:', initError.message);
       
-      // Messages d'erreur spécifiques selon le type
-      let hint = 'Vérifiez vos clés API Browserbase et Gemini. Ajoutez ?debug=true pour plus de détails.';
-      if (initError.message?.includes('Unauthorized') || initError.name === 'StagehandAPIUnauthorizedError') {
-        hint = `ERREUR D'AUTORISATION STAGEHAND:
-        
-1. Vérifiez que BROWSERBASE_API_KEY est correcte dans Vercel Environment Variables
-2. Vérifiez que BROWSERBASE_PROJECT_ID est correct dans Vercel
-3. IMPORTANT: La clé API Browserbase doit être WHITELISTÉE pour Stagehand
-   - Connectez-vous à votre dashboard Browserbase
-   - Vérifiez que votre clé API a les permissions Stagehand activées
-   - Si nécessaire, créez une nouvelle clé API avec permissions Stagehand
-4. Vérifiez que GEMINI_API_KEY est également définie dans Vercel
-
-Note: Stagehand nécessite une clé API Browserbase spécialement autorisée pour son utilisation.`;
-      } else if (initError.message?.includes('API key')) {
-        hint = 'Problème avec la clé API. Vérifiez que GEMINI_API_KEY est valide et a les permissions nécessaires.';
-      }
+      stagehandError = initError;
       
-      return res.status(503).json({
-        success: false,
-        error: 'Erreur lors de l\'initialisation de Stagehand',
-        details: initError.message || 'Impossible d\'initialiser Stagehand',
-        hint: hint,
-        type: initError.name || 'InitializationError',
-        timestamp: new Date().toISOString(),
-        debugInfo: debugMode ? {
-          errorMessage: initError.message,
-          errorStack: initError.stack,
-          errorName: initError.name,
-          stagehandConfig: {
-            env: stagehandConfig.env,
-            hasApiKey: !!stagehandConfig.apiKey,
-            hasProjectId: !!stagehandConfig.projectId,
-            modelName: stagehandConfig.modelName,
-            hasGeminiKey: !!stagehandConfig.modelClientOptions?.apiKey,
-            apiKeyPrefix: stagehandConfig.apiKey ? stagehandConfig.apiKey.substring(0, 8) + '...' : 'N/A',
-            projectIdPrefix: stagehandConfig.projectId ? stagehandConfig.projectId.substring(0, 8) + '...' : 'N/A',
-            geminiKeyPrefix: stagehandConfig.modelClientOptions?.apiKey ? stagehandConfig.modelClientOptions.apiKey.substring(0, 8) + '...' : 'N/A'
-          }
-        } : undefined
+      // Si erreur Unauthorized, basculer vers API REST Browserbase
+      if (initError.message?.includes('Unauthorized') || initError.name === 'StagehandAPIUnauthorizedError') {
+        console.log('Stagehand non autorisé - Basculement vers API REST Browserbase directe...');
+        useStagehand = false;
+      } else {
+        // Pour les autres erreurs, retourner l'erreur
+        let hint = 'Vérifiez vos clés API Browserbase et Gemini. Ajoutez ?debug=true pour plus de détails.';
+        if (initError.message?.includes('API key')) {
+          hint = 'Problème avec la clé API. Vérifiez que GEMINI_API_KEY est valide et a les permissions nécessaires.';
+        }
+        
+        return res.status(503).json({
+          success: false,
+          error: 'Erreur lors de l\'initialisation de Stagehand',
+          details: initError.message || 'Impossible d\'initialiser Stagehand',
+          hint: hint,
+          type: initError.name || 'InitializationError',
+          timestamp: new Date().toISOString(),
+          debugInfo: debugMode ? {
+            errorMessage: initError.message,
+            errorStack: initError.stack,
+            errorName: initError.name,
+            stagehandConfig: {
+              env: stagehandConfig.env,
+              hasApiKey: !!stagehandConfig.apiKey,
+              hasProjectId: !!stagehandConfig.projectId,
+              modelName: stagehandConfig.modelName,
+              hasGeminiKey: !!stagehandConfig.modelClientOptions?.apiKey,
+              apiKeyPrefix: stagehandConfig.apiKey ? stagehandConfig.apiKey.substring(0, 8) + '...' : 'N/A',
+              projectIdPrefix: stagehandConfig.projectId ? stagehandConfig.projectId.substring(0, 8) + '...' : 'N/A',
+              geminiKeyPrefix: stagehandConfig.modelClientOptions?.apiKey ? stagehandConfig.modelClientOptions.apiKey.substring(0, 8) + '...' : 'N/A'
+            }
+          } : undefined
+        });
+      }
+    }
+    
+    // Si Stagehand n'est pas disponible, utiliser API REST Browserbase
+    if (!useStagehand) {
+      console.log('Utilisation de l\'API REST Browserbase directe (fallback)...');
+      return await createBrowserbaseSessionDirect(req, res, {
+        email,
+        password,
+        hasCredentials,
+        debugMode,
+        browserbaseApiKey,
+        browserbaseProjectId,
+        stagehandError
       });
     }
 
