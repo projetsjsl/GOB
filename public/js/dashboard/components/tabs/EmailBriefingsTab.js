@@ -1566,7 +1566,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         <h2 className={`text-3xl font-bold transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
-                                            📡 Emma En Direct
+                                            <Icon name="broadcast-tower" className="w-8 h-8 inline mr-2" /> Emma En Direct
                                         </h2>
                                         <span className={`px-3 py-1 rounded-full text-xs font-bold transition-colors duration-300 ${
                                             isDarkMode
@@ -1601,12 +1601,12 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>⚙️ Briefings Automatiques (Cron Jobs)</h3>
+                            }`}><Icon name="settings" className="w-5 h-5 inline mr-2" /> Briefings Automatiques (Cron Jobs)</h3>
 
                             <p className={`text-sm mb-6 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
                             }`}>
-                                📅 Envois automatiques quotidiens (Lundi-Vendredi)
+                                <Icon name="calendar" className="w-4 h-4 inline mr-1" /> Envois automatiques quotidiens (Lundi-Vendredi)
                             </p>
 
                             <div className="space-y-4">
@@ -1619,7 +1619,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <h4 className={`font-bold mb-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
                                             }`}>
-                                                🌅 Briefing Matin - 7h20 ET
+                                                <Icon name="sun-light" className="w-4 h-4 inline mr-1" /> Briefing Matin - 7h20 ET
                                             </h4>
                                             <p className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1627,8 +1627,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                 Asie • Futures • Préouverture
                                             </p>
                                         </div>
-                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                                            🟢 ACTIF
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 flex items-center gap-1">
+                                            <Icon name="check-circle" className="w-3 h-3" /> ACTIF
                                         </span>
                                     </div>
                                     <div className={`text-sm space-y-1 transition-colors duration-300 ${
@@ -1636,7 +1636,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     }`}>
                                         <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
                                         <p><strong>Horaire UTC:</strong> 11:20 (Lun-Ven)</p>
-                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
+                                        <p><strong>Statut Vercel:</strong> <Icon name="check" className="w-3 h-3 inline" /> Configuré</p>
                                     </div>
                                 </div>
 
@@ -1649,7 +1649,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <h4 className={`font-bold mb-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
                                             }`}>
-                                                ☀️ Briefing Midi - 11h50 ET
+                                                <Icon name="sun" className="w-4 h-4 inline mr-1" /> Briefing Midi - 11h50 ET
                                             </h4>
                                             <p className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1657,8 +1657,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                 Wall Street • Clôture Europe
                                             </p>
                                         </div>
-                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                                            🟢 ACTIF
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 flex items-center gap-1">
+                                            <Icon name="check-circle" className="w-3 h-3" /> ACTIF
                                         </span>
                                     </div>
                                     <div className={`text-sm space-y-1 transition-colors duration-300 ${
@@ -1666,7 +1666,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     }`}>
                                         <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
                                         <p><strong>Horaire UTC:</strong> 15:50 (Lun-Ven)</p>
-                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
+                                        <p><strong>Statut Vercel:</strong> <Icon name="check" className="w-3 h-3 inline" /> Configuré</p>
                                     </div>
                                 </div>
 
@@ -1679,7 +1679,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <h4 className={`font-bold mb-1 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
                                             }`}>
-                                                🌆 Briefing Soir - 16h20 ET
+                                                <Icon name="city" className="w-4 h-4 inline mr-1" /> Briefing Soir - 16h20 ET
                                             </h4>
                                             <p className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1687,8 +1687,8 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                 Clôture US • Asie Next
                                             </p>
                                         </div>
-                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                                            🟢 ACTIF
+                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 flex items-center gap-1">
+                                            <Icon name="check-circle" className="w-3 h-3" /> ACTIF
                                         </span>
                                     </div>
                                     <div className={`text-sm space-y-1 transition-colors duration-300 ${
@@ -1696,7 +1696,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     }`}>
                                         <p><strong>Destinataire:</strong> projetsjsl@gmail.com</p>
                                         <p><strong>Horaire UTC:</strong> 20:20 (Lun-Ven)</p>
-                                        <p><strong>Statut Vercel:</strong> ✅ Configuré</p>
+                                        <p><strong>Statut Vercel:</strong> <Icon name="check" className="w-3 h-3 inline" /> Configuré</p>
                                     </div>
                                 </div>
 
@@ -1706,13 +1706,13 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                 }`}>
                                     <h4 className={`font-semibold mb-3 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>⚙️ Configuration Globale</h4>
+                                    }`}><Icon name="settings" className="w-4 h-4 inline mr-2" /> Configuration Globale</h4>
                                     <div className={`text-sm space-y-1 transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
                                         <p><strong>Timezone:</strong> Eastern Time (ET)</p>
                                         <p><strong>Jours actifs:</strong> Lundi-Vendredi</p>
-                                        <p><strong>Statut Vercel Crons:</strong> ✅ Configuré dans vercel.json</p>
+                                        <p><strong>Statut Vercel Crons:</strong> <Icon name="check" className="w-3 h-3 inline" /> Configuré dans vercel.json</p>
                                         <p><strong>Dernière modification:</strong> 2025-01-16</p>
                                     </div>
                                 </div>
@@ -1724,7 +1724,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <p className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-800'
                                     }`}>
-                                        💡 <strong>Note:</strong> Les crons sont configurés dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">vercel.json</code>.
+                                        <Icon name="light-bulb" className="w-4 h-4 inline mr-1" /> <strong>Note:</strong> Les crons sont configurés dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">vercel.json</code>.
                                         Pour modifier les horaires, utilisez les scripts <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:edt</code> ou
                                         <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">npm run cron:est</code>.
                                     </p>
@@ -1738,7 +1738,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📝 Gestion des Prompts de Briefing</h3>
+                            }`}><Icon name="edit-pencil" className="w-5 h-5 inline mr-2" /> Gestion des Prompts de Briefing</h3>
 
                             <p className={`text-sm mb-6 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1755,7 +1755,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>⏰ Gestion des Horaires et Automatisations</h3>
+                            }`}><Icon name="clock" className="w-5 h-5 inline mr-2" /> Gestion des Horaires et Automatisations</h3>
 
                             <p className={`text-sm mb-6 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1772,7 +1772,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>👁️ Prévisualisation des Emails de Briefing</h3>
+                            }`}><Icon name="eye" className="w-5 h-5 inline mr-2" /> Prévisualisation des Emails de Briefing</h3>
 
                             <p className={`text-sm mb-6 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1789,7 +1789,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📧 Gestion des Destinataires Email</h3>
+                            }`}><Icon name="mail" className="w-5 h-5 inline mr-2" /> Gestion des Destinataires Email</h3>
 
                             <p className={`text-sm mb-6 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1806,7 +1806,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>✉️ Email Personnalisé Ponctuel</h3>
+                            }`}><Icon name="mail" className="w-5 h-5 inline mr-2" /> Email Personnalisé Ponctuel</h3>
 
                             <p className={`text-sm mb-6 transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -1820,7 +1820,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <label className={`block text-sm font-semibold mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        📝 Prompt Personnalisé
+                                        <Icon name="edit-pencil" className="w-4 h-4 inline mr-1" /> Prompt Personnalisé
                                     </label>
                                     <textarea
                                         placeholder="Exemple: Analyse détaillée de Tesla suite à la publication des Q4 earnings. Focus sur les marges et le guidance 2025."
@@ -1838,7 +1838,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <label className={`block text-sm font-semibold mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        🎯 Tickers à Analyser (optionnel)
+                                        <Icon name="target" className="w-4 h-4 inline mr-1" /> Tickers à Analyser (optionnel)
                                     </label>
                                     <input
                                         type="text"
@@ -1856,7 +1856,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <label className={`block text-sm font-semibold mb-3 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        📊 Sources Prioritaires
+                                        <Icon name="stats-report" className="w-4 h-4 inline mr-1" /> Sources Prioritaires
                                     </label>
                                     <div className="grid grid-cols-2 gap-3">
                                         <label className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors duration-300 ${
@@ -1865,7 +1865,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
                                             <span className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>📈 Prix & Volumes</span>
+                                            }`}><Icon name="trending-up" className="w-3 h-3 inline mr-1" /> Prix & Volumes</span>
                                         </label>
                                         <label className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors duration-300 ${
                                             isDarkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
@@ -1873,7 +1873,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
                                             <span className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>📰 News</span>
+                                            }`}><Icon name="newspaper" className="w-3 h-3 inline mr-1" /> News</span>
                                         </label>
                                         <label className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors duration-300 ${
                                             isDarkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
@@ -1881,7 +1881,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
                                             <span className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>📊 Earnings</span>
+                                            }`}><Icon name="stats-report" className="w-3 h-3 inline mr-1" /> Earnings</span>
                                         </label>
                                         <label className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-colors duration-300 ${
                                             isDarkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
@@ -1889,7 +1889,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
                                             <span className={`text-sm transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                            }`}>📉 Techniques</span>
+                                            }`}><Icon name="trending-down" className="w-3 h-3 inline mr-1" /> Techniques</span>
                                         </label>
                                     </div>
                                 </div>
@@ -1899,7 +1899,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <label className={`block text-sm font-semibold mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        📧 Destinataire(s)
+                                        <Icon name="mail" className="w-4 h-4 inline mr-1" /> Destinataire(s)
                                     </label>
                                     <input
                                         type="email"
@@ -1916,14 +1916,14 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                 {/* Actions */}
                                 <div className="flex gap-3 pt-2">
                                     <button
-                                        className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                                        className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
                                     >
-                                        🔄 Générer Aperçu
+                                        <Icon name="refresh" className="w-4 h-4" /> Générer Aperçu
                                     </button>
                                     <button
-                                        className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                                        className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                                     >
-                                        📧 Générer & Envoyer Direct
+                                        <Icon name="mail" className="w-4 h-4" /> Générer & Envoyer Direct
                                     </button>
                                 </div>
 
@@ -1931,7 +1931,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                 <div className={`p-3 rounded-lg text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'bg-purple-900/20 text-purple-300' : 'bg-purple-50 text-purple-800'
                                 }`}>
-                                    💡 <strong>Astuce:</strong> Le prompt personnalisé utilise Emma Agent pour générer un briefing sur-mesure. Plus votre demande est précise, meilleur sera le résultat.
+                                    <Icon name="light-bulb" className="w-4 h-4 inline mr-1" /> <strong>Astuce:</strong> Le prompt personnalisé utilise Emma Agent pour générer un briefing sur-mesure. Plus votre demande est précise, meilleur sera le résultat.
                                 </div>
                             </div>
                         </div>
@@ -1958,7 +1958,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             : 'bg-gray-800 border-gray-700 hover:border-gray-600'
                                     }`}
                                 >
-                                    <div className="text-4xl mb-3">🌅</div>
+                                    <div className="text-4xl mb-3"><Icon name="sun-light" className="w-10 h-10" /></div>
                                     <div className={`font-bold text-lg mb-1 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
@@ -1989,7 +1989,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             : 'bg-green-50 border-green-200 hover:border-green-400'
                                     }`}
                                 >
-                                    <div className="text-4xl mb-3">☀️</div>
+                                    <div className="text-4xl mb-3"><Icon name="sun" className="w-10 h-10" /></div>
                                     <div className={`font-bold text-lg mb-1 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
@@ -2020,7 +2020,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             : 'bg-indigo-50 border-indigo-200 hover:border-indigo-400'
                                     }`}
                                 >
-                                    <div className="text-4xl mb-3">🌙</div>
+                                    <div className="text-4xl mb-3"><Icon name="moon" className="w-10 h-10" /></div>
                                     <div className={`font-bold text-lg mb-1 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
@@ -2076,7 +2076,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         <h3 className={`text-xl font-bold mb-1 transition-colors duration-300 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
-                                            {currentBriefing?.subject || '📄 Aperçu du briefing'}
+                                            {currentBriefing?.subject || <><Icon name="page" className="w-5 h-5 inline mr-2" /> Aperçu du briefing</>}
                                         </h3>
                                         <div className="flex items-center gap-2 mt-2">
                                             {currentBriefing?.fallback === true && (
@@ -2085,7 +2085,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                         ? 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/50'
                                                         : 'bg-yellow-100 text-yellow-700 border border-yellow-300'
                                                 }`}>
-                                                    ⚠️ Mode Fallback
+                                                    <Icon name="warning-triangle" className="w-3 h-3" /> Mode Fallback
                                                 </span>
                                             )}
                                             {currentBriefing?.cognitive && (
@@ -2094,7 +2094,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                         ? 'bg-purple-600/20 text-purple-300 border border-purple-500/50'
                                                         : 'bg-purple-100 text-purple-700 border border-purple-300'
                                                 }`}>
-                                                    🧠 Analyse Cognitive
+                                                    <Icon name="brain" className="w-3 h-3" /> Analyse Cognitive
                                                 </span>
                                             )}
                                             {currentBriefing && !currentBriefing?.fallback && (
@@ -2103,7 +2103,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                         ? 'bg-green-600/20 text-green-300 border border-green-500/50'
                                                         : 'bg-green-100 text-green-700 border border-green-300'
                                                 }`}>
-                                                    ✓ Prêt
+                                                    <Icon name="check" className="w-3 h-3" /> Prêt
                                                 </span>
                                             )}
                                         </div>
@@ -2163,7 +2163,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         isDarkMode ? 'bg-gray-700/50 border-purple-500/30' : 'bg-purple-50 border-purple-200'
                                     }`}>
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-xl"><Icon emoji="🧠" size={24} /></span>
+                                            <span className="text-xl"><Icon name="brain" className="w-6 h-6" /></span>
                                             <h4 className={`font-semibold transition-colors duration-300 ${
                                                 isDarkMode ? 'text-purple-300' : 'text-purple-700'
                                             }`}>
@@ -2205,7 +2205,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                 <div className={`text-xs font-semibold mb-1 transition-colors duration-300 ${
                                                     isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                 }`}>
-                                                    🔥 Sujets du moment:
+                                                    <Icon name="fire" className="w-3 h-3 inline mr-1" /> Sujets du moment:
                                                 </div>
                                                 <ul className={`text-sm space-y-1 transition-colors duration-300 ${
                                                     isDarkMode ? 'text-gray-400' : 'text-gray-700'
@@ -2226,7 +2226,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                 <div className={`text-xs font-semibold mb-1 transition-colors duration-300 ${
                                                     isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                 }`}>
-                                                    🔧 Outils Emma Agent utilisés:
+                                                    <Icon name="tools" className="w-3 h-3 inline mr-1" /> Outils Emma Agent utilisés:
                                                 </div>
                                                 <div className="flex flex-wrap gap-1">
                                                     {currentBriefing.smartData.tools_used.map((tool, i) => (
@@ -2245,7 +2245,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                             <div className={`mt-3 pt-3 border-t text-sm italic transition-colors duration-300 ${
                                                 isDarkMode ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-600'
                                             }`}>
-                                                💡 {currentBriefing.intentData.summary}
+                                                <Icon name="light-bulb" className="w-3 h-3 inline mr-1" /> {currentBriefing.intentData.summary}
                                             </div>
                                         )}
                                     </div>
@@ -2274,9 +2274,9 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                         <button
                                             onClick={sendEmail}
                                             disabled={!recipients.trim()}
-                                            className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                         >
-                                            📧 Envoyer
+                                            <Icon name="mail" className="w-4 h-4" /> Envoyer
                                         </button>
                                     </div>
                                 </div>
@@ -2287,10 +2287,10 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                     <div className={`p-3 border-b flex justify-between items-center transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
                                     }`}>
-                                        <span className={`text-sm font-medium transition-colors duration-300 ${
+                                        <span className={`text-sm font-medium transition-colors duration-300 flex items-center gap-2 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>
-                                            {isEditMode ? '✏️ Édition HTML' : '👁️ Prévisualisation Email'}
+                                            {isEditMode ? <><Icon name="edit-pencil" className="w-4 h-4" /> Édition HTML</> : <><Icon name="eye" className="w-4 h-4" /> Prévisualisation Email</>}
                                         </span>
                                         <div className="flex gap-2">
                                             {isEditMode ? (
@@ -2303,13 +2303,13 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                                 : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
                                                         }`}
                                                     >
-                                                        ✖ Annuler
+                                                        <Icon name="xmark" className="w-3 h-3" /> Annuler
                                                     </button>
                                                     <button
                                                         onClick={saveEditedContent}
                                                         className="inline-flex items-center gap-1 px-3 py-1 rounded text-xs font-medium bg-green-600 hover:bg-green-700 text-white transition-all"
                                                     >
-                                                        ✓ Enregistrer
+                                                        <Icon name="check" className="w-3 h-3" /> Enregistrer
                                                     </button>
                                                 </>
                                             ) : (
@@ -2346,7 +2346,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                                                     spellCheck="false"
                                                 />
                                                 <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                    💡 Astuce: Vous pouvez modifier le HTML directement. Les changements seront appliqués au briefing.
+                                                    <Icon name="light-bulb" className="w-3 h-3 inline mr-1" /> Astuce: Vous pouvez modifier le HTML directement. Les changements seront appliqués au briefing.
                                                 </div>
                                             </div>
                                         ) : (
@@ -2374,7 +2374,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📚 Historique des Briefings</h3>
+                            }`}><Icon name="library" className="w-5 h-5 inline mr-2" /> Historique des Briefings</h3>
                             
                             {briefingHistory.length > 0 ? (
                                 <div className="space-y-3">

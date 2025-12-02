@@ -448,7 +448,7 @@ const DansWatchlistTab = () => {
                 }`}>
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                            <span className="text-xl">🔍</span>
+                            <Icon name="search" className="w-5 h-5" />
                             <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 Screener - Dan's Watchlist
                             </h3>
@@ -546,7 +546,7 @@ const DansWatchlistTab = () => {
                                 : 'bg-gray-800 hover:bg-gray-700 text-white'
                         }`}
                     >
-                        {loadingScreener ? '⏳ Analyse en cours...' : `🔍 Analyser ma Watchlist (${watchlistTickers.length} titres)`}
+                        {loadingScreener ? <><Icon name="hourglass" className="w-4 h-4 mr-1 inline" /> Analyse en cours...</> : <><Icon name="search" className="w-4 h-4 mr-1 inline" /> Analyser ma Watchlist ({watchlistTickers.length} titres)</>}
                     </button>
                     
                     {/* Résultats */}
@@ -617,9 +617,9 @@ const DansWatchlistTab = () => {
             )}
             
             <div className="flex justify-between items-center">
-                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                <h2 className={`text-2xl font-bold transition-colors duration-300 flex items-center gap-2 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>👀 Dan's Watchlist</h2>
+                }`}><Icon name="eye" className="w-8 h-8" /> Dan's Watchlist</h2>
                 <div className="flex gap-2">
                     <button
                         onClick={() => setShowScreener(!showScreener)}
@@ -631,27 +631,27 @@ const DansWatchlistTab = () => {
                                     : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
                         }`}
                     >
-                        {showScreener ? '✕ Fermer Screener' : '🔍 Ouvrir Screener'}
+                        {showScreener ? <><Icon name="xmark" className="w-4 h-4 mr-1 inline" /> Fermer Screener</> : <><Icon name="search" className="w-4 h-4 mr-1 inline" /> Ouvrir Screener</>}
                     </button>
                     <button
                         onClick={refreshWatchlist}
                         disabled={watchlistLoading || watchlistTickers.length === 0}
                         className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 disabled:opacity-50 transition-colors"
                     >
-                        {watchlistLoading ? 'Actualisation...' : '🔄 Actualiser'}
+                        {watchlistLoading ? 'Actualisation...' : <><Icon name="refresh" className="w-4 h-4 mr-1 inline" /> Actualiser</>}
                     </button>
                     <button
                         onClick={emmaPopulateWatchlist}
                         disabled={watchlistLoading}
                         className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
                     >
-                        <span>🤖</span>
+                        <Icon name="bot" className="w-5 h-5" />
                         Emma Populate
                     </button>
-                    <div className={`text-sm px-4 py-2 rounded ${
+                    <div className={`text-sm px-4 py-2 rounded flex items-center gap-2 ${
                         isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                     }`}>
-                        {!initialLoadComplete ? '⏳ Chargement initial...' : '🚀 Supabase + Arrière-plan silencieux'}
+                        {!initialLoadComplete ? <><Icon name="hourglass" className="w-4 h-4" /> Chargement initial...</> : <><Icon name="rocket" className="w-4 h-4" /> Supabase + Arrière-plan silencieux</>}
                     </div>
                 </div>
             </div>
@@ -662,9 +662,9 @@ const DansWatchlistTab = () => {
                     ? 'bg-gray-900 border-gray-700' 
                     : 'bg-gray-50 border-gray-200'
             }`}>
-                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 flex items-center gap-2 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>➕ Ajouter un Ticker</h3>
+                }`}><Icon name="plus" className="w-5 h-5" /> Ajouter un Ticker</h3>
                 <div className="flex gap-2">
                     <input
                         type="text"
@@ -682,13 +682,13 @@ const DansWatchlistTab = () => {
                         onClick={addTickerToWatchlist}
                         className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                     >
-                        ➕ Ajouter
+                        <Icon name="plus" className="w-4 h-4 mr-1 inline" /> Ajouter
                     </button>
                 </div>
-                <p className={`text-sm mt-2 transition-colors duration-300 ${
+                <p className={`text-sm mt-2 transition-colors duration-300 flex items-center gap-1 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                 }`}>
-                    💡 Ces tickers ne seront visibles que dans cette watchlist personnalisée
+                    <Icon name="light-bulb" className="w-4 h-4" /> Ces tickers ne seront visibles que dans cette watchlist personnalisée
                 </p>
             </div>
 
@@ -699,10 +699,10 @@ const DansWatchlistTab = () => {
                         ? 'bg-gray-900 border-gray-700' 
                         : 'bg-gray-50 border-gray-200'
                 }`}>
-                    <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
+                    <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 flex items-center gap-2 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        📊 Tickers de la Watchlist ({watchlistTickers.length})
+                        <Icon name="stats-report" className="w-5 h-5" /> Tickers de la Watchlist ({watchlistTickers.length})
                     </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -809,7 +809,7 @@ const DansWatchlistTab = () => {
                         ? 'bg-gray-900 border-gray-700' 
                         : 'bg-gray-50 border-gray-200'
                 } text-center`}>
-                    <div className="text-6xl mb-4">👀</div>
+                    <div className="text-6xl mb-4 flex justify-center"><Icon name="eye" className="w-16 h-16" /></div>
                     <h3 className={`text-xl font-semibold mb-2 transition-colors duration-300 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>Watchlist Vide</h3>

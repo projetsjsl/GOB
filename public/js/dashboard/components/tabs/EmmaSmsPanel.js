@@ -131,7 +131,7 @@ const EmmaSmsPanel = () => {
                 }`}>
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <h3 className="text-xl font-semibold flex items-center gap-2"><Icon emoji="📱" size={20}/> Emma SMS</h3>
+                            <h3 className="text-xl font-semibold flex items-center gap-2"><Icon name="smartphone-device" className="w-5 h-5"/> Emma SMS</h3>
                             <p className="text-sm opacity-75">Gérez les webhooks n8n, le serveur de test et les variables SMS.</p>
                         </div>
                         <button
@@ -284,19 +284,19 @@ const EmmaSmsPanel = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                            <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="📡" size={16}/> Webhook n8n</h4>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon name="broadcast-tower" className="w-4 h-4"/> Webhook n8n</h4>
                             <p className="text-xs break-all mb-2">{envValues.EMMA_WEBHOOK_URL || 'Non défini'}</p>
                             {webhookStatus && statusBadge(webhookStatus.status === 'ok' ? 'n8n OK' : webhookStatus.status.toUpperCase(), webhookStatus.status === 'ok' ? 'success' : 'error')}
                             <p className="text-xs opacity-70 mt-1">{webhookStatus?.message}</p>
                                 </div>
                                 <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                                    <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="🔌" size={16}/> Serveur local</h4>
+                                    <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon name="plug-type-c" className="w-4 h-4"/> Serveur local</h4>
                                     <p className="text-sm">Port: {serverState.info?.port || envValues.PORT || '3000'}</p>
                                     <p className="text-xs opacity-70">Mode: {serverState.info?.mode || envValues.MODE || 'test'}</p>
                                     <p className="text-xs opacity-70">PID: {serverState.info?.pid || '—'}</p>
                                 </div>
                                 <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                                    <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="📝" size={16}/> Checklist Twilio</h4>
+                                    <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon name="notes" className="w-4 h-4"/> Checklist Twilio</h4>
                                     <ul className="text-xs space-y-1">
                                         <li>{envValues.TWILIO_ACCOUNT_SID ? '✔️ SID configuré' : '⚠️ SID manquant'}</li>
                                         <li>{envValues.TWILIO_AUTH_TOKEN ? '✔️ Token configuré' : '⚠️ Token manquant'}</li>
@@ -306,7 +306,7 @@ const EmmaSmsPanel = () => {
                             </div>
 
                             <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-100 bg-white'}`}>
-                                <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="📘" size={16}/> Instructions rapides</h4>
+                                <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon name="book" className="w-4 h-4"/> Instructions rapides</h4>
                                 <ol className="text-sm list-decimal list-inside space-y-1 opacity-80">
                                     <li>Mode TEST : `EMMA_WEBHOOK_URL` → `.../gob-sms-webhook-test`, `TEST_MODE=true`, aucun coût Twilio.</li>
                                     <li>Mode PROD LOCAL : définir `PUBLIC_URL` (ngrok), `MODE=prod_local`, `TEST_MODE=false`, configurer le webhook Twilio vers `PUBLIC_URL/webhook/sms`.</li>
@@ -318,7 +318,7 @@ const EmmaSmsPanel = () => {
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
                                         <h4 className="text-lg font-semibold flex items-center gap-2">
-                                            <Icon emoji="🖥️" size={16}/> Dashboard Remote
+                                            <Icon name="pc-check" className="w-4 h-4"/> Dashboard Remote
                                         </h4>
                                         <p className="text-xs opacity-70 break-all">{publicUrl || '(PUBLIC_URL non défini)'}</p>
                                     </div>

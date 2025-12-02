@@ -2001,7 +2001,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         }`}>
                                                             <div className="flex items-center gap-2 flex-wrap">
                                                                 <span className="font-medium flex items-center gap-1">
-                                                                    <Icon emoji="⚙️" size={16} />
+                                                                    <Icon name="Settings" size={16} />
                                                                     Paramètres:
                                                                 </span>
                                                                 {message.model && message.model !== 'cached' && (
@@ -2011,12 +2011,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                         message.model === 'gemini' ? 'bg-green-100 text-green-700 border border-green-300' :
                                                                         'bg-gray-200 text-gray-700'
                                                                     }`}>
-                                                                        🤖 {message.model === 'sonar-pro' ? 'Sonar Pro' : message.model === 'claude' ? 'Claude' : message.model === 'gemini' ? 'Gemini' : message.model}
+                                                                        <Icon name="Bot" className="inline mr-1" size={12} /> {message.model === 'sonar-pro' ? 'Sonar Pro' : message.model === 'claude' ? 'Claude' : message.model === 'gemini' ? 'Gemini' : message.model}
                                                                     </span>
                                                                 )}
                                                                 {message.cached && (
                                                                     <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-300">
-                                                                        💾 Cache (instantané)
+                                                                        <Icon name="FloppyDisk" className="inline mr-1" size={12} /> Cache (instantané)
                                                                     </span>
                                                                 )}
                                                                 <span className={`px-1.5 py-0.5 rounded text-xs ${
@@ -2037,7 +2037,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             </div>
                                                             {message.modelReason && (
                                                                 <div className="text-xs mt-1 text-gray-500 italic">
-                                                                    💡 {message.modelReason}
+                                                                    <Icon name="LightBulb" className="inline mr-1" size={12} /> {message.modelReason}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -2071,7 +2071,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     }`}>
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-medium flex items-center gap-1">
-                                                                <Icon emoji="⚙️" size={16} />
+                                                                <Icon name="Settings" size={16} />
                                                                 Utilise:
                                                             </span>
                                                             <span className={`px-1.5 py-0.5 rounded text-xs ${
@@ -2130,7 +2130,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 >
                                     <div className="flex items-center justify-between">
                                         <span className="text-xs font-medium flex items-center gap-2">
-                                            <span>💡</span>
+                                            <span><Icon name="LightBulb" size={14} /></span>
                                             <span>Commandes rapides disponibles</span>
                                         </span>
                                         <span className={`text-xs transition-transform duration-300 ${showCommandsHelp ? 'rotate-180' : ''}`}>
@@ -2147,16 +2147,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     }`}>
                                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
                                             {[
-                                                { cmd: '/rsi', desc: 'RSI Screener', icon: '📊' },
-                                                { cmd: '/quote', desc: 'Prix temps réel', icon: '💰' },
-                                                { cmd: '/fundamentals', desc: 'Fondamentaux', icon: '📈' },
-                                                { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
-                                                { cmd: '/news', desc: 'Actualités', icon: '📰' },
-                                                { cmd: '/screener', desc: 'Stock Screener', icon: '🔎' },
-                                                { cmd: '/calendar', desc: 'Calendrier éco', icon: '📅' },
-                                                { cmd: '/earnings', desc: 'Résultats', icon: '📊' },
-                                                { cmd: '/taux', desc: 'Courbe taux', icon: '📉' },
-                                                { cmd: '/watchlist', desc: 'Watchlist', icon: '⭐' }
+                                                { cmd: '/rsi', desc: 'RSI Screener', icon: <Icon name="GraphUp" size={14} /> },
+                                                { cmd: '/quote', desc: 'Prix temps réel', icon: <Icon name="CircleCurrency" size={14} /> },
+                                                { cmd: '/fundamentals', desc: 'Fondamentaux', icon: <Icon name="TrendingUp" size={14} /> },
+                                                { cmd: '/technical', desc: 'Analyse technique', icon: <Icon name="Search" size={14} /> },
+                                                { cmd: '/news', desc: 'Actualités', icon: <Icon name="Newspaper" size={14} /> },
+                                                { cmd: '/screener', desc: 'Stock Screener', icon: <Icon name="ZoomIn" size={14} /> },
+                                                { cmd: '/calendar', desc: 'Calendrier éco', icon: <Icon name="Calendar" size={14} /> },
+                                                { cmd: '/earnings', desc: 'Résultats', icon: <Icon name="GraphUp" size={14} /> },
+                                                { cmd: '/taux', desc: 'Courbe taux', icon: <Icon name="TrendingDown" size={14} /> },
+                                                { cmd: '/watchlist', desc: 'Watchlist', icon: <Icon name="Star" size={14} /> }
                                             ].map((command) => (
                                                 <button
                                                     key={command.cmd}
@@ -2190,7 +2190,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 ? 'border-gray-700 text-gray-400' 
                                                 : 'border-gray-200 text-gray-500'
                                         }`}>
-                                            💡 <strong>Astuce:</strong> Tapez <code className={`px-1 py-0.5 rounded ${
+                                            <Icon name="LightBulb" className="inline mr-1" size={12} /> <strong>Astuce:</strong> Tapez <code className={`px-1 py-0.5 rounded ${
                                                 isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'
                                             }`}>/</code> dans le champ de saisie pour voir l'autocomplete
                                         </div>
@@ -2208,7 +2208,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <label className={`font-semibold transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        📱 Simuler canal:
+                                        <Icon name="Phone" className="inline mr-2" size={16} /> Simuler canal:
                                     </label>
                                     
                                     <label className="flex items-center gap-2 cursor-pointer">
@@ -2226,7 +2226,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <span className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>
-                                            🌐 Web (complet)
+                                            <Icon name="Globe" className="inline mr-1" size={14} /> Web (complet)
                                         </span>
                                     </label>
                                     
@@ -2244,7 +2244,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <span className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>
-                                            📱 SMS (format court)
+                                            <Icon name="Phone" className="inline mr-1" size={14} /> SMS (format court)
                                         </span>
                                     </label>
                                 </div>
@@ -2256,7 +2256,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     }`}
                                     style={{ display: 'none' }}
                                 >
-                                    ℹ️ Mode SMS: Réponse formatée comme un vrai SMS (3 messages max, pas d'envoi réel)
+                                    <Icon name="InfoCircle" className="inline mr-1" size={14} /> Mode SMS: Réponse formatée comme un vrai SMS (3 messages max, pas d'envoi réel)
                                 </div>
                             </div>
 
@@ -2274,16 +2274,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             if (value.startsWith('/')) {
                                                 const query = value.slice(1).toLowerCase();
                                                 const commands = [
-                                                    { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: '📊' },
-                                                    { cmd: '/quote', desc: 'Prix en temps réel', icon: '💰' },
-                                                    { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: '📈' },
-                                                    { cmd: '/technical', desc: 'Analyse technique', icon: '🔍' },
-                                                    { cmd: '/news', desc: 'Actualités récentes', icon: '📰' },
-                                                    { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: '🔎' },
-                                                    { cmd: '/calendar', desc: 'Calendrier économique', icon: '📅' },
-                                                    { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: '📊' },
-                                                    { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: '📉' },
-                                                    { cmd: '/watchlist', desc: 'Gestion watchlist', icon: '⭐' }
+                                                    { cmd: '/rsi', desc: 'RSI Screener - Opportunités survente/surachat', icon: <Icon name="GraphUp" size={14} /> },
+                                                    { cmd: '/quote', desc: 'Prix en temps réel', icon: <Icon name="CircleCurrency" size={14} /> },
+                                                    { cmd: '/fundamentals', desc: 'Analyse fondamentale', icon: <Icon name="TrendingUp" size={14} /> },
+                                                    { cmd: '/technical', desc: 'Analyse technique', icon: <Icon name="Search" size={14} /> },
+                                                    { cmd: '/news', desc: 'Actualités récentes', icon: <Icon name="Newspaper" size={14} /> },
+                                                    { cmd: '/screener', desc: 'Stock Screener - Recherche avancée', icon: <Icon name="ZoomIn" size={14} /> },
+                                                    { cmd: '/calendar', desc: 'Calendrier économique', icon: <Icon name="Calendar" size={14} /> },
+                                                    { cmd: '/earnings', desc: 'Résultats d\'entreprises', icon: <Icon name="GraphUp" size={14} /> },
+                                                    { cmd: '/taux', desc: 'Courbe des taux obligataires', icon: <Icon name="TrendingDown" size={14} /> },
+                                                    { cmd: '/watchlist', desc: 'Gestion watchlist', icon: <Icon name="Star" size={14} /> }
                                                 ];
                                                 
                                                 const filtered = commands.filter(c => 
@@ -2425,7 +2425,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             : 'bg-gray-800 text-white hover:bg-gray-700'
                                     }`}
                                 >
-                                    {emmaLoading ? '⏳' : '📤'}
+                                    {emmaLoading ? <Icon name="Hourglass" className="animate-spin" /> : <Icon name="Send" />}
                                 </button>
                                 {emmaInput.trim() && (
                                     <button
@@ -2455,13 +2455,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             onClick={resetPrompt}
                                             className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors"
                                         >
-                                            🔄 Réinitialiser
+                                            <Icon name="Refresh" className="inline mr-1" size={14} /> Réinitialiser
                                         </button>
                                         <button
                                             onClick={savePrompt}
                                             className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                                         >
-                                            💾 Sauvegarder
+                                            <Icon name="FloppyDisk" className="inline mr-1" size={14} /> Sauvegarder
                                         </button>
                                     </div>
                                 </div>
@@ -2494,7 +2494,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {showEmailModal && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
                                 <div className={`w-full max-w-md rounded-lg p-6 shadow-xl ${isDarkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-200'}`}>
-                                    <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>✉️ Envoyer par courriel</h3>
+                                    <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><Icon name="Mail" className="inline mr-2" /> Envoyer par courriel</h3>
                                     <div className="space-y-3">
                                         <input
                                             type="email"
@@ -2581,7 +2581,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             onClick={() => setEmmaTemperature(0.3)}
                                             className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors"
                                         >
-                                            🔄 Réinitialiser
+                                            <Icon name="Refresh" className="inline mr-1" size={14} /> Réinitialiser
                                         </button>
                                         <button
                                             onClick={() => {
@@ -2590,7 +2590,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             }}
                                             className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                                         >
-                                            💾 Sauvegarder
+                                            <Icon name="FloppyDisk" className="inline mr-1" size={14} /> Sauvegarder
                                         </button>
                                     </div>
                                 </div>
@@ -2637,7 +2637,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 }`}
                                             >
                                                 <div className="font-medium flex items-center gap-2">
-                                                    <Icon emoji="📊" size={16} />
+                                                    <Icon name="GraphUp" size={16} />
                                                     Très Précis
                                                 </div>
                                                 <div className="text-xs opacity-75">Analyses factuelles</div>
@@ -2653,7 +2653,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 }`}
                                             >
                                                 <div className="font-medium flex items-center gap-2">
-                                                    <Icon emoji="📈" size={16} />
+                                                    <Icon name="TrendingUp" size={16} />
                                                     Financier
                                                 </div>
                                                 <div className="text-xs opacity-75">Analyses professionnelles</div>
@@ -2668,7 +2668,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium">🎯 Modéré</div>
+                                                <div className="font-medium"><Icon name="Target" className="inline mr-1" size={16} /> Modéré</div>
                                                 <div className="text-xs opacity-75">Équilibré et factuel</div>
                                             </button>
                                             <button
@@ -2681,7 +2681,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                                 }`}
                                             >
-                                                <div className="font-medium">⚖️ Équilibré</div>
+                                                <div className="font-medium"><Icon name="Scales" className="inline mr-1" size={16} /> Équilibré</div>
                                                 <div className="text-xs opacity-75">Professionnel et naturel</div>
                                             </button>
                                             <button
@@ -2695,7 +2695,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 }`}
                                             >
                                                 <div className="font-medium flex items-center gap-2">
-                                                    <Icon emoji="🎨" size={16} />
+                                                    <Icon name="Palette" size={16} />
                                                     Créatif
                                                 </div>
                                                 <div className="text-xs opacity-75">Idées innovantes</div>
@@ -2731,13 +2731,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         {showLengthEditor && (
                             <div className={`backdrop-blur-sm rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>📏 Contrôle de Longueur Emma</h3>
+                                    <h3 className={`text-lg font-semibold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}><Icon name="Ruler" className="inline mr-2" /> Contrôle de Longueur Emma</h3>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => setEmmaMaxTokens(4096)}
                                             className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors"
                                         >
-                                            🔄 Réinitialiser
+                                            <Icon name="Refresh" className="inline mr-1" size={14} /> Réinitialiser
                                         </button>
                                         <button
                                             onClick={() => {
@@ -2745,7 +2745,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             }}
                                             className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                                         >
-                                            💾 Sauvegarder
+                                            <Icon name="FloppyDisk" className="inline mr-1" size={14} /> Sauvegarder
                                         </button>
                                     </div>
                                 </div>
@@ -2781,21 +2781,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 onClick={() => setEmmaMaxTokens(1024)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 1024 ? 'bg-green-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                                             >
-                                                <div className="font-medium">📝 Court</div>
+                                                <div className="font-medium"><Icon name="EditPencil" className="inline mr-1" size={16} /> Court</div>
                                                 <div className="text-xs opacity-75">2-3 paragraphes</div>
                                             </button>
                                             <button
                                                 onClick={() => setEmmaMaxTokens(2048)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 2048 ? 'bg-green-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                                             >
-                                                <div className="font-medium">📊 Moyen</div>
+                                                <div className="font-medium"><Icon name="GraphUp" className="inline mr-1" size={16} /> Moyen</div>
                                                 <div className="text-xs opacity-75">Analyses courtes à moyenne</div>
                                             </button>
                                             <button
                                                 onClick={() => setEmmaMaxTokens(4096)}
                                                 className={`p-3 rounded-lg text-sm transition-colors ${emmaMaxTokens === 4096 ? 'bg-green-600 text-white' : isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                                             >
-                                                <div className="font-medium">📈 Complet</div>
+                                                <div className="font-medium"><Icon name="TrendingUp" className="inline mr-1" size={16} /> Complet</div>
                                                 <div className="text-xs opacity-75">Analyses moyennes (Par défaut)</div>
                                             </button>
                                             <button

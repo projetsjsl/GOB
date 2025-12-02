@@ -51,7 +51,7 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
                 <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 max-w-md w-full mx-4 border border-red-700 shadow-2xl">
                     <div className="flex flex-col items-center gap-4">
                         <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
-                            <i className="iconoir-warning-triangle text-red-500 text-3xl"></i>
+                            <Icon name="warning-triangle" className="w-8 h-8 text-red-500" />
                         </div>
                         <h3 className="text-xl font-bold text-white">Erreur de Chargement</h3>
                         <p className="text-gray-400 text-center">{error}</p>
@@ -83,7 +83,7 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
                     <div>
                         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                             <span className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                                <i className="iconoir-graph-up text-blue-400 text-xl"></i>
+                                <Icon name="graph-up" className="w-5 h-5 text-blue-400" />
                             </span>
                             Analyse Approfondie: {symbol}
                         </h2>
@@ -93,7 +93,7 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
                         onClick={onClose}
                         className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors"
                     >
-                        <i className="iconoir-xmark text-gray-400 text-xl"></i>
+                        <Icon name="xmark" className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
 
@@ -113,7 +113,7 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
                                     : 'text-gray-400 hover:text-gray-200'
                                 }`}
                         >
-                            <i className={`iconoir-${tab.icon}`}></i>
+                            <Icon name={tab.icon} className="w-5 h-5" />
                             {tab.label}
                         </button>
                     ))}
@@ -178,7 +178,7 @@ const ValuationTab = ({ data }) => {
             {/* Fair Value Gauge */}
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i className="iconoir-target text-blue-400"></i>
+                    <Icon name="target" className="w-5 h-5 text-blue-400" />
                     Juste Valeur
                 </h3>
                 <div className="flex items-center justify-center py-8">
@@ -226,7 +226,7 @@ const ValuationTab = ({ data }) => {
             {/* Valuation Methods */}
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i className="iconoir-calculator text-purple-400"></i>
+                    <Icon name="calculator" className="w-5 h-5 text-purple-400" />
                     Méthodes de Valorisation
                 </h3>
                 <div className="space-y-4">
@@ -278,7 +278,7 @@ const ValuationTab = ({ data }) => {
             {/* Historical Trends */}
             <div className="lg:col-span-2 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i className="iconoir-chart-line text-emerald-400"></i>
+                    <Icon name="chart-line" className="w-5 h-5 text-emerald-400" />
                     Tendances Financières (5-6 périodes)
                 </h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -358,13 +358,13 @@ const ValuationTab = ({ data }) => {
                             valuation.recommendation.includes('Sell') ? 'bg-red-500/20' :
                                 'bg-yellow-500/20'
                         }`}>
-                        <i className={`iconoir-${valuation.recommendation.includes('Buy') ? 'arrow-up' :
+                        <Icon name={valuation.recommendation.includes('Buy') ? 'arrow-up' :
                                 valuation.recommendation.includes('Sell') ? 'arrow-down' :
                                     'minus'
-                            } text-3xl ${valuation.recommendation.includes('Buy') ? 'text-green-400' :
+                            } className={`w-8 h-8 ${valuation.recommendation.includes('Buy') ? 'text-green-400' :
                                 valuation.recommendation.includes('Sell') ? 'text-red-400' :
                                     'text-yellow-400'
-                            }`}></i>
+                            }`} />
                     </div>
                 </div>
             </div>
@@ -446,7 +446,7 @@ const FinancialsTab = ({ data }) => {
                                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                             }`}
                     >
-                        <i className={`iconoir-${type.icon}`}></i>
+                        <Icon name={type.icon} className="w-5 h-5" />
                         {type.label}
                     </button>
                 ))}
@@ -568,7 +568,7 @@ const MetricsTab = ({ data }) => {
                 <div key={idx} className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                         <span className={`w-8 h-8 bg-${category.color}-500/20 rounded-lg flex items-center justify-center`}>
-                            <i className={`iconoir-${category.icon} text-${category.color}-400`}></i>
+                            <Icon name={category.icon} className={`w-5 h-5 text-${category.color}-400`} />
                         </span>
                         {category.title}
                     </h3>
@@ -602,7 +602,7 @@ const InsightsTab = ({ data }) => {
         return (
             <div className="text-center py-12">
                 <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i className="iconoir-brain text-yellow-400 text-3xl"></i>
+                    <Icon name="brain" className="w-8 h-8 text-yellow-400" />
                 </div>
                 <p className="text-gray-400">Insights IA temporairement indisponibles</p>
             </div>
@@ -614,7 +614,7 @@ const InsightsTab = ({ data }) => {
             {/* AI Analysis */}
             <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-xl p-6 border border-purple-700/50">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i className="iconoir-brain text-purple-400"></i>
+                    <Icon name="brain" className="w-5 h-5 text-purple-400" />
                     Analyse Gemini AI
                 </h3>
                 <p className="text-gray-300 leading-relaxed whitespace-pre-line">
@@ -626,14 +626,14 @@ const InsightsTab = ({ data }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-green-700/30">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <i className="iconoir-check-circle text-green-400"></i>
+                        <Icon name="check-circle" className="w-5 h-5 text-green-400" />
                         Forces
                     </h3>
                     <ul className="space-y-3">
                         {(aiInsights.strengths || []).map((strength, idx) => (
                             <li key={idx} className="flex items-start gap-3">
                                 <span className="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <i className="iconoir-plus text-green-400 text-sm"></i>
+                                    <Icon name="plus" className="w-4 h-4 text-green-400" />
                                 </span>
                                 <span className="text-gray-300 text-sm">{strength}</span>
                             </li>
@@ -643,14 +643,14 @@ const InsightsTab = ({ data }) => {
 
                 <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-red-700/30">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <i className="iconoir-warning-triangle text-red-400"></i>
+                        <Icon name="warning-triangle" className="w-5 h-5 text-red-400" />
                         Risques
                     </h3>
                     <ul className="space-y-3">
                         {(aiInsights.weaknesses || []).map((weakness, idx) => (
                             <li key={idx} className="flex items-start gap-3">
                                 <span className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <i className="iconoir-minus text-red-400 text-sm"></i>
+                                    <Icon name="minus" className="w-4 h-4 text-red-400" />
                                 </span>
                                 <span className="text-gray-300 text-sm">{weakness}</span>
                             </li>
@@ -663,14 +663,14 @@ const InsightsTab = ({ data }) => {
             {aiInsights.trends && aiInsights.trends.length > 0 && (
                 <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-blue-700/30">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <i className="iconoir-graph-up text-blue-400"></i>
+                        <Icon name="graph-up" className="w-5 h-5 text-blue-400" />
                         Tendances Clés
                     </h3>
                     <ul className="space-y-3">
                         {aiInsights.trends.map((trend, idx) => (
                             <li key={idx} className="flex items-start gap-3">
                                 <span className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <i className="iconoir-arrow-tr text-blue-400 text-sm"></i>
+                                    <Icon name="arrow-tr" className="w-4 h-4 text-blue-400" />
                                 </span>
                                 <span className="text-gray-300 text-sm">{trend}</span>
                             </li>

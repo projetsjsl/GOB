@@ -81,7 +81,7 @@ const EconomicEventsModal = ({ symbol, stockData, watchlist, onClose }) => {
                 <div className="bg-gradient-to-r from-sky-900/40 to-indigo-900/40 border-b border-sky-500/30 p-6 flex justify-between items-center">
                     <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-xl bg-sky-500/20 flex items-center justify-center">
-                            <i className="iconoir-globe text-sky-400 text-3xl"></i>
+                            <Icon name="globe" className="w-8 h-8 text-sky-400" />
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white">Economic Events Calendar</h2>
@@ -92,7 +92,7 @@ const EconomicEventsModal = ({ symbol, stockData, watchlist, onClose }) => {
                         onClick={onClose}
                         className="w-10 h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors"
                     >
-                        <i className="iconoir-cancel text-gray-400 text-xl"></i>
+                        <Icon name="cancel" className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
 
@@ -212,7 +212,7 @@ const EconomicEventsModal = ({ symbol, stockData, watchlist, onClose }) => {
                 {/* Footer */}
                 <div className="bg-gray-800/50 border-t border-gray-700 p-4 flex justify-between items-center">
                     <div className="text-sm text-gray-500">
-                        <i className="iconoir-database text-sky-400 mr-1"></i>
+                        <Icon name="database" className="w-4 h-4 inline mr-1 text-sky-400" />
                         Economic data from FMP + fallback sources
                     </div>
                     <button

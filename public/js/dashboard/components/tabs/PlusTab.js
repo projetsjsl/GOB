@@ -25,7 +25,7 @@ const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
                 <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                 }`}>
-                    <Icon emoji="⚙️" name="Settings" size={24} className="mr-2 inline-block" />
+                    <Icon name="settings" className="w-6 h-6 inline mr-2" />
                     Paramètres
                 </h2>
 
@@ -53,7 +53,7 @@ const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
                                     : 'bg-red-500 hover:bg-red-600 text-white'
                             } shadow-lg hover:shadow-xl transform hover:scale-105`}
                         >
-                            <Icon emoji="🚪" name="LogOut" size={20} className="mr-2 inline-block" />
+                            <Icon name="log-out" className="w-5 h-5 inline mr-2" />
                             Se déconnecter
                         </button>
                     </div>

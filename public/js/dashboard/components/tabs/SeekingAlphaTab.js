@@ -10,7 +10,7 @@ const SeekingAlphaTab = () => (
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="📈" size={24} className="mr-2 inline-block" />
+                        <IconSystem.trending direction="up" className="mr-2 inline-block w-6 h-6" />
                         Analyses Seeking Alpha
                     </h2>
                         <div className="flex gap-2">
@@ -32,29 +32,29 @@ const SeekingAlphaTab = () => (
                                 disabled={scrapingStatus === 'running'}
                                 className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
                             >
-                                {scrapingStatus === 'running' ? 'Scraping...' : '🚀 Lancer le Scraper'}
+                                {scrapingStatus === 'running' ? 'Scraping...' : <span><Icon name="Rocket" className="inline mr-1" /> Lancer le Scraper</span>}
                             </button>
                             <button
                                 onClick={() => openSeekingAlpha('AAPL')}
                                 className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
                             >
-                                🌐 Ouvrir Seeking Alpha
+                                <span><Icon name="Globe" className="inline mr-1" /> Ouvrir Seeking Alpha</span>
                             </button>
                             <button
                                 onClick={() => {
                                     const script = generateScrapingScript('CVS');
                                     navigator.clipboard.writeText(script).then(() => {
-                                        addScrapingLog('📋 Script de scraping copié dans le presse-papiers', 'success');
-                                        addScrapingLog('💡 Collez-le dans la console F12 de Seeking Alpha', 'info');
+                                        addScrapingLog(<span><Icon name="ClipboardCheck" className="inline mr-1" /> Script de scraping copié dans le presse-papiers</span>, 'success');
+                                        addScrapingLog(<span><Icon name="LightBulb" className="inline mr-1" /> Collez-le dans la console F12 de Seeking Alpha</span>, 'info');
                                     });
                                 }}
                                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                             >
-                                📋 Script F12
+                                <span><Icon name="Clipboard" className="inline mr-1" /> Script F12</span>
                             </button>
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🤖 Démarrage de l\'analyse Perplexity sur les données existantes...', 'info');
+                                    addScrapingLog(<span><Icon name="Bot" className="inline mr-1" /> Démarrage de l'analyse Perplexity sur les données existantes...</span>, 'info');
                                     try {
                                         for (const ticker of tickers) {
                                             const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
@@ -62,14 +62,14 @@ const SeekingAlphaTab = () => (
                                                 await analyzeWithClaude(ticker, seekingAlphaItem.parsedData);
                                             }
                                         }
-                                        addScrapingLog('✅ Analyse Perplexity terminée pour tous les titres', 'success');
+                                        addScrapingLog(<span><Icon name="CheckCircle" className="inline mr-1" /> Analyse Perplexity terminée pour tous les titres</span>, 'success');
                                     } catch (error) {
-                                        addScrapingLog(`❌ Erreur analyse Perplexity: ${error.message}`, 'error');
+                                        addScrapingLog(<span><Icon name="XCircle" className="inline mr-1" /> Erreur analyse Perplexity: {error.message}</span>, 'error');
                                     }
                                 }}
                                 className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
                             >
-                                🤖 Analyser avec Claude
+                                <span><Icon name="Bot" className="inline mr-1" /> Analyser avec Claude</span>
                             </button>
                         </div>
                     </div>
@@ -219,7 +219,7 @@ const SeekingAlphaTab = () => (
                                                 {claudeData?.strengths && (
                                                     <div className="bg-green-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-green-800 mb-4 flex items-center">
-                                                            <span className="mr-2">✅</span>
+                                                            <Icon name="CheckCircle" className="mr-2" />
                                                             Points Positifs
                                                         </h4>
                                                         <div className="space-y-3">
@@ -236,7 +236,7 @@ const SeekingAlphaTab = () => (
                                                 {claudeData?.concerns && claudeData.concerns[0] !== "Analyse en attente" && (
                                                     <div className="bg-red-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-red-800 mb-4 flex items-center">
-                                                            <span className="mr-2">⚠️</span>
+                                                            <Icon name="WarningTriangle" className="mr-2" />
                                                             Préoccupations
                                                         </h4>
                                                         <div className="space-y-3">
@@ -255,7 +255,7 @@ const SeekingAlphaTab = () => (
                                                  !claudeData?.finalConclusion?.recommendation?.includes('En attente') && (
                                                     <div className="bg-blue-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
-                                                            <span className="mr-2">💡</span>
+                                                            <Icon name="LightBulb" className="mr-2" />
                                                             Recommandation
                                                         </h4>
                                                         <div className="text-blue-700 leading-relaxed">
@@ -269,7 +269,7 @@ const SeekingAlphaTab = () => (
                                                  claudeData?.metrics?.marketCap === 'En attente d\'analyse' && (
                                                     <div className="bg-yellow-50 rounded-lg p-6 border-2 border-yellow-200">
                                                         <h4 className="text-lg font-bold text-yellow-800 mb-3 flex items-center">
-                                                            <span className="mr-2">⏳</span>
+                                                            <Icon name="Hourglass" className="mr-2" />
                                                             Données en cours de traitement
                                                         </h4>
                                                         <div className="text-yellow-700 leading-relaxed space-y-2">
@@ -282,7 +282,7 @@ const SeekingAlphaTab = () => (
                                                             </ol>
                                                             <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
                                                                 <p className="text-sm text-blue-800">
-                                                                    💡 <strong>Astuce :</strong> Les données parsées automatiquement sont affichées ci-dessus. 
+                                                                    <Icon name="LightBulb" className="inline mr-1" /> <strong>Astuce :</strong> Les données parsées automatiquement sont affichées ci-dessus. 
                                                                     Pour une analyse plus approfondie avec insights IA, utilisez l'API Claude.
                                                                 </p>
                                                             </div>
@@ -318,7 +318,7 @@ const SeekingAlphaTab = () => (
                             isDarkMode ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-300'
                         }`}>
                             <div className="text-center">
-                                <div className="text-5xl mb-4"><Icon emoji="📊" size={48} /></div>
+                                <div className="text-5xl mb-4"><IconSystem.chart className="w-12 h-12 inline-block" /></div>
                                 <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-yellow-200' : 'text-yellow-800'}`}>
                                     Aucun ticker disponible
                                 </h3>
@@ -356,7 +356,7 @@ const SeekingAlphaTab = () => (
                                                     className="px-3 py-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs rounded-lg transition-all duration-300 shadow-lg"
                                                     title="Comparaison avec les peers"
                                                 >
-                                                    🔍 Peers
+                                                    <span><Icon name="Search" className="inline mr-1" /> Peers</span>
                                                 </button>
                                                 <button
                                                     onClick={() => setSelectedStock(stock.ticker)}
@@ -433,7 +433,7 @@ const SeekingAlphaTab = () => (
                             isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                📊 Tickers disponibles ({tickers.length})
+                                <IconSystem.chart className="inline mr-2 w-5 h-5" /> Tickers disponibles ({tickers.length})
                             </h3>
                             <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 Cliquez sur un ticker pour voir ses détails ou lancez le scraper pour collecter les données Seeking Alpha.
@@ -468,7 +468,7 @@ const SeekingAlphaTab = () => (
                     {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length === 0 && (
                         <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <Icon emoji="📋" size={24} />
+                                <IconSystem.news className="w-6 h-6" />
                                 Analyses Seeking Alpha
                             </h3>
                             <div className="text-center py-8">
@@ -487,7 +487,7 @@ const SeekingAlphaTab = () => (
                     {!selectedStock && seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
                         <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <Icon emoji="📋" size={24} />
+                                <IconSystem.news className="w-6 h-6" />
                                 Analyses Seeking Alpha
                             </h3>
                             <div className="space-y-4">
@@ -509,7 +509,7 @@ const SeekingAlphaTab = () => (
                                                         className="px-3 py-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs rounded-lg transition-all duration-300 shadow-lg"
                                                         title="Comparaison avec les peers"
                                                     >
-                                                        🔍 Peers
+                                                        <span><Icon name="Search" className="inline mr-1" /> Peers</span>
                                                     </button>
                                                     <button
                                                         onClick={() => setSelectedStock(ticker)}

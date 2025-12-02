@@ -17,7 +17,7 @@ const AdminJSLaiTab = ({
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>⚙️ Admin-JSLAI</h2>
+                        }`}><Icon name="Settings" className="inline mr-2" /> Admin-JSLAI</h2>
                     </div>
 
                     <EmmaSmsPanel />
@@ -27,13 +27,13 @@ const AdminJSLaiTab = ({
                         isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            <Icon emoji="🔍" size={20} />
+                            <Icon name="Search" size={20} />
                             Debug des Données
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="📊" size={18} />
+                                    <Icon name="GraphUp" size={18} />
                                     Stock Data
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -48,7 +48,7 @@ const AdminJSLaiTab = ({
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="📰" size={18} />
+                                    <Icon name="Newspaper" size={18} />
                                     News Data
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -60,7 +60,7 @@ const AdminJSLaiTab = ({
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="🎯" size={18} />
+                                    <Icon name="Target" size={18} />
                                     Seeking Alpha
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -79,7 +79,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                                <Icon emoji="📦" size={20} />
+                                <Icon name="Box" size={20} />
                                 Gestion du Cache Supabase
                             </h3>
                             <button
@@ -104,7 +104,7 @@ const AdminJSLaiTab = ({
                                         : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                 }`}
                             >
-                                {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
+                                {loadingCacheStatus ? <span><Icon name="Hourglass" className="inline mr-1" /> Chargement...</span> : <span><Icon name="Refresh" className="inline mr-1" /> Actualiser</span>}
                             </button>
                         </div>
 
@@ -112,7 +112,7 @@ const AdminJSLaiTab = ({
                         <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
-                                    <Icon emoji="⚙️" size={16} />
+                                    <Icon name="Settings" size={16} />
                                     Paramètres du Cache
                                 </div>
                                 <div className="space-y-3">
@@ -180,7 +180,7 @@ const AdminJSLaiTab = ({
                             {/* État du Cache */}
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
-                                    <Icon emoji="📊" size={16} />
+                                    <Icon name="GraphUp" size={16} />
                                     État du Cache
                                 </div>
                                 <div className="space-y-2 text-xs">
@@ -202,7 +202,7 @@ const AdminJSLaiTab = ({
                                                             ? 'bg-yellow-500 text-white'
                                                             : 'bg-green-500 text-white'
                                                     }`}>
-                                                        {status.expired ? '⚠️ Expiré' : '✅ Valide'}
+                                                        {status.expired ? <span><Icon name="WarningTriangle" className="inline mr-1" /> Expiré</span> : <span><Icon name="CheckCircle" className="inline mr-1" /> Valide</span>}
                                                     </span>
                                                 </div>
                                                 {status.age_hours && (
@@ -238,7 +238,7 @@ const AdminJSLaiTab = ({
                                         isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
                                     }`}
                                 >
-                                    🗑️ Vider le Cache
+                                    <Icon name="Trash" className="inline mr-1" /> Vider le Cache
                                 </button>
                                 <button
                                     onClick={() => {
@@ -255,7 +255,7 @@ const AdminJSLaiTab = ({
                                         isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
                                     }`}
                                 >
-                                    🔄 Réinitialiser
+                                    <Icon name="Refresh" className="inline mr-1" /> Réinitialiser
                                 </button>
                             </div>
                         </div>
@@ -267,7 +267,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                <Icon emoji="📋" size={20} />
+                                <Icon name="Clipboard" size={20} />
                                 Logs Système
                             </h3>
                             <button
@@ -310,7 +310,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                <Icon emoji="🧠" size={20} />
+                                <Icon name="Brain" size={20} />
                                 Deep Think
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
@@ -320,18 +320,18 @@ const AdminJSLaiTab = ({
                         <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    <Icon emoji="🎯" size={16} />
+                                    <Icon name="Target" size={16} />
                                     Statut du système
                                 </div>
                                 <div className="text-xs space-y-1">
-                                    <div>• Gemini API: {typeof window !== 'undefined' ? '✅ Actif' : '⚠️ Vérification...'}</div>
-                                    <div>• Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? '✅ Opérationnel' : '⏸️ En attente'}</div>
-                                    <div>• Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? '✅ Données disponibles' : '⚠️ Pas de données'}</div>
+                                    <div>• Gemini API: {typeof window !== 'undefined' ? <span><Icon name="CheckCircle" className="inline mr-1" /> Actif</span> : <span><Icon name="WarningTriangle" className="inline mr-1" /> Vérification...</span>}</div>
+                                    <div>• Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? <span><Icon name="CheckCircle" className="inline mr-1" /> Opérationnel</span> : <span><Icon name="Pause" className="inline mr-1" /> En attente</span>}</div>
+                                    <div>• Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? <span><Icon name="CheckCircle" className="inline mr-1" /> Données disponibles</span> : <span><Icon name="WarningTriangle" className="inline mr-1" /> Pas de données</span>}</div>
                                 </div>
                             </div>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    <Icon emoji="📊" size={16} />
+                                    <Icon name="GraphUp" size={16} />
                                     Métriques
                                 </div>
                                 <div className="text-xs space-y-1">
@@ -349,7 +349,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-red-300' : 'text-red-900'}`}>
-                                <Icon emoji="⚠️" size={20} />
+                                <Icon name="WarningTriangle" size={20} />
                                 Violations
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${
@@ -365,7 +365,7 @@ const AdminJSLaiTab = ({
                         }`}>
                             {systemLogs.filter(l => l.type === 'error').length === 0 ? (
                                 <div className={`text-center py-4 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
-                                    ✅ Aucune violation détectée - Système opérationnel
+                                    <Icon name="CheckCircle" className="inline mr-1" /> Aucune violation détectée - Système opérationnel
                                 </div>
                             ) : (
                                 <div className="space-y-2">
@@ -377,7 +377,7 @@ const AdminJSLaiTab = ({
                                             }`}
                                         >
                                             <div className="flex items-start gap-2">
-                                                <span className="text-red-500">⚠️</span>
+                                                <Icon name="WarningTriangle" className="text-red-500" />
                                                 <div className="flex-1">
                                                     <div className="font-semibold text-xs">[{log.timestamp}]</div>
                                                     <div className="mt-1">{log.text}</div>
@@ -389,7 +389,7 @@ const AdminJSLaiTab = ({
                             )}
                         </div>
                         <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            💡 <strong>Info:</strong> Les violations sont automatiquement trackées. Consultez les logs système ci-dessus pour plus de détails.
+                            <Icon name="LightBulb" className="inline mr-1" /> <strong>Info:</strong> Les violations sont automatiquement trackées. Consultez les logs système ci-dessus pour plus de détails.
                         </div>
                     </div>
 
@@ -399,7 +399,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
-                                <Icon emoji="🎨" size={20} />
+                                <Icon name="Palette" size={20} />
                                 Mode d'Affichage des Icônes
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
@@ -407,14 +407,14 @@ const AdminJSLaiTab = ({
                                     ? isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-200 text-blue-900'
                                     : isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'
                             }`}>
-                                {isProfessionalMode ? '💼 Professionnel' : '🎉 Fun'}
+                                {isProfessionalMode ? <span><Icon name="Briefcase" className="inline mr-1" /> Professionnel</span> : <span><Icon name="PartyPopper" className="inline mr-1" /> Fun</span>}
                             </div>
                         </div>
                         <div className={`space-y-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
-                                        <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
+                                        <Icon name={isProfessionalMode ? "Briefcase" : "PartyPopper"} size={18} />
                                         <span className="font-semibold">
                                             {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
                                         </span>
@@ -432,12 +432,12 @@ const AdminJSLaiTab = ({
                                     >
                                         {isProfessionalMode ? (
                                             <span className="flex items-center gap-2">
-                                                <i className="iconoir-briefcase"></i>
+                                                <Icon name="Briefcase" className="inline mr-2" />
                                                 Mode Professionnel
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <span>🎉</span>
+                                                <Icon name="PartyPopper" className="inline mr-2" />
                                                 Mode Fun
                                             </span>
                                         )}
@@ -446,19 +446,19 @@ const AdminJSLaiTab = ({
                                 <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                     {isProfessionalMode ? (
                                         <>
-                                            <p className="mb-1">✅ Icônes professionnelles Iconoir activées</p>
+                                            <p className="mb-1"><Icon name="CheckCircle" className="inline mr-1" /> Icônes professionnelles Iconoir activées</p>
                                             <p>Les emojis sont remplacés par des icônes vectorielles modernes pour une apparence plus professionnelle.</p>
                                         </>
                                     ) : (
                                         <>
-                                            <p className="mb-1">✅ Mode Fun avec emojis activé</p>
+                                            <p className="mb-1"><Icon name="CheckCircle" className="inline mr-1" /> Mode Fun avec emojis activé</p>
                                             <p>Les icônes sont affichées sous forme d'emojis colorés pour une expérience plus décontractée.</p>
                                         </>
                                     )}
                                 </div>
                             </div>
                             <div className={`p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
-                                💡 <strong>Astuce:</strong> Le mode sélectionné est sauvegardé automatiquement et s'applique à tous les onglets du dashboard.
+                                <Icon name="LightBulb" className="inline mr-1" /> <strong>Astuce:</strong> Le mode sélectionné est sauvegardé automatiquement et s'applique à tous les onglets du dashboard.
                             </div>
                         </div>
                     </div>
@@ -469,7 +469,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
-                                <Icon emoji="🤖" size={20} />
+                                <Icon name="Bot" size={20} />
                                 Configuration Emma IA
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
@@ -477,7 +477,7 @@ const AdminJSLaiTab = ({
                                     ? isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
                                     : isDarkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-200 text-red-900'
                             }`}>
-                                {emmaConnected ? '✅ Gemini Actif' : '❌ Gemini Inactif'}
+                                {emmaConnected ? <span><Icon name="CheckCircle" className="inline mr-1" /> Gemini Actif</span> : <span><Icon name="XCircle" className="inline mr-1" /> Gemini Inactif</span>}
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -489,7 +489,7 @@ const AdminJSLaiTab = ({
                                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                                 }`}
                             >
-                                📝 Modifier Prompt
+                                <Icon name="EditPencil" className="inline mr-1" /> Modifier Prompt
                             </button>
                             <button
                                 onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
@@ -499,7 +499,7 @@ const AdminJSLaiTab = ({
                                         : 'bg-gray-800 hover:bg-gray-700 text-white'
                                 }`}
                             >
-                                🌡️ Température
+                                <Icon name="Thermometer" className="inline mr-1" /> Température
                             </button>
                             <button
                                 onClick={() => setShowLengthEditor(!showLengthEditor)}
@@ -509,11 +509,11 @@ const AdminJSLaiTab = ({
                                         : 'bg-green-600 hover:bg-green-700 text-white'
                                 }`}
                             >
-                                📏 Longueur Réponse
+                                <Icon name="Ruler" className="inline mr-1" /> Longueur Réponse
                             </button>
                         </div>
                         <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            💡 <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement.
+                            <Icon name="LightBulb" className="inline mr-1" /> <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement.
                         </div>
                     </div>
 
@@ -526,7 +526,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                        <Icon name="GraphUp" size={20} className="mr-2 inline-block" />
                         Gestion des Stocks
                     </h3>
                         <div className="flex flex-wrap gap-2">
@@ -559,7 +559,7 @@ const AdminJSLaiTab = ({
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                                <Icon name="GraphUp" size={20} className="mr-2 inline-block" />
                                 ÉTAPE 1: SCRAPING BATCH (25 tickers)
                             </h3>
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold ${
@@ -568,10 +568,10 @@ const AdminJSLaiTab = ({
                                     scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
                                     'bg-red-500 text-white'
                                 }`}>
-                                    {scrapingStatus === 'idle' ? '⏸️ EN ATTENTE' :
-                                     scrapingStatus === 'running' ? '🔄 SCRAPING...' :
-                                     scrapingStatus === 'completed' ? '✅ TERMINÉ' :
-                                     '❌ ERREUR'}
+                                    {scrapingStatus === 'idle' ? <span><Icon name="Pause" className="inline mr-1" /> EN ATTENTE</span> :
+                                     scrapingStatus === 'running' ? <span><Icon name="Refresh" className="inline mr-1 animate-spin" /> SCRAPING...</span> :
+                                     scrapingStatus === 'completed' ? <span><Icon name="CheckCircle" className="inline mr-1" /> TERMINÉ</span> :
+                                     <span><Icon name="XCircle" className="inline mr-1" /> ERREUR</span>}
                                 </span>
                             </div>
 
@@ -595,13 +595,13 @@ const AdminJSLaiTab = ({
                                 <p className={`text-sm mb-3 font-semibold transition-colors duration-300 ${
                                     isDarkMode ? 'text-yellow-300' : 'text-yellow-800'
                                 }`}>
-                                    ⚠️ IMPORTANT: Connectez-vous AVANT de lancer le scraping!
+                                    <Icon name="WarningTriangle" className="inline mr-1" /> IMPORTANT: Connectez-vous AVANT de lancer le scraping!
                                 </p>
                                 <ol className={`text-sm space-y-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    <li><strong>1.</strong> Cliquez "🔐 SE CONNECTER" → Login Seeking Alpha</li>
-                                    <li><strong>2.</strong> Cliquez "🚀 LANCER SCRAPING BATCH" → Toutes les popups s'ouvrent</li>
+                                    <li><strong>1.</strong> Cliquez "<span><Icon name="Lock" className="inline mr-1" /> SE CONNECTER</span>" → Login Seeking Alpha</li>
+                                    <li><strong>2.</strong> Cliquez "<span><Icon name="Rocket" className="inline mr-1" /> LANCER SCRAPING BATCH</span>" → Toutes les popups s'ouvrent</li>
                                     <li><strong>3.</strong> Pour CHAQUE popup: F12 → Console → Collez script → Entrée</li>
                                     <li><strong>4.</strong> Fermez la popup après copie</li>
                                     <li><strong>5.</strong> Les données sont auto-sauvegardées dans Supabase</li>
@@ -611,20 +611,20 @@ const AdminJSLaiTab = ({
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => {
-                                        addScrapingLog('🔐 Ouverture de la page de connexion Seeking Alpha...', 'info');
+                                        addScrapingLog(<span><Icon name="Lock" className="inline mr-1" /> Ouverture de la page de connexion Seeking Alpha...</span>, 'info');
                                         window.open('https://seekingalpha.com/account/login', '_blank');
-                                        addScrapingLog('✅ Connectez-vous, puis revenez ici', 'success');
+                                        addScrapingLog(<span><Icon name="CheckCircle" className="inline mr-1" /> Connectez-vous, puis revenez ici</span>, 'success');
                                     }}
                                     className="flex-1 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-bold text-lg shadow-lg"
                                 >
-                                    🔐 SE CONNECTER À SEEKING ALPHA
+                                    <Icon name="Lock" className="inline mr-2" /> SE CONNECTER À SEEKING ALPHA
                                 </button>
                                 <button
                                     onClick={runSeekingAlphaScraper}
                                     disabled={scrapingStatus === 'running'}
                                     className="flex-1 px-6 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg shadow-lg"
                                 >
-                                    {scrapingStatus === 'running' ? '⏳ SCRAPING EN COURS...' : '🚀 LANCER SCRAPING BATCH'}
+                                    {scrapingStatus === 'running' ? <span><Icon name="Hourglass" className="inline mr-2 animate-spin" /> SCRAPING EN COURS...</span> : <span><Icon name="Rocket" className="inline mr-2" /> LANCER SCRAPING BATCH</span>}
                                 </button>
                             </div>
                         </div>
@@ -638,7 +638,7 @@ const AdminJSLaiTab = ({
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                            <Icon name="Bot" size={20} className="mr-2 inline-block" />
                             ÉTAPE 2: ANALYSE BATCH PERPLEXITY
                         </h3>
 
@@ -648,7 +648,7 @@ const AdminJSLaiTab = ({
                                 <p className={`text-sm mb-3 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    📊 Cliquez pour analyser TOUTES les données scrapées en une seule fois:
+                                    <Icon name="GraphUp" className="inline mr-1" /> Cliquez pour analyser TOUTES les données scrapées en une seule fois:
                                 </p>
                                 <ul className={`text-sm space-y-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -663,38 +663,38 @@ const AdminJSLaiTab = ({
 
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🤖 Démarrage analyse Perplexity BATCH...', 'info');
+                                    addScrapingLog(<span><Icon name="Bot" className="inline mr-1" /> Démarrage analyse Perplexity BATCH...</span>, 'info');
                                     try {
                                         // Récupérer tous les raw scrapes depuis Supabase
-                                        addScrapingLog('📥 Récupération des données depuis Supabase...', 'info');
+                                        addScrapingLog(<span><Icon name="Download" className="inline mr-1" /> Récupération des données depuis Supabase...</span>, 'info');
                                         const response = await fetch('/api/seeking-alpha-scraping?type=raw&limit=100');
                                         const data = await response.json();
 
                                         if (data.success && data.data && data.data.length > 0) {
-                                            addScrapingLog(`✅ ${data.data.length} raw scrapes trouvés`, 'success');
+                                            addScrapingLog(<span><Icon name="CheckCircle" className="inline mr-1" /> {data.data.length} raw scrapes trouvés</span>, 'success');
 
                                             for (const item of data.data) {
                                                 const ticker = item.ticker;
-                                                addScrapingLog(`🔄 Analyse de ${ticker} avec Perplexity...`, 'info');
+                                                addScrapingLog(<span><Icon name="Refresh" className="inline mr-1 animate-spin" /> Analyse de {ticker} avec Perplexity...</span>, 'info');
                                                 await analyzeWithPerplexityAndUpdate(ticker, {
                                                     fullText: item.raw_text,
                                                     url: item.url,
                                                     content: {}
                                                 });
                                             }
-                                            addScrapingLog('🎉 Analyse Perplexity terminée pour TOUS les tickers!', 'success');
-                                            addScrapingLog('💾 Résultats sauvegardés dans Supabase', 'success');
+                                            addScrapingLog(<span><Icon name="PartyPopper" className="inline mr-1" /> Analyse Perplexity terminée pour TOUS les tickers!</span>, 'success');
+                                            addScrapingLog(<span><Icon name="FloppyDisk" className="inline mr-1" /> Résultats sauvegardés dans Supabase</span>, 'success');
                                         } else {
-                                            addScrapingLog('⚠️ Aucune donnée trouvée dans Supabase', 'warning');
-                                            addScrapingLog('💡 Effectuez d\'abord le scraping (Étape 1)', 'info');
+                                            addScrapingLog(<span><Icon name="WarningTriangle" className="inline mr-1" /> Aucune donnée trouvée dans Supabase</span>, 'warning');
+                                            addScrapingLog(<span><Icon name="LightBulb" className="inline mr-1" /> Effectuez d'abord le scraping (Étape 1)</span>, 'info');
                                         }
                                     } catch (error) {
-                                        addScrapingLog(`❌ Erreur: ${error.message}`, 'error');
+                                        addScrapingLog(<span><Icon name="XCircle" className="inline mr-1" /> Erreur: {error.message}</span>, 'error');
                                     }
                                 }}
                                 className="w-full px-6 py-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all font-bold text-lg shadow-lg"
                             >
-                                🤖 ANALYSER TOUT AVEC PERPLEXITY ({tickers.length} tickers)
+                                <Icon name="Bot" className="inline mr-2" /> ANALYSER TOUT AVEC PERPLEXITY ({tickers.length} tickers)
                             </button>
                         </div>
 
@@ -707,7 +707,7 @@ const AdminJSLaiTab = ({
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                            <Icon name="GraphUp" size={20} className="mr-2 inline-block" />
                             ÉTAPE 3: RÉSULTATS & AFFICHAGE
                         </h3>
 
@@ -723,14 +723,14 @@ const AdminJSLaiTab = ({
 
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🔄 Rafraîchissement des données depuis Supabase...', 'info');
+                                    addScrapingLog(<span><Icon name="Refresh" className="inline mr-1 animate-spin" /> Rafraîchissement des données depuis Supabase...</span>, 'info');
                                     await fetchSeekingAlphaData();
                                     await fetchSeekingAlphaStockData();
-                                    addScrapingLog('✅ Données rafraîchies!', 'success');
+                                    addScrapingLog(<span><Icon name="CheckCircle" className="inline mr-1" /> Données rafraîchies!</span>, 'success');
                                 }}
                                 className="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all font-bold text-lg shadow-lg"
                             >
-                                🔄 RAFRAÎCHIR LES DONNÉES DU TABLEAU
+                                <Icon name="Refresh" className="inline mr-2" /> RAFRAÎCHIR LES DONNÉES DU TABLEAU
                             </button>
                         </div>
                     </div>
@@ -788,7 +788,7 @@ const AdminJSLaiTab = ({
                                             : 'bg-gray-800 text-white hover:bg-gray-700'
                                     }`}
                                 >
-                                    {healthCheckLoading ? 'Vérification...' : '🔄 Vérifier Toutes'}
+                                    {healthCheckLoading ? 'Vérification...' : <span><Icon name="Refresh" className="inline mr-1" /> Vérifier Toutes</span>}
                                 </button>
                             </div>
                         </div>

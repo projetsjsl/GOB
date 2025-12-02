@@ -20,41 +20,42 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
     const loadComparisonData = async () => {
         setLoading(true);
         try {
-            const dataPromises = symbols.map(async (symbol) => {
-                const [metricsRes, ratiosRes, quoteRes] = await Promise.all([
-                    window.StockAnalysisAPI.fetchKeyMetrics(symbol, 1),
-                    window.StockAnalysisAPI.fetchFinancialRatios(symbol, 1),
-                    fetch(`${window.location.origin}/api/fmp?endpoint=quote&symbol=${symbol}`)
-                        .then(r => r.json())
-                ]);
+            const uniqueSymbols = Array.from(new Set(symbols.map(s => s.toUpperCase()).filter(Boolean)));
+            const API_BASE_URL = window.location.origin || '';
 
-                const metrics = Array.isArray(metricsRes?.data) ? metricsRes.data : (Array.isArray(metricsRes) ? metricsRes : []);
-                const ratios = Array.isArray(ratiosRes?.data) ? ratiosRes.data : (Array.isArray(ratiosRes) ? ratiosRes : []);
-                const quoteArray = Array.isArray(quoteRes?.data) ? quoteRes.data : (Array.isArray(quoteRes) ? quoteRes : []);
-                const quote = quoteArray[0] || {};
+            const batchRes = await fetch(
+                `${API_BASE_URL}/api/marketdata/batch?symbols=${uniqueSymbols.join(',')}&endpoints=quote,fundamentals,ratios`
+            );
+            const batch = batchRes.ok ? await batchRes.json() : null;
+            const quoteData = batch?.data?.quote || {};
+            const fundamentalsData = batch?.data?.fundamentals || {};
+            const ratiosData = batch?.data?.ratios || {};
+
+            const mapped = uniqueSymbols.map(symbol => {
+                const quote = quoteData[symbol] || {};
+                const ratios = ratiosData[symbol] || fundamentalsData[symbol] || {};
 
                 return {
                     symbol,
                     name: quote.name || quote.companyName || symbol,
                     price: quote.price || quote.c || 0,
                     change: quote.changesPercentage || quote.d || 0,
-                    marketCap: metrics[0]?.marketCap || 0,
-                    peRatio: metrics[0]?.peRatio || 0,
-                    priceToBook: metrics[0]?.priceToBookRatio || 0,
-                    roe: (ratios[0]?.returnOnEquityTTM || 0) * 100,
-                    roa: (ratios[0]?.returnOnAssetsTTM || 0) * 100,
-                    debtToEquity: ratios[0]?.debtEquityRatio || 0,
-                    currentRatio: ratios[0]?.currentRatio || 0,
-                    quickRatio: ratios[0]?.quickRatio || 0,
-                    revenueGrowth: (metrics[0]?.revenueGrowth || 0) * 100,
-                    netMargin: (ratios[0]?.netProfitMarginTTM || 0) * 100,
-                    dividendYield: (metrics[0]?.dividendYieldTTM || 0) * 100,
+                    marketCap: quote.marketCap || ratios.marketCap || 0,
+                    peRatio: ratios.priceEarningsRatioTTM || ratios.peRatioTTM || ratios.peRatio || 0,
+                    priceToBook: ratios.priceToBookRatioTTM || ratios.priceToBookRatio || 0,
+                    roe: (ratios.returnOnEquityTTM || ratios.roe || 0) * 100,
+                    roa: (ratios.returnOnAssetsTTM || ratios.roa || 0) * 100,
+                    debtToEquity: ratios.debtEquityRatio || ratios.debtToEquity || 0,
+                    currentRatio: ratios.currentRatio || 0,
+                    quickRatio: ratios.quickRatio || 0,
+                    revenueGrowth: (ratios.revenueGrowthTTM || ratios.revenueGrowth || 0) * 100,
+                    netMargin: (ratios.netProfitMarginTTM || ratios.netMargin || 0) * 100,
+                    dividendYield: (ratios.dividendYieldTTM || ratios.dividendYield || 0) * 100,
                     beta: quote.beta || 0
                 };
             });
 
-            const data = await Promise.all(dataPromises);
-            setComparisonData(data);
+            setComparisonData(mapped);
         } catch (error) {
             console.error('Error loading comparison data:', error);
         } finally {
@@ -143,7 +144,7 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                     <div>
                         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                             <span className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                                <i className="iconoir-stats-report text-blue-400 text-xl"></i>
+                                <Icon name="stats-report" className="w-5 h-5 text-blue-400" />
                             </span>
                             Comparaison Multi-Titres
                         </h2>
@@ -155,7 +156,7 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                         onClick={onClose}
                         className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors"
                     >
-                        <i className="iconoir-xmark text-gray-400 text-xl"></i>
+                        <Icon name="xmark" className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
 

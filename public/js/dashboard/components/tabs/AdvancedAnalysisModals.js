@@ -3,6 +3,7 @@
 
 const { useState, useEffect, useMemo } = React;
 const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, AreaChart, Area, PieChart, Pie, Cell } = window.Recharts || {};
+const Icon = window.Icon;
 const hasPieCharts = ResponsiveContainer && PieChart && Pie && Cell && Tooltip && Legend;
 const hasBarCharts = ResponsiveContainer && BarChart && CartesianGrid && XAxis && YAxis && Tooltip && Legend && Bar;
 
@@ -23,7 +24,7 @@ const BaseModal = ({ title, onClose, children, maxWidth = "max-w-4xl" }) => {
                         onClick={onClose}
                         className="p-2 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-white"
                     >
-                        <i className="iconoir-cancel text-xl"></i>
+                        {Icon ? <Icon name="xmark" className="w-5 h-5" /> : <i className="iconoir-cancel text-xl"></i>}
                     </button>
                 </div>
 
@@ -309,7 +310,7 @@ const AIStockAnalysisModal = ({ symbol, stockData, onClose }) => {
             <div className="space-y-6">
                 <div className="bg-gradient-to-br from-violet-900/20 to-fuchsia-900/20 border border-violet-500/30 rounded-xl p-6">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <i className="iconoir-brain text-violet-400"></i> Thèse d'Investissement
+                        {Icon ? <Icon name="brain" className="text-violet-400 w-5 h-5" /> : <i className="iconoir-brain text-violet-400"></i>} Thèse d'Investissement
                     </h3>
                     <p className="text-gray-300 leading-relaxed">
                         {symbol} démontre une position dominante sur son marché avec des fondamentaux solides. 
@@ -321,7 +322,7 @@ const AIStockAnalysisModal = ({ symbol, stockData, onClose }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-red-900/10 border border-red-500/30 rounded-xl p-6">
                         <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                            <i className="iconoir-warning-triangle text-red-400"></i> Risques Principaux
+                            {Icon ? <Icon name="warning-triangle" className="text-red-400 w-5 h-5" /> : <i className="iconoir-warning-triangle text-red-400"></i>} Risques Principaux
                         </h3>
                         <ul className="space-y-2 text-gray-300 list-disc list-inside">
                             <li>Volatilité macroéconomique affectant les dépenses des consommateurs.</li>
@@ -332,7 +333,7 @@ const AIStockAnalysisModal = ({ symbol, stockData, onClose }) => {
 
                     <div className="bg-green-900/10 border border-green-500/30 rounded-xl p-6">
                         <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                            <i className="iconoir-target text-green-400"></i> Objectifs de Prix
+                            {Icon ? <Icon name="target" className="text-green-400 w-5 h-5" /> : <i className="iconoir-target text-green-400"></i>} Objectifs de Prix
                         </h3>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
@@ -427,7 +428,6 @@ const AnalystConsensusModal = ({ symbol, stockData, onClose }) => {
             </BaseModal>
         );
     }
-
     return (
         <BaseModal title={`Consensus Analystes: ${symbol}`} onClose={onClose}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
