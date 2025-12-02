@@ -25843,6 +25843,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 {window.ThemeSelector && (
                                     <ThemeSelector isDarkMode={isDarkMode} />
                                 )}
+                                {window.NewsTicker && (
+                                    <NewsTicker isDarkMode={isDarkMode} />
+                                )}
 
                                 {/* Theme toggle - icône seulement */}
                                 <button
@@ -25901,6 +25904,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {/* Bloomberg-style bottom accent line */}
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"></div>
                 </header>
+
+                {/* News Ticker - Bandeau d'actualités défilant */}
+                {window.NewsTicker && (
+                    <NewsTicker isDarkMode={isDarkMode} />
+                )}
 
                 {/* TradingView Ticker Tape Widget - Bandeau de cotations */}
                 <div className="tradingview-widget-container" ref={tickerTapeRef}>
