@@ -46,20 +46,39 @@ export default async function handler(req, res) {
     // Pour l'instant, seule Browserbase est requise pour créer la session
     const geminiApiKey = process.env.GEMINI_API_KEY;
 
+    // Mode debug: retourner des infos même si config manquante
+    const debugMode = req.query.debug === 'true' || req.body?.debug === true;
+    
     if (!browserbaseApiKey || !browserbaseProjectId) {
       console.error('Configuration Browserbase manquante:', {
         hasApiKey: !!browserbaseApiKey,
-        hasProjectId: !!browserbaseProjectId
+        hasProjectId: !!browserbaseProjectId,
+        envKeys: Object.keys(process.env).filter(k => k.includes('BROWSERBASE'))
       });
+      
+      // En mode debug, retourner plus d'infos
+      if (debugMode) {
+        return res.status(503).json({
+          success: false,
+          error: 'Configuration Browserbase manquante',
+          details: 'BROWSERBASE_API_KEY et BROWSERBASE_PROJECT_ID sont requis',
+          hint: 'Configurez ces variables dans Vercel Environment Variables',
+          config: {
+            hasApiKey: !!browserbaseApiKey,
+            hasProjectId: !!browserbaseProjectId,
+            apiKeyPrefix: browserbaseApiKey ? browserbaseApiKey.substring(0, 4) + '...' : 'non défini',
+            projectIdPrefix: browserbaseProjectId ? browserbaseProjectId.substring(0, 4) + '...' : 'non défini',
+            envKeysFound: Object.keys(process.env).filter(k => k.includes('BROWSERBASE'))
+          },
+          timestamp: new Date().toISOString()
+        });
+      }
+      
       return res.status(503).json({
         success: false,
         error: 'Configuration Browserbase manquante',
         details: 'BROWSERBASE_API_KEY et BROWSERBASE_PROJECT_ID sont requis',
-        hint: 'Configurez ces variables dans Vercel Environment Variables',
-        config: {
-          hasApiKey: !!browserbaseApiKey,
-          hasProjectId: !!browserbaseProjectId
-        },
+        hint: 'Configurez ces variables dans Vercel Environment Variables. Ajoutez ?debug=true pour plus de détails.',
         timestamp: new Date().toISOString()
       });
     }
@@ -74,9 +93,21 @@ export default async function handler(req, res) {
     
     // Créer une session Browserbase
     console.log('Création d\'une session Browserbase pour FastGraphs...');
+    console.log('API URL:', `${browserbaseApiUrl}/sessions`);
+    console.log('Project ID:', browserbaseProjectId?.substring(0, 8) + '...');
     
     let sessionResponse;
     try {
+      const requestBody = {
+        url: 'https://www.fastgraphs.com/',
+        options: {
+          headless: false, // Pour voir le navigateur
+          keepAlive: true // Garder la session active
+        }
+      };
+      
+      console.log('Request body:', JSON.stringify(requestBody, null, 2));
+      
       sessionResponse = await fetch(`${browserbaseApiUrl}/sessions`, {
         method: 'POST',
         headers: {
@@ -84,24 +115,29 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
           'x-browserbase-project-id': browserbaseProjectId
         },
-        body: JSON.stringify({
-          url: 'https://www.fastgraphs.com/',
-          options: {
-            headless: false, // Pour voir le navigateur
-            keepAlive: true // Garder la session active
-          }
-        }),
+        body: JSON.stringify(requestBody),
         // Timeout pour éviter les attentes infinies
         signal: AbortSignal.timeout(30000) // 30 secondes
       });
+      
+      console.log('Response status:', sessionResponse.status);
+      console.log('Response headers:', Object.fromEntries(sessionResponse.headers.entries()));
     } catch (fetchError) {
       console.error('Erreur fetch Browserbase:', fetchError);
+      console.error('Error name:', fetchError.name);
+      console.error('Error message:', fetchError.message);
+      console.error('Error stack:', fetchError.stack);
+      
       if (fetchError.name === 'AbortError' || fetchError.name === 'TimeoutError') {
         return res.status(504).json({
           success: false,
           error: 'Timeout lors de la création de la session Browserbase',
-          details: 'La requête a pris trop de temps',
+          details: 'La requête a pris trop de temps (30s)',
           hint: 'Vérifiez votre connexion et réessayez',
+          debug: debugMode ? {
+            apiUrl: `${browserbaseApiUrl}/sessions`,
+            timeout: '30s'
+          } : undefined,
           timestamp: new Date().toISOString()
         });
       }
@@ -111,6 +147,11 @@ export default async function handler(req, res) {
           error: 'Erreur de connexion à Browserbase',
           details: 'Impossible de se connecter à l\'API Browserbase',
           hint: 'Vérifiez votre connexion internet et les clés API',
+          debug: debugMode ? {
+            errorName: fetchError.name,
+            errorMessage: fetchError.message,
+            apiUrl: `${browserbaseApiUrl}/sessions`
+          } : undefined,
           timestamp: new Date().toISOString()
         });
       }
@@ -140,6 +181,11 @@ export default async function handler(req, res) {
           error: 'Authentification Browserbase échouée',
           details: 'Clé API invalide ou expirée',
           hint: 'Vérifiez votre BROWSERBASE_API_KEY dans Vercel',
+          debug: debugMode ? {
+            apiKeyPrefix: browserbaseApiKey.substring(0, 8) + '...',
+            projectIdPrefix: browserbaseProjectId.substring(0, 8) + '...',
+            apiUrl: `${browserbaseApiUrl}/sessions`
+          } : undefined,
           timestamp: new Date().toISOString()
         });
       }
@@ -150,6 +196,11 @@ export default async function handler(req, res) {
           error: 'Endpoint Browserbase non trouvé',
           details: 'L\'endpoint /sessions n\'existe pas ou a changé',
           hint: 'Vérifiez la documentation Browserbase pour l\'URL correcte',
+          debug: debugMode ? {
+            apiUrl: `${browserbaseApiUrl}/sessions`,
+            method: 'POST',
+            headersSent: true
+          } : undefined,
           timestamp: new Date().toISOString()
         });
       }
@@ -159,7 +210,16 @@ export default async function handler(req, res) {
         error: 'Erreur lors de la création de la session Browserbase',
         details: errorDetails.message || errorText || 'Erreur inconnue',
         status: sessionResponse.status,
-        hint: 'Vérifiez vos clés API Browserbase et l\'ID du projet',
+        hint: 'Vérifiez vos clés API Browserbase et l\'ID du projet. Ajoutez ?debug=true pour plus de détails.',
+        debug: debugMode ? {
+          errorText,
+          errorDetails,
+          apiUrl: `${browserbaseApiUrl}/sessions`,
+          requestHeaders: {
+            hasAuth: true,
+            hasProjectId: true
+          }
+        } : undefined,
         timestamp: new Date().toISOString()
       });
     }
