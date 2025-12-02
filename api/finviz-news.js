@@ -1,6 +1,7 @@
 /**
- * API endpoint pour récupérer les actualités financières depuis Finviz
- * Scrape finviz.com/news.ashx et traduit en français
+ * API endpoint pour récupérer les actualités financières
+ * Sources: Finviz (scraping) + Perplexity (actualités de l'heure et du jour)
+ * Traduit en français via Gemini API
  */
 
 export default async function handler(req, res) {
@@ -18,6 +19,65 @@ export default async function handler(req, res) {
     }
 
     try {
+        // Récupérer les actualités depuis plusieurs sources en parallèle
+        const [finvizNews, perplexityNews] = await Promise.allSettled([
+            fetchFinvizNews(),
+            fetchPerplexityNews()
+        ]);
+
+        // Combiner les actualités
+        let allNews = [];
+        
+        if (finvizNews.status === 'fulfilled' && finvizNews.value.length > 0) {
+            allNews = [...allNews, ...finvizNews.value];
+        }
+        
+        if (perplexityNews.status === 'fulfilled' && perplexityNews.value.length > 0) {
+            allNews = [...allNews, ...perplexityNews.value];
+        }
+
+        // Dédupliquer par headline (normalisé)
+        const uniqueNews = deduplicateNews(allNews);
+        
+        // Trier par timestamp (plus récent en premier)
+        uniqueNews.sort((a, b) => {
+            const timeA = parseTime(a.time);
+            const timeB = parseTime(b.time);
+            return timeB - timeA;
+        });
+
+        // Limiter à 20 actualités
+        const limitedNews = uniqueNews.slice(0, 20);
+        
+        // Translate news items to French
+        const translatedNews = await translateNews(limitedNews);
+        
+        return res.status(200).json({
+            success: true,
+            news: translatedNews,
+            count: translatedNews.length,
+            sources: {
+                finviz: finvizNews.status === 'fulfilled' ? finvizNews.value.length : 0,
+                perplexity: perplexityNews.status === 'fulfilled' ? perplexityNews.value.length : 0
+            },
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('Erreur News API:', error);
+        return res.status(500).json({
+            success: false,
+            error: error.message || 'Erreur lors de la récupération des actualités',
+            timestamp: new Date().toISOString()
+        });
+    }
+}
+
+/**
+ * Fetch news from Finviz
+ */
+async function fetchFinvizNews() {
+    try {
         const finvizUrl = 'https://finviz.com/news.ashx';
         
         // Fetch Finviz news page
@@ -34,26 +94,131 @@ export default async function handler(req, res) {
         const html = await response.text();
         
         // Parse HTML to extract news items
-        const newsItems = parseFinvizNews(html);
-        
-        // Translate news items to French
-        const translatedNews = await translateNews(newsItems);
-        
-        return res.status(200).json({
-            success: true,
-            news: translatedNews,
-            count: translatedNews.length,
-            timestamp: new Date().toISOString()
+        return parseFinvizNews(html);
+    } catch (error) {
+        console.error('Erreur Finviz:', error);
+        return [];
+    }
+}
+
+/**
+ * Fetch news from Perplexity (actualités de l'heure et du jour)
+ */
+async function fetchPerplexityNews() {
+    const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
+    
+    if (!PERPLEXITY_API_KEY) {
+        console.warn('PERPLEXITY_API_KEY non configurée, skip Perplexity news');
+        return [];
+    }
+
+    try {
+        const prompt = `Liste les 15 principales actualités financières et économiques de l'heure et du jour d'aujourd'hui. Pour chaque actualité, fournis:
+1. Le titre (headline) en anglais
+2. L'heure approximative (format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures")
+3. La source (Bloomberg, Reuters, MarketWatch, etc.)
+
+Format de réponse (une actualité par ligne):
+[Heure] | [Titre] | [Source]
+
+Exemple:
+Aujourd'hui, 11:15 AM | Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data | MarketWatch
+Aujourd'hui, 10:45 AM | Federal Reserve signals potential rate cuts as inflation cools | Reuters
+
+Retourne uniquement les actualités, sans explication supplémentaire.`;
+
+        const response = await fetch('https://api.perplexity.ai/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'sonar',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Tu es un assistant spécialisé dans les actualités financières. Tu fournis des informations factuelles et récentes.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: 2000,
+                temperature: 0.3,
+                search_recency_filter: 'hour' // Actualités de l'heure
+            }),
+            signal: AbortSignal.timeout(30000) // 30 secondes timeout
         });
 
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Perplexity API error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices[0]?.message?.content || '';
+        
+        // Parse Perplexity response
+        return parsePerplexityNews(content);
+        
     } catch (error) {
-        console.error('Erreur Finviz News:', error);
-        return res.status(500).json({
-            success: false,
-            error: error.message || 'Erreur lors de la récupération des actualités Finviz',
-            timestamp: new Date().toISOString()
-        });
+        console.error('Erreur Perplexity News:', error);
+        return [];
     }
+}
+
+/**
+ * Parse Perplexity response to extract news items
+ */
+function parsePerplexityNews(content) {
+    const newsItems = [];
+    
+    try {
+        // Pattern: [Heure] | [Titre] | [Source]
+        const lines = content.split('\n').filter(line => line.trim());
+        
+        for (const line of lines) {
+            // Skip empty lines or lines that don't match the pattern
+            if (!line.includes('|')) continue;
+            
+            const parts = line.split('|').map(p => p.trim());
+            
+            if (parts.length >= 3) {
+                const time = parts[0] || 'Aujourd\'hui';
+                const headline = parts[1] || '';
+                const source = parts[2] || 'Perplexity';
+                
+                if (headline && headline.length > 10) {
+                    newsItems.push({
+                        time: time,
+                        headline: headline,
+                        source: source,
+                        raw: headline
+                    });
+                }
+            } else if (parts.length === 2) {
+                // Format alternatif: [Heure] | [Titre]
+                const time = parts[0] || 'Aujourd\'hui';
+                const headline = parts[1] || '';
+                
+                if (headline && headline.length > 10) {
+                    newsItems.push({
+                        time: time,
+                        headline: headline,
+                        source: 'Perplexity',
+                        raw: headline
+                    });
+                }
+            }
+        }
+        
+    } catch (parseError) {
+        console.error('Erreur parsing Perplexity response:', parseError);
+    }
+    
+    return newsItems;
 }
 
 /**
@@ -145,6 +310,67 @@ function parseFinvizNews(html) {
     }
     
     return newsItems;
+}
+
+/**
+ * Dédupliquer les actualités par headline (normalisé)
+ */
+function deduplicateNews(newsItems) {
+    const seen = new Set();
+    const unique = [];
+    
+    for (const item of newsItems) {
+        // Normaliser le headline pour la comparaison
+        const normalized = item.headline
+            .toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+        
+        if (!seen.has(normalized) && normalized.length > 10) {
+            seen.add(normalized);
+            unique.push(item);
+        }
+    }
+    
+    return unique;
+}
+
+/**
+ * Parser le temps pour trier les actualités
+ */
+function parseTime(timeStr) {
+    if (!timeStr) return 0;
+    
+    // Format: "Aujourd'hui, 11:15 AM" ou "Il y a 2 heures"
+    const now = new Date();
+    
+    // "Aujourd'hui, HH:MM AM/PM"
+    const todayMatch = timeStr.match(/Aujourd'hui[,\s]+(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (todayMatch) {
+        let hours = parseInt(todayMatch[1]);
+        const minutes = parseInt(todayMatch[2]);
+        const ampm = todayMatch[3].toUpperCase();
+        
+        if (ampm === 'PM' && hours !== 12) hours += 12;
+        if (ampm === 'AM' && hours === 12) hours = 0;
+        
+        const time = new Date(now);
+        time.setHours(hours, minutes, 0, 0);
+        return time.getTime();
+    }
+    
+    // "Il y a X heures"
+    const hoursAgoMatch = timeStr.match(/Il y a (\d+)\s*heures?/i);
+    if (hoursAgoMatch) {
+        const hoursAgo = parseInt(hoursAgoMatch[1]);
+        const time = new Date(now);
+        time.setHours(time.getHours() - hoursAgo);
+        return time.getTime();
+    }
+    
+    // Par défaut, retourner maintenant
+    return now.getTime();
 }
 
 /**
