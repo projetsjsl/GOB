@@ -693,8 +693,9 @@ const ThemeSelector = ({ isDarkMode = true }) => {
             {/* CEO Premium: Modal ultra-sophisticated */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl animate-fadeIn"
+                    className="fixed inset-0 flex items-center justify-center p-4 backdrop-blur-xl animate-fadeIn theme-selector-modal"
                     style={{ 
+                        zIndex: 9999,
                         background: `
                             radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
                             radial-gradient(ellipse at 80% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
