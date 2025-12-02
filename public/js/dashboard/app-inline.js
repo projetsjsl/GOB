@@ -25818,9 +25818,15 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                 ? '#00ff00'
                                                 : 'var(--theme-success, #10b981)',
-                                            fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                                ? '"Courier New", "Courier", monospace'
-                                                : '"Inter", "Arial", sans-serif',
+                                                    fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                        ? '"Consolas", "Monaco", "Menlo", "Courier New", "Courier", monospace'
+                                                        : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                        ? '"Montserrat", "Roboto", sans-serif'
+                                                        : currentThemeId === 'seeking-alpha'
+                                                        ? '"Source Sans Pro", "Open Sans", sans-serif'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '"Avenir Next", "Inter", sans-serif'
+                                                        : '"Inter", "Roboto", sans-serif',
                                             textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
                                                 ? `0 0 4px rgba(0, 255, 136, 0.5)`
                                                 : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'

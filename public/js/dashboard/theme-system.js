@@ -27,9 +27,9 @@ const defaultThemes = {
             warning: '#ffcc00', // yellow (alerts)
         },
         fonts: {
-            primary: 'Courier New, "Courier", monospace',
-            secondary: 'Courier New, "Courier", monospace',
-            mono: 'Courier New, "Courier", monospace'
+            primary: '"Consolas", "Monaco", "Menlo", "Courier New", "Courier", monospace',
+            secondary: '"Consolas", "Monaco", "Menlo", "Courier New", "Courier", monospace',
+            mono: '"Consolas", "Monaco", "Menlo", "Courier New", "Courier", monospace'
         },
         styles: {
             headerBg: '#000000',
@@ -186,9 +186,9 @@ const customThemes = {
             warning: '#ffaa00', // orange (#FFAA00) - alertes
         },
         fonts: {
-            primary: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
-            secondary: 'Inter, system-ui, sans-serif',
-            mono: '"Courier New", "Courier", monospace'
+            primary: '"Montserrat", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Inter", "Roboto", system-ui, sans-serif',
+            mono: '"Fira Code", "Consolas", "Monaco", "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #141b3d 0%, #1e2749 100%)',
@@ -218,9 +218,9 @@ const customThemes = {
             warning: '#ffaa00', // orange (#FFAA00) - alertes
         },
         fonts: {
-            primary: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
-            secondary: 'Inter, system-ui, sans-serif',
-            mono: '"Courier New", "Courier", monospace'
+            primary: '"Montserrat", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Inter", "Roboto", system-ui, sans-serif',
+            mono: '"Fira Code", "Consolas", "Monaco", "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
@@ -251,9 +251,9 @@ const customThemes = {
             warning: '#ffcc00', // yellow (alerts)
         },
         fonts: {
-            primary: 'Courier New, "Courier", monospace',
-            secondary: 'Courier New, "Courier", monospace',
-            mono: 'Courier New, "Courier", monospace'
+            primary: '"Consolas", "Monaco", "Menlo", "Courier New", "Courier", monospace',
+            secondary: '"Consolas", "Monaco", "Menlo", "Courier New", "Courier", monospace',
+            mono: '"Consolas", "Monaco", "Menlo", "Courier New", "Courier", monospace'
         },
         styles: {
             headerBg: '#000000',
@@ -284,9 +284,9 @@ const customThemes = {
             warning: '#fbbc04', // Google yellow
         },
         fonts: {
-            primary: 'Roboto, sans-serif',
-            secondary: 'Inter, sans-serif',
-            mono: 'monospace'
+            primary: '"Source Sans Pro", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Open Sans", "Roboto", "Inter", sans-serif',
+            mono: '"Fira Code", "Consolas", "Monaco", monospace'
         },
         styles: {
             headerBg: '#f5f5f5', // gris clair pour header
@@ -349,9 +349,9 @@ const customThemes = {
             warning: '#f59e0b', // amber (#F59E0B)
         },
         fonts: {
-            primary: 'Courier New, "Courier", monospace', // Style rétro terminal
-            secondary: 'Georgia, "Times New Roman", serif', // Style classique
-            mono: 'Courier New, "Courier", monospace'
+            primary: '"Georgia", "Times New Roman", "Palatino", serif', // Style rétro années 1990
+            secondary: '"Courier New", "Courier", monospace', // Style terminal rétro
+            mono: '"Courier New", "Courier", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
@@ -382,9 +382,9 @@ const customThemes = {
             warning: '#ff9800', // Orange (#FF9800) - alertes
         },
         fonts: {
-            primary: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-            secondary: 'Inter, system-ui, sans-serif',
-            mono: '"Courier New", "Courier", monospace'
+            primary: '"Avenir Next", "Avenir", "Frutiger", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: '"Inter", "Roboto", system-ui, sans-serif',
+            mono: '"SF Mono", "Consolas", "Monaco", "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #006747 0%, #00a651 100%)', // Dégradé vert Desjardins
