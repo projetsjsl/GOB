@@ -17,6 +17,45 @@ const AdminJSLaiTab = ({
                 // Vérifier que isDarkMode est défini et créer une variable locale darkMode
                 const darkMode = isDarkMode !== undefined ? isDarkMode : true;
                 
+                // États pour la gestion des indices TradingView
+                const [adminSelectedIndices, setAdminSelectedIndices] = React.useState(() => {
+                    try {
+                        const saved = localStorage.getItem('tradingview-selected-indices');
+                        if (saved) {
+                            return JSON.parse(saved);
+                        }
+                    } catch (e) {
+                        console.warn('Erreur chargement indices:', e);
+                    }
+                    // Par défaut: indices US principaux + crypto
+                    return [
+                        'SP:SPX',
+                        'DJ:DJI',
+                        'NASDAQ:NDX',
+                        'TVC:RUT',
+                        'TSX:OSPTX',
+                        'BITSTAMP:BTCUSD',
+                        'BITSTAMP:ETHUSD'
+                    ];
+                });
+                
+                const [showIndicesManager, setShowIndicesManager] = React.useState(false);
+                
+                // Fonction helper pour obtenir tous les indices disponibles
+                const getAllIndices = () => {
+                    if (typeof window !== 'undefined' && typeof window.getAllAvailableIndices === 'function') {
+                        return window.getAllAvailableIndices();
+                    }
+                    // Fallback si la fonction n'est pas disponible
+                    return {
+                        'us': [
+                            { proName: 'SP:SPX', title: 'S&P 500', category: 'us' },
+                            { proName: 'DJ:DJI', title: 'Dow Jones', category: 'us' },
+                            { proName: 'NASDAQ:NDX', title: 'NASDAQ 100', category: 'us' }
+                        ]
+                    };
+                };
+                
                 return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
@@ -472,6 +511,105 @@ const AdminJSLaiTab = ({
                                 💡 <strong>Astuce:</strong> Le mode sélectionné est sauvegardé automatiquement et s'applique à tous les onglets du dashboard.
                             </div>
                         </div>
+                    </div>
+
+                    {/* 📈 Gestion des Indices TradingView */}
+                    <div className={`rounded-lg p-4 border transition-colors duration-300 ${
+                        darkMode ? 'bg-gradient-to-br from-cyan-900/20 to-gray-900 border-cyan-700' : 'bg-gradient-to-br from-cyan-50 to-gray-50 border-cyan-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4 cursor-pointer" onClick={() => setShowIndicesManager(!showIndicesManager)}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-cyan-300' : 'text-cyan-900'}`}>
+                                {typeof Icon !== 'undefined' ? <Icon emoji="📈" size={20} /> : '📈'}
+                                Gestion des Indices TradingView
+                            </h3>
+                            <button className={`px-3 py-1 text-xs rounded transition-colors ${darkMode ? 'bg-cyan-600 hover:bg-cyan-700 text-white' : 'bg-cyan-500 hover:bg-cyan-600 text-white'}`}>
+                                {showIndicesManager ? '▼ Masquer' : '▶ Afficher'}
+                            </button>
+                        </div>
+
+                        {showIndicesManager && (
+                            <div className={`space-y-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <div className="flex justify-end mb-2">
+                                    <button
+                                        onClick={() => {
+                                            const defaultIndices = [
+                                                'SP:SPX',
+                                                'DJ:DJI',
+                                                'NASDAQ:NDX',
+                                                'TVC:RUT',
+                                                'TSX:OSPTX',
+                                                'BITSTAMP:BTCUSD',
+                                                'BITSTAMP:ETHUSD'
+                                            ];
+                                            setAdminSelectedIndices(defaultIndices);
+                                            localStorage.setItem('tradingview-selected-indices', JSON.stringify(defaultIndices));
+                                            window.location.reload();
+                                        }}
+                                        className={`px-3 py-1 text-xs rounded transition-colors ${darkMode ? 'bg-cyan-600 hover:bg-cyan-700 text-white' : 'bg-cyan-500 hover:bg-cyan-600 text-white'}`}
+                                    >
+                                        🔄 Réinitialiser
+                                    </button>
+                                </div>
+                                
+                                {Object.entries(getAllIndices()).map(([category, indices]) => (
+                                    <div key={category} className={`p-3 rounded border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                        <div className="font-semibold mb-3 flex items-center gap-2 capitalize">
+                                            {typeof Icon !== 'undefined' ? <Icon emoji={category === 'us' ? '🇺🇸' : category === 'canada' ? '🇨🇦' : category === 'europe' ? '🇪🇺' : category === 'asia' ? '🌏' : category === 'crypto' ? '₿' : category === 'commodities' ? '🛢️' : '💱'} size={18} /> : (category === 'us' ? '🇺🇸' : category === 'canada' ? '🇨🇦' : category === 'europe' ? '🇪🇺' : category === 'asia' ? '🌏' : category === 'crypto' ? '₿' : category === 'commodities' ? '🛢️' : '💱')}
+                                            {category === 'us' ? 'États-Unis' : category === 'canada' ? 'Canada' : category === 'europe' ? 'Europe' : category === 'asia' ? 'Asie-Pacifique' : category === 'crypto' ? 'Crypto-monnaies' : category === 'commodities' ? 'Matières Premières' : 'Forex'}
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                            {indices.map(index => {
+                                                const isSelected = adminSelectedIndices.includes(index.proName);
+                                                return (
+                                                    <label
+                                                        key={index.proName}
+                                                        className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                                                            isSelected
+                                                                ? darkMode ? 'bg-cyan-900/30 border-cyan-600' : 'bg-cyan-100 border-cyan-400'
+                                                                : darkMode ? 'bg-gray-700/50 border-gray-600 hover:bg-gray-700' : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+                                                        } border`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isSelected}
+                                                            onChange={(e) => {
+                                                                const newSelected = e.target.checked
+                                                                    ? [...adminSelectedIndices, index.proName]
+                                                                    : adminSelectedIndices.filter(id => id !== index.proName);
+                                                                setAdminSelectedIndices(newSelected);
+                                                                localStorage.setItem('tradingview-selected-indices', JSON.stringify(newSelected));
+                                                                // Recharger le widget
+                                                                setTimeout(() => window.location.reload(), 500);
+                                                            }}
+                                                            className="rounded"
+                                                        />
+                                                        <span className="text-sm font-medium">{index.title}</span>
+                                                        {!isSelected && (
+                                                            <span className="ml-auto text-xs opacity-50" title={`Format: ${index.proName}`}>
+                                                                {index.proName.split(':')[0]}
+                                                            </span>
+                                                        )}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                                
+                                <div className={`mt-4 p-3 rounded text-sm ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'}`}>
+                                    <div className="font-semibold mb-2 flex items-center gap-2">
+                                        {typeof Icon !== 'undefined' ? <Icon emoji="ℹ️" size={16} /> : 'ℹ️'}
+                                        Informations
+                                    </div>
+                                    <div className="text-xs space-y-1">
+                                        <div>• <strong>{adminSelectedIndices.length}</strong> indice(s) sélectionné(s)</div>
+                                        <div>• Les modifications sont sauvegardées automatiquement</div>
+                                        <div>• Le ticker tape se met à jour après la sélection</div>
+                                        <div>• Les symboles invalides (avec ⚠️) ne s'afficheront pas</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* 🤖 Configuration Emma IA */}
