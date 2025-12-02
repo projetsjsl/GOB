@@ -26819,6 +26819,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             }
 
             console.log('✅ Élément root trouvé, montage de React...');
+            console.log('📊 État du root avant montage:', rootElement.innerHTML.length, 'caractères');
             
             // Vérifier que React et ReactDOM sont disponibles
             if (typeof React === 'undefined') {
@@ -26827,15 +26828,33 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             if (typeof ReactDOM === 'undefined') {
                 throw new Error('ReactDOM n\'est pas défini');
             }
-            if (typeof BetaCombinedDashboard === 'undefined') {
-                throw new Error('BetaCombinedDashboard n\'est pas défini');
-            }
-
-            console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
             
-            // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
-            ReactDOM.render(<BetaCombinedDashboard />, rootElement);
-            console.log('✅ Application React montée avec succès !');
+            // Attendre que BetaCombinedDashboard soit défini (Babel peut prendre du temps)
+            let attempts = 0;
+            const maxAttempts = 100; // 10 secondes max (100 * 100ms)
+            const checkAndMount = () => {
+                attempts++;
+                if (typeof BetaCombinedDashboard !== 'undefined') {
+                    console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
+                    try {
+                        // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
+                        ReactDOM.render(<BetaCombinedDashboard />, rootElement);
+                        console.log('✅ Application React montée avec succès !');
+                    } catch (renderError) {
+                        console.error('❌ Erreur lors du ReactDOM.render:', renderError);
+                        throw renderError;
+                    }
+                } else if (attempts < maxAttempts) {
+                    if (attempts % 10 === 0) {
+                        console.log(`⏳ Attente de BetaCombinedDashboard... (${attempts}/${maxAttempts})`);
+                    }
+                    setTimeout(checkAndMount, 100);
+                } else {
+                    throw new Error('BetaCombinedDashboard n\'est pas défini après 10 secondes. Le script Babel ne s\'est peut-être pas chargé correctement.');
+                }
+            };
+            
+            checkAndMount();
             
         } catch (error) {
             console.error('❌ ERREUR CRITIQUE lors du montage React:', error);
