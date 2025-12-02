@@ -3425,6 +3425,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             return <span className="inline-block">{emoji}</span>;
         };
 
+        // Exposer Icon globalement pour les composants externes (AdminJSLaiTab, PlusTab, etc.)
+        window.Icon = Icon;
+
         // Volume: baisser le son général et couper le son du ripple/clic
         useEffect(() => {
             try {
