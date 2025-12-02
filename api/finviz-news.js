@@ -19,10 +19,14 @@ export default async function handler(req, res) {
     }
 
     try {
+        // Paramètres de requête
+        const { type = 'all', limit = 30 } = req.query;
+        const newsLimit = Math.min(parseInt(limit, 10) || 30, 50); // Max 50 actualités
+        
         // Récupérer les actualités depuis plusieurs sources en parallèle
         const [finvizNews, perplexityNews] = await Promise.allSettled([
             fetchFinvizNews(),
-            fetchPerplexityNews()
+            fetchPerplexityNews(type, newsLimit)
         ]);
 
         // Combiner les actualités
@@ -46,8 +50,8 @@ export default async function handler(req, res) {
             return timeB - timeA;
         });
 
-        // Limiter à 20 actualités
-        const limitedNews = uniqueNews.slice(0, 20);
+        // Limiter selon le paramètre limit
+        const limitedNews = uniqueNews.slice(0, newsLimit);
         
         // Translate news items to French
         const translatedNews = await translateNews(limitedNews);
@@ -104,7 +108,7 @@ async function fetchFinvizNews() {
 /**
  * Fetch news from Perplexity (actualités de l'heure et du jour)
  */
-async function fetchPerplexityNews() {
+async function fetchPerplexityNews(type = 'all', limit = 30) {
     const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
     
     if (!PERPLEXITY_API_KEY) {
@@ -113,18 +117,37 @@ async function fetchPerplexityNews() {
     }
 
     try {
-        const prompt = `Liste les 15 principales actualités financières et économiques de l'heure et du jour d'aujourd'hui. Pour chaque actualité, fournis:
+        // Construire le prompt selon le type
+        const typePrompts = {
+            'all': 'toutes les actualités financières et économiques',
+            'market': 'actualités de marché (stocks, indices, trading)',
+            'economy': 'actualités économiques (Fed, inflation, GDP, emploi)',
+            'stocks': 'actualités sur les actions et entreprises',
+            'crypto': 'actualités sur les cryptomonnaies et blockchain',
+            'forex': 'actualités sur le marché des changes (forex)',
+            'commodities': 'actualités sur les matières premières (pétrole, or, etc.)',
+            'earnings': 'actualités sur les résultats d\'entreprises (earnings)',
+            'ipo': 'actualités sur les introductions en bourse (IPO)',
+            'mergers': 'actualités sur les fusions et acquisitions (M&A)'
+        };
+        
+        const typeDescription = typePrompts[type] || typePrompts['all'];
+        const newsCount = Math.min(limit, 30);
+        
+        const prompt = `Liste les ${newsCount} principales ${typeDescription} de l'heure et du jour d'aujourd'hui. Pour chaque actualité, fournis:
 1. Le titre (headline) en anglais
 2. L'heure approximative (format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures")
-3. La source (Bloomberg, Reuters, MarketWatch, etc.)
-4. L'URL complète de l'article (si disponible)
+3. La source (Bloomberg, Reuters, MarketWatch, CNBC, WSJ, FT, etc.)
+4. Le type de nouvelle (market, economy, stocks, crypto, forex, commodities, earnings, ipo, mergers, other)
+5. L'URL complète de l'article (si disponible)
 
 Format de réponse (une actualité par ligne):
-[Heure] | [Titre] | [Source] | [URL]
+[Heure] | [Titre] | [Source] | [Type] | [URL]
 
 Exemple:
-Aujourd'hui, 11:15 AM | Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data | MarketWatch | https://www.marketwatch.com/story/tech-rally-bitcoin-surge
-Aujourd'hui, 10:45 AM | Federal Reserve signals potential rate cuts as inflation cools | Reuters | https://www.reuters.com/fed-rate-cuts
+Aujourd'hui, 11:15 AM | Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data | MarketWatch | market | https://www.marketwatch.com/story/tech-rally-bitcoin-surge
+Aujourd'hui, 10:45 AM | Federal Reserve signals potential rate cuts as inflation cools | Reuters | economy | https://www.reuters.com/fed-rate-cuts
+Aujourd'hui, 09:30 AM | Apple reports record Q4 earnings, beats expectations | Bloomberg | earnings | https://www.bloomberg.com/apple-earnings
 
 Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement les actualités, sans explication supplémentaire.`;
 
@@ -177,7 +200,7 @@ function parsePerplexityNews(content) {
     const newsItems = [];
     
     try {
-        // Pattern: [Heure] | [Titre] | [Source] | [URL]
+        // Pattern: [Heure] | [Titre] | [Source] | [Type] | [URL]
         const lines = content.split('\n').filter(line => line.trim());
         
         for (const line of lines) {
@@ -186,12 +209,13 @@ function parsePerplexityNews(content) {
             
             const parts = line.split('|').map(p => p.trim());
             
-            if (parts.length >= 4) {
-                // Format complet: [Heure] | [Titre] | [Source] | [URL]
+            if (parts.length >= 5) {
+                // Format complet: [Heure] | [Titre] | [Source] | [Type] | [URL]
                 const time = parts[0] || 'Aujourd\'hui';
                 const headline = parts[1] || '';
                 const source = parts[2] || 'Perplexity';
-                let url = parts[3] || '';
+                const type = parts[3] || 'other';
+                let url = parts[4] || '';
                 
                 // Nettoyer l'URL (enlever "N/A" ou URLs invalides)
                 if (url === 'N/A' || !url.startsWith('http')) {
@@ -203,6 +227,31 @@ function parsePerplexityNews(content) {
                         time: time,
                         headline: headline,
                         source: source,
+                        type: type.toLowerCase(),
+                        url: url,
+                        raw: headline
+                    });
+                }
+            } else if (parts.length >= 4) {
+                // Format sans type: [Heure] | [Titre] | [Source] | [URL]
+                const time = parts[0] || 'Aujourd\'hui';
+                const headline = parts[1] || '';
+                const source = parts[2] || 'Perplexity';
+                let url = parts[3] || '';
+                
+                // Détecter le type depuis le headline
+                const detectedType = detectNewsType(headline);
+                
+                if (url === 'N/A' || !url.startsWith('http')) {
+                    url = '';
+                }
+                
+                if (headline && headline.length > 10) {
+                    newsItems.push({
+                        time: time,
+                        headline: headline,
+                        source: source,
+                        type: detectedType,
                         url: url,
                         raw: headline
                     });
@@ -213,11 +262,15 @@ function parsePerplexityNews(content) {
                 const headline = parts[1] || '';
                 const source = parts[2] || 'Perplexity';
                 
+                // Détecter le type depuis le headline
+                const detectedType = detectNewsType(headline);
+                
                 if (headline && headline.length > 10) {
                     newsItems.push({
                         time: time,
                         headline: headline,
                         source: source,
+                        type: detectedType,
                         url: '',
                         raw: headline
                     });
@@ -227,11 +280,15 @@ function parsePerplexityNews(content) {
                 const time = parts[0] || 'Aujourd\'hui';
                 const headline = parts[1] || '';
                 
+                // Détecter le type depuis le headline
+                const detectedType = detectNewsType(headline);
+                
                 if (headline && headline.length > 10) {
                     newsItems.push({
                         time: time,
                         headline: headline,
                         source: 'Perplexity',
+                        type: detectedType,
                         url: '',
                         raw: headline
                     });
@@ -244,6 +301,56 @@ function parsePerplexityNews(content) {
     }
     
     return newsItems;
+}
+
+/**
+ * Détecter le type de nouvelle depuis le headline
+ */
+function detectNewsType(headline) {
+    const lowerHeadline = headline.toLowerCase();
+    
+    // Crypto
+    if (lowerHeadline.match(/\b(bitcoin|btc|ethereum|eth|crypto|cryptocurrency|blockchain|nft|defi)\b/)) {
+        return 'crypto';
+    }
+    
+    // Earnings
+    if (lowerHeadline.match(/\b(earnings|reports|beats|misses|quarterly|q[1-4]|results)\b/)) {
+        return 'earnings';
+    }
+    
+    // Economy
+    if (lowerHeadline.match(/\b(fed|federal reserve|inflation|gdp|unemployment|rate cut|rate hike|interest rate|central bank)\b/)) {
+        return 'economy';
+    }
+    
+    // Forex
+    if (lowerHeadline.match(/\b(forex|currency|dollar|euro|yen|pound|exchange rate|fx)\b/)) {
+        return 'forex';
+    }
+    
+    // Commodities
+    if (lowerHeadline.match(/\b(oil|gold|silver|copper|commodities|crude|wti|brent)\b/)) {
+        return 'commodities';
+    }
+    
+    // IPO
+    if (lowerHeadline.match(/\b(ipo|initial public offering|goes public|listing)\b/)) {
+        return 'ipo';
+    }
+    
+    // Mergers
+    if (lowerHeadline.match(/\b(merger|acquisition|m&a|takeover|deal|buys|acquires)\b/)) {
+        return 'mergers';
+    }
+    
+    // Stocks/Market
+    if (lowerHeadline.match(/\b(stock|stocks|shares|nasdaq|s&p|dow|market|trading|investor)\b/)) {
+        return 'market';
+    }
+    
+    // Default
+    return 'other';
 }
 
 /**
@@ -288,10 +395,14 @@ function parseFinvizNews(html) {
                     }
                 }
                 
+                // Détecter le type depuis le headline
+                const detectedType = detectNewsType(headline);
+                
                 newsItems.push({
                     time: time || 'Aujourd\'hui',
                     headline: headline,
                     source: source || 'Finviz',
+                    type: detectedType,
                     url: normalizedUrl || '',
                     raw: headline
                 });
@@ -323,10 +434,14 @@ function parseFinvizNews(html) {
                         }
                     }
                     
+                    // Détecter le type depuis le headline
+                    const detectedType = detectNewsType(headline);
+                    
                     newsItems.push({
                         time: 'Aujourd\'hui',
                         headline: headline,
                         source: 'Finviz',
+                        type: detectedType,
                         url: normalizedUrl,
                         raw: headline
                     });
@@ -346,6 +461,7 @@ function parseFinvizNews(html) {
                 time: 'Aujourd\'hui, 11:15 AM',
                 headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
                 source: 'MarketWatch',
+                type: 'market',
                 url: 'https://www.marketwatch.com',
                 raw: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data'
             },
@@ -353,6 +469,7 @@ function parseFinvizNews(html) {
                 time: 'Aujourd\'hui, 10:45 AM',
                 headline: 'Federal Reserve signals potential rate cuts as inflation cools',
                 source: 'Reuters',
+                type: 'economy',
                 url: 'https://www.reuters.com',
                 raw: 'Federal Reserve signals potential rate cuts as inflation cools'
             },
@@ -360,6 +477,7 @@ function parseFinvizNews(html) {
                 time: 'Aujourd\'hui, 10:20 AM',
                 headline: 'Oil prices rise on supply concerns amid Middle East tensions',
                 source: 'Bloomberg',
+                type: 'commodities',
                 url: 'https://www.bloomberg.com',
                 raw: 'Oil prices rise on supply concerns amid Middle East tensions'
             }

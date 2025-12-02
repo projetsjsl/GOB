@@ -8,10 +8,12 @@ const NewsTicker = ({ isDarkMode = true }) => {
     const [news, setNews] = useState([]);
     const [isVisible, setIsVisible] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
+    const [newsType, setNewsType] = useState('all');
+    const [showTypeSelector, setShowTypeSelector] = useState(false);
     const tickerRef = useRef(null);
     const animationRef = useRef(null);
 
-    // Charger les actualités au montage
+    // Charger les actualités au montage et quand le type change
     useEffect(() => {
         loadNews();
         
@@ -19,7 +21,7 @@ const NewsTicker = ({ isDarkMode = true }) => {
         const interval = setInterval(loadNews, 5 * 60 * 1000);
         
         return () => clearInterval(interval);
-    }, []);
+    }, [newsType]);
 
     // Animation du défilement
     useEffect(() => {
@@ -60,7 +62,7 @@ const NewsTicker = ({ isDarkMode = true }) => {
     const loadNews = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch('/api/finviz-news');
+            const response = await fetch(`/api/finviz-news?type=${newsType}&limit=40`);
             const data = await response.json();
             
             if (data.success && data.news && data.news.length > 0) {
@@ -72,18 +74,21 @@ const NewsTicker = ({ isDarkMode = true }) => {
                         time: 'Aujourd\'hui, 11:15 AM',
                         headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
                         source: 'MarketWatch',
+                        type: 'market',
                         url: 'https://www.marketwatch.com'
                     },
                     {
                         time: 'Aujourd\'hui, 10:45 AM',
                         headline: 'Federal Reserve signals potential rate cuts as inflation cools',
                         source: 'Reuters',
+                        type: 'economy',
                         url: 'https://www.reuters.com'
                     },
                     {
                         time: 'Aujourd\'hui, 10:20 AM',
                         headline: 'Oil prices rise on supply concerns amid Middle East tensions',
                         source: 'Bloomberg',
+                        type: 'commodities',
                         url: 'https://www.bloomberg.com'
                     }
                 ]);
@@ -96,6 +101,7 @@ const NewsTicker = ({ isDarkMode = true }) => {
                     time: 'Aujourd\'hui, 11:15 AM',
                     headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
                     source: 'MarketWatch',
+                    type: 'market',
                     url: 'https://www.marketwatch.com'
                 }
             ]);
@@ -117,6 +123,51 @@ const NewsTicker = ({ isDarkMode = true }) => {
         localStorage.setItem('news-ticker-visible', 'false');
     };
 
+    // Icônes pour les types de nouvelles
+    const getTypeIcon = (type) => {
+        const icons = {
+            'market': '📈',
+            'economy': '🏛️',
+            'stocks': '💼',
+            'crypto': '₿',
+            'forex': '💱',
+            'commodities': '🛢️',
+            'earnings': '📊',
+            'ipo': '🚀',
+            'mergers': '🤝',
+            'other': '📰'
+        };
+        return icons[type] || icons['other'];
+    };
+
+    // Icônes pour les sources
+    const getSourceIcon = (source) => {
+        const sourceLower = source.toLowerCase();
+        if (sourceLower.includes('bloomberg')) return '🔵';
+        if (sourceLower.includes('reuters')) return '🔴';
+        if (sourceLower.includes('marketwatch')) return '🟡';
+        if (sourceLower.includes('cnbc')) return '🟢';
+        if (sourceLower.includes('wsj') || sourceLower.includes('wall street')) return '📰';
+        if (sourceLower.includes('ft') || sourceLower.includes('financial times')) return '📄';
+        if (sourceLower.includes('yahoo')) return '💜';
+        if (sourceLower.includes('finviz')) return '📊';
+        return '📰';
+    };
+
+    // Types de nouvelles disponibles
+    const newsTypes = [
+        { value: 'all', label: 'Toutes', icon: '📰' },
+        { value: 'market', label: 'Marché', icon: '📈' },
+        { value: 'economy', label: 'Économie', icon: '🏛️' },
+        { value: 'stocks', label: 'Actions', icon: '💼' },
+        { value: 'crypto', label: 'Crypto', icon: '₿' },
+        { value: 'forex', label: 'Forex', icon: '💱' },
+        { value: 'commodities', label: 'Matières', icon: '🛢️' },
+        { value: 'earnings', label: 'Résultats', icon: '📊' },
+        { value: 'ipo', label: 'IPO', icon: '🚀' },
+        { value: 'mergers', label: 'Fusions', icon: '🤝' }
+    ];
+
     if (!isVisible) return null;
 
     return (
@@ -129,29 +180,77 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 zIndex: 100
             }}
         >
-            {/* Left icon */}
+            {/* Left icon + Type selector */}
             <div
-                className="absolute left-4 top-0 bottom-0 flex items-center z-20"
-                style={{ pointerEvents: 'none' }}
+                className="absolute left-4 top-0 bottom-0 flex items-center gap-2 z-20"
             >
                 <div
                     className="flex items-center justify-center"
                     style={{
                         width: '20px',
                         height: '20px',
-                        color: '#10b981'
+                        color: '#10b981',
+                        pointerEvents: 'none'
                     }}
                 >
                     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                     </svg>
                 </div>
+                
+                {/* Type selector button */}
+                <button
+                    onClick={() => setShowTypeSelector(!showTypeSelector)}
+                    className="px-2 py-1 rounded text-xs font-medium transition-colors hover:opacity-80"
+                    style={{
+                        backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.1)',
+                        color: '#10b981',
+                        border: `1px solid ${isDarkMode ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.2)'}`
+                    }}
+                    title="Filtrer par type de nouvelle"
+                >
+                    {newsTypes.find(t => t.value === newsType)?.icon || '📰'} {newsTypes.find(t => t.value === newsType)?.label || 'Toutes'}
+                </button>
+                
+                {/* Type selector dropdown */}
+                {showTypeSelector && (
+                    <div
+                        className="absolute left-0 top-full mt-1 rounded-lg shadow-xl border overflow-hidden z-30"
+                        style={{
+                            backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                            borderColor: isDarkMode ? 'rgba(75, 85, 99, 0.5)' : 'rgba(209, 213, 219, 0.5)',
+                            minWidth: '150px',
+                            maxHeight: '300px',
+                            overflowY: 'auto'
+                        }}
+                    >
+                        {newsTypes.map(type => (
+                            <button
+                                key={type.value}
+                                onClick={() => {
+                                    setNewsType(type.value);
+                                    setShowTypeSelector(false);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm transition-colors hover:opacity-80 flex items-center gap-2"
+                                style={{
+                                    backgroundColor: newsType === type.value 
+                                        ? (isDarkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.1)')
+                                        : 'transparent',
+                                    color: isDarkMode ? '#ffffff' : '#1f2937'
+                                }}
+                            >
+                                <span>{type.icon}</span>
+                                <span>{type.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Scrolling news content */}
             <div
                 ref={tickerRef}
-                className="absolute left-12 right-20 top-0 bottom-0 overflow-hidden"
+                className="absolute left-48 right-20 top-0 bottom-0 overflow-hidden"
             >
                 <div
                     className="news-ticker-content flex items-center h-full whitespace-nowrap"
@@ -171,17 +270,27 @@ const NewsTicker = ({ isDarkMode = true }) => {
                         news.map((item, index) => (
                             <React.Fragment key={index}>
                                 <div 
-                                    className="flex items-center gap-3 px-4 cursor-pointer hover:opacity-80 transition-opacity"
+                                    className="flex items-center gap-2 px-4 cursor-pointer hover:opacity-80 transition-opacity"
                                     onClick={() => {
                                         if (item.url) {
                                             window.open(item.url, '_blank', 'noopener,noreferrer');
                                         }
                                     }}
-                                    title={item.url ? 'Cliquer pour ouvrir l\'article' : ''}
+                                    title={item.url ? `${item.source} - ${item.type} - Cliquer pour ouvrir l'article` : `${item.source} - ${item.type}`}
                                 >
+                                    {/* Type icon */}
+                                    <span className="text-sm flex-shrink-0" title={`Type: ${item.type || 'other'}`}>
+                                        {getTypeIcon(item.type || 'other')}
+                                    </span>
+                                    
+                                    {/* Source icon */}
+                                    <span className="text-xs flex-shrink-0" title={`Source: ${item.source}`}>
+                                        {getSourceIcon(item.source)}
+                                    </span>
+                                    
                                     <span
                                         className="text-xs font-medium"
-                                        style={{ color: '#10b981', minWidth: '100px' }}
+                                        style={{ color: '#10b981', minWidth: '100px', flexShrink: 0 }}
                                     >
                                         {item.time}
                                     </span>
@@ -189,7 +298,6 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                         className="text-sm"
                                         style={{ 
                                             color: isDarkMode ? '#ffffff' : '#1f2937',
-                                            textDecoration: item.url ? 'none' : 'none',
                                             cursor: item.url ? 'pointer' : 'default'
                                         }}
                                     >
@@ -223,17 +331,27 @@ const NewsTicker = ({ isDarkMode = true }) => {
                             {news.map((item, index) => (
                                 <React.Fragment key={`dup-${index}`}>
                                     <div 
-                                        className="flex items-center gap-3 px-4 cursor-pointer hover:opacity-80 transition-opacity"
+                                        className="flex items-center gap-2 px-4 cursor-pointer hover:opacity-80 transition-opacity"
                                         onClick={() => {
                                             if (item.url) {
                                                 window.open(item.url, '_blank', 'noopener,noreferrer');
                                             }
                                         }}
-                                        title={item.url ? 'Cliquer pour ouvrir l\'article' : ''}
+                                        title={item.url ? `${item.source} - ${item.type} - Cliquer pour ouvrir l'article` : `${item.source} - ${item.type}`}
                                     >
+                                        {/* Type icon */}
+                                        <span className="text-sm flex-shrink-0" title={`Type: ${item.type || 'other'}`}>
+                                            {getTypeIcon(item.type || 'other')}
+                                        </span>
+                                        
+                                        {/* Source icon */}
+                                        <span className="text-xs flex-shrink-0" title={`Source: ${item.source}`}>
+                                            {getSourceIcon(item.source)}
+                                        </span>
+                                        
                                         <span
                                             className="text-xs font-medium"
-                                            style={{ color: '#10b981', minWidth: '100px' }}
+                                            style={{ color: '#10b981', minWidth: '100px', flexShrink: 0 }}
                                         >
                                             {item.time}
                                         </span>
