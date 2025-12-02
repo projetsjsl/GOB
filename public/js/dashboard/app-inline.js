@@ -25263,9 +25263,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }}
                     ></div>
 
-                    <div className="px-6 py-4 relative z-10">
+                    <div className="px-6 py-5 relative z-10">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-6">
+                            <div className="flex items-center space-x-8">
                                 {/* CEO Premium: Logo avec effets ultra-sophistiqués */}
                                 <div 
                                     className="relative p-3.5 rounded-xl shadow-2xl group/logo transition-all duration-500 hover:scale-105"
