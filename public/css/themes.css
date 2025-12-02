@@ -49,6 +49,10 @@
 
 /* Application des variables de thème aux éléments du dashboard */
 .theme-default,
+.theme-terminal,
+.theme-ia,
+.theme-darkmode,
+.theme-light,
 .theme-marketq,
 .theme-marketq-dark,
 .theme-bloomberg-terminal,
@@ -61,6 +65,10 @@
 
 /* Header avec thème */
 .theme-default header,
+.theme-terminal header,
+.theme-ia header,
+.theme-darkmode header,
+.theme-light header,
 .theme-marketq header,
 .theme-marketq-dark header,
 .theme-bloomberg-terminal header,
@@ -74,6 +82,10 @@
 
 /* Cards avec thème */
 .theme-default .bg-gray-900,
+.theme-terminal .bg-gray-900,
+.theme-ia .bg-gray-900,
+.theme-darkmode .bg-gray-900,
+.theme-light .bg-gray-900,
 .theme-marketq .bg-gray-900,
 .theme-marketq-dark .bg-gray-900,
 .theme-bloomberg-terminal .bg-gray-900,
@@ -89,6 +101,10 @@
 
 /* Texte avec thème */
 .theme-default .text-white,
+.theme-terminal .text-white,
+.theme-ia .text-white,
+.theme-darkmode .text-white,
+.theme-light .text-white,
 .theme-marketq .text-white,
 .theme-marketq-dark .text-white,
 .theme-bloomberg-terminal .text-white,
@@ -100,6 +116,10 @@
 }
 
 .theme-default .text-gray-400,
+.theme-terminal .text-gray-400,
+.theme-ia .text-gray-400,
+.theme-darkmode .text-gray-400,
+.theme-light .text-gray-400,
 .theme-marketq .text-gray-400,
 .theme-marketq-dark .text-gray-400,
 .theme-bloomberg-terminal .text-gray-400,
@@ -112,6 +132,10 @@
 
 /* Background principal */
 .theme-default .bg-black,
+.theme-terminal .bg-black,
+.theme-ia .bg-black,
+.theme-darkmode .bg-black,
+.theme-light .bg-black,
 .theme-marketq .bg-black,
 .theme-marketq-dark .bg-black,
 .theme-bloomberg-terminal .bg-black,
@@ -123,12 +147,17 @@
 }
 
 .theme-bloomberg-nostalgie .bg-black,
-.theme-desjardins .bg-black {
-    background-color: #ffffff !important; /* Blanc pour nostalgie et Desjardins */
+.theme-desjardins .bg-black,
+.theme-light .bg-black {
+    background-color: #ffffff !important; /* Blanc pour thèmes light */
 }
 
 /* Boutons avec thème */
 .theme-default button,
+.theme-terminal button,
+.theme-ia button,
+.theme-darkmode button,
+.theme-light button,
 .theme-marketq button,
 .theme-marketq-dark button,
 .theme-bloomberg-terminal button,
@@ -336,6 +365,10 @@
 
 /* Navigation avec thème */
 .theme-default nav,
+.theme-terminal nav,
+.theme-ia nav,
+.theme-darkmode nav,
+.theme-light nav,
 .theme-marketq nav,
 .theme-marketq-dark nav,
 .theme-bloomberg-terminal nav,
@@ -345,6 +378,37 @@
 .theme-desjardins nav {
     background-color: var(--theme-surface) !important;
     border-color: var(--theme-border) !important;
+}
+
+/* Thème spécifique: Terminal (identique à Bloomberg Terminal) */
+.theme-terminal {
+    font-family: 'Courier New', monospace !important;
+    background-color: #000000 !important;
+    color: #ffcc00 !important;
+}
+
+.theme-terminal * {
+    font-family: 'Courier New', monospace !important;
+}
+
+/* Thème spécifique: IA (identique à default) */
+.theme-ia {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* Thème spécifique: Light */
+.theme-light {
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+}
+
+.theme-light .text-white {
+    color: #1a1a1a !important;
+}
+
+.theme-light .bg-gray-900 {
+    background-color: #ffffff !important;
 }
 
 /* Thème spécifique: Desjardins - Vert et blanc professionnel */
