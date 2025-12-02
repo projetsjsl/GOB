@@ -51,12 +51,20 @@ const ThemeSelector = ({ isDarkMode = true }) => {
     // Obtenir les thèmes depuis le système global
     const getThemes = () => {
         if (!window.GOBThemes || !window.GOBThemes.themes) {
-            return [];
+            // Fallback si GOBThemes n'est pas encore chargé
+            return [
+                { id: 'darkmode', name: 'Dark Mode', isDefault: true },
+                { id: 'light', name: 'Light', isDefault: true },
+                { id: 'terminal', name: 'Terminal', isDefault: true },
+                { id: 'ia', name: 'IA', isDefault: true }
+            ];
         }
         return Object.values(window.GOBThemes.themes);
     };
 
     const themes = getThemes();
+    const defaultThemesList = themes.filter(t => t.isDefault);
+    const customThemesList = themes.filter(t => !t.isDefault);
 
     const handleThemeChange = (themeId) => {
         if (window.GOBThemes) {
@@ -71,6 +79,10 @@ const ThemeSelector = ({ isDarkMode = true }) => {
 
     const getThemeIcon = (themeId) => {
         const icons = {
+            'terminal': '💻',
+            'ia': '🤖',
+            'darkmode': '🌙',
+            'light': '☀️',
             'default': '🎨',
             'marketq': '📊',
             'marketq-dark': '⚫',
@@ -82,6 +94,21 @@ const ThemeSelector = ({ isDarkMode = true }) => {
         };
         return icons[themeId] || '✨';
     };
+    
+    // Toggle pour DarkMode/Light
+    const handleToggleDarkLight = () => {
+        const currentId = currentTheme;
+        if (currentId === 'darkmode') {
+            handleThemeChange('light');
+        } else if (currentId === 'light') {
+            handleThemeChange('darkmode');
+        } else {
+            // Si autre thème, basculer vers darkmode
+            handleThemeChange('darkmode');
+        }
+    };
+    
+    const isDarkLightTheme = currentTheme === 'darkmode' || currentTheme === 'light';
 
     const currentThemeData = themes.find(t => t.id === currentTheme) || themes[0];
 
@@ -195,6 +222,22 @@ const ThemeSelector = ({ isDarkMode = true }) => {
 
     return (
         <>
+            {/* Toggle DarkMode/Light si thème par défaut */}
+            {isDarkLightTheme && (
+                <button
+                    onClick={handleToggleDarkLight}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105 ${
+                        isDarkMode
+                            ? 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-300'
+                    }`}
+                    title={currentTheme === 'darkmode' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+                >
+                    <span className="text-lg">{currentTheme === 'darkmode' ? '🌙' : '☀️'}</span>
+                    <span className="hidden sm:inline">{currentTheme === 'darkmode' ? 'Dark' : 'Light'}</span>
+                </button>
+            )}
+            
             {/* Bouton pour ouvrir la modal */}
             <button
                 onClick={() => setIsOpen(true)}
@@ -251,9 +294,36 @@ const ThemeSelector = ({ isDarkMode = true }) => {
 
                         {/* Grille des thèmes */}
                         <div className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {themes.map(theme => renderThemePreview(theme))}
-                            </div>
+                            {/* Thèmes par défaut */}
+                            {defaultThemesList.length > 0 && (
+                                <div className="mb-6">
+                                    <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Thèmes par défaut
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        {defaultThemesList.map(theme => renderThemePreview(theme))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Thèmes personnalisés */}
+                            {customThemesList.length > 0 && (
+                                <div>
+                                    <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Thèmes personnalisés
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {customThemesList.map(theme => renderThemePreview(theme))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Message si aucun thème */}
+                            {themes.length === 0 && (
+                                <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <p>Aucun thème disponible</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Footer avec info */}
