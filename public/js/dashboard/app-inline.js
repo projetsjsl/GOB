@@ -25903,9 +25903,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 </header>
 
                 {/* News Ticker - Bandeau d'actualités défilant */}
-                {window.NewsTicker && (
-                    <NewsTicker isDarkMode={isDarkMode} />
-                )}
+                {window.NewsTicker && React.createElement(window.NewsTicker, { isDarkMode: isDarkMode })}
 
                 {/* TradingView Ticker Tape Widget - Bandeau de cotations */}
                 <div className="tradingview-widget-container" ref={tickerTapeRef}>
