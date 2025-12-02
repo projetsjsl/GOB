@@ -224,33 +224,81 @@ export default async function handler(req, res) {
       });
     }
 
+    // Lire la réponse comme texte d'abord pour déboguer
+    const responseText = await sessionResponse.text();
+    console.log('Réponse Browserbase brute:', responseText.substring(0, 500)); // Limiter pour les logs
+    
     let sessionData;
     try {
-      sessionData = await sessionResponse.json();
-      console.log('Session Browserbase créée:', sessionData.id);
+      // Essayer de parser comme JSON
+      if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
+        sessionData = JSON.parse(responseText);
+      } else {
+        // Si ce n'est pas du JSON, essayer d'extraire des informations
+        console.warn('Réponse Browserbase n\'est pas du JSON:', responseText.substring(0, 200));
+        throw new Error('Réponse non-JSON de Browserbase');
+      }
+      console.log('Session Browserbase créée:', sessionData.id || sessionData.sessionId);
     } catch (parseError) {
       console.error('Erreur parsing sessionData:', parseError);
-      return res.status(502).json({
-        success: false,
-        error: 'Erreur lors du parsing de la réponse Browserbase',
-        details: 'La réponse de Browserbase est invalide',
-        hint: 'Vérifiez les logs Browserbase',
-        timestamp: new Date().toISOString()
-      });
+      console.error('Réponse complète:', responseText);
+      
+      // Si la réponse contient des informations utiles même si ce n'est pas du JSON
+      if (responseText.includes('session') || responseText.includes('id')) {
+        // Essayer d'extraire l'ID de session avec une regex
+        const sessionIdMatch = responseText.match(/["']?id["']?\s*[:=]\s*["']?([^"'\s}]+)["']?/i);
+        const sessionId = sessionIdMatch ? sessionIdMatch[1] : null;
+        
+        if (sessionId) {
+          console.log('ID de session extrait:', sessionId);
+          sessionData = { id: sessionId, status: 'active' };
+        } else {
+          return res.status(502).json({
+            success: false,
+            error: 'Erreur lors du parsing de la réponse Browserbase',
+            details: 'La réponse de Browserbase n\'est pas au format JSON attendu',
+            hint: 'Vérifiez les logs Browserbase et la configuration de l\'API',
+            debug: debugMode ? {
+              responsePreview: responseText.substring(0, 500),
+              contentType: sessionResponse.headers.get('content-type'),
+              status: sessionResponse.status
+            } : undefined,
+            timestamp: new Date().toISOString()
+          });
+        }
+      } else {
+        return res.status(502).json({
+          success: false,
+          error: 'Erreur lors du parsing de la réponse Browserbase',
+          details: parseError.message || 'La réponse de Browserbase est invalide',
+          hint: 'Vérifiez les logs Browserbase et la configuration de l\'API',
+          debug: debugMode ? {
+            responsePreview: responseText.substring(0, 500),
+            contentType: sessionResponse.headers.get('content-type'),
+            status: sessionResponse.status,
+            parseError: parseError.message
+          } : undefined,
+          timestamp: new Date().toISOString()
+        });
+      }
     }
     
-    if (!sessionData || !sessionData.id) {
+    if (!sessionData || (!sessionData.id && !sessionData.sessionId)) {
       console.error('SessionData invalide:', sessionData);
       return res.status(502).json({
         success: false,
         error: 'Réponse Browserbase invalide',
-        details: 'La session n\'a pas été créée correctement',
-        hint: 'Vérifiez les logs Browserbase',
+        details: 'La session n\'a pas été créée correctement - ID manquant',
+        hint: 'Vérifiez les logs Browserbase et la structure de la réponse',
+        debug: debugMode ? {
+          sessionData,
+          responsePreview: responseText.substring(0, 500)
+        } : undefined,
         timestamp: new Date().toISOString()
       });
     }
     
-    const sessionId = sessionData.id;
+    const sessionId = sessionData.id || sessionData.sessionId;
     
     // Attendre que la page se charge (2 secondes)
     await new Promise(resolve => setTimeout(resolve, 2000));
