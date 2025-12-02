@@ -25,14 +25,14 @@ const AdminJSLaiTab = ({
                         }`}>⚙️ Admin-JSLAI</h2>
                     </div>
 
-                    <EmmaSmsPanel />
+                    {typeof EmmaSmsPanel !== 'undefined' && <EmmaSmsPanel />}
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            <Icon emoji="🔍" size={20} />
+                            {typeof Icon !== 'undefined' ? <Icon emoji="🔍" size={20} /> : '🔍'}
                             Debug des Données
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -42,13 +42,13 @@ const AdminJSLaiTab = ({
                                     Stock Data
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Tickers: {tickers.length} ({tickers.join(', ')})
+                                    Tickers: {typeof tickers !== 'undefined' ? tickers.length : 0} ({typeof tickers !== 'undefined' ? tickers.join(', ') : 'N/A'})
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Données chargées: {Object.keys(stockData).length}
+                                    Données chargées: {typeof stockData !== 'undefined' ? Object.keys(stockData).length : 0}
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
+                                    Dernière MAJ: {typeof lastUpdate !== 'undefined' && lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
                                 </div>
                             </div>
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
@@ -57,10 +57,10 @@ const AdminJSLaiTab = ({
                                     News Data
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Articles: {newsData.length}
+                                    Articles: {typeof newsData !== 'undefined' ? newsData.length : 0}
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
+                                    Premier article: {typeof newsData !== 'undefined' && newsData[0]?.title ? newsData[0].title.substring(0, 30) : 'Aucun'}...
                                 </div>
                             </div>
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
@@ -69,10 +69,10 @@ const AdminJSLaiTab = ({
                                     Seeking Alpha
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Stocks: {seekingAlphaData.stocks?.length || 0}
+                                    Stocks: {typeof seekingAlphaData !== 'undefined' && seekingAlphaData.stocks ? seekingAlphaData.stocks.length : 0}
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
+                                    Stock Data: {typeof seekingAlphaStockData !== 'undefined' && seekingAlphaStockData.stocks ? Object.keys(seekingAlphaStockData.stocks).length : 0}
                                 </div>
                             </div>
                         </div>
@@ -89,17 +89,19 @@ const AdminJSLaiTab = ({
                             </h3>
                             <button
                                 onClick={async () => {
-                                    setLoadingCacheStatus(true);
+                                    if (typeof setLoadingCacheStatus === 'function') setLoadingCacheStatus(true);
                                     try {
-                                        const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache?type=status&maxAgeHours=${cacheSettings.maxAgeHours || 4}`);
+                                        const apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+                                        const maxAge = typeof cacheSettings !== 'undefined' && cacheSettings.maxAgeHours ? cacheSettings.maxAgeHours : 4;
+                                        const response = await fetch(`${apiBase}/api/supabase-daily-cache?type=status&maxAgeHours=${maxAge}`);
                                         if (response.ok) {
                                             const data = await response.json();
-                                            setCacheStatus(data.status || {});
+                                            if (typeof setCacheStatus === 'function') setCacheStatus(data.status || {});
                                         }
                                     } catch (error) {
                                         console.error('Erreur récupération statut cache:', error);
                                     } finally {
-                                        setLoadingCacheStatus(false);
+                                        if (typeof setLoadingCacheStatus === 'function') setLoadingCacheStatus(false);
                                     }
                                 }}
                                 disabled={loadingCacheStatus}
@@ -123,18 +125,20 @@ const AdminJSLaiTab = ({
                                 <div className="space-y-3">
                                     <div>
                                         <label className="block text-sm mb-2">
-                                            Durée du cache (heures): <span className="font-bold text-blue-600">{cacheSettings.maxAgeHours}h</span>
-                                        </label>
-                                        <input
-                                            type="range"
-                                            min="1"
-                                            max="12"
-                                            value={cacheSettings.maxAgeHours}
-                                            onChange={(e) => {
+                                        Durée du cache (heures): <span className="font-bold text-blue-600">{typeof cacheSettings !== 'undefined' && cacheSettings.maxAgeHours ? cacheSettings.maxAgeHours : 4}h</span>
+                                    </label>
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="12"
+                                        value={typeof cacheSettings !== 'undefined' && cacheSettings.maxAgeHours ? cacheSettings.maxAgeHours : 4}
+                                        onChange={(e) => {
+                                            if (typeof cacheSettings !== 'undefined' && typeof setCacheSettings === 'function') {
                                                 const newSettings = { ...cacheSettings, maxAgeHours: parseInt(e.target.value) };
                                                 setCacheSettings(newSettings);
                                                 localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
-                                            }}
+                                            }
+                                        }}
                                             className="w-full"
                                         />
                                         <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -147,19 +151,21 @@ const AdminJSLaiTab = ({
                                         <input
                                             type="checkbox"
                                             id="refreshOnNavigation"
-                                            checked={cacheSettings.refreshOnNavigation}
-                                            onChange={(e) => {
+                                        checked={typeof cacheSettings !== 'undefined' && cacheSettings.refreshOnNavigation ? cacheSettings.refreshOnNavigation : false}
+                                        onChange={(e) => {
+                                            if (typeof cacheSettings !== 'undefined' && typeof setCacheSettings === 'function') {
                                                 const newSettings = { ...cacheSettings, refreshOnNavigation: e.target.checked };
                                                 setCacheSettings(newSettings);
                                                 localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
-                                            }}
+                                            }
+                                        }}
                                             className="rounded"
                                         />
                                         <label htmlFor="refreshOnNavigation" className="text-sm">
                                             Rafraîchir les données tickers lors de la navigation
                                         </label>
                                     </div>
-                                    {cacheSettings.refreshOnNavigation && (
+                                    {typeof cacheSettings !== 'undefined' && cacheSettings.refreshOnNavigation && (
                                         <div className="ml-6">
                                             <label className="block text-sm mb-2">
                                                 Intervalle de rafraîchissement (minutes): <span className="font-bold text-blue-600">{cacheSettings.refreshIntervalMinutes} min</span>
