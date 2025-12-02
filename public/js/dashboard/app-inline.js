@@ -651,6 +651,54 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         const tabSoundRef = useRef(null);
         const audioCtxRef = useRef(null);
         const tickerTapeRef = useRef(null);
+
+        // Fonction utilitaire pour obtenir les styles basés sur le thème
+        const getThemeStyles = () => {
+            return {
+                // Backgrounds
+                bg: { backgroundColor: 'var(--theme-bg)' },
+                surface: { backgroundColor: 'var(--theme-surface)' },
+                surfaceLight: { backgroundColor: 'var(--theme-surface-light)' },
+                // Text
+                text: { color: 'var(--theme-text)' },
+                textSecondary: { color: 'var(--theme-text-secondary)' },
+                // Borders
+                border: { borderColor: 'var(--theme-border)' },
+                // Buttons
+                buttonPrimary: {
+                    backgroundColor: 'var(--theme-primary)',
+                    color: 'var(--theme-text)',
+                },
+                buttonSecondary: {
+                    backgroundColor: 'var(--theme-secondary)',
+                    color: 'var(--theme-text)',
+                },
+                buttonSurface: {
+                    backgroundColor: 'var(--theme-surface-light)',
+                    color: 'var(--theme-text)',
+                },
+                // Cards
+                card: {
+                    backgroundColor: 'var(--theme-surface)',
+                    borderColor: 'var(--theme-border)',
+                    color: 'var(--theme-text)',
+                },
+            };
+        };
+
+        // Fonction pour obtenir les classes CSS basées sur le thème (alternative)
+        const getThemeClasses = (type) => {
+            // Utiliser des classes avec variables CSS via style inline
+            const baseClasses = {
+                bg: 'transition-colors duration-300',
+                surface: 'transition-colors duration-300',
+                text: 'transition-colors duration-300',
+                border: 'transition-colors duration-300',
+                button: 'transition-all duration-300',
+                card: 'transition-colors duration-300',
+            };
+            return baseClasses[type] || '';
+        };
         const stocksLoadingRef = useRef(false); // Pour éviter les chargements multiples
         const batchLoadedRef = useRef(false); // Pour suivre si le batch a déjà chargé les données
         
@@ -17343,32 +17391,82 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 </button>
                             )}
                             {/* Toggle Vue */}
-                            <div className={`flex gap-1 p-1 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'
-                                }`}>
+                            <div 
+                                className="flex gap-1 p-1 rounded-lg transition-colors duration-300"
+                                style={{ backgroundColor: 'var(--theme-surface-light)' }}
+                            >
                                 <button
                                     onClick={() => setStocksViewMode('list')}
-                                    className={`px-3 py-1 rounded text-sm font-medium transition-all duration-200 ${stocksViewMode === 'list'
-                                        ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
-                                        : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
-                                        }`}
+                                    className="px-3 py-1 rounded text-sm font-medium transition-all duration-200"
+                                style={stocksViewMode === 'list' 
+                                    ? {
+                                        backgroundColor: 'var(--theme-primary)',
+                                        color: 'var(--theme-text)'
+                                    }
+                                    : {
+                                        color: 'var(--theme-text-secondary)'
+                                    }
+                                }
+                                onMouseEnter={(e) => {
+                                    if (stocksViewMode !== 'list') {
+                                        e.currentTarget.style.color = 'var(--theme-text)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (stocksViewMode !== 'list') {
+                                        e.currentTarget.style.color = 'var(--theme-text-secondary)';
+                                    }
+                                }}
                                 >
                                     📋 Liste
                                 </button>
                                 <button
                                     onClick={() => setStocksViewMode('cards')}
-                                    className={`px-3 py-1 rounded text-sm font-medium transition-all duration-200 ${stocksViewMode === 'cards'
-                                        ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
-                                        : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
-                                        }`}
+                                    className="px-3 py-1 rounded text-sm font-medium transition-all duration-200"
+                                style={stocksViewMode === 'cards' 
+                                    ? {
+                                        backgroundColor: 'var(--theme-primary)',
+                                        color: 'var(--theme-text)'
+                                    }
+                                    : {
+                                        color: 'var(--theme-text-secondary)'
+                                    }
+                                }
+                                onMouseEnter={(e) => {
+                                    if (stocksViewMode !== 'cards') {
+                                        e.currentTarget.style.color = 'var(--theme-text)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (stocksViewMode !== 'cards') {
+                                        e.currentTarget.style.color = 'var(--theme-text-secondary)';
+                                    }
+                                }}
                                 >
                                     🎴 Cartes
                                 </button>
                                 <button
                                     onClick={() => setStocksViewMode('table')}
-                                    className={`px-3 py-1 rounded text-sm font-medium transition-all duration-200 ${stocksViewMode === 'table'
-                                        ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white')
-                                        : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
-                                        }`}
+                                    className="px-3 py-1 rounded text-sm font-medium transition-all duration-200"
+                                style={stocksViewMode === 'table' 
+                                    ? {
+                                        backgroundColor: 'var(--theme-primary)',
+                                        color: 'var(--theme-text)'
+                                    }
+                                    : {
+                                        color: 'var(--theme-text-secondary)'
+                                    }
+                                }
+                                onMouseEnter={(e) => {
+                                    if (stocksViewMode !== 'table') {
+                                        e.currentTarget.style.color = 'var(--theme-text)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (stocksViewMode !== 'table') {
+                                        e.currentTarget.style.color = 'var(--theme-text-secondary)';
+                                    }
+                                }}
                                 >
                                     📊 Tableau
                                 </button>
@@ -17398,11 +17496,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* Section d'ajout de ticker (uniquement pour watchlist) */}
                     {tickerSource === 'watchlist' && (
-                        <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 mt-4 ${isDarkMode
-                            ? 'bg-gray-900 border-gray-700'
-                            : 'bg-gray-50 border-gray-200'
-                            }`}>
-                            <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <div 
+                            className="backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 mt-4"
+                            style={{
+                                backgroundColor: 'var(--theme-surface)',
+                                borderColor: 'var(--theme-border)'
+                            }}
+                        >
+                            <h3 className="text-lg font-semibold mb-4 transition-colors duration-300" style={{ color: 'var(--theme-text)' }}>
                                 ➕ Ajouter un Ticker
                             </h3>
                             <div className="flex gap-2">
@@ -17411,20 +17512,32 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     value={newTicker}
                                     onChange={(e) => setNewTicker(e.target.value)}
                                     placeholder="Ex: AAPL, TSLA, GOOGL..."
-                                    className={`flex-1 px-3 py-2 rounded-lg border transition-colors duration-300 ${isDarkMode
-                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                        }`}
+                                    className="flex-1 px-3 py-2 rounded-lg border transition-colors duration-300"
+                                    style={{
+                                        backgroundColor: 'var(--theme-surface-light)',
+                                        borderColor: 'var(--theme-border)',
+                                        color: 'var(--theme-text)'
+                                    }}
                                     onKeyPress={(e) => e.key === 'Enter' && addTickerToWatchlist()}
                                 />
                                 <button
                                     onClick={addTickerToWatchlist}
-                                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                    className="px-4 py-2 rounded transition-colors"
+                                    style={{
+                                        backgroundColor: 'var(--theme-success)',
+                                        color: 'var(--theme-text)'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.opacity = '0.9';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.opacity = '1';
+                                    }}
                                 >
                                     ➕ Ajouter
                                 </button>
                             </div>
-                            <p className={`text-sm mt-2 transition-colors duration-300 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <p className="text-sm mt-2 transition-colors duration-300" style={{ color: 'var(--theme-text-secondary)' }}>
                                 💡 Ces tickers ne seront visibles que dans cette watchlist personnalisée
                             </p>
                         </div>
@@ -17432,18 +17545,31 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
                     {/* TOP MOVERS - Vue rapide */}
                     {displayedTickers.length > 0 && (
-                        <div className={`mt-6 p-6 rounded-xl transition-colors duration-300 ${isDarkMode
-                            ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
-                            : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
-                            }`}>
+                        <div 
+                            className="mt-6 p-6 rounded-xl transition-colors duration-300 border"
+                            style={{
+                                background: `linear-gradient(135deg, var(--theme-surface) 0%, var(--theme-surface-light) 100%)`,
+                                borderColor: 'var(--theme-border)',
+                                color: 'var(--theme-text)'
+                            }}
+                        >
                             <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 <LucideIcon name="Fire" className="w-6 h-6 text-orange-500" />
                                 Top Movers du Jour
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Top Gainers */}
-                                <div className={`p-3 sm:p-4 rounded-lg ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
-                                    <h4 className={`text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-3 ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
+                                <div 
+                                    className="p-3 sm:p-4 rounded-lg border"
+                                    style={{
+                                        backgroundColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.1)',
+                                        borderColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.3)'
+                                    }}
+                                >
+                                    <h4 
+                                        className="text-base sm:text-sm font-bold mb-3 sm:mb-3 flex items-center gap-3"
+                                        style={{ color: 'var(--theme-success)' }}
+                                    >
                                         <LucideIcon name="TrendingUp" className="w-5 h-5" />
                                         {renderMarketBadge('bull')}
                                         Top Gainers
@@ -17461,8 +17587,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             .map((item, idx) => (
                                                 <div
                                                     key={item.ticker}
-                                                    className={`flex items-start justify-between p-2 sm:p-2 rounded cursor-pointer transition-all hover:scale-[1.02] ${isDarkMode ? 'hover:bg-green-500/20' : 'hover:bg-green-100'
-                                                        }`}
+                                                    className="flex items-start justify-between p-2 sm:p-2 rounded cursor-pointer transition-all hover:scale-[1.02]"
+                                    style={{
+                                        backgroundColor: 'transparent',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.2)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
                                                     onClick={() => {
                                                         setSelectedStock(item.ticker);
                                                         setActiveTab('intellistocks');
@@ -17470,8 +17604,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 >
                                                     <div className="flex-1 min-w-0 pr-2">
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${isDarkMode ? 'bg-green-500/30 text-green-300' : 'bg-green-100 text-green-700'
-                                                                }`}>
+                                                            <div 
+                                                                className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                                                                style={{
+                                                                    backgroundColor: 'rgba(var(--theme-success-rgb, 16, 185, 129), 0.3)',
+                                                                    color: 'var(--theme-success)'
+                                                                }}
+                                                            >
                                                                 {idx + 1}
                                                             </div>
                                                             <img
