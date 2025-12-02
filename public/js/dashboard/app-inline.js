@@ -25337,6 +25337,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         const allTabs = [
             { id: 'markets-economy', label: 'Marchés', icon: 'iconoir-globe', component: MarketsEconomyTab },
             { id: 'intellistocks', label: 'JLab™', icon: 'iconoir-flask', component: JLabUnifiedTab },
+            { id: 'groupchat', label: 'RobotWeb', icon: 'iconoir-robot', component: window.GroupChatTab || (() => <div>Chargement...</div>) },
             { id: 'ask-emma', label: 'Emma', icon: 'iconoir-chat-bubble', component: AskEmmaTab },
             { id: 'assistant-vocal', label: 'Assistant', icon: 'iconoir-microphone', component: VoiceAssistantTab },
             { id: 'finvox', label: 'FinVox', icon: 'iconoir-voice-circle', component: FinVoxTab },
@@ -26462,6 +26463,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'markets-economy' && <MarketsEconomyTab />}
                     {/* {activeTab === 'yield-curve' && <YieldCurveTab />} */} {/* Intégré dans Marchés & Économie */}
                     {activeTab === 'intellistocks' && <JLabUnifiedTab />}
+                    {activeTab === 'groupchat' && window.GroupChatTab && React.createElement(window.GroupChatTab, { isDarkMode: isDarkMode })}
                     {activeTab === 'ask-emma' && <AskEmmaTab
                         prefillMessage={emmaPrefillMessage}
                         setPrefillMessage={setEmmaPrefillMessage}

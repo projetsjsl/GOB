@@ -118,6 +118,21 @@
       },
       "api/roles-config.js": {
         "maxDuration": 10
+      },
+      "api/groupchat/simulate.js": {
+        "maxDuration": 60
+      },
+      "api/groupchat/config.js": {
+        "maxDuration": 10
+      },
+      "api/groupchat/workflows.js": {
+        "maxDuration": 10
+      },
+      "api/groupchat/admin.js": {
+        "maxDuration": 30
+      },
+      "api/groupchat/test.js": {
+        "maxDuration": 30
       }
   },
   "headers": [

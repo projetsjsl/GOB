@@ -669,11 +669,8 @@
         return;
       }
 
-      // Démarrer le préchargement en arrière-plan
-      // Ne pas attendre - laisser tourner en parallèle pendant que l'utilisateur saisit ses identifiants
-      preloadDashboardData().catch(err => {
-        console.warn('⚠️ Préchargement échoué (non bloquant):', err);
-      });
+      // Le préchargement est maintenant géré par dashboard-preloader.js
+      // qui s'initialise automatiquement et précharge les données en arrière-plan
     });
 
     // Détection Caps Lock
