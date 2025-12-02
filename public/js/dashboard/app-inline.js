@@ -489,8 +489,20 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             
             // Écouter les changements de thème
             const handleThemeChange = (event) => {
-                // Forcer un re-render si nécessaire
-                console.log('Thème changé:', event.detail.themeId);
+                const themeId = event.detail.themeId;
+                console.log('Thème changé:', themeId);
+                
+                // Déterminer isDarkMode en fonction du thème
+                // Thèmes light: seeking-alpha, bloomberg-nostalgie
+                // Thèmes dark: default, marketq, bloomberg-terminal, bloomberg-mobile
+                const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie'];
+                const isLight = lightThemes.includes(themeId);
+                setIsDarkMode(!isLight);
+                
+                // Sauvegarder dans localStorage pour compatibilité
+                try {
+                    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                } catch (_) {}
             };
             
             window.addEventListener('themeChanged', handleThemeChange);
@@ -563,9 +575,19 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         // États pour les logs système (Admin JSL)
         const [systemLogs, setSystemLogs] = useState([]);
 
-        // État pour le thème (dark par défaut, respecte localStorage)
+        // État pour le thème (déterminé par le thème actuel)
         const [isDarkMode, setIsDarkMode] = useState(() => {
             try {
+                // Vérifier d'abord le thème GOB
+                if (window.GOBThemes) {
+                    const currentThemeId = window.GOBThemes.getCurrentTheme();
+                    const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie'];
+                    if (lightThemes.includes(currentThemeId)) {
+                        return false; // Light theme
+                    }
+                    return true; // Dark theme par défaut
+                }
+                // Fallback: vérifier localStorage legacy
                 const saved = localStorage.getItem('theme');
                 if (saved === 'dark') return true;
                 if (saved === 'light') return false;

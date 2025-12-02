@@ -8,7 +8,8 @@
 .theme-marketq,
 .theme-bloomberg-terminal,
 .theme-seeking-alpha,
-.theme-bloomberg-mobile {
+.theme-bloomberg-mobile,
+.theme-bloomberg-nostalgie {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -17,7 +18,8 @@
 .theme-marketq header,
 .theme-bloomberg-terminal header,
 .theme-seeking-alpha header,
-.theme-bloomberg-mobile header {
+.theme-bloomberg-mobile header,
+.theme-bloomberg-nostalgie header {
     background: var(--theme-header-bg) !important;
     border-color: var(--theme-border) !important;
 }
@@ -27,7 +29,8 @@
 .theme-marketq .bg-gray-900,
 .theme-bloomberg-terminal .bg-gray-900,
 .theme-seeking-alpha .bg-gray-900,
-.theme-bloomberg-mobile .bg-gray-900 {
+.theme-bloomberg-mobile .bg-gray-900,
+.theme-bloomberg-nostalgie .bg-gray-900 {
     background-color: var(--theme-surface) !important;
     border: var(--theme-card-border) !important;
     border-radius: var(--theme-border-radius) !important;
@@ -39,7 +42,8 @@
 .theme-marketq .text-white,
 .theme-bloomberg-terminal .text-white,
 .theme-seeking-alpha .text-white,
-.theme-bloomberg-mobile .text-white {
+.theme-bloomberg-mobile .text-white,
+.theme-bloomberg-nostalgie .text-white {
     color: var(--theme-text) !important;
 }
 
@@ -47,7 +51,8 @@
 .theme-marketq .text-gray-400,
 .theme-bloomberg-terminal .text-gray-400,
 .theme-seeking-alpha .text-gray-400,
-.theme-bloomberg-mobile .text-gray-400 {
+.theme-bloomberg-mobile .text-gray-400,
+.theme-bloomberg-nostalgie .text-gray-400 {
     color: var(--theme-text-secondary) !important;
 }
 
@@ -56,8 +61,13 @@
 .theme-marketq .bg-black,
 .theme-bloomberg-terminal .bg-black,
 .theme-seeking-alpha .bg-black,
-.theme-bloomberg-mobile .bg-black {
+.theme-bloomberg-mobile .bg-black,
+.theme-bloomberg-nostalgie .bg-black {
     background-color: var(--theme-bg) !important;
+}
+
+.theme-bloomberg-nostalgie .bg-black {
+    background-color: #ffffff !important; /* Blanc pour nostalgie */
 }
 
 /* Boutons avec thème */
@@ -65,7 +75,8 @@
 .theme-marketq button,
 .theme-bloomberg-terminal button,
 .theme-seeking-alpha button,
-.theme-bloomberg-mobile button {
+.theme-bloomberg-mobile button,
+.theme-bloomberg-nostalgie button {
     font-family: var(--theme-font-primary) !important;
 }
 
@@ -269,9 +280,86 @@
 .theme-marketq nav,
 .theme-bloomberg-terminal nav,
 .theme-seeking-alpha nav,
-.theme-bloomberg-mobile nav {
+.theme-bloomberg-mobile nav,
+.theme-bloomberg-nostalgie nav {
     background-color: var(--theme-surface) !important;
     border-color: var(--theme-border) !important;
+}
+
+/* Thème spécifique: Bloomberg Nostalgie - Style rétro années 1990 */
+.theme-bloomberg-nostalgie {
+    background-color: #ffffff !important;
+    color: #4c1d95 !important;
+    font-family: 'Courier New', monospace !important;
+}
+
+.theme-bloomberg-nostalgie header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%) !important;
+    border-bottom: 2px solid #8b5cf6 !important;
+    color: #4c1d95 !important;
+}
+
+.theme-bloomberg-nostalgie .bg-gray-900,
+.theme-bloomberg-nostalgie .bg-gray-800 {
+    background-color: #ffffff !important;
+    border: 2px solid #8b5cf6 !important;
+    border-radius: 0.25rem !important;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15) !important;
+}
+
+.theme-bloomberg-nostalgie .text-white {
+    color: #4c1d95 !important; /* Purple au lieu de blanc */
+}
+
+.theme-bloomberg-nostalgie .text-gray-400 {
+    color: #6b7280 !important;
+}
+
+.theme-bloomberg-nostalgie .text-green-500,
+.theme-bloomberg-nostalgie .text-green-400,
+.theme-bloomberg-nostalgie .text-green-600 {
+    color: #10b981 !important; /* Emerald pour gains */
+}
+
+.theme-bloomberg-nostalgie .text-red-500,
+.theme-bloomberg-nostalgie .text-red-400,
+.theme-bloomberg-nostalgie .text-red-600 {
+    color: #ef4444 !important; /* Red pour pertes */
+}
+
+.theme-bloomberg-nostalgie button.bg-blue-600,
+.theme-bloomberg-nostalgie .bg-blue-600,
+.theme-bloomberg-nostalgie .bg-green-500 {
+    background-color: #8b5cf6 !important; /* Purple pour CTA */
+    color: #ffffff !important;
+    border: 2px solid #8b5cf6 !important;
+}
+
+.theme-bloomberg-nostalgie button:hover {
+    background-color: #a78bfa !important; /* Lighter purple on hover */
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+}
+
+.theme-bloomberg-nostalgie nav {
+    background-color: #f8f9fa !important;
+    border-top: 2px solid #8b5cf6 !important;
+}
+
+.theme-bloomberg-nostalgie table {
+    border: 2px solid #8b5cf6 !important;
+    border-collapse: collapse !important;
+}
+
+.theme-bloomberg-nostalgie table th {
+    background-color: #f3f4f6 !important;
+    color: #4c1d95 !important;
+    border: 1px solid #8b5cf6 !important;
+}
+
+.theme-bloomberg-nostalgie table td {
+    border: 1px solid #d1d5db !important;
+    color: #4c1d95 !important;
+    background-color: #ffffff !important;
 }
 
 /* Transitions douces pour changement de thème */

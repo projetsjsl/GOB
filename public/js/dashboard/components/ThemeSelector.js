@@ -33,7 +33,8 @@ const ThemeSelector = ({ isDarkMode = true }) => {
         { id: 'marketq', name: 'MarketQ', icon: '📊' },
         { id: 'bloomberg-terminal', name: 'Bloomberg Terminal', icon: '💻' },
         { id: 'seeking-alpha', name: 'Seeking Alpha', icon: '📈' },
-        { id: 'bloomberg-mobile', name: 'Bloomberg Mobile', icon: '📱' }
+        { id: 'bloomberg-mobile', name: 'Bloomberg Mobile', icon: '📱' },
+        { id: 'bloomberg-nostalgie', name: 'Bloomberg Nostalgie', icon: '🕰️' }
     ];
 
     const handleThemeChange = (themeId) => {

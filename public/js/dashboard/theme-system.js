@@ -160,6 +160,39 @@ export const themes = {
             borderRadius: '1rem', // arrondi généreux pour mobile (touch-friendly)
             shadow: '0 4px 12px rgba(0, 0, 0, 0.5)', // ombre plus prononcée pour profondeur
         }
+    },
+    'bloomberg-nostalgie': {
+        name: 'Bloomberg Nostalgie',
+        id: 'bloomberg-nostalgie',
+        colors: {
+            primary: '#8b5cf6', // purple/violet (accents principaux - style rétro)
+            secondary: '#a78bfa', // lighter purple (accents secondaires)
+            background: '#ffffff', // white (fond principal - style années 1990)
+            surface: '#f8f9fa', // very light gray (cards, panels)
+            surfaceLight: '#ffffff', // white (hover states)
+            surfaceDark: '#e9ecef', // light gray (borders, separators)
+            text: '#4c1d95', // deep purple (texte principal)
+            textSecondary: '#6b7280', // medium gray (texte secondaire)
+            textGreen: '#10b981', // emerald (gains - style moderne mais discret)
+            textRed: '#ef4444', // red (pertes)
+            border: '#d1d5db', // light gray (bordures)
+            accent: '#8b5cf6', // purple (highlights, CTA)
+            success: '#10b981', // emerald
+            danger: '#ef4444', // red
+            warning: '#f59e0b', // amber
+        },
+        fonts: {
+            primary: 'Courier New, "Courier", monospace', // Style rétro terminal
+            secondary: 'Georgia, "Times New Roman", serif', // Style classique
+            mono: 'Courier New, "Courier", monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+            cardBg: '#ffffff',
+            cardBorder: '2px solid #8b5cf6', // Bordure violette style rétro
+            borderRadius: '0.25rem', // Légèrement arrondi (style années 1990)
+            shadow: '0 2px 8px rgba(139, 92, 246, 0.15)', // Ombre violette subtile
+        }
     }
 };
 
