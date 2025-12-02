@@ -26836,47 +26836,24 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 throw new Error('ReactDOM n\'est pas défini');
             }
             
-            // Attendre que BetaCombinedDashboard soit défini (Babel peut prendre du temps)
-            // Note: BetaCombinedDashboard est défini dans la portée du bloc if, donc accessible ici
-            let attempts = 0;
-            const maxAttempts = 150; // 15 secondes max (150 * 100ms) - Babel peut être lent sur gros fichiers
-            const checkAndMount = () => {
-                attempts++;
-                // Vérifier dans la portée locale d'abord, puis globale
-                const DashboardComponent = typeof BetaCombinedDashboard !== 'undefined' ? BetaCombinedDashboard : 
-                                         (typeof window.BetaCombinedDashboard !== 'undefined' ? window.BetaCombinedDashboard : undefined);
-                
-                if (DashboardComponent) {
-                    console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
-                    try {
-                        // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
-                        ReactDOM.render(<DashboardComponent />, rootElement);
-                        console.log('✅ Application React montée avec succès !');
-                    } catch (renderError) {
-                        console.error('❌ Erreur lors du ReactDOM.render:', renderError);
-                        console.error('Stack:', renderError.stack);
-                        throw renderError;
-                    }
-                } else if (attempts < maxAttempts) {
-                    if (attempts % 10 === 0 || attempts === 1) {
-                        console.log(`⏳ Attente de BetaCombinedDashboard... (${attempts}/${maxAttempts})`);
-                        console.log('🔍 Vérification portée:', {
-                            local: typeof BetaCombinedDashboard !== 'undefined',
-                            global: typeof window.BetaCombinedDashboard !== 'undefined',
-                            React: typeof React !== 'undefined',
-                            ReactDOM: typeof ReactDOM !== 'undefined'
-                        });
-                    }
-                    setTimeout(checkAndMount, 100);
-                } else {
-                    const errorMsg = 'BetaCombinedDashboard n\'est pas défini après 15 secondes. Le script Babel ne s\'est peut-être pas chargé correctement.';
-                    console.error('❌', errorMsg);
-                    throw new Error(errorMsg);
-                }
-            };
+            // Utiliser BetaCombinedDashboard directement (défini dans la portée du bloc)
+            // Il est aussi exposé globalement via window.BetaCombinedDashboard
+            const DashboardComponent = BetaCombinedDashboard || window.BetaCombinedDashboard;
             
-            // Démarrer la vérification immédiatement
-            checkAndMount();
+            if (!DashboardComponent) {
+                throw new Error('BetaCombinedDashboard n\'est pas défini. Le script Babel ne s\'est peut-être pas chargé correctement.');
+            }
+
+            console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
+            try {
+                // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
+                ReactDOM.render(<DashboardComponent />, rootElement);
+                console.log('✅ Application React montée avec succès !');
+            } catch (renderError) {
+                console.error('❌ Erreur lors du ReactDOM.render:', renderError);
+                console.error('Stack:', renderError.stack);
+                throw renderError;
+            }
             
         } catch (error) {
             console.error('❌ ERREUR CRITIQUE lors du montage React:', error);
