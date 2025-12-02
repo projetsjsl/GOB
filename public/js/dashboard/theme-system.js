@@ -223,6 +223,39 @@ export const themes = {
             borderRadius: '0.25rem', // Légèrement arrondi (style années 1990)
             shadow: '0 2px 8px rgba(139, 92, 246, 0.15)', // Ombre violette subtile
         }
+    },
+    desjardins: {
+        name: 'Desjardins',
+        id: 'desjardins',
+        colors: {
+            primary: '#006747', // Vert Desjardins foncé (couleur principale)
+            secondary: '#00a651', // Vert Desjardins plus clair (accents)
+            background: '#ffffff', // Blanc (fond principal)
+            surface: '#f5f5f5', // Gris très clair (cards, panels)
+            surfaceLight: '#ffffff', // Blanc (hover states)
+            surfaceDark: '#e8e8e8', // Gris clair (borders, separators)
+            text: '#1a1a1a', // Noir/gris foncé (texte principal)
+            textSecondary: '#666666', // Gris moyen (texte secondaire)
+            textGreen: '#00a651', // Vert Desjardins (gains)
+            textRed: '#d32f2f', // Rouge (pertes)
+            border: '#d0d0d0', // Gris clair (bordures)
+            accent: '#006747', // Vert Desjardins foncé (highlights, CTA)
+            success: '#00a651', // Vert Desjardins (success)
+            danger: '#d32f2f', // Rouge (danger)
+            warning: '#ff9800', // Orange (alertes)
+        },
+        fonts: {
+            primary: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: 'Inter, system-ui, sans-serif',
+            mono: '"Courier New", "Courier", monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #006747 0%, #00a651 100%)', // Dégradé vert Desjardins
+            cardBg: '#ffffff',
+            cardBorder: '1px solid #d0d0d0',
+            borderRadius: '0.5rem', // Arrondi modéré
+            shadow: '0 2px 8px rgba(0, 103, 71, 0.1)', // Ombre verte subtile
+        }
     }
 };
 

@@ -493,9 +493,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 console.log('Thème changé:', themeId);
                 
                 // Déterminer isDarkMode en fonction du thème
-                // Thèmes light: seeking-alpha, bloomberg-nostalgie
-                // Thèmes dark: default, marketq, bloomberg-terminal, bloomberg-mobile
-                const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie'];
+                // Thèmes light: seeking-alpha, bloomberg-nostalgie, desjardins
+                // Thèmes dark: default, marketq, marketq-dark, bloomberg-terminal, bloomberg-mobile
+                const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie', 'desjardins'];
                 const isLight = lightThemes.includes(themeId);
                 setIsDarkMode(!isLight);
                 
@@ -581,7 +581,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 // Vérifier d'abord le thème GOB
                 if (window.GOBThemes) {
                     const currentThemeId = window.GOBThemes.getCurrentTheme();
-                    const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie'];
+                    const lightThemes = ['seeking-alpha', 'bloomberg-nostalgie', 'desjardins'];
                     if (lightThemes.includes(currentThemeId)) {
                         return false; // Light theme
                     }

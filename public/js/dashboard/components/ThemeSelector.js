@@ -77,7 +77,8 @@ const ThemeSelector = ({ isDarkMode = true }) => {
             'bloomberg-terminal': '💻',
             'seeking-alpha': '📈',
             'bloomberg-mobile': '📱',
-            'bloomberg-nostalgie': '🕰️'
+            'bloomberg-nostalgie': '🕰️',
+            'desjardins': '🏦'
         };
         return icons[themeId] || '✨';
     };
