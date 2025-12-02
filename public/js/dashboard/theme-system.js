@@ -259,9 +259,146 @@ export const themes = {
     }
 };
 
+// Thèmes par défaut (Terminal, IA, DarkMode, Light) - DÉFINIS AVANT allThemes
+const defaultThemes = {
+    'terminal': {
+        name: 'Terminal',
+        id: 'terminal',
+        isDefault: true,
+        colors: {
+            primary: '#ffcc00',
+            secondary: '#00ff00',
+            background: '#000000',
+            surface: '#0a0a0a',
+            surfaceLight: '#1a1a1a',
+            text: '#ffcc00',
+            textSecondary: '#888888',
+            textGreen: '#00ff00',
+            textRed: '#ff0000',
+            border: '#333333',
+            accent: '#ffcc00',
+            success: '#00ff00',
+            danger: '#ff0000',
+            warning: '#ffcc00',
+        },
+        fonts: {
+            primary: 'Courier New, "Courier", monospace',
+            secondary: 'Courier New, "Courier", monospace',
+            mono: 'Courier New, "Courier", monospace'
+        },
+        styles: {
+            headerBg: '#000000',
+            cardBg: '#0a0a0a',
+            cardBorder: '1px solid #333333',
+            borderRadius: '0',
+            shadow: 'none',
+        }
+    },
+    'ia': {
+        name: 'IA',
+        id: 'ia',
+        isDefault: true,
+        colors: {
+            primary: '#8b5cf6',
+            secondary: '#a78bfa',
+            background: '#000000',
+            surface: '#111827',
+            surfaceLight: '#1f2937',
+            text: '#ffffff',
+            textSecondary: '#9ca3af',
+            border: '#374151',
+            accent: '#8b5cf6',
+            success: '#10b981',
+            danger: '#ef4444',
+            warning: '#f59e0b',
+        },
+        fonts: {
+            primary: 'Inter, sans-serif',
+            secondary: 'Roboto, sans-serif',
+            mono: 'monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
+            cardBg: '#111827',
+            cardBorder: '1px solid #374151',
+            borderRadius: '0.75rem',
+            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        }
+    },
+    'darkmode': {
+        name: 'Dark Mode',
+        id: 'darkmode',
+        isDefault: true,
+        colors: {
+            primary: '#10b981',
+            secondary: '#3b82f6',
+            background: '#000000',
+            surface: '#111827',
+            surfaceLight: '#1f2937',
+            text: '#ffffff',
+            textSecondary: '#9ca3af',
+            border: '#374151',
+            accent: '#8b5cf6',
+            success: '#10b981',
+            danger: '#ef4444',
+            warning: '#f59e0b',
+        },
+        fonts: {
+            primary: 'Inter, sans-serif',
+            secondary: 'Roboto, sans-serif',
+            mono: 'monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
+            cardBg: '#111827',
+            cardBorder: '1px solid #374151',
+            borderRadius: '0.75rem',
+            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        }
+    },
+    'light': {
+        name: 'Light',
+        id: 'light',
+        isDefault: true,
+        colors: {
+            primary: '#10b981',
+            secondary: '#3b82f6',
+            background: '#ffffff',
+            surface: '#f5f5f5',
+            surfaceLight: '#ffffff',
+            text: '#1a1a1a',
+            textSecondary: '#666666',
+            border: '#d0d0d0',
+            accent: '#8b5cf6',
+            success: '#10b981',
+            danger: '#ef4444',
+            warning: '#f59e0b',
+        },
+        fonts: {
+            primary: 'Inter, sans-serif',
+            secondary: 'Roboto, sans-serif',
+            mono: 'monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)',
+            cardBg: '#ffffff',
+            cardBorder: '1px solid #d0d0d0',
+            borderRadius: '0.75rem',
+            shadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        }
+    }
+};
+
+// Fusionner tous les thèmes
+const allThemes = {
+    ...defaultThemes,
+    ...themes
+};
+
 // Fonction pour appliquer un thème
-export function applyTheme(themeId) {
-    const theme = themes[themeId] || themes.default;
+function applyTheme(themeId) {
+    // Utiliser allThemes pour inclure les thèmes par défaut
+    const theme = allThemes[themeId] || allThemes.darkmode || defaultThemes.darkmode;
     const root = document.documentElement;
     
     // Appliquer les variables CSS
@@ -313,23 +450,6 @@ export function applyTheme(themeId) {
     localStorage.setItem('gob-dashboard-theme', themeId);
     
     return theme;
-}
-
-// Fonction pour obtenir le thème actuel
-export function getCurrentTheme() {
-    const saved = localStorage.getItem('gob-dashboard-theme');
-    // Vérifier dans tous les thèmes (par défaut + personnalisés)
-    if (saved && allThemes[saved]) {
-        return saved;
-    }
-    // Par défaut: darkmode
-    return 'darkmode';
-}
-
-// Fonction pour initialiser le thème au chargement
-export function initTheme() {
-    const themeId = getCurrentTheme();
-    return applyTheme(themeId);
 }
 
 // Thèmes par défaut (Terminal, IA, DarkMode, Light)
@@ -468,7 +588,24 @@ const allThemes = {
     ...themes
 };
 
-// Exposer globalement
+// Fonction pour obtenir le thème actuel
+function getCurrentTheme() {
+    const saved = localStorage.getItem('gob-dashboard-theme');
+    // Vérifier dans tous les thèmes (par défaut + personnalisés)
+    if (saved && allThemes[saved]) {
+        return saved;
+    }
+    // Par défaut: darkmode
+    return 'darkmode';
+}
+
+// Fonction pour initialiser le thème au chargement
+function initTheme() {
+    const themeId = getCurrentTheme();
+    return applyTheme(themeId);
+}
+
+// Exposer globalement AVANT l'initialisation
 window.GOBThemes = {
     themes: allThemes,
     defaultThemes,
@@ -477,4 +614,11 @@ window.GOBThemes = {
     getCurrentTheme,
     initTheme
 };
+
+// Initialiser le thème au chargement
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+} else {
+    initTheme();
+}
 

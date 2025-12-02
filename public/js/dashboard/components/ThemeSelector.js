@@ -9,12 +9,29 @@ const ThemeSelector = ({ isDarkMode = true }) => {
     const [currentTheme, setCurrentTheme] = useState('default');
     const modalRef = useRef(null);
 
-    // Charger le thème au montage
+    // Charger le thème au montage et écouter les changements
     useEffect(() => {
-        if (window.GOBThemes) {
-            const themeId = window.GOBThemes.getCurrentTheme();
-            setCurrentTheme(themeId);
-        }
+        const loadTheme = () => {
+            if (window.GOBThemes && window.GOBThemes.getCurrentTheme) {
+                const themeId = window.GOBThemes.getCurrentTheme();
+                setCurrentTheme(themeId);
+            } else {
+                // Attendre que GOBThemes soit disponible
+                setTimeout(loadTheme, 100);
+            }
+        };
+        
+        loadTheme();
+        
+        // Écouter les changements de thème
+        const handleThemeChange = (event) => {
+            if (event.detail && event.detail.themeId) {
+                setCurrentTheme(event.detail.themeId);
+            }
+        };
+        
+        window.addEventListener('themeChanged', handleThemeChange);
+        return () => window.removeEventListener('themeChanged', handleThemeChange);
     }, []);
 
     // Fermer la modal si on clique en dehors
@@ -116,9 +133,11 @@ const ThemeSelector = ({ isDarkMode = true }) => {
     const renderThemePreview = (theme) => {
         const colors = theme.colors || {};
         const isSelected = currentTheme === theme.id;
-        const isLightTheme = ['seeking-alpha', 'bloomberg-nostalgie'].includes(theme.id);
-        const previewBg = isLightTheme ? '#ffffff' : (colors.background || '#000000');
-        const previewText = isLightTheme ? '#202124' : (colors.text || '#ffffff');
+        // Détecter les thèmes light
+        const isLightTheme = ['seeking-alpha', 'bloomberg-nostalgie', 'desjardins', 'light'].includes(theme.id) || 
+                            (colors.background && colors.background.toLowerCase() === '#ffffff');
+        const previewBg = colors.background || (isLightTheme ? '#ffffff' : '#000000');
+        const previewText = colors.text || (isLightTheme ? '#202124' : '#ffffff');
 
         return (
             <div
