@@ -25843,9 +25843,6 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 {window.ThemeSelector && (
                                     <ThemeSelector isDarkMode={isDarkMode} />
                                 )}
-                                {window.NewsTicker && (
-                                    <NewsTicker isDarkMode={isDarkMode} />
-                                )}
 
                                 {/* Theme toggle - icône seulement */}
                                 <button
