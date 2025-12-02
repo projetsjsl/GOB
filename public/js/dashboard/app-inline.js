@@ -25181,14 +25181,36 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     style={{
                         background: 'var(--theme-header-bg, linear-gradient(135deg, #111827 0%, #1f2937 100%))',
                         borderColor: 'var(--theme-border, rgba(16, 185, 129, 0.2))',
+                        borderWidth: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '2px' : '1px',
                         color: 'var(--theme-text, #ffffff)',
                         fontFamily: 'var(--theme-font-primary, Inter, sans-serif)',
-                        boxShadow: `
-                            0 8px 32px rgba(0, 0, 0, 0.3),
-                            0 2px 8px rgba(0, 0, 0, 0.2),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                            inset 0 -1px 0 rgba(0, 0, 0, 0.1)
-                        `,
+                        boxShadow: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                            ? 'none'
+                            : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                            ? `
+                                0 8px 32px rgba(0, 212, 255, 0.2),
+                                0 2px 8px rgba(0, 212, 255, 0.1),
+                                inset 0 1px 0 rgba(0, 212, 255, 0.1),
+                                0 0 60px rgba(0, 212, 255, 0.1)
+                            `
+                            : currentThemeId === 'seeking-alpha'
+                            ? `
+                                0 8px 32px rgba(255, 107, 53, 0.15),
+                                0 2px 8px rgba(255, 107, 53, 0.1),
+                                inset 0 1px 0 rgba(255, 107, 53, 0.05)
+                            `
+                            : currentThemeId === 'desjardins'
+                            ? `
+                                0 8px 32px rgba(0, 103, 71, 0.15),
+                                0 2px 8px rgba(0, 103, 71, 0.1),
+                                inset 0 1px 0 rgba(0, 166, 81, 0.1)
+                            `
+                            : `
+                                0 8px 32px rgba(0, 0, 0, 0.3),
+                                0 2px 8px rgba(0, 0, 0, 0.2),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                                inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+                            `,
                         position: 'relative',
                         zIndex: 10
                     }}
@@ -25203,125 +25225,329 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             animation: 'glow-pulse 3s ease-in-out infinite'
                         }}
                     ></div>
-                    {/* CEO Premium: Multi-layer patterns animés selon le thème */}
+                    {/* CEO Premium: Patterns ultra-personnalisés selon le thème */}
                     <div 
                         className="absolute inset-0"
                         style={{
-                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.12 : 0.06,
-                            backgroundImage: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 4px)'
+                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' 
+                                ? 0.15 
                                 : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                ? 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0), radial-gradient(circle at 10px 10px, currentColor 0.5px, transparent 0)'
+                                ? 0.08
+                                : currentThemeId === 'seeking-alpha'
+                                ? 0.04
+                                : currentThemeId === 'desjardins'
+                                ? 0.03
+                                : 0.06,
+                            backgroundImage: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, currentColor 1px, currentColor 2px)'
+                                : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0), radial-gradient(circle at 10px 10px, currentColor 0.5px, transparent 0), radial-gradient(circle at 18px 18px, currentColor 0.3px, transparent 0)'
+                                : currentThemeId === 'seeking-alpha'
+                                ? 'repeating-linear-gradient(45deg, transparent, transparent 4px, currentColor 0.5px, currentColor 1px)'
+                                : currentThemeId === 'desjardins'
+                                ? 'repeating-linear-gradient(0deg, transparent, transparent 8px, currentColor 0.5px, currentColor 1px), repeating-linear-gradient(90deg, transparent, transparent 8px, currentColor 0.5px, currentColor 1px)'
+                                : currentThemeId === 'bloomberg-nostalgie'
+                                ? 'repeating-linear-gradient(45deg, transparent, transparent 2px, currentColor 1px, currentColor 2px), repeating-linear-gradient(-45deg, transparent, transparent 2px, currentColor 1px, currentColor 2px)'
                                 : 'repeating-linear-gradient(45deg, transparent, transparent 2px, currentColor 1px, currentColor 3px), repeating-linear-gradient(-45deg, transparent, transparent 2px, currentColor 1px, currentColor 3px)',
                             backgroundSize: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' 
-                                ? '100% 4px'
+                                ? '100% 4px, 4px 100%'
                                 : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                ? '16px 16px, 24px 24px'
+                                ? '16px 16px, 24px 24px, 32px 32px'
+                                : currentThemeId === 'seeking-alpha'
+                                ? '12px 12px'
+                                : currentThemeId === 'desjardins'
+                                ? '16px 16px, 16px 16px'
                                 : '8px 8px, 12px 12px',
-                            animation: 'float 20s ease-in-out infinite'
+                            animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? 'float 25s ease-in-out infinite'
+                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                ? 'none'
+                                : 'float 20s ease-in-out infinite'
                         }}
                     ></div>
                     
-                    {/* CEO Premium: Multi-layer gradients avec animation */}
+                    {/* CEO Premium: Gradients ultra-personnalisés selon le thème */}
                     <div 
                         className="absolute inset-0"
                         style={{
-                            background: `
-                                linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.12) 0%, transparent 40%),
-                                radial-gradient(ellipse at 20% 50%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.08) 0%, transparent 50%),
-                                radial-gradient(ellipse at 80% 50%, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.06) 0%, transparent 50%)
-                            `,
-                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.5 : 0.7,
-                            animation: 'gradient-shift 8s ease infinite'
+                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? `
+                                    linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, transparent 40%),
+                                    radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                                    radial-gradient(ellipse at 80% 50%, rgba(0, 168, 204, 0.08) 0%, transparent 50%),
+                                    linear-gradient(90deg, rgba(0, 212, 255, 0.05) 0%, transparent 50%, rgba(0, 212, 255, 0.05) 100%)
+                                `
+                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                ? `
+                                    linear-gradient(135deg, rgba(255, 204, 0, 0.08) 0%, transparent 50%),
+                                    linear-gradient(45deg, rgba(255, 204, 0, 0.05) 0%, transparent 50%)
+                                `
+                                : currentThemeId === 'seeking-alpha'
+                                ? `
+                                    linear-gradient(135deg, rgba(255, 107, 53, 0.12) 0%, transparent 40%),
+                                    radial-gradient(ellipse at 30% 50%, rgba(255, 107, 53, 0.08) 0%, transparent 50%)
+                                `
+                                : currentThemeId === 'desjardins'
+                                ? `
+                                    linear-gradient(135deg, rgba(0, 103, 71, 0.12) 0%, rgba(0, 166, 81, 0.08) 50%, transparent 100%),
+                                    radial-gradient(ellipse at 50% 0%, rgba(0, 166, 81, 0.1) 0%, transparent 50%)
+                                `
+                                : currentThemeId === 'bloomberg-nostalgie'
+                                ? `
+                                    linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+                                    radial-gradient(ellipse at 20% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+                                    radial-gradient(ellipse at 80% 50%, rgba(167, 139, 250, 0.05) 0%, transparent 50%)
+                                `
+                                : `
+                                    linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.12) 0%, transparent 40%),
+                                    radial-gradient(ellipse at 20% 50%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.08) 0%, transparent 50%),
+                                    radial-gradient(ellipse at 80% 50%, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.06) 0%, transparent 50%)
+                                `,
+                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.6 : 0.8,
+                            animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' || currentThemeId === 'bloomberg-nostalgie'
+                                ? 'gradient-shift 8s ease infinite'
+                                : 'none'
                         }}
                     ></div>
                     
-                    {/* CEO Premium: Shine effect animé */}
+                    {/* CEO Premium: Shine effect personnalisé selon le thème */}
                     <div 
                         className="absolute inset-0 opacity-0 group-hover/header:opacity-100 transition-opacity duration-1000 pointer-events-none overflow-hidden"
                         style={{
-                            background: `linear-gradient(135deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 50%, transparent 100%)`,
-                            animation: 'luxury-shimmer 4s ease-in-out infinite'
+                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? 'linear-gradient(135deg, transparent 0%, rgba(0, 212, 255, 0.2) 50%, transparent 100%)'
+                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                ? 'linear-gradient(135deg, transparent 0%, rgba(255, 204, 0, 0.15) 50%, transparent 100%)'
+                                : currentThemeId === 'seeking-alpha'
+                                ? 'linear-gradient(135deg, transparent 0%, rgba(255, 107, 53, 0.18) 50%, transparent 100%)'
+                                : currentThemeId === 'desjardins'
+                                ? 'linear-gradient(135deg, transparent 0%, rgba(0, 166, 81, 0.15) 50%, transparent 100%)'
+                                : `linear-gradient(135deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 50%, transparent 100%)`,
+                            animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? 'luxury-shimmer 3s ease-in-out infinite'
+                                : 'luxury-shimmer 4s ease-in-out infinite'
                         }}
                     ></div>
                     
-                    {/* CEO Premium: Corner accents */}
+                    {/* CEO Premium: Corner accents personnalisés selon le thème */}
                     <div 
-                        className="absolute top-0 left-0 w-40 h-40 opacity-30"
+                        className="absolute top-0 left-0 w-48 h-48"
                         style={{
-                            background: `radial-gradient(circle, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4) 0%, transparent 70%)`,
-                            filter: 'blur(20px)',
+                            opacity: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' ? 0.4 : 0.3,
+                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? 'radial-gradient(circle, rgba(0, 212, 255, 0.5) 0%, transparent 70%)'
+                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                ? 'radial-gradient(circle, rgba(255, 204, 0, 0.4) 0%, transparent 70%)'
+                                : currentThemeId === 'seeking-alpha'
+                                ? 'radial-gradient(circle, rgba(255, 107, 53, 0.4) 0%, transparent 70%)'
+                                : currentThemeId === 'desjardins'
+                                ? 'radial-gradient(circle, rgba(0, 166, 81, 0.4) 0%, transparent 70%)'
+                                : `radial-gradient(circle, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4) 0%, transparent 70%)`,
+                            filter: 'blur(25px)',
                             animation: 'glow-pulse 4s ease-in-out infinite'
                         }}
                     ></div>
                     <div 
-                        className="absolute top-0 right-0 w-40 h-40 opacity-30"
+                        className="absolute top-0 right-0 w-48 h-48"
                         style={{
-                            background: `radial-gradient(circle, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.3) 0%, transparent 70%)`,
-                            filter: 'blur(20px)',
+                            opacity: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' ? 0.35 : 0.25,
+                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? 'radial-gradient(circle, rgba(0, 168, 204, 0.4) 0%, transparent 70%)'
+                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                ? 'radial-gradient(circle, rgba(255, 204, 0, 0.3) 0%, transparent 70%)'
+                                : currentThemeId === 'seeking-alpha'
+                                ? 'radial-gradient(circle, rgba(26, 115, 232, 0.3) 0%, transparent 70%)'
+                                : currentThemeId === 'desjardins'
+                                ? 'radial-gradient(circle, rgba(0, 103, 71, 0.3) 0%, transparent 70%)'
+                                : `radial-gradient(circle, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.3) 0%, transparent 70%)`,
+                            filter: 'blur(25px)',
                             animation: 'glow-pulse 4s ease-in-out infinite 1s'
                         }}
                     ></div>
+                    
+                    {/* CEO Premium: Scanline effect pour Terminal/Bloomberg Terminal */}
+                    {(currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal') && (
+                        <div 
+                            className="absolute inset-0 pointer-events-none"
+                            style={{
+                                background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 204, 0, 0.03) 2px, rgba(255, 204, 0, 0.03) 4px)',
+                                animation: 'float 15s linear infinite',
+                                mixBlendMode: 'screen'
+                            }}
+                        ></div>
+                    )}
+                    
+                    {/* CEO Premium: Data stream effect pour MarketQ */}
+                    {(currentThemeId === 'marketq' || currentThemeId === 'marketq-dark') && (
+                        <>
+                            <div 
+                                className="absolute inset-0 pointer-events-none overflow-hidden"
+                                style={{
+                                    background: 'linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.1) 50%, transparent 100%)',
+                                    animation: 'luxury-shimmer 6s ease-in-out infinite',
+                                    transform: 'translateX(-100%)'
+                                }}
+                            ></div>
+                            <div 
+                                className="absolute inset-0 pointer-events-none"
+                                style={{
+                                    background: 'radial-gradient(ellipse at 50% 0%, rgba(0, 212, 255, 0.15) 0%, transparent 50%)',
+                                    animation: 'glow-pulse 5s ease-in-out infinite'
+                                }}
+                            ></div>
+                        </>
+                    )}
 
                     <div className="px-6 py-5 relative z-10">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-8">
-                                {/* CEO Premium: Logo avec effets ultra-sophistiqués */}
+                                {/* CEO Premium: Logo ultra-personnalisé selon le thème */}
                                 <div 
                                     className="relative p-3.5 rounded-xl shadow-2xl group/logo transition-all duration-500 hover:scale-105"
                                     style={{
-                                        background: `
-                                            linear-gradient(135deg, 
-                                                rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 0%, 
-                                                rgba(var(--theme-accent-rgb, 139, 92, 246), 0.1) 50%,
-                                                rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 100%
-                                            )
-                                        `,
-                                        backgroundSize: '200% 200%',
-                                        border: `2px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
-                                        boxShadow: `
-                                            0 12px 24px -4px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2),
-                                            0 4px 12px -2px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1),
-                                            inset 0 2px 4px rgba(255, 255, 255, 0.1),
-                                            inset 0 -2px 4px rgba(0, 0, 0, 0.1),
-                                            0 0 40px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15)
-                                        `,
+                                        background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                            ? `
+                                                linear-gradient(135deg, 
+                                                    rgba(0, 212, 255, 0.2) 0%, 
+                                                    rgba(0, 168, 204, 0.15) 50%,
+                                                    rgba(0, 212, 255, 0.2) 100%
+                                                )
+                                            `
+                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                            ? 'rgba(255, 204, 0, 0.1)'
+                                            : currentThemeId === 'seeking-alpha'
+                                            ? `
+                                                linear-gradient(135deg, 
+                                                    rgba(255, 107, 53, 0.15) 0%, 
+                                                    rgba(255, 107, 53, 0.1) 50%,
+                                                    rgba(255, 107, 53, 0.15) 100%
+                                                )
+                                            `
+                                            : currentThemeId === 'desjardins'
+                                            ? `
+                                                linear-gradient(135deg, 
+                                                    rgba(0, 103, 71, 0.15) 0%, 
+                                                    rgba(0, 166, 81, 0.12) 50%,
+                                                    rgba(0, 103, 71, 0.15) 100%
+                                                )
+                                            `
+                                            : `
+                                                linear-gradient(135deg, 
+                                                    rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 0%, 
+                                                    rgba(var(--theme-accent-rgb, 139, 92, 246), 0.1) 50%,
+                                                    rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 100%
+                                                )
+                                            `,
+                                        backgroundSize: (currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' || currentThemeId === 'seeking-alpha' || currentThemeId === 'desjardins') ? '200% 200%' : '100% 100%',
+                                        border: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                            ? '2px solid rgba(255, 204, 0, 0.5)'
+                                            : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                            ? '2px solid rgba(0, 212, 255, 0.5)'
+                                            : currentThemeId === 'seeking-alpha'
+                                            ? '2px solid rgba(255, 107, 53, 0.4)'
+                                            : currentThemeId === 'desjardins'
+                                            ? '2px solid rgba(0, 166, 81, 0.4)'
+                                            : `2px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
+                                        boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                            ? `
+                                                0 12px 24px -4px rgba(0, 212, 255, 0.3),
+                                                0 4px 12px -2px rgba(0, 212, 255, 0.2),
+                                                inset 0 2px 4px rgba(0, 212, 255, 0.1),
+                                                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                                                0 0 50px rgba(0, 212, 255, 0.2)
+                                            `
+                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                            ? `
+                                                0 0 20px rgba(255, 204, 0, 0.2),
+                                                inset 0 1px 0 rgba(255, 204, 0, 0.2)
+                                            `
+                                            : currentThemeId === 'seeking-alpha'
+                                            ? `
+                                                0 12px 24px -4px rgba(255, 107, 53, 0.25),
+                                                0 4px 12px -2px rgba(255, 107, 53, 0.15),
+                                                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                                                0 0 40px rgba(255, 107, 53, 0.15)
+                                            `
+                                            : currentThemeId === 'desjardins'
+                                            ? `
+                                                0 12px 24px -4px rgba(0, 103, 71, 0.2),
+                                                0 4px 12px -2px rgba(0, 166, 81, 0.15),
+                                                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                                                0 0 40px rgba(0, 166, 81, 0.15)
+                                            `
+                                            : `
+                                                0 12px 24px -4px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2),
+                                                0 4px 12px -2px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1),
+                                                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                                                inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                                                0 0 40px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15)
+                                            `,
                                         borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem',
-                                        animation: 'gradient-shift 5s ease infinite'
+                                        animation: (currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' || currentThemeId === 'seeking-alpha' || currentThemeId === 'desjardins') ? 'gradient-shift 5s ease infinite' : 'none'
                                     }}
                                 >
-                                    {/* Multi-layer shine */}
+                                    {/* Multi-layer shine personnalisé */}
                                     <div 
                                         className="absolute inset-0 rounded-xl opacity-0 group-hover/logo:opacity-100 transition-opacity duration-700"
                                         style={{
-                                            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%)`,
+                                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, transparent 50%, rgba(0, 212, 255, 0.15) 100%)'
+                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? 'linear-gradient(135deg, rgba(255, 204, 0, 0.25) 0%, transparent 50%)'
+                                                : currentThemeId === 'seeking-alpha'
+                                                ? 'linear-gradient(135deg, rgba(255, 107, 53, 0.25) 0%, transparent 50%, rgba(255, 107, 53, 0.15) 100%)'
+                                                : currentThemeId === 'desjardins'
+                                                ? 'linear-gradient(135deg, rgba(0, 166, 81, 0.25) 0%, transparent 50%, rgba(0, 166, 81, 0.15) 100%)'
+                                                : `linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%)`,
                                             borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem',
-                                            animation: 'luxury-shimmer 3s ease-in-out infinite'
+                                            animation: (currentThemeId === 'marketq' || currentThemeId === 'marketq-dark') ? 'luxury-shimmer 2.5s ease-in-out infinite' : 'luxury-shimmer 3s ease-in-out infinite'
                                         }}
                                     ></div>
                                     <div 
-                                        className="absolute inset-0 rounded-xl opacity-40"
+                                        className="absolute inset-0 rounded-xl"
                                         style={{
-                                            background: `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%)`,
+                                            opacity: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' ? 0.5 : 0.4,
+                                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? 'radial-gradient(circle at 30% 30%, rgba(0, 212, 255, 0.2) 0%, transparent 60%)'
+                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? 'radial-gradient(circle at 30% 30%, rgba(255, 204, 0, 0.15) 0%, transparent 60%)'
+                                                : `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%)`,
                                             borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem'
                                         }}
                                     ></div>
                                     
-                                    {/* Inner glow */}
+                                    {/* Inner glow personnalisé */}
                                     <div 
-                                        className="absolute inset-1 rounded-lg opacity-30"
+                                        className="absolute inset-1 rounded-lg"
                                         style={{
-                                            background: `radial-gradient(circle, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4) 0%, transparent 70%)`,
+                                            opacity: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' ? 0.4 : 0.3,
+                                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? 'radial-gradient(circle, rgba(0, 212, 255, 0.5) 0%, transparent 70%)'
+                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? 'radial-gradient(circle, rgba(255, 204, 0, 0.4) 0%, transparent 70%)'
+                                                : currentThemeId === 'seeking-alpha'
+                                                ? 'radial-gradient(circle, rgba(255, 107, 53, 0.4) 0%, transparent 70%)'
+                                                : currentThemeId === 'desjardins'
+                                                ? 'radial-gradient(circle, rgba(0, 166, 81, 0.4) 0%, transparent 70%)'
+                                                : `radial-gradient(circle, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4) 0%, transparent 70%)`,
                                             filter: 'blur(8px)',
                                             borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.5rem'
                                         }}
                                     ></div>
                                     
-                                    {/* Glow effect au hover */}
+                                    {/* Glow effect au hover personnalisé */}
                                     <div 
                                         className="absolute -inset-2 rounded-xl opacity-0 group-hover/logo:opacity-100 transition-opacity duration-700 blur-xl"
                                         style={{
-                                            background: `radial-gradient(ellipse, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.6) 0%, transparent 70%)`
+                                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? 'radial-gradient(ellipse, rgba(0, 212, 255, 0.7) 0%, transparent 70%)'
+                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? 'radial-gradient(ellipse, rgba(255, 204, 0, 0.6) 0%, transparent 70%)'
+                                                : currentThemeId === 'seeking-alpha'
+                                                ? 'radial-gradient(ellipse, rgba(255, 107, 53, 0.6) 0%, transparent 70%)'
+                                                : currentThemeId === 'desjardins'
+                                                ? 'radial-gradient(ellipse, rgba(0, 166, 81, 0.6) 0%, transparent 70%)'
+                                                : `radial-gradient(ellipse, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.6) 0%, transparent 70%)`
                                         }}
                                     ></div>
                                     
@@ -25335,16 +25561,41 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <div 
                                     className="border-l pl-7 relative"
                                     style={{
-                                        borderColor: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
-                                        borderWidth: '2px'
+                                        borderColor: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                            ? 'rgba(0, 212, 255, 0.5)'
+                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                            ? 'rgba(255, 204, 0, 0.5)'
+                                            : currentThemeId === 'seeking-alpha'
+                                            ? 'rgba(255, 107, 53, 0.4)'
+                                            : currentThemeId === 'desjardins'
+                                            ? 'rgba(0, 166, 81, 0.4)'
+                                            : `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
+                                        borderWidth: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '3px' : '2px'
                                     }}
                                 >
-                                    {/* Animated border glow */}
+                                    {/* Animated border glow personnalisé */}
                                     <div 
-                                        className="absolute left-0 top-0 bottom-0 w-1 opacity-50"
+                                        className="absolute left-0 top-0 bottom-0"
                                         style={{
-                                            background: `linear-gradient(180deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.6) 50%, transparent 100%)`,
-                                            animation: 'glow-pulse 3s ease-in-out infinite'
+                                            width: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '3px' : '2px',
+                                            opacity: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' ? 0.7 : 0.5,
+                                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? 'linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.8) 50%, transparent 100%)'
+                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? 'linear-gradient(180deg, transparent 0%, rgba(255, 204, 0, 0.8) 50%, transparent 100%)'
+                                                : currentThemeId === 'seeking-alpha'
+                                                ? 'linear-gradient(180deg, transparent 0%, rgba(255, 107, 53, 0.7) 50%, transparent 100%)'
+                                                : currentThemeId === 'desjardins'
+                                                ? 'linear-gradient(180deg, transparent 0%, rgba(0, 166, 81, 0.7) 50%, transparent 100%)'
+                                                : `linear-gradient(180deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.6) 50%, transparent 100%)`,
+                                            animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? 'glow-pulse 2.5s ease-in-out infinite'
+                                                : 'glow-pulse 3s ease-in-out infinite',
+                                            boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? '0 0 12px rgba(0, 212, 255, 0.4)'
+                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? '0 0 12px rgba(255, 204, 0, 0.4)'
+                                                : 'none'
                                         }}
                                     ></div>
                                     
@@ -25357,14 +25608,31 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? 'var(--theme-font-mono, "Courier New", monospace)'
                                                         : currentThemeId === 'bloomberg-nostalgie'
                                                         ? 'var(--theme-font-primary, "Courier New", monospace)'
+                                                        : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                        ? 'var(--theme-font-primary, Roboto, sans-serif)'
                                                         : "'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', var(--theme-font-primary, Inter), sans-serif",
                                                     fontWeight: 900, 
-                                                    letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.08em' : '-0.03em',
+                                                    letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' 
+                                                        ? '0.1em' 
+                                                        : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                        ? '-0.02em'
+                                                        : '-0.03em',
                                                     color: 'var(--theme-text, #ffffff)',
-                                                    textShadow: `
-                                                        0 2px 8px rgba(0, 0, 0, 0.3),
-                                                        0 0 20px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)
-                                                    `
+                                                    textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                        ? `
+                                                            0 2px 8px rgba(0, 0, 0, 0.4),
+                                                            0 0 25px rgba(0, 212, 255, 0.3),
+                                                            0 0 50px rgba(0, 212, 255, 0.2)
+                                                        `
+                                                        : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                        ? `
+                                                            0 2px 8px rgba(0, 0, 0, 0.5),
+                                                            0 0 20px rgba(255, 204, 0, 0.3)
+                                                        `
+                                                        : `
+                                                            0 2px 8px rgba(0, 0, 0, 0.3),
+                                                            0 0 20px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)
+                                                        `
                                                 }}
                                             >
                                                 TERMINAL FINANCIER
@@ -25377,11 +25645,23 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                             ? 'var(--theme-font-mono, "Courier New", monospace)'
                                                             : 'inherit',
-                                                        textShadow: `
-                                                            0 2px 12px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4),
-                                                            0 0 30px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)
-                                                        `,
-                                                        filter: 'brightness(1.1)'
+                                                        textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? `
+                                                                0 2px 12px rgba(0, 212, 255, 0.5),
+                                                                0 0 35px rgba(0, 212, 255, 0.4),
+                                                                0 0 60px rgba(0, 212, 255, 0.3)
+                                                            `
+                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? `
+                                                                0 2px 12px rgba(255, 204, 0, 0.5),
+                                                                0 0 30px rgba(255, 204, 0, 0.4)
+                                                            `
+                                                            : `
+                                                                0 2px 12px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4),
+                                                                0 0 30px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)
+                                                            `,
+                                                        filter: 'brightness(1.15)',
+                                                        animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark' ? 'glow-pulse 3s ease-in-out infinite' : 'none'
                                                     }}
                                                 >
                                                     Emma IA
@@ -25389,16 +25669,46 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 <span 
                                                     className="ml-4 text-xs font-bold px-3 py-1.5 rounded-lg relative inline-block"
                                                     style={{
-                                                        background: `linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.25) 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 100%)`,
+                                                        background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(0, 168, 204, 0.2) 100%)'
+                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? 'linear-gradient(135deg, rgba(255, 204, 0, 0.3) 0%, rgba(255, 204, 0, 0.2) 100%)'
+                                                            : currentThemeId === 'seeking-alpha'
+                                                            ? 'linear-gradient(135deg, rgba(255, 107, 53, 0.3) 0%, rgba(255, 107, 53, 0.2) 100%)'
+                                                            : currentThemeId === 'desjardins'
+                                                            ? 'linear-gradient(135deg, rgba(0, 166, 81, 0.3) 0%, rgba(0, 103, 71, 0.2) 100%)'
+                                                            : `linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.25) 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 100%)`,
                                                         color: 'var(--theme-primary, #4ade80)',
-                                                        border: `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
-                                                        boxShadow: `
-                                                            0 4px 12px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2),
-                                                            inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                                                        `,
+                                                        border: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? '1px solid rgba(0, 212, 255, 0.5)'
+                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? '1px solid rgba(255, 204, 0, 0.5)'
+                                                            : currentThemeId === 'seeking-alpha'
+                                                            ? '1px solid rgba(255, 107, 53, 0.4)'
+                                                            : currentThemeId === 'desjardins'
+                                                            ? '1px solid rgba(0, 166, 81, 0.4)'
+                                                            : `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
+                                                        boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? `
+                                                                0 4px 12px rgba(0, 212, 255, 0.3),
+                                                                inset 0 1px 0 rgba(0, 212, 255, 0.3),
+                                                                0 0 20px rgba(0, 212, 255, 0.2)
+                                                            `
+                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? `
+                                                                0 4px 12px rgba(255, 204, 0, 0.3),
+                                                                inset 0 1px 0 rgba(255, 204, 0, 0.3),
+                                                                0 0 20px rgba(255, 204, 0, 0.2)
+                                                            `
+                                                            : `
+                                                                0 4px 12px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2),
+                                                                inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                                                            `,
                                                         textTransform: 'uppercase',
                                                         letterSpacing: '0.1em',
-                                                        animation: 'glow-pulse 2.5s ease-in-out infinite'
+                                                        animation: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? 'glow-pulse 2s ease-in-out infinite'
+                                                            : 'glow-pulse 2.5s ease-in-out infinite'
                                                     }}
                                                 >
                                                     BÊTA
@@ -25407,16 +25717,25 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             <p 
                                                 className="text-sm font-semibold tracking-wider mt-2 relative"
                                                 style={{
-                                                    fontFamily: 'var(--theme-font-primary, Inter, sans-serif)',
+                                                    fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                        ? 'var(--theme-font-mono, "Courier New", monospace)'
+                                                        : 'var(--theme-font-primary, Inter, sans-serif)',
                                                     color: 'var(--theme-text-secondary, #9ca3af)',
-                                                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)'
+                                                    textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                        ? '0 1px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 212, 255, 0.1)'
+                                                        : '0 1px 4px rgba(0, 0, 0, 0.2)',
+                                                    letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.05em' : '0.02em'
                                                 }}
                                             >
                                                 Propulsé par <span 
                                                     style={{ 
                                                         color: 'var(--theme-primary, #4ade80)', 
                                                         fontWeight: 'bold',
-                                                        textShadow: `0 0 10px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`
+                                                        textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                            ? `0 0 12px rgba(0, 212, 255, 0.5), 0 0 24px rgba(0, 212, 255, 0.3)`
+                                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? `0 0 10px rgba(255, 204, 0, 0.4)`
+                                                            : `0 0 10px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`
                                                     }}
                                                 >
                                                     JSL AI
@@ -25428,23 +25747,53 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
 
                             <div className="flex items-center gap-3">
-                                {/* CEO Premium: Live indicator ultra-sophisticated */}
+                                {/* CEO Premium: Live indicator ultra-personnalisé selon le thème */}
                                 <div 
                                     className="flex items-center gap-2.5 px-4 py-2 rounded-xl relative group/live transition-all duration-500 hover:scale-105"
                                     style={{
-                                        background: `
-                                            linear-gradient(135deg, 
-                                                rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.15 : 0.2}) 0%, 
-                                                rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.1 : 0.15}) 100%
-                                            )
-                                        `,
-                                        border: `2px solid rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.4 : 0.5})`,
+                                        background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                            ? `
+                                                linear-gradient(135deg, 
+                                                    rgba(0, 255, 136, ${isDarkMode ? 0.2 : 0.25}) 0%, 
+                                                    rgba(0, 255, 136, ${isDarkMode ? 0.15 : 0.2}) 100%
+                                                )
+                                            `
+                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                            ? `
+                                                linear-gradient(135deg, 
+                                                    rgba(0, 255, 0, ${isDarkMode ? 0.15 : 0.2}) 0%, 
+                                                    rgba(0, 255, 0, ${isDarkMode ? 0.1 : 0.15}) 100%
+                                                )
+                                            `
+                                            : `
+                                                linear-gradient(135deg, 
+                                                    rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.15 : 0.2}) 0%, 
+                                                    rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.1 : 0.15}) 100%
+                                                )
+                                            `,
+                                        border: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                            ? `2px solid rgba(0, 255, 136, ${isDarkMode ? 0.5 : 0.6})`
+                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                            ? `2px solid rgba(0, 255, 0, ${isDarkMode ? 0.5 : 0.6})`
+                                            : `2px solid rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.4 : 0.5})`,
                                         borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem',
-                                        boxShadow: `
-                                            0 4px 16px rgba(var(--theme-success-rgb, 16, 185, 129), 0.2),
-                                            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                                            0 0 20px rgba(var(--theme-success-rgb, 16, 185, 129), 0.15)
-                                        `
+                                        boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                            ? `
+                                                0 4px 16px rgba(0, 255, 136, 0.3),
+                                                inset 0 1px 0 rgba(0, 255, 136, 0.2),
+                                                0 0 25px rgba(0, 255, 136, 0.2)
+                                            `
+                                            : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                            ? `
+                                                0 4px 16px rgba(0, 255, 0, 0.3),
+                                                inset 0 1px 0 rgba(0, 255, 0, 0.2),
+                                                0 0 25px rgba(0, 255, 0, 0.2)
+                                            `
+                                            : `
+                                                0 4px 16px rgba(var(--theme-success-rgb, 16, 185, 129), 0.2),
+                                                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                                                0 0 20px rgba(var(--theme-success-rgb, 16, 185, 129), 0.15)
+                                            `
                                     }}
                                 >
                                     {/* Shine effect */}
@@ -25460,15 +25809,31 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                         <div 
                                             className="w-2.5 h-2.5 rounded-full animate-pulse relative"
                                             style={{ 
-                                                backgroundColor: 'var(--theme-success, #10b981)',
-                                                boxShadow: `0 0 12px var(--theme-success, #10b981), 0 0 24px rgba(var(--theme-success-rgb, 16, 185, 129), 0.4)`
+                                                backgroundColor: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                    ? '#00ff88'
+                                                    : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                    ? '#00ff00'
+                                                    : 'var(--theme-success, #10b981)',
+                                                boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                    ? `0 0 12px #00ff88, 0 0 24px rgba(0, 255, 136, 0.5), 0 0 40px rgba(0, 255, 136, 0.3)`
+                                                    : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                    ? `0 0 12px #00ff00, 0 0 24px rgba(0, 255, 0, 0.5), 0 0 40px rgba(0, 255, 0, 0.3)`
+                                                    : `0 0 12px var(--theme-success, #10b981), 0 0 24px rgba(var(--theme-success-rgb, 16, 185, 129), 0.4)`
                                             }}
                                         ></div>
                                         <div 
                                             className="absolute inset-0 w-2.5 h-2.5 rounded-full animate-ping opacity-75"
                                             style={{ 
-                                                backgroundColor: 'var(--theme-success, #10b981)',
-                                                boxShadow: `0 0 12px var(--theme-success, #10b981)`
+                                                backgroundColor: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                    ? '#00ff88'
+                                                    : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                    ? '#00ff00'
+                                                    : 'var(--theme-success, #10b981)',
+                                                boxShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                    ? `0 0 12px #00ff88`
+                                                    : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                    ? `0 0 12px #00ff00`
+                                                    : `0 0 12px var(--theme-success, #10b981)`
                                             }}
                                         ></div>
                                         {/* Triple ring pulse */}
@@ -25477,7 +25842,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                 key={ring}
                                                 className="absolute inset-0 w-2.5 h-2.5 rounded-full"
                                                 style={{
-                                                    border: `1px solid var(--theme-success, #10b981)`,
+                                                    border: `1px solid ${currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                        ? '#00ff88'
+                                                        : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                        ? '#00ff00'
+                                                        : 'var(--theme-success, #10b981)'}`,
                                                     animation: `pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite ${ring * 0.3}s`,
                                                     opacity: 0.6 - (ring * 0.2),
                                                     transform: `scale(${1 + ring * 0.5})`
@@ -25488,12 +25857,20 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     <span 
                                         className="text-xs font-black tracking-widest relative z-10 uppercase"
                                         style={{ 
-                                            color: 'var(--theme-success, #10b981)',
+                                            color: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? '#00ff88'
+                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? '#00ff00'
+                                                : 'var(--theme-success, #10b981)',
                                             fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                 ? 'var(--theme-font-mono, "Courier New", monospace)'
                                                 : 'var(--theme-font-primary, Inter, sans-serif)',
-                                            textShadow: `0 0 8px rgba(var(--theme-success-rgb, 16, 185, 129), 0.5)`,
-                                            letterSpacing: '0.15em'
+                                            textShadow: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                                ? `0 0 10px rgba(0, 255, 136, 0.6), 0 0 20px rgba(0, 255, 136, 0.4)`
+                                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? `0 0 10px rgba(0, 255, 0, 0.6), 0 0 20px rgba(0, 255, 0, 0.4)`
+                                                : `0 0 8px rgba(var(--theme-success-rgb, 16, 185, 129), 0.5)`,
+                                            letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.2em' : '0.15em'
                                         }}
                                     >
                                         LIVE
