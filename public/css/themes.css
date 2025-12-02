@@ -5,8 +5,12 @@
 
 /* Styles pour la modal de sélection de thème */
 .theme-selector-modal {
-    z-index: 9999 !important;
+    z-index: 10000 !important;
     position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
 }
 
 @keyframes fadeIn {

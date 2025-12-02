@@ -10,8 +10,38 @@ const NewsTicker = ({ isDarkMode = true }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [newsType, setNewsType] = useState('all');
     const [showTypeSelector, setShowTypeSelector] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const tickerRef = useRef(null);
     const animationRef = useRef(null);
+
+    // Écouter si le modal ThemeSelector est ouvert
+    useEffect(() => {
+        const checkModalOpen = () => {
+            // Vérifier si le modal ThemeSelector est ouvert en cherchant l'élément
+            const modal = document.querySelector('.theme-selector-modal');
+            setIsModalOpen(modal !== null && modal.style.display !== 'none');
+        };
+
+        // Vérifier initialement
+        checkModalOpen();
+
+        // Observer les changements dans le DOM
+        const observer = new MutationObserver(checkModalOpen);
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+
+        // Écouter les événements personnalisés
+        const handleModalOpen = () => setIsModalOpen(true);
+        const handleModalClose = () => setIsModalOpen(false);
+        
+        window.addEventListener('themeSelectorOpen', handleModalOpen);
+        window.addEventListener('themeSelectorClose', handleModalClose);
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('themeSelectorOpen', handleModalOpen);
+            window.removeEventListener('themeSelectorClose', handleModalClose);
+        };
+    }, []);
 
     // Charger les actualités au montage et quand le type change
     useEffect(() => {
@@ -170,6 +200,9 @@ const NewsTicker = ({ isDarkMode = true }) => {
 
     if (!isVisible) return null;
 
+    // Masquer le NewsTicker si un modal est ouvert
+    if (isModalOpen) return null;
+
     return (
         <div
             className="relative w-full border-b overflow-hidden"
@@ -177,7 +210,7 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
                 borderColor: isDarkMode ? 'rgba(75, 85, 99, 0.3)' : 'rgba(209, 213, 219, 0.5)',
                 height: '40px',
-                zIndex: 10,
+                zIndex: 5,
                 position: 'relative'
             }}
         >
