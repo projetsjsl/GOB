@@ -25204,22 +25204,21 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         }}
                     ></div>
                     
-                    {/* Overlay gradient selon le thème */}
+                    {/* Overlay gradient selon le thème - utilise les couleurs du thème */}
                     <div 
                         className="absolute inset-0"
                         style={{
-                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, transparent 50%)'
-                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
-                                ? 'linear-gradient(135deg, rgba(255, 204, 0, 0.05) 0%, transparent 50%)'
-                                : currentThemeId === 'seeking-alpha'
-                                ? 'linear-gradient(135deg, rgba(255, 107, 53, 0.08) 0%, transparent 50%)'
-                                : currentThemeId === 'desjardins'
-                                ? 'linear-gradient(135deg, rgba(0, 103, 71, 0.1) 0%, transparent 50%)'
-                                : currentThemeId === 'bloomberg-nostalgie'
-                                ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, transparent 50%)'
-                                : 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, transparent 50%)',
-                            opacity: 0.6
+                            background: `linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1) 0%, transparent 50%)`,
+                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.4 : 0.6
+                        }}
+                    ></div>
+                    
+                    {/* Accent gradient selon le thème */}
+                    <div 
+                        className="absolute inset-0"
+                        style={{
+                            background: `radial-gradient(ellipse at 20% 50%, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.08) 0%, transparent 50%)`,
+                            opacity: 0.5
                         }}
                     ></div>
 

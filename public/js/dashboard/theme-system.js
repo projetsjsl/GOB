@@ -450,9 +450,11 @@ function applyTheme(themeId) {
     const primaryRgb = hexToRgb(theme.colors.primary);
     const successRgb = hexToRgb(theme.colors.success);
     const dangerRgb = hexToRgb(theme.colors.danger);
+    const accentRgb = hexToRgb(theme.colors.accent || theme.colors.primary);
     root.style.setProperty('--theme-primary-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`);
     root.style.setProperty('--theme-success-rgb', `${successRgb.r}, ${successRgb.g}, ${successRgb.b}`);
     root.style.setProperty('--theme-danger-rgb', `${dangerRgb.r}, ${dangerRgb.g}, ${dangerRgb.b}`);
+    root.style.setProperty('--theme-accent-rgb', `${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}`);
     
     // Variables spécifiques pour certains thèmes
     if (theme.colors.textGreen) {
