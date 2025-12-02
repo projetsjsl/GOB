@@ -25450,7 +25450,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             <div className={`min-h-screen transition-colors duration-300 ${isDarkMode
                 ? 'bg-black'
                 : 'bg-white'
-                }`}>
+                }`} style={{ minHeight: '100vh', backgroundColor: isDarkMode ? '#000000' : '#ffffff' }}>
                 {/* Professional/Fun Mode Toggle Button */}
 
                 {/* Intro Emma IA - première visite de session */}
@@ -26802,6 +26802,64 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
     // Fonction fallback SUPPRIMÉE - Plus de contenu demo
 
-    ReactDOM.render(<BetaCombinedDashboard />, document.getElementById('root'));
+    // Montage de l'application React avec gestion d'erreurs robuste
+    const mountApp = () => {
+        try {
+            const rootElement = document.getElementById('root');
+            if (!rootElement) {
+                console.error('❌ Élément root introuvable !');
+                document.body.innerHTML = `
+                    <div style="padding: 40px; text-align: center; background: #fee; border: 2px solid #fcc; margin: 20px; border-radius: 8px;">
+                        <h2 style="color: #c00;">⚠️ Erreur Critique</h2>
+                        <p style="color: #800;">L'élément root (#root) est introuvable dans le DOM.</p>
+                        <p style="color: #800;">Vérifiez que le HTML contient bien &lt;div id="root"&gt;&lt;/div&gt;</p>
+                    </div>
+                `;
+                return;
+            }
+
+            console.log('✅ Élément root trouvé, montage de React...');
+            
+            // Vérifier que React et ReactDOM sont disponibles
+            if (typeof React === 'undefined') {
+                throw new Error('React n\'est pas défini');
+            }
+            if (typeof ReactDOM === 'undefined') {
+                throw new Error('ReactDOM n\'est pas défini');
+            }
+            if (typeof BetaCombinedDashboard === 'undefined') {
+                throw new Error('BetaCombinedDashboard n\'est pas défini');
+            }
+
+            console.log('✅ React, ReactDOM et BetaCombinedDashboard sont disponibles');
+            
+            // Utiliser ReactDOM.render (compatible avec React 18 via Babel)
+            ReactDOM.render(<BetaCombinedDashboard />, rootElement);
+            console.log('✅ Application React montée avec succès !');
+            
+        } catch (error) {
+            console.error('❌ ERREUR CRITIQUE lors du montage React:', error);
+            const rootElement = document.getElementById('root') || document.body;
+            rootElement.innerHTML = `
+                <div style="padding: 40px; text-align: center; background: #fee; border: 2px solid #fcc; margin: 20px; border-radius: 8px; font-family: system-ui;">
+                    <h2 style="color: #c00; margin-bottom: 20px;">⚠️ Erreur de Chargement</h2>
+                    <p style="color: #800; margin-bottom: 10px;"><strong>Erreur:</strong> ${error.message}</p>
+                    <p style="color: #800; margin-bottom: 10px;"><strong>Stack:</strong> ${error.stack || 'N/A'}</p>
+                    <p style="color: #666; margin-top: 20px;">Veuillez rafraîchir la page ou contacter le support.</p>
+                    <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #c00; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Rafraîchir la page
+                    </button>
+                </div>
+            `;
+        }
+    };
+
+    // Attendre que le DOM soit complètement chargé
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', mountApp);
+    } else {
+        // DOM déjà chargé, monter immédiatement
+        mountApp();
+    }
 }
 
