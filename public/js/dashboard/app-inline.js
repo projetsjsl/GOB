@@ -26484,16 +26484,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     />}
                     {activeTab === 'assistant-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} />}
                     {activeTab === 'plus' && <PlusTab />}
-                    {activeTab === 'admin-jsla' && <AdminJSLaiTab
-                        emmaConnected={emmaConnected}
-                        setEmmaConnected={setEmmaConnected}
-                        showPromptEditor={showPromptEditor}
-                        setShowPromptEditor={setShowPromptEditor}
-                        showTemperatureEditor={showTemperatureEditor}
-                        setShowTemperatureEditor={setShowTemperatureEditor}
-                        showLengthEditor={showLengthEditor}
-                        setShowLengthEditor={setShowLengthEditor}
-                    />}
+                    {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
+                        emmaConnected: emmaConnected,
+                        setEmmaConnected: setEmmaConnected,
+                        showPromptEditor: showPromptEditor,
+                        setShowPromptEditor: setShowPromptEditor,
+                        showTemperatureEditor: showTemperatureEditor,
+                        setShowTemperatureEditor: setShowTemperatureEditor,
+                        showLengthEditor: showLengthEditor,
+                        setShowLengthEditor: setShowLengthEditor,
+                        isDarkMode: isDarkMode
+                    })}
                     {activeTab === 'dans-watchlist' && <DansWatchlistTab />}
                     {activeTab === 'scrapping-sa' && <ScrappingSATab />}
                     {activeTab === 'email-briefings' && <EmailBriefingsTab />}
