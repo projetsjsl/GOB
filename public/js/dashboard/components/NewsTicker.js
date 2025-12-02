@@ -207,11 +207,13 @@ const NewsTicker = ({ isDarkMode = true }) => {
         <div
             className="relative w-full border-b overflow-hidden"
             style={{
-                backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
-                borderColor: isDarkMode ? 'rgba(75, 85, 99, 0.3)' : 'rgba(209, 213, 219, 0.5)',
-                height: '40px',
+                backgroundColor: '#0a0e27', // Couleur fixe sombre pour contraste
+                borderTop: '3px solid #10b981', // Bordure supérieure verte visible et fixe
+                borderBottom: '2px solid #10b981', // Bordure inférieure verte visible et fixe
+                height: '52px', // Hauteur augmentée pour plus de visibilité
                 zIndex: 5,
-                position: 'relative'
+                position: 'relative',
+                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)' // Ombre verte subtile
             }}
         >
             {/* Left icon + Type selector */}
@@ -235,11 +237,12 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 {/* Type selector button */}
                 <button
                     onClick={() => setShowTypeSelector(!showTypeSelector)}
-                    className="px-2 py-1 rounded text-xs font-medium transition-colors hover:opacity-80"
+                    className="px-3 py-1.5 rounded-md text-sm font-semibold transition-colors hover:opacity-90"
                     style={{
-                        backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.1)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
                         color: '#10b981',
-                        border: `1px solid ${isDarkMode ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.2)'}`
+                        border: '2px solid #10b981',
+                        boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)'
                     }}
                     title="Filtrer par type de nouvelle"
                 >
@@ -296,10 +299,10 @@ const NewsTicker = ({ isDarkMode = true }) => {
                     {isLoading ? (
                         <div
                             className="flex items-center gap-2 px-4"
-                            style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}
+                            style={{ color: '#10b981' }}
                         >
-                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-xs">Chargement des actualités...</span>
+                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-sm font-medium" style={{ color: '#10b981' }}>Chargement des actualités...</span>
                         </div>
                     ) : (
                         news.map((item, index) => (
@@ -314,25 +317,25 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                     title={item.url ? `${item.source} - ${item.type} - Cliquer pour ouvrir l'article` : `${item.source} - ${item.type}`}
                                 >
                                     {/* Type icon */}
-                                    <span className="text-sm flex-shrink-0" title={`Type: ${item.type || 'other'}`}>
+                                    <span className="text-base flex-shrink-0" title={`Type: ${item.type || 'other'}`}>
                                         {getTypeIcon(item.type || 'other')}
                                     </span>
                                     
                                     {/* Source icon */}
-                                    <span className="text-xs flex-shrink-0" title={`Source: ${item.source}`}>
+                                    <span className="text-sm flex-shrink-0" title={`Source: ${item.source}`}>
                                         {getSourceIcon(item.source)}
                                     </span>
                                     
                                     <span
-                                        className="text-xs font-medium"
-                                        style={{ color: '#10b981', minWidth: '100px', flexShrink: 0 }}
+                                        className="text-sm font-semibold"
+                                        style={{ color: '#10b981', minWidth: '110px', flexShrink: 0 }}
                                     >
                                         {item.time}
                                     </span>
                                     <span
-                                        className="text-sm"
+                                        className="text-base font-medium"
                                         style={{ 
-                                            color: isDarkMode ? '#ffffff' : '#1f2937',
+                                            color: '#e0e7ff',
                                             cursor: item.url ? 'pointer' : 'default'
                                         }}
                                     >
@@ -375,25 +378,25 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                         title={item.url ? `${item.source} - ${item.type} - Cliquer pour ouvrir l'article` : `${item.source} - ${item.type}`}
                                     >
                                         {/* Type icon */}
-                                        <span className="text-sm flex-shrink-0" title={`Type: ${item.type || 'other'}`}>
+                                        <span className="text-base flex-shrink-0" title={`Type: ${item.type || 'other'}`}>
                                             {getTypeIcon(item.type || 'other')}
                                         </span>
                                         
                                         {/* Source icon */}
-                                        <span className="text-xs flex-shrink-0" title={`Source: ${item.source}`}>
+                                        <span className="text-sm flex-shrink-0" title={`Source: ${item.source}`}>
                                             {getSourceIcon(item.source)}
                                         </span>
                                         
                                         <span
-                                            className="text-xs font-medium"
-                                            style={{ color: '#10b981', minWidth: '100px', flexShrink: 0 }}
+                                            className="text-sm font-semibold"
+                                            style={{ color: '#10b981', minWidth: '110px', flexShrink: 0 }}
                                         >
                                             {item.time}
                                         </span>
                                         <span
-                                            className="text-sm"
+                                            className="text-base font-medium"
                                             style={{ 
-                                                color: isDarkMode ? '#ffffff' : '#1f2937',
+                                                color: '#e0e7ff',
                                                 cursor: item.url ? 'pointer' : 'default'
                                             }}
                                         >
@@ -428,15 +431,18 @@ const NewsTicker = ({ isDarkMode = true }) => {
             {/* Close button */}
             <button
                 onClick={handleClose}
-                className="absolute right-4 top-0 bottom-0 flex items-center justify-center z-20 transition-opacity hover:opacity-70"
+                className="absolute right-4 top-0 bottom-0 flex items-center justify-center z-20 transition-opacity hover:opacity-80"
                 style={{
-                    width: '24px',
-                    height: '24px',
-                    color: isDarkMode ? '#9ca3af' : '#6b7280'
+                    width: '28px',
+                    height: '28px',
+                    color: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(16, 185, 129, 0.3)'
                 }}
                 title="Fermer le bandeau d'actualités"
             >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
