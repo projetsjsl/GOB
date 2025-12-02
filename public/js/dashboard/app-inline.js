@@ -480,11 +480,20 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         );
     };
 
-    const BetaCombinedDashboard = () => {
+        const BetaCombinedDashboard = () => {
+        // État pour le thème actuel
+        const [currentThemeId, setCurrentThemeId] = useState(() => {
+            if (window.GOBThemes) {
+                return window.GOBThemes.getCurrentTheme();
+            }
+            return 'darkmode';
+        });
+        
         // Initialiser le thème au chargement
         React.useEffect(() => {
             if (window.GOBThemes) {
                 window.GOBThemes.initTheme();
+                setCurrentThemeId(window.GOBThemes.getCurrentTheme());
             }
             
             // Écouter les changements de thème
@@ -496,6 +505,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                 
                 const themeId = event.detail.themeId;
                 console.log('Thème changé:', themeId);
+                setCurrentThemeId(themeId);
                 
                 // Déterminer isDarkMode en fonction du thème
                 // Thèmes light: seeking-alpha, bloomberg-nostalgie, desjardins, light
@@ -25166,21 +25176,73 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     </div>
                 )}
                 {/* Header - Bloomberg Style - Always Dark */}
-                <header className="relative overflow-hidden bg-gradient-to-r from-black via-gray-900 to-black border-b border-green-500/20">
-                    {/* Bloomberg-style animated background pattern */}
-                    <div className="absolute inset-0 opacity-5">
-                        <div className="absolute inset-0" style={{
-                            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 4px)',
-                            backgroundSize: '100% 4px'
-                        }}></div>
-                    </div>
+                <header 
+                    className="relative overflow-hidden border-b"
+                    style={{
+                        background: 'var(--theme-header-bg, linear-gradient(135deg, #111827 0%, #1f2937 100%))',
+                        borderColor: 'var(--theme-border, rgba(16, 185, 129, 0.2))',
+                        color: 'var(--theme-text, #ffffff)',
+                        fontFamily: 'var(--theme-font-primary, Inter, sans-serif)',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                    }}
+                >
+                    {/* Pattern animé adapté au thème */}
+                    <div 
+                        className="absolute inset-0"
+                        style={{
+                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.1 : 0.05,
+                            backgroundImage: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 4px)'
+                                : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)'
+                                : 'repeating-linear-gradient(45deg, transparent, transparent 2px, currentColor 1px, currentColor 3px)',
+                            backgroundSize: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' 
+                                ? '100% 4px'
+                                : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? '16px 16px'
+                                : '8px 8px'
+                        }}
+                    ></div>
+                    
+                    {/* Overlay gradient selon le thème */}
+                    <div 
+                        className="absolute inset-0"
+                        style={{
+                            background: currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
+                                ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, transparent 50%)'
+                                : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                ? 'linear-gradient(135deg, rgba(255, 204, 0, 0.05) 0%, transparent 50%)'
+                                : currentThemeId === 'seeking-alpha'
+                                ? 'linear-gradient(135deg, rgba(255, 107, 53, 0.08) 0%, transparent 50%)'
+                                : currentThemeId === 'desjardins'
+                                ? 'linear-gradient(135deg, rgba(0, 103, 71, 0.1) 0%, transparent 50%)'
+                                : currentThemeId === 'bloomberg-nostalgie'
+                                ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, transparent 50%)'
+                                : 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, transparent 50%)',
+                            opacity: 0.6
+                        }}
+                    ></div>
 
                     <div className="px-6 py-4 relative z-10">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-6">
-                                {/* Logo avec effet Bloomberg */}
-                                <div className="relative p-3 rounded-lg bg-green-500/10 border border-green-500/30 shadow-lg shadow-green-500/10">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-transparent rounded-lg"></div>
+                                {/* Logo avec effet adapté au thème */}
+                                <div 
+                                    className="relative p-3 rounded-lg shadow-lg"
+                                    style={{
+                                        background: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1)`,
+                                        border: `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`,
+                                        boxShadow: `0 10px 15px -3px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1), 0 4px 6px -2px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.05)`,
+                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.5rem'
+                                    }}
+                                >
+                                    <div 
+                                        className="absolute inset-0 rounded-lg"
+                                        style={{
+                                            background: `linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2) 0%, transparent 100%)`,
+                                            borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.5rem'
+                                        }}
+                                    ></div>
                                     <img
                                         src="/logojslaidark.jpg"
                                         alt="JSL AI Logo"
@@ -25188,17 +25250,59 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     />
                                 </div>
 
-                                <div className="border-l border-green-500/30 pl-6">
+                                <div 
+                                    className="border-l pl-6"
+                                    style={{
+                                        borderColor: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`
+                                    }}
+                                >
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h1 className="text-4xl font-black tracking-tight text-white" style={{ fontFamily: "'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', 'Inter', sans-serif", fontWeight: 900, letterSpacing: '-0.02em' }}>
+                                            <h1 
+                                                className="text-4xl font-black tracking-tight"
+                                                style={{ 
+                                                    fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                        ? 'var(--theme-font-mono, "Courier New", monospace)'
+                                                        : currentThemeId === 'bloomberg-nostalgie'
+                                                        ? 'var(--theme-font-primary, "Courier New", monospace)'
+                                                        : "'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', var(--theme-font-primary, Inter), sans-serif",
+                                                    fontWeight: 900, 
+                                                    letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.05em' : '-0.02em',
+                                                    color: 'var(--theme-text, #ffffff)'
+                                                }}
+                                            >
                                                 TERMINAL FINANCIER
                                                 <br />
-                                                <span className="avenir-heavy text-3xl" style={{ color: '#4ade80', fontWeight: 900 }}>Emma IA</span>
-                                                <span className="ml-3 text-xs font-normal px-2 py-1 rounded bg-green-500/20 text-green-300">BÊTA</span>
+                                                <span 
+                                                    className="text-3xl"
+                                                    style={{ 
+                                                        color: 'var(--theme-primary, #4ade80)', 
+                                                        fontWeight: 900,
+                                                        fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                            ? 'var(--theme-font-mono, "Courier New", monospace)'
+                                                            : 'inherit'
+                                                    }}
+                                                >
+                                                    Emma IA
+                                                </span>
+                                                <span 
+                                                    className="ml-3 text-xs font-normal px-2 py-1 rounded"
+                                                    style={{
+                                                        background: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)`,
+                                                        color: 'var(--theme-primary, #4ade80)'
+                                                    }}
+                                                >
+                                                    BÊTA
+                                                </span>
                                             </h1>
-                                            <p className="text-xs font-medium tracking-wider mt-1 font-['Inter'] text-gray-400">
-                                                Propulsé par <span className="font-bold text-green-400">JSL AI</span> - Tous droits réservés
+                                            <p 
+                                                className="text-xs font-medium tracking-wider mt-1"
+                                                style={{
+                                                    fontFamily: 'var(--theme-font-primary, Inter, sans-serif)',
+                                                    color: 'var(--theme-text-secondary, #9ca3af)'
+                                                }}
+                                            >
+                                                Propulsé par <span style={{ color: 'var(--theme-primary, #4ade80)', fontWeight: 'bold' }}>JSL AI</span> - Tous droits réservés
                                             </p>
                                         </div>
                                     </div>
@@ -25206,14 +25310,36 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
 
                             <div className="flex items-center gap-3">
-                                {/* Live indicator */}
-                                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md ${isDarkMode ? 'bg-green-500/10 border border-green-500/30' : 'bg-green-50 border border-green-200'
-                                    }`}>
+                                {/* Live indicator adapté au thème */}
+                                <div 
+                                    className="flex items-center gap-2 px-3 py-1.5 rounded-md"
+                                    style={{
+                                        background: `rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.1 : 0.15})`,
+                                        border: `1px solid rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.3 : 0.4})`,
+                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.375rem'
+                                    }}
+                                >
                                     <div className="relative">
-                                        <div className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-green-400' : 'bg-green-500'} animate-pulse`}></div>
-                                        <div className={`absolute inset-0 w-2 h-2 rounded-full ${isDarkMode ? 'bg-green-400' : 'bg-green-500'} animate-ping opacity-75`}></div>
+                                        <div 
+                                            className="w-2 h-2 rounded-full animate-pulse"
+                                            style={{ backgroundColor: 'var(--theme-success, #10b981)' }}
+                                        ></div>
+                                        <div 
+                                            className="absolute inset-0 w-2 h-2 rounded-full animate-ping opacity-75"
+                                            style={{ backgroundColor: 'var(--theme-success, #10b981)' }}
+                                        ></div>
                                     </div>
-                                    <span className={`text-xs font-bold tracking-wide ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>LIVE</span>
+                                    <span 
+                                        className="text-xs font-bold tracking-wide"
+                                        style={{ 
+                                            color: 'var(--theme-success, #10b981)',
+                                            fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
+                                                ? 'var(--theme-font-mono, "Courier New", monospace)'
+                                                : 'var(--theme-font-primary, Inter, sans-serif)'
+                                        }}
+                                    >
+                                        LIVE
+                                    </span>
                                 </div>
 
                                 {/* Theme Selector */}
@@ -25224,10 +25350,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 {/* Theme toggle - icône seulement */}
                                 <button
                                     onClick={toggleTheme}
-                                    className={`p-1.5 rounded-md transition-all duration-300 hover:scale-105 border ${isDarkMode
-                                        ? 'bg-gray-800 hover:bg-gray-700 border-green-500/30 text-green-400'
-                                        : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
-                                        }`}
+                                    className="p-1.5 rounded-md transition-all duration-300 hover:scale-105 border"
+                                    style={{
+                                        background: `var(--theme-surface, ${isDarkMode ? '#1f2937' : '#ffffff'})`,
+                                        borderColor: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`,
+                                        color: 'var(--theme-primary, #4ade80)',
+                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.375rem'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = `var(--theme-surface-light, ${isDarkMode ? '#374151' : '#f9fafb'})`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = `var(--theme-surface, ${isDarkMode ? '#1f2937' : '#ffffff'})`;
+                                    }}
                                     title={isDarkMode ? 'Mode Clair' : 'Mode Sombre'}
                                 >
                                     <span className="text-sm">{isDarkMode ? '☀️' : '🌙'}</span>
@@ -25245,10 +25380,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                             window.location.href = '/login.html';
                                         }
                                     }}
-                                    className={`p-1.5 rounded-md transition-all duration-300 hover:scale-105 border ${isDarkMode
-                                        ? 'bg-gray-800 hover:bg-gray-700 border-red-500/30 text-red-400'
-                                        : 'bg-white hover:bg-gray-50 border-red-300 text-red-600'
-                                        }`}
+                                    className="p-1.5 rounded-md transition-all duration-300 hover:scale-105 border"
+                                    style={{
+                                        background: `var(--theme-surface, ${isDarkMode ? '#1f2937' : '#ffffff'})`,
+                                        borderColor: `rgba(var(--theme-danger-rgb, 239, 68, 68), 0.3)`,
+                                        color: 'var(--theme-danger, #ef4444)',
+                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.375rem'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = `var(--theme-surface-light, ${isDarkMode ? '#374151' : '#f9fafb'})`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = `var(--theme-surface, ${isDarkMode ? '#1f2937' : '#ffffff'})`;
+                                    }}
                                     title="Déconnexion"
                                 >
                                     <i className="iconoir-log-out text-sm"></i>

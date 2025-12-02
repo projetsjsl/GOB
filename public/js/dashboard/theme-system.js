@@ -421,6 +421,16 @@ function applyTheme(themeId) {
     
     const root = document.documentElement;
     
+    // Fonction helper pour convertir hex en RGB
+    const hexToRgb = (hex) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 16, g: 185, b: 129 }; // Default emerald
+    };
+    
     // Appliquer les variables CSS
     root.style.setProperty('--theme-primary', theme.colors.primary);
     root.style.setProperty('--theme-secondary', theme.colors.secondary);
@@ -435,6 +445,14 @@ function applyTheme(themeId) {
     root.style.setProperty('--theme-success', theme.colors.success);
     root.style.setProperty('--theme-danger', theme.colors.danger);
     root.style.setProperty('--theme-warning', theme.colors.warning);
+    
+    // Ajouter les valeurs RGB pour les rgba() dans les styles inline
+    const primaryRgb = hexToRgb(theme.colors.primary);
+    const successRgb = hexToRgb(theme.colors.success);
+    const dangerRgb = hexToRgb(theme.colors.danger);
+    root.style.setProperty('--theme-primary-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`);
+    root.style.setProperty('--theme-success-rgb', `${successRgb.r}, ${successRgb.g}, ${successRgb.b}`);
+    root.style.setProperty('--theme-danger-rgb', `${dangerRgb.r}, ${dangerRgb.g}, ${dangerRgb.b}`);
     
     // Variables spécifiques pour certains thèmes
     if (theme.colors.textGreen) {
