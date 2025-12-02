@@ -24,7 +24,19 @@ export default async function handler(req, res) {
 
   try {
     // Récupérer les identifiants depuis le body ou query params
-    const { email, password } = req.method === 'POST' ? req.body : req.query;
+    let email, password;
+    try {
+      if (req.method === 'POST') {
+        email = req.body?.email;
+        password = req.body?.password;
+      } else {
+        email = req.query?.email;
+        password = req.query?.password;
+      }
+    } catch (parseError) {
+      console.warn('Erreur parsing body/query:', parseError.message);
+    }
+    
     const hasCredentials = email && password;
     
     // Vérifier les variables d'environnement requises
@@ -40,13 +52,15 @@ export default async function handler(req, res) {
         hasProjectId: !!browserbaseProjectId
       });
       return res.status(503).json({
+        success: false,
         error: 'Configuration Browserbase manquante',
         details: 'BROWSERBASE_API_KEY et BROWSERBASE_PROJECT_ID sont requis',
         hint: 'Configurez ces variables dans Vercel Environment Variables',
         config: {
           hasApiKey: !!browserbaseApiKey,
           hasProjectId: !!browserbaseProjectId
-        }
+        },
+        timestamp: new Date().toISOString()
       });
     }
 
@@ -60,41 +74,121 @@ export default async function handler(req, res) {
     
     // Créer une session Browserbase
     console.log('Création d\'une session Browserbase pour FastGraphs...');
-    const sessionResponse = await fetch(`${browserbaseApiUrl}/sessions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${browserbaseApiKey}`,
-        'Content-Type': 'application/json',
-        'x-browserbase-project-id': browserbaseProjectId
-      },
-      body: JSON.stringify({
-        url: 'https://www.fastgraphs.com/',
-        options: {
-          headless: false, // Pour voir le navigateur
-          keepAlive: true // Garder la session active
-        }
-      })
-    });
+    
+    let sessionResponse;
+    try {
+      sessionResponse = await fetch(`${browserbaseApiUrl}/sessions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${browserbaseApiKey}`,
+          'Content-Type': 'application/json',
+          'x-browserbase-project-id': browserbaseProjectId
+        },
+        body: JSON.stringify({
+          url: 'https://www.fastgraphs.com/',
+          options: {
+            headless: false, // Pour voir le navigateur
+            keepAlive: true // Garder la session active
+          }
+        }),
+        // Timeout pour éviter les attentes infinies
+        signal: AbortSignal.timeout(30000) // 30 secondes
+      });
+    } catch (fetchError) {
+      console.error('Erreur fetch Browserbase:', fetchError);
+      if (fetchError.name === 'AbortError' || fetchError.name === 'TimeoutError') {
+        return res.status(504).json({
+          success: false,
+          error: 'Timeout lors de la création de la session Browserbase',
+          details: 'La requête a pris trop de temps',
+          hint: 'Vérifiez votre connexion et réessayez',
+          timestamp: new Date().toISOString()
+        });
+      }
+      if (fetchError.name === 'TypeError' && fetchError.message.includes('fetch')) {
+        return res.status(503).json({
+          success: false,
+          error: 'Erreur de connexion à Browserbase',
+          details: 'Impossible de se connecter à l\'API Browserbase',
+          hint: 'Vérifiez votre connexion internet et les clés API',
+          timestamp: new Date().toISOString()
+        });
+      }
+      throw fetchError;
+    }
 
     if (!sessionResponse.ok) {
-      const errorText = await sessionResponse.text();
-      console.error('Erreur Browserbase:', sessionResponse.status, errorText);
-      let errorDetails;
+      let errorText = '';
+      let errorDetails = {};
       try {
-        errorDetails = JSON.parse(errorText);
-      } catch {
-        errorDetails = { message: errorText };
+        errorText = await sessionResponse.text();
+        console.error('Erreur Browserbase:', sessionResponse.status, errorText);
+        try {
+          errorDetails = JSON.parse(errorText);
+        } catch {
+          errorDetails = { message: errorText };
+        }
+      } catch (parseError) {
+        console.error('Erreur parsing réponse Browserbase:', parseError);
+        errorText = 'Erreur inconnue';
       }
-      return res.status(sessionResponse.status).json({
+      
+      // Gérer les codes d'erreur spécifiques
+      if (sessionResponse.status === 401) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentification Browserbase échouée',
+          details: 'Clé API invalide ou expirée',
+          hint: 'Vérifiez votre BROWSERBASE_API_KEY dans Vercel',
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      if (sessionResponse.status === 404) {
+        return res.status(404).json({
+          success: false,
+          error: 'Endpoint Browserbase non trouvé',
+          details: 'L\'endpoint /sessions n\'existe pas ou a changé',
+          hint: 'Vérifiez la documentation Browserbase pour l\'URL correcte',
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      return res.status(sessionResponse.status >= 500 ? 502 : sessionResponse.status).json({
+        success: false,
         error: 'Erreur lors de la création de la session Browserbase',
-        details: errorDetails.message || errorText,
+        details: errorDetails.message || errorText || 'Erreur inconnue',
         status: sessionResponse.status,
-        hint: 'Vérifiez vos clés API Browserbase et l\'ID du projet'
+        hint: 'Vérifiez vos clés API Browserbase et l\'ID du projet',
+        timestamp: new Date().toISOString()
       });
     }
 
-    const sessionData = await sessionResponse.json();
-    console.log('Session Browserbase créée:', sessionData.id);
+    let sessionData;
+    try {
+      sessionData = await sessionResponse.json();
+      console.log('Session Browserbase créée:', sessionData.id);
+    } catch (parseError) {
+      console.error('Erreur parsing sessionData:', parseError);
+      return res.status(502).json({
+        success: false,
+        error: 'Erreur lors du parsing de la réponse Browserbase',
+        details: 'La réponse de Browserbase est invalide',
+        hint: 'Vérifiez les logs Browserbase',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    if (!sessionData || !sessionData.id) {
+      console.error('SessionData invalide:', sessionData);
+      return res.status(502).json({
+        success: false,
+        error: 'Réponse Browserbase invalide',
+        details: 'La session n\'a pas été créée correctement',
+        hint: 'Vérifiez les logs Browserbase',
+        timestamp: new Date().toISOString()
+      });
+    }
     
     const sessionId = sessionData.id;
     
@@ -276,10 +370,34 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Erreur FastGraphs Login:', error);
-    return res.status(500).json({
-      error: 'Erreur lors de la connexion à FastGraphs',
-      details: error.message,
-      hint: 'Vérifiez les variables d\'environnement Browserbase (BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID)'
+    console.error('Stack:', error.stack);
+    
+    // Gérer les différents types d'erreurs
+    let statusCode = 500;
+    let errorMessage = 'Erreur lors de la connexion à FastGraphs';
+    let hint = 'Vérifiez les variables d\'environnement Browserbase (BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID)';
+    
+    if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+      statusCode = 504;
+      errorMessage = 'Timeout lors de la connexion à FastGraphs';
+      hint = 'La requête a pris trop de temps. Réessayez.';
+    } else if (error.message?.includes('fetch')) {
+      statusCode = 503;
+      errorMessage = 'Erreur de connexion réseau';
+      hint = 'Impossible de se connecter à Browserbase. Vérifiez votre connexion.';
+    } else if (error.message?.includes('JSON')) {
+      statusCode = 502;
+      errorMessage = 'Erreur de parsing de la réponse';
+      hint = 'La réponse de Browserbase est invalide.';
+    }
+    
+    return res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      details: error.message || 'Erreur inconnue',
+      hint: hint,
+      type: error.name || 'UnknownError',
+      timestamp: new Date().toISOString()
     });
   }
 }
