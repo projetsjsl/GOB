@@ -11,8 +11,6 @@
  * Basé sur le workflow initial fourni par Browserbase
  */
 
-import { Stagehand } from '@browserbasehq/stagehand';
-
 // Configuration Stagehand pour utilisation avec Browserbase
 const getStagehandConfig = () => {
   return {
@@ -104,6 +102,33 @@ export default async function handler(req, res) {
       console.warn('GEMINI_API_KEY ou GOOGLE_API_KEY non définie - Stagehand utilisera la clé par défaut si disponible');
     }
 
+    // Import dynamique de Stagehand pour éviter les erreurs de chargement
+    console.log('Import de Stagehand...');
+    let Stagehand;
+    try {
+      const stagehandModule = await import('@browserbasehq/stagehand');
+      Stagehand = stagehandModule.Stagehand;
+      if (!Stagehand) {
+        throw new Error('Stagehand class not found in module');
+      }
+      console.log('Stagehand importé avec succès');
+    } catch (importError) {
+      console.error('Erreur lors de l\'import de Stagehand:', importError);
+      return res.status(500).json({
+        success: false,
+        error: 'Erreur lors du chargement de Stagehand',
+        details: importError.message || 'Impossible de charger le module @browserbasehq/stagehand',
+        hint: 'Vérifiez que @browserbasehq/stagehand est installé et compatible avec Vercel Serverless',
+        type: 'ImportError',
+        timestamp: new Date().toISOString(),
+        debugInfo: debugMode ? {
+          errorMessage: importError.message,
+          errorStack: importError.stack,
+          errorName: importError.name
+        } : undefined
+      });
+    }
+
     // Initialiser Stagehand
     console.log('Initialisation de Stagehand...');
     const stagehandConfig = getStagehandConfig();
@@ -118,9 +143,31 @@ export default async function handler(req, res) {
       });
     }
     
-    stagehand = new Stagehand(stagehandConfig);
-    await stagehand.init();
-    console.log('Stagehand initialisé avec succès.');
+    try {
+      stagehand = new Stagehand(stagehandConfig);
+      await stagehand.init();
+      console.log('Stagehand initialisé avec succès.');
+    } catch (initError) {
+      console.error('Erreur lors de l\'initialisation de Stagehand:', initError);
+      return res.status(503).json({
+        success: false,
+        error: 'Erreur lors de l\'initialisation de Stagehand',
+        details: initError.message || 'Impossible d\'initialiser Stagehand',
+        hint: 'Vérifiez vos clés API Browserbase et Gemini. Ajoutez ?debug=true pour plus de détails.',
+        type: 'InitializationError',
+        timestamp: new Date().toISOString(),
+        debugInfo: debugMode ? {
+          errorMessage: initError.message,
+          errorStack: initError.stack,
+          errorName: initError.name,
+          stagehandConfig: {
+            env: stagehandConfig.env,
+            hasApiKey: !!stagehandConfig.apiKey,
+            hasProjectId: !!stagehandConfig.projectId
+          }
+        } : undefined
+      });
+    }
 
     // Obtenir l'instance de page
     const page = stagehand.page;
