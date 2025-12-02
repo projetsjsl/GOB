@@ -3,6 +3,50 @@
  * Les thèmes utilisent des variables CSS définies dynamiquement par theme-system.js
  */
 
+/* Styles pour la modal de sélection de thème */
+.theme-selector-modal {
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.theme-preview-card {
+    transition: all 0.3s ease;
+}
+
+.theme-preview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Scrollbar personnalisée pour la modal */
+.theme-selector-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.theme-selector-modal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.theme-selector-modal::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.theme-selector-modal::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
 /* Application des variables de thème aux éléments du dashboard */
 .theme-default,
 .theme-marketq,
