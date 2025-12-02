@@ -152,7 +152,6 @@ const NewsTicker = ({ isDarkMode = true }) => {
             <div
                 ref={tickerRef}
                 className="absolute left-12 right-20 top-0 bottom-0 overflow-hidden"
-                style={{ pointerEvents: 'none' }}
             >
                 <div
                     className="news-ticker-content flex items-center h-full whitespace-nowrap"
