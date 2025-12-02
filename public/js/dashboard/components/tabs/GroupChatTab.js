@@ -33,24 +33,63 @@ const GroupChatTab = ({ isDarkMode = true }) => {
   const abortRef = useRef(null);
 
   useEffect(() => {
-    fetch('/api/groupchat/config').then(r=>r.json()).then(d=>{ 
-      setProviders(d.providers); 
-      setCurrentProvider(d.defaultProvider); 
-    }).catch(()=>{
-      setProviders({ 
-        simulation: { 
-          id:'simulation', 
-          name:'Simulation', 
-          description:'Free demo', 
-          status:'ready', 
-          cost:'FREE', 
-          icon:'🎭', 
-          endpoint:'/api/groupchat/simulate' 
-        } 
+    // Charger la configuration
+    fetch('/api/groupchat/config')
+      .then(r => {
+        if (!r.ok) throw new Error('Config fetch failed');
+        return r.json();
+      })
+      .then(d => { 
+        if (d && d.providers) {
+          setProviders(d.providers); 
+          setCurrentProvider(d.defaultProvider || 'simulation'); 
+        }
+      })
+      .catch((err) => {
+        console.warn('⚠️ GroupChat: Erreur chargement config, utilisation du mode simulation:', err);
+        setProviders({ 
+          simulation: { 
+            id:'simulation', 
+            name:'Simulation', 
+            description:'Free demo', 
+            status:'ready', 
+            cost:'FREE', 
+            icon:'🎭', 
+            endpoint:'/api/groupchat/simulate' 
+          } 
+        });
+        setCurrentProvider('simulation');
       });
-    });
-    fetch('/api/groupchat/admin').then(r=>r.json()).then(d=>{ setThemes(d.themes); }).catch(()=>{});
-    fetch('/api/groupchat/workflows').then(r=>r.json()).then(d=>{ setWorkflows(d.workflows); }).catch(()=>{});
+    
+    // Charger les thèmes
+    fetch('/api/groupchat/admin')
+      .then(r => {
+        if (!r.ok) throw new Error('Admin fetch failed');
+        return r.json();
+      })
+      .then(d => { 
+        if (d && d.themes) {
+          setThemes(d.themes); 
+        }
+      })
+      .catch((err) => {
+        console.warn('⚠️ GroupChat: Erreur chargement thèmes:', err);
+      });
+    
+    // Charger les workflows
+    fetch('/api/groupchat/workflows')
+      .then(r => {
+        if (!r.ok) throw new Error('Workflows fetch failed');
+        return r.json();
+      })
+      .then(d => { 
+        if (d && d.workflows) {
+          setWorkflows(d.workflows); 
+        }
+      })
+      .catch((err) => {
+        console.warn('⚠️ GroupChat: Erreur chargement workflows:', err);
+      });
   }, []);
 
   useEffect(() => { 
