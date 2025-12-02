@@ -368,18 +368,18 @@ const StocksNewsTab: React.FC<TabProps> = (props) => {
                                     <ellipse cx="100" cy="150" rx="50" ry="55" fill={isDarkMode ? '#ef4444' : '#dc2626'} />
                                 </svg>
                             </div>
-                            
+
                             {/* Decorative gradient overlay */}
                             <div className={`absolute inset-0 bg-gradient-to-l from-transparent via-transparent ${isDarkMode ? 'to-red-500/5' : 'to-red-100/30'} pointer-events-none`}></div>
-                            
+
                             {/* Pattern overlay for texture */}
                             <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
                                 backgroundImage: `radial-gradient(circle at 2px 2px, ${isDarkMode ? '#ef4444' : '#dc2626'} 1px, transparent 0)`,
                                 backgroundSize: '20px 20px'
                             }}></div>
-                            
-                            <div className="relative z-10">
-                                <div className="flex items-center justify-between mb-3">
+
+                            <div className="relative z-10 space-y-4">
+                                <div className="flex items-center justify-between">
                                     <h4 className={`text-sm font-bold flex items-center gap-3 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
                                         <div className="relative">
                                             <LucideIcon name="TrendingDown" className="w-5 h-5" />
@@ -387,100 +387,58 @@ const StocksNewsTab: React.FC<TabProps> = (props) => {
                                         {renderMarketBadge('bear')}
                                         <span>Top Losers</span>
                                     </h4>
-                                    {/* Bear Illustration */}
                                     <div className="flex-shrink-0 relative">
                                         <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg ${
                                             isDarkMode ? 'bg-red-500/30 border-2 border-red-500/50' : 'bg-red-200 border-2 border-red-300'
                                         }`}>
                                             <img src="/assets/bear-icon.svg" alt="Bear" className="w-12 h-12" />
                                         </div>
-                                        {/* Glow effect */}
                                         <div className={`absolute inset-0 rounded-full blur-md opacity-30 ${
                                             isDarkMode ? 'bg-red-500' : 'bg-red-400'
                                         }`}></div>
                                     </div>
                                 </div>
-                            <div className="space-y-2">
-                                {tickers
-                                    .map(ticker => ({
-                                        ticker,
-                                        change: stockData[ticker]?.dp || 0,
-                                        price: stockData[ticker]?.c || 0
-                                    }))
-                                    .filter(item => item.change < 0)
-                                    .sort((a, b) => a.change - b.change)
-                                    .slice(0, 5)
-                                    .map((item, idx) => (
-                                        <div
-                                            key={item.ticker}
-                                            className={`flex items-start justify-between p-2 rounded cursor-pointer transition-all hover:scale-[1.02] ${
-                                                isDarkMode ? 'hover:bg-red-500/20' : 'hover:bg-red-100'
-                                            }`}
-                                            onClick={() => {
-                                                safeSetSelectedStock(item.ticker);
-                                                safeSetActiveTab('intellistocks');
-                                            }}
-                                        >
-                                            <div className="flex-1 min-w-0 pr-2">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                                                        isDarkMode ? 'bg-red-500/30 text-red-300' : 'bg-red-100 text-red-700'
+
+                                <div className="space-y-2">
+                                    {tickers
+                                        .map(ticker => ({
+                                            ticker,
+                                            change: stockData[ticker]?.dp || 0,
+                                            price: stockData[ticker]?.c || 0
+                                        }))
+                                        .filter(item => item.change < 0)
+                                        .sort((a, b) => a.change - b.change)
+                                        .slice(0, 5)
+                                        .map((item, idx) => (
+                                            <div
+                                                key={item.ticker}
+                                                className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                                                    isDarkMode
+                                                        ? 'bg-red-500/10 border-red-500/30 hover:border-red-400/60'
+                                                        : 'bg-red-50 border-red-200 hover:border-red-300'
+                                                }`}
+                                                onClick={() => {
+                                                    safeSetSelectedStock(item.ticker);
+                                                    safeSetActiveTab('intellistocks');
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                        isDarkMode ? 'bg-red-500/30 text-red-200' : 'bg-red-100 text-red-700'
                                                     }`}>
                                                         {idx + 1}
-                                                    </div>
-                                                    <img
-                                                        src={getCompanyLogo(item.ticker)}
-                                                        alt={item.ticker}
-                                                        className="w-6 h-6 rounded flex-shrink-0"
-                                                        onError={(e) => e.target.style.display = 'none'}
-                                                    />
-                                                    <span className={`font-mono font-bold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0`}>
+                                                    </span>
+                                                    <span className={`font-mono font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                                         {item.ticker}
                                                     </span>
-                                                    <div className="text-red-500 font-bold text-sm ml-auto flex-shrink-0">
-                                                        {item.change.toFixed(2)}% ↓
-                                                    </div>
-                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} flex-shrink-0`}>
+                                                    <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                                         ${item.price.toFixed(2)}
-                                                    </div>
+                                                    </span>
                                                 </div>
-                                                
-                                                {/* Espace dédié pour les news avec placeholder */}
-                                                <div className={`mt-1 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                    {(() => {
-                                                        const reason = extractMoveReason(item.ticker, item.change);
-                                                        if (reason && reason !== '') {
-                                                            return (
-                                                                <div className={`text-xs flex items-start gap-2 leading-relaxed ${
-                                                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                                                }`}>
-                                                                    {tickerMoveReasons[item.ticker]?.source === 'Finviz AI' ? (
-                                                                        <span className="inline-flex items-center gap-1.5 flex-wrap">
-                                                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex-shrink-0">
-                                                                                AI
-                                                                            </span>
-                                                                            <span className="leading-relaxed break-words">{reason}</span>
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className="inline-flex items-start gap-1.5">
-                                                                            <span className="text-blue-400 flex-shrink-0 text-sm">📰</span>
-                                                                            <span className="leading-relaxed break-words">{reason}</span>
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        }
-                                                        return (
-                                                            <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
-                                                                Chargement des explications...
-                                                            </div>
-                                                        );
-                                                    })()}
-                                                </div>
+                                                <span className="text-red-400 font-bold">{item.change.toFixed(2)}%</span>
                                             </div>
-                                        </div>
-                                    ))}
-                            </div>
+                                        ))}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1469,22 +1427,23 @@ const StocksNewsTab: React.FC<TabProps> = (props) => {
                                 })}
                             </div>
 
-                            {newsData.length > 12 && (
-                                <div className="text-center mt-8">
-                                    <button
-                                        onClick={() => safeSetActiveTab('markets-economy')}
-                                        className={`px-8 py-4 rounded-xl font-bold text-base transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${
-                                            isDarkMode
-                                                ? 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white border-2 border-purple-400/50'
-                                                : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-2 border-purple-300/50'
-                                        }`}
-                                    >
-                                        <span className="mr-2">📰</span>
-                                        Voir toutes les actualités ({newsData.length})
-                                        <span className="ml-2">→</span>
-                                    </button>
-                                </div>
-                            )}
+                    {newsData.length > 12 && (
+                        <div className="text-center mt-8">
+                            <button
+                                onClick={() => safeSetActiveTab('markets-economy')}
+                                className={`px-8 py-4 rounded-xl font-bold text-base transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${
+                                    isDarkMode
+                                        ? 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white border-2 border-purple-400/50'
+                                        : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-2 border-purple-300/50'
+                                }`}
+                            >
+                                <span className="mr-2">📰</span>
+                                Voir toutes les actualités ({newsData.length})
+                                <span className="ml-2">→</span>
+                            </button>
+                        </div>
+                    )}
+                        </div>
                     </div>
                 </div>
             )}

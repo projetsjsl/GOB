@@ -59,6 +59,7 @@ export type TabName =
   | 'stocks-news'
   | 'admin-jslai'
   | 'plus'
+  | 'group-chat'
   | 'watchlist'
   | 'scrapping-sa'
   | 'seeking-alpha'
