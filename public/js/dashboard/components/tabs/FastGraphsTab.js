@@ -19,16 +19,20 @@ const FastGraphsTab = ({ isDarkMode = true }) => {
     const [automationSteps, setAutomationSteps] = useState([]);
     const [useCredentials, setUseCredentials] = useState(false);
 
+    const [debugMode, setDebugMode] = useState(false);
+    const [debugInfo, setDebugInfo] = useState(null);
+
     const handleLogin = async () => {
         setIsLoading(true);
         setError(null);
         setStatus('loading');
         setAutomationSteps([]);
+        setDebugInfo(null);
 
         try {
             const requestBody = useCredentials && email && password 
-                ? { email, password }
-                : {};
+                ? { email, password, debug: debugMode }
+                : { debug: debugMode };
 
             const response = await fetch('/api/fastgraphs-login', {
                 method: 'POST',
@@ -41,7 +45,14 @@ const FastGraphsTab = ({ isDarkMode = true }) => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || data.details || 'Erreur lors de la connexion');
+                // Afficher les infos de debug si disponibles
+                if (data.debug) {
+                    setDebugInfo(data.debug);
+                }
+                
+                const errorMessage = data.error || data.details || 'Erreur lors de la connexion';
+                const hint = data.hint ? `\n\n💡 ${data.hint}` : '';
+                throw new Error(errorMessage + hint);
             }
 
             if (data.success && data.session) {
@@ -51,6 +62,11 @@ const FastGraphsTab = ({ isDarkMode = true }) => {
                 // Afficher les étapes d'automatisation
                 if (data.automation?.steps) {
                     setAutomationSteps(data.automation.steps);
+                }
+                
+                // Afficher les infos de debug si disponibles
+                if (data.debug) {
+                    setDebugInfo(data.debug);
                 }
                 
                 // Ouvrir la session dans un nouvel onglet
@@ -110,7 +126,15 @@ const FastGraphsTab = ({ isDarkMode = true }) => {
                     {error && (
                         <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
                             <p className="text-red-400 font-medium mb-2">Erreur:</p>
-                            <p className="text-red-300 text-sm">{error}</p>
+                            <p className="text-red-300 text-sm whitespace-pre-line">{error}</p>
+                            {debugInfo && (
+                                <div className="mt-3 p-3 bg-gray-800 rounded border border-gray-700">
+                                    <p className="text-yellow-400 text-xs font-medium mb-2">🔍 Informations de débogage:</p>
+                                    <pre className="text-xs text-gray-300 overflow-auto max-h-40">
+                                        {JSON.stringify(debugInfo, null, 2)}
+                                    </pre>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -137,8 +161,8 @@ const FastGraphsTab = ({ isDarkMode = true }) => {
                 }`}>
                     <h2 className="text-xl font-semibold mb-4">Actions</h2>
                     
-                    {/* Option pour utiliser les identifiants */}
-                    <div className="mb-4">
+                    {/* Options */}
+                    <div className="mb-4 space-y-2">
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
                                 type="checkbox"
@@ -148,6 +172,17 @@ const FastGraphsTab = ({ isDarkMode = true }) => {
                             />
                             <span className="text-sm text-gray-300">
                                 Automatiser la connexion complète (avec identifiants)
+                            </span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={debugMode}
+                                onChange={(e) => setDebugMode(e.target.checked)}
+                                className="w-4 h-4 rounded border-gray-600"
+                            />
+                            <span className="text-sm text-gray-300">
+                                Mode debug (affiche plus d'informations en cas d'erreur)
                             </span>
                         </label>
                     </div>
