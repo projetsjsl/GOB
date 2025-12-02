@@ -39,75 +39,78 @@ export const themes = {
         name: 'MarketQ',
         id: 'marketq',
         colors: {
-            primary: '#00d4ff', // cyan
-            secondary: '#0066cc', // blue
-            background: '#0a0e27', // dark blue
-            surface: '#141b3d', // darker blue
-            surfaceLight: '#1e2749', // medium blue
-            text: '#e0e7ff', // light blue-white
-            textSecondary: '#94a3b8', // slate-400
-            border: '#334155', // slate-700
-            accent: '#00d4ff', // cyan
-            success: '#00ff88', // green-cyan
-            danger: '#ff3366', // pink-red
-            warning: '#ffaa00', // orange
+            primary: '#00d4ff', // cyan brillant (data-focused)
+            secondary: '#0066cc', // blue profond
+            background: '#0a0e27', // dark navy blue
+            surface: '#141b3d', // darker blue (cards)
+            surfaceLight: '#1e2749', // medium blue (hover states)
+            text: '#e0e7ff', // light blue-white (texte principal)
+            textSecondary: '#94a3b8', // slate-400 (texte secondaire)
+            border: '#00d4ff40', // cyan avec transparence
+            accent: '#00d4ff', // cyan (highlights)
+            success: '#00ff88', // green-cyan (gains)
+            danger: '#ff3366', // pink-red (pertes)
+            warning: '#ffaa00', // orange (alertes)
         },
         fonts: {
-            primary: 'Roboto, sans-serif',
+            primary: 'Roboto, -apple-system, sans-serif',
             secondary: 'Inter, sans-serif',
-            mono: 'Courier New, monospace'
+            mono: '"Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #141b3d 0%, #1e2749 100%)',
             cardBg: '#141b3d',
-            cardBorder: '1px solid #00d4ff33',
+            cardBorder: '1px solid rgba(0, 212, 255, 0.2)', // cyan avec transparence
             borderRadius: '0.5rem',
-            shadow: '0 4px 12px rgba(0, 212, 255, 0.2)',
+            shadow: '0 4px 12px rgba(0, 212, 255, 0.15)', // glow cyan
         }
     },
     'bloomberg-terminal': {
         name: 'Bloomberg Terminal',
         id: 'bloomberg-terminal',
         colors: {
-            primary: '#ffcc00', // Bloomberg yellow
-            secondary: '#000000', // black
-            background: '#000000', // black
+            primary: '#ffcc00', // Bloomberg yellow (#FFCC00 exact)
+            secondary: '#00ff00', // green pour données positives
+            background: '#000000', // black pur
             surface: '#0a0a0a', // near black
             surfaceLight: '#1a1a1a', // dark gray
-            text: '#ffcc00', // Bloomberg yellow
+            text: '#ffcc00', // Bloomberg yellow (texte principal)
             textSecondary: '#888888', // gray
+            textGreen: '#00ff00', // green pour gains
+            textRed: '#ff0000', // red pour pertes
             border: '#333333', // dark gray
             accent: '#ffcc00', // Bloomberg yellow
-            success: '#00ff00', // green
-            danger: '#ff0000', // red
+            success: '#00ff00', // green (bright green)
+            danger: '#ff0000', // red (bright red)
             warning: '#ffcc00', // yellow
         },
         fonts: {
-            primary: 'Courier New, monospace',
-            secondary: 'Courier New, monospace',
-            mono: 'Courier New, monospace'
+            primary: 'Courier New, "Courier", monospace',
+            secondary: 'Courier New, "Courier", monospace',
+            mono: 'Courier New, "Courier", monospace'
         },
         styles: {
             headerBg: '#000000',
             cardBg: '#0a0a0a',
             cardBorder: '1px solid #333333',
-            borderRadius: '0',
-            shadow: 'none',
+            borderRadius: '0', // pas de border-radius (style terminal)
+            shadow: 'none', // pas d'ombre (style terminal)
         }
     },
     'seeking-alpha': {
         name: 'Seeking Alpha',
         id: 'seeking-alpha',
         colors: {
-            primary: '#1a73e8', // Google blue
-            secondary: '#34a853', // Google green
-            background: '#ffffff', // white
-            surface: '#f8f9fa', // light gray
+            primary: '#ff6b35', // Seeking Alpha orange (boutons CTA)
+            secondary: '#1a73e8', // blue pour liens
+            background: '#ffffff', // white (contenu principal)
+            surface: '#f5f5f5', // light gray (header)
             surfaceLight: '#ffffff', // white
-            text: '#202124', // dark gray
+            surfaceDark: '#2d2d2d', // dark gray (sidebar gauche)
+            text: '#202124', // dark gray (texte principal)
             textSecondary: '#5f6368', // medium gray
             border: '#dadce0', // light gray
-            accent: '#1a73e8', // blue
+            accent: '#ff6b35', // orange (navigation sélectionnée)
             success: '#34a853', // green
             danger: '#ea4335', // red
             warning: '#fbbc04', // yellow
@@ -118,7 +121,7 @@ export const themes = {
             mono: 'monospace'
         },
         styles: {
-            headerBg: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+            headerBg: '#f5f5f5', // gris clair pour header
             cardBg: '#ffffff',
             cardBorder: '1px solid #dadce0',
             borderRadius: '0.5rem',
@@ -131,19 +134,19 @@ export const themes = {
         colors: {
             primary: '#ffcc00', // Bloomberg yellow
             secondary: '#ffffff', // white
-            background: '#1a1a1a', // dark gray
-            surface: '#2a2a2a', // medium gray
-            surfaceLight: '#3a3a3a', // lighter gray
-            text: '#ffffff', // white
-            textSecondary: '#cccccc', // light gray
-            border: '#444444', // gray
-            accent: '#ffcc00', // Bloomberg yellow
-            success: '#4caf50', // green
-            danger: '#f44336', // red
-            warning: '#ff9800', // orange
+            background: '#1a1a1a', // dark gray (fond principal)
+            surface: '#2a2a2a', // medium gray (cards)
+            surfaceLight: '#3a3a3a', // lighter gray (hover)
+            text: '#ffffff', // white (texte principal)
+            textSecondary: '#b0b0b0', // light gray (texte secondaire)
+            border: '#444444', // gray (bordures)
+            accent: '#ffcc00', // Bloomberg yellow (highlights)
+            success: '#4caf50', // Material green
+            danger: '#f44336', // Material red
+            warning: '#ff9800', // Material orange
         },
         fonts: {
-            primary: 'Roboto, sans-serif',
+            primary: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
             secondary: 'Inter, sans-serif',
             mono: 'monospace'
         },
@@ -151,8 +154,8 @@ export const themes = {
             headerBg: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
             cardBg: '#2a2a2a',
             cardBorder: '1px solid #444444',
-            borderRadius: '1rem',
-            shadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            borderRadius: '1rem', // arrondi pour mobile
+            shadow: '0 2px 8px rgba(0, 0, 0, 0.4)', // ombre plus prononcée
         }
     }
 };
@@ -168,6 +171,7 @@ export function applyTheme(themeId) {
     root.style.setProperty('--theme-bg', theme.colors.background);
     root.style.setProperty('--theme-surface', theme.colors.surface);
     root.style.setProperty('--theme-surface-light', theme.colors.surfaceLight);
+    root.style.setProperty('--theme-surface-dark', theme.colors.surfaceDark || theme.colors.surface);
     root.style.setProperty('--theme-text', theme.colors.text);
     root.style.setProperty('--theme-text-secondary', theme.colors.textSecondary);
     root.style.setProperty('--theme-border', theme.colors.border);
@@ -175,6 +179,14 @@ export function applyTheme(themeId) {
     root.style.setProperty('--theme-success', theme.colors.success);
     root.style.setProperty('--theme-danger', theme.colors.danger);
     root.style.setProperty('--theme-warning', theme.colors.warning);
+    
+    // Variables spécifiques pour certains thèmes
+    if (theme.colors.textGreen) {
+        root.style.setProperty('--theme-text-green', theme.colors.textGreen);
+    }
+    if (theme.colors.textRed) {
+        root.style.setProperty('--theme-text-red', theme.colors.textRed);
+    }
     
     // Appliquer les styles
     root.style.setProperty('--theme-header-bg', theme.styles.headerBg);
