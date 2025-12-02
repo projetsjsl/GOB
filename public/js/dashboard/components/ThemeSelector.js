@@ -143,170 +143,303 @@ const ThemeSelector = ({ isDarkMode = true }) => {
             <div
                 key={theme.id}
                 onClick={() => handleThemeChange(theme.id)}
-                className={`relative cursor-pointer transition-all duration-500 ease-out transform hover:scale-[1.03] hover:-translate-y-1 group overflow-hidden ${
+                className={`relative cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform hover:scale-[1.04] hover:-translate-y-2 group overflow-hidden ${
                     isSelected ? 'ring-2 ring-offset-4' : ''
                 }`}
                 style={{
                     backgroundColor: previewBg,
                     color: previewText,
-                    border: `2px solid ${isSelected ? colors.primary || colors.accent || '#3b82f6' : 'rgba(255,255,255,0.1)'}`,
-                    borderRadius: '1.25rem',
+                    border: `2px solid ${isSelected ? colors.primary || colors.accent || '#3b82f6' : 'rgba(255,255,255,0.08)'}`,
+                    borderRadius: '1.5rem',
                     overflow: 'hidden',
                     boxShadow: isSelected 
-                        ? `0 12px 48px ${colors.primary || colors.accent || '#3b82f6'}30, 0 0 0 3px ${colors.primary || colors.accent || '#3b82f6'}20, inset 0 1px 0 rgba(255,255,255,0.1)`
-                        : '0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+                        ? `
+                            0 20px 60px ${colors.primary || colors.accent || '#3b82f6'}40,
+                            0 0 0 4px ${colors.primary || colors.accent || '#3b82f6'}25,
+                            inset 0 2px 4px rgba(255,255,255,0.15),
+                            inset 0 -2px 4px rgba(0,0,0,0.1),
+                            0 0 80px ${colors.primary || colors.accent || '#3b82f6'}20
+                        `
+                        : `
+                            0 8px 32px rgba(0, 0, 0, 0.12),
+                            0 2px 8px rgba(0, 0, 0, 0.08),
+                            inset 0 1px 0 rgba(255,255,255,0.1),
+                            inset 0 -1px 0 rgba(0,0,0,0.05)
+                        `,
+                    transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    transformStyle: 'preserve-3d',
+                    perspective: '1000px'
                 }}
             >
-                {/* Shine effect au hover avec animation multi-layer */}
+                {/* Premium texture overlay */}
+                <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{
+                    backgroundImage: `
+                        repeating-linear-gradient(45deg, transparent, transparent 2px, ${previewText} 2px, ${previewText} 4px),
+                        repeating-linear-gradient(-45deg, transparent, transparent 2px, ${previewText} 2px, ${previewText} 4px)
+                    `,
+                    backgroundSize: '8px 8px'
+                }}></div>
+                
+                {/* Premium inner glow */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" style={{
+                    background: `radial-gradient(circle at 50% 0%, ${colors.primary || 'rgba(255,255,255,0.1)'} 0%, transparent 50%)`
+                }}></div>
+                {/* CEO Premium: Shine effect ultra-sophisticated */}
                 <div 
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none overflow-hidden"
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none overflow-hidden"
                     style={{
-                        background: `linear-gradient(135deg, transparent 30%, ${colors.primary || 'rgba(255,255,255,0.08)'} 50%, transparent 70%)`,
+                        background: `linear-gradient(135deg, transparent 20%, ${colors.primary || 'rgba(255,255,255,0.12)'} 50%, transparent 80%)`,
                     }}
                 >
+                    {/* Primary shine */}
                     <div 
                         className="absolute inset-0"
                         style={{
-                            background: `linear-gradient(135deg, transparent 0%, ${colors.primary || 'rgba(255,255,255,0.15)'} 50%, transparent 100%)`,
+                            background: `linear-gradient(135deg, transparent 0%, ${colors.primary || 'rgba(255,255,255,0.2)'} 50%, transparent 100%)`,
                             transform: 'translateX(-100%) translateY(-100%)',
-                            animation: 'shimmer 2.5s ease-in-out infinite'
+                            animation: 'shimmer 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                            filter: 'blur(1px)'
                         }}
                     ></div>
+                    {/* Secondary shine */}
                     <div 
                         className="absolute inset-0"
                         style={{
-                            background: `linear-gradient(45deg, transparent 0%, ${colors.accent || colors.primary || 'rgba(255,255,255,0.05)'} 50%, transparent 100%)`,
+                            background: `linear-gradient(45deg, transparent 0%, ${colors.accent || colors.primary || 'rgba(255,255,255,0.08)'} 50%, transparent 100%)`,
                             transform: 'translateX(100%) translateY(100%)',
-                            animation: 'shimmer 3s ease-in-out infinite 0.5s'
+                            animation: 'shimmer 4s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.7s',
+                            filter: 'blur(2px)'
+                        }}
+                    ></div>
+                    {/* Tertiary shine */}
+                    <div 
+                        className="absolute inset-0"
+                        style={{
+                            background: `linear-gradient(90deg, transparent 0%, ${colors.primary || 'rgba(255,255,255,0.06)'} 50%, transparent 100%)`,
+                            transform: 'translateY(-100%)',
+                            animation: 'shimmer 5s cubic-bezier(0.4, 0, 0.6, 1) infinite 1.4s',
+                            filter: 'blur(3px)'
                         }}
                     ></div>
                 </div>
                 
-                {/* Glow effect au hover avec multiple layers */}
+                {/* CEO Premium: Multi-layer glow effect */}
                 <div 
-                    className="absolute -inset-2 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none blur-2xl"
+                    className="absolute -inset-3 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none blur-3xl"
                     style={{
-                        background: `radial-gradient(circle at 30% 30%, ${colors.primary || colors.accent || '#3b82f6'}50 0%, transparent 60%)`,
+                        background: `radial-gradient(ellipse at 25% 25%, ${colors.primary || colors.accent || '#3b82f6'}60 0%, transparent 65%)`,
                     }}
                 ></div>
                 <div 
-                    className="absolute -inset-1 opacity-0 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none blur-lg"
+                    className="absolute -inset-2 opacity-0 group-hover:opacity-70 transition-opacity duration-800 pointer-events-none blur-2xl"
                     style={{
-                        background: `radial-gradient(circle at 70% 70%, ${colors.accent || colors.primary || '#8b5cf6'}40 0%, transparent 50%)`,
+                        background: `radial-gradient(ellipse at 75% 75%, ${colors.accent || colors.primary || '#8b5cf6'}50 0%, transparent 55%)`,
+                    }}
+                ></div>
+                <div 
+                    className="absolute -inset-1 opacity-0 group-hover:opacity-50 transition-opacity duration-600 pointer-events-none blur-xl"
+                    style={{
+                        background: `radial-gradient(circle at 50% 50%, ${colors.success || colors.primary || '#10b981'}30 0%, transparent 40%)`,
                     }}
                 ></div>
                 
-                {/* Particle effect subtle */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
-                    {[...Array(3)].map((_, i) => (
+                {/* CEO Premium: Particle constellation effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1200 pointer-events-none">
+                    {[...Array(5)].map((_, i) => (
                         <div
                             key={i}
-                            className="absolute w-1 h-1 rounded-full"
+                            className="absolute w-1.5 h-1.5 rounded-full"
                             style={{
-                                backgroundColor: colors.primary || colors.accent || '#3b82f6',
-                                left: `${20 + i * 30}%`,
-                                top: `${30 + i * 20}%`,
-                                animation: `float ${2 + i * 0.5}s ease-in-out infinite ${i * 0.3}s`,
-                                boxShadow: `0 0 8px ${colors.primary || colors.accent || '#3b82f6'}`
+                                background: `radial-gradient(circle, ${colors.primary || colors.accent || '#3b82f6'} 0%, transparent 70%)`,
+                                left: `${15 + i * 20}%`,
+                                top: `${25 + i * 15}%`,
+                                animation: `sparkle ${3 + i * 0.4}s ease-in-out infinite ${i * 0.4}s`,
+                                boxShadow: `0 0 12px ${colors.primary || colors.accent || '#3b82f6'}, 0 0 24px ${colors.primary || colors.accent || '#3b82f6'}40`
                             }}
                         ></div>
                     ))}
                 </div>
-                {/* Badge "Sélectionné" avec animation premium */}
+                
+                {/* CEO Premium: Edge lighting */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-800 pointer-events-none">
+                    <div className="absolute top-0 left-0 right-0 h-px" style={{
+                        background: `linear-gradient(90deg, transparent 0%, ${colors.primary || colors.accent || '#3b82f6'}50 50%, transparent 100%)`,
+                        boxShadow: `0 0 8px ${colors.primary || colors.accent || '#3b82f6'}`
+                    }}></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-px" style={{
+                        background: `linear-gradient(90deg, transparent 0%, ${colors.accent || colors.primary || '#8b5cf6'}50 50%, transparent 100%)`,
+                        boxShadow: `0 0 8px ${colors.accent || colors.primary || '#8b5cf6'}`
+                    }}></div>
+                </div>
+                {/* CEO Premium: Badge "Sélectionné" ultra-sophisticated */}
                 {isSelected && (
                     <>
-                        {/* Multiple rings pour effet de propagation */}
-                        {[0, 1, 2].map((ring) => (
+                        {/* Multiple rings avec propagation avancée */}
+                        {[0, 1, 2, 3].map((ring) => (
                             <div 
                                 key={ring}
                                 className="absolute top-3 right-3 z-0 rounded-full"
                                 style={{ 
-                                    width: `${28 + ring * 8}px`,
-                                    height: `${28 + ring * 8}px`,
-                                    marginTop: `${-ring * 4}px`,
-                                    marginRight: `${-ring * 4}px`,
-                                    border: `2px solid ${colors.primary || colors.accent || '#3b82f6'}`,
-                                    animation: `pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite ${ring * 0.3}s`,
-                                    opacity: 0.6 - (ring * 0.2)
+                                    width: `${32 + ring * 10}px`,
+                                    height: `${32 + ring * 10}px`,
+                                    marginTop: `${-ring * 5}px`,
+                                    marginRight: `${-ring * 5}px`,
+                                    border: `${2 + ring}px solid ${colors.primary || colors.accent || '#3b82f6'}`,
+                                    animation: `pulse-ring ${2.5 + ring * 0.3}s cubic-bezier(0.4, 0, 0.6, 1) infinite ${ring * 0.25}s`,
+                                    opacity: 0.7 - (ring * 0.15),
+                                    filter: `blur(${ring * 0.5}px)`
                                 }}
                             ></div>
                         ))}
                         
-                        {/* Badge principal avec gradient */}
+                        {/* CEO Premium: Badge principal avec effets ultra-sophistiqués */}
                         <div 
-                            className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-2xl relative overflow-hidden"
+                            className="absolute top-3 right-3 z-10 w-10 h-10 rounded-2xl flex items-center justify-center shadow-2xl relative overflow-hidden"
                             style={{ 
-                                background: `linear-gradient(135deg, ${colors.primary || colors.accent || '#3b82f6'} 0%, ${colors.accent || colors.primary || '#8b5cf6'} 100%)`,
-                                boxShadow: `0 0 24px ${colors.primary || colors.accent || '#3b82f6'}80, 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)`,
-                                animation: 'glow-pulse 2s ease-in-out infinite'
+                                background: `linear-gradient(135deg, ${colors.primary || colors.accent || '#3b82f6'} 0%, ${colors.accent || colors.primary || '#8b5cf6'} 50%, ${colors.primary || colors.accent || '#3b82f6'} 100%)`,
+                                backgroundSize: '200% 200%',
+                                boxShadow: `
+                                    0 0 32px ${colors.primary || colors.accent || '#3b82f6'}90,
+                                    0 8px 24px rgba(0,0,0,0.5),
+                                    inset 0 2px 4px rgba(255,255,255,0.3),
+                                    inset 0 -2px 4px rgba(0,0,0,0.2),
+                                    0 0 60px ${colors.primary || colors.accent || '#3b82f6'}40
+                                `,
+                                animation: 'glow-pulse 2.5s ease-in-out infinite, gradient-shift 4s ease infinite'
                             }}
                         >
-                            {/* Shine overlay */}
-                            <div className="absolute inset-0 opacity-50" style={{
-                                background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)'
+                            {/* Multi-layer shine */}
+                            <div className="absolute inset-0 opacity-60" style={{
+                                background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(255,255,255,0.2) 100%)'
                             }}></div>
-                            <svg className="w-5 h-5 text-white drop-shadow-lg relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            <div className="absolute inset-0 opacity-40" style={{
+                                background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5) 0%, transparent 70%)'
+                            }}></div>
+                            
+                            {/* Inner glow */}
+                            <div className="absolute inset-1 rounded-xl opacity-50" style={{
+                                background: `radial-gradient(circle, ${colors.primary || colors.accent || '#3b82f6'} 0%, transparent 70%)`,
+                                filter: 'blur(4px)'
+                            }}></div>
+                            
+                            <svg className="w-6 h-6 text-white drop-shadow-2xl relative z-10 filter brightness-125" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
                             </svg>
+                            
+                            {/* Sparkle effect */}
+                            <div className="absolute inset-0 opacity-0 animate-sparkle">
+                                <div className="absolute top-1 left-1 w-1 h-1 rounded-full bg-white" style={{
+                                    animation: 'sparkle 2s ease-in-out infinite'
+                                }}></div>
+                                <div className="absolute bottom-1 right-1 w-1 h-1 rounded-full bg-white" style={{
+                                    animation: 'sparkle 2s ease-in-out infinite 0.5s'
+                                }}></div>
+                            </div>
                         </div>
                     </>
                 )}
 
-                {/* Header de l'aperçu avec gradient premium */}
+                {/* CEO Premium: Header ultra-sophisticated */}
                 <div
-                    className="p-6 relative overflow-hidden group/header"
+                    className="p-7 relative overflow-hidden group/header"
                     style={{
-                        background: colors.styles?.headerBg || `linear-gradient(135deg, ${colors.surface || colors.background} 0%, ${colors.surfaceLight || colors.surface || colors.background} 100%)`,
-                        borderBottom: `1px solid ${colors.border || 'rgba(255,255,255,0.1)'}`
+                        background: colors.styles?.headerBg || `linear-gradient(135deg, ${colors.surface || colors.background} 0%, ${colors.surfaceLight || colors.surface || colors.background} 50%, ${colors.surface || colors.background} 100%)`,
+                        backgroundSize: '200% 200%',
+                        borderBottom: `1px solid ${colors.border || 'rgba(255,255,255,0.12)'}`,
+                        animation: 'gradient-shift 8s ease infinite'
                     }}
                 >
-                    {/* Pattern overlay animé */}
-                    <div className="absolute inset-0 opacity-[0.04] group-hover/header:opacity-[0.06] transition-opacity duration-500" style={{
-                        backgroundImage: `radial-gradient(circle at 2px 2px, ${colors.text || previewText} 1px, transparent 0)`,
-                        backgroundSize: '24px 24px',
-                        backgroundPosition: '0 0',
-                        animation: 'float 20s ease-in-out infinite'
+                    {/* CEO Premium: Multi-layer pattern */}
+                    <div className="absolute inset-0 opacity-[0.05] group-hover/header:opacity-[0.08] transition-opacity duration-700" style={{
+                        backgroundImage: `
+                            radial-gradient(circle at 3px 3px, ${colors.text || previewText} 1px, transparent 0),
+                            radial-gradient(circle at 15px 15px, ${colors.primary || colors.accent || '#3b82f6'} 0.5px, transparent 0)
+                        `,
+                        backgroundSize: '28px 28px, 32px 32px',
+                        animation: 'float 25s ease-in-out infinite'
                     }}></div>
                     
-                    {/* Gradient overlay multi-layer */}
-                    <div className="absolute inset-0 opacity-70 group-hover/header:opacity-90 transition-opacity duration-500" style={{
-                        background: `linear-gradient(135deg, ${colors.primary || 'transparent'}20 0%, transparent 40%, ${colors.accent || 'transparent'}15 60%, transparent 100%)`
-                    }}></div>
-                    <div className="absolute inset-0 opacity-30" style={{
-                        background: `radial-gradient(circle at 20% 50%, ${colors.primary || 'transparent'}15 0%, transparent 50%)`
+                    {/* CEO Premium: Gradient overlay ultra-sophisticated */}
+                    <div className="absolute inset-0 opacity-80 group-hover/header:opacity-100 transition-opacity duration-700" style={{
+                        background: `
+                            linear-gradient(135deg, ${colors.primary || 'transparent'}25 0%, transparent 35%, ${colors.accent || 'transparent'}20 45%, transparent 55%, ${colors.primary || 'transparent'}15 65%, transparent 100%),
+                            radial-gradient(ellipse at 20% 40%, ${colors.primary || 'transparent'}20 0%, transparent 45%),
+                            radial-gradient(ellipse at 80% 60%, ${colors.accent || 'transparent'}15 0%, transparent 40%)
+                        `
                     }}></div>
                     
-                    {/* Animated gradient line */}
-                    <div className="absolute bottom-0 left-0 right-0 h-px opacity-50" style={{
-                        background: `linear-gradient(90deg, transparent 0%, ${colors.primary || colors.accent || '#3b82f6'}50 50%, transparent 100%)`,
-                        animation: 'glow-pulse 3s ease-in-out infinite'
+                    {/* CEO Premium: Animated gradient line avec glow */}
+                    <div className="absolute bottom-0 left-0 right-0 h-[2px] opacity-60" style={{
+                        background: `linear-gradient(90deg, transparent 0%, ${colors.primary || colors.accent || '#3b82f6'}40 25%, ${colors.primary || colors.accent || '#3b82f6'}80 50%, ${colors.primary || colors.accent || '#3b82f6'}40 75%, transparent 100%)`,
+                        boxShadow: `0 0 12px ${colors.primary || colors.accent || '#3b82f6'}60`,
+                        animation: 'glow-pulse 4s ease-in-out infinite'
+                    }}></div>
+                    
+                    {/* CEO Premium: Corner highlights */}
+                    <div className="absolute top-0 left-0 w-20 h-20 opacity-20" style={{
+                        background: `radial-gradient(circle, ${colors.primary || colors.accent || '#3b82f6'} 0%, transparent 70%)`,
+                        filter: 'blur(15px)'
+                    }}></div>
+                    <div className="absolute top-0 right-0 w-20 h-20 opacity-20" style={{
+                        background: `radial-gradient(circle, ${colors.accent || colors.primary || '#8b5cf6'} 0%, transparent 70%)`,
+                        filter: 'blur(15px)'
                     }}></div>
                     
                     <div className="flex items-center justify-between relative z-10">
                         <div className="flex items-center gap-4">
                             <div 
-                                className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-2xl relative overflow-hidden group/icon transition-all duration-500 group-hover:scale-110 group-hover:rotate-3"
+                                className="w-16 h-16 rounded-3xl flex items-center justify-center text-4xl shadow-2xl relative overflow-hidden group/icon transition-all duration-700 group-hover:scale-110 group-hover:rotate-6"
                                 style={{ 
-                                    background: `linear-gradient(135deg, ${colors.primary || colors.accent || '#3b82f6'} 0%, ${colors.accent || colors.primary || '#8b5cf6'} 50%, ${colors.primary || colors.accent || '#3b82f6'} 100%)`,
-                                    backgroundSize: '200% 200%',
+                                    background: `linear-gradient(135deg, ${colors.primary || colors.accent || '#3b82f6'} 0%, ${colors.accent || colors.primary || '#8b5cf6'} 30%, ${colors.primary || colors.accent || '#3b82f6'} 60%, ${colors.accent || colors.primary || '#8b5cf6'} 100%)`,
+                                    backgroundSize: '300% 300%',
                                     color: '#ffffff',
-                                    boxShadow: `0 6px 24px ${colors.primary || colors.accent || '#3b82f6'}50, inset 0 1px 0 rgba(255,255,255,0.2)`,
-                                    animation: 'glow-pulse 3s ease-in-out infinite'
+                                    boxShadow: `
+                                        0 10px 40px ${colors.primary || colors.accent || '#3b82f6'}60,
+                                        inset 0 2px 6px rgba(255,255,255,0.3),
+                                        inset 0 -2px 6px rgba(0,0,0,0.2),
+                                        0 0 60px ${colors.primary || colors.accent || '#3b82f6'}40
+                                    `,
+                                    animation: 'glow-pulse 3.5s ease-in-out infinite, gradient-shift 5s ease infinite'
                                 }}
                             >
-                                {/* Animated gradient */}
-                                <div className="absolute inset-0 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-500" style={{
-                                    background: `linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)`,
-                                    animation: 'shimmer 2s ease-in-out infinite'
+                                {/* CEO Premium: Multi-layer shine */}
+                                <div className="absolute inset-0 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-700" style={{
+                                    background: `linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 40%, rgba(255,255,255,0.2) 60%, transparent 100%)`,
+                                    animation: 'shimmer 2.5s ease-in-out infinite'
+                                }}></div>
+                                <div className="absolute inset-0 opacity-50" style={{
+                                    background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 60%)'
                                 }}></div>
                                 
-                                {/* Glow effect */}
-                                <div className="absolute -inset-2 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-500 blur-xl" style={{
-                                    background: `radial-gradient(circle, ${colors.primary || colors.accent || '#3b82f6'}60 0%, transparent 70%)`
+                                {/* CEO Premium: Multi-layer glow */}
+                                <div className="absolute -inset-3 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-700 blur-2xl" style={{
+                                    background: `radial-gradient(ellipse, ${colors.primary || colors.accent || '#3b82f6'}70 0%, transparent 70%)`
+                                }}></div>
+                                <div className="absolute -inset-2 opacity-0 group-hover/icon:opacity-60 transition-opacity duration-500 blur-xl" style={{
+                                    background: `radial-gradient(circle, ${colors.accent || colors.primary || '#8b5cf6'}50 0%, transparent 60%)`
                                 }}></div>
                                 
-                                <span className="relative z-10 drop-shadow-lg filter brightness-110">{getThemeIcon(theme.id)}</span>
+                                {/* Inner highlight ring */}
+                                <div className="absolute inset-1 rounded-2xl opacity-30" style={{
+                                    border: `1px solid rgba(255,255,255,0.2)`,
+                                    boxShadow: 'inset 0 0 20px rgba(255,255,255,0.1)'
+                                }}></div>
+                                
+                                <span className="relative z-10 drop-shadow-2xl filter brightness-125 saturate-110">{getThemeIcon(theme.id)}</span>
+                                
+                                {/* Sparkle particles */}
+                                {[...Array(4)].map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="absolute w-1 h-1 rounded-full bg-white opacity-0 group-hover/icon:opacity-100 transition-opacity duration-500"
+                                        style={{
+                                            left: `${25 + i * 15}%`,
+                                            top: `${20 + i * 20}%`,
+                                            animation: `sparkle ${2 + i * 0.3}s ease-in-out infinite ${i * 0.2}s`,
+                                            boxShadow: `0 0 8px rgba(255,255,255,0.8)`
+                                        }}
+                                    ></div>
+                                ))}
                             </div>
                             <div>
                                 <div className="font-bold text-lg tracking-tight" style={{ color: colors.text || previewText }}>
@@ -546,16 +679,37 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                 </svg>
             </button>
 
-            {/* Modal de sélection de thème */}
+            {/* CEO Premium: Modal ultra-sophisticated */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn"
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl animate-fadeIn"
                     style={{ 
-                        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                        backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
+                        background: `
+                            radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                            radial-gradient(ellipse at 80% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                            rgba(0, 0, 0, 0.88)
+                        `,
+                        backdropFilter: 'blur(20px) saturate(180%)',
+                        WebkitBackdropFilter: 'blur(20px) saturate(180%)'
                     }}
                     onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
                 >
+                    {/* CEO Premium: Animated background particles */}
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                        {[...Array(8)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="absolute w-1 h-1 rounded-full"
+                                style={{
+                                    background: `radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, transparent 70%)`,
+                                    left: `${Math.random() * 100}%`,
+                                    top: `${Math.random() * 100}%`,
+                                    animation: `float ${10 + Math.random() * 10}s ease-in-out infinite ${Math.random() * 2}s`,
+                                    boxShadow: `0 0 20px rgba(59, 130, 246, 0.4)`
+                                }}
+                            ></div>
+                        ))}
+                    </div>
                     <div
                         ref={modalRef}
                         className={`relative w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-3xl shadow-2xl transform transition-all duration-700 group/modal ${
@@ -602,55 +756,104 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                             filter: 'blur(30px)',
                             animation: 'glow-pulse 4s ease-in-out infinite 1s'
                         }}></div>
-                        {/* Header de la modal avec gradient premium */}
-                        <div className={`sticky top-0 z-20 p-7 border-b backdrop-blur-xl relative overflow-hidden ${
+                        {/* CEO Premium: Header modal ultra-sophisticated */}
+                        <div className={`sticky top-0 z-20 p-8 border-b backdrop-blur-2xl relative overflow-hidden ${
                             isDarkMode 
-                                ? 'bg-gradient-to-br from-gray-900/98 via-gray-800/95 to-gray-900/98 border-gray-700/30' 
-                                : 'bg-gradient-to-br from-white/98 via-gray-50/95 to-white/98 border-gray-200/30'
-                        }`}>
-                            {/* Subtle pattern */}
-                            <div className={`absolute inset-0 opacity-[0.02] ${
+                                ? 'bg-gradient-to-br from-gray-900/99 via-gray-800/97 to-gray-900/99 border-gray-700/20' 
+                                : 'bg-gradient-to-br from-white/99 via-gray-50/97 to-white/99 border-gray-200/20'
+                        }`}
+                        style={{
+                            boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.05)'
+                        }}
+                        >
+                            {/* CEO Premium: Multi-layer pattern */}
+                            <div className={`absolute inset-0 opacity-[0.03] ${
                                 isDarkMode ? 'bg-white' : 'bg-black'
                             }`} style={{
-                                backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-                                backgroundSize: '32px 32px'
+                                backgroundImage: `
+                                    radial-gradient(circle at 3px 3px, currentColor 1px, transparent 0),
+                                    radial-gradient(circle at 18px 18px, currentColor 0.5px, transparent 0)
+                                `,
+                                backgroundSize: '36px 36px, 40px 40px',
+                                animation: 'float 30s ease-in-out infinite'
+                            }}></div>
+                            
+                            {/* CEO Premium: Gradient mesh */}
+                            <div className="absolute inset-0 opacity-30" style={{
+                                background: `
+                                    radial-gradient(ellipse at 0% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                                    radial-gradient(ellipse at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%)
+                                `
                             }}></div>
                             
                             <div className="flex items-center justify-between relative z-10">
-                                <div className="flex items-center gap-5">
-                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-xl relative overflow-hidden group/header-icon transition-transform duration-300 hover:scale-110 ${
+                                <div className="flex items-center gap-6">
+                                    <div className={`w-16 h-16 rounded-3xl flex items-center justify-center text-4xl shadow-2xl relative overflow-hidden group/header-icon transition-all duration-500 hover:scale-110 hover:rotate-6 ${
                                         isDarkMode 
-                                            ? 'bg-gradient-to-br from-gray-800 to-gray-700 border border-gray-700/50' 
-                                            : 'bg-gradient-to-br from-gray-100 to-white border border-gray-200/50'
-                                    }`}>
-                                        <div className="absolute inset-0 opacity-0 group-hover/header-icon:opacity-100 transition-opacity duration-300" style={{
-                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
+                                            ? 'bg-gradient-to-br from-gray-800 via-gray-750 to-gray-700 border border-gray-700/40' 
+                                            : 'bg-gradient-to-br from-gray-100 via-white to-gray-50 border border-gray-200/40'
+                                    }`}
+                                    style={{
+                                        boxShadow: `
+                                            0 8px 32px rgba(0,0,0,0.3),
+                                            inset 0 2px 4px rgba(255,255,255,0.1),
+                                            inset 0 -2px 4px rgba(0,0,0,0.1)
+                                        `
+                                    }}
+                                    >
+                                        {/* CEO Premium: Multi-layer shine */}
+                                        <div className="absolute inset-0 opacity-0 group-hover/header-icon:opacity-100 transition-opacity duration-500" style={{
+                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)',
+                                            animation: 'luxury-shimmer 3s ease-in-out infinite'
                                         }}></div>
-                                        <span className="relative z-10 drop-shadow-lg">🎨</span>
+                                        <div className="absolute inset-0 opacity-30" style={{
+                                            background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15) 0%, transparent 60%)'
+                                        }}></div>
+                                        
+                                        {/* Inner glow */}
+                                        <div className="absolute inset-2 rounded-2xl opacity-20" style={{
+                                            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)',
+                                            filter: 'blur(8px)'
+                                        }}></div>
+                                        
+                                        <span className="relative z-10 drop-shadow-2xl filter brightness-110">🎨</span>
                                     </div>
                                     <div>
-                                        <h2 className={`text-3xl font-extrabold tracking-tight mb-1.5 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        <h2 className={`text-4xl font-black tracking-tighter mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                                        style={{
+                                            textShadow: isDarkMode 
+                                                ? '0 2px 8px rgba(0,0,0,0.3), 0 0 20px rgba(59, 130, 246, 0.2)'
+                                                : '0 1px 4px rgba(0,0,0,0.1)'
+                                        }}
+                                        >
                                             Sélectionner un thème
                                         </h2>
-                                        <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                            Personnalisez l'apparence de votre dashboard
+                                        <p className={`text-sm font-semibold tracking-wide ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                            Personnalisez l'apparence de votre dashboard avec style
                                         </p>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className={`p-3 rounded-xl transition-all duration-300 hover:scale-110 hover:rotate-90 relative group/close ${
+                                    className={`p-3.5 rounded-2xl transition-all duration-500 hover:scale-110 hover:rotate-90 relative group/close ${
                                         isDarkMode
-                                            ? 'hover:bg-gray-800/80 text-gray-400 hover:text-white'
-                                            : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
+                                            ? 'hover:bg-gray-800/90 text-gray-400 hover:text-white border border-gray-700/30'
+                                            : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900 border border-gray-200/30'
                                     }`}
+                                    style={{
+                                        boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
+                                    }}
                                     title="Fermer (Esc)"
                                 >
-                                    <div className="absolute inset-0 rounded-xl opacity-0 group-hover/close:opacity-100 transition-opacity duration-300" style={{
-                                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%)'
+                                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover/close:opacity-100 transition-opacity duration-500" style={{
+                                        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%)',
+                                        boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)'
                                     }}></div>
-                                    <svg className="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover/close:opacity-50 transition-opacity duration-300" style={{
+                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)'
+                                    }}></div>
+                                    <svg className="w-6 h-6 relative z-10 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
                             </div>
