@@ -39,49 +39,50 @@ export const themes = {
         name: 'MarketQ',
         id: 'marketq',
         colors: {
-            primary: '#00d4ff', // cyan brillant (data-focused)
-            secondary: '#0066cc', // blue profond
-            background: '#0a0e27', // dark navy blue
-            surface: '#141b3d', // darker blue (cards)
-            surfaceLight: '#1e2749', // medium blue (hover states)
+            primary: '#00d4ff', // cyan brillant (data-focused, accents)
+            secondary: '#0066cc', // blue profond (liens, actions secondaires)
+            background: '#0a0e27', // dark navy blue (fond principal)
+            surface: '#141b3d', // darker blue (cards, panels)
+            surfaceLight: '#1e2749', // medium blue (hover states, active)
             text: '#e0e7ff', // light blue-white (texte principal)
             textSecondary: '#94a3b8', // slate-400 (texte secondaire)
-            border: '#00d4ff40', // cyan avec transparence
-            accent: '#00d4ff', // cyan (highlights)
-            success: '#00ff88', // green-cyan (gains)
+            border: '#00d4ff40', // cyan avec transparence (bordures)
+            accent: '#00d4ff', // cyan (highlights, focus)
+            success: '#00ff88', // green-cyan brillant (gains)
             danger: '#ff3366', // pink-red (pertes)
             warning: '#ffaa00', // orange (alertes)
         },
         fonts: {
-            primary: 'Roboto, -apple-system, sans-serif',
-            secondary: 'Inter, sans-serif',
-            mono: '"Courier New", monospace'
+            primary: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
+            secondary: 'Inter, system-ui, sans-serif',
+            mono: '"Courier New", "Courier", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #141b3d 0%, #1e2749 100%)',
             cardBg: '#141b3d',
-            cardBorder: '1px solid rgba(0, 212, 255, 0.2)', // cyan avec transparence
+            cardBorder: '1px solid rgba(0, 212, 255, 0.25)', // cyan avec transparence légèrement plus visible
             borderRadius: '0.5rem',
-            shadow: '0 4px 12px rgba(0, 212, 255, 0.15)', // glow cyan
+            shadow: '0 4px 16px rgba(0, 212, 255, 0.2)', // glow cyan plus prononcé
         }
     },
     'bloomberg-terminal': {
         name: 'Bloomberg Terminal',
         id: 'bloomberg-terminal',
         colors: {
-            primary: '#ffcc00', // Bloomberg yellow (#FFCC00 exact)
-            secondary: '#00ff00', // green pour données positives
-            background: '#000000', // black pur
-            surface: '#0a0a0a', // near black
-            surfaceLight: '#1a1a1a', // dark gray
+            primary: '#ffcc00', // Bloomberg yellow (#FFCC00 exact) - utilisé pour texte principal
+            secondary: '#00ff00', // green brillant pour données positives/gains
+            background: '#000000', // black pur (#000000)
+            surface: '#0a0a0a', // near black (panels)
+            surfaceLight: '#1a1a1a', // dark gray (hover states)
             text: '#ffcc00', // Bloomberg yellow (texte principal)
-            textSecondary: '#888888', // gray
-            textGreen: '#00ff00', // green pour gains
-            textRed: '#ff0000', // red pour pertes
-            border: '#333333', // dark gray
+            textSecondary: '#888888', // gray (texte secondaire)
+            textGreen: '#00ff00', // green brillant pour gains
+            textRed: '#ff0000', // red brillant pour pertes
+            textOrange: '#ff8800', // orange pour alertes
+            border: '#333333', // dark gray (bordures)
             accent: '#ffcc00', // Bloomberg yellow
-            success: '#00ff00', // green (bright green)
-            danger: '#ff0000', // red (bright red)
+            success: '#00ff00', // green brillant
+            danger: '#ff0000', // red brillant
             warning: '#ffcc00', // yellow
         },
         fonts: {
@@ -93,7 +94,7 @@ export const themes = {
             headerBg: '#000000',
             cardBg: '#0a0a0a',
             cardBorder: '1px solid #333333',
-            borderRadius: '0', // pas de border-radius (style terminal)
+            borderRadius: '0', // pas de border-radius (style terminal strict)
             shadow: 'none', // pas d'ombre (style terminal)
         }
     },
@@ -132,30 +133,32 @@ export const themes = {
         name: 'Bloomberg Mobile',
         id: 'bloomberg-mobile',
         colors: {
-            primary: '#ffcc00', // Bloomberg yellow
-            secondary: '#ffffff', // white
+            primary: '#ffcc00', // Bloomberg yellow (accents, highlights)
+            secondary: '#ffffff', // white (texte sur fond sombre)
             background: '#1a1a1a', // dark gray (fond principal)
-            surface: '#2a2a2a', // medium gray (cards)
-            surfaceLight: '#3a3a3a', // lighter gray (hover)
+            surface: '#2a2a2a', // medium gray (cards, panels)
+            surfaceLight: '#3a3a3a', // lighter gray (hover, active)
             text: '#ffffff', // white (texte principal)
             textSecondary: '#b0b0b0', // light gray (texte secondaire)
+            textGreen: '#4caf50', // Material green (gains)
+            textRed: '#f44336', // Material red (pertes)
             border: '#444444', // gray (bordures)
-            accent: '#ffcc00', // Bloomberg yellow (highlights)
+            accent: '#ffcc00', // Bloomberg yellow (highlights, CTA)
             success: '#4caf50', // Material green
             danger: '#f44336', // Material red
             warning: '#ff9800', // Material orange
         },
         fonts: {
-            primary: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
-            secondary: 'Inter, sans-serif',
-            mono: 'monospace'
+            primary: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            secondary: 'Inter, system-ui, sans-serif',
+            mono: 'SF Mono, "Courier New", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
             cardBg: '#2a2a2a',
             cardBorder: '1px solid #444444',
-            borderRadius: '1rem', // arrondi pour mobile
-            shadow: '0 2px 8px rgba(0, 0, 0, 0.4)', // ombre plus prononcée
+            borderRadius: '1rem', // arrondi généreux pour mobile (touch-friendly)
+            shadow: '0 4px 12px rgba(0, 0, 0, 0.5)', // ombre plus prononcée pour profondeur
         }
     }
 };
@@ -186,6 +189,12 @@ export function applyTheme(themeId) {
     }
     if (theme.colors.textRed) {
         root.style.setProperty('--theme-text-red', theme.colors.textRed);
+    }
+    if (theme.colors.textOrange) {
+        root.style.setProperty('--theme-text-orange', theme.colors.textOrange);
+    }
+    if (theme.colors.surfaceDark) {
+        root.style.setProperty('--theme-surface-dark', theme.colors.surfaceDark);
     }
     
     // Appliquer les styles

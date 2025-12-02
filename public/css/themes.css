@@ -69,10 +69,11 @@
     font-family: var(--theme-font-primary) !important;
 }
 
-/* Thème spécifique: Bloomberg Terminal */
+/* Thème spécifique: Bloomberg Terminal - Style terminal classique */
 .theme-bloomberg-terminal {
     font-family: var(--theme-font-mono) !important;
     background-color: #000000 !important;
+    color: #ffcc00 !important;
 }
 
 .theme-bloomberg-terminal * {
@@ -85,23 +86,51 @@
     color: #ffcc00 !important;
 }
 
+.theme-bloomberg-terminal .bg-gray-900,
+.theme-bloomberg-terminal .bg-gray-800 {
+    background-color: #0a0a0a !important;
+    border: 1px solid #333333 !important;
+    border-radius: 0 !important;
+}
+
 .theme-bloomberg-terminal .text-green-500,
-.theme-bloomberg-terminal .text-green-400 {
+.theme-bloomberg-terminal .text-green-400,
+.theme-bloomberg-terminal .text-green-600 {
     color: #00ff00 !important; /* Vert brillant pour gains */
 }
 
 .theme-bloomberg-terminal .text-red-500,
-.theme-bloomberg-terminal .text-red-400 {
+.theme-bloomberg-terminal .text-red-400,
+.theme-bloomberg-terminal .text-red-600 {
     color: #ff0000 !important; /* Rouge brillant pour pertes */
 }
 
 .theme-bloomberg-terminal button,
 .theme-bloomberg-terminal input,
-.theme-bloomberg-terminal select {
+.theme-bloomberg-terminal select,
+.theme-bloomberg-terminal textarea {
     background-color: #0a0a0a !important;
     border: 1px solid #333333 !important;
     color: #ffcc00 !important;
-    border-radius: 0 !important; /* Pas d'arrondi */
+    border-radius: 0 !important; /* Pas d'arrondi - style terminal strict */
+    font-family: 'Courier New', monospace !important;
+}
+
+.theme-bloomberg-terminal button:hover {
+    background-color: #1a1a1a !important;
+    border-color: #ffcc00 !important;
+}
+
+.theme-bloomberg-terminal table {
+    border-collapse: collapse !important;
+    border: 1px solid #333333 !important;
+}
+
+.theme-bloomberg-terminal table th,
+.theme-bloomberg-terminal table td {
+    border: 1px solid #333333 !important;
+    color: #ffcc00 !important;
+    background-color: #0a0a0a !important;
 }
 
 /* Thème spécifique: Seeking Alpha (mode clair avec sidebar sombre) */
@@ -135,56 +164,104 @@
     background-color: var(--theme-primary) !important; /* Orange pour CTA */
 }
 
-/* Thème spécifique: MarketQ */
+/* Thème spécifique: MarketQ - Style data-focused avec cyan */
 .theme-marketq {
     background-color: #0a0e27 !important;
+    color: #e0e7ff !important;
 }
 
 .theme-marketq header {
     border-bottom: 1px solid #00d4ff !important;
     background: linear-gradient(135deg, #141b3d 0%, #1e2749 100%) !important;
+    color: #e0e7ff !important;
 }
 
-.theme-marketq .bg-gray-900 {
+.theme-marketq .bg-gray-900,
+.theme-marketq .bg-gray-800 {
     background-color: #141b3d !important;
-    border: 1px solid rgba(0, 212, 255, 0.2) !important;
-    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.15) !important;
+    border: 1px solid rgba(0, 212, 255, 0.25) !important;
+    box-shadow: 0 4px 16px rgba(0, 212, 255, 0.2) !important;
+}
+
+.theme-marketq .text-white {
+    color: #e0e7ff !important;
+}
+
+.theme-marketq .text-gray-400 {
+    color: #94a3b8 !important;
 }
 
 .theme-marketq .text-green-500,
-.theme-marketq .text-green-400 {
-    color: #00ff88 !important; /* Green-cyan pour gains */
+.theme-marketq .text-green-400,
+.theme-marketq .text-green-600 {
+    color: #00ff88 !important; /* Green-cyan brillant pour gains */
 }
 
 .theme-marketq .text-red-500,
-.theme-marketq .text-red-400 {
+.theme-marketq .text-red-400,
+.theme-marketq .text-red-600 {
     color: #ff3366 !important; /* Pink-red pour pertes */
 }
 
-/* Thème spécifique: Bloomberg Mobile */
+.theme-marketq button.bg-blue-600,
+.theme-marketq .bg-blue-600 {
+    background-color: #00d4ff !important;
+    color: #0a0e27 !important;
+}
+
+.theme-marketq button:hover {
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.4) !important;
+}
+
+/* Thème spécifique: Bloomberg Mobile - Optimisé mobile avec accents jaunes */
 .theme-bloomberg-mobile {
     background-color: #1a1a1a !important;
+    color: #ffffff !important;
 }
 
 .theme-bloomberg-mobile header {
     border-bottom: 1px solid #444444 !important;
     background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%) !important;
+    color: #ffffff !important;
 }
 
-.theme-bloomberg-mobile .bg-gray-900 {
+.theme-bloomberg-mobile .bg-gray-900,
+.theme-bloomberg-mobile .bg-gray-800 {
     background-color: #2a2a2a !important;
-    border-radius: 1rem !important;
+    border-radius: 1rem !important; /* Arrondi généreux pour touch */
     border: 1px solid #444444 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.theme-bloomberg-mobile .text-white {
+    color: #ffffff !important;
+}
+
+.theme-bloomberg-mobile .text-gray-400 {
+    color: #b0b0b0 !important;
 }
 
 .theme-bloomberg-mobile .text-green-500,
-.theme-bloomberg-mobile .text-green-400 {
-    color: #4caf50 !important; /* Material green */
+.theme-bloomberg-mobile .text-green-400,
+.theme-bloomberg-mobile .text-green-600 {
+    color: #4caf50 !important; /* Material green pour gains */
 }
 
 .theme-bloomberg-mobile .text-red-500,
-.theme-bloomberg-mobile .text-red-400 {
-    color: #f44336 !important; /* Material red */
+.theme-bloomberg-mobile .text-red-400,
+.theme-bloomberg-mobile .text-red-600 {
+    color: #f44336 !important; /* Material red pour pertes */
+}
+
+.theme-bloomberg-mobile button {
+    border-radius: 0.75rem !important; /* Touch-friendly */
+    min-height: 44px !important; /* Taille minimale pour touch */
+}
+
+.theme-bloomberg-mobile button.bg-blue-600,
+.theme-bloomberg-mobile .bg-blue-600 {
+    background-color: #ffcc00 !important;
+    color: #000000 !important;
 }
 
 /* Navigation avec thème */
