@@ -1,5 +1,5 @@
 /**
- * Composant ThemeSelector - Sélecteur de thème pour le dashboard
+ * Composant ThemeSelector - Sélecteur de thème professionnel avec aperçus visuels
  */
 
 const { useState, useEffect, useRef } = React;
@@ -7,7 +7,7 @@ const { useState, useEffect, useRef } = React;
 const ThemeSelector = ({ isDarkMode = true }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [currentTheme, setCurrentTheme] = useState('default');
-    const dropdownRef = useRef(null);
+    const modalRef = useRef(null);
 
     // Charger le thème au montage
     useEffect(() => {
@@ -17,26 +17,46 @@ const ThemeSelector = ({ isDarkMode = true }) => {
         }
     }, []);
 
-    // Fermer le dropdown si on clique en dehors
+    // Fermer la modal si on clique en dehors
     useEffect(() => {
         function handleClickOutside(event) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
                 setIsOpen(false);
             }
         }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            // Empêcher le scroll du body quand la modal est ouverte
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
 
-    const themes = [
-        { id: 'default', name: 'Par défaut', icon: '🎨' },
-        { id: 'marketq', name: 'MarketQ', icon: '📊' },
-        { id: 'marketq-dark', name: 'MarketQ Noir', icon: '⚫' },
-        { id: 'bloomberg-terminal', name: 'Bloomberg Terminal', icon: '💻' },
-        { id: 'seeking-alpha', name: 'Seeking Alpha', icon: '📈' },
-        { id: 'bloomberg-mobile', name: 'Bloomberg Mobile', icon: '📱' },
-        { id: 'bloomberg-nostalgie', name: 'Bloomberg Nostalgie', icon: '🕰️' }
-    ];
+    // Fermer avec Escape
+    useEffect(() => {
+        function handleEscape(event) {
+            if (event.key === 'Escape' && isOpen) {
+                setIsOpen(false);
+            }
+        }
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [isOpen]);
+
+    // Obtenir les thèmes depuis le système global
+    const getThemes = () => {
+        if (!window.GOBThemes || !window.GOBThemes.themes) {
+            return [];
+        }
+        return Object.values(window.GOBThemes.themes);
+    };
+
+    const themes = getThemes();
 
     const handleThemeChange = (themeId) => {
         if (window.GOBThemes) {
@@ -49,67 +69,206 @@ const ThemeSelector = ({ isDarkMode = true }) => {
         }
     };
 
+    const getThemeIcon = (themeId) => {
+        const icons = {
+            'default': '🎨',
+            'marketq': '📊',
+            'marketq-dark': '⚫',
+            'bloomberg-terminal': '💻',
+            'seeking-alpha': '📈',
+            'bloomberg-mobile': '📱',
+            'bloomberg-nostalgie': '🕰️'
+        };
+        return icons[themeId] || '✨';
+    };
+
     const currentThemeData = themes.find(t => t.id === currentTheme) || themes[0];
 
+    // Fonction pour générer un aperçu de couleurs du thème
+    const renderThemePreview = (theme) => {
+        const colors = theme.colors || {};
+        const isSelected = currentTheme === theme.id;
+        const isLightTheme = ['seeking-alpha', 'bloomberg-nostalgie'].includes(theme.id);
+        const previewBg = isLightTheme ? '#ffffff' : (colors.background || '#000000');
+        const previewText = isLightTheme ? '#202124' : (colors.text || '#ffffff');
+
+        return (
+            <div
+                key={theme.id}
+                onClick={() => handleThemeChange(theme.id)}
+                className={`relative cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+                    isSelected ? 'ring-4 ring-blue-500 ring-offset-2' : ''
+                }`}
+                style={{
+                    backgroundColor: previewBg,
+                    color: previewText,
+                    border: `2px solid ${isSelected ? '#3b82f6' : colors.border || '#374151'}`,
+                    borderRadius: '0.75rem',
+                    overflow: 'hidden'
+                }}
+            >
+                {/* Header de l'aperçu */}
+                <div
+                    className="p-3 border-b"
+                    style={{
+                        backgroundColor: colors.surface || colors.background,
+                        borderColor: colors.border || '#374151'
+                    }}
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl">{getThemeIcon(theme.id)}</span>
+                            <span className="font-bold text-sm" style={{ color: colors.text || previewText }}>
+                                {theme.name}
+                            </span>
+                        </div>
+                        {isSelected && (
+                            <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                                <span className="text-white text-xs">✓</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Aperçu des couleurs */}
+                <div className="p-4 space-y-2">
+                    {/* Palette de couleurs principales */}
+                    <div className="grid grid-cols-4 gap-1 mb-3">
+                        <div
+                            className="h-8 rounded"
+                            style={{ backgroundColor: colors.primary || '#3b82f6' }}
+                            title="Primary"
+                        ></div>
+                        <div
+                            className="h-8 rounded"
+                            style={{ backgroundColor: colors.accent || colors.primary || '#8b5cf6' }}
+                            title="Accent"
+                        ></div>
+                        <div
+                            className="h-8 rounded"
+                            style={{ backgroundColor: colors.success || '#10b981' }}
+                            title="Success"
+                        ></div>
+                        <div
+                            className="h-8 rounded"
+                            style={{ backgroundColor: colors.danger || '#ef4444' }}
+                            title="Danger"
+                        ></div>
+                    </div>
+
+                    {/* Exemple de card */}
+                    <div
+                        className="p-3 rounded border"
+                        style={{
+                            backgroundColor: colors.surface || colors.background,
+                            borderColor: colors.border || '#374151',
+                            color: colors.text || previewText
+                        }}
+                    >
+                        <div className="text-xs font-semibold mb-1" style={{ color: colors.textSecondary || colors.text }}>
+                            Exemple de card
+                        </div>
+                        <div className="flex items-center gap-2 text-xs">
+                            <span style={{ color: colors.success || '#10b981' }}>+2.5%</span>
+                            <span style={{ color: colors.textSecondary || '#9ca3af' }}>•</span>
+                            <span style={{ color: colors.danger || '#ef4444' }}>-1.2%</span>
+                        </div>
+                    </div>
+
+                    {/* Badge de type */}
+                    <div className="flex justify-end mt-2">
+                        <span
+                            className="text-xs px-2 py-1 rounded"
+                            style={{
+                                backgroundColor: isLightTheme ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+                                color: previewText
+                            }}
+                        >
+                            {isLightTheme ? 'Light' : 'Dark'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <div className="relative" ref={dropdownRef}>
+        <>
+            {/* Bouton pour ouvrir la modal */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                onClick={() => setIsOpen(true)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105 ${
                     isDarkMode
                         ? 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-300'
                 }`}
                 title="Changer le thème"
             >
-                <span className="text-lg">{currentThemeData.icon}</span>
-                <span className="hidden sm:inline">{currentThemeData.name}</span>
-                <span className={`iconoir-nav-arrow-${isOpen ? 'up' : 'down'} text-sm`}></span>
+                <span className="text-lg">{currentThemeData ? getThemeIcon(currentThemeData.id) : '🎨'}</span>
+                <span className="hidden sm:inline">{currentThemeData?.name || 'Thème'}</span>
+                <span className="iconoir-nav-arrow-down text-sm"></span>
             </button>
 
+            {/* Modal de sélection de thème */}
             {isOpen && (
                 <div
-                    className={`absolute right-0 mt-2 w-64 rounded-lg shadow-xl border z-50 ${
-                        isDarkMode
-                            ? 'bg-gray-800 border-gray-700'
-                            : 'bg-white border-gray-200'
-                    }`}
-                    style={{ top: '100%' }}
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
                 >
-                    <div className="p-2">
-                        <div className={`text-xs font-semibold px-3 py-2 mb-1 ${
-                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    <div
+                        ref={modalRef}
+                        className={`relative w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl ${
+                            isDarkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-200'
+                        }`}
+                    >
+                        {/* Header de la modal */}
+                        <div className={`sticky top-0 z-10 p-6 border-b ${
+                            isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
                         }`}>
-                            THÈMES DISPONIBLES
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Sélectionner un thème
+                                    </h2>
+                                    <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        Choisissez l'apparence de votre dashboard
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setIsOpen(false)}
+                                    className={`p-2 rounded-lg transition-colors ${
+                                        isDarkMode
+                                            ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
+                                            : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
+                                    }`}
+                                    title="Fermer"
+                                >
+                                    <span className="iconoir-cancel text-xl"></span>
+                                </button>
+                            </div>
                         </div>
-                        {themes.map((theme) => (
-                            <button
-                                key={theme.id}
-                                onClick={() => handleThemeChange(theme.id)}
-                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-left ${
-                                    currentTheme === theme.id
-                                        ? isDarkMode
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-blue-100 text-blue-900'
-                                        : isDarkMode
-                                            ? 'hover:bg-gray-700 text-gray-200'
-                                            : 'hover:bg-gray-100 text-gray-900'
-                                }`}
-                            >
-                                <span className="text-xl">{theme.icon}</span>
-                                <span className="flex-1 font-medium">{theme.name}</span>
-                                {currentTheme === theme.id && (
-                                    <span className="iconoir-check text-lg"></span>
-                                )}
-                            </button>
-                        ))}
+
+                        {/* Grille des thèmes */}
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {themes.map(theme => renderThemePreview(theme))}
+                            </div>
+                        </div>
+
+                        {/* Footer avec info */}
+                        <div className={`p-4 border-t ${
+                            isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        }`}>
+                            <p className={`text-xs text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Le thème sélectionné est sauvegardé automatiquement
+                            </p>
+                        </div>
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 
 // Exposer globalement
 window.ThemeSelector = ThemeSelector;
-
