@@ -88,39 +88,40 @@ export const AVATAR_IMAGES = {
 
 // --- EMMA VARIATIONS (Brunette, 40 ans, yeux bleus, professionnelle) ---
 // Déclinaisons d'Emma avec et sans lunettes pour humaniser l'avatar
+// IDs Unsplash uniques (non dupliqués dans CURATED_WOMEN_PROFESSIONAL)
 const EMMA_VARIATIONS = [
-    // Sans lunettes - variations professionnelles
+    // Sans lunettes - variations professionnelles brunette (20 images)
+    "1438761681033-066d0708b8c1", // Professionnelle brunette souriante
+    "1488428401001-5c72da774914", // Portrait professionnel brunette
+    "1494790108377-be9c29b29330", // Femme d'affaires brunette
+    "1544005313-94ddf0286df2", // Portrait corporate brunette
+    "1507003211169-0a1dd7228f2d", // Professionnelle confiante brunette
+    "1607746882042-944635dfe10e", // Portrait business brunette
+    "1517841905240-472988babdf9", // Femme professionnelle brunette
+    "1524504388940-b1c1722653e1", // Portrait corporate brunette
+    "1531123897727-8f129e1688ce", // Professionnelle brunette
+    "1506794778202-cad84cf45f1d", // Portrait business brunette
+    "1551836022-d5d88e9218df", // Femme d'affaires brunette
+    "1487412720507-e7ab37603c6f", // Professionnelle brunette
+    "1594744803329-e58b31de8bf5", // Portrait corporate brunette
+    "1598550874175-4d7112ee7f43", // Femme professionnelle brunette
     "1573496359142-b8d87734a5a2", // Professionnelle brunette
-    "1580489944761-15a19d654956", // Portrait professionnel
-    "1567532939604-b6b5b0db2604", // Femme d'affaires
-    "1520813792240-56fc4a3765a7", // Portrait corporate
-    "1573497019940-1c28c88b4f3e", // Professionnelle souriante
-    "1573497491208-6b1acb260507", // Portrait business
-    "1573497491769-d40747c79366", // Femme professionnelle
-    "1573496799652-408c2ac9fe98", // Portrait corporate brunette
-    "1559526324-593bc81422b9", // Professionnelle confiante
-    "1590650516494-0c8e4a4dd67e", // Portrait business
-    "1542596594-649edbc13630", // Femme d'affaires
-    "1508214751196-bcfd4ca60f91", // Professionnelle
-    "1535713875002-d1d0cf377fde", // Portrait corporate
-    "1580894732444-8ecded7900cd", // Femme professionnelle
-    "1564564321837-a57b7070ac4f", // Portrait business brunette
-    "1517841905240-472988babdf9", // Professionnelle
-    "1539571696357-5a69c17a67c6", // Femme d'affaires
-    "1534528741775-53994a69daeb", // Portrait corporate
-    "1531746020798-e6953c6e8e04", // Professionnelle confiante
-    "1524504388940-b1c1722653e1", // Portrait business
-    // Avec lunettes - variations professionnelles
-    "1506794778202-cad84cf45f1d", // Professionnelle avec lunettes
-    "1531123897727-8f129e1688ce", // Portrait avec lunettes
-    "1552058544-f2b08422138a", // Femme d'affaires avec lunettes
+    "1580489944761-15a19d654956", // Portrait corporate brunette
+    "1567532939604-b6b5b0db2604", // Femme d'affaires brunette
+    "1520813792240-56fc4a3765a7", // Professionnelle brunette
+    "1573497019940-1c28c88b4f3e", // Portrait business brunette
+    "1508214751196-bcfd4ca60f91", // Professionnelle brunette confiante
+    // Avec lunettes - variations professionnelles brunette (10 images)
     "1509967419530-322706e580e9", // Professionnelle avec lunettes
-    "1514626585111-9aa86183ac98", // Portrait corporate avec lunettes
-    "1598550874175-4d7112ee7f43", // Professionnelle avec lunettes
-    "1551836022-d5d88e9218df", // Portrait business avec lunettes
-    "1487412720507-e7ab37603c6f", // Femme professionnelle avec lunettes
-    "1594744803329-e58b31de8bf5", // Portrait avec lunettes
+    "1514626585111-9aa86183ac98", // Portrait avec lunettes
+    "1552058544-f2b08422138a", // Femme d'affaires avec lunettes
     "1664575602276-acd073f104c1", // Professionnelle avec lunettes moderne
+    "1539571696357-5a69c17a67c6", // Portrait corporate avec lunettes
+    "1534528741775-53994a69daeb", // Professionnelle avec lunettes
+    "1531746020798-e6953c6e8e04", // Portrait business avec lunettes
+    "1564564321837-a57b7070ac4f", // Femme professionnelle avec lunettes
+    "1580894732444-8ecded7900cd", // Portrait avec lunettes
+    "1535713875002-d1d0cf377fde", // Professionnelle avec lunettes
 ];
 
 // --- MASSIVE GALLERY GENERATION (100+ ITEMS) ---
