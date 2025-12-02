@@ -129,8 +129,8 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
     );
 };
 
-window.BaseModal = BaseModal;
-window.PeerComparisonModal = PeerComparisonModal;
+window.BaseModal = window.BaseModal || BaseModal;
+window.PeerComparisonModal = window.PeerComparisonModal || PeerComparisonModal;
 
 // --- 2. Scenario Analysis Modal ---
 const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) => {
@@ -264,8 +264,8 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
     );
 };
 
-window.ScenarioAnalysisModal = ScenarioAnalysisModal;
-window.AdvancedScreenerModal = AdvancedScreenerModal;
+window.ScenarioAnalysisModal = window.ScenarioAnalysisModal || ScenarioAnalysisModal;
+window.AdvancedScreenerModal = window.AdvancedScreenerModal || AdvancedScreenerModal;
 
 // --- 4. Stock Analysis Modal ---
 const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
@@ -356,8 +356,8 @@ const AIStockAnalysisModal = ({ symbol, stockData, onClose }) => {
     );
 };
 
-window.StockAnalysisModal = StockAnalysisModal;
-window.AIStockAnalysisModal = AIStockAnalysisModal;
+window.StockAnalysisModal = window.StockAnalysisModal || StockAnalysisModal;
+window.AIStockAnalysisModal = window.AIStockAnalysisModal || AIStockAnalysisModal;
 
 // --- 6. News & Sentiment Modal ---
 const NewsAndSentimentModal = ({ symbol, stockData, onClose }) => {
@@ -470,8 +470,8 @@ const AnalystConsensusModal = ({ symbol, stockData, onClose }) => {
     );
 };
 
-window.NewsAndSentimentModal = NewsAndSentimentModal;
-window.AnalystConsensusModal = AnalystConsensusModal;
+window.NewsAndSentimentModal = window.NewsAndSentimentModal || NewsAndSentimentModal;
+window.AnalystConsensusModal = window.AnalystConsensusModal || AnalystConsensusModal;
 
 // --- 8. Earnings Calendar Modal ---
 const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
@@ -619,6 +619,6 @@ const WatchlistScreenerModal = ({ watchlist, onClose, onSelectStock }) => {
     );
 };
 
-window.EarningsCalendarModal = EarningsCalendarModal;
-window.EconomicEventsModal = EconomicEventsModal;
-window.WatchlistScreenerModal = WatchlistScreenerModal;
+window.EarningsCalendarModal = window.EarningsCalendarModal || EarningsCalendarModal;
+window.EconomicEventsModal = window.EconomicEventsModal || EconomicEventsModal;
+window.WatchlistScreenerModal = window.WatchlistScreenerModal || WatchlistScreenerModal;
