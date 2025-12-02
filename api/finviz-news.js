@@ -117,15 +117,16 @@ async function fetchPerplexityNews() {
 1. Le titre (headline) en anglais
 2. L'heure approximative (format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures")
 3. La source (Bloomberg, Reuters, MarketWatch, etc.)
+4. L'URL complète de l'article (si disponible)
 
 Format de réponse (une actualité par ligne):
-[Heure] | [Titre] | [Source]
+[Heure] | [Titre] | [Source] | [URL]
 
 Exemple:
-Aujourd'hui, 11:15 AM | Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data | MarketWatch
-Aujourd'hui, 10:45 AM | Federal Reserve signals potential rate cuts as inflation cools | Reuters
+Aujourd'hui, 11:15 AM | Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data | MarketWatch | https://www.marketwatch.com/story/tech-rally-bitcoin-surge
+Aujourd'hui, 10:45 AM | Federal Reserve signals potential rate cuts as inflation cools | Reuters | https://www.reuters.com/fed-rate-cuts
 
-Retourne uniquement les actualités, sans explication supplémentaire.`;
+Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement les actualités, sans explication supplémentaire.`;
 
         const response = await fetch('https://api.perplexity.ai/chat/completions', {
             method: 'POST',
@@ -176,7 +177,7 @@ function parsePerplexityNews(content) {
     const newsItems = [];
     
     try {
-        // Pattern: [Heure] | [Titre] | [Source]
+        // Pattern: [Heure] | [Titre] | [Source] | [URL]
         const lines = content.split('\n').filter(line => line.trim());
         
         for (const line of lines) {
@@ -185,7 +186,29 @@ function parsePerplexityNews(content) {
             
             const parts = line.split('|').map(p => p.trim());
             
-            if (parts.length >= 3) {
+            if (parts.length >= 4) {
+                // Format complet: [Heure] | [Titre] | [Source] | [URL]
+                const time = parts[0] || 'Aujourd\'hui';
+                const headline = parts[1] || '';
+                const source = parts[2] || 'Perplexity';
+                let url = parts[3] || '';
+                
+                // Nettoyer l'URL (enlever "N/A" ou URLs invalides)
+                if (url === 'N/A' || !url.startsWith('http')) {
+                    url = '';
+                }
+                
+                if (headline && headline.length > 10) {
+                    newsItems.push({
+                        time: time,
+                        headline: headline,
+                        source: source,
+                        url: url,
+                        raw: headline
+                    });
+                }
+            } else if (parts.length >= 3) {
+                // Format sans URL: [Heure] | [Titre] | [Source]
                 const time = parts[0] || 'Aujourd\'hui';
                 const headline = parts[1] || '';
                 const source = parts[2] || 'Perplexity';
@@ -195,6 +218,7 @@ function parsePerplexityNews(content) {
                         time: time,
                         headline: headline,
                         source: source,
+                        url: '',
                         raw: headline
                     });
                 }
@@ -208,6 +232,7 @@ function parsePerplexityNews(content) {
                         time: time,
                         headline: headline,
                         source: 'Perplexity',
+                        url: '',
                         raw: headline
                     });
                 }
@@ -241,19 +266,33 @@ function parseFinvizNews(html) {
             const timeMatch = rowHtml.match(/<td[^>]*>([^<]*\d{1,2}:\d{2}\s*(?:AM|PM)?)[^<]*<\/td>/i);
             const time = timeMatch ? timeMatch[1].trim() : '';
             
-            // Extract headline (usually in a link)
-            const headlineMatch = rowHtml.match(/<a[^>]*>([^<]+)<\/a>/i);
-            const headline = headlineMatch ? headlineMatch[1].trim() : '';
+            // Extract headline and URL (usually in a link)
+            const linkMatch = rowHtml.match(/<a[^>]*href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/i);
+            const headline = linkMatch ? linkMatch[2].trim() : '';
+            const url = linkMatch ? linkMatch[1].trim() : '';
             
             // Extract source
             const sourceMatch = rowHtml.match(/<td[^>]*>([A-Z][^<]+)<\/td>/i);
             const source = sourceMatch ? sourceMatch[1].trim() : '';
             
             if (headline && headline.length > 10) {
+                // Normaliser l'URL (ajouter https:// si manquant)
+                let normalizedUrl = url;
+                if (normalizedUrl && !normalizedUrl.startsWith('http')) {
+                    if (normalizedUrl.startsWith('//')) {
+                        normalizedUrl = 'https:' + normalizedUrl;
+                    } else if (normalizedUrl.startsWith('/')) {
+                        normalizedUrl = 'https://finviz.com' + normalizedUrl;
+                    } else {
+                        normalizedUrl = 'https://' + normalizedUrl;
+                    }
+                }
+                
                 newsItems.push({
                     time: time || 'Aujourd\'hui',
                     headline: headline,
                     source: source || 'Finviz',
+                    url: normalizedUrl || '',
                     raw: headline
                 });
                 count++;
@@ -262,18 +301,33 @@ function parseFinvizNews(html) {
         
         // Fallback: try to extract from news table structure
         if (newsItems.length === 0) {
-            // Alternative pattern: look for news links
-            const linkRegex = /<a[^>]*href="[^"]*news[^"]*"[^>]*>([^<]+)<\/a>/gi;
+            // Alternative pattern: look for news links with URLs
+            const linkRegex = /<a[^>]*href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/gi;
             let linkMatch;
             let linkCount = 0;
             
             while ((linkMatch = linkRegex.exec(html)) !== null && linkCount < 15) {
-                const headline = linkMatch[1].trim();
-                if (headline && headline.length > 15 && !headline.includes('<')) {
+                const url = linkMatch[1].trim();
+                const headline = linkMatch[2].trim();
+                
+                if (headline && headline.length > 15 && !headline.includes('<') && url.includes('news')) {
+                    // Normaliser l'URL
+                    let normalizedUrl = url;
+                    if (!normalizedUrl.startsWith('http')) {
+                        if (normalizedUrl.startsWith('//')) {
+                            normalizedUrl = 'https:' + normalizedUrl;
+                        } else if (normalizedUrl.startsWith('/')) {
+                            normalizedUrl = 'https://finviz.com' + normalizedUrl;
+                        } else {
+                            normalizedUrl = 'https://' + normalizedUrl;
+                        }
+                    }
+                    
                     newsItems.push({
                         time: 'Aujourd\'hui',
                         headline: headline,
                         source: 'Finviz',
+                        url: normalizedUrl,
                         raw: headline
                     });
                     linkCount++;
@@ -292,18 +346,21 @@ function parseFinvizNews(html) {
                 time: 'Aujourd\'hui, 11:15 AM',
                 headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
                 source: 'MarketWatch',
+                url: 'https://www.marketwatch.com',
                 raw: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data'
             },
             {
                 time: 'Aujourd\'hui, 10:45 AM',
                 headline: 'Federal Reserve signals potential rate cuts as inflation cools',
                 source: 'Reuters',
+                url: 'https://www.reuters.com',
                 raw: 'Federal Reserve signals potential rate cuts as inflation cools'
             },
             {
                 time: 'Aujourd\'hui, 10:20 AM',
                 headline: 'Oil prices rise on supply concerns amid Middle East tensions',
                 source: 'Bloomberg',
+                url: 'https://www.bloomberg.com',
                 raw: 'Oil prices rise on supply concerns amid Middle East tensions'
             }
         ];

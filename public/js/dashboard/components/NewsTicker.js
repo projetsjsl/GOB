@@ -71,17 +71,20 @@ const NewsTicker = ({ isDarkMode = true }) => {
                     {
                         time: 'Aujourd\'hui, 11:15 AM',
                         headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
-                        source: 'MarketWatch'
+                        source: 'MarketWatch',
+                        url: 'https://www.marketwatch.com'
                     },
                     {
                         time: 'Aujourd\'hui, 10:45 AM',
                         headline: 'Federal Reserve signals potential rate cuts as inflation cools',
-                        source: 'Reuters'
+                        source: 'Reuters',
+                        url: 'https://www.reuters.com'
                     },
                     {
                         time: 'Aujourd\'hui, 10:20 AM',
                         headline: 'Oil prices rise on supply concerns amid Middle East tensions',
-                        source: 'Bloomberg'
+                        source: 'Bloomberg',
+                        url: 'https://www.bloomberg.com'
                     }
                 ]);
             }
@@ -92,7 +95,8 @@ const NewsTicker = ({ isDarkMode = true }) => {
                 {
                     time: 'Aujourd\'hui, 11:15 AM',
                     headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
-                    source: 'MarketWatch'
+                    source: 'MarketWatch',
+                    url: 'https://www.marketwatch.com'
                 }
             ]);
         } finally {
@@ -167,7 +171,15 @@ const NewsTicker = ({ isDarkMode = true }) => {
                     ) : (
                         news.map((item, index) => (
                             <React.Fragment key={index}>
-                                <div className="flex items-center gap-3 px-4">
+                                <div 
+                                    className="flex items-center gap-3 px-4 cursor-pointer hover:opacity-80 transition-opacity"
+                                    onClick={() => {
+                                        if (item.url) {
+                                            window.open(item.url, '_blank', 'noopener,noreferrer');
+                                        }
+                                    }}
+                                    title={item.url ? 'Cliquer pour ouvrir l\'article' : ''}
+                                >
                                     <span
                                         className="text-xs font-medium"
                                         style={{ color: '#10b981', minWidth: '100px' }}
@@ -176,10 +188,28 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                     </span>
                                     <span
                                         className="text-sm"
-                                        style={{ color: isDarkMode ? '#ffffff' : '#1f2937' }}
+                                        style={{ 
+                                            color: isDarkMode ? '#ffffff' : '#1f2937',
+                                            textDecoration: item.url ? 'none' : 'none',
+                                            cursor: item.url ? 'pointer' : 'default'
+                                        }}
                                     >
                                         {item.headline}
                                     </span>
+                                    {item.url && (
+                                        <svg 
+                                            viewBox="0 0 24 24" 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            strokeWidth="2" 
+                                            className="w-3 h-3 flex-shrink-0"
+                                            style={{ color: isDarkMode ? 'rgba(156, 163, 175, 0.6)' : 'rgba(107, 114, 128, 0.6)' }}
+                                        >
+                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                            <polyline points="15 3 21 3 21 9"></polyline>
+                                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                                        </svg>
+                                    )}
                                 </div>
                                 <div
                                     className="w-8 h-px mx-4"
@@ -193,7 +223,15 @@ const NewsTicker = ({ isDarkMode = true }) => {
                         <>
                             {news.map((item, index) => (
                                 <React.Fragment key={`dup-${index}`}>
-                                    <div className="flex items-center gap-3 px-4">
+                                    <div 
+                                        className="flex items-center gap-3 px-4 cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => {
+                                            if (item.url) {
+                                                window.open(item.url, '_blank', 'noopener,noreferrer');
+                                            }
+                                        }}
+                                        title={item.url ? 'Cliquer pour ouvrir l\'article' : ''}
+                                    >
                                         <span
                                             className="text-xs font-medium"
                                             style={{ color: '#10b981', minWidth: '100px' }}
@@ -202,10 +240,27 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                         </span>
                                         <span
                                             className="text-sm"
-                                            style={{ color: isDarkMode ? '#ffffff' : '#1f2937' }}
+                                            style={{ 
+                                                color: isDarkMode ? '#ffffff' : '#1f2937',
+                                                cursor: item.url ? 'pointer' : 'default'
+                                            }}
                                         >
                                             {item.headline}
                                         </span>
+                                        {item.url && (
+                                            <svg 
+                                                viewBox="0 0 24 24" 
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                strokeWidth="2" 
+                                                className="w-3 h-3 flex-shrink-0"
+                                                style={{ color: isDarkMode ? 'rgba(156, 163, 175, 0.6)' : 'rgba(107, 114, 128, 0.6)' }}
+                                            >
+                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                            </svg>
+                                        )}
                                     </div>
                                     <div
                                         className="w-8 h-px mx-4"
