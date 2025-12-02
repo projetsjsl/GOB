@@ -196,7 +196,17 @@ export default async function handler(req, res) {
       // Messages d'erreur spécifiques selon le type
       let hint = 'Vérifiez vos clés API Browserbase et Gemini. Ajoutez ?debug=true pour plus de détails.';
       if (initError.message?.includes('Unauthorized') || initError.name === 'StagehandAPIUnauthorizedError') {
-        hint = 'La clé API Browserbase n\'est pas valide ou n\'est pas autorisée. Vérifiez: 1) La clé est correcte dans Vercel, 2) La clé est whitelistée pour Stagehand, 3) Le projet Browserbase est correct.';
+        hint = `ERREUR D'AUTORISATION STAGEHAND:
+        
+1. Vérifiez que BROWSERBASE_API_KEY est correcte dans Vercel Environment Variables
+2. Vérifiez que BROWSERBASE_PROJECT_ID est correct dans Vercel
+3. IMPORTANT: La clé API Browserbase doit être WHITELISTÉE pour Stagehand
+   - Connectez-vous à votre dashboard Browserbase
+   - Vérifiez que votre clé API a les permissions Stagehand activées
+   - Si nécessaire, créez une nouvelle clé API avec permissions Stagehand
+4. Vérifiez que GEMINI_API_KEY est également définie dans Vercel
+
+Note: Stagehand nécessite une clé API Browserbase spécialement autorisée pour son utilisation.`;
       } else if (initError.message?.includes('API key')) {
         hint = 'Problème avec la clé API. Vérifiez que GEMINI_API_KEY est valide et a les permissions nécessaires.';
       }
