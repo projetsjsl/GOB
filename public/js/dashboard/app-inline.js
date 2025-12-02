@@ -24219,7 +24219,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // Construire la liste finale des onglets à afficher
         const tabs = [...visibleTabs];
         if (hiddenTabs.length > 0) {
-            tabs.push({ id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: PlusTab, hiddenTabs: hiddenTabs });
+            tabs.push({ id: 'plus', label: 'Plus', icon: 'iconoir-menu', component: window.PlusTab || (() => <div>Chargement...</div>), hiddenTabs: hiddenTabs });
         }
 
         return (
@@ -25255,7 +25255,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                         setShowLengthEditor={setShowLengthEditor}
                     />}
                     {activeTab === 'assistant-vocal' && <VoiceAssistantTab isDarkMode={isDarkMode} />}
-                    {activeTab === 'plus' && <PlusTab />}
+                    {activeTab === 'plus' && window.PlusTab && React.createElement(window.PlusTab, { isDarkMode: isDarkMode, isProfessionalMode: isProfessionalMode })}
                     {activeTab === 'admin-jsla' && window.AdminJSLaiTab && React.createElement(window.AdminJSLaiTab, {
                         emmaConnected: emmaConnected,
                         setEmmaConnected: setEmmaConnected,

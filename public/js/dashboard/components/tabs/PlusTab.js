@@ -25,7 +25,7 @@ const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
                 <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                 }`}>
-                    <Icon emoji="⚙️" name="Settings" size={24} className="mr-2 inline-block" />
+                    {typeof Icon !== 'undefined' ? <Icon emoji="⚙️" name="Settings" size={24} className="mr-2 inline-block" /> : '⚙️'}
                     Paramètres
                 </h2>
 
@@ -62,3 +62,5 @@ const PlusTab = ({ isDarkMode, isProfessionalMode }) => {
         </div>
     );
 };
+
+window.PlusTab = PlusTab;

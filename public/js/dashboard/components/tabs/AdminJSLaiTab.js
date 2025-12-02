@@ -1194,7 +1194,7 @@ const AdminJSLaiTab = ({
                     </div>
                 </div>
             );
+        };
 
-            // Composant onglet Plus
-
+// Exposer le composant globalement
 window.AdminJSLaiTab = AdminJSLaiTab;
