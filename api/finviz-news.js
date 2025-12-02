@@ -1,7 +1,12 @@
 /**
  * API endpoint pour récupérer les actualités financières
- * Sources: Finviz (scraping) + Perplexity (actualités de l'heure et du jour)
+ * Sources hyper fiables:
+ * 1. Finviz (scraping) - Agrège Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
+ * 2. Perplexity (actualités de l'heure et du jour) - Sources premium
+ * 3. FMP (Financial Modeling Prep) - Bloomberg, WSJ, Reuters, CNBC, MarketWatch, Yahoo Finance, Forbes, Fortune
+ * 4. Finnhub - Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
  * Traduit en français via Gemini API
+ * Toutes les heures sont converties en heure de Montréal (Eastern Time)
  */
 
 export default async function handler(req, res) {
