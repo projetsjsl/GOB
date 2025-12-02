@@ -96,7 +96,7 @@ async function fetchFinvizNews() {
         }
 
         const html = await response.text();
-        
+
         // Parse HTML to extract news items
         return parseFinvizNews(html);
     } catch (error) {
@@ -211,11 +211,14 @@ function parsePerplexityNews(content) {
             
             if (parts.length >= 5) {
                 // Format complet: [Heure] | [Titre] | [Source] | [Type] | [URL]
-                const time = parts[0] || 'Aujourd\'hui';
+                let time = parts[0] || 'Aujourd\'hui';
                 const headline = parts[1] || '';
                 const source = parts[2] || 'Perplexity';
                 const type = parts[3] || 'other';
                 let url = parts[4] || '';
+                
+                // Convertir l'heure en heure de Montréal
+                time = formatTimeMontreal(time);
                 
                 // Nettoyer l'URL (enlever "N/A" ou URLs invalides)
                 if (url === 'N/A' || !url.startsWith('http')) {
@@ -234,10 +237,13 @@ function parsePerplexityNews(content) {
                 }
             } else if (parts.length >= 4) {
                 // Format sans type: [Heure] | [Titre] | [Source] | [URL]
-                const time = parts[0] || 'Aujourd\'hui';
+                let time = parts[0] || 'Aujourd\'hui';
                 const headline = parts[1] || '';
                 const source = parts[2] || 'Perplexity';
                 let url = parts[3] || '';
+                
+                // Convertir l'heure en heure de Montréal
+                time = formatTimeMontreal(time);
                 
                 // Détecter le type depuis le headline
                 const detectedType = detectNewsType(headline);
@@ -258,9 +264,12 @@ function parsePerplexityNews(content) {
                 }
             } else if (parts.length >= 3) {
                 // Format sans URL: [Heure] | [Titre] | [Source]
-                const time = parts[0] || 'Aujourd\'hui';
+                let time = parts[0] || 'Aujourd\'hui';
                 const headline = parts[1] || '';
                 const source = parts[2] || 'Perplexity';
+                
+                // Convertir l'heure en heure de Montréal
+                time = formatTimeMontreal(time);
                 
                 // Détecter le type depuis le headline
                 const detectedType = detectNewsType(headline);
@@ -277,8 +286,11 @@ function parsePerplexityNews(content) {
                 }
             } else if (parts.length === 2) {
                 // Format alternatif: [Heure] | [Titre]
-                const time = parts[0] || 'Aujourd\'hui';
+                let time = parts[0] || 'Aujourd\'hui';
                 const headline = parts[1] || '';
+                
+                // Convertir l'heure en heure de Montréal
+                time = formatTimeMontreal(time);
                 
                 // Détecter le type depuis le headline
                 const detectedType = detectNewsType(headline);
@@ -357,7 +369,7 @@ function detectNewsType(headline) {
  * Parse Finviz HTML to extract news items
  */
 function parseFinvizNews(html) {
-    const newsItems = [];
+        const newsItems = [];
     
     try {
         // Finviz news structure: news items are in table rows with class "nn"
@@ -371,7 +383,28 @@ function parseFinvizNews(html) {
             
             // Extract time
             const timeMatch = rowHtml.match(/<td[^>]*>([^<]*\d{1,2}:\d{2}\s*(?:AM|PM)?)[^<]*<\/td>/i);
-            const time = timeMatch ? timeMatch[1].trim() : '';
+            let time = timeMatch ? timeMatch[1].trim() : '';
+            
+            // Convertir l'heure en heure de Montréal si disponible
+            if (time) {
+                // Parser l'heure de Finviz (généralement en format "HH:MM AM/PM")
+                const timeParts = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+                if (timeParts) {
+                    let hours = parseInt(timeParts[1]);
+                    const minutes = parseInt(timeParts[2]);
+                    const ampm = timeParts[3].toUpperCase();
+                    
+                    if (ampm === 'PM' && hours !== 12) hours += 12;
+                    if (ampm === 'AM' && hours === 12) hours = 0;
+                    
+                    // Créer une date avec l'heure (en supposant que c'est aujourd'hui)
+                    const date = new Date();
+                    date.setHours(hours, minutes, 0, 0);
+                    
+                    // Formater en heure de Montréal
+                    time = formatTimeMontreal(date);
+                }
+            }
             
             // Extract headline and URL (usually in a link)
             const linkMatch = rowHtml.match(/<a[^>]*href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/i);
@@ -397,19 +430,19 @@ function parseFinvizNews(html) {
                 
                 // Détecter le type depuis le headline
                 const detectedType = detectNewsType(headline);
-                
-                newsItems.push({
-                    time: time || 'Aujourd\'hui',
+            
+            newsItems.push({
+                    time: time || formatTimeMontreal(new Date()),
                     headline: headline,
                     source: source || 'Finviz',
                     type: detectedType,
                     url: normalizedUrl || '',
                     raw: headline
-                });
-                count++;
+            });
+            count++;
             }
         }
-        
+
         // Fallback: try to extract from news table structure
         if (newsItems.length === 0) {
             // Alternative pattern: look for news links with URLs
@@ -438,7 +471,7 @@ function parseFinvizNews(html) {
                     const detectedType = detectNewsType(headline);
                     
                     newsItems.push({
-                        time: 'Aujourd\'hui',
+                        time: formatTimeMontreal(new Date()),
                         headline: headline,
                         source: 'Finviz',
                         type: detectedType,
@@ -456,9 +489,18 @@ function parseFinvizNews(html) {
     
     // If no news found, return sample news
     if (newsItems.length === 0) {
+        // Retourner des actualités d'exemple avec l'heure de Montréal
+        const now = new Date();
+        const sampleTime1 = new Date(now);
+        sampleTime1.setHours(11, 15, 0, 0);
+        const sampleTime2 = new Date(now);
+        sampleTime2.setHours(10, 45, 0, 0);
+        const sampleTime3 = new Date(now);
+        sampleTime3.setHours(10, 20, 0, 0);
+        
         return [
             {
-                time: 'Aujourd\'hui, 11:15 AM',
+                time: formatTimeMontreal(sampleTime1),
                 headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
                 source: 'MarketWatch',
                 type: 'market',
@@ -466,7 +508,7 @@ function parseFinvizNews(html) {
                 raw: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data'
             },
             {
-                time: 'Aujourd\'hui, 10:45 AM',
+                time: formatTimeMontreal(sampleTime2),
                 headline: 'Federal Reserve signals potential rate cuts as inflation cools',
                 source: 'Reuters',
                 type: 'economy',
@@ -474,7 +516,7 @@ function parseFinvizNews(html) {
                 raw: 'Federal Reserve signals potential rate cuts as inflation cools'
             },
             {
-                time: 'Aujourd\'hui, 10:20 AM',
+                time: formatTimeMontreal(sampleTime3),
                 headline: 'Oil prices rise on supply concerns amid Middle East tensions',
                 source: 'Bloomberg',
                 type: 'commodities',
@@ -509,6 +551,100 @@ function deduplicateNews(newsItems) {
     }
     
     return unique;
+}
+
+/**
+ * Formater une date/heure en heure de Montréal (Eastern Time)
+ * Format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures"
+ */
+function formatTimeMontreal(dateOrTimeString) {
+    let date;
+    
+    // Si c'est une string de temps existante, essayer de la parser
+    if (typeof dateOrTimeString === 'string') {
+        // Si c'est déjà formaté "Aujourd'hui, HH:MM AM/PM", parser l'heure
+        const todayMatch = dateOrTimeString.match(/Aujourd'hui[,\s]+(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+        if (todayMatch) {
+            const now = new Date();
+            let hours = parseInt(todayMatch[1]);
+            const minutes = parseInt(todayMatch[2]);
+            const ampm = todayMatch[3].toUpperCase();
+            
+            if (ampm === 'PM' && hours !== 12) hours += 12;
+            if (ampm === 'AM' && hours === 12) hours = 0;
+            
+            date = new Date(now);
+            date.setHours(hours, minutes, 0, 0);
+        } else if (dateOrTimeString.match(/Il y a (\d+)\s*heures?/i)) {
+            // "Il y a X heures" - calculer depuis maintenant
+            const hoursAgoMatch = dateOrTimeString.match(/Il y a (\d+)\s*heures?/i);
+            const hoursAgo = parseInt(hoursAgoMatch[1]);
+            date = new Date();
+            date.setHours(date.getHours() - hoursAgo);
+        } else {
+            // Sinon, essayer de parser comme date ISO ou timestamp
+            date = new Date(dateOrTimeString);
+        }
+    } else if (dateOrTimeString instanceof Date) {
+        date = dateOrTimeString;
+    } else {
+        date = new Date();
+    }
+    
+    // Vérifier si la date est valide
+    if (isNaN(date.getTime())) {
+        return 'Aujourd\'hui';
+    }
+    
+    // Obtenir l'heure actuelle en heure de Montréal
+    const nowMontreal = new Date();
+    const nowMontrealStr = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Montreal',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).format(nowMontreal);
+    
+    // Convertir la date en heure de Montréal
+    const montrealFormatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Montreal',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+    
+    const montrealParts = montrealFormatter.formatToParts(date);
+    const montrealDateStr = `${montrealParts.find(p => p.type === 'year').value}-${montrealParts.find(p => p.type === 'month').value}-${montrealParts.find(p => p.type === 'day').value}`;
+    
+    // Vérifier si c'est aujourd'hui
+    const isToday = montrealDateStr === nowMontrealStr.replace(/\//g, '-');
+    
+    if (isToday) {
+        // Formater en "Aujourd'hui, HH:MM AM/PM" en heure de Montréal
+        const hours = parseInt(montrealParts.find(p => p.type === 'hour').value);
+        const minutes = parseInt(montrealParts.find(p => p.type === 'minute').value);
+        const ampm = montrealParts.find(p => p.type === 'dayPeriod').value;
+        const displayHours = hours % 12 || 12;
+        const displayMinutes = minutes.toString().padStart(2, '0');
+        
+        return `Aujourd'hui, ${displayHours}:${displayMinutes} ${ampm.toUpperCase()}`;
+    } else {
+        // Calculer la différence en heures (en utilisant les timestamps UTC)
+        const diffMs = nowMontreal.getTime() - date.getTime();
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        
+        if (diffHours < 1) {
+            return 'À l\'instant';
+        } else if (diffHours < 24) {
+            return `Il y a ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+        } else {
+            const diffDays = Math.floor(diffHours / 24);
+            return `Il y a ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+        }
+    }
 }
 
 /**
