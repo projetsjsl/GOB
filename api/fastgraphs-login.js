@@ -35,10 +35,18 @@ export default async function handler(req, res) {
     const geminiApiKey = process.env.GEMINI_API_KEY;
 
     if (!browserbaseApiKey || !browserbaseProjectId) {
+      console.error('Configuration Browserbase manquante:', {
+        hasApiKey: !!browserbaseApiKey,
+        hasProjectId: !!browserbaseProjectId
+      });
       return res.status(503).json({
         error: 'Configuration Browserbase manquante',
         details: 'BROWSERBASE_API_KEY et BROWSERBASE_PROJECT_ID sont requis',
-        hint: 'Configurez ces variables dans Vercel Environment Variables'
+        hint: 'Configurez ces variables dans Vercel Environment Variables',
+        config: {
+          hasApiKey: !!browserbaseApiKey,
+          hasProjectId: !!browserbaseProjectId
+        }
       });
     }
 
@@ -71,7 +79,18 @@ export default async function handler(req, res) {
     if (!sessionResponse.ok) {
       const errorText = await sessionResponse.text();
       console.error('Erreur Browserbase:', sessionResponse.status, errorText);
-      throw new Error(`Erreur Browserbase: ${sessionResponse.status} - ${errorText}`);
+      let errorDetails;
+      try {
+        errorDetails = JSON.parse(errorText);
+      } catch {
+        errorDetails = { message: errorText };
+      }
+      return res.status(sessionResponse.status).json({
+        error: 'Erreur lors de la création de la session Browserbase',
+        details: errorDetails.message || errorText,
+        status: sessionResponse.status,
+        hint: 'Vérifiez vos clés API Browserbase et l\'ID du projet'
+      });
     }
 
     const sessionData = await sessionResponse.json();
@@ -206,150 +225,54 @@ export default async function handler(req, res) {
       })();
     `;
     
-    // Exécuter le script via l'API Browserbase
-    // Note: Browserbase utilise l'endpoint /sessions/{id}/execute pour exécuter du code
-    try {
-      const executeResponse = await fetch(`${browserbaseApiUrl}/sessions/${sessionId}/execute`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${browserbaseApiKey}`,
-          'Content-Type': 'application/json',
-          'x-browserbase-project-id': browserbaseProjectId
-        },
-        body: JSON.stringify({
-          script: automationScript
-        })
-      });
-      
-      if (executeResponse.ok) {
-        const executeResult = await executeResponse.json();
-        console.log('Résultat de l\'exécution:', executeResult);
-        
-        // Construire l'URL de la session
-        const sessionUrl = sessionData.url || 
-                          sessionData.viewerUrl || 
-                          `https://www.browserbase.com/sessions/${sessionId}`;
-        
-        return res.status(200).json({
-          success: true,
-          message: 'Connexion automatisée en cours',
-          session: {
-            id: sessionId,
-            url: sessionUrl,
-            status: sessionData.status || 'active',
-            createdAt: sessionData.createdAt || new Date().toISOString()
-          },
-          automation: {
-            loginButtonClicked: executeResult.success || false,
-            message: executeResult.message || 'Script exécuté',
-            steps: executeResult.results?.steps || null,
-            fullyAutomated: hasCredentials && executeResult.success
-          },
-          instructions: hasCredentials ? {
-            step1: 'La session Browserbase a été créée',
-            step2: 'Le bouton "Log In" a été cliqué automatiquement',
-            step3: 'Les identifiants ont été remplis automatiquement',
-            step4: 'Le formulaire a été soumis automatiquement',
-            step5: 'Vous devriez être connecté à FastGraphs',
-            note: 'Vérifiez la session pour confirmer la connexion'
-          } : {
-            step1: 'La session Browserbase a été créée',
-            step2: 'Le bouton "Log In" a été cliqué automatiquement',
-            step3: 'Entrez vos identifiants FastGraphs dans le formulaire qui s\'est ouvert',
-            step4: 'Vous serez connecté et pourrez utiliser FastGraphs',
-            note: 'Pour une automatisation complète, fournissez email et password dans la requête'
-          },
-          workflow: {
-            url: 'https://www.fastgraphs.com/',
-            action: 'click the Log In button',
-            status: 'automated',
-            automationLevel: 'fully-automated'
-          }
-        });
-      } else {
-        // Si l'endpoint /execute n'existe pas, essayer une autre méthode
-        console.warn('Endpoint /execute non disponible, utilisation de la méthode alternative');
-        throw new Error('Endpoint d\'exécution non disponible');
+    // Construire l'URL de la session
+    const sessionUrl = sessionData.url || 
+                      sessionData.viewerUrl || 
+                      sessionData.viewer_url ||
+                      `https://www.browserbase.com/sessions/${sessionId}`;
+    
+    // Pour l'instant, Browserbase ne supporte pas directement l'exécution de scripts via leur API REST
+    // L'automatisation complète nécessiterait Stagehand ou l'utilisation de leur SDK
+    // On retourne la session avec des instructions pour l'automatisation côté client
+    
+    // Note: L'automatisation JavaScript peut être injectée côté client via l'URL de la session
+    // ou via un bookmarklet, mais pour une vraie automatisation serveur, il faudrait Stagehand
+    
+    return res.status(200).json({
+      success: true,
+      message: hasCredentials ? 'Session créée - Automatisation disponible' : 'Session Browserbase créée avec succès',
+      session: {
+        id: sessionId,
+        url: sessionUrl,
+        status: sessionData.status || 'active',
+        createdAt: sessionData.createdAt || new Date().toISOString()
+      },
+      automation: {
+        script: hasCredentials ? automationScript : null,
+        loginButtonClicked: false, // Sera exécuté côté client si nécessaire
+        message: 'Session créée - L\'automatisation peut être exécutée via la session',
+        fullyAutomated: false // Nécessite Stagehand pour une vraie automatisation serveur
+      },
+      instructions: hasCredentials ? {
+        step1: 'La session Browserbase a été créée',
+        step2: 'Ouvrez l\'URL de la session dans un nouvel onglet',
+        step3: 'Le script d\'automatisation est disponible dans la réponse',
+        step4: 'Pour une automatisation complète serveur, utilisez Stagehand',
+        note: 'L\'automatisation JavaScript peut être injectée manuellement dans la console de la session'
+      } : {
+        step1: 'La session Browserbase a été créée',
+        step2: 'Ouvrez l\'URL de la session dans un nouvel onglet',
+        step3: 'Cliquez manuellement sur le bouton "Log In"',
+        step4: 'Entrez vos identifiants FastGraphs',
+        note: 'Pour une automatisation complète, fournissez email et password dans la requête'
+      },
+      workflow: {
+        url: 'https://www.fastgraphs.com/',
+        action: 'click the Log In button',
+        status: 'session_created',
+        automationLevel: hasCredentials ? 'script_available' : 'manual'
       }
-    } catch (executeError) {
-      console.warn('Erreur lors de l\'exécution du script, utilisation de la méthode alternative:', executeError.message);
-      
-      // Méthode alternative: Utiliser l'API Browserbase pour injecter du code via CDP (Chrome DevTools Protocol)
-      // Ou simplement retourner la session avec instructions
-      const sessionUrl = sessionData.url || 
-                        sessionData.viewerUrl || 
-                        `https://www.browserbase.com/sessions/${sessionId}`;
-      
-      // Essayer d'utiliser l'API Browserbase pour exécuter via CDP
-      try {
-        const cdpResponse = await fetch(`${browserbaseApiUrl}/sessions/${sessionId}/cdp`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${browserbaseApiKey}`,
-            'Content-Type': 'application/json',
-            'x-browserbase-project-id': browserbaseProjectId
-          },
-          body: JSON.stringify({
-            method: 'Runtime.evaluate',
-            params: {
-              expression: `
-                (async () => {
-                  await new Promise(r => setTimeout(r, 2000));
-                  const btn = Array.from(document.querySelectorAll('button, a')).find(b => 
-                    (b.textContent || '').toLowerCase().includes('log in') || 
-                    (b.textContent || '').toLowerCase().includes('login')
-                  );
-                  if (btn) {
-                    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    await new Promise(r => setTimeout(r, 500));
-                    btn.click();
-                    return { success: true };
-                  }
-                  return { success: false, message: 'Button not found' };
-                })()
-              `
-            }
-          })
-        });
-        
-        if (cdpResponse.ok) {
-          const cdpResult = await cdpResponse.json();
-          console.log('CDP résultat:', cdpResult);
-        }
-      } catch (cdpError) {
-        console.warn('CDP non disponible:', cdpError.message);
-      }
-      
-      // Retourner la session même si l'automatisation a échoué
-      return res.status(200).json({
-        success: true,
-        message: 'Session Browserbase créée (automatisation partielle)',
-        session: {
-          id: sessionId,
-          url: sessionUrl,
-          status: sessionData.status || 'active',
-          createdAt: sessionData.createdAt || new Date().toISOString()
-        },
-        automation: {
-          loginButtonClicked: false,
-          message: 'Automatisation non disponible, cliquez manuellement',
-          error: executeError.message
-        },
-        instructions: {
-          step1: 'La session Browserbase a été créée',
-          step2: 'Ouvrez l\'URL de la session dans un nouvel onglet',
-          step3: 'Cliquez manuellement sur le bouton "Log In"',
-          step4: 'Entrez vos identifiants FastGraphs',
-          note: 'L\'automatisation complète nécessite une configuration supplémentaire de Browserbase'
-        },
-        workflow: {
-          url: 'https://www.fastgraphs.com/',
-          action: 'click the Log In button',
-          status: 'session_created',
-          automationLevel: 'semi-automated'
-        }
-      });
-    }
+    });
 
   } catch (error) {
     console.error('Erreur FastGraphs Login:', error);
