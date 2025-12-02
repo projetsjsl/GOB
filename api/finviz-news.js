@@ -23,10 +23,12 @@ export default async function handler(req, res) {
         const { type = 'all', limit = 30 } = req.query;
         const newsLimit = Math.min(parseInt(limit, 10) || 30, 50); // Max 50 actualités
         
-        // Récupérer les actualités depuis plusieurs sources en parallèle
-        const [finvizNews, perplexityNews] = await Promise.allSettled([
+        // Récupérer les actualités depuis plusieurs sources fiables en parallèle
+        const [finvizNews, perplexityNews, fmpNews, finnhubNews] = await Promise.allSettled([
             fetchFinvizNews(),
-            fetchPerplexityNews(type, newsLimit)
+            fetchPerplexityNews(type, newsLimit),
+            fetchFMPNews(type, newsLimit),
+            fetchFinnhubNews(type, newsLimit)
         ]);
 
         // Combiner les actualités
@@ -38,6 +40,14 @@ export default async function handler(req, res) {
         
         if (perplexityNews.status === 'fulfilled' && perplexityNews.value.length > 0) {
             allNews = [...allNews, ...perplexityNews.value];
+        }
+        
+        if (fmpNews.status === 'fulfilled' && fmpNews.value.length > 0) {
+            allNews = [...allNews, ...fmpNews.value];
+        }
+        
+        if (finnhubNews.status === 'fulfilled' && finnhubNews.value.length > 0) {
+            allNews = [...allNews, ...finnhubNews.value];
         }
 
         // Dédupliquer par headline (normalisé)
@@ -62,7 +72,9 @@ export default async function handler(req, res) {
             count: translatedNews.length,
             sources: {
                 finviz: finvizNews.status === 'fulfilled' ? finvizNews.value.length : 0,
-                perplexity: perplexityNews.status === 'fulfilled' ? perplexityNews.value.length : 0
+                perplexity: perplexityNews.status === 'fulfilled' ? perplexityNews.value.length : 0,
+                fmp: fmpNews.status === 'fulfilled' ? fmpNews.value.length : 0,
+                finnhub: finnhubNews.status === 'fulfilled' ? finnhubNews.value.length : 0
             },
             timestamp: new Date().toISOString()
         });
