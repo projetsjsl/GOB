@@ -32,13 +32,13 @@ const AdminJSLaiTab = ({
                         darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {typeof Icon !== 'undefined' ? <Icon emoji="🔍" size={20} /> : '🔍'}
+                            {typeof Icon !== 'undefined' ? {typeof Icon !== 'undefined' ? <Icon emoji="🔍" size={20} /> : '🔍'} : '🔍'}
                             Debug des Données
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="📊" size={18} />
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={18} /> : '📊'}
                                     Stock Data
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -53,7 +53,7 @@ const AdminJSLaiTab = ({
                             </div>
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="📰" size={18} />
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="📰" size={18} /> : '📰'}
                                     News Data
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -65,7 +65,7 @@ const AdminJSLaiTab = ({
                             </div>
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="🎯" size={18} />
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="🎯" size={18} /> : '🎯'}
                                     Seeking Alpha
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -84,7 +84,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                                <Icon emoji="📦" size={20} />
+                                {typeof Icon !== 'undefined' ? <Icon emoji="📦" size={20} /> : '📦'}
                                 Gestion du Cache Supabase
                             </h3>
                             <button
@@ -119,7 +119,7 @@ const AdminJSLaiTab = ({
                         <div className={`space-y-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
-                                    <Icon emoji="⚙️" size={16} />
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="⚙️" size={16} /> : '⚙️'}
                                     Paramètres du Cache
                                 </div>
                                 <div className="space-y-3">
@@ -168,18 +168,20 @@ const AdminJSLaiTab = ({
                                     {typeof cacheSettings !== 'undefined' && cacheSettings.refreshOnNavigation && (
                                         <div className="ml-6">
                                             <label className="block text-sm mb-2">
-                                                Intervalle de rafraîchissement (minutes): <span className="font-bold text-blue-600">{cacheSettings.refreshIntervalMinutes} min</span>
+                                                Intervalle de rafraîchissement (minutes): <span className="font-bold text-blue-600">{typeof cacheSettings !== 'undefined' && cacheSettings.refreshIntervalMinutes ? cacheSettings.refreshIntervalMinutes : 10} min</span>
                                             </label>
                                             <input
                                                 type="range"
                                                 min="5"
                                                 max="30"
                                                 step="5"
-                                                value={cacheSettings.refreshIntervalMinutes}
+                                                value={typeof cacheSettings !== 'undefined' && cacheSettings.refreshIntervalMinutes ? cacheSettings.refreshIntervalMinutes : 10}
                                                 onChange={(e) => {
-                                                    const newSettings = { ...cacheSettings, refreshIntervalMinutes: parseInt(e.target.value) };
-                                                    setCacheSettings(newSettings);
-                                                    localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
+                                                    if (typeof cacheSettings !== 'undefined' && typeof setCacheSettings === 'function') {
+                                                        const newSettings = { ...cacheSettings, refreshIntervalMinutes: parseInt(e.target.value) };
+                                                        setCacheSettings(newSettings);
+                                                        localStorage.setItem('cacheSettings', JSON.stringify(newSettings));
+                                                    }
                                                 }}
                                                 className="w-full"
                                             />
@@ -191,7 +193,7 @@ const AdminJSLaiTab = ({
                             {/* État du Cache */}
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
-                                    <Icon emoji="📊" size={16} />
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={16} /> : '📊'}
                                     État du Cache
                                 </div>
                                 <div className="space-y-2 text-xs">
@@ -218,7 +220,7 @@ const AdminJSLaiTab = ({
                                                 </div>
                                                 {status.age_hours && (
                                                     <div className="mt-1 text-gray-600">
-                                                        Âge: {parseFloat(status.age_hours).toFixed(1)}h / {status.max_age_hours || cacheSettings.maxAgeHours}h max
+                                                        Âge: {parseFloat(status.age_hours).toFixed(1)}h / {status.max_age_hours || (typeof cacheSettings !== 'undefined' && cacheSettings.maxAgeHours ? cacheSettings.maxAgeHours : 4)}h max
                                                     </div>
                                                 )}
                                             </div>
@@ -278,7 +280,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                <Icon emoji="📋" size={20} />
+                                {typeof Icon !== 'undefined' ? <Icon emoji="📋" size={20} /> : '📋'}
                                 Logs Système
                             </h3>
                             <button
@@ -321,7 +323,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                <Icon emoji="🧠" size={20} />
+                                {typeof Icon !== 'undefined' ? <Icon emoji="🧠" size={20} /> : '🧠'}
                                 Deep Think
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
@@ -331,7 +333,7 @@ const AdminJSLaiTab = ({
                         <div className={`space-y-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    <Icon emoji="🎯" size={16} />
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="🎯" size={16} /> : '🎯'}
                                     Statut du système
                                 </div>
                                 <div className="text-xs space-y-1">
@@ -342,7 +344,7 @@ const AdminJSLaiTab = ({
                             </div>
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    <Icon emoji="📊" size={16} />
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={16} /> : '📊'}
                                     Métriques
                                 </div>
                                 <div className="text-xs space-y-1">
@@ -360,7 +362,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-red-300' : 'text-red-900'}`}>
-                                <Icon emoji="⚠️" size={20} />
+                                {typeof Icon !== 'undefined' ? <Icon emoji="⚠️" size={20} /> : '⚠️'}
                                 Violations
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${
@@ -410,7 +412,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
-                                <Icon emoji="🎨" size={20} />
+                                {typeof Icon !== 'undefined' ? <Icon emoji="🎨" size={20} /> : '🎨'}
                                 Mode d'Affichage des Icônes
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
@@ -425,7 +427,7 @@ const AdminJSLaiTab = ({
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
-                                        <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
+                                        {typeof Icon !== 'undefined' ? <Icon emoji={typeof isProfessionalMode !== 'undefined' && isProfessionalMode ? "💼" : "🎉"} size={18} /> : (typeof isProfessionalMode !== 'undefined' && isProfessionalMode ? "💼" : "🎉")}
                                         <span className="font-semibold">
                                             {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
                                         </span>
@@ -480,7 +482,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
-                                <Icon emoji="🤖" size={20} />
+                                {typeof Icon !== 'undefined' ? <Icon emoji="🤖" size={20} /> : '🤖'}
                                 Configuration Emma IA
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
@@ -537,7 +539,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                        {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={20} className="mr-2 inline-block" /> : '📊'}
                         Gestion des Stocks
                     </h3>
                         <div className="flex flex-wrap gap-2">
@@ -570,7 +572,7 @@ const AdminJSLaiTab = ({
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     darkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                                {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={20} className="mr-2 inline-block" /> : '📊'}
                                 ÉTAPE 1: SCRAPING BATCH (25 tickers)
                             </h3>
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold ${
@@ -649,7 +651,7 @@ const AdminJSLaiTab = ({
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 darkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                            {typeof Icon !== 'undefined' ? <Icon emoji="🤖" size={20} className="mr-2 inline-block" /> : '🤖'}
                             ÉTAPE 2: ANALYSE BATCH PERPLEXITY
                         </h3>
 
@@ -718,7 +720,7 @@ const AdminJSLaiTab = ({
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 darkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                            {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={20} className="mr-2 inline-block" /> : '📊'}
                             ÉTAPE 3: RÉSULTATS & AFFICHAGE
                         </h3>
 
@@ -956,7 +958,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                        {typeof Icon !== 'undefined' ? <Icon emoji="🤖" size={20} className="mr-2 inline-block" /> : '🤖'}
                         Monitoring Emma AI
                     </h3>
                         <div className="space-y-4">
@@ -965,7 +967,7 @@ const AdminJSLaiTab = ({
                                     darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
                                     <div className="text-purple-600 font-medium mb-2 flex items-center gap-2">
-                                        <Icon emoji="🧠" size={18} />
+                                        {typeof Icon !== 'undefined' ? <Icon emoji="🧠" size={18} /> : '🧠'}
                                         Emma Agent
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
@@ -1074,7 +1076,7 @@ const AdminJSLaiTab = ({
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                         darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                    <Icon emoji="📊" size={18} className="mr-2 inline-block" />
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={18} className="mr-2 inline-block" /> : '📊'}
                                     Outils Financiers
                                 </h4>
                                     <div className="space-y-1 text-sm">
@@ -1160,7 +1162,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="⚙️" size={20} className="mr-2 inline-block" />
+                        {typeof Icon !== 'undefined' ? <Icon emoji="⚙️" size={20} className="mr-2 inline-block" /> : '⚙️'}
                         Configuration
                     </h3>
                         <div className="space-y-4">
