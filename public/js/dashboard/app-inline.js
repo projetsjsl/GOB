@@ -3652,7 +3652,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             return () => {
                 if (container) {
                     container.innerHTML = '';
-                    container.removeEventListener('click', handleTickerClick, true);
+                    // Note: handleTickerClick n'est jamais ajouté, donc pas besoin de le retirer
                 }
                 history.pushState = originalPushState;
                 history.replaceState = originalReplaceState;
