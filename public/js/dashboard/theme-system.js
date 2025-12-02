@@ -11,20 +11,20 @@ const defaultThemes = {
         id: 'terminal',
         isDefault: true,
         colors: {
-            primary: '#ffcc00',
-            secondary: '#00ff00',
-            background: '#000000',
-            surface: '#0a0a0a',
-            surfaceLight: '#1a1a1a',
-            text: '#ffcc00',
-            textSecondary: '#888888',
-            textGreen: '#00ff00',
-            textRed: '#ff0000',
-            border: '#333333',
-            accent: '#ffcc00',
-            success: '#00ff00',
-            danger: '#ff0000',
-            warning: '#ffcc00',
+            primary: '#ffcc00', // yellow (#FFCC00) - couleur principale terminal
+            secondary: '#00ff00', // green (#00FF00) - accents secondaires
+            background: '#000000', // black (#000000) - fond principal
+            surface: '#0a0a0a', // near black (#0A0A0A) - cards, panels
+            surfaceLight: '#1a1a1a', // dark gray (#1A1A1A) - hover states
+            text: '#ffcc00', // yellow (#FFCC00) - texte principal
+            textSecondary: '#888888', // medium gray (#888888) - texte secondaire
+            textGreen: '#00ff00', // green (#00FF00) - gains
+            textRed: '#ff0000', // red (#FF0000) - pertes
+            border: '#333333', // dark gray (#333333) - bordures
+            accent: '#ffcc00', // yellow (highlights, focus)
+            success: '#00ff00', // green (#00FF00)
+            danger: '#ff0000', // red (#FF0000)
+            warning: '#ffcc00', // yellow (alerts)
         },
         fonts: {
             primary: 'Courier New, "Courier", monospace',
@@ -44,18 +44,18 @@ const defaultThemes = {
         id: 'ia',
         isDefault: true,
         colors: {
-            primary: '#8b5cf6',
-            secondary: '#a78bfa',
-            background: '#000000',
-            surface: '#111827',
-            surfaceLight: '#1f2937',
-            text: '#ffffff',
-            textSecondary: '#9ca3af',
-            border: '#374151',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
+            primary: '#8b5cf6', // purple (#8B5CF6) - couleur principale IA
+            secondary: '#a78bfa', // lighter purple (#A78BFA) - accents secondaires
+            background: '#000000', // black (#000000) - fond principal
+            surface: '#111827', // gray-900 (#111827) - cards, panels
+            surfaceLight: '#1f2937', // gray-800 (#1F2937) - hover states
+            text: '#ffffff', // white (#FFFFFF) - texte principal
+            textSecondary: '#9ca3af', // gray-400 (#9CA3AF) - texte secondaire
+            border: '#374151', // gray-700 (#374151) - bordures
+            accent: '#8b5cf6', // purple (highlights, focus)
+            success: '#10b981', // emerald-500 (#10B981)
+            danger: '#ef4444', // red-500 (#EF4444)
+            warning: '#f59e0b', // amber-500 (#F59E0B)
         },
         fonts: {
             primary: 'Inter, sans-serif',
@@ -75,18 +75,18 @@ const defaultThemes = {
         id: 'darkmode',
         isDefault: true,
         colors: {
-            primary: '#10b981',
-            secondary: '#3b82f6',
-            background: '#000000',
-            surface: '#111827',
-            surfaceLight: '#1f2937',
-            text: '#ffffff',
-            textSecondary: '#9ca3af',
-            border: '#374151',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
+            primary: '#10b981', // emerald-500 (#10B981) - couleur principale
+            secondary: '#3b82f6', // blue-500 (#3B82F6) - accents secondaires
+            background: '#000000', // black (#000000) - fond principal
+            surface: '#111827', // gray-900 (#111827) - cards, panels
+            surfaceLight: '#1f2937', // gray-800 (#1F2937) - hover states
+            text: '#ffffff', // white (#FFFFFF) - texte principal
+            textSecondary: '#9ca3af', // gray-400 (#9CA3AF) - texte secondaire
+            border: '#374151', // gray-700 (#374151) - bordures
+            accent: '#8b5cf6', // purple-500 (#8B5CF6) - highlights
+            success: '#10b981', // emerald-500 (#10B981)
+            danger: '#ef4444', // red-500 (#EF4444)
+            warning: '#f59e0b', // amber-500 (#F59E0B)
         },
         fonts: {
             primary: 'Inter, sans-serif',
@@ -106,18 +106,18 @@ const defaultThemes = {
         id: 'light',
         isDefault: true,
         colors: {
-            primary: '#10b981',
-            secondary: '#3b82f6',
-            background: '#ffffff',
-            surface: '#f5f5f5',
-            surfaceLight: '#ffffff',
-            text: '#1a1a1a',
-            textSecondary: '#666666',
-            border: '#d0d0d0',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
+            primary: '#10b981', // emerald-500 (#10B981) - couleur principale
+            secondary: '#3b82f6', // blue-500 (#3B82F6) - accents secondaires
+            background: '#ffffff', // white (#FFFFFF) - fond principal
+            surface: '#f5f5f5', // gray-100 (#F5F5F5) - cards, panels
+            surfaceLight: '#ffffff', // white (#FFFFFF) - hover states
+            text: '#1a1a1a', // near black (#1A1A1A) - texte principal
+            textSecondary: '#666666', // gray-600 (#666666) - texte secondaire
+            border: '#d0d0d0', // gray-300 (#D0D0D0) - bordures
+            accent: '#8b5cf6', // purple-500 (#8B5CF6) - highlights
+            success: '#10b981', // emerald-500 (#10B981)
+            danger: '#ef4444', // red-500 (#EF4444)
+            warning: '#f59e0b', // amber-500 (#F59E0B)
         },
         fonts: {
             primary: 'Inter, sans-serif',
@@ -170,18 +170,20 @@ const customThemes = {
         name: 'MarketQ',
         id: 'marketq',
         colors: {
-            primary: '#00d4ff', // cyan brillant (data-focused, accents)
-            secondary: '#0066cc', // blue profond (liens, actions secondaires)
-            background: '#0a0e27', // dark navy blue (fond principal)
-            surface: '#141b3d', // darker blue (cards, panels)
-            surfaceLight: '#1e2749', // medium blue (hover states, active)
-            text: '#e0e7ff', // light blue-white (texte principal)
-            textSecondary: '#94a3b8', // slate-400 (texte secondaire)
-            border: '#00d4ff40', // cyan avec transparence (bordures)
-            accent: '#00d4ff', // cyan (highlights, focus)
-            success: '#00ff88', // green-cyan brillant (gains)
-            danger: '#ff3366', // pink-red (pertes)
-            warning: '#ffaa00', // orange (alertes)
+            primary: '#00d4ff', // cyan brillant (#00D4FF) - data-focused, accents principaux
+            secondary: '#0066cc', // blue profond (#0066CC) - liens, actions secondaires
+            background: '#0a0e27', // dark navy blue (#0A0E27) - fond principal
+            surface: '#141b3d', // darker blue (#141B3D) - cards, panels
+            surfaceLight: '#1e2749', // medium blue (#1E2749) - hover states, active
+            text: '#e0e7ff', // light blue-white (#E0E7FF) - texte principal
+            textSecondary: '#94a3b8', // slate-400 (#94A3B8) - texte secondaire
+            textGreen: '#00ff88', // green-cyan brillant (#00FF88) - gains
+            textRed: '#ff3366', // pink-red (#FF3366) - pertes
+            border: 'rgba(0, 212, 255, 0.25)', // cyan avec transparence (bordures)
+            accent: '#00d4ff', // cyan (highlights, focus, CTA)
+            success: '#00ff88', // green-cyan brillant (#00FF88) - gains
+            danger: '#ff3366', // pink-red (#FF3366) - pertes
+            warning: '#ffaa00', // orange (#FFAA00) - alertes
         },
         fonts: {
             primary: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
@@ -200,18 +202,20 @@ const customThemes = {
         name: 'MarketQ Noir',
         id: 'marketq-dark',
         colors: {
-            primary: '#00d4ff', // cyan brillant (accents principaux)
-            secondary: '#00a8cc', // cyan plus foncé (accents secondaires)
-            background: '#000000', // noir pur (fond principal)
-            surface: '#0a0a0a', // near black (cards, panels)
-            surfaceLight: '#1a1a1a', // dark gray (hover states, active)
-            text: '#ffffff', // white (texte principal)
-            textSecondary: '#888888', // medium gray (texte secondaire)
-            border: '#00d4ff30', // cyan très subtil (bordures)
-            accent: '#00d4ff', // cyan (highlights, focus)
-            success: '#00ff88', // green-cyan brillant (gains)
-            danger: '#ff3366', // pink-red (pertes)
-            warning: '#ffaa00', // orange (alertes)
+            primary: '#00d4ff', // cyan brillant (#00D4FF) - accents principaux
+            secondary: '#00a8cc', // cyan plus foncé (#00A8CC) - accents secondaires
+            background: '#000000', // noir pur (#000000) - fond principal
+            surface: '#0a0a0a', // near black (#0A0A0A) - cards, panels
+            surfaceLight: '#1a1a1a', // dark gray (#1A1A1A) - hover states, active
+            text: '#ffffff', // white (#FFFFFF) - texte principal
+            textSecondary: '#888888', // medium gray (#888888) - texte secondaire
+            textGreen: '#00ff88', // green-cyan brillant (#00FF88) - gains
+            textRed: '#ff3366', // pink-red (#FF3366) - pertes
+            border: 'rgba(0, 212, 255, 0.15)', // cyan très subtil (bordures)
+            accent: '#00d4ff', // cyan (highlights, focus, CTA)
+            success: '#00ff88', // green-cyan brillant (#00FF88) - gains
+            danger: '#ff3366', // pink-red (#FF3366) - pertes
+            warning: '#ffaa00', // orange (#FFAA00) - alertes
         },
         fonts: {
             primary: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
@@ -231,20 +235,20 @@ const customThemes = {
         id: 'bloomberg-terminal',
         colors: {
             primary: '#ffcc00', // Bloomberg yellow (#FFCC00 exact) - utilisé pour texte principal
-            secondary: '#00ff00', // green brillant pour données positives/gains
+            secondary: '#00ff00', // green brillant (#00FF00) pour données positives/gains
             background: '#000000', // black pur (#000000)
-            surface: '#0a0a0a', // near black (panels)
-            surfaceLight: '#1a1a1a', // dark gray (hover states)
+            surface: '#0a0a0a', // near black (panels, cards)
+            surfaceLight: '#1a1a1a', // dark gray (hover states, active)
             text: '#ffcc00', // Bloomberg yellow (texte principal)
-            textSecondary: '#888888', // gray (texte secondaire)
-            textGreen: '#00ff00', // green brillant pour gains
-            textRed: '#ff0000', // red brillant pour pertes
-            textOrange: '#ff8800', // orange pour alertes
+            textSecondary: '#888888', // medium gray (texte secondaire)
+            textGreen: '#00ff00', // green brillant (#00FF00) pour gains
+            textRed: '#ff0000', // red brillant (#FF0000) pour pertes
+            textOrange: '#ff8800', // orange (#FF8800) pour alertes/warnings
             border: '#333333', // dark gray (bordures)
-            accent: '#ffcc00', // Bloomberg yellow
-            success: '#00ff00', // green brillant
-            danger: '#ff0000', // red brillant
-            warning: '#ffcc00', // yellow
+            accent: '#ffcc00', // Bloomberg yellow (highlights, focus)
+            success: '#00ff00', // green brillant (#00FF00)
+            danger: '#ff0000', // red brillant (#FF0000)
+            warning: '#ffcc00', // yellow (alerts)
         },
         fonts: {
             primary: 'Courier New, "Courier", monospace',
@@ -263,19 +267,21 @@ const customThemes = {
         name: 'Seeking Alpha',
         id: 'seeking-alpha',
         colors: {
-            primary: '#ff6b35', // Seeking Alpha orange (boutons CTA)
-            secondary: '#1a73e8', // blue pour liens
+            primary: '#ff6b35', // Seeking Alpha orange (#FF6B35 exact) - boutons CTA
+            secondary: '#1a73e8', // Google blue pour liens
             background: '#ffffff', // white (contenu principal)
-            surface: '#f5f5f5', // light gray (header)
-            surfaceLight: '#ffffff', // white
+            surface: '#f8f9fa', // very light gray (header, cards)
+            surfaceLight: '#ffffff', // white (hover states)
             surfaceDark: '#2d2d2d', // dark gray (sidebar gauche)
-            text: '#202124', // dark gray (texte principal)
-            textSecondary: '#5f6368', // medium gray
-            border: '#dadce0', // light gray
-            accent: '#ff6b35', // orange (navigation sélectionnée)
-            success: '#34a853', // green
-            danger: '#ea4335', // red
-            warning: '#fbbc04', // yellow
+            text: '#202124', // Google dark gray (texte principal)
+            textSecondary: '#5f6368', // Google medium gray
+            textGreen: '#34a853', // Google green (gains)
+            textRed: '#ea4335', // Google red (pertes)
+            border: '#dadce0', // Google light gray (bordures)
+            accent: '#ff6b35', // orange (navigation sélectionnée, highlights)
+            success: '#34a853', // Google green
+            danger: '#ea4335', // Google red
+            warning: '#fbbc04', // Google yellow
         },
         fonts: {
             primary: 'Roboto, sans-serif',
@@ -294,20 +300,20 @@ const customThemes = {
         name: 'Bloomberg Mobile',
         id: 'bloomberg-mobile',
         colors: {
-            primary: '#ffcc00', // Bloomberg yellow (accents, highlights)
-            secondary: '#ffffff', // white (texte sur fond sombre)
-            background: '#1a1a1a', // dark gray (fond principal)
-            surface: '#2a2a2a', // medium gray (cards, panels)
-            surfaceLight: '#3a3a3a', // lighter gray (hover, active)
-            text: '#ffffff', // white (texte principal)
-            textSecondary: '#b0b0b0', // light gray (texte secondaire)
-            textGreen: '#4caf50', // Material green (gains)
-            textRed: '#f44336', // Material red (pertes)
-            border: '#444444', // gray (bordures)
+            primary: '#ffcc00', // Bloomberg yellow (#FFCC00) - accents, highlights
+            secondary: '#ffffff', // white (#FFFFFF) - texte sur fond sombre
+            background: '#1a1a1a', // dark gray (#1A1A1A) - fond principal
+            surface: '#2a2a2a', // medium gray (#2A2A2A) - cards, panels
+            surfaceLight: '#3a3a3a', // lighter gray (#3A3A3A) - hover, active
+            text: '#ffffff', // white (#FFFFFF) - texte principal
+            textSecondary: '#b0b0b0', // light gray (#B0B0B0) - texte secondaire
+            textGreen: '#4caf50', // Material green (#4CAF50) - gains
+            textRed: '#f44336', // Material red (#F44336) - pertes
+            border: '#444444', // gray (#444444) - bordures
             accent: '#ffcc00', // Bloomberg yellow (highlights, CTA)
-            success: '#4caf50', // Material green
-            danger: '#f44336', // Material red
-            warning: '#ff9800', // Material orange
+            success: '#4caf50', // Material green (#4CAF50)
+            danger: '#f44336', // Material red (#F44336)
+            warning: '#ff9800', // Material orange (#FF9800)
         },
         fonts: {
             primary: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
@@ -326,21 +332,21 @@ const customThemes = {
         name: 'Bloomberg Nostalgie',
         id: 'bloomberg-nostalgie',
         colors: {
-            primary: '#8b5cf6', // purple/violet (accents principaux - style rétro)
-            secondary: '#a78bfa', // lighter purple (accents secondaires)
-            background: '#ffffff', // white (fond principal - style années 1990)
-            surface: '#f8f9fa', // very light gray (cards, panels)
-            surfaceLight: '#ffffff', // white (hover states)
-            surfaceDark: '#e9ecef', // light gray (borders, separators)
-            text: '#4c1d95', // deep purple (texte principal)
-            textSecondary: '#6b7280', // medium gray (texte secondaire)
-            textGreen: '#10b981', // emerald (gains - style moderne mais discret)
-            textRed: '#ef4444', // red (pertes)
-            border: '#d1d5db', // light gray (bordures)
+            primary: '#8b5cf6', // purple/violet (#8B5CF6) - accents principaux (style rétro)
+            secondary: '#a78bfa', // lighter purple (#A78BFA) - accents secondaires
+            background: '#ffffff', // white (#FFFFFF) - fond principal (style années 1990)
+            surface: '#f8f9fa', // very light gray (#F8F9FA) - cards, panels
+            surfaceLight: '#ffffff', // white (#FFFFFF) - hover states
+            surfaceDark: '#e9ecef', // light gray (#E9ECEF) - borders, separators
+            text: '#4c1d95', // deep purple (#4C1D95) - texte principal
+            textSecondary: '#6b7280', // medium gray (#6B7280) - texte secondaire
+            textGreen: '#10b981', // emerald (#10B981) - gains (style moderne mais discret)
+            textRed: '#ef4444', // red (#EF4444) - pertes
+            border: '#d1d5db', // light gray (#D1D5DB) - bordures
             accent: '#8b5cf6', // purple (highlights, CTA)
-            success: '#10b981', // emerald
-            danger: '#ef4444', // red
-            warning: '#f59e0b', // amber
+            success: '#10b981', // emerald (#10B981)
+            danger: '#ef4444', // red (#EF4444)
+            warning: '#f59e0b', // amber (#F59E0B)
         },
         fonts: {
             primary: 'Courier New, "Courier", monospace', // Style rétro terminal
@@ -359,21 +365,21 @@ const customThemes = {
         name: 'Desjardins',
         id: 'desjardins',
         colors: {
-            primary: '#006747', // Vert Desjardins foncé (couleur principale)
-            secondary: '#00a651', // Vert Desjardins plus clair (accents)
-            background: '#ffffff', // Blanc (fond principal)
-            surface: '#f5f5f5', // Gris très clair (cards, panels)
-            surfaceLight: '#ffffff', // Blanc (hover states)
-            surfaceDark: '#e8e8e8', // Gris clair (borders, separators)
-            text: '#1a1a1a', // Noir/gris foncé (texte principal)
-            textSecondary: '#666666', // Gris moyen (texte secondaire)
-            textGreen: '#00a651', // Vert Desjardins (gains)
-            textRed: '#d32f2f', // Rouge (pertes)
-            border: '#d0d0d0', // Gris clair (bordures)
+            primary: '#006747', // Vert Desjardins foncé (#006747) - couleur principale
+            secondary: '#00a651', // Vert Desjardins plus clair (#00A651) - accents
+            background: '#ffffff', // Blanc (#FFFFFF) - fond principal
+            surface: '#f5f5f5', // Gris très clair (#F5F5F5) - cards, panels
+            surfaceLight: '#ffffff', // Blanc (#FFFFFF) - hover states
+            surfaceDark: '#e8e8e8', // Gris clair (#E8E8E8) - borders, separators
+            text: '#1a1a1a', // Noir/gris foncé (#1A1A1A) - texte principal
+            textSecondary: '#666666', // Gris moyen (#666666) - texte secondaire
+            textGreen: '#00a651', // Vert Desjardins (#00A651) - gains
+            textRed: '#d32f2f', // Rouge (#D32F2F) - pertes
+            border: '#d0d0d0', // Gris clair (#D0D0D0) - bordures
             accent: '#006747', // Vert Desjardins foncé (highlights, CTA)
-            success: '#00a651', // Vert Desjardins (success)
-            danger: '#d32f2f', // Rouge (danger)
-            warning: '#ff9800', // Orange (alertes)
+            success: '#00a651', // Vert Desjardins (#00A651) - success
+            danger: '#d32f2f', // Rouge (#D32F2F) - danger
+            warning: '#ff9800', // Orange (#FF9800) - alertes
         },
         fonts: {
             primary: 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
