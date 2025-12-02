@@ -6,12 +6,16 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "generate-excel": "node excel-template-generator.js"
   },
   "dependencies": {
     "express": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "exceljs": "^4.4.0"
   },
   "engines": {
     "node": ">=18.0.0"
