@@ -12,16 +12,16 @@ const AdminJSLaiTab = ({
                 setShowTemperatureEditor,
                 showLengthEditor,
                 setShowLengthEditor,
-                isDarkMode = true
+                darkMode = true
             }) => {
-                // Vérifier que isDarkMode est défini
-                const darkMode = isDarkMode !== undefined ? isDarkMode : true;
+                // Vérifier que darkMode est défini
+                const darkMode = darkMode !== undefined ? darkMode : true;
                 
                 return (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
+                            darkMode ? 'text-white' : 'text-gray-900'
                         }`}>⚙️ Admin-JSLAI</h2>
                     </div>
 
@@ -29,49 +29,49 @@ const AdminJSLaiTab = ({
 
                     {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
-                        <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                             <Icon emoji="🔍" size={20} />
                             Debug des Données
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                            <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
                                     <Icon emoji="📊" size={18} />
                                     Stock Data
                                 </div>
-                                <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Tickers: {tickers.length} ({tickers.join(', ')})
                                 </div>
-                                <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Données chargées: {Object.keys(stockData).length}
                                 </div>
-                                <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
                                 </div>
                             </div>
-                            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                            <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
                                     <Icon emoji="📰" size={18} />
                                     News Data
                                 </div>
-                                <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Articles: {newsData.length}
                                 </div>
-                                <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Premier article: {newsData[0]?.title?.substring(0, 30) || 'Aucun'}...
                                 </div>
                             </div>
-                            <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
+                            <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
                                     <Icon emoji="🎯" size={18} />
                                     Seeking Alpha
                                 </div>
-                                <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Stocks: {seekingAlphaData.stocks?.length || 0}
                                 </div>
-                                <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
+                                <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Stock Data: {Object.keys(seekingAlphaStockData.stocks || {}).length}
                                 </div>
                             </div>
@@ -80,10 +80,10 @@ const AdminJSLaiTab = ({
 
                     {/* 📦 Gestion du Cache Supabase */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
+                        darkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>
                                 <Icon emoji="📦" size={20} />
                                 Gestion du Cache Supabase
                             </h3>
@@ -106,7 +106,7 @@ const AdminJSLaiTab = ({
                                 className={`px-3 py-1 text-xs rounded transition-colors ${
                                     loadingCacheStatus
                                         ? 'bg-gray-500 text-white cursor-not-allowed'
-                                        : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                        : darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                 }`}
                             >
                                 {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
@@ -114,8 +114,8 @@ const AdminJSLaiTab = ({
                         </div>
 
                         {/* Paramètres du Cache */}
-                        <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                        <div className={`space-y-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
                                     <Icon emoji="⚙️" size={16} />
                                     Paramètres du Cache
@@ -183,22 +183,22 @@ const AdminJSLaiTab = ({
                             </div>
 
                             {/* État du Cache */}
-                            <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                            <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
                                     <Icon emoji="📊" size={16} />
                                     État du Cache
                                 </div>
                                 <div className="space-y-2 text-xs">
                                     {Object.keys(cacheStatus).length === 0 ? (
-                                        <div className={`text-center py-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        <div className={`text-center py-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                             Cliquez sur "Actualiser" pour voir l'état du cache
                                         </div>
                                     ) : (
                                         Object.entries(cacheStatus).map(([type, status]) => (
                                             <div key={type} className={`p-2 rounded border ${
                                                 status.expired
-                                                    ? isDarkMode ? 'bg-yellow-900/30 border-yellow-800' : 'bg-yellow-50 border-yellow-200'
-                                                    : isDarkMode ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'
+                                                    ? darkMode ? 'bg-yellow-900/30 border-yellow-800' : 'bg-yellow-50 border-yellow-200'
+                                                    : darkMode ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'
                                             }`}>
                                                 <div className="flex justify-between items-center">
                                                     <span className="font-semibold capitalize">{type.replace('_', ' ')}</span>
@@ -240,7 +240,7 @@ const AdminJSLaiTab = ({
                                         }
                                     }}
                                     className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
-                                        isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
+                                        darkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
                                     }`}
                                 >
                                     🗑️ Vider le Cache
@@ -257,7 +257,7 @@ const AdminJSLaiTab = ({
                                         alert('Paramètres réinitialisés aux valeurs par défaut');
                                     }}
                                     className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
-                                        isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
+                                        darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
                                     }`}
                                 >
                                     🔄 Réinitialiser
@@ -268,10 +268,10 @@ const AdminJSLaiTab = ({
 
                     {/* 📋 Logs Système - Nouveau */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+                        darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                 <Icon emoji="📋" size={20} />
                                 Logs Système
                             </h3>
@@ -283,10 +283,10 @@ const AdminJSLaiTab = ({
                             </button>
                         </div>
                         <div className={`max-h-64 overflow-y-auto rounded p-3 font-mono text-xs ${
-                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                            darkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             {systemLogs.length === 0 ? (
-                                <div className={`text-center py-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                <div className={`text-center py-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                     Aucun log pour le moment
                                 </div>
                             ) : (
@@ -294,12 +294,12 @@ const AdminJSLaiTab = ({
                                     <div
                                         key={index}
                                         className={`py-1 border-b ${
-                                            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                                            darkMode ? 'border-gray-700' : 'border-gray-200'
                                         } ${
                                             log.type === 'error' ? 'text-red-500' :
                                             log.type === 'success' ? 'text-green-500' :
                                             log.type === 'warning' ? 'text-yellow-500' :
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}
                                     >
                                         <span className="text-gray-500">[{log.timestamp}]</span> {log.text}
@@ -311,19 +311,19 @@ const AdminJSLaiTab = ({
 
                     {/* 🧠 Deep Think - Analyses Profondes */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
+                        darkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-purple-300' : 'text-purple-900'}`}>
                                 <Icon emoji="🧠" size={20} />
                                 Deep Think
                             </h3>
-                            <span className={`px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
+                            <span className={`px-2 py-1 text-xs rounded ${darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
                                 AI Analysis System
                             </span>
                         </div>
-                        <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                        <div className={`space-y-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
                                     <Icon emoji="🎯" size={16} />
                                     Statut du système
@@ -334,7 +334,7 @@ const AdminJSLaiTab = ({
                                     <div>• Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? '✅ Données disponibles' : '⚠️ Pas de données'}</div>
                                 </div>
                             </div>
-                            <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                            <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
                                     <Icon emoji="📊" size={16} />
                                     Métriques
@@ -350,26 +350,26 @@ const AdminJSLaiTab = ({
 
                     {/* ⚠️ Violations & Diagnostics */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gradient-to-br from-red-900/20 to-gray-900 border-red-700' : 'bg-gradient-to-br from-red-50 to-gray-50 border-red-200'
+                        darkMode ? 'bg-gradient-to-br from-red-900/20 to-gray-900 border-red-700' : 'bg-gradient-to-br from-red-50 to-gray-50 border-red-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-red-300' : 'text-red-900'}`}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-red-300' : 'text-red-900'}`}>
                                 <Icon emoji="⚠️" size={20} />
                                 Violations
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${
                                 systemLogs.filter(l => l.type === 'error').length > 0
                                     ? 'bg-red-500 text-white'
-                                    : isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
+                                    : darkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
                             }`}>
                                 {systemLogs.filter(l => l.type === 'error').length} erreur(s)
                             </span>
                         </div>
                         <div className={`max-h-48 overflow-y-auto rounded p-3 font-mono text-xs ${
-                            isDarkMode ? 'bg-gray-800' : 'bg-white'
+                            darkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             {systemLogs.filter(l => l.type === 'error').length === 0 ? (
-                                <div className={`text-center py-4 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                                <div className={`text-center py-4 ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
                                     ✅ Aucune violation détectée - Système opérationnel
                                 </div>
                             ) : (
@@ -378,7 +378,7 @@ const AdminJSLaiTab = ({
                                         <div
                                             key={index}
                                             className={`p-2 rounded border ${
-                                                isDarkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'
+                                                darkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-800'
                                             }`}
                                         >
                                             <div className="flex items-start gap-2">
@@ -393,30 +393,30 @@ const AdminJSLaiTab = ({
                                 </div>
                             )}
                         </div>
-                        <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
+                        <div className={`mt-3 p-2 rounded text-xs ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
                             💡 <strong>Info:</strong> Les violations sont automatiquement trackées. Consultez les logs système ci-dessus pour plus de détails.
                         </div>
                     </div>
 
                     {/* 🎨 Mode Professionnel / Fun */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'
+                        darkMode ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
                                 <Icon emoji="🎨" size={20} />
                                 Mode d'Affichage des Icônes
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
                                 isProfessionalMode
-                                    ? isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-200 text-blue-900'
-                                    : isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'
+                                    ? darkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-200 text-blue-900'
+                                    : darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'
                             }`}>
                                 {isProfessionalMode ? '💼 Professionnel' : '🎉 Fun'}
                             </div>
                         </div>
-                        <div className={`space-y-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                        <div className={`space-y-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
                                         <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
@@ -448,7 +448,7 @@ const AdminJSLaiTab = ({
                                         )}
                                     </button>
                                 </div>
-                                <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <div className={`text-xs mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                     {isProfessionalMode ? (
                                         <>
                                             <p className="mb-1">✅ Icônes professionnelles Iconoir activées</p>
@@ -462,7 +462,7 @@ const AdminJSLaiTab = ({
                                     )}
                                 </div>
                             </div>
-                            <div className={`p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
+                            <div className={`p-2 rounded text-xs ${darkMode ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
                                 💡 <strong>Astuce:</strong> Le mode sélectionné est sauvegardé automatiquement et s'applique à tous les onglets du dashboard.
                             </div>
                         </div>
@@ -470,17 +470,17 @@ const AdminJSLaiTab = ({
 
                     {/* 🤖 Configuration Emma IA */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
+                        darkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
                                 <Icon emoji="🤖" size={20} />
                                 Configuration Emma IA
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
                                 emmaConnected
-                                    ? isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
-                                    : isDarkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-200 text-red-900'
+                                    ? darkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
+                                    : darkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-200 text-red-900'
                             }`}>
                                 {emmaConnected ? '✅ Gemini Actif' : '❌ Gemini Inactif'}
                             </div>
@@ -489,7 +489,7 @@ const AdminJSLaiTab = ({
                             <button
                                 onClick={() => setShowPromptEditor(!showPromptEditor)}
                                 className={`px-4 py-2 rounded transition-colors ${
-                                    isDarkMode
+                                    darkMode
                                         ? 'bg-purple-800 hover:bg-purple-700 text-white'
                                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                                 }`}
@@ -499,7 +499,7 @@ const AdminJSLaiTab = ({
                             <button
                                 onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
                                 className={`px-4 py-2 rounded transition-colors ${
-                                    isDarkMode
+                                    darkMode
                                         ? 'bg-gray-800 hover:bg-gray-700 text-white'
                                         : 'bg-gray-800 hover:bg-gray-700 text-white'
                                 }`}
@@ -509,7 +509,7 @@ const AdminJSLaiTab = ({
                             <button
                                 onClick={() => setShowLengthEditor(!showLengthEditor)}
                                 className={`px-4 py-2 rounded transition-colors ${
-                                    isDarkMode
+                                    darkMode
                                         ? 'bg-green-800 hover:bg-green-700 text-white'
                                         : 'bg-green-600 hover:bg-green-700 text-white'
                                 }`}
@@ -517,19 +517,19 @@ const AdminJSLaiTab = ({
                                 📏 Longueur Réponse
                             </button>
                         </div>
-                        <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
+                        <div className={`mt-3 p-2 rounded text-xs ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
                             💡 <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement.
                         </div>
                     </div>
 
                     {/* Section Administration des Stocks */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                        isDarkMode
+                        darkMode
                             ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
+                            darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
                         <Icon emoji="📊" size={20} className="mr-2 inline-block" />
                         Gestion des Stocks
@@ -556,13 +556,13 @@ const AdminJSLaiTab = ({
                     <div className="space-y-4">
                         {/* ÉTAPE 1: SCRAPING BATCH */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
-                            isDarkMode
+                            darkMode
                                 ? 'bg-gradient-to-r from-gray-900/40 to-gray-800/40 border-gray-500/50'
                                 : 'bg-gradient-to-r from-gray-800/40 to-gray-700/40 border-gray-400/50'
                         }`}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                    darkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
                                 <Icon emoji="📊" size={20} className="mr-2 inline-block" />
                                 ÉTAPE 1: SCRAPING BATCH (25 tickers)
@@ -595,15 +595,15 @@ const AdminJSLaiTab = ({
                             )}
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
-                                isDarkMode ? 'bg-black/30' : 'bg-white/60'
+                                darkMode ? 'bg-black/30' : 'bg-white/60'
                             }`}>
                                 <p className={`text-sm mb-3 font-semibold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-yellow-300' : 'text-yellow-800'
+                                    darkMode ? 'text-yellow-300' : 'text-yellow-800'
                                 }`}>
                                     ⚠️ IMPORTANT: Connectez-vous AVANT de lancer le scraping!
                                 </p>
                                 <ol className={`text-sm space-y-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     <li><strong>1.</strong> Cliquez "🔐 SE CONNECTER" → Login Seeking Alpha</li>
                                     <li><strong>2.</strong> Cliquez "🚀 LANCER SCRAPING BATCH" → Toutes les popups s'ouvrent</li>
@@ -636,27 +636,27 @@ const AdminJSLaiTab = ({
 
                         {/* ÉTAPE 2: ANALYSE PERPLEXITY */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
-                            isDarkMode
+                            darkMode
                                 ? 'bg-gradient-to-r from-pink-900/40 to-rose-900/40 border-pink-500/50'
                                 : 'bg-gradient-to-r from-pink-50 to-rose-50 border-pink-400/50'
                         }`}>
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                darkMode ? 'text-white' : 'text-gray-900'
                             }`}>
                             <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
                             ÉTAPE 2: ANALYSE BATCH PERPLEXITY
                         </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
-                                isDarkMode ? 'bg-black/30' : 'bg-white/60'
+                                darkMode ? 'bg-black/30' : 'bg-white/60'
                             }`}>
                                 <p className={`text-sm mb-3 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     📊 Cliquez pour analyser TOUTES les données scrapées en une seule fois:
                                 </p>
                                 <ul className={`text-sm space-y-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     <li>✓ Récupère tous les raw scrapes depuis Supabase</li>
                                     <li>✓ Analyse avec Perplexity AI en batch</li>
@@ -705,22 +705,22 @@ const AdminJSLaiTab = ({
 
                         {/* ÉTAPE 3: RÉSULTATS */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
-                            isDarkMode
+                            darkMode
                                 ? 'bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-emerald-500/50'
                                 : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-400/50'
                         }`}>
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                darkMode ? 'text-white' : 'text-gray-900'
                             }`}>
                             <Icon emoji="📊" size={20} className="mr-2 inline-block" />
                             ÉTAPE 3: RÉSULTATS & AFFICHAGE
                         </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
-                                isDarkMode ? 'bg-black/30' : 'bg-white/60'
+                                darkMode ? 'bg-black/30' : 'bg-white/60'
                             }`}>
                                 <p className={`text-sm transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     Toutes les analyses apparaissent dans le tableau ci-dessous. Cliquez sur "RAFRAÎCHIR" pour recharger les dernières données depuis Supabase.
                                 </p>
@@ -743,15 +743,15 @@ const AdminJSLaiTab = ({
                     {/* Section Logs de Scraping */}
                     {scrapingLogs.length > 0 && (
                         <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                            isDarkMode 
+                            darkMode 
                                 ? 'bg-gray-900 border-gray-700' 
                                 : 'bg-gray-50 border-gray-200'
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                darkMode ? 'text-white' : 'text-gray-900'
                             }`}>📋 Logs de Scraping</h3>
                             <div className={`max-h-64 overflow-y-auto space-y-2 ${
-                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                darkMode ? 'bg-gray-800' : 'bg-white'
                             } rounded-lg p-4`}>
                                 {scrapingLogs.map((log, index) => (
                                     <div key={index} className={`text-sm p-2 rounded ${
@@ -772,13 +772,13 @@ const AdminJSLaiTab = ({
 
                     {/* Section État des Connexions & Diagnostic des APIs - FUSIONNÉE */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                        isDarkMode 
+                        darkMode 
                             ? 'bg-gray-900 border-gray-700' 
                             : 'bg-gray-50 border-gray-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold transition-colors duration-300 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                darkMode ? 'text-white' : 'text-gray-900'
                             }`}>🔗 État des Connexions & Diagnostic des APIs</h3>
                             <div className="flex gap-2">
                                 <button
@@ -853,26 +853,26 @@ const AdminJSLaiTab = ({
                         {Object.keys(apiStatus).length > 0 && (
                             <div className="space-y-3 mb-4">
                                 <h4 className={`text-sm font-semibold mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>Connexions détaillées:</h4>
                                 {Object.entries(apiStatus).map(([api, status]) => (
                                     <div key={api} className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-300 ${
-                                        isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                                        darkMode ? 'bg-gray-800' : 'bg-gray-100'
                                     }`}>
                                         <div className="flex-1">
                                             <span className={`font-mono capitalize transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                                darkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>{api}</span>
                                             {status.error && (
                                                 <div className={`text-xs mt-1 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-red-400' : 'text-red-600'
+                                                    darkMode ? 'text-red-400' : 'text-red-600'
                                                 }`}>
                                                     {status.error}
                                                 </div>
                                             )}
                                             {status.source && (
                                                 <div className={`text-xs mt-1 transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                                                    darkMode ? 'text-gray-500' : 'text-gray-500'
                                                 }`}>
                                                     Source: {status.source}
                                                 </div>
@@ -885,7 +885,7 @@ const AdminJSLaiTab = ({
                                                 status.status === 'error' ? 'bg-red-500' : 'bg-gray-500'
                                             }`}></span>
                                             <span className={`text-sm transition-colors duration-300 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                darkMode ? 'text-gray-400' : 'text-gray-600'
                                             }`}>
                                                 {status.responseTime}ms
                                             </span>
@@ -898,10 +898,10 @@ const AdminJSLaiTab = ({
                         {/* Recommandations (si healthStatus disponible) */}
                         {healthStatus && healthStatus.recommendations && healthStatus.recommendations.length > 0 && (
                             <div className={`p-4 rounded-lg mt-4 ${
-                                isDarkMode ? 'bg-gray-800' : 'bg-gray-700'
+                                darkMode ? 'bg-gray-800' : 'bg-gray-700'
                             }`}>
                                 <h4 className={`font-semibold mb-3 ${
-                                    isDarkMode ? 'text-white' : 'text-blue-900'
+                                    darkMode ? 'text-white' : 'text-blue-900'
                                 }`}>
                                     💡 Recommandations
                                 </h4>
@@ -935,7 +935,7 @@ const AdminJSLaiTab = ({
                         )}
 
                         {Object.keys(apiStatus).length === 0 && !healthStatus && (
-                            <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <div className={`text-center py-8 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 <p>Cliquez sur "🔄 Vérifier Toutes" pour diagnostiquer les connexions</p>
                             </div>
                         )}
@@ -943,12 +943,12 @@ const AdminJSLaiTab = ({
 
                     {/* Section Monitoring API Emma */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                        isDarkMode
+                        darkMode
                             ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
+                            darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
                         <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
                         Monitoring Emma AI
@@ -956,49 +956,49 @@ const AdminJSLaiTab = ({
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                    darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
                                     <div className="text-purple-600 font-medium mb-2 flex items-center gap-2">
                                         <Icon emoji="🧠" size={18} />
                                         Emma Agent
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
                                         Status: <span className="text-green-500">✅ Opérationnel</span>
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
                                         Outils: 12 disponibles
                                     </div>
                                 </div>
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                    darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
                                     <div className="text-blue-600 font-medium mb-2">📧 Briefings</div>
                                     <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
                                         Cron: <span className="text-green-500">✅ Actif</span>
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
                                         Horaires: 7h20 • 11h50 • 16h20
                                     </div>
                                 </div>
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                    darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
                                     <div className="text-emerald-600 font-medium mb-2">🗄️ Supabase</div>
                                     <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
                                         Tables: 4 créées
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
                                         Tickers: {teamTickers.length} team + {watchlistTickers.length} watchlist
                                     </div>
@@ -1053,63 +1053,63 @@ const AdminJSLaiTab = ({
 
                     {/* Section Gestion des Outils Emma */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                        isDarkMode
+                        darkMode
                             ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
+                            darkMode ? 'text-white' : 'text-gray-900'
                         }`}>🔧 Gestion des Outils Emma</h3>
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                    darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                        darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
                                     <Icon emoji="📊" size={18} className="mr-2 inline-block" />
                                     Outils Financiers
                                 </h4>
                                     <div className="space-y-1 text-sm">
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Polygon Stock Price</div>
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• FMP Fundamentals</div>
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Finnhub News</div>
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Twelve Data Technical</div>
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Alpha Vantage Ratios</div>
                                     </div>
                                 </div>
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
-                                    isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+                                    darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
-                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                        darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>🗄️ Outils Supabase</h4>
                                     <div className="space-y-1 text-sm">
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Watchlist Manager</div>
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Team Tickers</div>
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Economic Calendar</div>
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Earnings Calendar</div>
                                         <div className={`transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            darkMode ? 'text-gray-300' : 'text-gray-700'
                                         }`}>• Analyst Recommendations</div>
                                     </div>
                                 </div>
@@ -1147,12 +1147,12 @@ const AdminJSLaiTab = ({
 
                     {/* Section Configuration */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
-                        isDarkMode
+                        darkMode
                             ? 'bg-gray-900 border-gray-700'
                             : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
-                            isDarkMode ? 'text-white' : 'text-gray-900'
+                            darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
                         <Icon emoji="⚙️" size={20} className="mr-2 inline-block" />
                         Configuration
@@ -1160,7 +1160,7 @@ const AdminJSLaiTab = ({
                         <div className="space-y-4">
                             <div>
                                 <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     Token GitHub (pour les mises à jour)
                                 </label>
@@ -1170,7 +1170,7 @@ const AdminJSLaiTab = ({
                                     onChange={(e) => setGithubToken(e.target.value)}
                                     placeholder="Entrez votre token GitHub"
                                     className={`w-full px-3 py-2 rounded-lg border transition-colors duration-300 ${
-                                        isDarkMode 
+                                        darkMode 
                                             ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                                     }`}
