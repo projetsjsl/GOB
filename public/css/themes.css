@@ -1,0 +1,132 @@
+/**
+ * Styles CSS pour les thèmes du Dashboard GOB
+ * Les thèmes utilisent des variables CSS définies dynamiquement par theme-system.js
+ */
+
+/* Application des variables de thème aux éléments du dashboard */
+.theme-default,
+.theme-marketq,
+.theme-bloomberg-terminal,
+.theme-seeking-alpha,
+.theme-bloomberg-mobile {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Header avec thème */
+.theme-default header,
+.theme-marketq header,
+.theme-bloomberg-terminal header,
+.theme-seeking-alpha header,
+.theme-bloomberg-mobile header {
+    background: var(--theme-header-bg) !important;
+    border-color: var(--theme-border) !important;
+}
+
+/* Cards avec thème */
+.theme-default .bg-gray-900,
+.theme-marketq .bg-gray-900,
+.theme-bloomberg-terminal .bg-gray-900,
+.theme-seeking-alpha .bg-gray-900,
+.theme-bloomberg-mobile .bg-gray-900 {
+    background-color: var(--theme-surface) !important;
+    border: var(--theme-card-border) !important;
+    border-radius: var(--theme-border-radius) !important;
+    box-shadow: var(--theme-shadow) !important;
+}
+
+/* Texte avec thème */
+.theme-default .text-white,
+.theme-marketq .text-white,
+.theme-bloomberg-terminal .text-white,
+.theme-seeking-alpha .text-white,
+.theme-bloomberg-mobile .text-white {
+    color: var(--theme-text) !important;
+}
+
+.theme-default .text-gray-400,
+.theme-marketq .text-gray-400,
+.theme-bloomberg-terminal .text-gray-400,
+.theme-seeking-alpha .text-gray-400,
+.theme-bloomberg-mobile .text-gray-400 {
+    color: var(--theme-text-secondary) !important;
+}
+
+/* Background principal */
+.theme-default .bg-black,
+.theme-marketq .bg-black,
+.theme-bloomberg-terminal .bg-black,
+.theme-seeking-alpha .bg-black,
+.theme-bloomberg-mobile .bg-black {
+    background-color: var(--theme-bg) !important;
+}
+
+/* Boutons avec thème */
+.theme-default button,
+.theme-marketq button,
+.theme-bloomberg-terminal button,
+.theme-seeking-alpha button,
+.theme-bloomberg-mobile button {
+    font-family: var(--theme-font-primary) !important;
+}
+
+/* Thème spécifique: Bloomberg Terminal */
+.theme-bloomberg-terminal {
+    font-family: var(--theme-font-mono) !important;
+}
+
+.theme-bloomberg-terminal * {
+    font-family: var(--theme-font-mono) !important;
+}
+
+.theme-bloomberg-terminal header {
+    background: var(--theme-bg) !important;
+    border-bottom: 2px solid var(--theme-primary) !important;
+}
+
+/* Thème spécifique: Seeking Alpha (mode clair) */
+.theme-seeking-alpha {
+    background-color: var(--theme-bg) !important;
+}
+
+.theme-seeking-alpha .bg-gray-900 {
+    background-color: var(--theme-surface) !important;
+}
+
+.theme-seeking-alpha .text-white {
+    color: var(--theme-text) !important;
+}
+
+/* Thème spécifique: MarketQ */
+.theme-marketq header {
+    border-bottom: 1px solid var(--theme-primary) !important;
+}
+
+.theme-marketq .bg-gray-900 {
+    border: 1px solid var(--theme-primary) !important;
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2) !important;
+}
+
+/* Thème spécifique: Bloomberg Mobile */
+.theme-bloomberg-mobile header {
+    border-bottom: 1px solid var(--theme-border) !important;
+}
+
+.theme-bloomberg-mobile .bg-gray-900 {
+    border-radius: 1rem !important;
+}
+
+/* Navigation avec thème */
+.theme-default nav,
+.theme-marketq nav,
+.theme-bloomberg-terminal nav,
+.theme-seeking-alpha nav,
+.theme-bloomberg-mobile nav {
+    background-color: var(--theme-surface) !important;
+    border-color: var(--theme-border) !important;
+}
+
+/* Transitions douces pour changement de thème */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+

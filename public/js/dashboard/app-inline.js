@@ -481,6 +481,22 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     };
 
     const BetaCombinedDashboard = () => {
+        // Initialiser le thème au chargement
+        React.useEffect(() => {
+            if (window.GOBThemes) {
+                window.GOBThemes.initTheme();
+            }
+            
+            // Écouter les changements de thème
+            const handleThemeChange = (event) => {
+                // Forcer un re-render si nécessaire
+                console.log('Thème changé:', event.detail.themeId);
+            };
+            
+            window.addEventListener('themeChanged', handleThemeChange);
+            return () => window.removeEventListener('themeChanged', handleThemeChange);
+        }, []);
+        
         // États principaux
         const [activeTab, setActiveTab] = useState('intellistocks'); // Onglet par défaut: JLab™ (contient Titres & Nouvelles et Finance Pro)
         const [tickers, setTickers] = useState([]);
@@ -25170,6 +25186,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                     </div>
                                     <span className={`text-xs font-bold tracking-wide ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>LIVE</span>
                                 </div>
+
+                                {/* Theme Selector */}
+                                {window.ThemeSelector && (
+                                    <ThemeSelector isDarkMode={isDarkMode} />
+                                )}
 
                                 {/* Theme toggle - icône seulement */}
                                 <button
