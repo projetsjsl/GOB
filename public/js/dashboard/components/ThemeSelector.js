@@ -729,6 +729,7 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                                 : 'bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200/20'
                         }`}
                         style={{
+                            zIndex: 10000,
                             boxShadow: `
                                 0 30px 100px rgba(0, 0, 0, 0.7),
                                 0 0 0 1px rgba(255, 255, 255, 0.08),

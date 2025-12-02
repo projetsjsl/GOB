@@ -4,6 +4,11 @@
  */
 
 /* Styles pour la modal de sélection de thème */
+.theme-selector-modal {
+    z-index: 9999 !important;
+    position: fixed !important;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
