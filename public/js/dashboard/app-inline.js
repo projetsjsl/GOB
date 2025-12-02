@@ -480,7 +480,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         );
     };
 
-        const BetaCombinedDashboard = () => {
+    const BetaCombinedDashboard = () => {
         // État pour le thème actuel
         const [currentThemeId, setCurrentThemeId] = useState(() => {
             if (window.GOBThemes) {
@@ -3396,6 +3396,88 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             setFilteredNews(newsData);
         }, [newsData]);
 
+        // Liste exhaustive d'indices TradingView valides (accessible globalement)
+        const getAllAvailableIndices = window.getAllAvailableIndices = () => {
+            return {
+                'us': [
+                    { proName: 'SP:SPX', title: 'S&P 500', category: 'us' },
+                    { proName: 'DJ:DJI', title: 'Dow Jones', category: 'us' },
+                    { proName: 'NASDAQ:NDX', title: 'NASDAQ 100', category: 'us' },
+                    { proName: 'TVC:RUT', title: 'Russell 2000', category: 'us' },
+                    { proName: 'TVC:VIX', title: 'VIX', category: 'us' },
+                    { proName: 'NYSE:NYA', title: 'NYSE Composite', category: 'us' }
+                ],
+                'canada': [
+                    { proName: 'TSX:OSPTX', title: 'S&P/TSX Composite', category: 'canada' },
+                    { proName: 'TSX:OSPTX60', title: 'S&P/TSX 60', category: 'canada' },
+                    { proName: 'TSXV:OSPVX', title: 'TSX Venture', category: 'canada' }
+                ],
+                'europe': [
+                    { proName: 'LSE:UKX', title: 'FTSE 100', category: 'europe' },
+                    { proName: 'XETR:DAX', title: 'DAX', category: 'europe' },
+                    { proName: 'EURONEXT:FCHI', title: 'CAC 40', category: 'europe' },
+                    { proName: 'BME:IBEX', title: 'IBEX 35', category: 'europe' },
+                    { proName: 'MIL:FTSEMIB', title: 'FTSE MIB', category: 'europe' },
+                    { proName: 'EURONEXT:AEX', title: 'AEX', category: 'europe' },
+                    { proName: 'SIX:SSMI', title: 'SMI', category: 'europe' },
+                    { proName: 'EURONEXT:PSI20', title: 'PSI 20', category: 'europe' },
+                    { proName: 'XETR:MDAX', title: 'MDAX', category: 'europe' }
+                ],
+                'asia': [
+                    { proName: 'TVC:NK225', title: 'Nikkei 225', category: 'asia' },
+                    { proName: 'HKEX:HSI', title: 'Hang Seng', category: 'asia' },
+                    { proName: 'ASX:XJO', title: 'ASX 200', category: 'asia' },
+                    { proName: 'SSE:000001', title: 'SSE Composite', category: 'asia' },
+                    { proName: 'BSE:SENSEX', title: 'BSE Sensex', category: 'asia' },
+                    { proName: 'KRX:KOSPI', title: 'KOSPI', category: 'asia' },
+                    { proName: 'TVC:TWII', title: 'Taiwan Weighted', category: 'asia' }
+                ],
+                'crypto': [
+                    { proName: 'BITSTAMP:BTCUSD', title: 'Bitcoin', category: 'crypto' },
+                    { proName: 'BITSTAMP:ETHUSD', title: 'Ethereum', category: 'crypto' },
+                    { proName: 'BINANCE:BNBUSD', title: 'BNB', category: 'crypto' },
+                    { proName: 'COINBASE:SOLUSD', title: 'Solana', category: 'crypto' },
+                    { proName: 'COINBASE:ADAUSD', title: 'Cardano', category: 'crypto' }
+                ],
+                'commodities': [
+                    { proName: 'TVC:USOIL', title: 'WTI Crude Oil', category: 'commodities' },
+                    { proName: 'TVC:BRENT', title: 'Brent Crude', category: 'commodities' },
+                    { proName: 'TVC:XAUUSD', title: 'Gold', category: 'commodities' },
+                    { proName: 'TVC:XAGUSD', title: 'Silver', category: 'commodities' },
+                    { proName: 'TVC:XCUUSD', title: 'Copper', category: 'commodities' }
+                ],
+                'forex': [
+                    { proName: 'FX:EURUSD', title: 'EUR/USD', category: 'forex' },
+                    { proName: 'FX:GBPUSD', title: 'GBP/USD', category: 'forex' },
+                    { proName: 'FX:USDJPY', title: 'USD/JPY', category: 'forex' },
+                    { proName: 'FX:USDCAD', title: 'USD/CAD', category: 'forex' },
+                    { proName: 'FX:AUDUSD', title: 'AUD/USD', category: 'forex' }
+                ]
+            };
+        };
+
+        // Charger les indices sélectionnés depuis localStorage
+        const [selectedIndices, setSelectedIndices] = useState(() => {
+            try {
+                const saved = localStorage.getItem('tradingview-selected-indices');
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+            } catch (e) {
+                console.warn('Erreur chargement indices:', e);
+            }
+            // Par défaut: indices US principaux + crypto
+            return [
+                'SP:SPX',
+                'DJ:DJI',
+                'NASDAQ:NDX',
+                'TVC:RUT',
+                'TSX:OSPTX',
+                'BITSTAMP:BTCUSD',
+                'BITSTAMP:ETHUSD'
+            ];
+        });
+
         // Charger le widget TradingView Ticker Tape
         useEffect(() => {
             const container = tickerTapeRef.current;
@@ -3403,94 +3485,30 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             container.innerHTML = '';
 
+            // Obtenir tous les indices disponibles
+            const allIndices = getAllAvailableIndices();
+            const flatIndices = Object.values(allIndices).flat();
+            
+            // Filtrer les indices sélectionnés
+            const symbolsToDisplay = flatIndices.filter(idx => 
+                selectedIndices.includes(idx.proName)
+            );
+
+            // Si aucun indice sélectionné, utiliser les indices par défaut
+            const finalSymbols = symbolsToDisplay.length > 0 
+                ? symbolsToDisplay 
+                : [
+                    { proName: 'SP:SPX', title: 'S&P 500' },
+                    { proName: 'DJ:DJI', title: 'Dow Jones' },
+                    { proName: 'NASDAQ:NDX', title: 'NASDAQ 100' }
+                ];
+
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
             script.type = 'text/javascript';
             script.async = true;
             script.textContent = JSON.stringify({
-                symbols: [
-                    // Indices US
-                    {
-                        proName: 'FOREXCOM:SPXUSD',
-                        title: 'S&P 500'
-                    },
-                    {
-                        proName: 'FOREXCOM:DJI',
-                        title: 'Dow Jones'
-                    },
-                    {
-                        proName: 'FOREXCOM:NSXUSD',
-                        title: 'NASDAQ 100'
-                    },
-                    {
-                        proName: 'TVC:RUT',
-                        title: 'Russell 2000'
-                    },
-                    // Indices Amérique du Nord
-                    {
-                        proName: 'TSX:OSPTX',
-                        title: 'TSX (Canada)'
-                    },
-                    // Indices Europe
-                    {
-                        proName: 'FOREXCOM:UKXGBP',
-                        title: 'FTSE 100 (UK)'
-                    },
-                    {
-                        proName: 'XETR:DAX',
-                        title: 'DAX (Allemagne)'
-                    },
-                    {
-                        proName: 'EURONEXT:FCHI',
-                        title: 'CAC 40 (France)'
-                    },
-                    {
-                        proName: 'BME:IBEX',
-                        title: 'IBEX 35 (Espagne)'
-                    },
-                    {
-                        proName: 'MIL:FTSEMIB',
-                        title: 'FTSE MIB (Italie)'
-                    },
-                    {
-                        proName: 'EURONEXT:AEX',
-                        title: 'AEX (Pays-Bas)'
-                    },
-                    {
-                        proName: 'SIX:SSMI',
-                        title: 'SMI (Suisse)'
-                    },
-                    // Indices Asie-Pacifique
-                    {
-                        proName: 'TVC:NK225',
-                        title: 'Nikkei 225 (Japon)'
-                    },
-                    {
-                        proName: 'HKEX:HSI',
-                        title: 'Hang Seng (Hong Kong)'
-                    },
-                    {
-                        proName: 'ASX:XJO',
-                        title: 'ASX 200 (Australie)'
-                    },
-                    {
-                        proName: 'SSE:000001',
-                        title: 'SSE Composite (Chine)'
-                    },
-                    {
-                        proName: 'BSE:SENSEX',
-                        title: 'BSE Sensex (Inde)'
-                    },
-                    // Crypto-monnaies
-                    {
-                        proName: 'BITSTAMP:BTCUSD',
-                        title: 'Bitcoin'
-                    },
-                    {
-                        proName: 'BITSTAMP:ETHUSD',
-                        title: 'Ethereum'
-                    }
-                ],
+                symbols: finalSymbols,
                 colorTheme: isDarkMode ? 'dark' : 'light',
                 locale: 'fr',
                 largeChartUrl: '',
@@ -5044,6 +5062,98 @@ STRUCTURE JSON OBLIGATOIRE:
                                 <div>• Requêtes API: {systemLogs.length}</div>
                                 <div>• Dernière analyse: {systemLogs[0]?.timestamp || 'N/A'}</div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 📈 Gestion des Indices TradingView */}
+                <div className={`rounded-lg p-4 border transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-br from-cyan-900/20 to-gray-900 border-cyan-700' : 'bg-gradient-to-br from-cyan-50 to-gray-50 border-cyan-200'
+                    }`}>
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-cyan-300' : 'text-cyan-900'}`}>
+                            <Icon emoji="📈" size={20} />
+                            Gestion des Indices TradingView
+                        </h3>
+                        <button
+                            onClick={() => {
+                                // Réinitialiser aux indices par défaut
+                                const defaultIndices = [
+                                    'SP:SPX',
+                                    'DJ:DJI',
+                                    'NASDAQ:NDX',
+                                    'TVC:RUT',
+                                    'TSX:OSPTX',
+                                    'BITSTAMP:BTCUSD',
+                                    'BITSTAMP:ETHUSD'
+                                ];
+                                setAdminSelectedIndices(defaultIndices);
+                                localStorage.setItem('tradingview-selected-indices', JSON.stringify(defaultIndices));
+                                window.location.reload();
+                            }}
+                            className={`px-3 py-1 text-xs rounded transition-colors ${isDarkMode ? 'bg-cyan-600 hover:bg-cyan-700 text-white' : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                                }`}
+                        >
+                            🔄 Réinitialiser
+                        </button>
+                    </div>
+                    
+                    <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {Object.entries(getAllIndices()).map(([category, indices]) => (
+                            <div key={category} className={`p-3 rounded border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                                <div className="font-semibold mb-3 flex items-center gap-2 capitalize">
+                                    <Icon emoji={category === 'us' ? '🇺🇸' : category === 'canada' ? '🇨🇦' : category === 'europe' ? '🇪🇺' : category === 'asia' ? '🌏' : category === 'crypto' ? '₿' : category === 'commodities' ? '🛢️' : '💱'} size={18} />
+                                    {category === 'us' ? 'États-Unis' : category === 'canada' ? 'Canada' : category === 'europe' ? 'Europe' : category === 'asia' ? 'Asie-Pacifique' : category === 'crypto' ? 'Crypto-monnaies' : category === 'commodities' ? 'Matières Premières' : 'Forex'}
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                    {indices.map(index => {
+                                        const isSelected = adminSelectedIndices.includes(index.proName);
+                                        return (
+                                            <label
+                                                key={index.proName}
+                                                className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                                                    isSelected
+                                                        ? isDarkMode ? 'bg-cyan-900/30 border-cyan-600' : 'bg-cyan-100 border-cyan-400'
+                                                        : isDarkMode ? 'bg-gray-700/50 border-gray-600 hover:bg-gray-700' : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+                                                } border`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={(e) => {
+                                                        const newSelected = e.target.checked
+                                                            ? [...adminSelectedIndices, index.proName]
+                                                            : adminSelectedIndices.filter(id => id !== index.proName);
+                                                        setAdminSelectedIndices(newSelected);
+                                                        localStorage.setItem('tradingview-selected-indices', JSON.stringify(newSelected));
+                                                        // Recharger le widget
+                                                        setTimeout(() => window.location.reload(), 500);
+                                                    }}
+                                                    className="rounded"
+                                                />
+                                                <span className="text-sm font-medium">{index.title}</span>
+                                                {!isSelected && (
+                                                    <span className="ml-auto text-xs opacity-50" title={`Format: ${index.proName}`}>
+                                                        {index.proName.split(':')[0]}
+                                                    </span>
+                                                )}
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className={`mt-4 p-3 rounded text-sm ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'}`}>
+                        <div className="font-semibold mb-2 flex items-center gap-2">
+                            <Icon emoji="ℹ️" size={16} />
+                            Informations
+                        </div>
+                        <div className="text-xs space-y-1">
+                            <div>• <strong>{adminSelectedIndices.length}</strong> indice(s) sélectionné(s)</div>
+                            <div>• Les modifications sont sauvegardées automatiquement</div>
+                            <div>• Le ticker tape se met à jour après la sélection</div>
+                            <div>• Les symboles invalides (avec ⚠️) ne s'afficheront pas</div>
                         </div>
                     </div>
                 </div>
@@ -26017,8 +26127,8 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 <nav 
                     ref={navRef}
                     className={`fixed bottom-0 left-0 right-0 backdrop-blur-md transition-all duration-300 z-40 shadow-2xl ${isDarkMode
-                        ? 'bg-black/95 border-t border-green-500/20'
-                        : 'bg-white/95 border-t-2 border-gray-200'
+                    ? 'bg-black/95 border-t border-green-500/20'
+                    : 'bg-white/95 border-t-2 border-gray-200'
                         } ${showLoadingScreen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                 >
                     <div className="flex items-center overflow-x-auto scrollbar-hide px-2 py-3 gap-1" style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}>
