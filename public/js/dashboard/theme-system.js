@@ -1,10 +1,141 @@
 /**
  * Système de thèmes pour le Dashboard GOB
- * 5 thèmes disponibles: default, marketq, bloomberg-terminal, seeking-alpha, bloomberg-mobile
+ * Thèmes par défaut: Terminal, IA, DarkMode, Light
+ * Thèmes personnalisés: MarketQ, Bloomberg Terminal, Seeking Alpha, etc.
  */
 
-// Définition des thèmes
-export const themes = {
+// Thèmes par défaut (Terminal, IA, DarkMode, Light) - DÉFINIS EN PREMIER
+const defaultThemes = {
+    'terminal': {
+        name: 'Terminal',
+        id: 'terminal',
+        isDefault: true,
+        colors: {
+            primary: '#ffcc00',
+            secondary: '#00ff00',
+            background: '#000000',
+            surface: '#0a0a0a',
+            surfaceLight: '#1a1a1a',
+            text: '#ffcc00',
+            textSecondary: '#888888',
+            textGreen: '#00ff00',
+            textRed: '#ff0000',
+            border: '#333333',
+            accent: '#ffcc00',
+            success: '#00ff00',
+            danger: '#ff0000',
+            warning: '#ffcc00',
+        },
+        fonts: {
+            primary: 'Courier New, "Courier", monospace',
+            secondary: 'Courier New, "Courier", monospace',
+            mono: 'Courier New, "Courier", monospace'
+        },
+        styles: {
+            headerBg: '#000000',
+            cardBg: '#0a0a0a',
+            cardBorder: '1px solid #333333',
+            borderRadius: '0',
+            shadow: 'none',
+        }
+    },
+    'ia': {
+        name: 'IA',
+        id: 'ia',
+        isDefault: true,
+        colors: {
+            primary: '#8b5cf6',
+            secondary: '#a78bfa',
+            background: '#000000',
+            surface: '#111827',
+            surfaceLight: '#1f2937',
+            text: '#ffffff',
+            textSecondary: '#9ca3af',
+            border: '#374151',
+            accent: '#8b5cf6',
+            success: '#10b981',
+            danger: '#ef4444',
+            warning: '#f59e0b',
+        },
+        fonts: {
+            primary: 'Inter, sans-serif',
+            secondary: 'Roboto, sans-serif',
+            mono: 'monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
+            cardBg: '#111827',
+            cardBorder: '1px solid #374151',
+            borderRadius: '0.75rem',
+            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        }
+    },
+    'darkmode': {
+        name: 'Dark Mode',
+        id: 'darkmode',
+        isDefault: true,
+        colors: {
+            primary: '#10b981',
+            secondary: '#3b82f6',
+            background: '#000000',
+            surface: '#111827',
+            surfaceLight: '#1f2937',
+            text: '#ffffff',
+            textSecondary: '#9ca3af',
+            border: '#374151',
+            accent: '#8b5cf6',
+            success: '#10b981',
+            danger: '#ef4444',
+            warning: '#f59e0b',
+        },
+        fonts: {
+            primary: 'Inter, sans-serif',
+            secondary: 'Roboto, sans-serif',
+            mono: 'monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
+            cardBg: '#111827',
+            cardBorder: '1px solid #374151',
+            borderRadius: '0.75rem',
+            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
+        }
+    },
+    'light': {
+        name: 'Light',
+        id: 'light',
+        isDefault: true,
+        colors: {
+            primary: '#10b981',
+            secondary: '#3b82f6',
+            background: '#ffffff',
+            surface: '#f5f5f5',
+            surfaceLight: '#ffffff',
+            text: '#1a1a1a',
+            textSecondary: '#666666',
+            border: '#d0d0d0',
+            accent: '#8b5cf6',
+            success: '#10b981',
+            danger: '#ef4444',
+            warning: '#f59e0b',
+        },
+        fonts: {
+            primary: 'Inter, sans-serif',
+            secondary: 'Roboto, sans-serif',
+            mono: 'monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)',
+            cardBg: '#ffffff',
+            cardBorder: '1px solid #d0d0d0',
+            borderRadius: '0.75rem',
+            shadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        }
+    }
+};
+
+// Thèmes personnalisés
+const customThemes = {
     default: {
         name: 'Par défaut',
         id: 'default',
@@ -259,140 +390,10 @@ export const themes = {
     }
 };
 
-// Thèmes par défaut (Terminal, IA, DarkMode, Light) - DÉFINIS AVANT allThemes
-const defaultThemes = {
-    'terminal': {
-        name: 'Terminal',
-        id: 'terminal',
-        isDefault: true,
-        colors: {
-            primary: '#ffcc00',
-            secondary: '#00ff00',
-            background: '#000000',
-            surface: '#0a0a0a',
-            surfaceLight: '#1a1a1a',
-            text: '#ffcc00',
-            textSecondary: '#888888',
-            textGreen: '#00ff00',
-            textRed: '#ff0000',
-            border: '#333333',
-            accent: '#ffcc00',
-            success: '#00ff00',
-            danger: '#ff0000',
-            warning: '#ffcc00',
-        },
-        fonts: {
-            primary: 'Courier New, "Courier", monospace',
-            secondary: 'Courier New, "Courier", monospace',
-            mono: 'Courier New, "Courier", monospace'
-        },
-        styles: {
-            headerBg: '#000000',
-            cardBg: '#0a0a0a',
-            cardBorder: '1px solid #333333',
-            borderRadius: '0',
-            shadow: 'none',
-        }
-    },
-    'ia': {
-        name: 'IA',
-        id: 'ia',
-        isDefault: true,
-        colors: {
-            primary: '#8b5cf6',
-            secondary: '#a78bfa',
-            background: '#000000',
-            surface: '#111827',
-            surfaceLight: '#1f2937',
-            text: '#ffffff',
-            textSecondary: '#9ca3af',
-            border: '#374151',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
-        },
-        fonts: {
-            primary: 'Inter, sans-serif',
-            secondary: 'Roboto, sans-serif',
-            mono: 'monospace'
-        },
-        styles: {
-            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
-            cardBg: '#111827',
-            cardBorder: '1px solid #374151',
-            borderRadius: '0.75rem',
-            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
-        }
-    },
-    'darkmode': {
-        name: 'Dark Mode',
-        id: 'darkmode',
-        isDefault: true,
-        colors: {
-            primary: '#10b981',
-            secondary: '#3b82f6',
-            background: '#000000',
-            surface: '#111827',
-            surfaceLight: '#1f2937',
-            text: '#ffffff',
-            textSecondary: '#9ca3af',
-            border: '#374151',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
-        },
-        fonts: {
-            primary: 'Inter, sans-serif',
-            secondary: 'Roboto, sans-serif',
-            mono: 'monospace'
-        },
-        styles: {
-            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
-            cardBg: '#111827',
-            cardBorder: '1px solid #374151',
-            borderRadius: '0.75rem',
-            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
-        }
-    },
-    'light': {
-        name: 'Light',
-        id: 'light',
-        isDefault: true,
-        colors: {
-            primary: '#10b981',
-            secondary: '#3b82f6',
-            background: '#ffffff',
-            surface: '#f5f5f5',
-            surfaceLight: '#ffffff',
-            text: '#1a1a1a',
-            textSecondary: '#666666',
-            border: '#d0d0d0',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
-        },
-        fonts: {
-            primary: 'Inter, sans-serif',
-            secondary: 'Roboto, sans-serif',
-            mono: 'monospace'
-        },
-        styles: {
-            headerBg: 'linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)',
-            cardBg: '#ffffff',
-            cardBorder: '1px solid #d0d0d0',
-            borderRadius: '0.75rem',
-            shadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-        }
-    }
-};
-
-// Fusionner tous les thèmes
+// Fusionner tous les thèmes (défaut + personnalisés)
 const allThemes = {
     ...defaultThemes,
-    ...themes
+    ...customThemes
 };
 
 // Fonction pour appliquer un thème
@@ -449,144 +450,11 @@ function applyTheme(themeId) {
     // Sauvegarder dans localStorage
     localStorage.setItem('gob-dashboard-theme', themeId);
     
+    // Déclencher un événement personnalisé
+    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId } }));
+    
     return theme;
 }
-
-// Thèmes par défaut (Terminal, IA, DarkMode, Light)
-const defaultThemes = {
-    'terminal': {
-        name: 'Terminal',
-        id: 'terminal',
-        isDefault: true,
-        colors: {
-            primary: '#ffcc00',
-            secondary: '#00ff00',
-            background: '#000000',
-            surface: '#0a0a0a',
-            surfaceLight: '#1a1a1a',
-            text: '#ffcc00',
-            textSecondary: '#888888',
-            textGreen: '#00ff00',
-            textRed: '#ff0000',
-            border: '#333333',
-            accent: '#ffcc00',
-            success: '#00ff00',
-            danger: '#ff0000',
-            warning: '#ffcc00',
-        },
-        fonts: {
-            primary: 'Courier New, "Courier", monospace',
-            secondary: 'Courier New, "Courier", monospace',
-            mono: 'Courier New, "Courier", monospace'
-        },
-        styles: {
-            headerBg: '#000000',
-            cardBg: '#0a0a0a',
-            cardBorder: '1px solid #333333',
-            borderRadius: '0',
-            shadow: 'none',
-        }
-    },
-    'ia': {
-        name: 'IA',
-        id: 'ia',
-        isDefault: true,
-        colors: {
-            primary: '#8b5cf6',
-            secondary: '#a78bfa',
-            background: '#000000',
-            surface: '#111827',
-            surfaceLight: '#1f2937',
-            text: '#ffffff',
-            textSecondary: '#9ca3af',
-            border: '#374151',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
-        },
-        fonts: {
-            primary: 'Inter, sans-serif',
-            secondary: 'Roboto, sans-serif',
-            mono: 'monospace'
-        },
-        styles: {
-            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
-            cardBg: '#111827',
-            cardBorder: '1px solid #374151',
-            borderRadius: '0.75rem',
-            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
-        }
-    },
-    'darkmode': {
-        name: 'Dark Mode',
-        id: 'darkmode',
-        isDefault: true,
-        colors: {
-            primary: '#10b981',
-            secondary: '#3b82f6',
-            background: '#000000',
-            surface: '#111827',
-            surfaceLight: '#1f2937',
-            text: '#ffffff',
-            textSecondary: '#9ca3af',
-            border: '#374151',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
-        },
-        fonts: {
-            primary: 'Inter, sans-serif',
-            secondary: 'Roboto, sans-serif',
-            mono: 'monospace'
-        },
-        styles: {
-            headerBg: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
-            cardBg: '#111827',
-            cardBorder: '1px solid #374151',
-            borderRadius: '0.75rem',
-            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
-        }
-    },
-    'light': {
-        name: 'Light',
-        id: 'light',
-        isDefault: true,
-        colors: {
-            primary: '#10b981',
-            secondary: '#3b82f6',
-            background: '#ffffff',
-            surface: '#f5f5f5',
-            surfaceLight: '#ffffff',
-            text: '#1a1a1a',
-            textSecondary: '#666666',
-            border: '#d0d0d0',
-            accent: '#8b5cf6',
-            success: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b',
-        },
-        fonts: {
-            primary: 'Inter, sans-serif',
-            secondary: 'Roboto, sans-serif',
-            mono: 'monospace'
-        },
-        styles: {
-            headerBg: 'linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)',
-            cardBg: '#ffffff',
-            cardBorder: '1px solid #d0d0d0',
-            borderRadius: '0.75rem',
-            shadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-        }
-    }
-};
-
-// Fusionner tous les thèmes
-const allThemes = {
-    ...defaultThemes,
-    ...themes
-};
 
 // Fonction pour obtenir le thème actuel
 function getCurrentTheme() {
@@ -609,7 +477,7 @@ function initTheme() {
 window.GOBThemes = {
     themes: allThemes,
     defaultThemes,
-    customThemes: themes,
+    customThemes,
     applyTheme,
     getCurrentTheme,
     initTheme
@@ -621,4 +489,3 @@ if (document.readyState === 'loading') {
 } else {
     initTheme();
 }
-
