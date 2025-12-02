@@ -25177,88 +25177,181 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 )}
                 {/* Header - Bloomberg Style - Always Dark */}
                 <header 
-                    className="relative overflow-hidden border-b"
+                    className="relative overflow-hidden border-b group/header"
                     style={{
                         background: 'var(--theme-header-bg, linear-gradient(135deg, #111827 0%, #1f2937 100%))',
                         borderColor: 'var(--theme-border, rgba(16, 185, 129, 0.2))',
                         color: 'var(--theme-text, #ffffff)',
                         fontFamily: 'var(--theme-font-primary, Inter, sans-serif)',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                        boxShadow: `
+                            0 8px 32px rgba(0, 0, 0, 0.3),
+                            0 2px 8px rgba(0, 0, 0, 0.2),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                            inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+                        `,
+                        position: 'relative',
+                        zIndex: 10
                     }}
                 >
-                    {/* Pattern animé adapté au thème */}
+                    {/* Animated border glow */}
+                    <div 
+                        className="absolute inset-0 opacity-0 group-hover/header:opacity-100 transition-opacity duration-1000 pointer-events-none"
+                        style={{
+                            background: `linear-gradient(90deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3) 50%, transparent 100%)`,
+                            height: '2px',
+                            bottom: '-1px',
+                            animation: 'glow-pulse 3s ease-in-out infinite'
+                        }}
+                    ></div>
+                    {/* CEO Premium: Multi-layer patterns animés selon le thème */}
                     <div 
                         className="absolute inset-0"
                         style={{
-                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.1 : 0.05,
+                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.12 : 0.06,
                             backgroundImage: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                 ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 4px)'
                                 : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                ? 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)'
-                                : 'repeating-linear-gradient(45deg, transparent, transparent 2px, currentColor 1px, currentColor 3px)',
+                                ? 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0), radial-gradient(circle at 10px 10px, currentColor 0.5px, transparent 0)'
+                                : 'repeating-linear-gradient(45deg, transparent, transparent 2px, currentColor 1px, currentColor 3px), repeating-linear-gradient(-45deg, transparent, transparent 2px, currentColor 1px, currentColor 3px)',
                             backgroundSize: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' 
                                 ? '100% 4px'
                                 : currentThemeId === 'marketq' || currentThemeId === 'marketq-dark'
-                                ? '16px 16px'
-                                : '8px 8px'
+                                ? '16px 16px, 24px 24px'
+                                : '8px 8px, 12px 12px',
+                            animation: 'float 20s ease-in-out infinite'
                         }}
                     ></div>
                     
-                    {/* Overlay gradient selon le thème - utilise les couleurs du thème */}
+                    {/* CEO Premium: Multi-layer gradients avec animation */}
                     <div 
                         className="absolute inset-0"
                         style={{
-                            background: `linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1) 0%, transparent 50%)`,
-                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.4 : 0.6
+                            background: `
+                                linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.12) 0%, transparent 40%),
+                                radial-gradient(ellipse at 20% 50%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.08) 0%, transparent 50%),
+                                radial-gradient(ellipse at 80% 50%, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.06) 0%, transparent 50%)
+                            `,
+                            opacity: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? 0.5 : 0.7,
+                            animation: 'gradient-shift 8s ease infinite'
                         }}
                     ></div>
                     
-                    {/* Accent gradient selon le thème */}
+                    {/* CEO Premium: Shine effect animé */}
                     <div 
-                        className="absolute inset-0"
+                        className="absolute inset-0 opacity-0 group-hover/header:opacity-100 transition-opacity duration-1000 pointer-events-none overflow-hidden"
                         style={{
-                            background: `radial-gradient(ellipse at 20% 50%, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.08) 0%, transparent 50%)`,
-                            opacity: 0.5
+                            background: `linear-gradient(135deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 50%, transparent 100%)`,
+                            animation: 'luxury-shimmer 4s ease-in-out infinite'
+                        }}
+                    ></div>
+                    
+                    {/* CEO Premium: Corner accents */}
+                    <div 
+                        className="absolute top-0 left-0 w-40 h-40 opacity-30"
+                        style={{
+                            background: `radial-gradient(circle, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4) 0%, transparent 70%)`,
+                            filter: 'blur(20px)',
+                            animation: 'glow-pulse 4s ease-in-out infinite'
+                        }}
+                    ></div>
+                    <div 
+                        className="absolute top-0 right-0 w-40 h-40 opacity-30"
+                        style={{
+                            background: `radial-gradient(circle, rgba(var(--theme-accent-rgb, 139, 92, 246), 0.3) 0%, transparent 70%)`,
+                            filter: 'blur(20px)',
+                            animation: 'glow-pulse 4s ease-in-out infinite 1s'
                         }}
                     ></div>
 
                     <div className="px-6 py-4 relative z-10">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-6">
-                                {/* Logo avec effet adapté au thème */}
+                                {/* CEO Premium: Logo avec effets ultra-sophistiqués */}
                                 <div 
-                                    className="relative p-3 rounded-lg shadow-lg"
+                                    className="relative p-3.5 rounded-xl shadow-2xl group/logo transition-all duration-500 hover:scale-105"
                                     style={{
-                                        background: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1)`,
-                                        border: `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`,
-                                        boxShadow: `0 10px 15px -3px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1), 0 4px 6px -2px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.05)`,
-                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.5rem'
+                                        background: `
+                                            linear-gradient(135deg, 
+                                                rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 0%, 
+                                                rgba(var(--theme-accent-rgb, 139, 92, 246), 0.1) 50%,
+                                                rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 100%
+                                            )
+                                        `,
+                                        backgroundSize: '200% 200%',
+                                        border: `2px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
+                                        boxShadow: `
+                                            0 12px 24px -4px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2),
+                                            0 4px 12px -2px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.1),
+                                            inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                                            inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+                                            0 0 40px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15)
+                                        `,
+                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem',
+                                        animation: 'gradient-shift 5s ease infinite'
                                     }}
                                 >
+                                    {/* Multi-layer shine */}
                                     <div 
-                                        className="absolute inset-0 rounded-lg"
+                                        className="absolute inset-0 rounded-xl opacity-0 group-hover/logo:opacity-100 transition-opacity duration-700"
                                         style={{
-                                            background: `linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2) 0%, transparent 100%)`,
+                                            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%)`,
+                                            borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem',
+                                            animation: 'luxury-shimmer 3s ease-in-out infinite'
+                                        }}
+                                    ></div>
+                                    <div 
+                                        className="absolute inset-0 rounded-xl opacity-40"
+                                        style={{
+                                            background: `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 60%)`,
+                                            borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem'
+                                        }}
+                                    ></div>
+                                    
+                                    {/* Inner glow */}
+                                    <div 
+                                        className="absolute inset-1 rounded-lg opacity-30"
+                                        style={{
+                                            background: `radial-gradient(circle, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4) 0%, transparent 70%)`,
+                                            filter: 'blur(8px)',
                                             borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.5rem'
                                         }}
                                     ></div>
+                                    
+                                    {/* Glow effect au hover */}
+                                    <div 
+                                        className="absolute -inset-2 rounded-xl opacity-0 group-hover/logo:opacity-100 transition-opacity duration-700 blur-xl"
+                                        style={{
+                                            background: `radial-gradient(ellipse, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.6) 0%, transparent 70%)`
+                                        }}
+                                    ></div>
+                                    
                                     <img
                                         src="/logojslaidark.jpg"
                                         alt="JSL AI Logo"
-                                        className="w-20 h-20 object-contain relative z-10"
+                                        className="w-20 h-20 object-contain relative z-10 drop-shadow-2xl filter brightness-110"
                                     />
                                 </div>
 
                                 <div 
-                                    className="border-l pl-6"
+                                    className="border-l pl-7 relative"
                                     style={{
-                                        borderColor: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)`
+                                        borderColor: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
+                                        borderWidth: '2px'
                                     }}
                                 >
-                                    <div className="flex items-center gap-4">
+                                    {/* Animated border glow */}
+                                    <div 
+                                        className="absolute left-0 top-0 bottom-0 w-1 opacity-50"
+                                        style={{
+                                            background: `linear-gradient(180deg, transparent 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.6) 50%, transparent 100%)`,
+                                            animation: 'glow-pulse 3s ease-in-out infinite'
+                                        }}
+                                    ></div>
+                                    
+                                    <div className="flex items-center gap-4 relative z-10">
                                         <div>
                                             <h1 
-                                                className="text-4xl font-black tracking-tight"
+                                                className="text-5xl font-black tracking-tighter relative"
                                                 style={{ 
                                                     fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                         ? 'var(--theme-font-mono, "Courier New", monospace)'
@@ -25266,42 +25359,68 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         ? 'var(--theme-font-primary, "Courier New", monospace)'
                                                         : "'Avenir Pro 85 Heavy', 'Avenir Next', 'Avenir', 'Montserrat', var(--theme-font-primary, Inter), sans-serif",
                                                     fontWeight: 900, 
-                                                    letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.05em' : '-0.02em',
-                                                    color: 'var(--theme-text, #ffffff)'
+                                                    letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.08em' : '-0.03em',
+                                                    color: 'var(--theme-text, #ffffff)',
+                                                    textShadow: `
+                                                        0 2px 8px rgba(0, 0, 0, 0.3),
+                                                        0 0 20px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)
+                                                    `
                                                 }}
                                             >
                                                 TERMINAL FINANCIER
                                                 <br />
                                                 <span 
-                                                    className="text-3xl"
+                                                    className="text-4xl relative inline-block"
                                                     style={{ 
                                                         color: 'var(--theme-primary, #4ade80)', 
                                                         fontWeight: 900,
                                                         fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                             ? 'var(--theme-font-mono, "Courier New", monospace)'
-                                                            : 'inherit'
+                                                            : 'inherit',
+                                                        textShadow: `
+                                                            0 2px 12px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4),
+                                                            0 0 30px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.3)
+                                                        `,
+                                                        filter: 'brightness(1.1)'
                                                     }}
                                                 >
                                                     Emma IA
                                                 </span>
                                                 <span 
-                                                    className="ml-3 text-xs font-normal px-2 py-1 rounded"
+                                                    className="ml-4 text-xs font-bold px-3 py-1.5 rounded-lg relative inline-block"
                                                     style={{
-                                                        background: `rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2)`,
-                                                        color: 'var(--theme-primary, #4ade80)'
+                                                        background: `linear-gradient(135deg, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.25) 0%, rgba(var(--theme-primary-rgb, 16, 185, 129), 0.15) 100%)`,
+                                                        color: 'var(--theme-primary, #4ade80)',
+                                                        border: `1px solid rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`,
+                                                        boxShadow: `
+                                                            0 4px 12px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.2),
+                                                            inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                                                        `,
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.1em',
+                                                        animation: 'glow-pulse 2.5s ease-in-out infinite'
                                                     }}
                                                 >
                                                     BÊTA
                                                 </span>
                                             </h1>
                                             <p 
-                                                className="text-xs font-medium tracking-wider mt-1"
+                                                className="text-sm font-semibold tracking-wider mt-2 relative"
                                                 style={{
                                                     fontFamily: 'var(--theme-font-primary, Inter, sans-serif)',
-                                                    color: 'var(--theme-text-secondary, #9ca3af)'
+                                                    color: 'var(--theme-text-secondary, #9ca3af)',
+                                                    textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)'
                                                 }}
                                             >
-                                                Propulsé par <span style={{ color: 'var(--theme-primary, #4ade80)', fontWeight: 'bold' }}>JSL AI</span> - Tous droits réservés
+                                                Propulsé par <span 
+                                                    style={{ 
+                                                        color: 'var(--theme-primary, #4ade80)', 
+                                                        fontWeight: 'bold',
+                                                        textShadow: `0 0 10px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)`
+                                                    }}
+                                                >
+                                                    JSL AI
+                                                </span> - Tous droits réservés
                                             </p>
                                         </div>
                                     </div>
@@ -25309,32 +25428,72 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
 
                             <div className="flex items-center gap-3">
-                                {/* Live indicator adapté au thème */}
+                                {/* CEO Premium: Live indicator ultra-sophisticated */}
                                 <div 
-                                    className="flex items-center gap-2 px-3 py-1.5 rounded-md"
+                                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl relative group/live transition-all duration-500 hover:scale-105"
                                     style={{
-                                        background: `rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.1 : 0.15})`,
-                                        border: `1px solid rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.3 : 0.4})`,
-                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.375rem'
+                                        background: `
+                                            linear-gradient(135deg, 
+                                                rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.15 : 0.2}) 0%, 
+                                                rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.1 : 0.15}) 100%
+                                            )
+                                        `,
+                                        border: `2px solid rgba(var(--theme-success-rgb, 16, 185, 129), ${isDarkMode ? 0.4 : 0.5})`,
+                                        borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem',
+                                        boxShadow: `
+                                            0 4px 16px rgba(var(--theme-success-rgb, 16, 185, 129), 0.2),
+                                            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                                            0 0 20px rgba(var(--theme-success-rgb, 16, 185, 129), 0.15)
+                                        `
                                     }}
                                 >
-                                    <div className="relative">
+                                    {/* Shine effect */}
+                                    <div 
+                                        className="absolute inset-0 rounded-xl opacity-0 group-hover/live:opacity-100 transition-opacity duration-500"
+                                        style={{
+                                            background: `linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%)`,
+                                            borderRadius: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0' : '0.75rem'
+                                        }}
+                                    ></div>
+                                    
+                                    <div className="relative z-10">
                                         <div 
-                                            className="w-2 h-2 rounded-full animate-pulse"
-                                            style={{ backgroundColor: 'var(--theme-success, #10b981)' }}
+                                            className="w-2.5 h-2.5 rounded-full animate-pulse relative"
+                                            style={{ 
+                                                backgroundColor: 'var(--theme-success, #10b981)',
+                                                boxShadow: `0 0 12px var(--theme-success, #10b981), 0 0 24px rgba(var(--theme-success-rgb, 16, 185, 129), 0.4)`
+                                            }}
                                         ></div>
                                         <div 
-                                            className="absolute inset-0 w-2 h-2 rounded-full animate-ping opacity-75"
-                                            style={{ backgroundColor: 'var(--theme-success, #10b981)' }}
+                                            className="absolute inset-0 w-2.5 h-2.5 rounded-full animate-ping opacity-75"
+                                            style={{ 
+                                                backgroundColor: 'var(--theme-success, #10b981)',
+                                                boxShadow: `0 0 12px var(--theme-success, #10b981)`
+                                            }}
                                         ></div>
+                                        {/* Triple ring pulse */}
+                                        {[0, 1, 2].map((ring) => (
+                                            <div
+                                                key={ring}
+                                                className="absolute inset-0 w-2.5 h-2.5 rounded-full"
+                                                style={{
+                                                    border: `1px solid var(--theme-success, #10b981)`,
+                                                    animation: `pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite ${ring * 0.3}s`,
+                                                    opacity: 0.6 - (ring * 0.2),
+                                                    transform: `scale(${1 + ring * 0.5})`
+                                                }}
+                                            ></div>
+                                        ))}
                                     </div>
                                     <span 
-                                        className="text-xs font-bold tracking-wide"
+                                        className="text-xs font-black tracking-widest relative z-10 uppercase"
                                         style={{ 
                                             color: 'var(--theme-success, #10b981)',
                                             fontFamily: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                 ? 'var(--theme-font-mono, "Courier New", monospace)'
-                                                : 'var(--theme-font-primary, Inter, sans-serif)'
+                                                : 'var(--theme-font-primary, Inter, sans-serif)',
+                                            textShadow: `0 0 8px rgba(var(--theme-success-rgb, 16, 185, 129), 0.5)`,
+                                            letterSpacing: '0.15em'
                                         }}
                                     >
                                         LIVE
