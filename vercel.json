@@ -111,7 +111,7 @@
       "maxDuration": 10
     },
     "api/fastgraphs-login.js": {
-      "maxDuration": 60
+      "maxDuration": 300
     }
   },
   "headers": [
