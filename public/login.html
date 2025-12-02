@@ -731,7 +731,25 @@
           })
         });
 
-        const data = await response.json();
+        // Vérifier si la réponse est vide ou invalide
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text();
+          console.error('Réponse non-JSON reçue:', text);
+          throw new Error(`Erreur serveur: ${response.status} ${response.statusText}`);
+        }
+
+        let data;
+        try {
+          const text = await response.text();
+          if (!text || text.trim() === '') {
+            throw new Error('Réponse vide du serveur');
+          }
+          data = JSON.parse(text);
+        } catch (jsonError) {
+          console.error('Erreur parsing JSON:', jsonError);
+          throw new Error('Erreur de format de réponse du serveur');
+        }
 
         if (!response.ok || !data.success) {
           throw new Error(data.error || 'Échec de connexion');
