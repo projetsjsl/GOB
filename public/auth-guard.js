@@ -25,6 +25,12 @@
     async init() {
       console.log('🔐 Auth Guard: Vérification de l\'authentification...');
 
+      // Mode développement: bypass auth si flag défini
+      if (window.__AUTH_GUARD_DISABLED || window.location.search.includes('dev=true')) {
+        console.log('⚠️ Auth Guard désactivé (mode développement)');
+        return;
+      }
+
       // Vérifier si on est sur la page de login (ne pas rediriger)
       if (window.location.pathname.includes('login.html')) {
         console.log('📝 Page de login détectée - pas de vérification nécessaire');
