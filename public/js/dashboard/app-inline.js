@@ -25625,8 +25625,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                             ? '0 1px 4px rgba(0, 212, 255, 0.4), 0 0 12px rgba(0, 212, 255, 0.3)'
                                                             : currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal'
                                                             ? '0 1px 4px rgba(0, 255, 0, 0.5), 0 0 12px rgba(0, 255, 0, 0.4)'
-                                                            : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                            : currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                             ? '0 1px 2px rgba(0, 0, 0, 0.3)'
+                                                            : currentThemeId === 'desjardins'
+                                                            ? '0 1px 3px rgba(0, 0, 0, 0.5), 0 0 8px rgba(0, 166, 81, 0.3)'
                                                             : '0 1px 4px rgba(var(--theme-primary-rgb, 16, 185, 129), 0.4)',
                                                         filter: 'brightness(1.1)'
                                                     }}
@@ -25689,8 +25691,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                         : currentThemeId === 'desjardins'
                                                         ? '#e5e7eb'
                                                         : '#9ca3af',
-                                                    textShadow: currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'desjardins' || currentThemeId === 'light'
+                                                    textShadow: currentThemeId === 'seeking-alpha' || currentThemeId === 'bloomberg-nostalgie' || currentThemeId === 'light'
                                                         ? '0 1px 1px rgba(255, 255, 255, 0.5)'
+                                                        : currentThemeId === 'desjardins'
+                                                        ? '0 1px 2px rgba(0, 0, 0, 0.3)'
                                                         : '0 1px 2px rgba(0, 0, 0, 0.3)',
                                                     letterSpacing: currentThemeId === 'bloomberg-terminal' || currentThemeId === 'terminal' ? '0.03em' : '0.01em'
                                                 }}
