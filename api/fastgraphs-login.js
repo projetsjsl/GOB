@@ -426,9 +426,21 @@ export default async function handler(req, res) {
       stagehandError = initError;
       
       // Si erreur Unauthorized, basculer vers API REST Browserbase
-      if (initError.message?.includes('Unauthorized') || initError.name === 'StagehandAPIUnauthorizedError') {
-        console.log('Stagehand non autorisé - Basculement vers API REST Browserbase directe...');
+      const isUnauthorizedError = initError.message?.includes('Unauthorized') || 
+                                  initError.name === 'StagehandAPIUnauthorizedError' ||
+                                  initError.name?.includes('Unauthorized');
+      
+      console.log('🔍 Vérification erreur Stagehand:', {
+        message: initError.message,
+        name: initError.name,
+        isUnauthorizedError,
+        willFallback: isUnauthorizedError
+      });
+      
+      if (isUnauthorizedError) {
+        console.log('✅ Stagehand non autorisé - Basculement vers API REST Browserbase directe...');
         useStagehand = false;
+        // Ne pas retourner ici, continuer pour appeler le fallback
       } else {
         // Pour les autres erreurs, retourner l'erreur
         let hint = 'Vérifiez vos clés API Browserbase et Gemini. Ajoutez ?debug=true pour plus de détails.';
@@ -457,6 +469,39 @@ export default async function handler(req, res) {
               projectIdPrefix: stagehandConfig.projectId ? stagehandConfig.projectId.substring(0, 8) + '...' : 'N/A',
               geminiKeyPrefix: stagehandConfig.modelClientOptions?.apiKey ? stagehandConfig.modelClientOptions.apiKey.substring(0, 8) + '...' : 'N/A'
             }
+          } : undefined
+        });
+      }
+    }
+    
+    // Si Stagehand n'est pas disponible, utiliser API REST Browserbase
+    if (!useStagehand) {
+      console.log('🔄 Utilisation de l\'API REST Browserbase directe (fallback)...');
+      try {
+        return await createBrowserbaseSessionDirect(req, res, {
+          email,
+          password,
+          hasCredentials,
+          debugMode,
+          browserbaseApiKey,
+          browserbaseProjectId,
+          stagehandError
+        });
+      } catch (fallbackError) {
+        console.error('❌ Erreur lors du fallback API REST:', fallbackError);
+        // Si le fallback échoue aussi, retourner une erreur combinée
+        return res.status(500).json({
+          success: false,
+          error: 'Erreur lors de la création de la session (Stagehand et API REST ont échoué)',
+          details: `Stagehand: ${stagehandError?.message || 'Unauthorized'}, API REST: ${fallbackError.message}`,
+          hint: 'Vérifiez vos clés API Browserbase. Ajoutez ?debug=true pour plus de détails.',
+          type: 'DualFailureError',
+          timestamp: new Date().toISOString(),
+          debugInfo: debugMode ? {
+            stagehandError: stagehandError?.message,
+            fallbackError: fallbackError.message,
+            stagehandStack: stagehandError?.stack,
+            fallbackStack: fallbackError.stack
           } : undefined
         });
       }
