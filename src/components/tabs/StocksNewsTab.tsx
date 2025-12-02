@@ -249,10 +249,10 @@ const StocksNewsTab: React.FC<TabProps> = (props) => {
                                     </h4>
                                     {/* Bull Illustration */}
                                     <div className="flex-shrink-0 relative">
-                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg ${
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg ${
                                             isDarkMode ? 'bg-green-500/30 border-2 border-green-500/50' : 'bg-green-200 border-2 border-green-300'
                                         }`}>
-                                            🐂
+                                            <img src="/assets/bull-icon.svg" alt="Bull" className="w-12 h-12" />
                                         </div>
                                         {/* Glow effect */}
                                         <div className={`absolute inset-0 rounded-full blur-md opacity-30 ${
@@ -389,10 +389,10 @@ const StocksNewsTab: React.FC<TabProps> = (props) => {
                                     </h4>
                                     {/* Bear Illustration */}
                                     <div className="flex-shrink-0 relative">
-                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg ${
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg ${
                                             isDarkMode ? 'bg-red-500/30 border-2 border-red-500/50' : 'bg-red-200 border-2 border-red-300'
                                         }`}>
-                                            🐻
+                                            <img src="/assets/bear-icon.svg" alt="Bear" className="w-12 h-12" />
                                         </div>
                                         {/* Glow effect */}
                                         <div className={`absolute inset-0 rounded-full blur-md opacity-30 ${

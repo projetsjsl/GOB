@@ -3515,6 +3515,32 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                             }
                         };
                         
+                        // Intercepter history.pushState et history.replaceState
+                        const originalPushState = history.pushState;
+                        const originalReplaceState = history.replaceState;
+                        
+                        history.pushState = function(...args) {
+                            const url = args[2];
+                            if (url && typeof url === 'string' && url.includes('tradingview.com')) {
+                                setTickerExpandableUrl(url);
+                                setTickerExpandableTitle('TradingView Chart');
+                                setTickerExpandableOpen(true);
+                                return;
+                            }
+                            return originalPushState.apply(history, args);
+                        };
+                        
+                        history.replaceState = function(...args) {
+                            const url = args[2];
+                            if (url && typeof url === 'string' && url.includes('tradingview.com')) {
+                                setTickerExpandableUrl(url);
+                                setTickerExpandableTitle('TradingView Chart');
+                                setTickerExpandableOpen(true);
+                                return;
+                            }
+                            return originalReplaceState.apply(history, args);
+                        };
+                        
                         // Ajouter un overlay transparent pour capturer les clics
                         const overlay = document.createElement('div');
                         overlay.style.cssText = `
