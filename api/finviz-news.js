@@ -118,6 +118,178 @@ async function fetchFinvizNews() {
 }
 
 /**
+ * Fetch news from FMP (Financial Modeling Prep) - Sources: Bloomberg, WSJ, Reuters, CNBC, etc.
+ */
+async function fetchFMPNews(type = 'all', limit = 30) {
+    const FMP_API_KEY = process.env.FMP_API_KEY;
+    
+    if (!FMP_API_KEY) {
+        console.warn('FMP_API_KEY non configurée, skip FMP news');
+        return [];
+    }
+
+    try {
+        const limitParam = Math.min(limit, 50);
+        const fmpUrl = `https://financialmodelingprep.com/stable/news/general-latest?page=0&limit=${limitParam}&apikey=${FMP_API_KEY}`;
+        
+        const response = await fetch(fmpUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'GOB-Financial-Dashboard/1.0'
+            },
+            signal: AbortSignal.timeout(15000) // 15 secondes timeout
+        });
+
+        if (!response.ok) {
+            throw new Error(`FMP API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (!Array.isArray(data) || data.length === 0) {
+            return [];
+        }
+
+        // Convertir les nouvelles FMP au format standard
+        const newsItems = [];
+        for (const item of data.slice(0, limit)) {
+            if (!item.title || item.title.length < 10) continue;
+            
+            // Détecter le type depuis le titre
+            const detectedType = detectNewsType(item.title);
+            
+            // Extraire la source (FMP fournit parfois le site source)
+            const source = item.site || item.source || 'FMP';
+            
+            // Parser la date
+            let time = 'Aujourd\'hui';
+            if (item.publishedDate) {
+                try {
+                    const pubDate = new Date(item.publishedDate);
+                    time = formatTimeMontreal(pubDate);
+                } catch (e) {
+                    // Garder 'Aujourd\'hui' si erreur de parsing
+                }
+            }
+            
+            // Normaliser l'URL
+            let url = item.url || '';
+            if (url && !url.startsWith('http')) {
+                url = 'https://' + url;
+            }
+            
+            newsItems.push({
+                time: time,
+                headline: item.title,
+                source: source,
+                type: detectedType,
+                url: url,
+                raw: item.title
+            });
+        }
+        
+        return newsItems;
+        
+    } catch (error) {
+        console.error('Erreur FMP News:', error);
+        return [];
+    }
+}
+
+/**
+ * Fetch news from Finnhub - Sources: Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
+ */
+async function fetchFinnhubNews(type = 'all', limit = 30) {
+    const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
+    
+    if (!FINNHUB_API_KEY) {
+        console.warn('FINNHUB_API_KEY non configurée, skip Finnhub news');
+        return [];
+    }
+
+    try {
+        // Mapper le type vers la catégorie Finnhub
+        const categoryMap = {
+            'all': 'general',
+            'market': 'general',
+            'economy': 'general',
+            'stocks': 'general',
+            'crypto': 'crypto',
+            'forex': 'forex',
+            'commodities': 'general',
+            'earnings': 'general',
+            'ipo': 'general',
+            'mergers': 'general'
+        };
+        
+        const category = categoryMap[type] || 'general';
+        const finnhubUrl = `https://finnhub.io/api/v1/news?category=${category}&token=${FINNHUB_API_KEY}`;
+        
+        const response = await fetch(finnhubUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'GOB-Financial-Dashboard/1.0'
+            },
+            signal: AbortSignal.timeout(15000) // 15 secondes timeout
+        });
+
+        if (!response.ok) {
+            throw new Error(`Finnhub API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (!Array.isArray(data) || data.length === 0) {
+            return [];
+        }
+
+        // Convertir les nouvelles Finnhub au format standard
+        const newsItems = [];
+        for (const item of data.slice(0, limit)) {
+            if (!item.headline || item.headline.length < 10) continue;
+            
+            // Détecter le type depuis le headline
+            const detectedType = detectNewsType(item.headline);
+            
+            // Extraire la source (Finnhub fournit la source)
+            const source = item.source || 'Finnhub';
+            
+            // Parser la date (Finnhub utilise timestamp Unix)
+            let time = 'Aujourd\'hui';
+            if (item.datetime) {
+                try {
+                    const pubDate = new Date(item.datetime * 1000); // Convertir timestamp Unix en millisecondes
+                    time = formatTimeMontreal(pubDate);
+                } catch (e) {
+                    // Garder 'Aujourd\'hui' si erreur de parsing
+                }
+            }
+            
+            // Normaliser l'URL
+            let url = item.url || '';
+            if (url && !url.startsWith('http')) {
+                url = 'https://' + url;
+            }
+            
+            newsItems.push({
+                time: time,
+                headline: item.headline,
+                source: source,
+                type: detectedType,
+                url: url,
+                raw: item.headline
+            });
+        }
+        
+        return newsItems;
+
+    } catch (error) {
+        console.error('Erreur Finnhub News:', error);
+        return [];
+    }
+}
+
+/**
  * Fetch news from Perplexity (actualités de l'heure et du jour)
  */
 async function fetchPerplexityNews(type = 'all', limit = 30) {
