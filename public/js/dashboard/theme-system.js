@@ -65,6 +65,36 @@ export const themes = {
             shadow: '0 4px 16px rgba(0, 212, 255, 0.2)', // glow cyan plus prononcé
         }
     },
+    'marketq-dark': {
+        name: 'MarketQ Noir',
+        id: 'marketq-dark',
+        colors: {
+            primary: '#00d4ff', // cyan brillant (accents principaux)
+            secondary: '#00a8cc', // cyan plus foncé (accents secondaires)
+            background: '#000000', // noir pur (fond principal)
+            surface: '#0a0a0a', // near black (cards, panels)
+            surfaceLight: '#1a1a1a', // dark gray (hover states, active)
+            text: '#ffffff', // white (texte principal)
+            textSecondary: '#888888', // medium gray (texte secondaire)
+            border: '#00d4ff30', // cyan très subtil (bordures)
+            accent: '#00d4ff', // cyan (highlights, focus)
+            success: '#00ff88', // green-cyan brillant (gains)
+            danger: '#ff3366', // pink-red (pertes)
+            warning: '#ffaa00', // orange (alertes)
+        },
+        fonts: {
+            primary: 'Roboto, -apple-system, BlinkMacSystemFont, sans-serif',
+            secondary: 'Inter, system-ui, sans-serif',
+            mono: '"Courier New", "Courier", monospace'
+        },
+        styles: {
+            headerBg: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+            cardBg: '#0a0a0a',
+            cardBorder: '1px solid rgba(0, 212, 255, 0.15)', // cyan très subtil
+            borderRadius: '0.5rem',
+            shadow: '0 4px 20px rgba(0, 212, 255, 0.15)', // glow cyan subtil sur noir
+        }
+    },
     'bloomberg-terminal': {
         name: 'Bloomberg Terminal',
         id: 'bloomberg-terminal',

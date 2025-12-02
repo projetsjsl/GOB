@@ -6,6 +6,7 @@
 /* Application des variables de thème aux éléments du dashboard */
 .theme-default,
 .theme-marketq,
+.theme-marketq-dark,
 .theme-bloomberg-terminal,
 .theme-seeking-alpha,
 .theme-bloomberg-mobile,
@@ -16,6 +17,7 @@
 /* Header avec thème */
 .theme-default header,
 .theme-marketq header,
+.theme-marketq-dark header,
 .theme-bloomberg-terminal header,
 .theme-seeking-alpha header,
 .theme-bloomberg-mobile header,
@@ -27,6 +29,7 @@
 /* Cards avec thème */
 .theme-default .bg-gray-900,
 .theme-marketq .bg-gray-900,
+.theme-marketq-dark .bg-gray-900,
 .theme-bloomberg-terminal .bg-gray-900,
 .theme-seeking-alpha .bg-gray-900,
 .theme-bloomberg-mobile .bg-gray-900,
@@ -40,6 +43,7 @@
 /* Texte avec thème */
 .theme-default .text-white,
 .theme-marketq .text-white,
+.theme-marketq-dark .text-white,
 .theme-bloomberg-terminal .text-white,
 .theme-seeking-alpha .text-white,
 .theme-bloomberg-mobile .text-white,
@@ -49,6 +53,7 @@
 
 .theme-default .text-gray-400,
 .theme-marketq .text-gray-400,
+.theme-marketq-dark .text-gray-400,
 .theme-bloomberg-terminal .text-gray-400,
 .theme-seeking-alpha .text-gray-400,
 .theme-bloomberg-mobile .text-gray-400,
@@ -59,6 +64,7 @@
 /* Background principal */
 .theme-default .bg-black,
 .theme-marketq .bg-black,
+.theme-marketq-dark .bg-black,
 .theme-bloomberg-terminal .bg-black,
 .theme-seeking-alpha .bg-black,
 .theme-bloomberg-mobile .bg-black,
@@ -73,6 +79,7 @@
 /* Boutons avec thème */
 .theme-default button,
 .theme-marketq button,
+.theme-marketq-dark button,
 .theme-bloomberg-terminal button,
 .theme-seeking-alpha button,
 .theme-bloomberg-mobile button,
@@ -278,12 +285,79 @@
 /* Navigation avec thème */
 .theme-default nav,
 .theme-marketq nav,
+.theme-marketq-dark nav,
 .theme-bloomberg-terminal nav,
 .theme-seeking-alpha nav,
 .theme-bloomberg-mobile nav,
 .theme-bloomberg-nostalgie nav {
     background-color: var(--theme-surface) !important;
     border-color: var(--theme-border) !important;
+}
+
+/* Thème spécifique: MarketQ Noir - Version ultra sombre */
+.theme-marketq-dark {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+.theme-marketq-dark header {
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%) !important;
+    color: #ffffff !important;
+}
+
+.theme-marketq-dark .bg-gray-900,
+.theme-marketq-dark .bg-gray-800 {
+    background-color: #0a0a0a !important;
+    border: 1px solid rgba(0, 212, 255, 0.15) !important;
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.15) !important;
+}
+
+.theme-marketq-dark .text-white {
+    color: #ffffff !important;
+}
+
+.theme-marketq-dark .text-gray-400 {
+    color: #888888 !important;
+}
+
+.theme-marketq-dark .text-green-500,
+.theme-marketq-dark .text-green-400,
+.theme-marketq-dark .text-green-600 {
+    color: #00ff88 !important; /* Green-cyan brillant pour gains */
+}
+
+.theme-marketq-dark .text-red-500,
+.theme-marketq-dark .text-red-400,
+.theme-marketq-dark .text-red-600 {
+    color: #ff3366 !important; /* Pink-red pour pertes */
+}
+
+.theme-marketq-dark button.bg-blue-600,
+.theme-marketq-dark .bg-blue-600 {
+    background-color: #00d4ff !important;
+    color: #000000 !important;
+    border: 1px solid #00d4ff !important;
+}
+
+.theme-marketq-dark button:hover {
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.3) !important;
+}
+
+.theme-marketq-dark table {
+    border: 1px solid rgba(0, 212, 255, 0.15) !important;
+}
+
+.theme-marketq-dark table th {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(0, 212, 255, 0.15) !important;
+}
+
+.theme-marketq-dark table td {
+    border: 1px solid rgba(0, 212, 255, 0.1) !important;
+    color: #ffffff !important;
+    background-color: #0a0a0a !important;
 }
 
 /* Thème spécifique: Bloomberg Nostalgie - Style rétro années 1990 */

@@ -31,6 +31,7 @@ const ThemeSelector = ({ isDarkMode = true }) => {
     const themes = [
         { id: 'default', name: 'Par défaut', icon: '🎨' },
         { id: 'marketq', name: 'MarketQ', icon: '📊' },
+        { id: 'marketq-dark', name: 'MarketQ Noir', icon: '⚫' },
         { id: 'bloomberg-terminal', name: 'Bloomberg Terminal', icon: '💻' },
         { id: 'seeking-alpha', name: 'Seeking Alpha', icon: '📈' },
         { id: 'bloomberg-mobile', name: 'Bloomberg Mobile', icon: '📱' },
