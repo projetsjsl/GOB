@@ -32,7 +32,7 @@ const AdminJSLaiTab = ({
                         darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {typeof Icon !== 'undefined' ? {typeof Icon !== 'undefined' ? <Icon emoji="🔍" size={20} /> : '🔍'} : '🔍'}
+                            {typeof Icon !== 'undefined' ? <Icon emoji="🔍" size={20} /> : '🔍'}
                             Debug des Données
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
