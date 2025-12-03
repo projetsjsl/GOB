@@ -151,7 +151,7 @@ const AdminJSLaiTab = ({
                 // Fonctions helper pour les health checks
                 const [healthCheckLoading, setHealthCheckLoading] = React.useState(false);
                 const [healthStatus, setHealthStatus] = React.useState(null);
-                const [apiStatus, setApiStatus] = React.useState(null);
+                const [apiStatus, setApiStatus] = React.useState({});
                 
                 const checkApiStatus = async () => {
                     setHealthCheckLoading(true);
@@ -381,12 +381,12 @@ const AdminJSLaiTab = ({
                                     État du Cache
                                 </div>
                                 <div className="space-y-2 text-xs">
-                                    {Object.keys(cacheStatus).length === 0 ? (
+                                    {!cacheStatus || (typeof cacheStatus === 'object' && Object.keys(cacheStatus).length === 0) ? (
                                         <div className={`text-center py-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                             Cliquez sur "Actualiser" pour voir l'état du cache
                                         </div>
                                     ) : (
-                                        Object.entries(cacheStatus).map(([type, status]) => (
+                                        cacheStatus && typeof cacheStatus === 'object' && Object.entries(cacheStatus).map(([type, status]) => (
                                             <div key={type} className={`p-2 rounded border ${
                                                 status.expired
                                                     ? darkMode ? 'bg-yellow-900/30 border-yellow-800' : 'bg-yellow-50 border-yellow-200'
@@ -1307,7 +1307,7 @@ const AdminJSLaiTab = ({
                         )}
 
                         {/* Liste détaillée des connexions */}
-                        {Object.keys(apiStatus).length > 0 && (
+                        {apiStatus && typeof apiStatus === 'object' && Object.keys(apiStatus).length > 0 && (
                             <div className="space-y-3 mb-4">
                                 <h4 className={`text-sm font-semibold mb-2 transition-colors duration-300 ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -1391,7 +1391,7 @@ const AdminJSLaiTab = ({
                             </div>
                         )}
 
-                        {Object.keys(apiStatus).length === 0 && !healthStatus && (
+                        {(!apiStatus || (typeof apiStatus === 'object' && Object.keys(apiStatus).length === 0)) && !healthStatus && (
                             <div className={`text-center py-8 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 <p>Cliquez sur "🔄 Vérifier Toutes" pour diagnostiquer les connexions</p>
                             </div>
