@@ -1614,6 +1614,109 @@ const AdminJSLaiTab = ({
                     </div>
 
 
+                    {/* Section Gestion des Barres d'Annonces */}
+                    <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
+                        darkMode
+                            ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700'
+                            : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'
+                    }`}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className={`text-lg font-semibold flex items-center gap-2 transition-colors duration-300 ${
+                                darkMode ? 'text-indigo-300' : 'text-indigo-900'
+                            }`}>
+                                {typeof Icon !== 'undefined' ? <Icon emoji="📢" size={20} /> : '📢'}
+                                Gestion des Barres d'Annonces
+                            </h3>
+                            <span className={`px-2 py-1 text-xs rounded ${darkMode ? 'bg-indigo-900/50 text-indigo-300' : 'bg-indigo-200 text-indigo-900'}`}>
+                                Gemini + Google Search
+                            </span>
+                        </div>
+                        <div className={`space-y-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <p className="text-sm mb-4">
+                                Configurez les barres d'annonces dynamiques alimentées par Gemini avec Google Search. 
+                                Les barres peuvent être fermées par les utilisateurs (X) et se rafraîchissent automatiquement.
+                            </p>
+                            {(() => {
+                                const config = typeof window.getAnnouncementBarsConfig === 'function' 
+                                    ? window.getAnnouncementBarsConfig() 
+                                    : {};
+                                const barTypes = [
+                                    { key: 'news-top', label: 'Actualités Financières', emoji: '📰', description: 'Actualités importantes de l\'heure' },
+                                    { key: 'update-top', label: 'Mises à Jour Système', emoji: '🆕', description: 'Nouvelles fonctionnalités et améliorations' },
+                                    { key: 'event-top', label: 'Événements Économiques', emoji: '📅', description: 'Fed, GDP, emploi, etc.' },
+                                    { key: 'market-alert-top', label: 'Alertes de Marché', emoji: '⚠️', description: 'Volatilité, crash, rally' },
+                                    { key: 'promotion-top', label: 'Promotions', emoji: '🎁', description: 'Offres sur services premium' }
+                                ];
+                                
+                                return (
+                                    <div className="space-y-3">
+                                        {barTypes.map(({ key, label, emoji, description }) => {
+                                            const barConfig = config[key] || { enabled: false, type: key.split('-')[0], section: 'top', design: 'default' };
+                                            return (
+                                                <div key={key} className={`p-4 rounded-lg border transition-colors duration-300 ${
+                                                    darkMode 
+                                                        ? barConfig.enabled 
+                                                            ? 'bg-indigo-900/30 border-indigo-700' 
+                                                            : 'bg-gray-800 border-gray-700'
+                                                        : barConfig.enabled 
+                                                            ? 'bg-indigo-100 border-indigo-300' 
+                                                            : 'bg-white border-gray-200'
+                                                }`}>
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3 flex-1">
+                                                            <span className="text-2xl">{emoji}</span>
+                                                            <div>
+                                                                <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                    {label}
+                                                                </div>
+                                                                <div className="text-xs opacity-75">
+                                                                    {description}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={barConfig.enabled}
+                                                                onChange={() => {
+                                                                    const newConfig = {
+                                                                        ...config,
+                                                                        [key]: {
+                                                                            ...barConfig,
+                                                                            enabled: !barConfig.enabled
+                                                                        }
+                                                                    };
+                                                                    if (typeof window.setAnnouncementBarsConfig === 'function') {
+                                                                        window.setAnnouncementBarsConfig(newConfig);
+                                                                    }
+                                                                }}
+                                                                className="sr-only peer"
+                                                            />
+                                                            <div className={`w-11 h-6 rounded-full peer transition-colors ${
+                                                                barConfig.enabled
+                                                                    ? darkMode ? 'bg-indigo-600' : 'bg-indigo-500'
+                                                                    : darkMode ? 'bg-gray-700' : 'bg-gray-300'
+                                                            }`}>
+                                                                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                                                                    barConfig.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                                                                } mt-0.5`}></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            })()}
+                            <div className={`mt-4 p-3 rounded text-xs ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
+                                💡 <strong>Astuce:</strong> Les barres activées s'affichent en haut de page. 
+                                Les utilisateurs peuvent les fermer avec le bouton X. 
+                                Le contenu est généré dynamiquement via Gemini avec Google Search pour des données à jour.
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Section Configuration */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                         darkMode

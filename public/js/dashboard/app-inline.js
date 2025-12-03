@@ -25034,6 +25034,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"></div>
                 </header>
 
+                {/* Announcement Bars - Barres d'annonces dynamiques (Gemini-powered) */}
+                {window.AnnouncementBarManager && React.createElement(window.AnnouncementBarManager, { isDarkMode: isDarkMode })}
+
                 {/* News Ticker - Bandeau d'actualités défilant */}
                 {window.NewsTicker && React.createElement(window.NewsTicker, { isDarkMode: isDarkMode })}
 
