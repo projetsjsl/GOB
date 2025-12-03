@@ -2,7 +2,7 @@
  * API endpoint pour récupérer les actualités financières
  * Sources hyper fiables:
  * 1. Finviz (scraping) - Agrège Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
- * 2. Perplexity (actualités de l'heure et du jour) - Sources premium
+ * 2. Gemini avec Google Search (actualités de l'heure et du jour) - Gratuit et à jour
  * 3. FMP (Financial Modeling Prep) - Bloomberg, WSJ, Reuters, CNBC, MarketWatch, Yahoo Finance, Forbes, Fortune
  * 4. Finnhub - Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
  * Traduit en français via Gemini API
@@ -29,9 +29,10 @@ export default async function handler(req, res) {
         const newsLimit = Math.min(parseInt(limit, 10) || 30, 50); // Max 50 actualités
         
         // Récupérer les actualités depuis plusieurs sources fiables en parallèle
-        const [finvizNews, perplexityNews, fmpNews, finnhubNews] = await Promise.allSettled([
+        // Utiliser Gemini avec Google Search au lieu de Perplexity (gratuit et moins sur-sollicité)
+        const [finvizNews, geminiNews, fmpNews, finnhubNews] = await Promise.allSettled([
             fetchFinvizNews(),
-            fetchPerplexityNews(type, newsLimit),
+            fetchGeminiNews(type, newsLimit),
             fetchFMPNews(type, newsLimit),
             fetchFinnhubNews(type, newsLimit)
         ]);
@@ -43,8 +44,8 @@ export default async function handler(req, res) {
             allNews = [...allNews, ...finvizNews.value];
         }
         
-        if (perplexityNews.status === 'fulfilled' && perplexityNews.value.length > 0) {
-            allNews = [...allNews, ...perplexityNews.value];
+        if (geminiNews.status === 'fulfilled' && geminiNews.value.length > 0) {
+            allNews = [...allNews, ...geminiNews.value];
         }
         
         if (fmpNews.status === 'fulfilled' && fmpNews.value.length > 0) {
@@ -77,7 +78,7 @@ export default async function handler(req, res) {
             count: translatedNews.length,
             sources: {
                 finviz: finvizNews.status === 'fulfilled' ? finvizNews.value.length : 0,
-                perplexity: perplexityNews.status === 'fulfilled' ? perplexityNews.value.length : 0,
+                gemini: geminiNews.status === 'fulfilled' ? geminiNews.value.length : 0,
                 fmp: fmpNews.status === 'fulfilled' ? fmpNews.value.length : 0,
                 finnhub: finnhubNews.status === 'fulfilled' ? finnhubNews.value.length : 0
             },
@@ -295,7 +296,97 @@ async function fetchFinnhubNews(type = 'all', limit = 30) {
 }
 
 /**
+ * Fetch news from Gemini with Google Search (actualités de l'heure et du jour)
+ * Remplace Perplexity pour éviter la sur-sollicitation
+ */
+async function fetchGeminiNews(type = 'all', limit = 30) {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    
+    if (!GEMINI_API_KEY) {
+        console.warn('GEMINI_API_KEY non configurée, skip Gemini news');
+        return [];
+    }
+
+    try {
+        // Construire le prompt selon le type
+        const typePrompts = {
+            'all': 'toutes les actualités financières et économiques',
+            'market': 'actualités de marché (stocks, indices, trading)',
+            'economy': 'actualités économiques (Fed, inflation, GDP, emploi)',
+            'stocks': 'actualités sur les actions et entreprises',
+            'crypto': 'actualités sur les cryptomonnaies et blockchain',
+            'forex': 'actualités sur le marché des changes (forex)',
+            'commodities': 'actualités sur les matières premières (pétrole, or, etc.)',
+            'earnings': 'actualités sur les résultats d\'entreprises (earnings)',
+            'ipo': 'actualités sur les introductions en bourse (IPO)',
+            'mergers': 'actualités sur les fusions et acquisitions (M&A)'
+        };
+        
+        const typeDescription = typePrompts[type] || typePrompts['all'];
+        const newsCount = Math.min(limit, 30);
+        
+        const prompt = `Utilise Google Search pour trouver les ${newsCount} principales ${typeDescription} de l'heure et du jour d'aujourd'hui. Pour chaque actualité, fournis:
+1. Le titre (headline) en anglais
+2. L'heure approximative (format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures")
+3. La source (Bloomberg, Reuters, MarketWatch, CNBC, WSJ, FT, etc.)
+4. Le type de nouvelle (market, economy, stocks, crypto, forex, commodities, earnings, ipo, mergers, other)
+5. L'URL complète de l'article (si disponible)
+
+Format de réponse (une actualité par ligne):
+[Heure] | [Titre] | [Source] | [Type] | [URL]
+
+Exemple:
+Aujourd'hui, 11:15 AM | Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data | MarketWatch | market | https://www.marketwatch.com/story/tech-rally-bitcoin-surge
+Aujourd'hui, 10:45 AM | Federal Reserve signals potential rate cuts as inflation cools | Reuters | economy | https://www.reuters.com/fed-rate-cuts
+Aujourd'hui, 09:30 AM | Apple reports record Q4 earnings, beats expectations | Bloomberg | earnings | https://www.bloomberg.com/apple-earnings
+
+Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement les actualités, sans explication supplémentaire.`;
+
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+        
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: prompt }]
+                }],
+                tools: [{
+                    googleSearchRetrieval: {} // Active Google Search pour données à jour
+                }],
+                generationConfig: {
+                    temperature: 0.3,
+                    topK: 20,
+                    topP: 0.8,
+                    maxOutputTokens: 2000,
+                    candidateCount: 1
+                }
+            }),
+            signal: AbortSignal.timeout(30000) // 30 secondes timeout
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        
+        // Parse Gemini response (même format que Perplexity)
+        return parsePerplexityNews(content);
+        
+    } catch (error) {
+        console.error('Erreur Gemini News:', error);
+        return [];
+    }
+}
+
+/**
  * Fetch news from Perplexity (actualités de l'heure et du jour)
+ * @deprecated Utiliser fetchGeminiNews à la place pour éviter la sur-sollicitation
  */
 async function fetchPerplexityNews(type = 'all', limit = 30) {
     const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
