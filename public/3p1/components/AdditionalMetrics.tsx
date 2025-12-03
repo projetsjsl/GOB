@@ -108,7 +108,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
     return (
         <div className="space-y-6">
             {/* Indicateur JPEGY */}
-            <div className="card bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-200">
+            <div className="bg-white p-5 rounded-lg shadow border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                     🎯 JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield)
                 </h3>
@@ -222,7 +222,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
             </div>
 
             {/* Ratios Actuels vs Historiques */}
-            <div className="card">
+            <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                     📊 Ratios Actuels vs Historiques
                 </h3>
