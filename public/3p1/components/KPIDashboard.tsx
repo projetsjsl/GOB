@@ -917,13 +917,27 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <div 
-                        className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                        className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-sm relative"
                         style={{ backgroundColor: getReturnColor(metric.totalReturnPercent) }}
                       >
                         {metric.profile.id}
+                        <div className="absolute -top-1 -right-1">
+                          {(metric.profile.isWatchlist ?? false) ? (
+                            <EyeIcon className="w-4 h-4 text-blue-300" title="Watchlist" />
+                          ) : (
+                            <StarIcon className="w-4 h-4 text-yellow-400" title="Portefeuille" />
+                          )}
+                        </div>
                       </div>
                       <div className="flex-1">
-                        <div className="font-bold text-gray-800">{metric.profile.info.name || metric.profile.id}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="font-bold text-gray-800">{metric.profile.info.name || metric.profile.id}</div>
+                          {(metric.profile.isWatchlist ?? false) ? (
+                            <EyeIcon className="w-4 h-4 text-blue-500" title="Watchlist" />
+                          ) : (
+                            <StarIcon className="w-4 h-4 text-yellow-500" title="Portefeuille" />
+                          )}
+                        </div>
                         <div className="text-xs text-gray-500">{metric.profile.info.sector}</div>
                       </div>
                       <div className="text-right">
