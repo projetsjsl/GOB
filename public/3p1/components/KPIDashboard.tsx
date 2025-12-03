@@ -815,7 +815,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       firstEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 100);
                   }}
-                  className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded transition-colors"
+                  className="px-3 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors"
                 >
                   Zoom Top 10
                 </button>
