@@ -235,6 +235,17 @@ export default async function handler(req, res) {
             };
         }).sort((a, b) => a.year - b.year);
 
+        // 6a. Fetch Beta from Key Metrics (most recent)
+        let beta = null;
+        if (metricsData && metricsData.length > 0) {
+            // Beta est généralement dans les key-metrics les plus récents
+            // Essayer aussi dans le profile
+            beta = profile.beta || (metricsData[0]?.beta) || null;
+            if (beta !== null) {
+                beta = parseFloat(beta);
+            }
+        }
+
         // 7. Helper function to determine preferred symbol
         const getPreferredSymbol = (profile) => {
             const country = profile.country || '';
@@ -271,17 +282,29 @@ export default async function handler(req, res) {
             ? profile.image 
             : `https://financialmodelingprep.com/image-stock/${logoBaseSymbol}.png`;
         
+        // Helper function to format market cap
+        const formatMarketCap = (mktCap) => {
+            if (!mktCap || mktCap === 0) return 'N/A';
+            if (mktCap >= 1000000000000) return (mktCap / 1000000000000).toFixed(2) + 'T';
+            if (mktCap >= 1000000000) return (mktCap / 1000000000).toFixed(2) + 'B';
+            if (mktCap >= 1000000) return (mktCap / 1000000).toFixed(2) + 'M';
+            return mktCap.toFixed(0);
+        };
+
         const mappedInfo = {
+            symbol: cleanSymbol,
             name: profile.companyName,
             sector: profile.sector,
-            marketCap: (profile.mktCap / 1000000000).toFixed(1) + 'B',
+            securityRank: 'N/A', // À mettre à jour manuellement ou via ValueLine
+            marketCap: profile.mktCap ? formatMarketCap(profile.mktCap) : 'N/A',
             logo: logoUrl,
             country: profile.country || '',
             exchange: profile.exchangeShortName || profile.exchange || '',
             currency: profile.currency || 'USD',
             preferredSymbol: cleanSymbol, // Garder le symbole original demandé
             actualSymbol: usedSymbol, // Le symbole réellement utilisé par FMP
-            logoSymbol: logoBaseSymbol // Symbole à utiliser pour les logos (sans .TO, avec format standard)
+            logoSymbol: logoBaseSymbol, // Symbole à utiliser pour les logos (sans .TO, avec format standard)
+            beta: beta // Ajouter le beta récupéré
         };
 
         return res.status(200).json({

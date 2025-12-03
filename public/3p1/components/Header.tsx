@@ -169,7 +169,43 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="bg-gray-100 px-3 py-1 rounded text-center">
             <span className="font-semibold text-gray-600 block text-xs">CÔTE SÉCURITÉ</span>
             <span className="font-bold text-green-600">{info.securityRank}</span>
+            <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
           </div>
+          {info.beta !== undefined && info.beta !== null && (
+            <div className="bg-gray-100 px-3 py-1 rounded text-center">
+              <span className="font-semibold text-gray-600 block text-xs">BETA</span>
+              <span className="font-bold text-blue-600">{info.beta.toFixed(2)}</span>
+            </div>
+          )}
+          {/* Métriques ValueLine */}
+          {info.earningsPredictability && (
+            <div className="bg-gray-100 px-3 py-1 rounded text-center">
+              <span className="font-semibold text-gray-600 block text-xs">EARNINGS PRED.</span>
+              <span className="font-bold text-purple-600">{info.earningsPredictability}</span>
+              <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
+            </div>
+          )}
+          {info.priceGrowth && (
+            <div className="bg-gray-100 px-3 py-1 rounded text-center">
+              <span className="font-semibold text-gray-600 block text-xs">PRICE GROWTH</span>
+              <span className="font-bold text-indigo-600">{info.priceGrowth}</span>
+              <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
+            </div>
+          )}
+          {info.persistence && (
+            <div className="bg-gray-100 px-3 py-1 rounded text-center">
+              <span className="font-semibold text-gray-600 block text-xs">PERSISTENCE</span>
+              <span className="font-bold text-pink-600">{info.persistence}</span>
+              <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
+            </div>
+          )}
+          {info.priceStability && (
+            <div className="bg-gray-100 px-3 py-1 rounded text-center">
+              <span className="font-semibold text-gray-600 block text-xs">PRICE STABILITY</span>
+              <span className="font-bold text-teal-600">{info.priceStability}</span>
+              <span className="text-[9px] text-gray-500 block mt-0.5">ValueLine 3 déc 2025</span>
+            </div>
+          )}
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('open-save-dialog'))}
             className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase transition-colors no-print bg-blue-600 text-white hover:bg-blue-700"

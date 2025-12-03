@@ -59,6 +59,12 @@ export interface CompanyInfo {
   preferredSymbol?: string; // Symbole préféré (TSX pour Canada, ADR pour Europe/Asie)
   actualSymbol?: string; // Symbole réellement utilisé par FMP
   logoSymbol?: string; // Symbole optimisé pour les logos
+  beta?: number; // Beta (volatilité relative au marché)
+  // Métriques ValueLine (Source: ValueLine au 3 décembre 2025)
+  earningsPredictability?: string; // Earnings Predictability
+  priceGrowth?: string; // Price Growth
+  persistence?: string; // Persistence
+  priceStability?: string; // Price Stability
 }
 
 export enum Recommendation {

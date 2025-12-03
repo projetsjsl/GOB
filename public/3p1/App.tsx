@@ -1475,14 +1475,69 @@ export default function App() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Score Sécurité</label>
+                                                <label className="block text-xs text-gray-500 mb-1">Financial Strength (ValueLine 3 déc 2025)</label>
                                                 <input
                                                     type="text"
                                                     value={info.securityRank}
                                                     onChange={(e) => handleUpdateInfo('securityRank', e.target.value)}
                                                     className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    placeholder="A+, A, B+, etc."
                                                 />
                                             </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Earnings Predictability (ValueLine 3 déc 2025)</label>
+                                                <input
+                                                    type="text"
+                                                    value={info.earningsPredictability || ''}
+                                                    onChange={(e) => handleUpdateInfo('earningsPredictability', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    placeholder="100, 95, 90, etc."
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Price Growth (ValueLine 3 déc 2025)</label>
+                                                <input
+                                                    type="text"
+                                                    value={info.priceGrowth || ''}
+                                                    onChange={(e) => handleUpdateInfo('priceGrowth', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    placeholder="A++, A+, A, etc."
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Persistence (ValueLine 3 déc 2025)</label>
+                                                <input
+                                                    type="text"
+                                                    value={info.persistence || ''}
+                                                    onChange={(e) => handleUpdateInfo('persistence', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    placeholder="A++, A+, A, etc."
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Price Stability (ValueLine 3 déc 2025)</label>
+                                                <input
+                                                    type="text"
+                                                    value={info.priceStability || ''}
+                                                    onChange={(e) => handleUpdateInfo('priceStability', e.target.value)}
+                                                    className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                    placeholder="100, 95, 90, etc."
+                                                />
+                                            </div>
+                                            {info.beta !== undefined && info.beta !== null && (
+                                                <div>
+                                                    <label className="block text-xs text-gray-500 mb-1">Beta (API FMP)</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={info.beta}
+                                                        onChange={(e) => handleUpdateInfo('beta', parseFloat(e.target.value) || 0)}
+                                                        className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
+                                                        readOnly
+                                                        title="Beta récupéré automatiquement via API FMP"
+                                                    />
+                                                </div>
+                                            )}
                                             <div className="pt-2 mt-2 border-t border-gray-100">
                                                 <label className="flex items-center gap-2 cursor-pointer">
                                                     <input
