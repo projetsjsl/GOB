@@ -120,8 +120,8 @@ const AdminJSLaiTab = ({
                 // États pour les logs de scraping
                 const [scrapingLogs, setScrapingLogs] = React.useState([]);
                 
-                // Mise à jour de addScrapingLog pour ajouter aux logs
-                const addScrapingLogUpdated = (message, type = 'info') => {
+                // Fonction addScrapingLog pour ajouter aux logs
+                const addScrapingLog = (message, type = 'info') => {
                     const log = {
                         message,
                         type,
@@ -130,9 +130,6 @@ const AdminJSLaiTab = ({
                     setScrapingLogs(prev => [...prev, log]);
                     console.log(`[Scraping ${type.toUpperCase()}] ${message}`);
                 };
-                
-                // Remplacer addScrapingLog par la version mise à jour
-                const addScrapingLog = addScrapingLogUpdated;
                 
                 // Fonctions helper pour les données Seeking Alpha
                 const fetchSeekingAlphaData = async () => {
