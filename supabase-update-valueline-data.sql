@@ -1,7 +1,7 @@
 -- ============================================================================
 -- MISE À JOUR DES MÉTRIQUES VALUELINE
 -- Généré automatiquement depuis valueline.xlsx
--- Date: 2025-12-03T21:24:01.934Z
+-- Date: 2025-12-03T22:07:56.863Z
 -- ============================================================================
 -- 
 -- Ce script met à jour les métriques ValueLine pour tous les tickers
@@ -10103,14 +10103,29 @@ WHERE ticker = 'ZTS';
 -- ============================================================================
 -- VÉRIFICATION
 -- ============================================================================
+-- Note: price_growth sera NULL (normal, pas de colonne séparée dans Excel)
+-- "Price Growth Persistence" est UNE SEULE métrique → va dans "persistence"
+
 SELECT 
     ticker,
     security_rank,
     earnings_predictability,
-    price_growth,
-    persistence,
+    persistence,  -- ← Contient "Price Growth Persistence" (note numérique 5-100)
     price_stability,
+    price_growth,  -- ← Sera NULL (normal, pas de données disponibles)
     valueline_updated_at
 FROM tickers
 WHERE valueline_updated_at IS NOT NULL
-ORDER BY ticker;
+ORDER BY ticker
+LIMIT 20;  -- Afficher les 20 premiers pour vérification
+
+-- Statistiques de mise à jour
+SELECT 
+    COUNT(*) as total_tickers,
+    COUNT(security_rank) as avec_security_rank,
+    COUNT(earnings_predictability) as avec_earnings_predictability,
+    COUNT(persistence) as avec_persistence,  -- Devrait être ~1009
+    COUNT(price_stability) as avec_price_stability,
+    COUNT(price_growth) as avec_price_growth  -- Devrait être 0 (normal)
+FROM tickers
+WHERE valueline_updated_at IS NOT NULL;
