@@ -154,11 +154,25 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     return chartHeight - padding - (((returnPercent - minReturn) / range) * (chartHeight - 2 * padding));
   };
 
+  // Vérifier si on a des profils
+  if (profiles.length === 0) {
+    return (
+      <div className="bg-white p-8 rounded-lg shadow border border-gray-200 text-center">
+        <h3 className="text-xl font-bold text-gray-700 mb-4">Vue KPI Dashboard</h3>
+        <p className="text-gray-500 mb-4">Aucun profil disponible pour afficher les KPI.</p>
+        <p className="text-sm text-gray-400">Ajoutez des tickers dans la sidebar de gauche pour voir les métriques.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Filtres */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
         <h3 className="text-lg font-bold mb-4">Filtres de Screening</h3>
+        <div className="mb-2 text-xs text-gray-500">
+          {filteredMetrics.length} titre(s) affiché(s) sur {profileMetrics.length} total
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Rendement Min (%)</label>
@@ -457,27 +471,33 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </div>
           </div>
         </div>
+        )}
       </div>
 
       {/* Tableau détaillé */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
         <h3 className="text-lg font-bold mb-4">Tableau de Performance</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-100">
-              <tr>
-                <th className="p-2 text-left">Ticker</th>
-                <th className="p-2 text-right">JPEGY</th>
-                <th className="p-2 text-right">Rendement Total</th>
-                <th className="p-2 text-right">Ratio 3:1</th>
-                <th className="p-2 text-right">Potentiel Hausse</th>
-                <th className="p-2 text-right">Risque Baisse</th>
-                <th className="p-2 text-center">Approuvé</th>
-                <th className="p-2 text-center">Recommandation</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filteredMetrics.map((metric) => (
+        {filteredMetrics.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Aucun titre ne correspond aux filtres sélectionnés.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-100">
+                <tr>
+                  <th className="p-2 text-left">Ticker</th>
+                  <th className="p-2 text-right">JPEGY</th>
+                  <th className="p-2 text-right">Rendement Total</th>
+                  <th className="p-2 text-right">Ratio 3:1</th>
+                  <th className="p-2 text-right">Potentiel Hausse</th>
+                  <th className="p-2 text-right">Risque Baisse</th>
+                  <th className="p-2 text-center">Approuvé</th>
+                  <th className="p-2 text-center">Recommandation</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {filteredMetrics.map((metric) => (
                 <tr
                   key={metric.profile.id}
                   onClick={() => onSelect(metric.profile.id)}
@@ -518,10 +538,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     </span>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
