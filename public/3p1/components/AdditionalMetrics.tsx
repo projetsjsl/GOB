@@ -276,7 +276,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
 
             {/* Marges et Qualité */}
             <div className="grid grid-cols-2 gap-4">
-                <div className="card">
+                <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
                     <h4 className="font-bold text-gray-800 mb-3">💰 Marges</h4>
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
@@ -294,7 +294,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
                     </div>
                 </div>
 
-                <div className="card">
+                <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
                     <h4 className="font-bold text-gray-800 mb-3">🏦 Structure Financière</h4>
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
@@ -358,7 +358,7 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
             </div>
 
             {/* Recommandation d'Achat/Vente */}
-            <div className="card">
+            <div className="bg-white p-5 rounded-lg shadow border border-gray-200">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">🎯 Zones de Prix Recommandées</h3>
                 <div className="space-y-3">
                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
