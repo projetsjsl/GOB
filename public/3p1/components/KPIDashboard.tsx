@@ -28,10 +28,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       // Calcul JPEGY
       const baseYearData = profile.data.find(d => d.year === profile.assumptions.baseYear) || profile.data[profile.data.length - 1];
       const baseEPS = baseYearData?.earningsPerShare || 0;
-      const currentPE = baseEPS > 0 ? profile.assumptions.currentPrice / baseEPS : 0;
-      const currentYield = (profile.assumptions.currentDividend / profile.assumptions.currentPrice) * 100;
-      const growthPlusYield = profile.assumptions.growthRateEPS + currentYield;
-      const jpegy = growthPlusYield > 0 ? currentPE / growthPlusYield : 0;
+      const basePE = baseEPS > 0 ? profile.assumptions.currentPrice / baseEPS : 0;
+      const baseYield = (profile.assumptions.currentDividend / profile.assumptions.currentPrice) * 100;
+      const growthPlusYield = profile.assumptions.growthRateEPS + baseYield;
+      const jpegy = growthPlusYield > 0 ? basePE / growthPlusYield : 0;
 
       // Calcul rendement total potentiel
       const baseValues = {
@@ -96,6 +96,44 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
 
       // Vérifier si version approuvée (simulé - à connecter avec la base de données)
       const hasApprovedVersion = false; // TODO: Connecter avec l'API
+      
+      // Calculer des métriques supplémentaires
+      const currentPE = basePE; // Réutiliser le P/E calculé plus haut
+      const currentPCF = baseYearData?.cashFlowPerShare > 0 
+        ? profile.assumptions.currentPrice / baseYearData.cashFlowPerShare 
+        : 0;
+      const currentPBV = baseYearData?.bookValuePerShare > 0
+        ? profile.assumptions.currentPrice / baseYearData.bookValuePerShare
+        : 0;
+      const currentYield = baseYield; // Réutiliser le yield calculé plus haut
+      
+      // Calculer la croissance moyenne historique
+      const validData = profile.data.filter(d => d.earningsPerShare > 0);
+      let historicalGrowth = 0;
+      if (validData.length >= 2) {
+        const firstEPS = validData[0].earningsPerShare;
+        const lastEPS = validData[validData.length - 1].earningsPerShare;
+        const years = validData[validData.length - 1].year - validData[0].year;
+        if (years > 0 && firstEPS > 0) {
+          historicalGrowth = (Math.pow(lastEPS / firstEPS, 1 / years) - 1) * 100;
+        }
+      }
+      
+      // Calculer la volatilité (écart-type des rendements historiques)
+      const priceChanges = [];
+      for (let i = 1; i < validHistory.length; i++) {
+        if (validHistory[i].priceHigh > 0 && validHistory[i-1].priceHigh > 0) {
+          const change = ((validHistory[i].priceHigh - validHistory[i-1].priceHigh) / validHistory[i-1].priceHigh) * 100;
+          priceChanges.push(change);
+        }
+      }
+      const avgChange = priceChanges.length > 0 
+        ? priceChanges.reduce((a, b) => a + b, 0) / priceChanges.length 
+        : 0;
+      const variance = priceChanges.length > 0
+        ? priceChanges.reduce((sum, change) => sum + Math.pow(change - avgChange, 2), 0) / priceChanges.length
+        : 0;
+      const volatility = Math.sqrt(variance);
 
       return {
         profile,
@@ -106,7 +144,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         downsideRisk,
         upsidePotential,
         hasApprovedVersion,
-        targetPrice
+        targetPrice,
+        currentPE,
+        currentPCF,
+        currentPBV,
+        currentYield,
+        historicalGrowth,
+        volatility
       };
     });
   }, [profiles]);
@@ -140,19 +184,40 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   };
 
   // Calculer les dimensions du graphique
-  const chartWidth = 800;
-  const chartHeight = 600;
-  const padding = 60;
+  const chartWidth = 900;
+  const chartHeight = 700;
+  const padding = 80;
+  
+  // Calculer les échelles avec marges
+  const maxJPEGY = Math.max(...filteredMetrics.map(m => m.jpegy), 5);
+  const minJPEGY = Math.min(...filteredMetrics.map(m => m.jpegy), 0);
+  const maxReturn = Math.max(...filteredMetrics.map(m => m.totalReturnPercent), 200);
+  const minReturn = Math.min(...filteredMetrics.map(m => m.totalReturnPercent), -50);
+  
   const xScale = (jpegy: number) => {
-    const maxJPEGY = Math.max(...filteredMetrics.map(m => m.jpegy), 5);
-    return padding + ((jpegy / maxJPEGY) * (chartWidth - 2 * padding));
+    const range = maxJPEGY - minJPEGY || 1;
+    return padding + ((jpegy - minJPEGY) / range) * (chartWidth - 2 * padding);
   };
+  
   const yScale = (returnPercent: number) => {
-    const minReturn = Math.min(...filteredMetrics.map(m => m.totalReturnPercent), -50);
-    const maxReturn = Math.max(...filteredMetrics.map(m => m.totalReturnPercent), 200);
-    const range = maxReturn - minReturn;
+    const range = maxReturn - minReturn || 1;
     return chartHeight - padding - (((returnPercent - minReturn) / range) * (chartHeight - 2 * padding));
   };
+  
+  // Générer les ticks pour les axes
+  const xTicks = [];
+  const xTickCount = 10;
+  for (let i = 0; i <= xTickCount; i++) {
+    const value = minJPEGY + (maxJPEGY - minJPEGY) * (i / xTickCount);
+    xTicks.push({ value, position: xScale(value) });
+  }
+  
+  const yTicks = [];
+  const yTickCount = 10;
+  for (let i = 0; i <= yTickCount; i++) {
+    const value = minReturn + (maxReturn - minReturn) * (i / yTickCount);
+    yTicks.push({ value, position: yScale(value) });
+  }
 
   // Vérifier si on a des profils
   if (profiles.length === 0) {
@@ -238,103 +303,238 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         </div>
       </div>
 
-      {/* Matrice à carreaux */}
-      <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-        <h3 className="text-lg font-bold mb-4">Matrice de Performance</h3>
-        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-          {filteredMetrics.map((metric) => (
-            <div
-              key={metric.profile.id}
-              onClick={() => onSelect(metric.profile.id)}
-              className={`aspect-square rounded-lg p-2 cursor-pointer transition-all hover:scale-110 border-2 ${
-                currentId === metric.profile.id ? 'border-blue-600 ring-2 ring-blue-300' : 'border-gray-200'
-              }`}
-              style={{
-                backgroundColor: getReturnColor(metric.totalReturnPercent),
-                opacity: 0.8
-              }}
-              title={`${metric.profile.id}: ${metric.totalReturnPercent.toFixed(1)}% | JPEGY: ${metric.jpegy.toFixed(2)}`}
-            >
-              <div className="flex flex-col items-center justify-center h-full text-white text-xs font-bold">
-                <div className="text-[10px] mb-1">{metric.profile.id}</div>
-                <div className="text-[8px]">{metric.totalReturnPercent.toFixed(0)}%</div>
-                {metric.hasApprovedVersion && (
-                  <CheckCircleIcon className="w-3 h-3 mt-1" />
-                )}
-              </div>
+      {/* Matrice à carreaux Améliorée */}
+      <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
+          <div className="flex items-center gap-4 text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded bg-green-600"></div>
+              <span className="text-gray-600">≥50%</span>
             </div>
-          ))}
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded bg-green-300"></div>
+              <span className="text-gray-600">20-50%</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded bg-yellow-400"></div>
+              <span className="text-gray-600">0-20%</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded bg-red-600"></div>
+              <span className="text-gray-600">&lt;0%</span>
+            </div>
+          </div>
         </div>
+        {filteredMetrics.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Aucun titre ne correspond aux filtres sélectionnés.
+          </div>
+        ) : (
+          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+            {filteredMetrics.map((metric) => (
+              <div
+                key={metric.profile.id}
+                onClick={() => onSelect(metric.profile.id)}
+                className={`p-3 rounded-lg cursor-pointer transition-all hover:scale-110 hover:shadow-xl border-2 ${
+                  currentId === metric.profile.id ? 'border-blue-600 ring-4 ring-blue-300 shadow-xl' : 'border-gray-200'
+                }`}
+                style={{
+                  backgroundColor: getReturnColor(metric.totalReturnPercent),
+                  opacity: currentId === metric.profile.id ? 1 : 0.85
+                }}
+                title={`${metric.profile.info.name || metric.profile.id}
+Rendement: ${metric.totalReturnPercent.toFixed(1)}%
+JPEGY: ${metric.jpegy.toFixed(2)}
+Ratio 3:1: ${metric.ratio31.toFixed(2)}
+P/E: ${metric.currentPE?.toFixed(1) || 'N/A'}x
+Secteur: ${metric.profile.info.sector}`}
+              >
+                <div className="flex flex-col items-center justify-center h-full text-white">
+                  <div className="text-xs font-bold mb-1">{metric.profile.id}</div>
+                  <div className="text-[10px] font-semibold mb-1">{metric.totalReturnPercent.toFixed(0)}%</div>
+                  <div className="text-[8px] opacity-90">JPEGY: {metric.jpegy.toFixed(1)}</div>
+                  {metric.hasApprovedVersion && (
+                    <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Graphique X/Y */}
-      <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-        <h3 className="text-lg font-bold mb-4">Positionnement JPEGY vs Rendement</h3>
-        <div className="overflow-x-auto">
-          <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded">
-            {/* Axes */}
-            <line
-              x1={padding}
-              y1={chartHeight - padding}
-              x2={chartWidth - padding}
-              y2={chartHeight - padding}
-              stroke="#333"
-              strokeWidth="2"
-            />
-            <line
-              x1={padding}
-              y1={padding}
-              x2={padding}
-              y2={chartHeight - padding}
-              stroke="#333"
-              strokeWidth="2"
-            />
-            
-            {/* Labels */}
-            <text x={chartWidth / 2} y={chartHeight - 10} textAnchor="middle" className="text-xs font-semibold">
-              JPEGY
-            </text>
-            <text
-              x={20}
-              y={chartHeight / 2}
-              textAnchor="middle"
-              transform={`rotate(-90, 20, ${chartHeight / 2})`}
-              className="text-xs font-semibold"
-            >
-              Rendement Total (%)
-            </text>
-
-            {/* Points */}
-            {filteredMetrics.map((metric) => {
-              const x = xScale(metric.jpegy);
-              const y = yScale(metric.totalReturnPercent);
-              return (
-                <g key={metric.profile.id}>
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r={currentId === metric.profile.id ? 8 : 6}
-                    fill={getJpegyColor(metric.jpegy)}
-                    stroke={currentId === metric.profile.id ? '#2563eb' : '#fff'}
-                    strokeWidth={currentId === metric.profile.id ? 2 : 1}
-                    className="cursor-pointer hover:r-8"
-                    onClick={() => onSelect(metric.profile.id)}
-                  />
-                  {currentId === metric.profile.id && (
-                    <text
-                      x={x}
-                      y={y - 15}
-                      textAnchor="middle"
-                      className="text-xs font-bold fill-blue-600"
-                    >
-                      {metric.profile.id}
-                    </text>
-                  )}
-                </g>
-              );
-            })}
-          </svg>
+      {/* Graphique X/Y Amélioré */}
+      <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-gray-800">📊 Positionnement JPEGY vs Rendement Total</h3>
+          <div className="text-xs text-gray-500">
+            {filteredMetrics.length} titre(s) affiché(s)
+          </div>
         </div>
+        {filteredMetrics.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Aucun titre à afficher sur le graphique.
+          </div>
+        ) : (
+          <div className="overflow-x-auto bg-gray-50 p-4 rounded-lg">
+            <svg width={chartWidth} height={chartHeight} className="border border-gray-300 rounded bg-white">
+              {/* Grille de fond */}
+              {xTicks.map((tick, i) => (
+                <line
+                  key={`x-grid-${i}`}
+                  x1={tick.position}
+                  y1={padding}
+                  x2={tick.position}
+                  y2={chartHeight - padding}
+                  stroke="#e5e7eb"
+                  strokeWidth="1"
+                  strokeDasharray="2,2"
+                />
+              ))}
+              {yTicks.map((tick, i) => (
+                <line
+                  key={`y-grid-${i}`}
+                  x1={padding}
+                  y1={tick.position}
+                  x2={chartWidth - padding}
+                  y2={tick.position}
+                  stroke="#e5e7eb"
+                  strokeWidth="1"
+                  strokeDasharray="2,2"
+                />
+              ))}
+              
+              {/* Axes */}
+              <line
+                x1={padding}
+                y1={chartHeight - padding}
+                x2={chartWidth - padding}
+                y2={chartHeight - padding}
+                stroke="#1f2937"
+                strokeWidth="2"
+              />
+              <line
+                x1={padding}
+                y1={padding}
+                x2={padding}
+                y2={chartHeight - padding}
+                stroke="#1f2937"
+                strokeWidth="2"
+              />
+            
+              {/* Ticks et Labels sur l'axe X */}
+              {xTicks.map((tick, i) => (
+                <g key={`x-tick-${i}`}>
+                  <line
+                    x1={tick.position}
+                    y1={chartHeight - padding}
+                    x2={tick.position}
+                    y2={chartHeight - padding + 5}
+                    stroke="#1f2937"
+                    strokeWidth="1.5"
+                  />
+                  <text
+                    x={tick.position}
+                    y={chartHeight - padding + 20}
+                    textAnchor="middle"
+                    className="text-xs font-medium fill-gray-700"
+                  >
+                    {tick.value.toFixed(1)}
+                  </text>
+                </g>
+              ))}
+              
+              {/* Ticks et Labels sur l'axe Y */}
+              {yTicks.map((tick, i) => (
+                <g key={`y-tick-${i}`}>
+                  <line
+                    x1={padding}
+                    y1={tick.position}
+                    x2={padding - 5}
+                    y2={tick.position}
+                    stroke="#1f2937"
+                    strokeWidth="1.5"
+                  />
+                  <text
+                    x={padding - 10}
+                    y={tick.position + 4}
+                    textAnchor="end"
+                    className="text-xs font-medium fill-gray-700"
+                  >
+                    {tick.value.toFixed(0)}%
+                  </text>
+                </g>
+              ))}
+            
+              {/* Labels des axes */}
+              <text 
+                x={chartWidth / 2} 
+                y={chartHeight - 15} 
+                textAnchor="middle" 
+                className="text-sm font-bold fill-gray-800"
+              >
+                JPEGY (P/E ajusté pour croissance et rendement)
+              </text>
+              <text
+                x={25}
+                y={chartHeight / 2}
+                textAnchor="middle"
+                transform={`rotate(-90, 25, ${chartHeight / 2})`}
+                className="text-sm font-bold fill-gray-800"
+              >
+                Rendement Total Projeté (5 ans, %)
+              </text>
+              
+              {/* Légende JPEGY */}
+              <g transform={`translate(${chartWidth - 200}, ${padding + 20})`}>
+                <text x={0} y={0} className="text-xs font-semibold fill-gray-700">Légende JPEGY:</text>
+                {[
+                  { label: 'Excellent (≤0.5)', color: '#86efac' },
+                  { label: 'Bon (0.5-1.5)', color: '#16a34a' },
+                  { label: 'Moyen (1.5-1.75)', color: '#eab308' },
+                  { label: 'Faible (1.75-2.0)', color: '#f97316' },
+                  { label: 'Mauvais (>2.0)', color: '#dc2626' }
+                ].map((item, idx) => (
+                  <g key={idx} transform={`translate(0, ${(idx + 1) * 18})`}>
+                    <circle cx={8} cy={0} r={6} fill={item.color} />
+                    <text x={20} y={4} className="text-[10px] fill-gray-600">{item.label}</text>
+                  </g>
+                ))}
+              </g>
+
+              {/* Points */}
+              {filteredMetrics.map((metric) => {
+                const x = xScale(metric.jpegy);
+                const y = yScale(metric.totalReturnPercent);
+                return (
+                  <g key={metric.profile.id}>
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r={currentId === metric.profile.id ? 8 : 6}
+                      fill={getJpegyColor(metric.jpegy)}
+                      stroke={currentId === metric.profile.id ? '#2563eb' : '#fff'}
+                      strokeWidth={currentId === metric.profile.id ? 2 : 1}
+                      className="cursor-pointer hover:r-8"
+                      onClick={() => onSelect(metric.profile.id)}
+                    />
+                    {currentId === metric.profile.id && (
+                      <text
+                        x={x}
+                        y={y - 15}
+                        textAnchor="middle"
+                        className="text-xs font-bold fill-blue-600"
+                      >
+                        {metric.profile.id}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* 5 Autres Idées de Visualisation */}
@@ -475,9 +675,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         </div>
       )}
 
-      {/* Tableau détaillé */}
-      <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-        <h3 className="text-lg font-bold mb-4">Tableau de Performance</h3>
+      {/* Tableau détaillé Amélioré */}
+      <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-gray-800">📋 Tableau de Performance Détaillé</h3>
+          <div className="text-xs text-gray-500">
+            {filteredMetrics.length} titre(s)
+          </div>
+        </div>
         {filteredMetrics.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             Aucun titre ne correspond aux filtres sélectionnés.
@@ -485,19 +690,22 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-100">
+              <thead className="bg-gradient-to-r from-slate-100 to-slate-50 sticky top-0">
                 <tr>
-                  <th className="p-2 text-left">Ticker</th>
-                  <th className="p-2 text-right">JPEGY</th>
-                  <th className="p-2 text-right">Rendement Total</th>
-                  <th className="p-2 text-right">Ratio 3:1</th>
-                  <th className="p-2 text-right">Potentiel Hausse</th>
-                  <th className="p-2 text-right">Risque Baisse</th>
-                  <th className="p-2 text-center">Approuvé</th>
-                  <th className="p-2 text-center">Recommandation</th>
+                  <th className="p-3 text-left font-bold text-gray-700 border-b border-gray-300">Ticker</th>
+                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="P/E ajusté pour croissance et rendement">JPEGY</th>
+                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Rendement total projeté sur 5 ans">Rendement</th>
+                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Ratio potentiel de hausse vs risque de baisse">Ratio 3:1</th>
+                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Potentiel de hausse en %">Hausse</th>
+                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Risque de baisse en %">Baisse</th>
+                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Ratio cours/bénéfice actuel">P/E</th>
+                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Rendement du dividende">Yield</th>
+                  <th className="p-3 text-right font-bold text-gray-700 border-b border-gray-300" title="Croissance historique des EPS">Croissance</th>
+                  <th className="p-3 text-center font-bold text-gray-700 border-b border-gray-300">Approuvé</th>
+                  <th className="p-3 text-center font-bold text-gray-700 border-b border-gray-300">Signal</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-gray-100">
                 {filteredMetrics.map((metric) => (
                 <tr
                   key={metric.profile.id}
