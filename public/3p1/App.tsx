@@ -1337,6 +1337,8 @@ export default function App() {
                                         data={data}
                                         assumptions={assumptions}
                                         onUpdateAssumption={handleUpdateAssumption}
+                                        info={info}
+                                        sector={info.sector}
                                     />
 
                                     {/* Historical Ranges Table - Aide pour les hypothèses */}
