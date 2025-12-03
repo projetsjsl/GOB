@@ -1,0 +1,42 @@
+{
+  "name": "GOB Terminal Financier - JLab",
+  "short_name": "JLab",
+  "description": "Dashboard financier propulsé par JSL AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1e293b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/jlab.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/jlab.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/jlab.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "business", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Accéder au dashboard principal",
+      "url": "/beta-combined-dashboard.html",
+      "icons": [{ "src": "/jlab.png", "sizes": "192x192" }]
+    }
+  ]
+}
+
