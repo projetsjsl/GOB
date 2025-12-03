@@ -22,6 +22,22 @@ vercel env ls
 
 ---
 
+## 🔁 Salon ChatGPT de groupe (VITE_GROUP_CHAT_URL)
+
+**Pourquoi** : Alimente l’onglet « Group Chat » du dashboard avec le lien/token partagé sans jamais le commiter dans le code.
+
+**Ajouter dans Vercel (Dashboard ou CLI)** :
+
+```bash
+vercel env add VITE_GROUP_CHAT_URL
+# Value: https://chatgpt.com/gg/abcdef?token=partage-123
+# Scope: Production, Preview, Development
+```
+
+> Après l’ajout, relancez un déploiement pour que le tableau de bord charge automatiquement l’URL par défaut.
+
+---
+
 ## 🔑 CLÉS API REQUISES (CRITIQUES)
 
 ### 1️⃣ PERPLEXITY_API_KEY (⚠️ MANQUANTE - CRITIQUE)
