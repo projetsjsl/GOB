@@ -886,11 +886,42 @@ Secteur: ${metric.profile.info.sector}`}
           </div>
         </div>
 
-        {/* Idée 3: Distribution des Risques Amélioré */}
+        {/* Idée 3: Distribution des Risques Amélioré avec Graphique */}
         <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4">⚠️ Distribution des Risques de Baisse</h3>
           <div className="text-xs text-gray-500 mb-3">
-            Classification par niveau de risque
+            Classification par niveau de risque avec visualisation
+          </div>
+          <div className="mb-4">
+            <div className="flex items-end justify-between gap-3 h-24 border-b border-l border-gray-300 pb-2 pl-2 bg-gray-50 p-2 rounded">
+              {['Faible', 'Modéré', 'Élevé'].map((level, idx) => {
+                const ranges = [[0, 20], [20, 50], [50, 100]];
+                const count = filteredMetrics.filter(m => 
+                  m.downsideRisk >= ranges[idx][0] && m.downsideRisk < ranges[idx][1]
+                ).length;
+                const maxCount = Math.max(...['Faible', 'Modéré', 'Élevé'].map((_, i) => {
+                  const r = [[0, 20], [20, 50], [50, 100]];
+                  return filteredMetrics.filter(m => 
+                    m.downsideRisk >= r[i][0] && m.downsideRisk < r[i][1]
+                  ).length;
+                }), 1);
+                return (
+                  <div key={level} className="flex-1 flex flex-col items-center">
+                    <div
+                      className="w-full rounded-t cursor-pointer hover:opacity-80 transition-opacity"
+                      style={{
+                        height: `${(count / maxCount) * 100}%`,
+                        backgroundColor: idx === 0 ? '#86efac' : idx === 1 ? '#eab308' : '#dc2626',
+                        minHeight: '10px'
+                      }}
+                      title={`${level}: ${count} titre(s)`}
+                    />
+                    <span className="text-[9px] text-gray-600 mt-1 text-center">{level}</span>
+                    <span className="text-xs font-bold text-gray-800">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <div className="space-y-2">
             {['Faible', 'Modéré', 'Élevé'].map((level, idx) => {
@@ -898,13 +929,26 @@ Secteur: ${metric.profile.info.sector}`}
               const count = filteredMetrics.filter(m => 
                 m.downsideRisk >= ranges[idx][0] && m.downsideRisk < ranges[idx][1]
               ).length;
+              const titles = filteredMetrics
+                .filter(m => m.downsideRisk >= ranges[idx][0] && m.downsideRisk < ranges[idx][1])
+                .map(m => m.profile.id)
+                .slice(0, 5);
               return (
-                <div key={level} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-sm font-medium">{level}</span>
+                <div key={level} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">{level}</span>
+                    {titles.length > 0 && (
+                      <span className="text-xs text-gray-500">
+                        ({titles.join(', ')}{titles.length < count ? ` +${count - titles.length}` : ''})
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     <div className="w-32 h-4 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-red-500"
+                        className={`h-full ${
+                          idx === 0 ? 'bg-green-400' : idx === 1 ? 'bg-yellow-400' : 'bg-red-500'
+                        }`}
                         style={{ width: `${(count / filteredMetrics.length) * 100}%` }}
                       />
                     </div>
