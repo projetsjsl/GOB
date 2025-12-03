@@ -109,8 +109,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="jlab.png">
+  <!-- Favicon JLab -->
+  <link rel="icon" type="image/png" href="/jlab.png">
+  <link rel="apple-touch-icon" href="/jlab.png">
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#1e293b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- Iconoir Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
@@ -669,11 +675,8 @@
         return;
       }
 
-      // Démarrer le préchargement en arrière-plan
-      // Ne pas attendre - laisser tourner en parallèle pendant que l'utilisateur saisit ses identifiants
-      preloadDashboardData().catch(err => {
-        console.warn('⚠️ Préchargement échoué (non bloquant):', err);
-      });
+      // Le préchargement est maintenant géré par dashboard-preloader.js
+      // qui s'initialise automatiquement et précharge les données en arrière-plan
     });
 
     // Détection Caps Lock

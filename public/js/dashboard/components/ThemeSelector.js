@@ -45,12 +45,17 @@ const ThemeSelector = ({ isDarkMode = true }) => {
             document.addEventListener('mousedown', handleClickOutside);
             // Empêcher le scroll du body quand la modal est ouverte
             document.body.style.overflow = 'hidden';
+            // Notifier que le modal est ouvert
+            window.dispatchEvent(new CustomEvent('themeSelectorOpen'));
         } else {
             document.body.style.overflow = '';
+            // Notifier que le modal est fermé
+            window.dispatchEvent(new CustomEvent('themeSelectorClose'));
         }
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
             document.body.style.overflow = '';
+            window.dispatchEvent(new CustomEvent('themeSelectorClose'));
         };
     }, [isOpen]);
 
@@ -695,7 +700,12 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                 <div
                     className="fixed inset-0 flex items-center justify-center p-4 backdrop-blur-xl animate-fadeIn theme-selector-modal"
                     style={{ 
-                        zIndex: 9999,
+                        zIndex: 10000,
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
                         background: `
                             radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
                             radial-gradient(ellipse at 80% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
@@ -730,7 +740,8 @@ const ThemeSelector = ({ isDarkMode = true }) => {
                                 : 'bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200/20'
                         }`}
                         style={{
-                            zIndex: 10000,
+                            zIndex: 10001,
+                            position: 'relative',
                             boxShadow: `
                                 0 30px 100px rgba(0, 0, 0, 0.7),
                                 0 0 0 1px rgba(255, 255, 255, 0.08),

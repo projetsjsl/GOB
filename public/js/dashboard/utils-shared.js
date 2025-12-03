@@ -74,6 +74,100 @@
         return `${Math.floor(hours / 24)}j`;
     };
 
+    /**
+     * Convertir une date/heure en heure de Montréal (Eastern Time)
+     * Format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures"
+     */
+    const formatTimeMontreal = (dateOrTimeString) => {
+        let date;
+        
+        // Si c'est une string de temps existante, essayer de la parser
+        if (typeof dateOrTimeString === 'string') {
+            // Si c'est déjà formaté "Aujourd'hui, HH:MM AM/PM", parser l'heure
+            const todayMatch = dateOrTimeString.match(/Aujourd'hui[,\s]+(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+            if (todayMatch) {
+                const now = new Date();
+                let hours = parseInt(todayMatch[1]);
+                const minutes = parseInt(todayMatch[2]);
+                const ampm = todayMatch[3].toUpperCase();
+                
+                if (ampm === 'PM' && hours !== 12) hours += 12;
+                if (ampm === 'AM' && hours === 12) hours = 0;
+                
+                date = new Date(now);
+                date.setHours(hours, minutes, 0, 0);
+            } else if (dateOrTimeString.match(/Il y a (\d+)\s*heures?/i)) {
+                // "Il y a X heures" - calculer depuis maintenant
+                const hoursAgoMatch = dateOrTimeString.match(/Il y a (\d+)\s*heures?/i);
+                const hoursAgo = parseInt(hoursAgoMatch[1]);
+                date = new Date();
+                date.setHours(date.getHours() - hoursAgo);
+            } else {
+                // Sinon, essayer de parser comme date ISO
+                date = new Date(dateOrTimeString);
+            }
+        } else if (dateOrTimeString instanceof Date) {
+            date = dateOrTimeString;
+        } else {
+            date = new Date();
+        }
+        
+        // Vérifier si la date est valide
+        if (isNaN(date.getTime())) {
+            return 'Aujourd\'hui';
+        }
+        
+        // Obtenir l'heure actuelle en heure de Montréal
+        const nowMontreal = new Date();
+        const nowMontrealStr = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'America/Montreal',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).format(nowMontreal);
+        
+        // Convertir la date en heure de Montréal
+        const montrealFormatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/Montreal',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        
+        const montrealParts = montrealFormatter.formatToParts(date);
+        const montrealDateStr = `${montrealParts.find(p => p.type === 'year').value}-${montrealParts.find(p => p.type === 'month').value}-${montrealParts.find(p => p.type === 'day').value}`;
+        
+        // Vérifier si c'est aujourd'hui
+        const isToday = montrealDateStr === nowMontrealStr.replace(/\//g, '-');
+        
+        if (isToday) {
+            // Formater en "Aujourd'hui, HH:MM AM/PM" en heure de Montréal
+            const hours = parseInt(montrealParts.find(p => p.type === 'hour').value);
+            const minutes = parseInt(montrealParts.find(p => p.type === 'minute').value);
+            const ampm = montrealParts.find(p => p.type === 'dayPeriod').value;
+            const displayHours = hours % 12 || 12;
+            const displayMinutes = minutes.toString().padStart(2, '0');
+            
+            return `Aujourd'hui, ${displayHours}:${displayMinutes} ${ampm.toUpperCase()}`;
+        } else {
+            // Calculer la différence en heures (en utilisant les timestamps UTC)
+            const diffMs = nowMontreal.getTime() - date.getTime();
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            
+            if (diffHours < 1) {
+                return 'À l\'instant';
+            } else if (diffHours < 24) {
+                return `Il y a ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+            } else {
+                const diffDays = Math.floor(diffHours / 24);
+                return `Il y a ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+            }
+        }
+    };
+
     const renderMarketBadge = (type, isDarkMode = true) => {
         const isBull = type === 'bull';
         const classes = isBull
@@ -179,6 +273,7 @@
     window.DASHBOARD_UTILS.getCredibilityTier = getCredibilityTier;
     window.DASHBOARD_UTILS.getSourceCredibility = getSourceCredibility;
     window.DASHBOARD_UTILS.formatTimeAgo = formatTimeAgo;
+    window.DASHBOARD_UTILS.formatTimeMontreal = formatTimeMontreal;
     window.DASHBOARD_UTILS.renderMarketBadge = renderMarketBadge;
     window.DASHBOARD_UTILS.cleanText = cleanText;
     window.DASHBOARD_UTILS.getNewsIcon = getNewsIcon;

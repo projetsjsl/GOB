@@ -9,14 +9,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSL AI</title>
     <!-- Version: 2.1.0 - JLab V2 with Synchronized Widgets - 2025-10-25 -->
-    <!-- Favicon JSLAI -->
-    <link rel="icon" type="image/png" href="jlab.png">
-    <link rel="apple-touch-icon" href="jlab.png">
+    <!-- Favicon JLab -->
+    <link rel="icon" type="image/png" href="/jlab.png">
+    <link rel="apple-touch-icon" href="/jlab.png">
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1e293b" />
     <!-- Cache bust: 2025-10-15 21:00 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=Georgia:wght@400;700&display=swap"
         rel="stylesheet">
     <!-- Avenir Pro 85 Heavy alternative: Montserrat Heavy (900) ou Avenir Next si disponible -->
     <style>
@@ -109,6 +111,12 @@
     <script type="text/babel" src="js/dashboard/components/tabs/FinVoxTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/EmmAIATab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/FastGraphsTab.js"></script>
+    <!-- GroupChat Tab (JSLAI RobotWeb Ultimate v5.0) -->
+    <script type="text/babel" src="js/dashboard/components/tabs/GroupChatTab.js"></script>
+    <!-- AdminJSLai Tab -->
+    <script type="text/babel" src="js/dashboard/components/tabs/AdminJSLaiTab.js"></script>
+    <!-- PlusTab Component -->
+    <script type="text/babel" src="js/dashboard/components/tabs/PlusTab.js"></script>
 
     <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
@@ -128,6 +136,8 @@
 
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <!-- Roles & Permissions System -->
+    <script src="/js/roles-permissions.js"></script>
 
     <!-- Script pour exposer les bibliothèques globalement -->
     <script>
@@ -722,8 +732,8 @@
     <script src="/js/auth-guard.js"></script>
 </head>
 
-<body class="min-h-screen">
-    <div id="root"></div>
+<body class="min-h-screen" style="margin: 0; padding: 0; min-height: 100vh; background-color: #000000;">
+    <div id="root" style="min-height: 100vh; width: 100%;"></div>
 
     <!-- Stock Analysis Components (fixed API routing) -->
     <script src="/js/dashboard/stockAnalysisAPI-FIXED.js"></script>
@@ -747,6 +757,10 @@
     <!-- Main Tabs Components -->
     <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script>
     <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script>
+
+    <!-- Announcement Bars System (Gemini-powered) -->
+    <script type="text/babel" src="/js/dashboard/components/AnnouncementBar.js"></script>
+    <script type="text/babel" src="/js/dashboard/components/AnnouncementBarManager.js"></script>
 
     <!-- Inline (legacy) bundle to preserve existing design -->
     <script type="text/babel" data-presets="react" src="/js/dashboard/app-inline.js"></script>
