@@ -1711,7 +1711,16 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                     currentId === metric.profile.id ? 'bg-blue-100' : ''
                   }`}
                 >
-                  <td className="p-2 font-bold">{metric.profile.id}</td>
+                  <td className="p-2 font-bold">
+                    <div className="flex items-center gap-2">
+                      <span>{metric.profile.id}</span>
+                      {(metric.profile.isWatchlist ?? false) ? (
+                        <EyeIcon className="w-4 h-4 text-blue-500" title="Watchlist" />
+                      ) : (
+                        <StarIcon className="w-4 h-4 text-yellow-500" title="Portefeuille" />
+                      )}
+                    </div>
+                  </td>
                   <td className="p-2 text-right">
                     <span
                       className="inline-block w-4 h-4 rounded-full mr-2"
