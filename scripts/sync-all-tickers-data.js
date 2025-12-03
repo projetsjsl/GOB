@@ -1,28 +1,36 @@
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.local' });
+
 const API_BASE_URL = process.env.VERCEL_URL 
     ? `https://${process.env.VERCEL_URL}` 
     : 'https://gobapps.com';
 
+// Configuration Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+    console.error('❌ SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY doivent être définis');
+    process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 async function getAllTickers() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/admin/tickers?is_active=true&limit=1000`);
+        const { data, error } = await supabase
+            .from('tickers')
+            .select('ticker, company_name, sector, country, exchange')
+            .eq('is_active', true)
+            .limit(1000);
         
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status} ${response.statusText}`);
+        if (error) {
+            throw new Error(`Supabase error: ${error.message}`);
         }
         
-        const result = await response.json();
-        
-        if (!result.success) {
-            throw new Error(result.error || 'Erreur lors du chargement des tickers');
-        }
-        
-        return (result.tickers || []).map(t => ({
-            ticker: t.ticker,
-            company_name: t.company_name,
-            sector: t.sector,
-            country: t.country,
-            exchange: t.exchange
-        }));
+        return data || [];
     } catch (error) {
         throw new Error(`Erreur récupération tickers: ${error.message}`);
     }
@@ -50,26 +58,25 @@ async function syncTickerData(ticker) {
             };
         }
         
-        // Mettre à jour le ticker dans Supabase via API
+        // Mettre à jour le ticker dans Supabase directement
         try {
-            const updateResponse = await fetch(`${API_BASE_URL}/api/admin/tickers`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ticker: ticker.ticker,
-                    company_name: data.info?.name || ticker.company_name,
-                    sector: data.info?.sector || ticker.sector,
-                    country: data.info?.country || ticker.country,
-                    exchange: data.info?.exchange || ticker.exchange,
-                    currency: data.info?.currency || 'USD'
-                })
-            });
+            const updateData = {
+                updated_at: new Date().toISOString()
+            };
             
-            if (!updateResponse.ok) {
-                // Ne pas échouer si la mise à jour échoue, on a quand même les données
-                console.warn(`⚠️  Impossible de mettre à jour ${ticker.ticker} dans Supabase`);
+            if (data.info?.name) updateData.company_name = data.info.name;
+            if (data.info?.sector) updateData.sector = data.info.sector;
+            if (data.info?.country) updateData.country = data.info.country;
+            if (data.info?.exchange) updateData.exchange = data.info.exchange;
+            if (data.info?.currency) updateData.currency = data.info.currency;
+            
+            const { error: updateError } = await supabase
+                .from('tickers')
+                .update(updateData)
+                .eq('ticker', ticker.ticker);
+            
+            if (updateError) {
+                console.warn(`⚠️  Impossible de mettre à jour ${ticker.ticker} dans Supabase: ${updateError.message}`);
             }
         } catch (updateError) {
             // Ne pas échouer si la mise à jour échoue
