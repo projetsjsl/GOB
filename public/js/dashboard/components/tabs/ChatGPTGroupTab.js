@@ -94,6 +94,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
     const [settings, setSettings] = useState(defaultSettings);
     const [copied, setCopied] = useState(false);
     const [iframeError, setIframeError] = useState(null);
+    const [cspBlocked, setCspBlocked] = useState(false);
     const [accessSafety, setAccessSafety] = useState('needs-token');
     const [sessionOrigin, setSessionOrigin] = useState('non configuré');
     
@@ -316,28 +317,64 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                             }, hasEnvChatUrl
                                 ? 'URL par défaut chargée depuis .env/Vercel'
                                 : 'Ajoutez VITE_GROUP_CHAT_URL dans .env ou Vercel'),
-                            iframeError ? (
-                                React.createElement('span', { className: 'text-red-300' }, iframeError)
-                            ) : (
-                                React.createElement('span', { className: 'text-green-300' }, 'Connexion prête')
-                            )
+                            React.createElement('span', { 
+                                className: 'px-3 py-1 rounded-full bg-blue-900/60 text-blue-100 text-xs border border-blue-700/50' 
+                            }, '💡 Ouvrir dans un nouvel onglet (CSP bloque iframe)')
                         )
                     ),
-                    // Iframe de prévisualisation
+                    // Zone de prévisualisation (iframe remplacé par bouton d'ouverture)
+                    // ⚠️ NOTE: ChatGPT bloque les iframes via CSP (Content Security Policy)
+                    // Solution: Afficher un bouton d'ouverture au lieu d'un iframe
                     React.createElement('div', { 
-                        className: 'aspect-video rounded-lg overflow-hidden border bg-black relative z-10',
-                        style: { borderColor: isDarkMode ? '#374151' : '#d1d5db' }
+                        className: 'aspect-video rounded-lg overflow-hidden border bg-gradient-to-br from-gray-900 via-gray-800 to-black relative z-10 flex items-center justify-center',
+                        style: { borderColor: isDarkMode ? '#374151' : '#d1d5db', minHeight: '400px' }
                     },
                         settings.sessionUrl ? (
-                            React.createElement('iframe', {
-                                src: settings.sessionUrl,
-                                title: 'Session de clavardage ChatGPT',
-                                className: 'w-full h-full',
-                                allow: 'clipboard-read; clipboard-write; fullscreen; accelerometer; camera; microphone',
-                                referrerPolicy: 'no-referrer',
-                                sandbox: 'allow-same-origin allow-scripts allow-popups allow-forms allow-downloads',
-                                onError: () => setIframeError('La prévisualisation est bloquée. Ouvrez dans un nouvel onglet si nécessaire.')
-                            })
+                            // ChatGPT bloque les iframes - Afficher un bouton d'ouverture
+                            React.createElement('div', { 
+                                className: 'absolute inset-0 flex flex-col items-center justify-center text-center p-8 space-y-6' 
+                            },
+                                React.createElement('div', { className: 'space-y-4' },
+                                    // Icône ou illustration
+                                    React.createElement('div', { className: 'text-6xl mb-4' }, '💬'),
+                                    React.createElement('h3', { className: `text-2xl font-bold ${themeStyles.text} mb-2` }, settings.roomName),
+                                    React.createElement('p', { className: `${themeStyles.textSecondary} text-sm mb-6` }, 
+                                        'ChatGPT bloque l\'intégration en iframe pour des raisons de sécurité.'
+                                    ),
+                                    React.createElement('p', { className: `${themeStyles.textMuted} text-xs mb-8` },
+                                        'Utilisez le bouton ci-dessous pour ouvrir le salon dans un nouvel onglet.'
+                                    ),
+                                    // Bouton principal d'ouverture
+                                    React.createElement('button', {
+                                        onClick: handleOpenChat,
+                                        className: `px-8 py-4 rounded-xl shadow-2xl shadow-blue-500/30 text-lg font-semibold transition-all duration-200 transform hover:scale-105 ${
+                                            settings.sessionUrl
+                                                ? `${themeStyles.buttonPrimary} text-white`
+                                                : `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
+                                        }`
+                                    }, 
+                                        React.createElement('span', { className: 'mr-2' }, '🚀'),
+                                        'Ouvrir le salon ChatGPT'
+                                    ),
+                                    // Bouton secondaire pour copier le lien
+                                    React.createElement('button', {
+                                        onClick: handleCopyLink,
+                                        className: `px-6 py-3 rounded-lg border transition-colors ${
+                                            settings.sessionUrl
+                                                ? `${themeStyles.buttonSecondary} text-white`
+                                                : `${themeStyles.surface} ${themeStyles.border} ${themeStyles.textMuted} cursor-not-allowed`
+                                        }`
+                                    }, copied ? '✅ Lien copié' : '📋 Copier le lien')
+                                ),
+                                // Badge d'information CSP
+                                React.createElement('div', { 
+                                    className: `mt-6 px-4 py-2 rounded-lg ${themeStyles.surface} border ${themeStyles.border} text-xs ${themeStyles.textMuted}` 
+                                },
+                                    React.createElement('p', {}, 'ℹ️ '),
+                                    React.createElement('p', {}, 'ChatGPT utilise une politique de sécurité (CSP) qui bloque les iframes.'),
+                                    React.createElement('p', {}, 'C\'est une mesure de sécurité normale pour protéger les utilisateurs.')
+                                )
+                            )
                         ) : (
                             React.createElement('div', { 
                                 className: 'absolute inset-0 flex items-center justify-center text-center p-6' 
@@ -354,16 +391,6 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                                 )
                             )
                         ),
-                        iframeError && settings.sessionUrl && (
-                            React.createElement('div', { 
-                                className: 'absolute inset-0 flex items-center justify-center bg-black/80 text-center p-4' 
-                            },
-                                React.createElement('div', {},
-                                    React.createElement('p', { className: `font-semibold ${themeStyles.text}` }, 'Prévisualisation indisponible'),
-                                    React.createElement('p', { className: `${themeStyles.textSecondary} text-sm mt-1` }, 'Le domaine externe peut bloquer l\'iframe. Utilisez le bouton ci-dessus pour ouvrir le salon.')
-                                )
-                            )
-                        )
                     )
                 ),
 
