@@ -978,6 +978,314 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                 )
             )
         )
+        ) : (
+            // ============================================
+            // MODE INTÉGRÉ (Chat Intégré avec Historique)
+            // ============================================
+            React.createElement(React.Fragment, {},
+                // Header avec titre et actions
+                React.createElement('div', { 
+                    className: `flex items-center justify-between flex-wrap gap-3 ${themeStyles.bg} p-4 rounded-xl border ${themeStyles.border}`
+                },
+                    React.createElement('div', { className: 'space-y-1' },
+                        React.createElement('p', { 
+                            className: 'text-xs text-green-200 uppercase tracking-[0.2em]' 
+                        }, 'Chat intégré avec historique'),
+                        React.createElement('h2', { 
+                            className: 'text-3xl font-bold flex items-center gap-2' 
+                        },
+                            integratedRoom ? integratedRoom.roomName : settings.roomName,
+                            React.createElement('span', { 
+                                className: 'inline-flex items-center gap-1 text-sm px-3 py-1 rounded-full bg-green-900 text-green-100 border border-green-500/50' 
+                            }, 'Live')
+                        ),
+                        React.createElement('p', { 
+                            className: `${themeStyles.textSecondary} mt-1 max-w-3xl` 
+                        }, 'Chat intégré avec historique complet, contexte partagé et visibilité en temps réel pour tous les utilisateurs.')
+                    ),
+                    integratedRoom && (
+                        React.createElement('div', { className: 'flex items-center gap-3' },
+                            React.createElement('div', { 
+                                className: `px-4 py-2 rounded-lg ${themeStyles.surface} border ${themeStyles.border}` 
+                            },
+                                React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Code du salon'),
+                                React.createElement('p', { className: `text-lg font-mono font-bold ${themeStyles.text}` }, integratedRoom.roomCode)
+                            ),
+                            React.createElement('button', {
+                                onClick: () => {
+                                    navigator.clipboard.writeText(integratedRoom.roomCode);
+                                    setCopied(true);
+                                    setTimeout(() => setCopied(false), 2000);
+                                },
+                                className: `px-4 py-2 rounded-lg border transition-colors ${themeStyles.buttonSecondary} text-white`
+                            }, copied ? 'Code copié ✅' : '📋 Copier le code')
+                        )
+                    )
+                ),
+
+                // Zone de chat intégré
+                React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-3 gap-6' },
+                    // Colonne principale: Chat (2/3)
+                    React.createElement('div', { className: 'lg:col-span-2 space-y-4' },
+                        // Zone de messages
+                        React.createElement('div', { 
+                            className: `rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow`,
+                            style: { height: '600px', display: 'flex', flexDirection: 'column' }
+                        },
+                            // Header du chat
+                            React.createElement('div', { 
+                                className: `p-4 border-b ${themeStyles.border} flex items-center justify-between` 
+                            },
+                                React.createElement('div', {},
+                                    React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 
+                                        integratedRoom ? integratedRoom.roomName : 'Salon de chat'
+                                    ),
+                                    React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 
+                                        `${integratedParticipants.length} participant${integratedParticipants.length > 1 ? 's' : ''} en ligne`
+                                    )
+                                ),
+                                integratedRoom && integratedParticipants.length > 0 && (
+                                    React.createElement('div', { className: 'flex items-center gap-2' },
+                                        integratedParticipants.map((p, idx) => 
+                                            React.createElement('span', { 
+                                                key: idx,
+                                                className: 'text-2xl',
+                                                title: `${p.user_display_name} (en ligne)`
+                                            }, p.user_icon || '🧠')
+                                        )
+                                    )
+                                )
+                            ),
+
+                            // Zone de messages scrollable
+                            React.createElement('div', { 
+                                className: 'flex-1 overflow-y-auto p-4 space-y-4',
+                                style: { maxHeight: '500px' }
+                            },
+                                isLoadingMessages ? (
+                                    React.createElement('div', { className: 'flex items-center justify-center h-full' },
+                                        React.createElement('div', { className: 'text-center' },
+                                            React.createElement('div', { className: 'inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mb-4' }),
+                                            React.createElement('p', { className: `${themeStyles.textSecondary}` }, 'Chargement des messages...')
+                                        )
+                                    )
+                                ) : integratedRoom ? (
+                                    integratedMessages.length > 0 ? (
+                                        integratedMessages.map((msg, idx) => 
+                                            React.createElement('div', {
+                                                key: msg.id || idx,
+                                                className: `flex items-start gap-3 p-3 rounded-lg ${
+                                                    msg.role === 'user' 
+                                                        ? `${themeStyles.surface}` 
+                                                        : msg.role === 'assistant'
+                                                            ? 'bg-green-900/20 border border-green-700/30'
+                                                            : 'bg-gray-800/50'
+                                                }`
+                                            },
+                                                React.createElement('div', { className: 'text-2xl flex-shrink-0' }, 
+                                                    msg.user_icon || (msg.role === 'assistant' ? '🤖' : '🧠')
+                                                ),
+                                                React.createElement('div', { className: 'flex-1 min-w-0' },
+                                                    React.createElement('div', { className: 'flex items-center gap-2 mb-1' },
+                                                        React.createElement('span', { className: `font-semibold ${themeStyles.text}` }, 
+                                                            msg.user_display_name || (msg.role === 'assistant' ? 'ChatGPT' : 'Utilisateur')
+                                                        ),
+                                                        React.createElement('span', { className: `text-xs ${themeStyles.textMuted}` }, 
+                                                            new Date(msg.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                                                        )
+                                                    ),
+                                                    React.createElement('p', { className: `${themeStyles.textSecondary} whitespace-pre-wrap break-words` }, 
+                                                        msg.content
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ) : (
+                                        React.createElement('div', { className: 'flex items-center justify-center h-full text-center p-8' },
+                                            React.createElement('div', {},
+                                                React.createElement('p', { className: `text-4xl mb-4` }, '💬'),
+                                                React.createElement('p', { className: `${themeStyles.textSecondary}` }, 'Aucun message pour le moment'),
+                                                React.createElement('p', { className: `text-sm ${themeStyles.textMuted} mt-2` }, 'Envoyez le premier message pour commencer la conversation')
+                                            )
+                                        )
+                                    )
+                                ) : (
+                                    React.createElement('div', { className: 'flex items-center justify-center h-full text-center p-8' },
+                                        React.createElement('div', {},
+                                            React.createElement('p', { className: `text-4xl mb-4` }, '🚀'),
+                                            React.createElement('p', { className: `${themeStyles.textSecondary} mb-4` }, 'Créer un nouveau salon de chat intégré'),
+                                            React.createElement('button', {
+                                                onClick: handleCreateIntegratedRoom,
+                                                disabled: isLoadingMessages,
+                                                className: `px-6 py-3 rounded-lg shadow-lg ${themeStyles.buttonPrimary} text-white font-semibold`
+                                            }, isLoadingMessages ? 'Création...' : 'Créer le salon')
+                                        )
+                                    )
+                                )
+                            ),
+
+                            // Zone de saisie
+                            integratedRoom && (
+                                React.createElement('div', { 
+                                    className: `p-4 border-t ${themeStyles.border} flex items-center gap-3` 
+                                },
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        value: newMessage,
+                                        onChange: (e) => setNewMessage(e.target.value),
+                                        onKeyPress: (e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSendIntegratedMessage();
+                                            }
+                                        },
+                                        placeholder: 'Tapez votre message...',
+                                        disabled: isSendingMessage,
+                                        className: `flex-1 px-4 py-2 rounded-lg ${themeStyles.input} focus:border-green-400 ${themeStyles.text}`,
+                                        style: { outline: 'none' }
+                                    }),
+                                    React.createElement('button', {
+                                        onClick: handleSendIntegratedMessage,
+                                        disabled: !newMessage.trim() || isSendingMessage,
+                                        className: `px-6 py-2 rounded-lg shadow-lg transition-all ${
+                                            newMessage.trim() && !isSendingMessage
+                                                ? `${themeStyles.buttonPrimary} text-white`
+                                                : `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
+                                        }`
+                                    }, isSendingMessage ? '⏳' : '📤 Envoyer')
+                                )
+                            )
+                        )
+                    ),
+
+                    // Colonne latérale: Configuration et Participants (1/3)
+                    React.createElement('div', { className: 'space-y-4' },
+                        // Participants en ligne
+                        integratedRoom && (
+                            React.createElement('div', { 
+                                className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow` 
+                            },
+                                React.createElement('p', { className: 'text-xs uppercase text-green-200 tracking-wide mb-3' }, 'Participants'),
+                                React.createElement('div', { className: 'space-y-2' },
+                                    integratedParticipants.length > 0 ? (
+                                        integratedParticipants.map((p, idx) => 
+                                            React.createElement('div', {
+                                                key: idx,
+                                                className: `flex items-center gap-3 p-2 rounded-lg ${themeStyles.bg}`
+                                            },
+                                                React.createElement('span', { className: 'text-2xl' }, p.user_icon || '🧠'),
+                                                React.createElement('div', { className: 'flex-1' },
+                                                    React.createElement('p', { className: `${themeStyles.text} font-medium` }, p.user_display_name),
+                                                    React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 
+                                                        'En ligne'
+                                                    )
+                                                ),
+                                                React.createElement('div', { 
+                                                    className: 'w-2 h-2 rounded-full bg-green-500'
+                                                })
+                                            )
+                                        )
+                                    ) : (
+                                        React.createElement('p', { className: `${themeStyles.textSecondary} text-sm` }, 'Aucun participant en ligne')
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Configuration (même que mode partagé mais adapté)
+                        React.createElement('div', { 
+                            className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow space-y-4` 
+                        },
+                            React.createElement('div', { className: 'flex items-center justify-between' },
+                                React.createElement('div', {},
+                                    React.createElement('p', { className: 'text-xs uppercase text-green-200 tracking-wide' }, 'Configuration'),
+                                    React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Paramètres du salon')
+                                )
+                            ),
+
+                            // Formulaire de configuration (simplifié pour mode intégré)
+                            React.createElement('div', { className: 'space-y-4' },
+                                React.createElement('label', { className: 'space-y-1' },
+                                    React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Nom du salon'),
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        className: `w-full px-3 py-2 rounded-lg ${themeStyles.input} focus:border-green-400 ${themeStyles.text}`,
+                                        value: settings.roomName,
+                                        onChange: (e) => handleChange('roomName', e.target.value),
+                                        disabled: !!integratedRoom
+                                    })
+                                ),
+
+                                React.createElement('label', { className: 'space-y-1' },
+                                    React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Système (prompt)'),
+                                    React.createElement('textarea', {
+                                        className: `w-full px-3 py-2 rounded-lg ${themeStyles.input} focus:border-green-400 ${themeStyles.text}`,
+                                        rows: 3,
+                                        value: settings.systemPrompt,
+                                        onChange: (e) => handleChange('systemPrompt', e.target.value),
+                                        disabled: !!integratedRoom
+                                    })
+                                ),
+
+                                React.createElement('label', { className: 'space-y-1' },
+                                    React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Température (0-1)'),
+                                    React.createElement('input', {
+                                        type: 'number',
+                                        step: '0.05',
+                                        min: 0,
+                                        max: 1,
+                                        className: `w-full px-3 py-2 rounded-lg ${themeStyles.input} focus:border-green-400 ${themeStyles.text}`,
+                                        value: settings.temperature,
+                                        onChange: (e) => handleChange('temperature', formatTemperature(Number(e.target.value))),
+                                        disabled: !!integratedRoom
+                                    })
+                                ),
+
+                                integratedRoom && (
+                                    React.createElement('div', { className: `p-3 rounded-lg bg-blue-900/20 border border-blue-700/30` },
+                                        React.createElement('p', { className: `text-xs ${themeStyles.textMuted} mb-2` }, 'ℹ️ Information'),
+                                        React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 
+                                            'Les paramètres ne peuvent être modifiés qu\'à la création du salon. Créez un nouveau salon pour changer ces paramètres.'
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Statut du salon
+                        integratedRoom && (
+                            React.createElement('div', { 
+                                className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow space-y-3` 
+                            },
+                                React.createElement('div', { className: 'flex items-center justify-between' },
+                                    React.createElement('div', {},
+                                        React.createElement('p', { className: 'text-xs uppercase text-green-200 tracking-wide' }, 'Statut'),
+                                        React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Salon actif')
+                                    ),
+                                    React.createElement('span', { 
+                                        className: 'px-3 py-1 rounded-full bg-green-900 text-green-200 text-xs' 
+                                    }, 'Live')
+                                ),
+                                React.createElement('div', { className: `space-y-2 text-sm ${themeStyles.textSecondary}` },
+                                    React.createElement('div', { className: 'flex items-center justify-between' },
+                                        React.createElement('span', {}, 'Messages'),
+                                        React.createElement('strong', { className: themeStyles.text }, `${integratedMessages.length}`)
+                                    ),
+                                    React.createElement('div', { className: 'flex items-center justify-between' },
+                                        React.createElement('span', {}, 'Participants'),
+                                        React.createElement('strong', { className: themeStyles.text }, `${integratedParticipants.length}`)
+                                    ),
+                                    React.createElement('div', { className: 'flex items-center justify-between' },
+                                        React.createElement('span', {}, 'Code'),
+                                        React.createElement('strong', { className: `font-mono ${themeStyles.text}` }, integratedRoom.roomCode)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
     );
 };
 
