@@ -50,7 +50,6 @@ const AdminJSLaiTab = ({
                     }
                 });
                 const [showSettings, setShowSettings] = React.useState(false);
-                const [loadingCacheStatus, setLoadingCacheStatus] = React.useState(false);
                 const [systemLogs] = React.useState([]);
                 const [isProfessionalMode, setIsProfessionalMode] = React.useState(() => {
                     try {
