@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { StarIcon, EyeIcon } from '@heroicons/react/24/solid';
 import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
@@ -188,7 +189,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     minJPEGY: 0,
     maxJPEGY: 10,
     sector: '',
-    recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
+    recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL',
+    source: 'all' as 'all' | 'portfolio' | 'watchlist' // Nouveau filtre pour portefeuille/watchlist
   }));
 
   // Mettre à jour les filtres quand defaultFilterValues change (nouveaux profils chargés)
@@ -931,8 +933,15 @@ ${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}`}
                     }}
                     title={`${metric.profile.id}: ${metric.totalReturnPercent.toFixed(1)}%`}
                   >
-                    <div className="flex flex-col items-center text-white text-[9px]">
-                      <div className="font-bold">{metric.profile.id}</div>
+                    <div className="flex flex-col items-center text-white text-[9px] relative">
+                      <div className="flex items-center gap-0.5">
+                        <div className="font-bold">{metric.profile.id}</div>
+                        {(metric.profile.isWatchlist ?? false) ? (
+                          <EyeIcon className="w-2.5 h-2.5 text-blue-300" title="Watchlist" />
+                        ) : (
+                          <StarIcon className="w-2.5 h-2.5 text-yellow-400" title="Portefeuille" />
+                        )}
+                      </div>
                       <div className="text-[8px]">{metric.totalReturnPercent.toFixed(0)}%</div>
                     </div>
                   </div>
