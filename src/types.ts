@@ -59,6 +59,8 @@ export type TabName =
   | 'stocks-news'
   | 'admin-jslai'
   | 'plus'
+  | 'robotweb'
+  | 'group-chat'
   | 'watchlist'
   | 'scrapping-sa'
   | 'seeking-alpha'
