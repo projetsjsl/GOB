@@ -24,6 +24,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     key: string;
     direction: 'asc' | 'desc';
   }>({ key: 'totalReturnPercent', direction: 'desc' });
+  
+  const [comparisonMode, setComparisonMode] = useState(false);
+  const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
 
   // Calculer les métriques pour chaque profil
   const profileMetrics = useMemo(() => {
