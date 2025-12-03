@@ -596,7 +596,11 @@ Secteur: ${metric.profile.info.sector}`}
             })()}
           </div>
           <div className="mt-2 text-xs text-gray-500 text-center">
-            {filteredMetrics.length} titre(s) | Range: {Math.min(...filteredMetrics.map(m => m.totalReturnPercent)).toFixed(0)}% à {Math.max(...filteredMetrics.map(m => m.totalReturnPercent)).toFixed(0)}%
+            {filteredMetrics.length} titre(s) | Range: {
+              filteredMetrics.length > 0 
+                ? `${Math.min(...filteredMetrics.map(m => m.totalReturnPercent)).toFixed(0)}% à ${Math.max(...filteredMetrics.map(m => m.totalReturnPercent)).toFixed(0)}%`
+                : 'N/A'
+            }
           </div>
         </div>
       )}
