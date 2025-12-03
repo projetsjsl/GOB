@@ -330,7 +330,7 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                         className="text-sm font-semibold"
                                         style={{ color: '#10b981', minWidth: '110px', flexShrink: 0 }}
                                     >
-                                        {item.time}
+                                        {item.source || item.source_provider || item.source_original || 'Source'}
                                     </span>
                                     <span
                                         className="text-base font-medium"
@@ -391,7 +391,7 @@ const NewsTicker = ({ isDarkMode = true }) => {
                                             className="text-sm font-semibold"
                                             style={{ color: '#10b981', minWidth: '110px', flexShrink: 0 }}
                                         >
-                                            {item.time}
+                                            {item.source || item.source_provider || item.source_original || 'Source'}
                                         </span>
                                         <span
                                             className="text-base font-medium"
