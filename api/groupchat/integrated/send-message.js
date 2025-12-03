@@ -23,7 +23,9 @@ export default async function handler(req, res) {
             userId,
             userDisplayName,
             userIcon = '🧠',
-            message
+            message,
+            skipAssistant = false, // Ne pas appeler le LLM automatiquement
+            forceAssistant = false // Forcer l'appel du LLM (pour appel manuel)
         } = req.body;
 
         // Validation
@@ -93,11 +95,14 @@ export default async function handler(req, res) {
             });
 
         // Appeler l'API OpenAI pour obtenir la réponse
+        // ⚠️ LOGIQUE: Ne pas appeler si skipAssistant=true, OU forcer si forceAssistant=true
         const openaiApiKey = process.env.OPENAI_API_KEY;
         let assistantMessage = null;
         let assistantMessageId = null;
 
-        if (openaiApiKey) {
+        const shouldCallAssistant = !skipAssistant || forceAssistant;
+
+        if (openaiApiKey && shouldCallAssistant) {
             try {
                 // Récupérer les derniers messages pour le contexte
                 const { data: recentMessages, error: historyError } = await supabase
@@ -175,12 +180,36 @@ export default async function handler(req, res) {
                         }
                     }
                 } else {
-                    console.warn('Erreur API OpenAI:', await openaiResponse.text());
+                    const errorText = await openaiResponse.text();
+                    console.warn('Erreur API OpenAI:', errorText);
+                    // Si c'est un appel forcé, retourner l'erreur
+                    if (forceAssistant) {
+                        return res.status(500).json({
+                            success: false,
+                            error: 'Erreur génération réponse ChatGPT',
+                            details: errorText
+                        });
+                    }
                 }
             } catch (openaiError) {
                 console.error('Erreur appel OpenAI:', openaiError);
-                // Ne pas échouer si OpenAI échoue, on retourne quand même le message utilisateur
+                // Si c'est un appel forcé, retourner l'erreur
+                if (forceAssistant) {
+                    return res.status(500).json({
+                        success: false,
+                        error: 'Erreur appel OpenAI',
+                        details: openaiError.message
+                    });
+                }
+                // Sinon, ne pas échouer - on retourne quand même le message utilisateur
             }
+        } else if (forceAssistant && !openaiApiKey) {
+            // Si on force l'appel mais qu'il n'y a pas de clé API
+            return res.status(503).json({
+                success: false,
+                error: 'OPENAI_API_KEY non configurée',
+                note: 'Configurez OPENAI_API_KEY dans Vercel pour utiliser le chat intégré'
+            });
         }
 
         return res.status(200).json({

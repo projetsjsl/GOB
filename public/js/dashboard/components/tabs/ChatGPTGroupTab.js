@@ -117,6 +117,19 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
     const [newMessage, setNewMessage] = useState('');
     const [pollingInterval, setPollingInterval] = useState(null);
     
+    // Contrôle des interventions LLM
+    const [llmAutoReply, setLlmAutoReply] = useState(() => {
+        try {
+            const saved = localStorage.getItem('gob-llm-auto-reply');
+            return saved === 'true';
+        } catch {
+            return false; // Par défaut: désactivé pour éviter de "pourrir" la conversation
+        }
+    });
+    const [llmReplyOnMention, setLlmReplyOnMention] = useState(true); // Répondre si @chatgpt ou @assistant
+    const [llmReplyOnQuestion, setLlmReplyOnQuestion] = useState(false); // Répondre automatiquement aux questions
+    const [isCallingLlm, setIsCallingLlm] = useState(false);
+    
     const hasEnvChatUrl = Boolean(envChatUrl);
     const isUsingEnvDefault = Boolean(envChatUrl) && settings.sessionUrl === envChatUrl;
 
@@ -328,8 +341,33 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
         setPollingInterval(interval);
     };
 
-    const handleSendIntegratedMessage = async () => {
+    // Détecter si le message contient une mention ou une question
+    const shouldCallLlm = (message) => {
+        const msg = message.toLowerCase().trim();
+        
+        // Mention explicite (@chatgpt, @assistant, etc.)
+        if (llmReplyOnMention && (msg.includes('@chatgpt') || msg.includes('@assistant') || msg.includes('@ai'))) {
+            return true;
+        }
+        
+        // Question (se termine par ?)
+        if (llmReplyOnQuestion && msg.endsWith('?')) {
+            return true;
+        }
+        
+        // Auto-reply activé
+        if (llmAutoReply) {
+            return true;
+        }
+        
+        return false;
+    };
+
+    const handleSendIntegratedMessage = async (skipAssistant = false) => {
         if (!newMessage.trim() || !integratedRoom || isSendingMessage) return;
+
+        const messageText = newMessage.trim();
+        const shouldCallAssistant = !skipAssistant && shouldCallLlm(messageText);
 
         try {
             setIsSendingMessage(true);
@@ -341,14 +379,15 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                     userId: settings.userAlias || 'user',
                     userDisplayName: settings.userAlias || settings.adminDisplayName,
                     userIcon: settings.userIcon,
-                    message: newMessage.trim()
+                    message: messageText,
+                    skipAssistant: skipAssistant || !shouldCallAssistant // Ne pas appeler le LLM si skipAssistant ou si conditions non remplies
                 })
             });
 
             const data = await response.json();
             if (data.success) {
                 setNewMessage('');
-                // Recharger les messages pour avoir la réponse de l'assistant
+                // Recharger les messages pour avoir la réponse de l'assistant (si appelé)
                 await loadIntegratedMessages(integratedRoom.id);
             } else {
                 alert('Erreur envoi message: ' + (data.error || 'Erreur inconnue'));
@@ -358,6 +397,52 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
             alert('Erreur envoi message: ' + error.message);
         } finally {
             setIsSendingMessage(false);
+        }
+    };
+
+    // Appeler le LLM manuellement sur le dernier message
+    const handleCallLlmManually = async () => {
+        if (!integratedRoom || isCallingLlm) return;
+
+        try {
+            setIsCallingLlm(true);
+            
+            // Récupérer le dernier message utilisateur
+            const lastUserMessage = [...integratedMessages]
+                .reverse()
+                .find(msg => msg.role === 'user');
+            
+            if (!lastUserMessage) {
+                alert('Aucun message utilisateur récent pour appeler le LLM');
+                return;
+            }
+
+            // Appeler l'API pour générer une réponse
+            const response = await fetch('/api/groupchat/integrated/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    roomId: integratedRoom.id,
+                    userId: 'assistant',
+                    userDisplayName: 'ChatGPT',
+                    userIcon: '🤖',
+                    message: lastUserMessage.content,
+                    forceAssistant: true // Forcer la génération d'une réponse
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                // Recharger les messages pour voir la réponse
+                await loadIntegratedMessages(integratedRoom.id);
+            } else {
+                alert('Erreur appel LLM: ' + (data.error || 'Erreur inconnue'));
+            }
+        } catch (error) {
+            console.error('Erreur appel LLM manuel:', error);
+            alert('Erreur appel LLM: ' + error.message);
+        } finally {
+            setIsCallingLlm(false);
         }
     };
 
@@ -1124,35 +1209,89 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                                 )
                             ),
 
-                            // Zone de saisie
+                            // Zone de saisie avec contrôle LLM
                             integratedRoom && (
                                 React.createElement('div', { 
-                                    className: `p-4 border-t ${themeStyles.border} flex items-center gap-3` 
+                                    className: `p-4 border-t ${themeStyles.border}` 
                                 },
-                                    React.createElement('input', {
-                                        type: 'text',
-                                        value: newMessage,
-                                        onChange: (e) => setNewMessage(e.target.value),
-                                        onKeyPress: (e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                e.preventDefault();
-                                                handleSendIntegratedMessage();
-                                            }
-                                        },
-                                        placeholder: 'Tapez votre message...',
-                                        disabled: isSendingMessage,
-                                        className: `flex-1 px-4 py-2 rounded-lg ${themeStyles.input} focus:border-green-400 ${themeStyles.text}`,
-                                        style: { outline: 'none' }
-                                    }),
-                                    React.createElement('button', {
-                                        onClick: handleSendIntegratedMessage,
-                                        disabled: !newMessage.trim() || isSendingMessage,
-                                        className: `px-6 py-2 rounded-lg shadow-lg transition-all ${
-                                            newMessage.trim() && !isSendingMessage
-                                                ? `${themeStyles.buttonPrimary} text-white`
-                                                : `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
-                                        }`
-                                    }, isSendingMessage ? '⏳' : '📤 Envoyer')
+                                    // Indicateur de mode LLM
+                                    React.createElement('div', { 
+                                        className: 'mb-2 flex items-center justify-between text-xs' 
+                                    },
+                                        React.createElement('div', { className: 'flex items-center gap-2' },
+                                            shouldCallLlm(newMessage) ? (
+                                                React.createElement(React.Fragment, {},
+                                                    React.createElement('span', { className: 'text-green-400' }, '🤖 LLM répondra'),
+                                                    React.createElement('span', { className: `${themeStyles.textMuted}` }, 
+                                                        llmAutoReply ? '(auto)' : 
+                                                        llmReplyOnMention && newMessage.toLowerCase().includes('@') ? '(mention)' :
+                                                        llmReplyOnQuestion && newMessage.endsWith('?') ? '(question)' : ''
+                                                    )
+                                                )
+                                            ) : (
+                                                React.createElement('span', { className: `${themeStyles.textMuted}` }, '💬 Message uniquement (pas de LLM)')
+                                            )
+                                        ),
+                                        React.createElement('button', {
+                                            onClick: () => {
+                                                const lastUserMsg = [...integratedMessages].reverse().find(m => m.role === 'user');
+                                                if (lastUserMsg) {
+                                                    handleCallLlmManually();
+                                                } else {
+                                                    alert('Aucun message utilisateur récent');
+                                                }
+                                            },
+                                            disabled: isCallingLlm || integratedMessages.filter(m => m.role === 'user').length === 0,
+                                            className: `px-3 py-1 rounded text-xs transition-all ${
+                                                isCallingLlm || integratedMessages.filter(m => m.role === 'user').length === 0
+                                                    ? `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
+                                                    : 'bg-blue-900/30 text-blue-200 hover:bg-blue-900/50 border border-blue-700/30'
+                                            }`,
+                                            title: 'Appeler le LLM sur le dernier message'
+                                        }, isCallingLlm ? '⏳ Appel...' : '🤖 Appeler LLM')
+                                    ),
+                                    React.createElement('div', { className: 'flex items-center gap-3' },
+                                        React.createElement('input', {
+                                            type: 'text',
+                                            value: newMessage,
+                                            onChange: (e) => setNewMessage(e.target.value),
+                                            onKeyPress: (e) => {
+                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                    e.preventDefault();
+                                                    handleSendIntegratedMessage(false); // Utiliser la logique automatique
+                                                }
+                                            },
+                                            placeholder: shouldCallLlm(newMessage) 
+                                                ? 'Tapez votre message (LLM répondra)...' 
+                                                : 'Tapez votre message...',
+                                            disabled: isSendingMessage,
+                                            className: `flex-1 px-4 py-2 rounded-lg ${themeStyles.input} focus:border-green-400 ${themeStyles.text}`,
+                                            style: { outline: 'none' }
+                                        }),
+                                        // Bouton envoyer SANS LLM
+                                        React.createElement('button', {
+                                            onClick: () => handleSendIntegratedMessage(true), // skipAssistant = true
+                                            disabled: !newMessage.trim() || isSendingMessage,
+                                            className: `px-3 py-2 rounded-lg transition-all text-xs ${
+                                                newMessage.trim() && !isSendingMessage
+                                                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600 border border-gray-600'
+                                                    : `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
+                                            }`,
+                                            title: 'Envoyer sans appeler le LLM'
+                                        }, '💬'),
+                                        // Bouton envoyer AVEC LLM (si conditions remplies)
+                                        React.createElement('button', {
+                                            onClick: () => handleSendIntegratedMessage(false), // Utiliser la logique automatique
+                                            disabled: !newMessage.trim() || isSendingMessage,
+                                            className: `px-4 py-2 rounded-lg shadow-lg transition-all ${
+                                                newMessage.trim() && !isSendingMessage
+                                                    ? shouldCallLlm(newMessage)
+                                                        ? `${themeStyles.buttonPrimary} text-white`
+                                                        : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                                                    : `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
+                                            }`
+                                        }, isSendingMessage ? '⏳' : shouldCallLlm(newMessage) ? '📤 Envoyer' : '📤')
+                                    )
                                 )
                             )
                         )
@@ -1187,6 +1326,94 @@ const ChatGPTGroupTab = ({ isDarkMode = true }) => {
                                         )
                                     ) : (
                                         React.createElement('p', { className: `${themeStyles.textSecondary} text-sm` }, 'Aucun participant en ligne')
+                                    )
+                                )
+                            )
+                        ),
+
+                        // Contrôle des interventions LLM
+                        integratedRoom && (
+                            React.createElement('div', { 
+                                className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow space-y-4` 
+                            },
+                                React.createElement('div', { className: 'flex items-center justify-between' },
+                                    React.createElement('div', {},
+                                        React.createElement('p', { className: 'text-xs uppercase text-purple-200 tracking-wide' }, 'Contrôle LLM'),
+                                        React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Interventions ChatGPT')
+                                    )
+                                ),
+                                React.createElement('div', { className: 'space-y-3' },
+                                    React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 
+                                        'Contrôlez quand ChatGPT répond pour éviter de "pourrir" la conversation tout en bénéficiant de sa valeur ajoutée.'
+                                    ),
+                                    // Auto-reply
+                                    React.createElement('label', { className: 'flex items-center justify-between cursor-pointer' },
+                                        React.createElement('div', { className: 'flex-1' },
+                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Réponse automatique'),
+                                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 
+                                                'ChatGPT répond à chaque message (peut être envahissant)'
+                                            )
+                                        ),
+                                        React.createElement('button', {
+                                            onClick: () => setLlmAutoReply(!llmAutoReply),
+                                            className: `relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                llmAutoReply ? 'bg-green-600' : 'bg-gray-600'
+                                            }`
+                                        },
+                                            React.createElement('span', {
+                                                className: `inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                    llmAutoReply ? 'translate-x-6' : 'translate-x-1'
+                                                }`
+                                            })
+                                        )
+                                    ),
+                                    // Répondre aux mentions
+                                    React.createElement('label', { className: 'flex items-center justify-between cursor-pointer' },
+                                        React.createElement('div', { className: 'flex-1' },
+                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Répondre aux mentions'),
+                                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 
+                                                'Répondre si @chatgpt, @assistant ou @ai dans le message'
+                                            )
+                                        ),
+                                        React.createElement('button', {
+                                            onClick: () => setLlmReplyOnMention(!llmReplyOnMention),
+                                            className: `relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                llmReplyOnMention ? 'bg-green-600' : 'bg-gray-600'
+                                            }`
+                                        },
+                                            React.createElement('span', {
+                                                className: `inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                    llmReplyOnMention ? 'translate-x-6' : 'translate-x-1'
+                                                }`
+                                            })
+                                        )
+                                    ),
+                                    // Répondre aux questions
+                                    React.createElement('label', { className: 'flex items-center justify-between cursor-pointer' },
+                                        React.createElement('div', { className: 'flex-1' },
+                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Répondre aux questions'),
+                                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 
+                                                'Répondre automatiquement si le message se termine par ?'
+                                            )
+                                        ),
+                                        React.createElement('button', {
+                                            onClick: () => setLlmReplyOnQuestion(!llmReplyOnQuestion),
+                                            className: `relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                llmReplyOnQuestion ? 'bg-green-600' : 'bg-gray-600'
+                                            }`
+                                        },
+                                            React.createElement('span', {
+                                                className: `inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                    llmReplyOnQuestion ? 'translate-x-6' : 'translate-x-1'
+                                                }`
+                                            })
+                                        )
+                                    ),
+                                    React.createElement('div', { className: `p-3 rounded-lg bg-blue-900/20 border border-blue-700/30 mt-3` },
+                                        React.createElement('p', { className: `text-xs ${themeStyles.textMuted} mb-1` }, '💡 Astuce'),
+                                        React.createElement('p', { className: `text-xs ${themeStyles.textSecondary}` }, 
+                                            'Utilisez le bouton "🤖 Appeler LLM" pour demander une réponse manuellement sur n\'importe quel message.'
+                                        )
                                     )
                                 )
                             )
