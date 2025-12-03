@@ -29,9 +29,6 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
 
   // Calculer les métriques pour chaque profil
-  // Utiliser une clé basée sur les profils pour forcer le recalcul
-  const profilesKey = profiles.map(p => `${p.id}-${p.lastModified}`).join('|');
-  
   const profileMetrics = useMemo(() => {
     return profiles.map(profile => {
       const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);
@@ -164,7 +161,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         volatility
       };
     });
-  }, [profiles]);
+  }, [profiles]); // Les dépendances sont correctes, React détectera les changements dans le tableau
 
   // Filtrer et trier les profils
   const filteredMetrics = useMemo(() => {
