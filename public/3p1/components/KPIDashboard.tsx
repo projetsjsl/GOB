@@ -4,6 +4,7 @@ import { AnalysisProfile } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
 import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon } from '@heroicons/react/24/outline';
+import { listSnapshots } from '../services/snapshotApi';
 
 interface KPIDashboardProps {
   profiles: AnalysisProfile[];
@@ -20,6 +21,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
   const [matrixView, setMatrixView] = useState<'grid' | 'list' | 'compact'>('grid');
+  const [approvedVersions, setApprovedVersions] = useState<Set<string>>(new Set());
 
   // Calculer les métriques pour chaque profil
   const profileMetrics = useMemo(() => {
@@ -96,8 +98,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       const upsidePotential = totalReturnPercent;
       const ratio31 = downsideRisk > 0 ? upsidePotential / downsideRisk : 0;
 
-      // Vérifier si version approuvée (simulé - à connecter avec la base de données)
-      const hasApprovedVersion = false; // TODO: Connecter avec l'API
+      // Vérifier si version approuvée (vérifié via useEffect)
+      const hasApprovedVersion = approvedVersions.has(profile.id);
       
       // Calculer des métriques supplémentaires
       const currentPE = basePE; // Réutiliser le P/E calculé plus haut
@@ -155,6 +157,49 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         volatility
       };
     });
+  }, [profiles, approvedVersions]);
+
+  // Charger les versions approuvées pour tous les profils (avec batch pour éviter trop de requêtes)
+  useEffect(() => {
+    const loadApprovedVersions = async () => {
+      const approvedSet = new Set<string>();
+      
+      // Traiter par batch de 10 pour éviter de surcharger l'API
+      const batchSize = 10;
+      for (let i = 0; i < profiles.length; i += batchSize) {
+        const batch = profiles.slice(i, i + batchSize);
+        
+        await Promise.all(
+          batch.map(async (profile) => {
+            try {
+              const result = await listSnapshots(profile.id, 50);
+              if (result.success && result.snapshots) {
+                const hasApproved = result.snapshots.some(
+                  (snapshot: any) => snapshot.is_approved === true
+                );
+                if (hasApproved) {
+                  approvedSet.add(profile.id);
+                }
+              }
+            } catch (error) {
+              // Erreur silencieuse pour ne pas polluer la console
+              // Les versions approuvées sont une fonctionnalité bonus
+            }
+          })
+        );
+        
+        // Petit délai entre les batches pour éviter de surcharger l'API
+        if (i + batchSize < profiles.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      
+      setApprovedVersions(approvedSet);
+    };
+
+    if (profiles.length > 0) {
+      loadApprovedVersions();
+    }
   }, [profiles]);
 
   // Calculer les valeurs min/max réelles pour définir des filtres par défaut qui incluent tout
