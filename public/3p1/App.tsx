@@ -445,9 +445,21 @@ export default function App() {
                 setData(result.data);
             }
 
-            // Update Info
+            // Update Info (including logo)
             if (result.info) {
                 setInfo(prev => ({ ...prev, ...result.info }));
+                // Also update in library to persist logo
+                setLibrary(prev => {
+                    const profile = prev[activeId];
+                    if (!profile) return prev;
+                    return {
+                        ...prev,
+                        [activeId]: {
+                            ...profile,
+                            info: { ...profile.info, ...result.info }
+                        }
+                    };
+                });
             }
 
             // Auto-fill assumptions based on historical data

@@ -69,13 +69,29 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-2">
         <div className="flex items-center gap-3">
           {/* Logo */}
-          {info.logo && (
+          {info.logo ? (
             <img 
               src={info.logo} 
               alt={info.name}
               className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200"
               onError={(e) => {
-                // Fallback si le logo ne charge pas
+                // Fallback vers logo FMP générique si le logo ne charge pas
+                const fallbackUrl = `https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png`;
+                if (e.currentTarget.src !== fallbackUrl) {
+                  e.currentTarget.src = fallbackUrl;
+                } else {
+                  // Si le fallback échoue aussi, masquer l'image
+                  e.currentTarget.style.display = 'none';
+                }
+              }}
+            />
+          ) : (
+            // Fallback si pas de logo dans les données
+            <img 
+              src={`https://financialmodelingprep.com/image-stock/${info.preferredSymbol || info.symbol}.png`}
+              alt={info.name}
+              className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200"
+              onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
             />

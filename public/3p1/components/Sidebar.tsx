@@ -148,13 +148,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)}`} title={`Signal: ${recommendation}`}></div>
 
                   {/* Logo */}
-                  {profile.info.logo && (
+                  {profile.info.logo ? (
                     <img 
                       src={profile.info.logo} 
                       alt={profile.info.name}
                       className="w-8 h-8 rounded object-cover flex-shrink-0"
                       onError={(e) => {
-                        // Fallback si le logo ne charge pas
+                        // Fallback vers logo FMP générique si le logo ne charge pas
+                        const fallbackUrl = `https://financialmodelingprep.com/image-stock/${profile.info.preferredSymbol || profile.id}.png`;
+                        if (e.currentTarget.src !== fallbackUrl) {
+                          e.currentTarget.src = fallbackUrl;
+                        } else {
+                          // Si le fallback échoue aussi, masquer l'image
+                          e.currentTarget.style.display = 'none';
+                        }
+                      }}
+                    />
+                  ) : (
+                    // Fallback si pas de logo dans les données
+                    <img 
+                      src={`https://financialmodelingprep.com/image-stock/${profile.info.preferredSymbol || profile.id}.png`}
+                      alt={profile.info.name}
+                      className="w-8 h-8 rounded object-cover flex-shrink-0"
+                      onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
                     />
