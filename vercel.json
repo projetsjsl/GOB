@@ -159,6 +159,11 @@
       "source": "/test",
       "destination": "/test-simple.html",
       "permanent": false
+    },
+    {
+      "source": "/REEE",
+      "destination": "https://jslai.app/rrq",
+      "permanent": false
     }
   ]
 }
