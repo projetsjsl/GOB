@@ -14,6 +14,8 @@
     <link rel="apple-touch-icon" href="/jlab.png">
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#1e293b" />
+    <!-- Variable d'environnement VITE_GROUP_CHAT_URL pour ChatGPTGroupTab -->
+    <meta name="vite-group-chat-url" content="" id="vite-group-chat-url-meta" />
     <!-- Cache bust: 2025-10-15 21:00 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -113,6 +115,8 @@
     <script type="text/babel" src="js/dashboard/components/tabs/FastGraphsTab.js"></script>
     <!-- GroupChat Tab (JSLAI RobotWeb Ultimate v5.0) -->
     <script type="text/babel" src="js/dashboard/components/tabs/GroupChatTab.js"></script>
+    <!-- ChatGPT Group Tab (ChatGPT Group Chat Integration) -->
+    <script type="text/babel" src="js/dashboard/components/tabs/ChatGPTGroupTab.js"></script>
     <!-- AdminJSLai Tab -->
     <script type="text/babel" src="js/dashboard/components/tabs/AdminJSLaiTab.js"></script>
     <!-- PlusTab Component -->
@@ -143,6 +147,33 @@
     <script>
         // Exposer Recharts globalement
         window.Recharts = window.Recharts || {};
+
+        // ============================================
+        // INJECTION VARIABLE D'ENVIRONNEMENT VITE_GROUP_CHAT_URL
+        // ============================================
+        // Pour Babel inline, on doit passer la variable via un script
+        // En production Vercel, cette variable sera injectée côté serveur
+        // En développement, elle peut être définie dans window.importMetaEnv
+        (function() {
+            // Essayer de récupérer depuis window.importMetaEnv (si défini par Vite)
+            const envChatUrl = (typeof window !== 'undefined' && window.importMetaEnv && window.importMetaEnv.VITE_GROUP_CHAT_URL)
+                ? window.importMetaEnv.VITE_GROUP_CHAT_URL
+                : '';
+            
+            // Injecter dans le meta tag pour que ChatGPTGroupTab.js puisse le lire
+            const metaTag = document.getElementById('vite-group-chat-url-meta');
+            if (metaTag && envChatUrl) {
+                metaTag.setAttribute('content', envChatUrl);
+            }
+            
+            // Exposer aussi via window pour accès direct
+            if (typeof window !== 'undefined') {
+                window.importMetaEnv = window.importMetaEnv || {};
+                if (envChatUrl) {
+                    window.importMetaEnv.VITE_GROUP_CHAT_URL = envChatUrl;
+                }
+            }
+        })();
 
         // Gestionnaire d'erreur global pour éviter que les erreurs de scripts externes cassent l'application
         window.addEventListener('error', function (event) {
