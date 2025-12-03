@@ -11,33 +11,14 @@ interface KPIDashboardProps {
 }
 
 export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect }) => {
-  // Calculer les valeurs min/max réelles pour définir des filtres par défaut qui incluent tout
-  const defaultFilterValues = useMemo(() => {
-    if (profileMetrics.length === 0) {
-      return {
-        minReturn: -100,
-        maxReturn: 500,
-        minJPEGY: 0,
-        maxJPEGY: 10,
-        sector: '',
-        recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
-      };
-    }
-    
-    const returns = profileMetrics.map(m => m.totalReturnPercent);
-    const jpegyValues = profileMetrics.map(m => m.jpegy);
-    
-    return {
-      minReturn: Math.floor(Math.min(...returns, -100)) - 10, // Marge de sécurité
-      maxReturn: Math.ceil(Math.max(...returns, 500)) + 10, // Marge de sécurité
-      minJPEGY: Math.max(0, Math.floor(Math.min(...jpegyValues, 0))),
-      maxJPEGY: Math.ceil(Math.max(...jpegyValues, 10)) + 2, // Marge de sécurité
-      sector: '',
-      recommendation: 'all' as 'all' | 'BUY' | 'HOLD' | 'SELL'
-    };
-  }, [profileMetrics]);
-
-  const [filters, setFilters] = useState(defaultFilterValues);
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: 'asc' | 'desc';
+  }>({ key: 'totalReturnPercent', direction: 'desc' });
+  
+  const [comparisonMode, setComparisonMode] = useState(false);
+  const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
+  const [matrixView, setMatrixView] = useState<'grid' | 'list' | 'compact'>('grid');
   
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -562,10 +543,23 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </button>
           </div>
         </div>
-        <div className="mb-2 text-xs text-gray-500">
-          {filteredMetrics.length} titre(s) affiché(s) sur {profileMetrics.length} total
+        <div className="mb-4 flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            <span className="font-bold text-blue-600">{filteredMetrics.length}</span> titre(s) affiché(s) sur{' '}
+            <span className="font-semibold">{profileMetrics.length}</span> total
+            {(filters.minReturn !== defaultFilterValues.minReturn || 
+              filters.maxReturn !== defaultFilterValues.maxReturn || 
+              filters.minJPEGY !== defaultFilterValues.minJPEGY || 
+              filters.maxJPEGY !== defaultFilterValues.maxJPEGY || 
+              filters.sector !== '' || 
+              filters.recommendation !== 'all') && (
+              <span className="ml-2 text-xs text-blue-600">({profileMetrics.length - filteredMetrics.length} masqué(s))</span>
+            )}
+          </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        
+        {/* Filtres avec indicateurs visuels */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Rendement Min (%)</label>
             <input
